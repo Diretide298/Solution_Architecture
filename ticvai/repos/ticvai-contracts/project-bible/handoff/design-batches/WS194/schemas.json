@@ -1,0 +1,564 @@
+{
+ "FiscalPeriod": {
+  "x-ticvai-persistence": "ledger.fiscal_period + ledger.fiscal_period_event",
+  "type": "object",
+  "description": "`startDate` and `endDate` are days in the region's time zone: a posting belongs to the period when its `postedAt`, in that zone, falls on or between them.\n",
+  "required": [
+   "id",
+   "legalEntityId",
+   "name",
+   "startDate",
+   "endDate",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "startDate": {
+    "type": "string",
+    "format": "date",
+    "description": "A day in the region's time zone, local midnight to local midnight."
+   },
+   "endDate": {
+    "type": "string",
+    "format": "date",
+    "description": "A day in the region's time zone, local midnight to local midnight."
+   },
+   "status": {
+    "$ref": "#/components/schemas/PeriodStatus"
+   },
+   "closedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The approval request a close or reopen is waiting on (`approvals`), routed to a finance approver (decided 28 September, audit R144). Null when nothing is waiting."
+   },
+   "events": {
+    "type": "array",
+    "description": "**Every step of the period's close, oldest first**: begin, abandon, close and reopen, each with who, when and (for abandon and reopen) why. A reopened period restates figures somebody has already reported, so the reason is kept, not just the latest status.\n",
+    "items": {
+     "$ref": "#/components/schemas/FiscalPeriodEvent"
+    }
+   }
+  }
+ },
+ "FiscalPeriodEvent": {
+  "type": "object",
+  "description": "One step in a fiscal period's close. Written by the operation that took the step; never edited.",
+  "required": [
+   "action",
+   "principalId",
+   "occurredAt"
+  ],
+  "properties": {
+   "action": {
+    "type": "string",
+    "enum": [
+     "beginClose",
+     "abandonClose",
+     "close",
+     "reopen"
+    ]
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Required by `abandonPeriodClose` and `reopenPeriod`; null for the other steps."
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Who took the step."
+   },
+   "approverPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The approver of a `reopen`. Null for the other steps."
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PeriodCloseResult": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "fiscalPeriodId",
+   "dryRun",
+   "passed",
+   "checks"
+  ],
+  "properties": {
+   "fiscalPeriodId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "dryRun": {
+    "type": "boolean"
+   },
+   "passed": {
+    "type": "boolean"
+   },
+   "checks": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "check",
+      "passed"
+     ],
+     "properties": {
+      "check": {
+       "type": "string",
+       "enum": [
+        "trialBalanceBalances",
+        "noUnapprovedJournals",
+        "noOpenShifts",
+        "settlementsReconciled",
+        "recognitionRunComplete",
+        "priorPeriodClosed",
+        "varianceExceptionsReviewed"
+       ]
+      },
+      "passed": {
+       "type": "boolean"
+      },
+      "detail": {
+       "type": "string"
+      },
+      "blockingCount": {
+       "type": "integer"
+      }
+     }
+    }
+   }
+  }
+ },
+ "PeriodStatus": {
+  "type": "string",
+  "enum": [
+   "open",
+   "closing",
+   "closed"
+  ]
+ },
+ "UnifiedReconciliation": {
+  "type": "object",
+  "description": "4.2.19. **Four sources and the variances between them.** A view showing each balanced against itself has not reconciled anything.\n",
+  "properties": {
+   "from": {
+    "type": "string",
+    "format": "date",
+    "description": "A day in the region's time zone, local midnight to local midnight."
+   },
+   "to": {
+    "type": "string",
+    "format": "date",
+    "description": "A day in the region's time zone, local midnight to local midnight."
+   },
+   "sources": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "source": {
+       "type": "string",
+       "enum": [
+        "pos",
+        "gateway",
+        "bank",
+        "wallet",
+        "ledger"
+       ]
+      },
+      "providerName": {
+       "type": "string",
+       "nullable": true
+      },
+      "total": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "transactionCount": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "variances": {
+    "type": "array",
+    "description": "**Where two sources disagree, named.** A discrepancy is usually the gap between two of them rather than inside one, and *\"out by 240\"* without saying between what is not actionable.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "between": {
+       "type": "array",
+       "description": "The two sources that disagree, as named in `sources[].source`.",
+       "minItems": 2,
+       "maxItems": 2,
+       "items": {
+        "type": "string",
+        "enum": [
+         "pos",
+         "gateway",
+         "bank",
+         "wallet",
+         "ledger"
+        ]
+       }
+      },
+      "amount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "likelyCause": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "Wallet": {
+  "x-ticvai-persistence": "wallet.wallet + wallet.credit_lot",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "balance",
+   "currency",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "balance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "credits": {
+    "type": "array",
+    "description": "4.3.5 and 4.3.19. **One balance and one bonus balance with one expiry could not express what the requirement asks for** — cash, bonus and redemption credit, each with its own expiry.\n**The expiries are the reason this is a list.** Cash a guest paid for should outlive a promotional credit they were given, and a single `expiresAt` either expires the money they paid or never expires the promotion.\n**Consumed first-expiry-first-out across all three** (4.3.19), which is also the order that is fairest to the guest — spend what is about to die before what is not.\n**One entry per `active` lot in `wallet.credit_lot`** for this wallet: `amount` is the lot's `remaining_amount`, `expiresAt` its `expires_at`, `sourceRef` its `source_reference`. `kind` and `isRefundable` are not stored on the lot; they come from the lot's credit type (`listCreditLots` returns the lots themselves).\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "amount"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "cash",
+        "bonus",
+        "redemption",
+        "refund",
+        "goodwill"
+       ],
+       "description": "**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability.\n",
+       "x-ticvai-persisted": false
+      },
+      "amount": {
+       "x-ticvai-column": "remaining_amount",
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "expiresAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "sourceRef": {
+       "type": "string",
+       "nullable": true,
+       "x-ticvai-column": "source_reference"
+      },
+      "isRefundable": {
+       "type": "boolean",
+       "default": false,
+       "x-ticvai-persisted": false,
+       "description": "**True only for `cash`.** A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice.\n"
+      }
+     }
+    }
+   },
+   "bonusBalance": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Promotional value. Typically non-refundable and spent first."
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "suspended",
+     "closed"
+    ]
+   },
+   "homeCellName": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where the authoritative balance lives. Present when the guest is linked across cells.\n"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastActivityAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "WalletAccountingMapping": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.accounting_mapping",
+  "description": "Boards 9.2 and 9.3. **Different credit types are different liabilities.**",
+  "properties": {
+   "mappings": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "creditTypeId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "liabilityAccountCode": {
+       "type": "string"
+      },
+      "breakageRevenueAccountCode": {
+       "type": "string",
+       "nullable": true
+      },
+      "costAccountCode": {
+       "type": "string",
+       "nullable": true,
+       "description": "**For credit the venue gave away.** Promotional credit is a marketing cost already incurred, not money owed back, and booking it as a liability overstates what the venue owes by whatever marketing did last quarter.\n"
+      }
+     }
+    }
+   },
+   "breakagePolicy": {
+    "type": "object",
+    "properties": {
+     "recogniseAfterMonths": {
+      "type": "integer",
+      "nullable": true,
+      "description": "**Recognised on a policy, not on the expiry date.** Some jurisdictions require the liability to be held long after the printed expiry.\n"
+     },
+     "requiresApproval": {
+      "type": "boolean",
+      "default": true
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletLiabilityRow": {
+  "type": "object",
+  "description": "Boards 9.5 and 9.6. **The number the finance director asks for.**",
+  "properties": {
+   "key": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "outstanding": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "expiringThisPeriod": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "breakageRecognised": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "walletCount": {
+    "type": "integer"
+   },
+   "oldestLotAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   }
+  }
+ },
+ "WalletReconciliation": {
+  "type": "object",
+  "description": "Board 9.4. **Three sources, and the exception names which pair disagrees.**",
+  "properties": {
+   "from": {
+    "type": "string",
+    "format": "date"
+   },
+   "to": {
+    "type": "string",
+    "format": "date"
+   },
+   "subLedgerTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "generalLedgerTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "acquirerTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "exceptions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "pair": {
+       "type": "string",
+       "enum": [
+        "subLedgerVsGeneralLedger",
+        "subLedgerVsAcquirer",
+        "generalLedgerVsAcquirer"
+       ]
+      },
+      "difference": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "transactionIds": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       }
+      },
+      "likelyCause": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "WalletReconciliationSources": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.reconciliation_source",
+  "description": "Board 9, p.105. **What `getWalletReconciliation` compares.** `walletLedger` is always on.",
+  "required": [
+   "sources"
+  ],
+  "properties": {
+   "sources": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "enabled"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "walletLedger",
+        "pos",
+        "paymentGateway",
+        "paymentServer",
+        "giftCard",
+        "finance"
+       ]
+      },
+      "enabled": {
+       "type": "boolean",
+       "default": true
+      },
+      "matchKeys": {
+       "type": "array",
+       "description": "Fields a movement is matched on, e.g. transactionId, authorisationCode, terminalId, amount, businessDate.",
+       "items": {
+        "type": "string"
+       }
+      },
+      "toleranceAmount": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "description": "A pair differing by no more than this is agreed. Default zero."
+      },
+      "schedule": {
+       "type": "string",
+       "enum": [
+        "realTime",
+        "hourly",
+        "daily",
+        "endOfBusinessDay"
+       ],
+       "default": "endOfBusinessDay"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ }
+}

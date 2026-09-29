@@ -1,6 +1,6 @@
 # WS92 — Rental Management board 5
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 7 operations · 7 schemas · 2 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 2 permissions apply here:
+  `RENTAL_BOOK, RENTAL_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-534` | Rental Booking Command Center | commandCentre | 0 | 0 | — |
-| `BO-535` | New Rental Booking Wizard | configEditor | 0 | 0 | — |
-| `BO-536` | Availability Selection & Alternative Options | listDetail | 0 | 0 | — |
-| `BO-537` | Customer & Participant Information | listDetail | 0 | 0 | — |
-| `BO-538` | Group Rental & Participant Management | listDetail | 0 | 0 | — |
-| `BO-539` | Rental Agreement & Waiver Completion | listDetail | 0 | 0 | — |
-| `BO-540` | Booking Commercial Summary & Payment | listDetail | 0 | 0 | — |
-| `BO-541` | Reservation Confirmation & QR Voucher | listDetail | 0 | 0 | — |
-| `BO-542` | Reservation Modification, Cancellation & No-Show | listDetail | 0 | 0 | — |
-| `BO-543` | Reservation Detail, Timeline & Readiness | configEditor | 0 | 0 | — |
+| `BO-534` | Rental Booking Command Center | commandCentre | 1 | 0 | — |
+| `BO-535` | New Rental Booking Wizard | configEditor | 2 | 0 | — |
+| `BO-536` | Availability Selection & Alternative Options | listDetail | 1 | 0 | — |
+| `BO-537` | Customer & Participant Information | listDetail | 1 | 0 | — |
+| `BO-538` | Group Rental & Participant Management | listDetail | 2 | 0 | — |
+| `BO-539` | Rental Agreement & Waiver Completion | listDetail | 1 | 0 | — |
+| `BO-540` | Booking Commercial Summary & Payment | listDetail | 1 | 0 | — |
+| `BO-541` | Reservation Confirmation & QR Voucher | listDetail | 1 | 0 | — |
+| `BO-542` | Reservation Modification, Cancellation & No-Show | listDetail | 2 | 0 | — |
+| `BO-543` | Reservation Detail, Timeline & Readiness | configEditor | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-536, BO-537, BO-539, BO-540, BO-541, BO-543 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-537, BO-539, BO-540, BO-541, BO-543 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

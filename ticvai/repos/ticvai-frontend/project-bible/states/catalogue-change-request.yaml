@@ -1,0 +1,106 @@
+# Catalogue change request — state model
+# Contract: catalogue.CatalogueChangeRequest.status
+# Checked by tools/check-states.py. Added 29 September (data model DM3).
+
+entity: Catalogue change request
+contract: catalogue
+enum: CatalogueChangeRequest.status
+enumKind: inline
+enumSchema: CatalogueChangeRequest
+enumProperty: status
+owner: catalogue
+initial:
+- draft
+- pendingApproval
+terminal:
+- rejected
+- rolledBack
+transitions:
+- from: draft
+  to: pendingValidation
+  operation: submitPricingChangeRequest
+  trigger: operation
+  guard: The author submits. **Live pricing is untouched** until the request is approved and published
+- from: returnedForModification
+  to: pendingValidation
+  operation: submitPricingChangeRequest
+  trigger: operation
+  guard: Resubmitted after the author's edits
+- from: pendingValidation
+  to: pendingApproval
+  operation: submitPricingChangeRequest
+  trigger: operation
+  guard: Every check passes (lines present, effective date not in the past, every object still exists); an
+    `approvals.ApprovalRequest` is opened under the authority policy and its id recorded
+- from: pendingValidation
+  to: draft
+  operation: submitPricingChangeRequest
+  trigger: operation
+  guard: A check fails; the problems come back as `422` and the author fixes them
+- from: pendingApproval
+  to: approved
+  operation: decidePricingChangeRequest
+  trigger: operation
+  guard: '`approve` at the last required level, by someone other than the requester and inside their
+    authority tier'
+  requiresApproval: true
+- from: pendingApproval
+  to: rejected
+  operation: decidePricingChangeRequest
+  trigger: operation
+  guard: '`reject`, with a comment'
+- from: pendingApproval
+  to: returnedForModification
+  operation: decidePricingChangeRequest
+  trigger: operation
+  guard: '`returnForModification`, with a comment'
+- from: pendingApproval
+  to: approved
+  operation: approveReviewDecision
+  trigger: operation
+  guard: A product change request approved at its last stage
+  requiresApproval: true
+- from: pendingApproval
+  to: rejected
+  operation: approveReviewDecision
+  trigger: operation
+  guard: A product change request rejected
+- from: pendingApproval
+  to: returnedForModification
+  operation: approveReviewDecision
+  trigger: operation
+  guard: '`requestChanges` on a product change request'
+- from: approved
+  to: scheduled
+  operation: publishPricingEffectiveDate
+  trigger: operation
+  guard: Every pre-publication check passes and no other version is scheduled for the same object and date
+- from: approved
+  to: published
+  operation: publishPricingEffectiveDate
+  trigger: operation
+  guard: '`publicationMode: immediate`'
+- from: scheduled
+  to: approved
+  operation: publishPricingEffectiveDate
+  trigger: operation
+  guard: '`cancel` before the publication date'
+  isReversal: true
+- from: scheduled
+  to: published
+  trigger: timer
+  guard: The publication date is reached; a new `catalogue.price_list_version` (or product version) is created
+- from: published
+  to: rolledBack
+  trigger: job
+  guard: A `catalogue.rollback_action` naming this request completes; the earlier version is restored as a
+    new version
+  isReversal: true
+notes: '**Two subjects, one path.** Product and pricing change requests move through the same states;
+  `approveReviewDecision` decides a product request and `decidePricingChangeRequest` a pricing one. A product
+  request is created already `pendingApproval` by the product change that needed approval; a pricing request
+  starts `draft` in the workspace.
+
+
+  **`published` is not terminal** because a rollback can still follow. A rejected request is never reopened:
+  a changed mind is a new request.'

@@ -1,6 +1,6 @@
 # WS60 — Ticket Media   Credential Management board 2
 
-**10 screens · 10 operations · 18 schemas · 2 permissions**
+**10 screens · 17 operations · 24 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, SCOPE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, ORDER_REPRINT, PRODUCT_CONFIGURE, PRODUCT_VIEW, SCOPE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,13 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-344` | Media Design Studio Command Center | commandCentre | 1 | 0 | — |
+| `BO-344` | Media Design Studio Command Center | commandCentre | 4 | 0 | — |
 | `BO-345` | Digital QR & Barcode Ticket Designer | configEditor | 1 | 0 | — |
-| `BO-346` | PDF, Printable & POS Ticket Designer | configEditor | 1 | 0 | — |
+| `BO-346` | PDF, Printable & POS Ticket Designer | configEditor | 5 | 0 | — |
 | `BO-347` | Apple Wallet Pass Designer | configEditor | 1 | 0 | — |
 | `BO-348` | Google Wallet Pass Designer | configEditor | 1 | 0 | — |
 | `BO-349` | RFID, NFC, Card & Wristband Media Designer | configEditor | 1 | 0 | — |
 | `BO-350` | Digital Card, Membership & Wearable Designer | configEditor | 1 | 0 | — |
 | `BO-351` | Dynamic Fields, Data Mapping & Content Builder | configEditor | 1 | 0 | — |
-| `BO-352` | Branding, Localization & Template Inheritance | listDetail | 1 | 0 | — |
+| `BO-352` | Branding, Localization & Template Inheritance | listDetail | 2 | 0 | — |
 | `BO-353` | Multi-Media Preview, Testing, Approval & Publication | listDetail | 1 | 0 | — |
-
-## Thin screens in this batch
-
-**BO-352, BO-353 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

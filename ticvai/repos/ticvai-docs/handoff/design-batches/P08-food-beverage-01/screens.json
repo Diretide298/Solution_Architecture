@@ -24,17 +24,17 @@
     {
      "to": "BO-104",
      "trigger": "Food & Beverage",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-104 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-104 declares entryState.params  and BO-020 holds none of them, so the edge carries nothing and BO-104 opens cold"
     },
     {
      "to": "GST-025",
      "trigger": "Tracks the order",
      "provenance": "flow F11 step 5→6",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "orderId"
+     ]
     }
    ]
   },
@@ -43,13 +43,6 @@
   "pattern": "listDetail",
   "patternReason": "`listFnbOrders` reads the population and `getFnbOrder` reads one of them — list, select, act",
   "purpose": "Take, amend and route an F&B order from the back office — and see what the kitchen is working on.",
-  "gaps": [
-   {
-    "operation": "listKitchenStations",
-    "why": "**2 declared operations reach no component on this screen**: listKitchenStations, listKitchenTickets. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -58,8 +51,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Outlet id",
+       "operation": "listFnbOrders",
+       "notes": "Sends `?outletId=` to `listFnbOrders`.",
+       "provenance": "contract fnb.yaml GET /fnb-orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Table visit id",
+       "operation": "listFnbOrders",
+       "notes": "Sends `?tableVisitId=` to `listFnbOrders`.",
+       "provenance": "contract fnb.yaml GET /fnb-orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listFnbOrders",
+       "notes": "Sends `?status=` to `listFnbOrders`.",
+       "provenance": "contract fnb.yaml GET /fnb-orders"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every order",
+       "label": "Every F&B order",
        "bindsTo": "FnbOrder",
        "columns": [
         "FnbOrder.id",
@@ -77,6 +91,50 @@
        ],
        "operation": "listFnbOrders",
        "provenance": "contract fnb.yaml GET /fnb-orders"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every kitchen station",
+       "bindsTo": "KitchenStation",
+       "columns": [
+        "KitchenStation.id",
+        "KitchenStation.code",
+        "KitchenStation.name",
+        "KitchenStation.outletId",
+        "KitchenStation.menuItemIds",
+        "KitchenStation.displayEndpoint",
+        "KitchenStation.isActive"
+       ],
+       "operation": "listKitchenStations",
+       "provenance": "contract fnb.yaml GET /kitchen/stations"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every kitchen ticket",
+       "bindsTo": "KitchenTicket",
+       "columns": [
+        "KitchenTicket.id",
+        "KitchenTicket.orderId",
+        "KitchenTicket.orderNumber",
+        "KitchenTicket.outletId",
+        "KitchenTicket.tableLabel",
+        "KitchenTicket.serviceMode",
+        "KitchenTicket.coursing",
+        "KitchenTicket.buzzerCode",
+        "KitchenTicket.status",
+        "KitchenTicket.priority",
+        "KitchenTicket.prioritisedByPrincipalId",
+        "KitchenTicket.prioritiseReason"
+       ],
+       "operation": "listKitchenTickets",
+       "provenance": "contract fnb.yaml GET /kitchen/tickets"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -86,7 +144,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected order",
+       "label": "The selected F&B order",
        "bindsTo": "FnbOrder",
        "columns": [
         "FnbOrder.id",
@@ -114,88 +172,46 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Accept",
+       "label": "Accept F&B order",
        "operation": "acceptFnbOrder",
        "provenance": "contract fnb.yaml POST /fnb-orders/{orderId}/accept"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save kitchen ticket status",
        "operation": "setKitchenTicketStatus",
        "provenance": "contract fnb.yaml PUT /kitchen/tickets/{ticketId}/status"
       },
       {
        "kind": "secondaryButton",
-       "label": "Amend",
+       "label": "Amend F&B order",
        "operation": "amendFnbOrder",
        "provenance": "contract fnb.yaml PATCH /fnb-orders/{orderId}"
       },
       {
        "kind": "destructiveButton",
-       "label": "Cancel",
+       "label": "Cancel F&B order",
        "operation": "cancelFnbOrder",
+       "notes": "**Cancelling an accepted order is a void and needs `ORDER_VOID`** (decided 28 September, audit R091 (5)); before acceptance `ORDER_MODIFY` is enough. Without it the server answers 403 void-permission-required and the dialog says so.",
        "provenance": "contract fnb.yaml POST /fnb-orders/{orderId}/cancel"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create F&B order",
        "operation": "createFnbOrder",
        "provenance": "contract fnb.yaml POST /fnb-orders"
       },
       {
        "kind": "secondaryButton",
-       "label": "Prioritise",
+       "label": "Prioritise kitchen ticket",
        "operation": "prioritiseKitchenTicket",
        "provenance": "contract fnb.yaml POST /kitchen/tickets/{ticketId}/prioritise"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save kitchen stations",
        "operation": "setKitchenStations",
        "provenance": "contract fnb.yaml PUT /kitchen/stations"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "acceptFnbOrder",
-       "label": "Accept fnb order",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "cancelFnbOrder",
-       "label": "Cancel fnb order",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "detailPanel",
-       "derived": true,
-       "impliedBy": "getFnbOrder",
-       "notes": "One record, read-only.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "acceptFnbOrder",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -205,17 +221,132 @@
    {
     "id": "confirmCancelFnbOrder",
     "component": "confirmDialog",
-    "trigger": "Cancel",
-    "body": "**Names what `cancelFnbOrder` changes and what it leaves alone**, in the consequence rather than the verb. A order this affects should be identified in the dialog, not just counted.",
+    "trigger": "Cancel F&B order",
+    "body": "**Names what `cancelFnbOrder` changes and what it leaves alone**, in the consequence rather than the verb. A order this affects should be identified in the dialog, not just counted. **Collects what `cancelFnbOrder` sends before it is called.** Required: `recordedAt`, `reason`. Optional: `note`, `recordWaste`. Once the order is accepted the reason comes from the void reason list (guestChangedMind, enteredInError, itemUnavailable, qualityIssue, duplicate, other), **Other makes the note required**, and the act needs `ORDER_VOID` (decided 28 September, audit R125 (4), R091 (5), R222).",
     "provenance": "contract fnb.yaml POST /fnb-orders/{orderId}/cancel"
+   },
+   {
+    "id": "formAcceptFnbOrder",
+    "component": "modal",
+    "trigger": "Accept F&B order",
+    "body": "**Collects what `acceptFnbOrder` sends before it is called.** Required: `recordedAt`. Optional: `estimatedReadyAt`, `stationId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Accept F&B order",
+     "operation": "acceptFnbOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recordedAt",
+      "estimatedReadyAt",
+      "stationId"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /fnb-orders/{orderId}/accept"
+   },
+   {
+    "id": "formSetKitchenTicketStatus",
+    "component": "modal",
+    "trigger": "Save kitchen ticket status",
+    "body": "**Collects what `setKitchenTicketStatus` sends before it is called.** Required: `status`, `recordedAt`. Optional: `lineIds`, `stationId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save kitchen ticket status",
+     "operation": "setKitchenTicketStatus"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "recordedAt",
+      "lineIds",
+      "stationId"
+     ]
+    },
+    "provenance": "contract fnb.yaml PUT /kitchen/tickets/{ticketId}/status"
+   },
+   {
+    "id": "formAmendFnbOrder",
+    "component": "modal",
+    "trigger": "Amend F&B order",
+    "body": "**Collects what `amendFnbOrder` sends before it is called.** Nothing in the body is required. Optional: `addLines`, `removeLineIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Amend F&B order",
+     "operation": "amendFnbOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "addLines",
+      "removeLineIds"
+     ]
+    },
+    "provenance": "contract fnb.yaml PATCH /fnb-orders/{orderId}"
+   },
+   {
+    "id": "formCreateFnbOrder",
+    "component": "modal",
+    "trigger": "Create F&B order",
+    "body": "**Collects what `createFnbOrder` sends before it is called.** Required: `id`, `outletId`, `serviceMode`, `lines`, `recordedAt`. Optional: `tableVisitId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateFnbOrderRequest",
+    "confirm": {
+     "label": "Create F&B order",
+     "operation": "createFnbOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "outletId",
+      "serviceMode",
+      "lines",
+      "recordedAt",
+      "tableVisitId"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /fnb-orders"
+   },
+   {
+    "id": "formPrioritiseKitchenTicket",
+    "component": "modal",
+    "trigger": "Prioritise kitchen ticket",
+    "body": "**Collects what `prioritiseKitchenTicket` sends before it is called.** Required: `reason`. Optional: `priority`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Prioritise kitchen ticket",
+     "operation": "prioritiseKitchenTicket"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason",
+      "priority"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /kitchen/tickets/{ticketId}/prioritise"
+   },
+   {
+    "id": "formSetKitchenStations",
+    "component": "modal",
+    "trigger": "Save kitchen stations",
+    "body": "**Collects what `setKitchenStations` sends before it is called.** Required: `stations`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save kitchen stations",
+     "operation": "setKitchenStations"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "stations"
+     ]
+    },
+    "provenance": "contract fnb.yaml PUT /kitchen/stations"
    }
   ],
   "states": {
    "loading": "The order list.",
    "error": "Could not load. Names which read failed and leaves the order untouched.",
-   "emptyFirstRun": "No order yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the order are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No order yet. Offers Create F&B order (`createFnbOrder`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on outletId, tableVisitId, status and the order are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getFnbOrder` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -267,7 +398,7 @@
     "operationId": "getFnbOrder",
     "contract": "fnb",
     "purpose": "Read an F&B order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listFnbOrders",
@@ -384,17 +515,17 @@
     {
      "to": "BO-104",
      "trigger": "Food & Beverage",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-104 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-104 declares entryState.params  and BO-021 holds none of them, so the edge carries nothing and BO-104 opens cold"
     },
     {
      "to": "POS-002",
      "trigger": "Sell — Ticket Catalogue",
      "provenance": "flow F81 step 1→2",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "orderId"
+     ]
     }
    ]
   },
@@ -415,7 +546,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected order search",
+       "label": "The guest order status",
        "bindsTo": "GuestOrderStatus",
        "columns": [
         "GuestOrderStatus.orderId",
@@ -436,41 +567,19 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Record",
+       "label": "Record order handover",
        "operation": "recordOrderHandover",
        "provenance": "contract fnb.yaml POST /guest-orders/{orderId}/delivery"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "derived": true,
-       "impliedBy": "getGuestOrderStatus",
-       "notes": "One record, read-only.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "recordOrderHandover",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The order search list.",
+   "loading": "The order search, read by `getGuestOrderStatus`.",
    "error": "Could not load. Names which read failed and leaves the order search untouched.",
-   "emptyFirstRun": "No order search yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the order search are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No order search yet. Offers Record order handover (`recordOrderHandover`).",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_MODIFY`, which `recordOrderHandover` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -503,10 +612,34 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-021",
+   "derivedFrom": "wireframes/reference/Retail Board 3.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRecordOrderHandover",
+    "component": "modal",
+    "trigger": "Record order handover",
+    "body": "**Collects what `recordOrderHandover` sends before it is called.** Required: `outcome`, `recordedAt`. Optional: `deliveredToLocationId`, `runnerPrincipalId`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Record order handover",
+     "operation": "recordOrderHandover"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "outcome",
+      "recordedAt",
+      "deliveredToLocationId",
+      "runnerPrincipalId",
+      "note"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /guest-orders/{orderId}/delivery"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -556,12 +689,6 @@
    "notes": "**Returns to BO-104.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product. **flow F31 — the manager re-verifies allergens from the menu being drafted.** The flow is the authority on the journey and the navigation has to agree with it; marking this block non-inferred is what turned the disagreement from a warning into a failure.",
    "transitions": [
     {
-     "to": "BO-111",
-     "trigger": "An item's recipe changed, so its allergens are re-verified",
-     "provenance": "flow F31 step 2→3",
-     "operation": "applyMenuActions"
-    },
-    {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
      "provenance": "flow F93 step 2→3"
@@ -569,10 +696,7 @@
     {
      "to": "BO-104",
      "trigger": "Food & Beverage",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-104 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-104 declares entryState.params  and BO-045 holds none of them, so the edge carries nothing and BO-104 opens cold"
     },
     {
      "to": "POS-002",
@@ -581,6 +705,16 @@
      "operation": "publishMenu",
      "crossesDevice": true,
      "back": false
+    },
+    {
+     "to": "BO-111",
+     "trigger": "An item's recipe changed, so its allergens are re-verified",
+     "provenance": "flow F31 step 2→3",
+     "operation": "applyMenuActions",
+     "carries": [
+      "menuId",
+      "menuItemId"
+     ]
     }
    ]
   },
@@ -604,6 +738,20 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Outlet id",
+       "operation": "listMenus",
+       "notes": "Sends `?outletId=` to `listMenus`.",
+       "provenance": "contract fnb.yaml GET /menus"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Active at",
+       "operation": "listMenus",
+       "notes": "Sends `?activeAt=` to `listMenus`.",
+       "provenance": "contract fnb.yaml GET /menus"
+      },
+      {
        "kind": "dataTable",
        "label": "Every menu",
        "bindsTo": "Menu",
@@ -618,6 +766,12 @@
        ],
        "operation": "listMenus",
        "provenance": "contract fnb.yaml GET /menus"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishMenu",
+       "notes": "Declares `publishMenu`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -649,50 +803,58 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create menu",
        "operation": "createMenu",
        "provenance": "contract fnb.yaml POST /menus"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save menu sections",
        "operation": "setMenuSections",
        "provenance": "contract fnb.yaml PUT /menus/{menuId}/sections"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save menu",
        "operation": "updateMenu",
        "provenance": "contract fnb.yaml PATCH /menus/{menuId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Publish",
+       "label": "Publish menu",
        "operation": "publishMenu",
        "provenance": "contract fnb.yaml POST /menus/{menuId}/publish"
       },
       {
        "kind": "secondaryButton",
-       "label": "Schedule",
+       "label": "Schedule menu publish",
        "operation": "scheduleMenuPublish",
        "provenance": "contract fnb.yaml POST /menus/{menuId}/schedule"
       },
       {
        "kind": "secondaryButton",
-       "label": "Rollback",
+       "label": "Rollback menu",
        "operation": "rollbackMenu",
        "provenance": "contract fnb.yaml POST /menus/{menuId}/rollback"
       },
       {
        "kind": "secondaryButton",
-       "label": "Apply",
+       "label": "Apply menu actions",
        "operation": "applyMenuActions",
        "provenance": "contract fnb.yaml POST /menus/{menuId}/actions"
       },
       {
        "kind": "secondaryButton",
-       "label": "Verify",
+       "label": "Re-check allergens (manual)",
        "operation": "verifyAllergens",
+       "notes": "**A manual re-check** (decided 28 September, audit R241). The server already runs `verifyAllergens` after every recipe, substitution or modifier change; this button runs it again on demand.",
+       "provenance": "contract fnb.yaml POST /menu-items/{menuItemId}/verify-allergens"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Last allergen verdict",
+       "operation": "verifyAllergens",
+       "notes": "**Shows the last automatic verdict** — `matches`, `undeclared` (with `via` and `sourceRef`, shown first), `overDeclared` — from the check the server runs after every recipe, substitution or modifier change, with when it ran (decided 28 September, audit R241). **The contract records the verdict but exposes no read of it yet**, so until one exists this panel shows the result of the latest manual re-check; the response is inline and binds to no named schema.",
        "provenance": "contract fnb.yaml POST /menu-items/{menuItemId}/verify-allergens"
       },
       {
@@ -702,49 +864,15 @@
        "provenance": "authored — required by check-screens"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "derived": true,
-       "impliedBy": "getMenu",
-       "notes": "One record, read-only.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createMenu",
-       "label": "Create menu",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createMenu",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishMenu",
-       "notes": "Declares `publishMenu`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The menu list.",
    "error": "Could not load. Names which read failed and leaves the menu untouched.",
-   "emptyFirstRun": "No menu yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the menu are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No menu yet. Offers Create menu (`createMenu`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on outletId, activeAt and the menu are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listMenus` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -757,7 +885,7 @@
     "operationId": "getMenu",
     "contract": "fnb",
     "purpose": "Read a menu with sections and items",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createMenu",
@@ -825,10 +953,32 @@
    {
     "operationId": "verifyAllergens",
     "contract": "fnb",
-    "purpose": "Does this dish still match its claim?",
+    "purpose": "Does this dish still match its claim? Runs automatically after every change; here a manual re-check (audit R241)",
     "trigger": "onAction",
     "invalidates": [
      "listMenus"
+    ]
+   },
+   {
+    "operationId": "createModifierGroup",
+    "contract": "fnb",
+    "purpose": "Create a modifier group",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listMenus",
+     "getMenu"
+    ]
+   },
+   {
+    "operationId": "attachModifierGroup",
+    "contract": "fnb",
+    "purpose": "Give a menu item its choices",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listMenus",
+     "getMenu"
     ]
    }
   ],
@@ -860,10 +1010,142 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-045",
+   "derivedFrom": "wireframes/reference/FnB Board 2.dc.html",
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateMenu",
+    "component": "modal",
+    "trigger": "Create menu",
+    "body": "**Collects what `createMenu` sends before it is called.** Required: `code`, `name`, `outletId`. Optional: `availability`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateMenuRequest",
+    "confirm": {
+     "label": "Create menu",
+     "operation": "createMenu"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "outletId",
+      "availability"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /menus"
+   },
+   {
+    "id": "formSetMenuSections",
+    "component": "modal",
+    "trigger": "Save menu sections",
+    "body": "**Collects what `setMenuSections` sends before it is called.** Required: `sections`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save menu sections",
+     "operation": "setMenuSections"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "sections"
+     ]
+    },
+    "provenance": "contract fnb.yaml PUT /menus/{menuId}/sections"
+   },
+   {
+    "id": "formUpdateMenu",
+    "component": "modal",
+    "trigger": "Save menu",
+    "body": "**Collects what `updateMenu` sends before it is called.** Nothing in the body is required. Optional: `name`, `availability`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save menu",
+     "operation": "updateMenu"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "availability",
+      "isActive"
+     ]
+    },
+    "provenance": "contract fnb.yaml PATCH /menus/{menuId}"
+   },
+   {
+    "id": "formPublishMenu",
+    "component": "modal",
+    "trigger": "Publish menu",
+    "body": "**Collects what `publishMenu` sends before it is called.** Nothing in the body is required. Optional: `effectiveAt`, `channels`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Publish menu",
+     "operation": "publishMenu"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "effectiveAt",
+      "channels",
+      "note"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /menus/{menuId}/publish"
+   },
+   {
+    "id": "formScheduleMenuPublish",
+    "component": "modal",
+    "trigger": "Schedule menu publish",
+    "body": "**Collects what `scheduleMenuPublish` sends before it is called.** Nothing in the body is required. Optional: `effectiveAt`, `cancelScheduleId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Schedule menu publish",
+     "operation": "scheduleMenuPublish"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "effectiveAt",
+      "cancelScheduleId"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /menus/{menuId}/schedule"
+   },
+   {
+    "id": "formRollbackMenu",
+    "component": "modal",
+    "trigger": "Rollback menu",
+    "body": "**Collects what `rollbackMenu` sends before it is called.** Nothing in the body is required. Optional: `toVersion`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Rollback menu",
+     "operation": "rollbackMenu"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "toVersion"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /menus/{menuId}/rollback"
+   },
+   {
+    "id": "formApplyMenuActions",
+    "component": "modal",
+    "trigger": "Apply menu actions",
+    "body": "**Collects what `applyMenuActions` sends before it is called.** Required: `actions`. Optional: `previewOnly`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Apply menu actions",
+     "operation": "applyMenuActions"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "actions",
+      "previewOnly"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /menus/{menuId}/actions"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -912,10 +1194,7 @@
     {
      "to": "BO-104",
      "trigger": "Food & Beverage",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-104 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-104 declares entryState.params  and BO-046 holds none of them, so the edge carries nothing and BO-104 opens cold"
     }
    ]
   },
@@ -924,13 +1203,6 @@
   "pattern": "listDetail",
   "patternReason": "`listKitchenTickets` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "Show the kitchen what to make, in order.",
-  "gaps": [
-   {
-    "operation": "listKitchenStations",
-    "why": "**1 declared operation reach no component on this screen**: listKitchenStations. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -939,8 +1211,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Station id",
+       "operation": "listKitchenTickets",
+       "notes": "Sends `?stationId=` to `listKitchenTickets`.",
+       "provenance": "contract fnb.yaml GET /kitchen/tickets"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listKitchenTickets",
+       "notes": "Sends `?status=` to `listKitchenTickets`.",
+       "provenance": "contract fnb.yaml GET /kitchen/tickets"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every kitchen display",
+       "label": "Every kitchen ticket",
        "bindsTo": "KitchenTicket",
        "columns": [
         "KitchenTicket.id",
@@ -958,6 +1244,23 @@
        ],
        "operation": "listKitchenTickets",
        "provenance": "contract fnb.yaml GET /kitchen/tickets"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every kitchen station",
+       "bindsTo": "KitchenStation",
+       "columns": [
+        "KitchenStation.id",
+        "KitchenStation.code",
+        "KitchenStation.name",
+        "KitchenStation.outletId",
+        "KitchenStation.menuItemIds",
+        "KitchenStation.displayEndpoint",
+        "KitchenStation.displayWorkstationIds",
+        "KitchenStation.isActive"
+       ],
+       "operation": "listKitchenStations",
+       "provenance": "contract fnb.yaml GET /kitchen/stations"
       }
      ]
     },
@@ -967,7 +1270,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected kitchen display",
+       "label": "The selected kitchen ticket",
        "bindsTo": "KitchenTicket",
        "columns": [
         "KitchenTicket.id",
@@ -997,42 +1300,21 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save kitchen ticket status",
        "operation": "setKitchenTicketStatus",
        "provenance": "contract fnb.yaml PUT /kitchen/tickets/{ticketId}/status"
       },
       {
        "kind": "secondaryButton",
-       "label": "Prioritise",
+       "label": "Prioritise kitchen ticket",
        "operation": "prioritiseKitchenTicket",
        "provenance": "contract fnb.yaml POST /kitchen/tickets/{ticketId}/prioritise"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save kitchen stations",
        "operation": "setKitchenStations",
        "provenance": "contract fnb.yaml PUT /kitchen/stations"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setKitchenTicketStatus",
-       "label": "Save kitchen ticket status",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setKitchenTicketStatus",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1041,9 +1323,9 @@
   "states": {
    "loading": "The kitchen display list.",
    "error": "Could not load. Names which read failed and leaves the kitchen display untouched.",
-   "emptyFirstRun": "No kitchen display yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the kitchen display are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No kitchen display yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on stationId, status and the kitchen display are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listKitchenTickets` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1112,6 +1394,63 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-046"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetKitchenTicketStatus",
+    "component": "modal",
+    "trigger": "Save kitchen ticket status",
+    "body": "**Collects what `setKitchenTicketStatus` sends before it is called.** Required: `status`, `recordedAt`. Optional: `lineIds`, `stationId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save kitchen ticket status",
+     "operation": "setKitchenTicketStatus"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "recordedAt",
+      "lineIds",
+      "stationId"
+     ]
+    },
+    "provenance": "contract fnb.yaml PUT /kitchen/tickets/{ticketId}/status"
+   },
+   {
+    "id": "formPrioritiseKitchenTicket",
+    "component": "modal",
+    "trigger": "Prioritise kitchen ticket",
+    "body": "**Collects what `prioritiseKitchenTicket` sends before it is called.** Required: `reason`. Optional: `priority`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Prioritise kitchen ticket",
+     "operation": "prioritiseKitchenTicket"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason",
+      "priority"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /kitchen/tickets/{ticketId}/prioritise"
+   },
+   {
+    "id": "formSetKitchenStations",
+    "component": "modal",
+    "trigger": "Save kitchen stations",
+    "body": "**Collects what `setKitchenStations` sends before it is called.** Required: `stations`. **Each station carries its display assignment**, `displayWorkstationIds` — the kitchen displays that show this station's rail. A display belongs to one station; assigning it to a second is refused 400. The kitchen display takes its station from this assignment rather than from a picker on the display (decided 28 September, audit R277). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save kitchen stations",
+     "operation": "setKitchenStations"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "stations"
+     ]
+    },
+    "provenance": "contract fnb.yaml PUT /kitchen/stations"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1164,65 +1503,41 @@
     {
      "to": "BO-020",
      "trigger": "F&B Order Management",
-     "carries": [
-      "orderId",
-      "ticketId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-020 declares entryState.params orderId, ticketId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-020 declares entryState.params orderId, ticketId and BO-104 holds none of them, so the edge carries nothing and BO-020 opens cold"
     },
     {
      "to": "BO-021",
      "trigger": "Order Search",
-     "carries": [
-      "orderId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-021 declares entryState.params orderId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-021 declares entryState.params orderId and BO-104 holds none of them, so the edge carries nothing and BO-021 opens cold"
     },
     {
      "to": "BO-045",
      "trigger": "Menu Management",
      "carries": [
       "menuId",
-      "menuItemId",
-      "venueId"
+      "menuItemId"
      ],
-     "provenance": "derived — BO-045 declares entryState.params menuId, menuItemId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-045 declares entryState.params menuId, menuItemId and BO-104 holds menuId, menuItemId, so an edge into it carries them"
     },
     {
      "to": "BO-046",
      "trigger": "Kitchen Display",
-     "carries": [
-      "ticketId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-046 declares entryState.params ticketId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-046 declares entryState.params ticketId and BO-104 holds none of them, so the edge carries nothing and BO-046 opens cold"
     },
     {
      "to": "BO-134",
      "trigger": "Kitchen & Preparation Stations",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-134 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-134 declares entryState.params  and BO-104 holds none of them, so the edge carries nothing and BO-134 opens cold"
     },
     {
      "to": "BO-135",
      "trigger": "Order Routing & KDS/Printer Rules",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-135 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-135 declares entryState.params  and BO-104 holds none of them, so the edge carries nothing and BO-135 opens cold"
     },
     {
      "to": "BO-136",
      "trigger": "F&B Global Settings & Controls",
-     "carries": [
-      "planId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-136 declares entryState.params planId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-136 declares entryState.params planId and BO-104 holds none of them, so the edge carries nothing and BO-136 opens cold"
     }
    ]
   },
@@ -1230,7 +1545,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listMenus` reads the population and `getVenueSettings` reads one of them — list, select, act",
-  "purpose": "Everything in food & beverage, and what in it needs attention.",
+  "purpose": "Everything in food & beverage.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1239,8 +1554,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Outlet id",
+       "operation": "listMenus",
+       "notes": "Sends `?outletId=` to `listMenus`.",
+       "provenance": "contract fnb.yaml GET /menus"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Active at",
+       "operation": "listMenus",
+       "notes": "Sends `?activeAt=` to `listMenus`.",
+       "provenance": "contract fnb.yaml GET /menus"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every food beverage",
+       "label": "Every menu",
        "bindsTo": "Menu",
        "columns": [
         "Menu.id",
@@ -1253,6 +1582,33 @@
        ],
        "operation": "listMenus",
        "provenance": "contract fnb.yaml GET /menus"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Takings and admissions today",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.code",
+        "KpiValue.name",
+        "KpiValue.value",
+        "KpiValue.period",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ],
+       "operation": "getKpiValues",
+       "notes": "**Takings and admissions**, from `getKpiValues?kpiCodes=takings,admissions`; with no `period` the period is today in the venue's time zone (decided 28 September, audit R283).",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      },
+      {
+       "kind": "cardList",
+       "bindsTo": "screens",
+       "notes": "4 screens. **No attention counts** until a summary operation exists to supply them (decided 28 September, audit R283).",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search food & beverage",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1262,13 +1618,34 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected food beverage",
+       "label": "The selected menu",
+       "bindsTo": "Menu",
+       "columns": [
+        "Menu.id",
+        "Menu.code",
+        "Menu.name",
+        "Menu.outletId",
+        "Menu.availability",
+        "Menu.sections",
+        "Menu.isActive",
+        "Menu.publishedVersion",
+        "Menu.publishedAt"
+       ],
+       "operation": "listMenus",
+       "provenance": "contract fnb.yaml GET /menus"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The venue settings",
        "bindsTo": "VenueSettings",
        "columns": [
         "VenueSettings.id",
         "VenueSettings.venueId",
+        "VenueSettings.currencyCode",
+        "VenueSettings.currencyScale",
         "VenueSettings.supportHours",
         "VenueSettings.quietHours",
+        "VenueSettings.biometrics",
         "VenueSettings.segregatedAccess",
         "VenueSettings.alerting"
        ],
@@ -1283,26 +1660,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create menu",
        "operation": "createMenu",
        "provenance": "contract fnb.yaml POST /menus"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "cardList",
-       "bindsTo": "screens",
-       "notes": "4 screens, each with what needs attention.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "searchField",
-       "label": "Search food & beverage",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1316,6 +1676,12 @@
    "emptyNoAccess": "You do not have permission for food & beverage. **Said plainly** — an empty section reads as broken."
   },
   "apis": [
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Today's takings and admissions tiles — `kpiCodes=takings,admissions`, period defaulting to today (decided 28 September, audit R283)",
+    "trigger": "onLoad"
+   },
    {
     "operationId": "getVenueSettings",
     "contract": "tenancy",
@@ -1360,6 +1726,29 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-104"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateMenu",
+    "component": "modal",
+    "trigger": "Create menu",
+    "body": "**Collects what `createMenu` sends before it is called.** Required: `code`, `name`, `outletId`. Optional: `availability`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateMenuRequest",
+    "confirm": {
+     "label": "Create menu",
+     "operation": "createMenu"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "outletId",
+      "availability"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /menus"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1408,10 +1797,7 @@
     {
      "to": "BO-104",
      "trigger": "Food & Beverage",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-104 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-104 declares entryState.params  and BO-134 holds none of them, so the edge carries nothing and BO-104 opens cold"
     }
    ]
   },
@@ -1431,8 +1817,15 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Outlet id",
+       "operation": "listKitchenStations",
+       "notes": "Sends `?outletId=` to `listKitchenStations`.",
+       "provenance": "contract fnb.yaml GET /kitchen/stations"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every kitchen preparation stations",
+       "label": "Every kitchen station",
        "bindsTo": "KitchenStation",
        "columns": [
         "KitchenStation.id",
@@ -1441,10 +1834,16 @@
         "KitchenStation.outletId",
         "KitchenStation.menuItemIds",
         "KitchenStation.displayEndpoint",
+        "KitchenStation.displayWorkstationIds",
         "KitchenStation.isActive"
        ],
        "operation": "listKitchenStations",
        "provenance": "contract fnb.yaml GET /kitchen/stations"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search kitchen",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1454,7 +1853,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected kitchen preparation stations",
+       "label": "The selected kitchen station",
        "bindsTo": "KitchenStation",
        "columns": [
         "KitchenStation.id",
@@ -1463,6 +1862,7 @@
         "KitchenStation.outletId",
         "KitchenStation.menuItemIds",
         "KitchenStation.displayEndpoint",
+        "KitchenStation.displayWorkstationIds",
         "KitchenStation.isActive"
        ],
        "operation": "listKitchenStations",
@@ -1476,20 +1876,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save kitchen stations",
        "operation": "setKitchenStations",
        "provenance": "contract fnb.yaml PUT /kitchen/stations"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search kitchen",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1498,9 +1887,9 @@
   "states": {
    "loading": "The kitchen preparation stations list.",
    "error": "Could not load. Names which read failed and leaves the kitchen preparation stations untouched.",
-   "emptyFirstRun": "No kitchen preparation stations yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the kitchen preparation stations are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No kitchen preparation stations yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on outletId and the kitchen preparation stations are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listKitchenStations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1517,12 +1906,32 @@
     "invalidates": [
      "listKitchenStations"
     ]
+   },
+   {
+    "operationId": "setKitchenSla",
+    "contract": "fnb",
+    "purpose": "Set how long a ticket may sit before it is late",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listKitchenStations"
+    ]
+   },
+   {
+    "operationId": "listOutlets",
+    "contract": "tenancy",
+    "purpose": "The outlets whose kitchen SLA is set (setKitchenSla is per outlet)",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
    "params": [
     {
      "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "outletId",
      "from": "session"
     }
    ],
@@ -1539,9 +1948,29 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-134",
+   "derivedFrom": "wireframes/reference/FnB Board 1.dc.html",
    "note": "**Drawn by Claude Design on `FnB Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetKitchenStations",
+    "component": "modal",
+    "trigger": "Save kitchen stations",
+    "body": "**Collects what `setKitchenStations` sends before it is called.** Required: `stations`. **Each station carries its display assignment**, `displayWorkstationIds` — the kitchen displays that show this station's rail. A display belongs to one station; assigning it to a second is refused 400. The kitchen display takes its station from this assignment rather than from a picker on the display (decided 28 September, audit R277). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save kitchen stations",
+     "operation": "setKitchenStations"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "stations"
+     ]
+    },
+    "provenance": "contract fnb.yaml PUT /kitchen/stations"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1590,10 +2019,7 @@
     {
      "to": "BO-104",
      "trigger": "Food & Beverage",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-104 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-104 declares entryState.params  and BO-135 holds none of them, so the edge carries nothing and BO-104 opens cold"
     }
    ]
   },
@@ -1613,8 +2039,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listWorkstations",
+       "notes": "Sends `?venueId=` to `listWorkstations`.",
+       "provenance": "contract tenancy.yaml GET /workstations"
+      },
+      {
+       "kind": "textField",
+       "label": "Sale board kind",
+       "operation": "listWorkstations",
+       "notes": "Sends `?saleBoardKind=` to `listWorkstations`.",
+       "provenance": "contract tenancy.yaml GET /workstations"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every order routing kds",
+       "label": "Every workstation",
        "bindsTo": "Workstation",
        "columns": [
         "Workstation.id",
@@ -1632,6 +2072,11 @@
        ],
        "operation": "listWorkstations",
        "provenance": "contract tenancy.yaml GET /workstations"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search order routing",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1641,7 +2086,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected order routing kds",
+       "label": "The selected workstation",
        "bindsTo": "Workstation",
        "columns": [
         "Workstation.id",
@@ -1672,20 +2117,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save kitchen stations",
        "operation": "setKitchenStations",
        "provenance": "contract fnb.yaml PUT /kitchen/stations"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search order routing",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1694,9 +2128,9 @@
   "states": {
    "loading": "The order routing kds list.",
    "error": "Could not load. Names which read failed and leaves the order routing kds untouched.",
-   "emptyFirstRun": "No order routing kds yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the order routing kds are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No order routing kds yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on venueId, saleBoardKind and the order routing kds are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listWorkstations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1735,9 +2169,29 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-135",
+   "derivedFrom": "wireframes/reference/FnB Board 1.dc.html",
    "note": "**Drawn by Claude Design on `FnB Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetKitchenStations",
+    "component": "modal",
+    "trigger": "Save kitchen stations",
+    "body": "**Collects what `setKitchenStations` sends before it is called.** Required: `stations`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save kitchen stations",
+     "operation": "setKitchenStations"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "stations"
+     ]
+    },
+    "provenance": "contract fnb.yaml PUT /kitchen/stations"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1792,10 +2246,7 @@
     {
      "to": "BO-104",
      "trigger": "Food & Beverage",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-104 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-104 declares entryState.params  and BO-136 holds none of them, so the edge carries nothing and BO-104 opens cold"
     }
    ]
   },
@@ -1817,8 +2268,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "selectField",
+       "label": "Status",
+       "operation": "listProductionRuns",
+       "notes": "Sends `?status=` to `listProductionRuns`.",
+       "provenance": "contract fnb.yaml GET /production-runs"
+      },
+      {
+       "kind": "selectField",
+       "label": "Location kind",
+       "operation": "listProductionRuns",
+       "notes": "Sends `?locationKind=` to `listProductionRuns`.",
+       "provenance": "contract fnb.yaml GET /production-runs"
+      },
+      {
+       "kind": "datePicker",
+       "label": "From",
+       "operation": "listProductionRuns",
+       "notes": "Sends `?from=` to `listProductionRuns`.",
+       "provenance": "contract fnb.yaml GET /production-runs"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every global settings controls",
+       "label": "Every production run",
        "bindsTo": "ProductionRun",
        "columns": [
         "ProductionRun.id",
@@ -1833,58 +2305,7 @@
        ],
        "operation": "listProductionRuns",
        "provenance": "contract fnb.yaml GET /production-runs"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected global settings controls",
-       "bindsTo": "VenueSettings",
-       "columns": [
-        "VenueSettings.id",
-        "VenueSettings.venueId",
-        "VenueSettings.supportHours",
-        "VenueSettings.quietHours",
-        "VenueSettings.segregatedAccess",
-        "VenueSettings.alerting"
-       ],
-       "operation": "getVenueSettings",
-       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save changes",
-       "operation": "setVenueSettings",
-       "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
       },
-      {
-       "kind": "secondaryButton",
-       "label": "Build",
-       "operation": "buildProductionPlan",
-       "provenance": "contract fnb.yaml POST /production-plans"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Release",
-       "operation": "releaseProductionPlan",
-       "provenance": "contract fnb.yaml POST /production-plans/{planId}/release"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
       {
        "kind": "searchField",
        "label": "Search f",
@@ -1897,15 +2318,83 @@
        "provenance": "carried from the previous definition"
       }
      ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected production run",
+       "bindsTo": "ProductionRun",
+       "columns": [
+        "ProductionRun.id",
+        "ProductionRun.recipeId",
+        "ProductionRun.productionPlanId",
+        "ProductionRun.producingOutletId",
+        "ProductionRun.forOutletIds",
+        "ProductionRun.plannedQuantity",
+        "ProductionRun.actualQuantity",
+        "ProductionRun.scheduledFor",
+        "ProductionRun.status",
+        "ProductionRun.varianceReason"
+       ],
+       "operation": "listProductionRuns",
+       "provenance": "contract fnb.yaml GET /production-runs"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The venue settings",
+       "bindsTo": "VenueSettings",
+       "columns": [
+        "VenueSettings.id",
+        "VenueSettings.venueId",
+        "VenueSettings.currencyCode",
+        "VenueSettings.currencyScale",
+        "VenueSettings.supportHours",
+        "VenueSettings.quietHours",
+        "VenueSettings.biometrics",
+        "VenueSettings.segregatedAccess",
+        "VenueSettings.alerting",
+        "VenueSettings.fnb"
+       ],
+       "operation": "getVenueSettings",
+       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save venue settings",
+       "operation": "setVenueSettings",
+       "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Build production plan",
+       "operation": "buildProductionPlan",
+       "provenance": "contract fnb.yaml POST /production-plans"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Release production plan",
+       "operation": "releaseProductionPlan",
+       "provenance": "contract fnb.yaml POST /production-plans/{planId}/release"
+      }
+     ]
     }
    ]
   },
   "states": {
    "loading": "The global settings controls list.",
    "error": "Could not load. Names which read failed and leaves the global settings controls untouched.",
-   "emptyFirstRun": "No global settings controls yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the global settings controls are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No global settings controls yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on status, locationKind, from and the global settings controls are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getVenueSettings` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1972,10 +2461,71 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-136",
+   "derivedFrom": "wireframes/reference/FnB Board 2.dc.html",
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetVenueSettings",
+    "component": "modal",
+    "trigger": "Save venue settings",
+    "body": "**Collects what `setVenueSettings` sends before it is called.** Nothing in the body is required. Optional: `id`, `venueId`, `currencyCode`, `currencyScale`, `supportHours`, `quietHours`, `biometrics`, `segregatedAccess`, `alerting`, and **the configured limits** — `displayCurrencies`, the cart, resale, exchange, reschedule and reservation limits, `shiftVarianceThreshold`, and the `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue` and `reporting` groups (decided 28 September, audit R094). **A limit left empty inherits the tenant default** (null = inherit); each field shows the default it would inherit. **`fnb.foodSafetyLeadPrincipalId` is settable here** — until a food-safety lead is named, escalating a corrective action is refused 409 no-food-safety-lead, and the screen says so (decided 28 September, audit R096 (9)). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "VenueSettings",
+    "confirm": {
+     "label": "Save venue settings",
+     "operation": "setVenueSettings"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "currencyCode",
+      "currencyScale",
+      "supportHours",
+      "quietHours",
+      "biometrics",
+      "segregatedAccess",
+      "alerting",
+      "displayCurrencies",
+      "catalogue",
+      "inventory",
+      "seating",
+      "promotions",
+      "fnb",
+      "queue",
+      "reporting"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
+   },
+   {
+    "id": "formBuildProductionPlan",
+    "component": "modal",
+    "trigger": "Build production plan",
+    "body": "**Collects what `buildProductionPlan` sends before it is called.** Required: `id`, `forDate`, `status`, `lines`. Optional: `outletId`, `basedOnSuggestionId`, `releasedRunIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ProductionPlan",
+    "confirm": {
+     "label": "Build production plan",
+     "operation": "buildProductionPlan"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "forDate",
+      "status",
+      "lines",
+      "outletId",
+      "basedOnSuggestionId",
+      "releasedRunIds"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /production-plans"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

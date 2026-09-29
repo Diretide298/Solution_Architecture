@@ -22,7 +22,7 @@
   "method": "POST",
   "path": "/resource-bookings",
   "contract": "resources",
-  "summary": "Reserve a specific resource for a window",
+  "summary": "Reserve a specific resource for a window — staff only",
   "permission": "RESOURCE_BOOK",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -36,6 +36,25 @@
   ],
   "requestBody": null,
   "responds": "ResourceBooking"
+ },
+ "captureStoredValue": {
+  "method": "POST",
+  "path": "/stored-value/authorisations/{authorisationId}/capture",
+  "contract": "orders",
+  "summary": "Take some or all of a held balance",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "StoredValueAuthorisation"
  },
  "checkInResource": {
   "method": "POST",
@@ -75,6 +94,58 @@
   "requestBody": null,
   "responds": "ResourceBooking"
  },
+ "getKpiValues": {
+  "method": "GET",
+  "path": "/kpi-values",
+  "contract": "reporting",
+  "summary": "Current values, against target, with movement",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kpiIds",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kpiCodes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "compareTo",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KpiValue"
+ },
+ "getPerformanceManifest": {
+  "method": "GET",
+  "path": "/performances/{performanceId}/manifest",
+  "contract": "resources",
+  "summary": "Who is in a performance, in what order",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PerformanceParticipant"
+ },
  "getResourceAvailability": {
   "method": "GET",
   "path": "/resources/{resourceId}/availability",
@@ -99,25 +170,12 @@
   "requestBody": null,
   "responds": "ResourceAvailability"
  },
- "getSessionManifest": {
-  "method": "GET",
-  "path": "/sessions/{sessionId}/manifest",
-  "contract": "resources",
-  "summary": "Who is in a session, in what order",
-  "permission": "RESOURCE_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "SessionParticipant"
- },
  "getVenueSettings": {
   "method": "GET",
   "path": "/venues/{venueId}/settings",
   "contract": "tenancy",
   "summary": "Operational settings for this venue",
-  "permission": "TENANT_CONFIGURE",
+  "permission": "TENANT_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -222,9 +280,9 @@
   "requestBody": null,
   "responds": "StoredValueAuthorisation"
  },
- "reorderSessionManifest": {
+ "reorderPerformanceManifest": {
   "method": "PUT",
-  "path": "/sessions/{sessionId}/manifest",
+  "path": "/performances/{performanceId}/manifest",
   "contract": "resources",
   "summary": "Change the running order",
   "permission": "RESOURCE_BOOK",
@@ -239,7 +297,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "SessionParticipant"
+  "responds": "PerformanceParticipant"
  },
  "setResourceQualifications": {
   "method": "PUT",

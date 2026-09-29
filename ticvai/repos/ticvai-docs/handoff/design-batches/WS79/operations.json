@@ -1,1 +1,140 @@
-{}
+{
+ "cloneReaderConfiguration": {
+  "method": "POST",
+  "path": "/readers/{readerId}/clone",
+  "contract": "games",
+  "summary": "Copy one reader's configuration onto other readers",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Reader"
+ },
+ "enrolDevice": {
+  "method": "POST",
+  "path": "/devices/{deviceId}/enrolment",
+  "contract": "tenancy",
+  "summary": "Take a registered device through enrolment to activation",
+  "permission": "DEVICE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DeviceEnrolment",
+  "responds": "RegisteredDevice"
+ },
+ "listReaders": {
+  "method": "GET",
+  "path": "/readers",
+  "contract": "games",
+  "summary": "Readers, their attractions and their health",
+  "permission": "DEVICE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Reader"
+ },
+ "registerDevice": {
+  "method": "POST",
+  "path": "/devices",
+  "contract": "tenancy",
+  "summary": "Register a device",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RegisteredDevice",
+  "responds": "RegisteredDevice"
+ },
+ "setReaderConfiguration": {
+  "method": "PUT",
+  "path": "/readers/{readerId}",
+  "contract": "games",
+  "summary": "What this reader charges, opens, shows and refuses",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Reader",
+  "responds": "Reader"
+ },
+ "setReaderProfile": {
+  "method": "PUT",
+  "path": "/reader-profiles",
+  "contract": "games",
+  "summary": "How a reader behaves and what it shows",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ReaderProfile",
+  "responds": "ReaderProfile"
+ },
+ "testReader": {
+  "method": "POST",
+  "path": "/readers/{readerId}/test",
+  "contract": "games",
+  "summary": "Prove a reader works before a guest finds out it does not",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ReaderTestResult"
+ }
+}

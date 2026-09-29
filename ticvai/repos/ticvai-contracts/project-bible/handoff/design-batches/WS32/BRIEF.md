@@ -1,6 +1,6 @@
 # WS32 — Order   Reservation Management board 2
 
-**10 screens · 10 operations · 15 schemas · 3 permissions**
+**9 screens · 14 operations · 27 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `ORDER_CREATE, ORDER_VIEW, REGION_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `ORDER_CREATE, ORDER_VIEW, ORDER_VOID, PAYMENT_VOID, PRODUCT_CONFIGURE, REGION_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,15 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-314` | Amendment & After-Sales Command Center | listDetail | 1 | 1 | — |
+| `BO-314` | Amendment & After-Sales Command Center | listDetail | 2 | 0 | — |
 | `BO-315` | Order Amendment Workspace | listDetail | 1 | 0 | — |
 | `BO-316` | Amendment Eligibility & Policy Rule Builder | configEditor | 1 | 0 | — |
 | `BO-317` | Cancellation & Partial Cancellation Policy Configuration | listDetail | 1 | 0 | — |
-| `BO-318` | Refund Policy & Refund Calculation Configuration | configEditor | 1 | 0 | — |
-| `BO-319` | Void, Reversal & Same-Day Correction Management | configEditor | 1 | 0 | — |
-| `BO-320` | Ticket Reissue & Fulfillment Regeneration | configEditor | 1 | 0 | — |
+| `BO-318` | Refund Policy & Refund Calculation Configuration | configEditor | 2 | 0 | — |
+| `BO-319` | Void, Reversal & Same-Day Correction Management | configEditor | 5 | 0 | — |
 | `BO-321` | After-Sales Financial Settlement & Adjustment Workspace | listDetail | 1 | 0 | — |
 | `BO-322` | Approval, Exception & Service Recovery Management | configEditor | 1 | 0 | — |
-| `BO-323` | Amendment History, Audit & After-Sales Analytics | configEditor | 1 | 0 | — |
+| `BO-323` | Amendment History, Audit & After-Sales Analytics | configEditor | 2 | 0 | — |
 
 ## Thin screens in this batch
 

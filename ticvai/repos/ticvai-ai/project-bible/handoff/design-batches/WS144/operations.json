@@ -1,0 +1,233 @@
+{
+ "awardBadge": {
+  "method": "POST",
+  "path": "/customers/{customerId}/badges",
+  "contract": "marketing-crm",
+  "summary": "Award a badge",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "customerId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MarketingCustomerBadge",
+  "responds": "MarketingCustomerBadge"
+ },
+ "createChallenge": {
+  "method": "POST",
+  "path": "/challenges",
+  "contract": "marketing-crm",
+  "summary": "Define a challenge, mission or streak",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Challenge",
+  "responds": "Challenge"
+ },
+ "createLoyaltyProgramme": {
+  "method": "POST",
+  "path": "/loyalty/programmes",
+  "contract": "marketing-crm",
+  "summary": "Create a loyalty programme",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "LoyaltyProgramme",
+  "responds": "LoyaltyProgramme"
+ },
+ "createReferral": {
+  "method": "POST",
+  "path": "/referrals",
+  "contract": "marketing-crm",
+  "summary": "Issue a referral code",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Referral",
+  "responds": "Referral"
+ },
+ "getGuestIntelligence": {
+  "method": "GET",
+  "path": "/guests/{guestId}/intelligence",
+  "contract": "marketing-crm",
+  "summary": "Value, engagement, churn and propensity, with their reasons",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestIntelligence"
+ },
+ "getLoyaltyPosition": {
+  "method": "GET",
+  "path": "/loyalty/position",
+  "contract": "marketing-crm",
+  "summary": "A guest's points, tier and what is within reach",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "programmeId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getMyChallenges": {
+  "method": "GET",
+  "path": "/guests/me/challenges",
+  "contract": "marketing-crm",
+  "summary": "Active challenges and how far along I am",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "listLoyaltyProgrammes": {
+  "method": "GET",
+  "path": "/loyalty/programmes",
+  "contract": "marketing-crm",
+  "summary": "List loyalty programmes",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "setBadge": {
+  "method": "PUT",
+  "path": "/badges",
+  "contract": "marketing-crm",
+  "summary": "Define a badge",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MarketingBadge",
+  "responds": "MarketingBadge"
+ },
+ "setLoyaltyCampaign": {
+  "method": "PUT",
+  "path": "/loyalty/campaigns",
+  "contract": "marketing-crm",
+  "summary": "Define a loyalty campaign and its window",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MarketingLoyaltyCampaign",
+  "responds": "MarketingLoyaltyCampaign"
+ },
+ "setLoyaltyRules": {
+  "method": "PUT",
+  "path": "/loyalty/programmes/{programmeId}/rules",
+  "contract": "marketing-crm",
+  "summary": "Replace a programme's rules as one set",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "programmeId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "LoyaltyRuleSet",
+  "responds": "LoyaltyRuleSet"
+ },
+ "setReward": {
+  "method": "PUT",
+  "path": "/loyalty/rewards",
+  "contract": "marketing-crm",
+  "summary": "Define a reward and its points cost",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MarketingReward",
+  "responds": "MarketingReward"
+ }
+}

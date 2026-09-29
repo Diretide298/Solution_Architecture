@@ -10,11 +10,34 @@ enumProperty: status
 owner: orders
 initial:
 - listed
+- pendingReview
 terminal:
 - sold
 - withdrawn
 - expired
+- rejected
 transitions:
+- from: pendingReview
+  to: listed
+  operation: approveListingModeration
+  trigger: operation
+  guard: '**Approved by a moderator.** A listing starts in `pendingReview` only when the venue''s
+    `ResaleMarketplaceConfig.moderationMode` is `manual`, or `riskBased` and one of its `reviewTriggers`
+    fired; otherwise it is created `listed` (DM5, 29 September). `requestInformation` leaves it here'
+- from: pendingReview
+  to: rejected
+  operation: approveListingModeration
+  trigger: operation
+  guard: Rejected, with the reason recorded on the listing (`moderationReason`)
+- from: pendingReview
+  to: withdrawn
+  operation: createResaleListing
+  trigger: operation
+  guard: The seller withdrew it before review finished
+- from: pendingReview
+  to: expired
+  trigger: timer
+  guard: Never reviewed before the performance started
 - from: listed
   to: reserved
   operation: createResaleListing

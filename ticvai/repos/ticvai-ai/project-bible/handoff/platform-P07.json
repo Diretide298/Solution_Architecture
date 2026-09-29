@@ -11,7 +11,7 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 11,
-  "operations": 24,
+  "operations": 27,
   "contracts": 5,
   "modules": 1,
   "undrawn": 0,
@@ -32,18 +32,18 @@
  "contracts": [
   {
    "contract": "access",
-   "operations": 11
+   "operations": 14
   },
   {
    "contract": "identity",
    "operations": 8
   },
   {
-   "contract": "orders",
+   "contract": "cross-region",
    "operations": 2
   },
   {
-   "contract": "cross-region",
+   "contract": "orders",
    "operations": 2
   },
   {
@@ -67,7 +67,7 @@
    "module": "Access",
    "wave": 1,
    "route": "/access/access-point-direction",
-   "operations": 3,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -148,7 +148,7 @@
    "module": "Access",
    "wave": 1,
    "route": "/access/gate-mode",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   }
  ],

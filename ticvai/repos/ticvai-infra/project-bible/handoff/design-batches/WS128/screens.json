@@ -1,0 +1,419 @@
+[
+ {
+  "id": "BO-703",
+  "name": "Seating & Capacity Command Center",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "4",
+   "number": "01",
+   "page": 81
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/seating-capacity-command-center-bo-703",
+   "component": "apps/venue-management-web/src/routes/sell/SeatingCapacityCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-704",
+    "BO-705"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-704",
+     "trigger": "Event Capacity Profile Configuration",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "carries": [
+      "eventId"
+     ]
+    },
+    {
+     "to": "BO-705",
+     "trigger": "Seating Mode & Reservation Configuration",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "carries": [
+      "eventId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide management with a consolidated backend view of the financial, commercial, sponsorship, attendance and operational performance of events.",
+  "purposeNote": "Authorized users can obtain a consolidated view of event commercial and operational performance while data visibility remains controlled by tenant, entity and role permissions.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 81"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 81"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setEventCapacityProfile",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setEventCapacityProfile"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The seating capacity list.",
+   "error": "Could not load. Names which read failed and leaves the seating capacity untouched.",
+   "emptyFirstRun": "No seating capacity yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the seating capacity are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setEventCapacityProfile",
+    "contract": "catalogue",
+    "purpose": "Capacity at a glance",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getSeatInventory"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-703",
+   "workshopBoard": "wireframes/WS51 Event Management Configuration Backend Structure v1.0 Board 4.dc.html#bo-703"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Event_Management_Configuration_Backend_Structure_v1.0.pdf page 81. 0 of 0 labels bound to a contract property; 0 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "eventId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-704",
+  "name": "Event Capacity Profile Configuration",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "4",
+   "number": "02",
+   "page": 82
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/event-capacity-profile-configuration-bo-704",
+   "component": "apps/venue-management-web/src/routes/sell/EventCapacityProfileConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-703"
+   ],
+   "exitTo": [
+    "BO-703"
+   ],
+   "transitions": [
+    {
+     "to": "BO-703",
+     "trigger": "Back to Seating & Capacity Command Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "eventId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure the financial plan and budget against which event performance will be measured.",
+  "purposeNote": "Administrators can create an event-level financial plan and compare budget, commitments, actuals and forecasts using data referenced from the shared Finance services.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 82"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 82"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setEventCapacityProfile",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setEventCapacityProfile"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The event capacity profile list.",
+   "error": "Could not load. Names which read failed and leaves the event capacity profile untouched.",
+   "emptyFirstRun": "No event capacity profile yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the event capacity profile are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setEventCapacityProfile",
+    "contract": "catalogue",
+    "purpose": "The capacity profile",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getSeatInventory"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-704",
+   "workshopBoard": "wireframes/WS51 Event Management Configuration Backend Structure v1.0 Board 4.dc.html#bo-704"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Event_Management_Configuration_Backend_Structure_v1.0.pdf page 82. 0 of 0 labels bound to a contract property; 0 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "eventId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-705",
+  "name": "Seating Mode & Reservation Configuration",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "4",
+   "number": "03",
+   "page": 83
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/seating-mode-reservation-configuration-bo-705",
+   "component": "apps/venue-management-web/src/routes/sell/SeatingModeReservationConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-703"
+   ],
+   "exitTo": [
+    "BO-703"
+   ],
+   "transitions": [
+    {
+     "to": "BO-703",
+     "trigger": "Back to Seating & Capacity Command Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "eventId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Define how financial performance should be measured and attributed to an event.",
+  "purposeNote": "The system provides traceable event profitability using configured financial attribution rules without duplicating the underlying accounting ledger.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 83"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 83"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setEventCapacityProfile",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setEventCapacityProfile"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The seating mode reservation list.",
+   "error": "Could not load. Names which read failed and leaves the seating mode reservation untouched.",
+   "emptyFirstRun": "No seating mode reservation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the seating mode reservation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setEventCapacityProfile",
+    "contract": "catalogue",
+    "purpose": "Seating mode",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getSeatInventory"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-705",
+   "workshopBoard": "wireframes/WS51 Event Management Configuration Backend Structure v1.0 Board 4.dc.html#bo-705"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Event_Management_Configuration_Backend_Structure_v1.0.pdf page 83. 0 of 0 labels bound to a contract property; 0 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "eventId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

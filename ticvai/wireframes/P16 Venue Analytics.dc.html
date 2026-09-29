@@ -158,7 +158,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getCommandCentre · getDashboard · listAlerts · requestSuggestion +1</div>
+          <div><b>OPERATIONS</b> &middot; getCommandCentre · getDashboard · listAlerts · requestSuggestion +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, domain&larr;session, dashboardId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; entry point · <a href="#anl-002">ANL-002</a>  &mdash; <i>Sales, Revenue &amp; Channel</i> <span class="car">dashboardId · reportId</span><br><a href="#anl-003">ANL-003</a>  &mdash; <i>Operational Performance</i> <span class="car">dashboardId · reportId</span><br><a href="#anl-004">ANL-004</a>  &mdash; <i>Product Performance</i> <span class="car">dashboardId · reportId</span><br><a href="#anl-005">ANL-005</a>  &mdash; <i>Cost, Margin &amp; Profitability</i> <span class="car">dashboardId · reportId</span><br><a href="#anl-006">ANL-006</a>  &mdash; <i>Inventory &amp; Waste Intelligence</i> <span class="car">dashboardId · reportId</span><br><a href="#anl-007">ANL-007</a>  &mdash; <i>Guest &amp; Conversion Intelligence</i> <span class="car">dashboardId · reportId</span><br><a href="#anl-008">ANL-008</a>  &mdash; <i>Demand Forecasting</i> <span class="car">dashboardId</span><br><a href="#anl-009">ANL-009</a>  &mdash; <i>AI Assistant &amp; Action Center</i> <span class="car">alertId · reportId</span><br><a href="#anl-010">ANL-010</a>  &mdash; <i>Suggestions &amp; Advice</i> <span class="car">suggestionId</span><br><a href="#anl-012">ANL-012</a>  &mdash; <i>Live Operations Dashboard</i><br><a href="#anl-013">ANL-013</a>  &mdash; <i>Revenue Pulse</i><br><a href="#anl-014">ANL-014</a>  &mdash; <i>Attendance &amp; Footfall Intelligence</i><br><a href="#anl-015">ANL-015</a>  &mdash; <i>Capacity &amp; Utilization Monitor</i><br><a href="#anl-016">ANL-016</a>  &mdash; <i>Sales &amp; Channel Performance</i><br><a href="#anl-017">ANL-017</a>  &mdash; <i>Customer, Membership &amp; Loyalty Pulse</i><br><a href="#anl-018">ANL-018</a>  &mdash; <i>Alerts &amp; Exception Center</i><br><a href="#anl-019">ANL-019</a>  &mdash; <i>AI Management Insights</i><br><a href="#anl-020">ANL-020</a>  &mdash; <i>Multi-Site &amp; Performance Comparison</i><br><a href="#anl-021">ANL-021</a>  &mdash; <i>Dashboard Library</i> <span class="car">dashboardId</span><br><a href="#anl-031">ANL-031</a>  &mdash; <i>Report Catalogue &amp; Library</i><br><a href="#anl-041">ANL-041</a>  &mdash; <i>Reporting Governance Command Center</i><br><a href="#anl-051">ANL-051</a>  &mdash; <i>AI Analytics Command Center</i><br><a href="#anl-061">ANL-061</a>  &mdash; <i>BI &amp; Analytics Administration Command Center</i></div>
@@ -188,7 +188,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getDashboard · runReport</div>
+          <div><b>OPERATIONS</b> &middot; getDashboard · runReport · recordDashboardView</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, domain&larr;session, dashboardId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#anl-001">ANL-001</a>  &mdash; <i>Executive Command Center</i> <span class="car">dashboardId · reportId</span></div>
@@ -218,7 +218,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getDashboard · runReport · listAlerts · listDevices +1</div>
+          <div><b>OPERATIONS</b> &middot; getDashboard · runReport · listAlerts · listDevices +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, domain&larr;session, dashboardId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#anl-001">ANL-001</a>  &mdash; <i>Executive Command Center</i> <span class="car">dashboardId · reportId</span></div>
@@ -248,7 +248,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getDashboard · runReport · listProducts</div>
+          <div><b>OPERATIONS</b> &middot; getDashboard · runReport · listProducts · recordDashboardView</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, domain&larr;session, dashboardId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#anl-001">ANL-001</a>  &mdash; <i>Executive Command Center</i> <span class="car">dashboardId · reportId</span><br><a href="#anl-006">ANL-006</a>  &mdash; <i>Inventory &amp; Waste Intelligence</i> <span class="car">dashboardId · reportId</span></div>
@@ -278,7 +278,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getDashboard · runReport · getStockValuation</div>
+          <div><b>OPERATIONS</b> &middot; getDashboard · runReport · getStockValuation · recordDashboardView</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, domain&larr;session, dashboardId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#anl-001">ANL-001</a>  &mdash; <i>Executive Command Center</i> <span class="car">dashboardId · reportId</span><br><a href="#anl-007">ANL-007</a>  &mdash; <i>Guest &amp; Conversion Intelligence</i> <span class="car">dashboardId · reportId</span></div>
@@ -308,7 +308,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getDashboard · runReport · getCountVariance · listExpiringBatches</div>
+          <div><b>OPERATIONS</b> &middot; getDashboard · runReport · getCountVariance · listExpiringBatches +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, domain&larr;session, countId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#anl-001">ANL-001</a>  &mdash; <i>Executive Command Center</i> <span class="car">dashboardId · reportId</span></div>
@@ -338,7 +338,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getDashboard · runReport · listSegments · createSegment +1</div>
+          <div><b>OPERATIONS</b> &middot; getDashboard · runReport · listSegments · createSegment +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, domain&larr;session, dashboardId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#anl-001">ANL-001</a>  &mdash; <i>Executive Command Center</i> <span class="car">dashboardId · reportId</span><br><a href="#anl-004">ANL-004</a>  &mdash; <i>Product Performance</i> <span class="car">dashboardId · reportId</span></div>
@@ -368,7 +368,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; askReportingQuestion · getDashboard</div>
+          <div><b>OPERATIONS</b> &middot; askReportingQuestion · getDashboard · recordDashboardView</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, domain&larr;session, dashboardId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#anl-001">ANL-001</a>  &mdash; <i>Executive Command Center</i> <span class="car">dashboardId · reportId</span></div>
@@ -698,7 +698,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getAnalyticsBenchmark</div>
+          <div><b>OPERATIONS</b> &middot; getAnalyticsBenchmark · listSiteNormalisationBases</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#anl-001">ANL-001</a>  &mdash; <i>Back to Executive Command Center</i><br><a href="#anl-012">ANL-012</a>  &mdash; <i>Live Operations Dashboard</i><br><a href="#anl-013">ANL-013</a>  &mdash; <i>Revenue Pulse</i><br><a href="#anl-014">ANL-014</a>  &mdash; <i>Attendance &amp; Footfall Intelligence</i><br><a href="#anl-015">ANL-015</a>  &mdash; <i>Capacity &amp; Utilization Monitor</i><br><a href="#anl-016">ANL-016</a>  &mdash; <i>Sales &amp; Channel Performance</i><br><a href="#anl-017">ANL-017</a>  &mdash; <i>Customer, Membership &amp; Loyalty Pulse</i><br><a href="#anl-018">ANL-018</a>  &mdash; <i>Alerts &amp; Exception Center</i><br><a href="#anl-019">ANL-019</a>  &mdash; <i>AI Management Insights</i></div>
@@ -728,7 +728,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listDashboards · getDashboard · createDashboard</div>
+          <div><b>OPERATIONS</b> &middot; listDashboards · getDashboard · createDashboard · recordDashboardView</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; dashboardId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#anl-001">ANL-001</a>  &mdash; <i>Back to Executive Command Center</i> <span class="car">dashboardId · reportId</span><br><a href="#anl-022">ANL-022</a>  &mdash; <i>Dashboard Creation Wizard</i><br><a href="#anl-023">ANL-023</a>  &mdash; <i>Drag-and-Drop Dashboard Canvas</i> <span class="car">dashboardId</span><br><a href="#anl-024">ANL-024</a>  &mdash; <i>Widget &amp; Visualization Library</i><br><a href="#anl-025">ANL-025</a>  &mdash; <i>KPI Builder</i><br><a href="#anl-026">ANL-026</a>  &mdash; <i>Targets, Thresholds &amp; KPI Status Rules</i><br><a href="#anl-027">ANL-027</a>  &mdash; <i>Data &amp; Filter Configuration</i> <span class="car">dashboardId</span><br><a href="#anl-028">ANL-028</a>  &mdash; <i>Drill-Down &amp; Interaction Designer</i> <span class="car">dashboardId</span><br><a href="#anl-029">ANL-029</a>  &mdash; <i>Dashboard Access, Publishing &amp; Versioning</i> <span class="car">dashboardId</span><br><a href="#anl-030">ANL-030</a>  &mdash; <i>Dashboard Preview, Validation &amp; Health</i> <span class="car">dashboardId</span></div>
@@ -788,7 +788,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; updateDashboard · getDashboard · deleteDashboard</div>
+          <div><b>OPERATIONS</b> &middot; updateDashboard · getDashboard · deleteDashboard · recordDashboardView</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; dashboardId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#anl-021">ANL-021</a>  &mdash; <i>Back to Dashboard Library</i> <span class="car">dashboardId</span></div>
@@ -998,7 +998,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getDashboard · listAnalyticsPipelines</div>
+          <div><b>OPERATIONS</b> &middot; getDashboard · listAnalyticsPipelines · recordDashboardView</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; dashboardId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#anl-021">ANL-021</a>  &mdash; <i>Back to Dashboard Library</i> <span class="car">dashboardId</span></div>
@@ -2018,12 +2018,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getAnalyticsBenchmark</div>
+          <div><b>OPERATIONS</b> &middot; getAnalyticsBenchmark · listSiteNormalisationBases · setSiteNormalisationBasis</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#anl-061">ANL-061</a>  &mdash; <i>Back to BI &amp; Analytics Administration Comman</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetSiteNormalisationBasis &middot; <i>Save site normalisation basis</i> &middot; <b>Save site normalisation basis</b> &middot; Cancel <span class="dis">discards bases</span></div></div>
         </div>
       </div>
       <div id="anl-065" class="scr" data-ws="WS71">

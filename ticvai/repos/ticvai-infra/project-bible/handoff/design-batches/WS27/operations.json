@@ -8,9 +8,53 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "GroupDiscountExceptionApprovalWorkflowInput",
   "responds": "GroupDiscountExceptionApprovalWorkflowView"
+ },
+ "createGroupBooking": {
+  "method": "POST",
+  "path": "/group-bookings",
+  "contract": "orders",
+  "summary": "Turn an order into a group booking",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateGroupBookingRequest",
+  "responds": "GroupBooking"
+ },
+ "createGroupEnquiry": {
+  "method": "POST",
+  "path": "/group-enquiry-opportunity",
+  "contract": "orders",
+  "summary": "Capture a group enquiry",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GroupEnquiryInput",
+  "responds": "GroupEnquiryOpportunityView"
  },
  "listGroupCustomerOrganization": {
   "method": "GET",
@@ -64,6 +108,70 @@
   "requestBody": null,
   "responds": "GroupSalesCommandCenterView"
  },
+ "listGroupSale2": {
+  "method": "GET",
+  "path": "/group-sale-2",
+  "contract": "orders",
+  "summary": "Group Sales Analytics & AI Intelligence Center",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "customerType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "organization",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "salesOwner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "groupType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "campaign",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "market",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "GroupSalesAnalyticsAiIntelligenceCenterView"
+ },
  "listQuoteBookingConversion": {
   "method": "GET",
   "path": "/quote-booking-conversion",
@@ -99,9 +207,34 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "GroupBooking360HandoverWorkspaceInput",
   "responds": "GroupBooking360HandoverWorkspaceView"
+ },
+ "setGroupCustomerOrganization": {
+  "method": "PUT",
+  "path": "/group-customer-organization",
+  "contract": "orders",
+  "summary": "Save a group customer organisation's profile",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GroupCustomerOrganizationInput",
+  "responds": "GroupCustomerOrganizationView"
  },
  "setGroupPackageExperience": {
   "method": "PUT",
@@ -112,7 +245,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "GroupPackageExperienceBuilderInput",
   "responds": "GroupPackageExperienceBuilderView"
  },
@@ -125,8 +264,33 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "GroupQuotationBuilderProposalGenerationInput",
   "responds": "GroupQuotationBuilderProposalGenerationView"
+ },
+ "updateGroupBooking": {
+  "method": "PATCH",
+  "path": "/group-bookings/{groupBookingId}",
+  "contract": "orders",
+  "summary": "Confirm numbers, change the leader or cancel a group",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "UpdateGroupBookingRequest",
+  "responds": "GroupBooking"
  }
 }

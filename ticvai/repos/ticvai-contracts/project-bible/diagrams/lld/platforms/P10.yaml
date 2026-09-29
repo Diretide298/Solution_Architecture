@@ -27,7 +27,7 @@ servicesCalled:
 - service: OrderService
   operationCalls: 85
 - service: PlatformService
-  operationCalls: 44
+  operationCalls: 59
 - service: CatalogueService
   operationCalls: 33
 - service: IdentityService
@@ -769,6 +769,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - actOnPartnerApplicationReview
   - listPartnerOnboardingApplication
   states:
   - emptyFirstRun
@@ -776,7 +777,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - applicationId<-navigation
   goesTo:
   - PTR-022
   boardFrames: null
@@ -790,14 +792,17 @@ screens:
   wave: 3
   density: compact
   operations:
+  - createPartnerUser
   - listPartnerContactUser
+  - setPartnerContact
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - partnerId<-session
   goesTo:
   - PTR-022
   boardFrames: null
@@ -812,13 +817,15 @@ screens:
   density: compact
   operations:
   - listTerritoryMarketDistribution
+  - setPartnerDistributionRights
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - partnerId<-session
   goesTo:
   - PTR-022
   boardFrames: null
@@ -875,13 +882,15 @@ screens:
   density: compact
   operations:
   - listPartnerAccessRole
+  - setPartnerCapabilityGrants
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - partnerId<-session
   goesTo:
   - PTR-022
   boardFrames: null
@@ -1011,6 +1020,7 @@ screens:
   density: compact
   operations:
   - listCommissionMarginIncentive
+  - setPartnerCommissionRules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1018,7 +1028,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - agreementId<-navigation
   goesTo:
   - PTR-032
   boardFrames: null
@@ -1033,13 +1044,15 @@ screens:
   density: compact
   operations:
   - listCreditLimitExposure
+  - setPartnerCreditProfile
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - agreementId<-navigation
   goesTo:
   - PTR-032
   boardFrames: null
@@ -1054,6 +1067,7 @@ screens:
   density: compact
   operations:
   - listDepositGuaranteeFinancial
+  - setPartnerSecurity
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1061,7 +1075,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - partnerId<-session
   goesTo:
   - PTR-032
   boardFrames: null
@@ -1098,6 +1113,7 @@ screens:
   density: compact
   operations:
   - listCommercialAllocationQuota
+  - setPartnerAllocations
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1105,7 +1121,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - agreementId<-navigation
   goesTo:
   - PTR-032
   boardFrames: null
@@ -1237,6 +1254,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - createPartnerChangeRequest
   - listPartnerCancellationRefund
   states:
   - emptyFirstRun
@@ -1281,6 +1299,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - actOnPartnerReconciliationException
   - listPartnerReconciliationException
   states:
   - emptyFirstRun
@@ -1289,7 +1308,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - exceptionId<-navigation
   goesTo:
   - PTR-042
   boardFrames: null
@@ -1303,6 +1323,8 @@ screens:
   wave: 3
   density: compact
   operations:
+  - actOnPartnerCommissionLine
+  - actOnPartnerSettlementBatch
   - listCommissionCalculationSettlement
   states:
   - emptyFirstRun
@@ -1311,7 +1333,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - lineId<-navigation
+  - batchId<-navigation
   goesTo:
   - PTR-042
   boardFrames: null
@@ -1325,6 +1349,8 @@ screens:
   wave: 3
   density: compact
   operations:
+  - actOnPartnerCase
+  - createPartnerCase
   - listPartnerDisputeCase
   states:
   - emptyFirstRun
@@ -1333,7 +1359,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - caseId<-navigation
   goesTo:
   - PTR-042
   boardFrames: null

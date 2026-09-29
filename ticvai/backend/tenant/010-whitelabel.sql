@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS whitelabel.footer_config_social_link (
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 7 operations read it and 2 write it; 2 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS whitelabel.guided_choice (
     id                                text PRIMARY KEY NOT NULL,
     venue_id                          uuid NOT NULL,

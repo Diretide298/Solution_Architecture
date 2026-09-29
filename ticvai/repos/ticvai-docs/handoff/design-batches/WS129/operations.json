@@ -1,0 +1,34 @@
+{
+ "listAccessProfiles": {
+  "method": "GET",
+  "path": "/accreditation-access-profiles",
+  "contract": "accreditation",
+  "summary": "Named bundles of zones, dates and times",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccessProfile"
+ },
+ "setEventRegistration": {
+  "method": "PUT",
+  "path": "/events/{eventId}/registration",
+  "contract": "catalogue",
+  "summary": "What is captured, from whom, and what it lets them in to",
+  "permission": "EVENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EventRegistration",
+  "responds": "EventRegistration"
+ }
+}

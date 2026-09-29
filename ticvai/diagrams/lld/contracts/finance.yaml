@@ -326,9 +326,11 @@ operations:
   reads:
   - cache:idempotency
   - ledger.settlement
+  - payments.provider_connection
   writes:
   - cache:idempotency
   - ledger.settlement
+  - payments.provider_cost
 - operation: listAccountMappings
   verb: GET
   path: /account-mappings

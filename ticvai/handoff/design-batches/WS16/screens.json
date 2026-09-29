@@ -17,44 +17,6 @@
    "component": "apps/venue-management-web/src/routes/venue-operations/ApprovalDecisionWorkspace.tsx",
    "status": "notStarted"
   },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Provide the approver with one comprehensive workspace to evaluate and action a request.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 31"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 31"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": []
-    }
-   ]
-  },
-  "states": {
-   "loading": "The approval decision list.",
-   "error": "Could not load. Names which read failed and leaves the approval decision untouched.",
-   "emptyFirstRun": "No approval decision yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the approval decision are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-374"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 31. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
     "BO-100"
@@ -125,6 +87,67 @@
     }
    ]
   },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide the approver with one comprehensive workspace to evaluate and action a request.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 31"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 31"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "approveDecision",
+       "label": "Approve decision",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "approveDecision"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The approval decision list.",
+   "error": "Could not load. Names which read failed and leaves the approval decision untouched.",
+   "emptyFirstRun": "No approval decision yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the approval decision are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "approveDecision",
+    "contract": "promotions",
+    "purpose": "Approval Inbox & Decision Workspace",
+    "trigger": "onAction"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-374",
+   "workshopBoard": "wireframes/WS33 Approval Workflows and Governance Board 4.dc.html#bo-374"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 31. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -166,6 +189,22 @@
    "component": "apps/venue-management-web/src/routes/venue-operations/BusinessContextEvidenceViewer.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "BO-374"
+   ],
+   "exitTo": [
+    "BO-374"
+   ],
+   "transitions": [
+    {
+     "to": "BO-374",
+     "trigger": "Back to Approval Decision Workspace",
+     "provenance": "structural — pack board 4 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -187,7 +226,14 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listApprovalRequests",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
     }
    ]
   },
@@ -198,28 +244,21 @@
    "emptyNoResults": "The filter narrowed it and the business context evidence are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listApprovalRequests",
+    "contract": "approvals",
+    "purpose": "The request and its evidence",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-375"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-375",
+   "workshopBoard": "wireframes/WS33 Approval Workflows and Governance Board 4.dc.html#bo-375"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "BO-374"
-   ],
-   "exitTo": [
-    "BO-374"
-   ],
-   "transitions": [
-    {
-     "to": "BO-374",
-     "trigger": "Back to Approval Decision Workspace",
-     "provenance": "structural — pack board 4 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -260,6 +299,22 @@
    "route": "/venue-operations/approval-timeline-decision-chain-bo-376",
    "component": "apps/venue-management-web/src/routes/venue-operations/ApprovalTimelineDecisionChain.tsx",
    "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-374"
+   ],
+   "exitTo": [
+    "BO-374"
+   ],
+   "transitions": [
+    {
+     "to": "BO-374",
+     "trigger": "Back to Approval Decision Workspace",
+     "provenance": "structural — pack board 4 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
   },
   "density": "compact",
   "pattern": "listDetail",
@@ -338,7 +393,15 @@
    "emptyNoResults": "The filter narrowed it and the approval timeline decision are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getApprovalRecord",
+    "contract": "approvals",
+    "purpose": "The decision chain, verified",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Request created",
@@ -347,29 +410,20 @@
     "Assignment",
     "Reassignment",
     "Delegation"
+   ],
+   "params": [
+    {
+     "name": "requestId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-376"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-376",
+   "workshopBoard": "wireframes/WS33 Approval Workflows and Governance Board 4.dc.html#bo-376"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 33. 0 of 12 labels bound to a contract property; 12 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "BO-374"
-   ],
-   "exitTo": [
-    "BO-374"
-   ],
-   "transitions": [
-    {
-     "to": "BO-374",
-     "trigger": "Back to Approval Decision Workspace",
-     "provenance": "structural — pack board 4 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -411,6 +465,22 @@
    "component": "apps/venue-management-web/src/routes/venue-operations/ApproveSensitiveActionConfirmation.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "BO-374"
+   ],
+   "exitTo": [
+    "BO-374"
+   ],
+   "transitions": [
+    {
+     "to": "BO-374",
+     "trigger": "Back to Approval Decision Workspace",
+     "provenance": "structural — pack board 4 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -432,7 +502,27 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "decideApprovalRequest",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listStepUpPolicies",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "decideApprovalRequest"
+      }
+     ]
     }
    ]
   },
@@ -443,25 +533,48 @@
    "emptyNoResults": "The filter narrowed it and the approve sensitive action are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "decideApprovalRequest",
+    "contract": "approvals",
+    "purpose": "Approve",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listApprovalRequests",
+     "getApprovalRecord",
+     "getApprovalAnalytics"
+    ]
+   },
+   {
+    "operationId": "signApprovalDecision",
+    "contract": "approvals",
+    "purpose": "Sign it where required",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getApprovalRecord"
+    ]
+   },
+   {
+    "operationId": "listStepUpPolicies",
+    "contract": "approvals",
+    "purpose": "Whether step-up is required",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-377"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-377",
+   "workshopBoard": "wireframes/WS33 Approval Workflows and Governance Board 4.dc.html#bo-377"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 34. 0 of 0 labels bound to a contract property; 0 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "BO-374"
-   ],
-   "exitTo": [
-    "BO-374"
-   ],
-   "transitions": [
+  "entryState": {
+   "params": [
     {
-     "to": "BO-374",
-     "trigger": "Back to Approval Decision Workspace",
-     "provenance": "structural — pack board 4 wiring, 9 September 2026",
-     "back": true
+     "name": "requestId",
+     "from": "navigation"
     }
    ]
   },
@@ -506,6 +619,22 @@
    "component": "apps/venue-management-web/src/routes/venue-operations/RejectReturnRequestInformation.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "BO-374"
+   ],
+   "exitTo": [
+    "BO-374"
+   ],
+   "transitions": [
+    {
+     "to": "BO-374",
+     "trigger": "Back to Approval Decision Workspace",
+     "provenance": "structural — pack board 4 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -527,7 +656,36 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Reject",
+       "operation": "decideApprovalRequest",
+       "notes": "Sends `decision=reject` to `decideApprovalRequest`.",
+       "provenance": "MoM 10 Aug 2026 §5.5 (Approve, Reject, Return, Request More Information); decided 29 September, readiness close-out (QA wiring note)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Return for changes",
+       "operation": "decideApprovalRequest",
+       "notes": "Sends `decision=return` to `decideApprovalRequest`.",
+       "provenance": "MoM 10 Aug 2026 §5.5 (Approve, Reject, Return, Request More Information); decided 29 September, readiness close-out (QA wiring note)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request more information",
+       "operation": "decideApprovalRequest",
+       "notes": "Sends `decision=requestInformation` to `decideApprovalRequest`.",
+       "provenance": "MoM 10 Aug 2026 §5.5 (Approve, Reject, Return, Request More Information); decided 29 September, readiness close-out (QA wiring note)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "decideApprovalRequest"
+      }
+     ]
     }
    ]
   },
@@ -538,25 +696,31 @@
    "emptyNoResults": "The filter narrowed it and the reject return request are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "decideApprovalRequest",
+    "contract": "approvals",
+    "purpose": "Reject, return or ask for more",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listApprovalRequests",
+     "getApprovalRecord",
+     "getApprovalAnalytics"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-378"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-378",
+   "workshopBoard": "wireframes/WS33 Approval Workflows and Governance Board 4.dc.html#bo-378"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 34. 0 of 0 labels bound to a contract property; 0 of 12 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "BO-374"
-   ],
-   "exitTo": [
-    "BO-374"
-   ],
-   "transitions": [
+  "entryState": {
+   "params": [
     {
-     "to": "BO-374",
-     "trigger": "Back to Approval Decision Workspace",
-     "provenance": "structural — pack board 4 wiring, 9 September 2026",
-     "back": true
+     "name": "requestId",
+     "from": "navigation"
     }
    ]
   },
@@ -601,6 +765,22 @@
    "component": "apps/venue-management-web/src/routes/venue-operations/RequesterModificationResubmission.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "BO-374"
+   ],
+   "exitTo": [
+    "BO-374"
+   ],
+   "transitions": [
+    {
+     "to": "BO-374",
+     "trigger": "Back to Approval Decision Workspace",
+     "provenance": "structural — pack board 4 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -622,7 +802,21 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "resubmitApprovalRequest",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "resubmitApprovalRequest"
+      }
+     ]
     }
    ]
   },
@@ -633,25 +827,29 @@
    "emptyNoResults": "The filter narrowed it and the requester modification resubmission are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "resubmitApprovalRequest",
+    "contract": "approvals",
+    "purpose": "Amend and resubmit",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listApprovalRequests"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-379"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-379",
+   "workshopBoard": "wireframes/WS33 Approval Workflows and Governance Board 4.dc.html#bo-379"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 35. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "BO-374"
-   ],
-   "exitTo": [
-    "BO-374"
-   ],
-   "transitions": [
+  "entryState": {
+   "params": [
     {
-     "to": "BO-374",
-     "trigger": "Back to Approval Decision Workspace",
-     "provenance": "structural — pack board 4 wiring, 9 September 2026",
-     "back": true
+     "name": "requestId",
+     "from": "navigation"
     }
    ]
   },
@@ -696,6 +894,22 @@
    "component": "apps/venue-management-web/src/routes/venue-operations/WithdrawalCancellationExpirationReopening.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "BO-374"
+   ],
+   "exitTo": [
+    "BO-374"
+   ],
+   "transitions": [
+    {
+     "to": "BO-374",
+     "trigger": "Back to Approval Decision Workspace",
+     "provenance": "structural — pack board 4 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -717,7 +931,21 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "withdrawApprovalRequest",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "withdrawApprovalRequest"
+      }
+     ]
     }
    ]
   },
@@ -728,25 +956,29 @@
    "emptyNoResults": "The filter narrowed it and the withdrawal cancellation expiration are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "withdrawApprovalRequest",
+    "contract": "approvals",
+    "purpose": "Withdraw or cancel",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listApprovalRequests"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-380"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-380",
+   "workshopBoard": "wireframes/WS33 Approval Workflows and Governance Board 4.dc.html#bo-380"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 36. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "BO-374"
-   ],
-   "exitTo": [
-    "BO-374"
-   ],
-   "transitions": [
+  "entryState": {
+   "params": [
     {
-     "to": "BO-374",
-     "trigger": "Back to Approval Decision Workspace",
-     "provenance": "structural — pack board 4 wiring, 9 September 2026",
-     "back": true
+     "name": "requestId",
+     "from": "navigation"
     }
    ]
   },
@@ -791,6 +1023,22 @@
    "component": "apps/venue-management-web/src/routes/venue-operations/SegregationOfDutiesFourEyesControl.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "BO-374"
+   ],
+   "exitTo": [
+    "BO-374"
+   ],
+   "transitions": [
+    {
+     "to": "BO-374",
+     "trigger": "Back to Approval Decision Workspace",
+     "provenance": "structural — pack board 4 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -812,7 +1060,14 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listApprovalControlPolicies",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
     }
    ]
   },
@@ -823,28 +1078,21 @@
    "emptyNoResults": "The filter narrowed it and the segregation duties four-eyes are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listApprovalControlPolicies",
+    "contract": "approvals",
+    "purpose": "Four-eyes and dual control in force",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-381"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-381",
+   "workshopBoard": "wireframes/WS33 Approval Workflows and Governance Board 4.dc.html#bo-381"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 36. 0 of 0 labels bound to a contract property; 0 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "BO-374"
-   ],
-   "exitTo": [
-    "BO-374"
-   ],
-   "transitions": [
-    {
-     "to": "BO-374",
-     "trigger": "Back to Approval Decision Workspace",
-     "provenance": "structural — pack board 4 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -886,16 +1134,27 @@
    "component": "apps/venue-management-web/src/routes/venue-operations/ApprovedActionExecutionStatus.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "BO-374"
+   ],
+   "exitTo": [
+    "BO-374"
+   ],
+   "transitions": [
+    {
+     "to": "BO-374",
+     "trigger": "Back to Approval Decision Workspace",
+     "provenance": "structural — pack board 4 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Separate approval of the request from execution of the underlying business transaction. This distinction is extremely important. An approval being completed does not automatically mean the underlying transaction executed successfully.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Retry | Investigate | Escalate. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 37 §Actions"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -917,13 +1176,21 @@
       {
        "kind": "primaryButton",
        "label": "Retry | Investigate | Escalate",
+       "operation": "resolveApprovedActionExecution",
        "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 37 §Actions"
       }
      ]
     },
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listWorkflowInstanceProcess",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
     }
    ]
   },
@@ -934,25 +1201,38 @@
    "emptyNoResults": "The filter narrowed it and the approved action execution are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listWorkflowInstanceProcess",
+    "contract": "approvals",
+    "purpose": "Whether the approved action ran",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listApprovedActionExecutions",
+    "contract": "approvals",
+    "purpose": "Approved actions and whether they ran",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "resolveApprovedActionExecution",
+    "contract": "approvals",
+    "purpose": "Retry, investigate or escalate",
+    "trigger": "onAction"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-382"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-382",
+   "workshopBoard": "wireframes/WS33 Approval Workflows and Governance Board 4.dc.html#bo-382"
   },
-  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 37. 0 of 0 labels bound to a contract property; 1 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "BO-374"
-   ],
-   "exitTo": [
-    "BO-374"
-   ],
-   "transitions": [
+  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 37. 0 of 0 labels bound to a contract property; 1 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `resolveApprovedActionExecution`.",
+  "entryState": {
+   "params": [
     {
-     "to": "BO-374",
-     "trigger": "Back to Approval Decision Workspace",
-     "provenance": "structural — pack board 4 wiring, 9 September 2026",
-     "back": true
+     "name": "executionId",
+     "from": "navigation"
     }
    ]
   },
@@ -997,6 +1277,22 @@
    "component": "apps/venue-management-web/src/routes/venue-operations/DecisionRecordImmutableAuditView.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "BO-374"
+   ],
+   "exitTo": [
+    "BO-374"
+   ],
+   "transitions": [
+    {
+     "to": "BO-374",
+     "trigger": "Back to Approval Decision Workspace",
+     "provenance": "structural — pack board 4 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -1018,7 +1314,14 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getApprovalRecord",
+       "notes": "One record, read-only."
+      }
+     ]
     }
    ]
   },
@@ -1029,25 +1332,26 @@
    "emptyNoResults": "The filter narrowed it and the decision record immutable are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getApprovalRecord",
+    "contract": "approvals",
+    "purpose": "The immutable record, and whether it is intact",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-383"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-383",
+   "workshopBoard": "wireframes/WS33 Approval Workflows and Governance Board 4.dc.html#bo-383"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 38. 0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "BO-374"
-   ],
-   "exitTo": [
-    "BO-374"
-   ],
-   "transitions": [
+  "entryState": {
+   "params": [
     {
-     "to": "BO-374",
-     "trigger": "Back to Approval Decision Workspace",
-     "provenance": "structural — pack board 4 wiring, 9 September 2026",
-     "back": true
+     "name": "requestId",
+     "from": "navigation"
     }
    ]
   },

@@ -1,4 +1,4 @@
--- assets — 13 tables
+-- assets — 14 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
@@ -75,6 +75,7 @@ CREATE TABLE IF NOT EXISTS assets.media_asset (
     custom_metadata                   jsonb,
     shared_with_tenant_ids            text[],
     tags                              text[],
+    category_id                       uuid,
     venue_id                          uuid,
     url                               text,
     thumbnail_url                     text,
@@ -105,6 +106,18 @@ CREATE TABLE IF NOT EXISTS assets.media_collection_member (
     asset_id                          uuid NOT NULL,
     added_by_principal_id             uuid,
     added_at                          timestamptz
+);
+
+-- Holds 7 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS assets.media_fingerprint (
+    id                                uuid PRIMARY KEY NOT NULL,
+    media_asset_id                    uuid NOT NULL,
+    perceptual_hash                   text,
+    embedding                         text[],
+    model_version                     text NOT NULL,
+    computed_at                       timestamptz NOT NULL,
+    scope_path                        ltree NOT NULL
 );
 
 -- An upload in progress, with the ticket a client uses to send bytes directly

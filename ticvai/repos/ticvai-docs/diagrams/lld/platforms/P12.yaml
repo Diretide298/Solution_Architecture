@@ -27,7 +27,7 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: MarketingService
-  operationCalls: 55
+  operationCalls: 60
 - service: IdentityService
   operationCalls: 9
 - service: ReportingService
@@ -385,6 +385,7 @@ screens:
   density: compact
   operations:
   - createCaseClassificationIntelligent
+  - listCaseCategories
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -567,6 +568,8 @@ screens:
   density: compact
   operations:
   - listQueues
+  - listServiceQueues
+  - setServiceQueueDefinition
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -587,6 +590,8 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listCaseCategories
+  - listServiceQueues
   - setIntelligentRoutingSkill
   states:
   - emptyFirstRun

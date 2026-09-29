@@ -1,173 +1,53 @@
 {
- "AccessMonitoringAnalyticsCommandCenterView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Access Monitoring & Analytics Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "totalAdmissionsToday": {
-    "type": "integer",
-    "description": "Total Admissions Today"
-   },
-   "entries": {
-    "type": "integer",
-    "description": "Entries"
-   },
-   "exits": {
-    "type": "integer",
-    "description": "Exits"
-   },
-   "currentlyInVenue": {
-    "type": "string",
-    "description": "Currently In Venue"
-   },
-   "reEntries": {
-    "type": "integer",
-    "description": "Re-entries"
-   },
-   "crossovers": {
-    "type": "integer",
-    "description": "Crossovers"
-   },
-   "groupAdmissions": {
-    "type": "integer",
-    "description": "Group Admissions"
-   },
-   "fastPassUses": {
-    "type": "integer",
-    "description": "Fast Pass Uses"
-   },
-   "validScans": {
-    "type": "integer",
-    "description": "Valid Scans"
-   },
-   "rejectedScans": {
-    "type": "integer",
-    "description": "Rejected Scans"
-   },
-   "interventionRate": {
-    "type": "number",
-    "description": "Intervention Rate"
-   },
-   "averageValidationTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Average Validation Time"
-   },
-   "activeGates": {
-    "type": "integer",
-    "description": "Active Gates"
-   },
-   "offlineDevices": {
-    "type": "integer",
-    "description": "Offline Devices"
-   },
-   "totalAdmissions": {
-    "type": "integer",
-    "description": "TOTAL ADMISSIONS (the pack shows 42,684)"
-   },
-   "avgValidation": {
-    "type": "number",
-    "description": "AVG. VALIDATION"
-   }
-  }
- },
  "AccessReportsScheduledReportingDataExportView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Access Reports, Scheduled Reporting & Data Export displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "tenant": {
-    "type": "string",
-    "description": "Tenant"
+   "name": {
+    "type": "string"
    },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
+   "reportId": {
+    "type": "string"
    },
-   "park": {
-    "type": "string",
-    "description": "Park"
+   "formats": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "dashboard",
+      "csv",
+      "xlsx",
+      "pdf",
+      "apiDataFeed",
+      "biIntegration"
+     ]
+    }
    },
-   "zone": {
-    "type": "string",
-    "description": "Zone"
+   "filterCriteria": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Saved filters, e.g. venue=..., gate=..."
    },
-   "event": {
+   "scheduleTime": {
     "type": "string",
-    "description": "Event"
+    "description": "Local time of day, e.g. 07:00"
    },
-   "date": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date"
-   },
-   "ticketType": {
-    "type": "string",
-    "description": "Ticket Type"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "gate": {
-    "type": "string",
-    "description": "Gate"
-   },
-   "device": {
-    "type": "string",
-    "description": "Device"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "partner": {
-    "type": "string",
-    "description": "Partner"
-   },
-   "dashboard": {
-    "type": "string",
-    "description": "Dashboard"
-   },
-   "csv": {
-    "type": "string",
-    "description": "CSV"
-   },
-   "xlsx": {
-    "type": "string",
-    "description": "XLSX"
-   },
-   "pdf": {
-    "type": "string",
-    "description": "PDF"
-   },
-   "apiDataFeed": {
-    "type": "string",
-    "description": "API/Data Feed"
-   },
-   "biIntegration": {
-    "type": "string",
-    "description": "BI integration"
-   },
-   "rbac": {
-    "type": "string",
-    "description": "RBAC"
-   },
-   "tenantIsolation": {
-    "type": "string",
-    "description": "tenant isolation"
-   },
-   "fieldLevelRestrictions": {
-    "type": "string",
-    "description": "field-level restrictions"
-   },
-   "retentionRules": {
-    "type": "string",
-    "description": "retention rules"
+   "recipients": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Authorized recipients or reporting destinations"
    }
-  }
+  },
+  "required": [
+   "reportId",
+   "name"
+  ]
  },
  "AiAccessIntelligenceForecastingExecutiveInsightsView": {
   "type": "object",
@@ -181,13 +61,11 @@
    },
    "peakArrivalTime": {
     "type": "string",
-    "format": "date-time",
-    "description": "Peak Arrival Time"
+    "description": "Forecast time window, e.g. 09:40-10:30"
    },
    "peakExitTime": {
     "type": "string",
-    "format": "date-time",
-    "description": "Peak Exit Time"
+    "description": "Forecast time window"
    },
    "venueOccupancy": {
     "type": "integer",
@@ -198,8 +76,8 @@
     "description": "Zone Occupancy"
    },
    "gateDemand": {
-    "type": "string",
-    "description": "Gate Demand"
+    "type": "integer",
+    "description": "Forecast guests per hour at peak across gates"
    },
    "groupArrivalPressure": {
     "type": "string",
@@ -213,17 +91,16 @@
     "type": "integer",
     "description": "Device Capacity"
    },
-   "expectedAttendance": {
-    "type": "integer",
-    "description": "Expected Attendance (the pack shows 28,400)"
-   },
    "currentPlanned": {
-    "type": "string",
-    "description": "Current Planned (the pack shows 10)"
+    "type": "integer",
+    "description": "Entry lanes currently planned"
    },
-   "forecastAiRecommend": {
+   "recommendedEntryLanes": {
+    "type": "integer"
+   },
+   "aiRecommendation": {
     "type": "string",
-    "description": "Forecast → AI Recommend"
+    "description": "Advisory text only; any operational change goes through the normal permission and approval controls"
    }
   }
  },
@@ -234,15 +111,15 @@
   "description": "**What Attendance & Admission Analytics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "ticketsSold": {
-    "type": "string",
+    "type": "integer",
     "description": "Tickets Sold"
    },
    "ticketsEligibleToday": {
-    "type": "string",
+    "type": "integer",
     "description": "Tickets Eligible Today"
    },
    "ticketsScanned": {
-    "type": "string",
+    "type": "integer",
     "description": "Tickets Scanned"
    },
    "uniqueGuests": {
@@ -262,61 +139,103 @@
     "description": "Membership Attendance"
    },
    "repeatEntry": {
-    "type": "string",
+    "type": "integer",
     "description": "Repeat Entry"
    },
    "attendanceRate": {
-    "type": "integer",
-    "description": "Attendance Rate"
+    "type": "number",
+    "description": "Percent"
    },
    "noShowRate": {
     "type": "number",
     "description": "no-show rate"
-   },
-   "ticketType": {
+   }
+  }
+ },
+ "Cadence": {
+  "x-ticvai-persistence": "none — embedded in schedule",
+  "type": "object",
+  "description": "**What each frequency needs (decided 28 September, audit R158).** `daily`: `timeOfDay`. `weekly`: `dayOfWeek` and `timeOfDay`. `monthly`: `dayOfMonth` and `timeOfDay`, a day past the month's end running on its last day. `quarterly`: `dayOfMonth` and `timeOfDay`, in the first month of each quarter. `onShiftClose` and `onPeriodClose`: nothing else, they run on the event. A field a frequency needs and does not have, or one it does not take, is the 400 on `createReportSchedule`. **Times are in the venue's time zone.**\n",
+  "required": [
+   "frequency"
+  ],
+  "properties": {
+   "frequency": {
     "type": "string",
-    "description": "ticket type"
+    "enum": [
+     "daily",
+     "weekly",
+     "monthly",
+     "quarterly",
+     "onShiftClose",
+     "onPeriodClose"
+    ]
    },
-   "channel": {
-    "type": "string",
-    "description": "channel"
-   },
-   "event": {
-    "type": "string",
-    "description": "event"
-   },
-   "dateTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "date/time"
-   },
-   "customerSegment": {
-    "type": "string",
-    "description": "customer segment"
-   },
-   "sold": {
-    "type": "string",
-    "description": "Sold (the pack shows 25,000)"
-   },
-   "eligible": {
-    "type": "string",
-    "description": "Eligible (the pack shows 23,842)"
-   },
-   "attended": {
-    "type": "string",
-    "description": "Attended (the pack shows 21,384)"
-   },
-   "purchased": {
-    "type": "string",
-    "description": "Purchased (the pack shows 120)"
-   },
-   "actualAttendance": {
+   "dayOfWeek": {
     "type": "integer",
-    "description": "Actual Attendance (the pack shows 112)"
+    "minimum": 0,
+    "maximum": 6
    },
-   "attendance": {
+   "dayOfMonth": {
     "type": "integer",
-    "description": "Attendance (the pack shows 93.3%)"
+    "minimum": 1,
+    "maximum": 31
+   },
+   "timeOfDay": {
+    "type": "string",
+    "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+   },
+   "timeZone": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Always the venue's time zone (decided 28 September, audit R158), returned so a reader knows which. Not taken on a write."
+   }
+  }
+ },
+ "CreateReportScheduleRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "reportId",
+   "cadence",
+   "recipients",
+   "format"
+  ],
+  "properties": {
+   "reportId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "cadence": {
+    "$ref": "#/components/schemas/Cadence"
+   },
+   "parameters": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "As `RunReportRequest.parameters` — keyed by the report's `ReportParameter.key`, applied to every run."
+   },
+   "recipients": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "$ref": "#/components/schemas/Recipient"
+    }
+   },
+   "format": {
+    "$ref": "#/components/schemas/ExportFormat"
+   },
+   "includePersonalData": {
+    "type": "boolean",
+    "default": false
+   },
+   "skipIfEmpty": {
+    "type": "boolean",
+    "default": true,
+    "description": "An empty report every morning trains people to ignore the report."
    }
   }
  },
@@ -331,12 +250,14 @@
     "description": "Re-entry rate"
    },
    "averageTimeOutside": {
-    "type": "string",
-    "format": "date-time",
-    "description": "average time outside"
+    "type": "integer",
+    "description": "Minutes"
    },
    "mostUsedReEntryGates": {
-    "type": "integer",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "most-used re-entry gates"
    },
    "rejectedReEntry": {
@@ -344,35 +265,84 @@
     "description": "rejected re-entry"
    },
    "reEntryByProduct": {
-    "type": "string",
-    "description": "re-entry by product"
-   },
-   "parkAParkB": {
-    "type": "string",
-    "description": "Park A → Park B"
-   },
-   "parkBParkA": {
-    "type": "string",
-    "description": "Park B → Park A"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Product and re-entry count pairs"
    },
    "crossoverTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "crossover time"
+    "type": "integer",
+    "description": "Average minutes between leaving one park and entering the next"
    },
    "crossoverProduct": {
-    "type": "string",
-    "description": "crossover product"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Products used for crossover, with counts"
    },
    "crossoverUtilization": {
     "type": "number",
     "description": "crossover utilization"
    },
-   "waterPark": {
-    "type": "string",
-    "description": "Water Park (the pack shows 1,327)"
+   "firstEntries": {
+    "type": "integer"
+   },
+   "temporaryExits": {
+    "type": "integer"
+   },
+   "reEntries": {
+    "type": "integer"
+   },
+   "crossovers": {
+    "type": "integer"
+   },
+   "finalExits": {
+    "type": "integer"
+   },
+   "crossoverFlows": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "From park, to park and count, e.g. Park A to Park B"
    }
   }
+ },
+ "ExecutionStatus": {
+  "type": "string",
+  "enum": [
+   "queued",
+   "running",
+   "completed",
+   "failed",
+   "cancelled",
+   "expired"
+  ]
+ },
+ "ExportFormat": {
+  "type": "string",
+  "enum": [
+   "csv",
+   "xlsx",
+   "pdf",
+   "json"
+  ]
+ },
+ "FieldType": {
+  "type": "string",
+  "enum": [
+   "string",
+   "integer",
+   "decimal",
+   "money",
+   "boolean",
+   "date",
+   "dateTime",
+   "uuid",
+   "enum"
+  ]
  },
  "GraphicalAccessMapLiveGatePerformanceView": {
   "type": "object",
@@ -380,75 +350,67 @@
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Graphical Access Map & Live Gate Performance displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "gates": {
-    "type": "integer",
-    "description": "Gates"
+   "accessPointId": {
+    "type": "string"
    },
-   "turnstiles": {
-    "type": "integer",
-    "description": "Turnstiles"
-   },
-   "entryPoints": {
-    "type": "integer",
-    "description": "Entry points"
-   },
-   "exitPoints": {
-    "type": "integer",
-    "description": "Exit points"
-   },
-   "reEntryGates": {
-    "type": "integer",
-    "description": "Re-entry gates"
-   },
-   "groupGates": {
-    "type": "integer",
-    "description": "Group gates"
-   },
-   "vipGates": {
-    "type": "integer",
-    "description": "VIP gates"
-   },
-   "attractionAccess": {
+   "pointType": {
     "type": "string",
-    "description": "attraction access"
+    "enum": [
+     "gate",
+     "turnstile",
+     "entryPoint",
+     "exitPoint",
+     "reEntryGate",
+     "groupGate",
+     "vipGate",
+     "attractionAccess",
+     "crossoverPoint"
+    ]
    },
-   "crossoverPoints": {
-    "type": "integer",
-    "description": "crossover points"
-   },
-   "healthy": {
+   "status": {
     "type": "string",
-    "description": "🟢 Healthy"
-   },
-   "warning": {
-    "type": "string",
-    "description": "🟡 Warning"
-   },
-   "critical": {
-    "type": "string",
-    "description": "🔴 Critical"
-   },
-   "offline": {
-    "type": "integer",
-    "description": "⚫ Offline"
+    "enum": [
+     "healthy",
+     "warning",
+     "critical",
+     "offline"
+    ]
    },
    "guests": {
     "type": "integer",
-    "description": "Guests (the pack shows 171 | Pa ge, 4,821)"
+    "description": "Guests (the pack shows 4,821)"
    },
    "success": {
-    "type": "string",
-    "description": "Success (the pack shows 96.4%)"
+    "type": "number",
+    "description": "Success rate, percent"
    },
    "reject": {
-    "type": "string",
-    "description": "Reject (the pack shows 2.1%)"
+    "type": "number",
+    "description": "Reject rate, percent"
    },
    "yellow": {
+    "type": "number",
+    "description": "Operator-review rate, percent"
+   },
+   "name": {
+    "type": "string"
+   },
+   "parentId": {
     "type": "string",
-    "description": "Yellow (the pack shows 1.5%)"
+    "description": "Zone or park the point sits in"
+   },
+   "throughputPerMinute": {
+    "type": "number"
+   },
+   "averageValidationSeconds": {
+    "type": "number"
    }
-  }
+  },
+  "required": [
+   "accessPointId",
+   "pointType",
+   "status"
+  ]
  },
  "GuestDwellTimeLengthOfStayAttractionFlowView": {
   "type": "object",
@@ -457,32 +419,31 @@
   "description": "**What Guest Dwell Time, Length of Stay & Attraction Flow displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "averageLengthOfStay": {
-    "type": "number",
-    "description": "Average Length of Stay"
+    "type": "integer",
+    "description": "Minutes, where entry and exit data exist"
    },
    "medianStay": {
-    "type": "string",
-    "description": "Median Stay"
+    "type": "integer",
+    "description": "Minutes"
    },
    "peakArrival": {
     "type": "string",
-    "description": "Peak Arrival"
+    "description": "Time window, e.g. 09:40-10:30"
    },
    "peakDeparture": {
     "type": "string",
-    "description": "Peak Departure"
+    "description": "Time window"
    },
    "zoneDwellTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Zone Dwell Time"
+    "type": "integer",
+    "description": "Average minutes in the selected zone"
    },
    "attractionVisits": {
     "type": "integer",
     "description": "Attraction Visits"
    },
    "fastPassUsage": {
-    "type": "string",
+    "type": "integer",
     "description": "Fast Pass Usage"
    },
    "reEntryBehavior": {
@@ -497,17 +458,9 @@
     "type": "integer",
     "description": "Total Validations (the pack shows 6,211)"
    },
-   "fastPass": {
-    "type": "string",
-    "description": "Fast Pass (the pack shows 1,827)"
-   },
    "repeatVisits": {
     "type": "integer",
     "description": "Repeat Visits (the pack shows 369)"
-   },
-   "unnecessary": {
-    "type": "string",
-    "description": "unnecessary"
    }
   }
  },
@@ -517,6 +470,19 @@
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Live Venue Occupancy & People Counting displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
+   "areaLevel": {
+    "type": "string",
+    "enum": [
+     "venue",
+     "park",
+     "zone",
+     "attraction",
+     "controlledArea"
+    ]
+   },
+   "areaId": {
+    "type": "string"
+   },
    "exits": {
     "type": "integer",
     "description": "Exits (the pack shows ±)"
@@ -526,7 +492,7 @@
     "description": "Operational Adjustments (the pack shows =)"
    },
    "current": {
-    "type": "string",
+    "type": "integer",
     "description": "Current (the pack shows 8,214)"
    },
    "capacity": {
@@ -534,36 +500,219 @@
     "description": "Capacity (the pack shows 12,000)"
    },
    "occupancy": {
-    "type": "integer",
-    "description": "Occupancy (the pack shows 68.5%)"
+    "type": "number",
+    "description": "Percent of capacity"
    },
-   "kidsZone": {
-    "type": "string",
-    "description": "Kids Zone (the pack shows 1,842 / 2,500, 🟢 74%)"
+   "areaName": {
+    "type": "string"
    },
-   "adventureZone": {
-    "type": "string",
-    "description": "Adventure Zone (the pack shows 3,107 / 3,500, 🟠 89%)"
+   "parentAreaId": {
+    "type": "string"
    },
-   "vipZone": {
-    "type": "string",
-    "description": "VIP Zone (the pack shows 421 / 600, 🟢 70%)"
+   "entries": {
+    "type": "integer"
    },
-   "normal": {
+   "status": {
     "type": "string",
-    "description": "Normal (the pack shows 0–79%)"
+    "enum": [
+     "normal",
+     "warning",
+     "high",
+     "critical"
+    ],
+    "description": "Band from the configured occupancy thresholds"
+   }
+  },
+  "required": [
+   "areaId",
+   "areaLevel"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
    },
-   "warning": {
-    "type": "string",
-    "description": "Warning (the pack shows 80–89%)"
+   "nextCursor": {
+    "type": "string"
    },
-   "high": {
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Recipient": {
+  "x-ticvai-persistence": "reporting.schedule_recipient",
+  "type": "object",
+  "description": "One recipient of a schedule. **A row of `reporting.schedule_recipient`, a child of `reporting.schedule`** — `ReportSchedule` declares the pair, which is what gives the table its `schedule_id`. Pull audit 26 September: declared on its own, the table had no column tying a recipient to its schedule.\n",
+  "required": [
+   "kind",
+   "address"
+  ],
+  "properties": {
+   "kind": {
     "type": "string",
-    "description": "High (the pack shows 90–94%)"
+    "enum": [
+     "principal",
+     "email",
+     "sftp",
+     "webhook"
+    ]
    },
-   "critical": {
+   "address": {
+    "type": "string"
+   },
+   "principalId": {
     "type": "string",
-    "description": "Critical (the pack shows 95%+)"
+    "format": "uuid"
+   }
+  }
+ },
+ "ReportResult": {
+  "x-ticvai-persistence": "none — result set, cached in object storage",
+  "type": "object",
+  "required": [
+   "executionId",
+   "columns",
+   "rows"
+  ],
+  "properties": {
+   "executionId": {
+    "type": "string"
+   },
+   "columns": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "key": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string"
+      },
+      "type": {
+       "$ref": "#/components/schemas/FieldType"
+      }
+     }
+    }
+   },
+   "rows": {
+    "type": "array",
+    "description": "**Open on purpose; the shape is `columns`.** Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a `Money`, dates, date-times and uuids as strings. A report's columns are chosen at run time, so no fixed schema can name them.\n",
+    "items": {
+     "type": "object",
+     "additionalProperties": true
+    }
+   },
+   "totals": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Aggregated columns only, keyed and typed as a row is."
+   },
+   "rowCount": {
+    "type": "integer"
+   },
+   "nextCursor": {
+    "type": "string",
+    "nullable": true
+   },
+   "generatedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "dataAsOf": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it prevents an argument about a figure that moved.\n"
+   }
+  }
+ },
+ "ReportSchedule": {
+  "x-ticvai-persistence": "reporting.schedule + reporting.schedule_recipient",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateReportScheduleRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "ownerPrincipalId",
+     "isPaused",
+     "createdAt"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "ownerPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The schedule runs under this principal's permissions, not the recipients'. A standing grant of whatever the owner can see.\n"
+     },
+     "isPaused": {
+      "type": "boolean"
+     },
+     "lastRunAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "lastRunStatus": {
+      "$ref": "#/components/schemas/ExecutionStatus"
+     },
+     "nextRunAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "consecutiveFailures": {
+      "type": "integer"
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  ]
+ },
+ "RunReportRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "properties": {
+   "parameters": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "**Open on purpose; its shape is the report's.** Keyed by `ReportParameter.key` of the definition being run, each value of that parameter's `type`. An `isRequired` parameter with no value here and no `defaultValue` is the `400` `runReport` lists.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Narrows to one venue. Omitting it returns everything the caller's scope permits — it cannot be used to reach beyond that.\n"
+   },
+   "dateFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158)."
+   },
+   "dateTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Defaults to today in the venue's time zone when not sent (audit R158)."
+   },
+   "forceAsync": {
+    "type": "boolean",
+    "default": false,
+    "description": "Queue regardless of size, for a result to be collected later."
    }
   }
  },
@@ -573,22 +722,24 @@
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Throughput, Queue & Validation Performance Analytics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
+   "gateId": {
+    "type": "string"
+   },
    "guestsPerMinute": {
-    "type": "string",
+    "type": "number",
     "description": "Guests per Minute"
    },
    "guestsPerHour": {
-    "type": "string",
+    "type": "integer",
     "description": "Guests per Hour"
    },
    "averageScanTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Average Scan Time"
+    "type": "number",
+    "description": "Seconds"
    },
    "averageGateCycle": {
     "type": "number",
-    "description": "Average Gate Cycle"
+    "description": "Seconds"
    },
    "successRate": {
     "type": "number",
@@ -603,30 +754,10 @@
     "description": "Manual Intervention Rate"
    },
    "downtime": {
-    "type": "string",
-    "description": "Downtime"
+    "type": "integer",
+    "description": "Minutes"
    },
-   "gateGuestsHrValidationRejectIntervention": {
-    "type": "string",
-    "description": "Gate Guests/hr Validation Reject Intervention"
-   },
-   "g011482039s1208": {
-    "type": "number",
-    "description": "G01 1,482 0.39s 1.2% 0.8%"
-   },
-   "g021391042s1411": {
-    "type": "number",
-    "description": "G02 1,391 0.42s 1.4% 1.1%"
-   },
-   "g03821081s8264": {
-    "type": "number",
-    "description": "G03 821 0.81s 8.2% 6.4%"
-   },
-   "gate03Underperforming": {
-    "type": "string",
-    "description": "GATE 03 — UNDERPERFORMING"
-   },
-   "reasonsType": {
+   "bottleneckReason": {
     "type": "string",
     "enum": [
      "qrReadFailures",
@@ -636,8 +767,21 @@
      "wrongGuestRouting"
     ],
     "description": "Vocabulary listed under Potential reasons."
+   },
+   "gateName": {
+    "type": "string"
+   },
+   "rejectRate": {
+    "type": "number",
+    "description": "Percent"
+   },
+   "underperforming": {
+    "type": "boolean"
    }
-  }
+  },
+  "required": [
+   "gateId"
+  ]
  },
  "ValidationOutcomeRejectionAnalyticsView": {
   "type": "object",
@@ -652,6 +796,29 @@
    "overrides": {
     "type": "integer",
     "description": "Overrides (the pack shows 281)"
+   },
+   "allowedRate": {
+    "type": "number",
+    "description": "Percent"
+   },
+   "operatorReviewRate": {
+    "type": "number",
+    "description": "Percent"
+   },
+   "deniedRate": {
+    "type": "number",
+    "description": "Percent"
+   },
+   "overrideRate": {
+    "type": "number",
+    "description": "Overrides as a percent of rejections"
+   },
+   "rejectionReasons": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Reason, count and share, e.g. Wrong Visit Date"
    }
   }
  }

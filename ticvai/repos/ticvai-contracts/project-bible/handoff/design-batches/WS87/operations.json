@@ -1,1 +1,158 @@
-{}
+{
+ "getGameCard": {
+  "method": "GET",
+  "path": "/game-cards/{cardCode}",
+  "contract": "games",
+  "summary": "Read a card's balances",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GameCard"
+ },
+ "getGameEligibility": {
+  "method": "GET",
+  "path": "/game-eligibility",
+  "contract": "games",
+  "summary": "What this guest can play right now, and what it would cost",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "cardId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GameEligibility"
+ },
+ "getWallet": {
+  "method": "GET",
+  "path": "/wallets/{subjectId}",
+  "contract": "wallet",
+  "summary": "Read a guest wallet",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Wallet"
+ },
+ "listGameplayTransactions": {
+  "method": "GET",
+  "path": "/gameplay-transactions",
+  "contract": "games",
+  "summary": "Taps, decisions and what they cost",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "readerId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outcome",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GameplayTransaction"
+ },
+ "listPrizes": {
+  "method": "GET",
+  "path": "/prizes",
+  "contract": "games",
+  "summary": "The prize catalogue",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "maxPoints",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "setGameKioskConfiguration": {
+  "method": "PUT",
+  "path": "/game-kiosk-config",
+  "contract": "games",
+  "summary": "The self-service journey, its theme and its languages",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GameKioskConfig",
+  "responds": "GameKioskConfig"
+ },
+ "topUpWallet": {
+  "method": "POST",
+  "path": "/wallets/{subjectId}/top-ups",
+  "contract": "wallet",
+  "summary": "Add value to a wallet",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Wallet"
+ }
+}

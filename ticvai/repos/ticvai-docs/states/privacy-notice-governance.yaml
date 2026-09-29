@@ -1,0 +1,63 @@
+# Privacy notice governance — state model
+# Contract: marketing-crm.PrivacyNoticeGovernance.status
+# Checked by tools/check-states.py. Added 29 September (writers pass; data model DM6).
+
+entity: Privacy notice governance
+contract: marketing-crm
+enum: PrivacyNoticeGovernance.status
+enumKind: inline
+enumSchema: PrivacyNoticeGovernance
+enumProperty: status
+owner: marketing-crm
+initial:
+- draft
+terminal:
+- archived
+transitions:
+- from: draft
+  to: review
+  operation: setPrivacyNoticePolicyGovernance
+  trigger: operation
+  guard: A `changeClassification` is set (else `422`); the move raises an approval request on the
+    tenant's approval matrix
+- from: review
+  to: draft
+  operation: setPrivacyNoticePolicyGovernance
+  trigger: operation
+  guard: The administrator withdraws the version from review, or the approval request is rejected
+    (`decideApprovalRequest`), which returns the row to `draft`
+  isReversal: true
+- from: review
+  to: approved
+  operation: decideApprovalRequest
+  trigger: operation
+  requiresApproval: true
+  guard: The approval request is approved; `approvedByPrincipalId` and `approvedAt` are stamped by the
+    decision, never sent by the caller
+- from: approved
+  to: scheduled
+  operation: setPrivacyNoticePolicyGovernance
+  trigger: operation
+  guard: The policy's effective date is in the future
+- from: approved
+  to: published
+  operation: setPrivacyNoticePolicyGovernance
+  trigger: operation
+  guard: The version goes live now, through white-label or `approvePrivacyTesting` `publish`
+- from: scheduled
+  to: published
+  trigger: timer
+  guard: The policy's effective date arrives
+- from: published
+  to: superseded
+  trigger: cascade
+  guard: A newer version of the same `documentType` and language is published
+- from: superseded
+  to: archived
+  operation: setPrivacyNoticePolicyGovernance
+  trigger: operation
+  guard: The administrator archives a superseded version; what guests accepted under it is kept
+notes: '**Classification is a person''s call, never AI''s** (pack 17.1.8, decided 29 September, writers
+  pass). `changeClassification`, `requiresReAcceptance` and `requiresNotification` freeze from
+  `approved` on; a different classification is a new version, so there is no way back from `approved`
+  to `review`.'

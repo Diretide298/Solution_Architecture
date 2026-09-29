@@ -1,6 +1,6 @@
 # WS87 — Game and Ride board 10
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 7 operations · 6 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `PRODUCT_VIEW, TENANT_CONFIGURE, WALLET_OPERATE, WALLET_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-484` | Self-Service Experience Command Center | commandCentre | 0 | 0 | — |
-| `BO-485` | Self-Service Kiosk Profile & Channel Configuration | listDetail | 0 | 0 | — |
-| `BO-486` | Customer Card / Wallet Identification | listDetail | 0 | 0 | — |
-| `BO-487` | Customer Wallet & Balance Summary | listDetail | 0 | 0 | — |
-| `BO-488` | Self-Service Wallet Top-Up | listDetail | 0 | 0 | — |
-| `BO-489` | Bonus, Free Game & Benefit View | listDetail | 0 | 0 | — |
-| `BO-490` | Game & Ride Eligibility / “What Can I Play?” | listDetail | 0 | 0 | — |
-| `BO-491` | Redemption Balance & Prize Discovery | listDetail | 0 | 0 | — |
-| `BO-492` | Customer Game & Wallet Transaction History | listDetail | 0 | 0 | — |
-| `BO-493` | Self-Service UI Theme, Language & Journey Configuration | configEditor | 0 | 0 | — |
+| `BO-484` | Self-Service Experience Command Center | commandCentre | 1 | 0 | — |
+| `BO-485` | Self-Service Kiosk Profile & Channel Configuration | listDetail | 1 | 0 | — |
+| `BO-486` | Customer Card / Wallet Identification | listDetail | 1 | 0 | — |
+| `BO-487` | Customer Wallet & Balance Summary | listDetail | 1 | 0 | — |
+| `BO-488` | Self-Service Wallet Top-Up | listDetail | 1 | 0 | — |
+| `BO-489` | Bonus, Free Game & Benefit View | listDetail | 1 | 0 | — |
+| `BO-490` | Game & Ride Eligibility / “What Can I Play?” | listDetail | 1 | 0 | — |
+| `BO-491` | Redemption Balance & Prize Discovery | listDetail | 1 | 0 | — |
+| `BO-492` | Customer Game & Wallet Transaction History | listDetail | 1 | 0 | — |
+| `BO-493` | Self-Service UI Theme, Language & Journey Configuration | configEditor | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-485, BO-486, BO-487, BO-488, BO-489, BO-490, BO-491, BO-492 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-485, BO-486, BO-487, BO-488, BO-490, BO-491, BO-492 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

@@ -1,6 +1,6 @@
 # WS03 — Access Control board 3
 
-**10 screens · 10 operations · 13 schemas · 2 permissions**
+**10 screens · 12 operations · 12 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, SCOPE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, AUDIT_VIEW, SCOPE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-164` | Digital Credential Security Command Center | commandCentre | 1 | 0 | — |
+| `BO-164` | Digital Credential Security Command Center | commandCentre | 3 | 0 | — |
 | `BO-165` | Dynamic QR Security Profile Builder | configEditor | 1 | 0 | — |
-| `BO-166` | Credential Activation & Display Rules | listDetail | 1 | 0 | — |
+| `BO-166` | Credential Activation & Display Rules | listDetail | 2 | 0 | — |
 | `BO-167` | Device Binding & Session Security | listDetail | 1 | 0 | — |
 | `BO-168` | BLE Beacon & Geofence Configuration | configEditor | 1 | 0 | — |
 | `BO-169` | Credential Transfer & Rebinding | configEditor | 1 | 0 | — |
 | `BO-170` | Credential Revocation & Lifecycle Events | listDetail | 1 | 0 | — |
 | `BO-171` | Offline Cryptographic Validation Profile | listDetail | 1 | 0 | — |
 | `BO-172` | Embedded Entitlement Payload Designer | listDetail | 1 | 0 | — |
-| `BO-173` | Credential Security Simulation, Audit & Publication | listDetail | 1 | 0 | — |
+| `BO-173` | Credential Security Simulation, Audit & Publication | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
 

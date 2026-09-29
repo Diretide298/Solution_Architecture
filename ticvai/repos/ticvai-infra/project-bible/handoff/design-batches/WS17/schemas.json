@@ -1,1 +1,319 @@
-{}
+{
+ "ApprovalAnalytics": {
+  "type": "object",
+  "x-ticvai-persistence": "none — aggregated from approvals.request",
+  "properties": {
+   "from": {
+    "type": "string",
+    "format": "date"
+   },
+   "to": {
+    "type": "string",
+    "format": "date"
+   },
+   "groupBy": {
+    "type": "string",
+    "description": "The grouping asked for, as the `groupBy` query parameter; each row's `key` is one value of it.",
+    "enum": [
+     "kind",
+     "approver",
+     "venue",
+     "day",
+     "week"
+    ]
+   },
+   "rows": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "key": {
+       "type": "string"
+      },
+      "raised": {
+       "type": "integer"
+      },
+      "approved": {
+       "type": "integer"
+      },
+      "rejected": {
+       "type": "integer"
+      },
+      "withdrawn": {
+       "type": "integer"
+      },
+      "expired": {
+       "type": "integer",
+       "description": "**Requests nobody answered.** Usually a routing defect rather than a busy approver, and the number that says the matrix names the wrong person.\n"
+      },
+      "escalated": {
+       "type": "integer"
+      },
+      "slaBreached": {
+       "type": "integer"
+      },
+      "medianMinutes": {
+       "type": "number"
+      },
+      "p95Minutes": {
+       "type": "number"
+      }
+     }
+    }
+   }
+  }
+ },
+ "ApprovalDelegation": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.delegation",
+  "required": [
+   "delegatorPrincipalId",
+   "delegatePrincipalId",
+   "from",
+   "to"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "delegatorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "A principal id (`identity.Principal.id`). This contract stores the id only; the name to show, and the people to pick from, come from `identity.listPrincipals` and `identity.getPrincipal`.\n"
+   },
+   "delegatePrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "A principal id, resolved to a name the same way as `delegatorPrincipalId`."
+   },
+   "kinds": {
+    "type": "array",
+    "description": "Absent means everything the delegator may approve.",
+    "items": {
+     "$ref": "#/components/schemas/ApprovalKind"
+    }
+   },
+   "maxAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "A delegate may be given less authority than the delegator, never more."
+   },
+   "from": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "to": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**Required.** An open-ended delegation is an approver who quietly stopped approving and a delegate who does not know they still hold it.\n"
+   },
+   "reason": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "ApprovalKind": {
+  "type": "string",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n",
+  "enum": [
+   "refund",
+   "priceOverride",
+   "discountOverride",
+   "complimentaryTicket",
+   "membershipCancellation",
+   "accessPermissionChange",
+   "configurationChange",
+   "aiRecommendation",
+   "releasePromotion",
+   "requisition",
+   "stockWriteOff",
+   "journalEntry",
+   "periodClose",
+   "periodReopen",
+   "purchaseOrderCancel",
+   "purchaseOrderShortClose",
+   "tenantMigration",
+   "productChange",
+   "pricingChange"
+  ]
+ },
+ "ApprovalSlaPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.sla_policy",
+  "description": "Approvals boards 5.5 and 5.6. **A target with no consequence is a number in a table**, so the reminder and breach behaviour are part of the policy.\n",
+  "required": [
+   "code"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "appliesToRequestKinds": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ApprovalKind"
+    }
+   },
+   "targetMinutes": {
+    "type": "integer"
+   },
+   "businessHoursOnly": {
+    "type": "boolean",
+    "default": true,
+    "description": "**A four-hour SLA starting at five in the afternoon is breached by nine the next morning with nobody having done anything wrong.**\n"
+   },
+   "calendarId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "reminders": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "atPercentOfTarget": {
+       "type": "integer"
+      },
+      "notify": {
+       "type": "string",
+       "enum": [
+        "approver",
+        "approverManager",
+        "requester",
+        "escalationGroup"
+       ]
+      }
+     }
+    }
+   },
+   "firstReminderAtPercent": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 100,
+    "nullable": true,
+    "description": "**Percent of `targetMinutes` at which the first reminder goes** (decided 29 September, readiness close-out: the reminder steps are percentages of target). A column so the SLA, Escalation, Reminder & Timeout Rules screen reads it rather than unpacking `reminders`; the reminder in `reminders` at this percentage says whom it notifies (data model for the agreed operations, 29 September)."
+   },
+   "secondReminderAtPercent": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Percent of `targetMinutes` at which the second reminder goes; above `firstReminderAtPercent`"
+   },
+   "escalateAtPercent": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Percent of `targetMinutes` at which the request or workflow escalates; at or above `secondReminderAtPercent`"
+   },
+   "onBreach": {
+    "type": "string",
+    "enum": [
+     "notifyOnly",
+     "escalate",
+     "autoApprove",
+     "autoReject"
+    ],
+    "default": "escalate"
+   },
+   "autoActionAllowed": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Auto-approval on breach is off unless somebody says otherwise, in writing.** A queue that approves itself when nobody looks is not an approval process.\n"
+   },
+   "escalationGroupId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "ApproverAvailability": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.approver_availability",
+  "description": "Approvals boards 5.3 and 5.4. **Dated, so nobody has to remember to turn it off.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "One period of absence. The key `setApproverAvailability` replaces by; absent on input to record a new period. Already the table's key (`approvals.approver_availability.id`), and until 26 September missing from the wire, so no period could be addressed.\n"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "unavailableFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "unavailableTo": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "substitutePrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "delegationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "appliesToRequestKinds": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ApprovalKind"
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ }
+}

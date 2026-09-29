@@ -188,12 +188,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAccessPoints · getAccessPoint · setTurnstileMode</div>
+          <div><b>OPERATIONS</b> &middot; listAccessPoints · getAccessPoint · setTurnstileMode · startPodiumShift +1</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; accessPointId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; accessPointId&larr;deepLink, podiumId&larr;session, shiftId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Ready to scan</i><br><a href="#scn-013">SCN-013</a> <br><a href="#scn-015">SCN-015</a>  &mdash; <i>Loads the offline package</i><br><a href="#scn-016">SCN-016</a>  &mdash; <i>Gate mode</i> <span class="car">accessPointId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetTurnstileMode &middot; <i>Save gate mode</i> &middot; <b>Save gate mode</b> &middot; Cancel <span class="dis">discards operatingMode · mode · reason</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetTurnstileMode &middot; <i>Save gate mode</i> &middot; <b>Save gate mode</b> &middot; Cancel <span class="dis">discards operatingMode · mode · reason</span></div><div class="ov"><b>modal</b> formStartPodiumShift &middot; <i>Start podium shift</i> &middot; <b>Start podium shift</b> &middot; Cancel <span class="dis">discards role · accessDeviceId</span></div><div class="ov"><b>modal</b> formEndPodiumShift &middot; <i>End podium shift</i> &middot; <b>End podium shift</b> &middot; Cancel <span class="dis">discards handoverNote</span></div></div>
         </div>
       </div>
       <div id="scn-003" class="scr">
@@ -458,12 +458,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setTurnstileMode · getAccessPoint · listAccessPoints</div>
+          <div><b>OPERATIONS</b> &middot; setTurnstileMode · getAccessPoint · listAccessPoints · cancelGateModeChange</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; accessPointId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; accessPointId&larr;deepLink, changeId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-002">SCN-002</a>  &mdash; <i>Access point &amp; direction</i> <span class="car">accessPointId</span><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Ready to scan</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetTurnstileMode &middot; <i>Save gate mode</i> &middot; <b>Save gate mode</b> &middot; Cancel <span class="dis">discards operatingMode · mode · reason</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetTurnstileMode &middot; <i>Save gate mode</i> &middot; <b>Save gate mode</b> &middot; Cancel <span class="dis">discards operatingMode · mode · reason</span></div><div class="ov"><b>confirmDialog</b> confirmCancelGateModeChange &middot; <i>Cancel gate mode change</i></div></div>
         </div>
       </div></div>
   <div class="bottom">

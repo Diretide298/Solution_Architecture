@@ -11,7 +11,7 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 69,
-  "operations": 55,
+  "operations": 58,
   "contracts": 11,
   "modules": 1,
   "undrawn": 0,
@@ -32,7 +32,7 @@
  "contracts": [
   {
    "contract": "reporting",
-   "operations": 37
+   "operations": 40
   },
   {
    "contract": "ai",
@@ -55,7 +55,7 @@
    "operations": 1
   },
   {
-   "contract": "orders",
+   "contract": "promotions",
    "operations": 1
   },
   {
@@ -71,7 +71,7 @@
    "operations": 1
   },
   {
-   "contract": "promotions",
+   "contract": "orders",
    "operations": 1
   }
  ],
@@ -82,7 +82,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/executive-command-center",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -91,7 +91,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/sales-revenue-channel",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -100,7 +100,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/operational-performance",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -109,7 +109,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/product-performance",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -118,7 +118,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/cost-margin-profitability",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -127,7 +127,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/inventory-waste-intelligence",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -136,7 +136,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/guest-conversion-intelligence",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -145,7 +145,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/demand-forecasting",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -244,7 +244,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/multi-site-performance-comparison-anl-020",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -253,7 +253,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/dashboard-library-anl-021",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -271,7 +271,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/drag-and-drop-dashboard-canvas-anl-023",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -334,7 +334,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/dashboard-preview-validation-health-anl-030",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -640,7 +640,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/benchmark-comparative-analytics-configuration-anl-064",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {

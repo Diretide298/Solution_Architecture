@@ -16,26 +16,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
- },
- "applyManualDiscount": {
-  "method": "POST",
-  "path": "/orders/{orderId}/discounts",
-  "contract": "orders",
-  "summary": "Apply a discount a cashier chose",
-  "permission": "ORDER_DISCOUNT",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ManualDiscountRequest",
-  "responds": "Order"
+  "responds": "FiscalPeriod"
  },
  "approveJournalEntry": {
   "method": "POST",
@@ -73,7 +54,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "FiscalPeriod"
  },
  "closeFiscalPeriod": {
   "method": "POST",
@@ -170,25 +151,6 @@
   "requestBody": "LegalEntity",
   "responds": "LegalEntity"
  },
- "createOrder": {
-  "method": "POST",
-  "path": "/orders",
-  "contract": "orders",
-  "summary": "Create an order",
-  "permission": "ORDER_CREATE",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateOrderRequest",
-  "responds": "Order"
- },
  "createRecognitionSchedule": {
   "method": "POST",
   "path": "/recognition-schedules",
@@ -231,7 +193,7 @@
   "method": "POST",
   "path": "/tax-exemptions",
   "contract": "finance",
-  "summary": "DelegatedAccess a tax exemption",
+  "summary": "Grant a tax exemption",
   "permission": "TAX_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -245,25 +207,6 @@
   ],
   "requestBody": "TaxExemption",
   "responds": "TaxExemption"
- },
- "exchangeOrderLines": {
-  "method": "POST",
-  "path": "/orders/{orderId}/exchanges",
-  "contract": "orders",
-  "summary": "Exchange lines for different products or dates",
-  "permission": "ORDER_EXCHANGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ExchangeOrderRequest",
-  "responds": "OrderExchangeResult"
  },
  "getAccount": {
   "method": "GET",
@@ -315,45 +258,6 @@
   "requestBody": null,
   "responds": "JournalEntry"
  },
- "getOrder": {
-  "method": "GET",
-  "path": "/orders/{orderId}",
-  "contract": "orders",
-  "summary": "Read an order",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "Order"
- },
- "getOrderStatement": {
-  "method": "GET",
-  "path": "/orders/{orderId}/statement",
-  "contract": "orders",
-  "summary": "Full financial history of an order",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "OrderStatement"
- },
- "getRefundPolicy": {
-  "method": "GET",
-  "path": "/venues/{venueId}/refund-policy",
-  "contract": "orders",
-  "summary": "Read a venue's refund policy",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "RefundPolicy"
- },
  "getTrialBalance": {
   "method": "GET",
   "path": "/ledger/trial-balance",
@@ -383,7 +287,7 @@
   "path": "/venues/{venueId}/settings",
   "contract": "tenancy",
   "summary": "Operational settings for this venue",
-  "permission": "TENANT_CONFIGURE",
+  "permission": "TENANT_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -391,15 +295,15 @@
   "requestBody": null,
   "responds": "VenueSettings"
  },
- "holdOrder": {
+ "ingestFxRates": {
   "method": "POST",
-  "path": "/orders/{orderId}/hold",
-  "contract": "orders",
-  "summary": "Park a sale and free the till",
-  "permission": "ORDER_MODIFY",
-  "offlineCapable": true,
-  "conflictPolicy": "lastWriterWins",
-  "scopeLevel": "workstation",
+  "path": "/fx-rates/ingest",
+  "contract": "finance",
+  "summary": "Pull rates from the configured provider",
+  "permission": "LEDGER_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "region",
   "parameters": [
    {
     "name": null,
@@ -408,7 +312,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "Order"
+  "responds": null
  },
  "listAccountMappings": {
   "method": "GET",
@@ -432,7 +336,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "AccountMapping"
+  "responds": "Page"
  },
  "listAccounts": {
   "method": "GET",
@@ -497,74 +401,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listDeliveryLocations": {
-  "method": "GET",
-  "path": "/venues/{venueId}/delivery-locations",
-  "contract": "fnb",
-  "summary": "Where an order can be delivered",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "kind",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "servingOutletId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "DeliveryLocation"
- },
- "listDiningOutlets": {
-  "method": "GET",
-  "path": "/venues/{venueId}/dining",
-  "contract": "fnb",
-  "summary": "Where a guest can eat, right now",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "openNow",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "orderingMethod",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "DiningOutlet"
- },
  "listFiscalPeriods": {
   "method": "GET",
   "path": "/fiscal-periods",
@@ -597,7 +433,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "FiscalPeriod"
+  "responds": "Page"
  },
  "listFxRates": {
   "method": "GET",
@@ -620,6 +456,11 @@
     "required": null
    },
    {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -631,7 +472,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "FxRate"
+  "responds": "Page"
  },
  "listJournalEntries": {
   "method": "GET",
@@ -694,31 +535,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "LegalEntity"
- },
- "listOrderRefunds": {
-  "method": "GET",
-  "path": "/orders/{orderId}/refunds",
-  "contract": "orders",
-  "summary": "List refunds against an order",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Refund"
+  "responds": "Page"
  },
  "listOrders": {
   "method": "GET",
@@ -863,6 +680,11 @@
     "required": null
    },
    {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": "status",
     "in": "query",
     "required": null
@@ -932,26 +754,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "TaxExemption"
- },
- "modifyOrder": {
-  "method": "POST",
-  "path": "/orders/{orderId}/modify",
-  "contract": "orders",
-  "summary": "Add or remove lines on an existing order",
-  "permission": "ORDER_MODIFY",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ModifyOrderRequest",
-  "responds": "OrderModificationResult"
+  "responds": "Page"
  },
  "rejectJournal": {
   "method": "POST",
@@ -970,7 +773,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "JournalEntry"
  },
  "reopenPeriod": {
   "method": "POST",
@@ -990,63 +793,6 @@
   ],
   "requestBody": null,
   "responds": null
- },
- "reprintOrder": {
-  "method": "POST",
-  "path": "/orders/{orderId}/reprints",
-  "contract": "orders",
-  "summary": "Reprint or resend tickets",
-  "permission": "ORDER_REPRINT",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "rescheduleOrder": {
-  "method": "POST",
-  "path": "/orders/{orderId}/reschedule",
-  "contract": "orders",
-  "summary": "Move an order to another performance",
-  "permission": "ORDER_RESCHEDULE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "OrderExchangeResult"
- },
- "resumeOrder": {
-  "method": "POST",
-  "path": "/orders/{orderId}/resume",
-  "contract": "orders",
-  "summary": "Bring a parked sale back to a till",
-  "permission": "ORDER_MODIFY",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "OrderResumeResult"
  },
  "reverseJournalEntry": {
   "method": "POST",
@@ -1143,44 +889,6 @@
   "requestBody": "FxRate",
   "responds": "FxRate"
  },
- "setRefundPolicy": {
-  "method": "PUT",
-  "path": "/venues/{venueId}/refund-policy",
-  "contract": "orders",
-  "summary": "Set a venue's refund policy",
-  "permission": "REGION_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RefundPolicy",
-  "responds": "RefundPolicy"
- },
- "setVenueSettings": {
-  "method": "PUT",
-  "path": "/venues/{venueId}/settings",
-  "contract": "tenancy",
-  "summary": "Set support hours, quiet hours, segregated access and alerting",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "VenueSettings",
-  "responds": "VenueSettings"
- },
  "updateAccount": {
   "method": "PATCH",
   "path": "/accounts/{accountId}",
@@ -1219,15 +927,15 @@
   "requestBody": null,
   "responds": "TaxCode"
  },
- "voidOrder": {
+ "validateRecognitionSchedules": {
   "method": "POST",
-  "path": "/orders/{orderId}/voids",
-  "contract": "orders",
-  "summary": "Void an order",
-  "permission": "ORDER_VOID",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
+  "path": "/recognition-schedules/validate",
+  "contract": "finance",
+  "summary": "Find product kinds claimed by more than one schedule",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -1236,6 +944,25 @@
    }
   ],
   "requestBody": null,
-  "responds": "Order"
+  "responds": null
+ },
+ "verifyTaxExemption": {
+  "method": "POST",
+  "path": "/tax-exemptions/{exemptionId}/verify",
+  "contract": "finance",
+  "summary": "Record that a tax exemption's evidence was checked",
+  "permission": "TAX_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TaxExemption"
  }
 }

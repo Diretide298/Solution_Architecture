@@ -1,6 +1,6 @@
 # WS29 — Membership   Annual Pass Management board 1
 
-**10 screens · 10 operations · 17 schemas · 2 permissions**
+**10 screens · 17 operations · 22 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `PLATFORM_CELL_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `PLATFORM_CELL_MANAGE, PLATFORM_TENANT_VIEW, PRICE_CONFIGURE, PRICE_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -62,13 +61,13 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `BO-284` | Membership & Annual Pass Command Center | listDetail | 1 | 0 | — |
-| `BO-285` | Membership Product & Tier Builder | configEditor | 1 | 0 | — |
+| `BO-285` | Membership Product & Tier Builder | configEditor | 2 | 0 | — |
 | `BO-286` | Membership Eligibility & Qualification Rule Builder | configEditor | 1 | 0 | — |
 | `BO-287` | Validity, Activation & Expiry Configuration | listDetail | 1 | 0 | — |
-| `BO-288` | Membership Entitlement & Admission Benefit Builder | configEditor | 1 | 0 | — |
-| `BO-289` | Membership Usage, Visit & Consumption Rules | listDetail | 1 | 0 | — |
+| `BO-288` | Membership Entitlement & Admission Benefit Builder | configEditor | 4 | 0 | — |
+| `BO-289` | Membership Usage, Visit & Consumption Rules | listDetail | 3 | 0 | — |
 | `BO-290` | Family, Household & Dependent Membership Configuration | configEditor | 1 | 0 | — |
-| `BO-291` | Membership Commercial, Pricing & Channel Association | configEditor | 1 | 0 | — |
+| `BO-291` | Membership Commercial, Pricing & Channel Association | configEditor | 4 | 0 | — |
 | `BO-292` | Renewal, Auto-Renewal & Membership Continuity Configuration | configEditor | 1 | 0 | — |
 | `BO-293` | Membership Product Validation, Approval, Publication & Versioning | configEditor | 1 | 0 | — |
 

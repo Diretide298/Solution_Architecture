@@ -1,6 +1,6 @@
 # WS01 — Access Control board 1
 
-**10 screens · 10 operations · 15 schemas · 2 permissions**
+**10 screens · 19 operations · 29 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, SCOPE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, SCOPE_MANAGE, SCOPE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **1 of these operations work offline**: listAccessPoints
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-144` | Access Control Command Center | listDetail | 1 | 0 | — |
-| `BO-145` | Venue & Park Access Structure | listDetail | 1 | 0 | — |
+| `BO-144` | Access Control Command Center | listDetail | 2 | 0 | — |
+| `BO-145` | Venue & Park Access Structure | listDetail | 4 | 0 | — |
 | `BO-146` | Access Area & Zone Builder | listDetail | 1 | 0 | — |
 | `BO-147` | Attraction Access Configuration | listDetail | 1 | 0 | — |
 | `BO-148` | Access Point Directory | configEditor | 1 | 0 | — |
 | `BO-149` | Gate & Lane Configuration | listDetail | 1 | 0 | — |
 | `BO-150` | Access Control Graphical Map Designer | listDetail | 1 | 0 | — |
-| `BO-151` | Access Location Grouping | listDetail | 1 | 0 | — |
-| `BO-152` | Operating Calendar & Special Access Days | configEditor | 1 | 0 | — |
-| `BO-153` | Topology Validation & Publication | listDetail | 1 | 0 | — |
+| `BO-151` | Access Location Grouping | listDetail | 3 | 2 | — |
+| `BO-152` | Operating Calendar & Special Access Days | configEditor | 3 | 2 | — |
+| `BO-153` | Topology Validation & Publication | listDetail | 2 | 1 | — |
 
 ## Thin screens in this batch
 
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-144 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-145",
@@ -186,10 +182,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrator can understand the complete access-control estate and identify operational/configuration problems from one screen.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Dashboard should show) and no metric row",
   "purpose": "Central operational/configuration landing page for the complete Access Control module.",
-  "purposeNote": "Administrator can understand the complete access-control estate and identify operational/configuration problems from one screen.",
   "layout": {
    "template": "split",
    "regions": [
@@ -215,7 +211,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "AccessControlCommandCenterView.failedScans",
         "AccessControlCommandCenterView.overrides",
         "AccessControlCommandCenterView.securityAlerts",
-        "AccessControlCommandCenterView.offlineDevices",
         "AccessControlCommandCenterView.synchronizationStatus"
        ],
        "bindsTo": "AccessControlCommandCenterView",
@@ -247,7 +242,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "AccessControlCommandCenterView.failedScans",
         "AccessControlCommandCenterView.overrides",
         "AccessControlCommandCenterView.securityAlerts",
-        "AccessControlCommandCenterView.offlineDevices",
         "AccessControlCommandCenterView.synchronizationStatus"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Display hierarchy such as”.",
@@ -270,6 +264,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Access Control Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "createAccessPoint",
+    "contract": "access",
+    "purpose": "Add an access point to the estate from the command centre",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listAccess"
+    ]
    }
   ],
   "entryState": {
@@ -285,7 +289,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-144"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-144",
+   "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-144"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 6. 14 of 16 labels bound to a contract property; 16 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -348,10 +353,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Any tenant can model single-site or multi-park operations without development.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Define the highest-level physical access hierarchy.",
-  "purposeNote": "Any tenant can model single-site or multi-park operations without development.",
   "gaps": [
    {
     "operation": null,
@@ -375,6 +380,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "derived": true,
        "impliedBy": "listVenueParkAccess",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createOrgUnit",
+       "label": "Create org unit",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createOrgUnit"
       }
      ]
     }
@@ -393,21 +412,51 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Venue & Park Access Structure",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOrgUnits",
+    "contract": "tenancy",
+    "purpose": "The venue, park and zone tree the access structure hangs from",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "createOrgUnit",
+    "contract": "tenancy",
+    "purpose": "Add a venue, park or zone node",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listOrgUnits"
+    ]
+   },
+   {
+    "operationId": "updateOrgUnit",
+    "contract": "tenancy",
+    "purpose": "Rename, move or deactivate a node",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listOrgUnits"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "VenueParkAccessStructureView.venue",
-    "VenueParkAccessStructureView.park",
-    "VenueParkAccessStructureView.building",
-    "VenueParkAccessStructureView.eventSpace",
-    "VenueParkAccessStructureView.waterpark"
+    "VenueParkAccessStructureView.entityType"
+   ],
+   "params": [
+    {
+     "name": "orgUnitId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-145"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-145",
+   "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-145"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 0 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -470,10 +519,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Access-controlled zones can be configured and reorganized without software changes.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Divide a venue into controlled access areas.",
-  "purposeNote": "Access-controlled zones can be configured and reorganized without software changes.",
   "gaps": [
    {
     "operation": null,
@@ -526,16 +575,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setAccessAreaZone",
     "contract": "access",
     "purpose": "Access Area & Zone Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setAccessAreaZone"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-146"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-146",
+   "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-146"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -598,10 +645,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "An attraction can independently enforce admission requirements without changing the base ticket product.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure attractions as access-controlled destinations.",
-  "purposeNote": "An attraction can independently enforce admission requirements without changing the base ticket product.",
   "gaps": [
    {
     "operation": null,
@@ -654,16 +701,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setAttractionAccess",
     "contract": "access",
     "purpose": "Attraction Access Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setAttractionAccess"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-147"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-147",
+   "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-147"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -726,10 +771,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations can logically group multiple physical devices under one controlled access point.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Additional settings) and no display directory — it is settings, not a population",
   "purpose": "Create the logical access points where validation occurs. An Access Point is different from a physical reader/device.",
-  "purposeNote": "Operations can logically group multiple physical devices under one controlled access point.",
   "layout": {
    "template": "form",
    "regions": [
@@ -788,7 +833,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-148"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-148",
+   "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-148"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 6 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -851,10 +897,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every physical lane can have independent configuration while inheriting settings from its parent access point.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure individual physical gates/lanes.",
-  "purposeNote": "Every physical lane can have independent configuration while inheriting settings from its parent access point.",
   "gaps": [
    {
     "operation": null,
@@ -907,16 +953,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setGateLane",
     "contract": "access",
     "purpose": "Gate & Lane Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setGateLane"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-149"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-149",
+   "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-149"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 0 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -979,10 +1023,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Access infrastructure can be configured and monitored geographically from a venue map.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Create a graphical digital twin of the access-control environment.",
-  "purposeNote": "Access infrastructure can be configured and monitored geographically from a venue map.",
   "gaps": [
    {
     "operation": null,
@@ -1035,16 +1079,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setAccessGraphicalMap",
     "contract": "access",
     "purpose": "Access Control Graphical Map Designer",
-    "trigger": "onAction",
-    "invalidates": [
-     "setAccessGraphicalMap"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-150"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-150",
+   "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-150"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 12. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1107,10 +1149,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Multiple access-control devices can contribute to common occupancy and operational statistics.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Group multiple access points for operational and capacity purposes.",
-  "purposeNote": "Multiple access-control devices can contribute to common occupancy and operational statistics.",
   "gaps": [
    {
     "operation": null,
@@ -1136,6 +1178,28 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save access point group",
+       "operation": "setAccessPointGroup",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Access Location Grouping** (BO-151): a named group of access points in one venue (e.g.",
+       "provenance": "contract access.yaml PUT /access-point-groups"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Delete access point group",
+       "operation": "deleteAccessPointGroup",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "Deletes a group.",
+       "provenance": "contract access.yaml DELETE /access-point-groups/{groupId}"
+      }
+     ]
     }
    ]
   },
@@ -1152,14 +1216,65 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Access Location Grouping",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setAccessPointGroup",
+    "contract": "access",
+    "purpose": "Create or replace an access-point group",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAccessLocationGrouping"
+    ]
+   },
+   {
+    "operationId": "deleteAccessPointGroup",
+    "contract": "access",
+    "purpose": "Delete an access-point group",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAccessLocationGrouping"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-151"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-151",
+   "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-151"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 13. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetAccessPointGroup",
+    "component": "modal",
+    "trigger": "Save access point group",
+    "body": "**Collects what `setAccessPointGroup` sends before it is called.** Required: `id`, `venueId`, `name`, `scopePath`. Optional: `parentGroupId`, `accessPointIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessAccessPointGroup",
+    "confirm": {
+     "label": "Save access point group",
+     "operation": "setAccessPointGroup"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "name",
+      "scopePath",
+      "parentGroupId",
+      "accessPointIds"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /access-point-groups"
+   },
+   {
+    "id": "confirmDeleteAccessPointGroup",
+    "component": "confirmDialog",
+    "trigger": "Delete access point group",
+    "body": "**Names what `deleteAccessPointGroup` changes and what it leaves alone**, in the consequence rather than the verb. A record this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract access.yaml DELETE /access-point-groups/{groupId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1220,10 +1335,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Special-date access configurations can automatically replace standard operation without manual gate-by- gate changes.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Allow access topology and operating behavior to change by date/time.",
-  "purposeNote": "Special-date access configurations can automatically replace standard operation without manual gate-by- gate changes.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1282,6 +1397,28 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 13 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save operating calendar entry",
+       "operation": "setOperatingCalendarEntry",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Operating Calendar & Special Access Days** (BO-152) and Special Event, Free View & Alternative Admission (BO-222): one dated entry (a holiday, private event, free-entry day, special event and so on), whether tickets must be validated, and for a free-view or special-event window its admission type.",
+       "provenance": "contract access.yaml PUT /operating-calendar-entries"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Delete operating calendar entry",
+       "operation": "deleteOperatingCalendarEntry",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "Deletes one calendar entry.",
+       "provenance": "contract access.yaml DELETE /operating-calendar-entries/{entryId}"
+      }
+     ]
     }
    ]
   },
@@ -1297,14 +1434,70 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Operating Calendar & Special Access Days",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setOperatingCalendarEntry",
+    "contract": "access",
+    "purpose": "Create or replace an operating calendar entry",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOperatingCalendarSpecial"
+    ]
+   },
+   {
+    "operationId": "deleteOperatingCalendarEntry",
+    "contract": "access",
+    "purpose": "Delete an operating calendar entry",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOperatingCalendarSpecial"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-152"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-152",
+   "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-152"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 13. 0 of 0 labels bound to a contract property; 10 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetOperatingCalendarEntry",
+    "component": "modal",
+    "trigger": "Save operating calendar entry",
+    "body": "**Collects what `setOperatingCalendarEntry` sends before it is called.** Required: `id`, `venueId`, `dayType`, `startsAt`, `endsAt`, `scopePath`. Optional: `name`, `ticketValidationRequired`, `admissionType`, `attractionValidation`, `manualAttendanceRequired`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessOperatingCalendarEntry",
+    "confirm": {
+     "label": "Save operating calendar entry",
+     "operation": "setOperatingCalendarEntry"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "dayType",
+      "startsAt",
+      "endsAt",
+      "scopePath",
+      "name",
+      "ticketValidationRequired",
+      "admissionType",
+      "attractionValidation",
+      "manualAttendanceRequired"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /operating-calendar-entries"
+   },
+   {
+    "id": "confirmDeleteOperatingCalendarEntry",
+    "component": "confirmDialog",
+    "trigger": "Delete operating calendar entry",
+    "body": "**Names what `deleteOperatingCalendarEntry` changes and what it leaves alone**, in the consequence rather than the verb. A record this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract access.yaml DELETE /operating-calendar-entries/{entryId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1357,10 +1550,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from BO-144, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "No access topology enters production without validation, authorization, version tracking and rollback capability. Board 1 — Final Backend Navigation The left-side navigation for this board should therefore be:",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Final validation and controlled deployment of access configuration. Before publication, TICVAI automatically validates: orphan gates devices without access points access points without zones incorrect entry/exit direction missing offline configuration conflicting operating calendars inaccessible zones missing emergency configuration capacity inconsistencies missing reader/device association policy dependencies.",
-  "purposeNote": "No access topology enters production without validation, authorization, version tracking and rollback capability. Board 1 — Final Backend Navigation The left-side navigation for this board should therefore be:",
   "gaps": [
    {
     "operation": null,
@@ -1390,6 +1583,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "What publishing changes",
        "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
        "provenance": "authored — required by check-screens for publishTopologyValidation"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Rollback configuration version",
+       "operation": "rollbackConfigurationVersion",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**Rolls back the version in force** (Topology Validation & Publication, BO-153; rule sets roll back through `publishRuleConflictCheck` with step `rollBack`): the active version becomes `rolledBack` and the version it replaced (`previousVersionId`) becomes `active` again and is redistributed to the targets.",
+       "provenance": "contract access.yaml POST /configuration-versions/{versionId}/rollback"
       }
      ]
     },
@@ -1411,18 +1612,50 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "publishTopologyValidation",
     "contract": "access",
     "purpose": "Topology Validation & Publication",
-    "trigger": "onAction",
-    "invalidates": [
-     "publishTopologyValidation"
-    ]
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "rollbackConfigurationVersion",
+    "contract": "access",
+    "purpose": "Roll back an active access configuration version",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-153"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-153",
+   "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-153"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 0 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formRollbackConfigurationVersion",
+    "component": "modal",
+    "trigger": "Rollback configuration version",
+    "body": "**Collects what `rollbackConfigurationVersion` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Rollback configuration version",
+     "operation": "rollbackConfigurationVersion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract access.yaml POST /configuration-versions/{versionId}/rollback"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "versionId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1455,6 +1688,82 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "createAccessPoint": {
+  "method": "POST",
+  "path": "/access-points",
+  "contract": "access",
+  "summary": "Create an access point",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateAccessPointRequest",
+  "responds": "AccessPoint"
+ },
+ "createOrgUnit": {
+  "method": "POST",
+  "path": "/org-units",
+  "contract": "tenancy",
+  "summary": "Create a scope node",
+  "permission": "SCOPE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "brand",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateScopeNodeRequest",
+  "responds": "OrgUnit"
+ },
+ "deleteAccessPointGroup": {
+  "method": "DELETE",
+  "path": "/access-point-groups/{groupId}",
+  "contract": "access",
+  "summary": "Delete an access-point group",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "deleteOperatingCalendarEntry": {
+  "method": "DELETE",
+  "path": "/operating-calendar-entries/{entryId}",
+  "contract": "access",
+  "summary": "Delete an operating calendar entry",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "listAccess": {
   "method": "GET",
   "path": "/access",
@@ -1523,6 +1832,45 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "OperatingCalendarSpecialAccessDaysView"
  },
+ "listOrgUnits": {
+  "method": "GET",
+  "path": "/org-units",
+  "contract": "tenancy",
+  "summary": "List scope nodes visible to the session",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "under",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "level",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeInactive",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listVenueParkAccess": {
   "method": "GET",
   "path": "/venue-park-access",
@@ -1545,9 +1893,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "TopologyValidationPublicationInput",
   "responds": "TopologyValidationPublicationView"
+ },
+ "rollbackConfigurationVersion": {
+  "method": "POST",
+  "path": "/configuration-versions/{versionId}/rollback",
+  "contract": "access",
+  "summary": "Roll back an active access configuration version",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessConfigurationVersion"
  },
  "setAccessAreaZone": {
   "method": "PUT",
@@ -1558,7 +1931,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "AccessAreaZoneBuilderInput",
   "responds": "AccessAreaZoneBuilderView"
  },
@@ -1571,9 +1950,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "AccessControlGraphicalMapDesignerInput",
   "responds": "AccessControlGraphicalMapDesignerView"
+ },
+ "setAccessPointGroup": {
+  "method": "PUT",
+  "path": "/access-point-groups",
+  "contract": "access",
+  "summary": "Create or replace an access-point group",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessAccessPointGroup",
+  "responds": "AccessAccessPointGroup"
  },
  "setAttractionAccess": {
   "method": "PUT",
@@ -1584,7 +1988,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "AttractionAccessConfigurationInput",
   "responds": "AttractionAccessConfigurationView"
  },
@@ -1597,9 +2007,53 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "GateLaneConfigurationInput",
   "responds": "GateLaneConfigurationView"
+ },
+ "setOperatingCalendarEntry": {
+  "method": "PUT",
+  "path": "/operating-calendar-entries",
+  "contract": "access",
+  "summary": "Create or replace an operating calendar entry",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessOperatingCalendarEntry",
+  "responds": "AccessOperatingCalendarEntry"
+ },
+ "updateOrgUnit": {
+  "method": "PATCH",
+  "path": "/org-units/{orgUnitId}",
+  "contract": "tenancy",
+  "summary": "Rename or deactivate a scope node",
+  "permission": "SCOPE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "brand",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OrgUnit"
  }
 }
 ```
@@ -1610,12 +2064,77 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AccessAccessPointGroup": {
+  "type": "object",
+  "x-ticvai-persistence": "access.access_point_group",
+  "description": "A named group of access points in one venue (e.g. Main Entrance), optionally nested, whose counts roll up to a common occupancy (declared 29 September, data-model close-out DM1)",
+  "required": [
+   "id",
+   "venueId",
+   "name",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string",
+    "description": "Group name, e.g. Main Entrance"
+   },
+   "parentGroupId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Enclosing group, for nested groups"
+   },
+   "accessPointIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Member access points (access.access_point)"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node (ADR-0005)"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "AccessAreaZoneBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
   "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is access.parking_facility at 14%, so this is not an update to anything the package stores today and no new table has been decided",
   "description": "**What Access Area & Zone Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *Each zone receives* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
   "properties": {
+   "name": {
+    "type": "string",
+    "description": "Zone name, e.g. VIP Lounge"
+   },
+   "venueId": {
+    "type": "string",
+    "description": "Venue the zone belongs to"
+   },
+   "zoneId": {
+    "type": "string",
+    "description": "Zone being written"
+   },
    "zoneType": {
     "type": "string",
     "enum": [
@@ -1653,11 +2172,24 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "exit requirements"
    },
    "allowedCredentialClasses": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Credential classes admitted to the zone"
+   },
+   "parentId": {
     "type": "string",
-    "description": "allowed credential classes"
+    "description": "Park or zone this zone sits under in the venue structure"
    }
   },
-  "x-ticvai-record-definition": "Each zone receives"
+  "x-ticvai-record-definition": "Each zone receives",
+  "required": [
+   "zoneId",
+   "venueId",
+   "name",
+   "zoneType"
+  ]
  },
  "AccessAreaZoneBuilderView": {
   "type": "object",
@@ -1665,6 +2197,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Access Area & Zone Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
+   "name": {
+    "type": "string",
+    "description": "Zone name, e.g. VIP Lounge"
+   },
+   "venueId": {
+    "type": "string",
+    "description": "Venue the zone belongs to"
+   },
+   "zoneId": {
+    "type": "string",
+    "description": "Zone being written"
+   },
    "zoneType": {
     "type": "string",
     "enum": [
@@ -1702,8 +2246,168 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "exit requirements"
    },
    "allowedCredentialClasses": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Credential classes admitted to the zone"
+   },
+   "parentId": {
     "type": "string",
-    "description": "allowed credential classes"
+    "description": "Park or zone this zone sits under in the venue structure"
+   }
+  },
+  "required": [
+   "zoneId",
+   "venueId",
+   "name",
+   "zoneType"
+  ]
+ },
+ "AccessConfigurationVersion": {
+  "type": "object",
+  "x-ticvai-persistence": "access.configuration_version",
+  "description": "One version of access configuration (a topology or a rule set) moving through simulate, validate, schedule, publish and roll back, with its target, schedule, validation findings and the previous version kept for rollback (declared 29 September, data-model close-out DM1)",
+  "required": [
+   "id",
+   "configurationKind",
+   "version",
+   "status",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "configurationKind": {
+    "type": "string",
+    "enum": [
+     "topology",
+     "ruleSet"
+    ]
+   },
+   "version": {
+    "type": "string",
+    "description": "Version label"
+   },
+   "snapshot": {
+    "type": "object",
+    "description": "The configuration captured by this version, restored on rollback"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "validated",
+     "pendingApproval",
+     "scheduled",
+     "active",
+     "inactive",
+     "rolledBack"
+    ],
+    "default": "draft"
+   },
+   "lastStep": {
+    "type": "string",
+    "enum": [
+     "simulate",
+     "validate",
+     "schedule",
+     "publish",
+     "rollBack"
+    ],
+    "nullable": true,
+    "description": "Last lifecycle step run on this version"
+   },
+   "targetScope": {
+    "type": "string",
+    "enum": [
+     "tenant",
+     "venue",
+     "park",
+     "zone",
+     "accessPoint",
+     "selectedGates",
+     "selectedDevices"
+    ],
+    "nullable": true,
+    "description": "What the publication covers"
+   },
+   "targetIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "IDs within the target scope"
+   },
+   "publishMode": {
+    "type": "string",
+    "enum": [
+     "now",
+     "scheduled"
+    ],
+    "nullable": true
+   },
+   "scheduledAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validationIssues": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Blocking findings from pre-publication validation"
+   },
+   "conflicts": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Rule conflicts found by the conflict check (advisory)"
+   },
+   "previousVersionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Version this one replaces, for rollback"
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Approval request raised in the approvals engine"
+   },
+   "createdByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node (ADR-0005)"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -1763,7 +2467,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "currentAdmissionRate": {
     "type": "number",
-    "description": "Current admission rate"
+    "description": "Admissions per minute across the estate"
    },
    "failedScans": {
     "type": "integer",
@@ -1777,13 +2481,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "Security alerts"
    },
-   "offlineDevices": {
-    "type": "integer",
-    "description": "Offline devices"
-   },
    "synchronizationStatus": {
-    "type": "integer",
-    "description": "Synchronization status"
+    "type": "string",
+    "enum": [
+     "inSync",
+     "syncPending",
+     "syncFailed"
+    ],
+    "description": "Estate-wide offline sync state of devices"
    }
   }
  },
@@ -1793,35 +2498,34 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Access Control Graphical Map Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "cad": {
+   "venueId": {
     "type": "string",
-    "description": "CAD"
+    "description": "Venue the map belongs to"
    },
-   "pdf": {
+   "mapId": {
     "type": "string",
-    "description": "PDF"
+    "description": "Map being written"
    },
-   "image": {
+   "sourceFileType": {
     "type": "string",
-    "description": "image"
+    "enum": [
+     "cad",
+     "pdf",
+     "image",
+     "venuePlan",
+     "architecturalDrawing"
+    ],
+    "description": "Kind of drawing uploaded as the map base"
    },
-   "venuePlan": {
+   "sourceFile": {
     "type": "string",
-    "description": "venue plan"
-   },
-   "architecturalDrawing": {
-    "type": "string",
-    "description": "architectural drawing"
-   },
-   "ontoTheMap": {
-    "type": "string",
-    "description": "onto the map"
-   },
-   "ai": {
-    "type": "string",
-    "description": "AI"
+    "description": "Reference to the uploaded drawing"
    }
-  }
+  },
+  "required": [
+   "mapId",
+   "venueId"
+  ]
  },
  "AccessControlGraphicalMapDesignerView": {
   "type": "object",
@@ -1829,35 +2533,34 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Access Control Graphical Map Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "cad": {
+   "venueId": {
     "type": "string",
-    "description": "CAD"
+    "description": "Venue the map belongs to"
    },
-   "pdf": {
+   "mapId": {
     "type": "string",
-    "description": "PDF"
+    "description": "Map being written"
    },
-   "image": {
+   "sourceFileType": {
     "type": "string",
-    "description": "image"
+    "enum": [
+     "cad",
+     "pdf",
+     "image",
+     "venuePlan",
+     "architecturalDrawing"
+    ],
+    "description": "Kind of drawing uploaded as the map base"
    },
-   "venuePlan": {
+   "sourceFile": {
     "type": "string",
-    "description": "venue plan"
-   },
-   "architecturalDrawing": {
-    "type": "string",
-    "description": "architectural drawing"
-   },
-   "ontoTheMap": {
-    "type": "string",
-    "description": "onto the map"
-   },
-   "ai": {
-    "type": "string",
-    "description": "AI"
+    "description": "Reference to the uploaded drawing"
    }
-  }
+  },
+  "required": [
+   "mapId",
+   "venueId"
+  ]
  },
  "AccessLocationGroupingView": {
   "type": "object",
@@ -1865,63 +2568,277 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Access Location Grouping displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "gate01": {
+   "name": {
     "type": "string",
-    "description": "Gate 01"
+    "description": "Group name, e.g. Main Entrance"
    },
-   "gate02": {
-    "type": "string",
-    "description": "Gate 02"
+   "groupId": {
+    "type": "string"
    },
-   "gate03": {
-    "type": "string",
-    "description": "Gate 03"
+   "venueId": {
+    "type": "string"
    },
-   "gate04": {
+   "parentGroupId": {
     "type": "string",
-    "description": "Gate 04"
+    "description": "Enclosing group, for nested groups"
    },
-   "coasterGate": {
+   "accessPointIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Access points whose counts roll up into this group"
+   }
+  },
+  "required": [
+   "groupId",
+   "name"
+  ]
+ },
+ "AccessOperatingCalendarEntry": {
+  "type": "object",
+  "x-ticvai-persistence": "access.operating_calendar_entry",
+  "description": "One dated entry in a venue operating calendar (normal day, holiday, private event, free-entry day, special event and so on), with whether tickets must be validated. Merges access.special_admission_window, whose free-view and special-event windows are entries carrying an admission type (declared 29 September, data-model close-out DM1)",
+  "required": [
+   "id",
+   "venueId",
+   "dayType",
+   "startsAt",
+   "endsAt",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Coaster Gate"
+    "format": "uuid"
    },
-   "dropTowerGate": {
+   "venueId": {
     "type": "string",
-    "description": "Drop Tower Gate"
+    "format": "uuid"
    },
-   "adventureHallGate": {
+   "dayType": {
     "type": "string",
-    "description": "Adventure Hall Gate"
+    "enum": [
+     "normalOperatingDay",
+     "weekend",
+     "holiday",
+     "seasonalSchedule",
+     "privateEvent",
+     "freeEntryDay",
+     "maintenancePeriod",
+     "specialEvent",
+     "ladiesOnlySession",
+     "schoolGroupSession",
+     "afterHoursEvent"
+    ],
+    "description": "Kind of calendar entry"
    },
-   "normalOperatingDays": {
+   "name": {
     "type": "string",
-    "description": "normal operating days"
+    "nullable": true
    },
-   "weekends": {
+   "startsAt": {
     "type": "string",
-    "description": "weekends"
+    "format": "date-time"
    },
-   "holidays": {
+   "endsAt": {
     "type": "string",
-    "description": "holidays"
+    "format": "date-time"
    },
-   "seasonalSchedules": {
-    "type": "string",
-    "description": "seasonal schedules"
+   "ticketValidationRequired": {
+    "type": "boolean",
+    "default": true,
+    "description": "False on free-entry days"
    },
-   "privateEvents": {
+   "admissionType": {
     "type": "string",
-    "description": "private events"
+    "enum": [
+     "freeViewDay",
+     "specialEvent"
+    ],
+    "nullable": true,
+    "description": "Set on special admission windows only"
    },
-   "freeEntryDays": {
-    "type": "string",
-    "description": "free-entry days"
+   "attractionValidation": {
+    "type": "boolean",
+    "nullable": true,
+    "description": "Special windows: attraction gates keep validating tickets"
    },
-   "maintenancePeriods": {
+   "manualAttendanceRequired": {
+    "type": "boolean",
+    "nullable": true,
+    "description": "Special windows: operator enters attendance count"
+   },
+   "scopePath": {
     "type": "string",
-    "description": "maintenance periods"
+    "description": "ltree of the owning scope node (ADR-0005)"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
+ },
+ "AccessPoint": {
+  "x-ticvai-persistence": "access.access_point",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "venueId",
+   "operatingMode",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "externalCredentialSources": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExternalCredentialSourceList"
+     }
+    ],
+    "description": "BL-108. **A hotel room card admitting a guest to a water park** — externally issued, and the platform validates it without having sold it.\n**The entitlement is created on first use, not on check-in.** A hotel with 400 rooms does not want 400 entitlements a night for guests who never visit.\n"
+   },
+   "scanAnomalyRules": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ScanAnomalyRuleList"
+     }
+    ],
+    "description": "BL-104. **Rule-based scan anomalies, separated from the parked model-based engine** — device sharing, simultaneous entries at two gates, an impossible walking time between them.\n**These are deterministic and need no model**, which is why they are here and not in `ai`: two entries eight seconds apart at gates four hundred metres apart is arithmetic.\n"
+   },
+   "operatingMode": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AccessPointOperatingMode"
+     }
+    ],
+    "default": "normal",
+    "description": "**Set by the podium with `setTurnstileMode`, and it wins** (audit R221). BL-107 and BL-109. **A closed turnstile and one in emergency drop-arm mode look the same in the model and are opposite in meaning.** Closed refuses everybody; drop-arm lets everybody through, and it is the state that exists for an evacuation.\n**`podium` is a supervised validation position** — a member of staff directing a group through a lane, validating by eye against a list. It scans nothing and it is how school parties actually enter.\n**`freeFlow` counts without validating.** Useful at a free event, and a mode that must be visibly distinct from a broken reader.\n"
+   },
+   "vehicleLocationCapture": {
+    "type": "boolean",
+    "default": false,
+    "description": "BL-023. **Nothing helped a guest find their vehicle.** Where the access point is a car park entry, the level and zone are captured against the visit so the app can answer it — **the guest who cannot find their car at 11pm is the last impression of the day.**\n"
+   },
+   "mode": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/TurnstileMode"
+     }
+    ],
+    "nullable": true,
+    "description": "Narrows `operatingMode` only: `freeRotation` or `closed` within `normal` or `podium`, null otherwise and whenever the turnstile validates in its fixed `direction` (audit R221).\n"
+   },
+   "direction": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Direction"
+     }
+    ],
+    "description": "**Fixed per access point** (audit R221): set in the back office by `createAccessPoint` and `updateAccessPoint`, never by the podium.\n"
+   },
+   "antiPassbackEnabled": {
+    "type": "boolean"
+   },
+   "requiresExitBeforeReentry": {
+    "type": "boolean",
+    "default": false,
+    "description": "Written by `createAccessPoint` and `updateAccessPoint`, and returned so the edit form reads back what it wrote."
+   },
+   "driver": {
+    "type": "string",
+    "nullable": true,
+    "description": "Driver identifier for the controller behind this access point, as written by `createAccessPoint` and `updateAccessPoint`. Where the reader speaks OSDP the driver is standards-based; the controller layer above it is vendor-specific.\n"
+   },
+   "geofence": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AccessPointGeofence"
+     }
+    ],
+    "nullable": true,
+    "description": "Written by `setAccessPointGeofence`; null until one is set. **One `jsonb` column on the access point row** (`access.access_point.geofence`), read with the point when a handheld validates against it.\n"
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "lastHeartbeatAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "AccessPointGeofence": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "Where a handheld may validate for one access point, and what happens outside it. The body of `setAccessPointGeofence` and the value of `AccessPoint.geofence`.\n",
+  "required": [
+   "enforcement"
+  ],
+  "properties": {
+   "latitude": {
+    "type": "number"
+   },
+   "longitude": {
+    "type": "number"
+   },
+   "radiusMetres": {
+    "type": "integer",
+    "minimum": 5,
+    "maximum": 5000
+   },
+   "enforcement": {
+    "type": "string",
+    "enum": [
+     "off",
+     "warn",
+     "deny"
+    ],
+    "description": "`off` keeps the fence on record and checks nothing; `warn` lets a validation from outside the fence through with a warning; `deny` refuses it.\n"
+   },
+   "allowProximityBeacon": {
+    "type": "boolean",
+    "description": "Accept a BLE proximity assertion in place of GPS. Better indoors."
+   }
+  }
+ },
+ "AccessPointOperatingMode": {
+  "type": "string",
+  "description": "BL-107 and BL-109. **What the gate does, and what the podium sets** (`setTurnstileMode`, decided 28 September, audit R221). `closed` refuses everybody; `dropArm` lets everybody through and exists for an evacuation; `podium` is supervised validation by eye; `freeFlow` counts without validating; `maintenance` takes the lane out of use.\n",
+  "enum": [
+   "normal",
+   "freeFlow",
+   "dropArm",
+   "closed",
+   "podium",
+   "maintenance"
+  ]
  },
  "AttractionAccessConfigurationInput": {
   "type": "object",
@@ -1950,35 +2867,41 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Capacity"
    },
    "entryPoints": {
-    "type": "string",
-    "description": "Entry points"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Access point IDs used to enter"
    },
    "exitPoints": {
-    "type": "string",
-    "description": "Exit points"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Access point IDs used to exit"
    },
    "fastPassSupport": {
     "type": "boolean",
     "description": "Fast Pass support"
    },
    "heightRestriction": {
-    "type": "string",
-    "description": "Height restriction"
+    "type": "integer",
+    "description": "Minimum rider height in cm, e.g. 130"
    },
    "ageRestriction": {
-    "type": "string",
-    "description": "Age restriction"
+    "type": "integer",
+    "description": "Minimum age in years"
    },
    "adultCompanionRequirement": {
-    "type": "string",
+    "type": "boolean",
     "description": "Adult companion requirement"
    },
    "membershipAccess": {
-    "type": "string",
+    "type": "boolean",
     "description": "Membership access"
    },
    "vipAccess": {
-    "type": "string",
+    "type": "boolean",
     "description": "VIP access"
    },
    "entitlementRequirement": {
@@ -1986,7 +2909,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "entitlement requirement"
    },
    "biometricRequirement": {
-    "type": "string",
+    "type": "boolean",
     "description": "biometric requirement"
    },
    "operatingCalendar": {
@@ -1998,7 +2921,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "temporary closure behavior"
    }
   },
-  "x-ticvai-record-definition": "For each attraction"
+  "x-ticvai-record-definition": "For each attraction",
+  "required": [
+   "attractionId",
+   "name",
+   "venue"
+  ]
  },
  "AttractionAccessConfigurationView": {
   "type": "object",
@@ -2027,35 +2955,41 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Capacity"
    },
    "entryPoints": {
-    "type": "string",
-    "description": "Entry points"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Access point IDs used to enter"
    },
    "exitPoints": {
-    "type": "string",
-    "description": "Exit points"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Access point IDs used to exit"
    },
    "fastPassSupport": {
     "type": "boolean",
     "description": "Fast Pass support"
    },
    "heightRestriction": {
-    "type": "string",
-    "description": "Height restriction"
+    "type": "integer",
+    "description": "Minimum rider height in cm, e.g. 130"
    },
    "ageRestriction": {
-    "type": "string",
-    "description": "Age restriction"
+    "type": "integer",
+    "description": "Minimum age in years"
    },
    "adultCompanionRequirement": {
-    "type": "string",
+    "type": "boolean",
     "description": "Adult companion requirement"
    },
    "membershipAccess": {
-    "type": "string",
+    "type": "boolean",
     "description": "Membership access"
    },
    "vipAccess": {
-    "type": "string",
+    "type": "boolean",
     "description": "VIP access"
    },
    "entitlementRequirement": {
@@ -2063,7 +2997,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "entitlement requirement"
    },
    "biometricRequirement": {
-    "type": "string",
+    "type": "boolean",
     "description": "biometric requirement"
    },
    "operatingCalendar": {
@@ -2073,6 +3007,120 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "temporaryClosureBehavior": {
     "type": "string",
     "description": "temporary closure behavior"
+   }
+  },
+  "required": [
+   "attractionId",
+   "name",
+   "venue"
+  ]
+ },
+ "CreateAccessPointRequest": {
+  "type": "object",
+  "required": [
+   "code",
+   "name",
+   "venueId",
+   "direction"
+  ],
+  "properties": {
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "direction": {
+    "$ref": "#/components/schemas/Direction"
+   },
+   "antiPassbackEnabled": {
+    "type": "boolean",
+    "default": false
+   },
+   "requiresExitBeforeReentry": {
+    "type": "boolean",
+    "default": false
+   },
+   "driver": {
+    "type": "string"
+   }
+  }
+ },
+ "CreateScopeNodeRequest": {
+  "type": "object",
+  "required": [
+   "level",
+   "parentId",
+   "code",
+   "name"
+  ],
+  "properties": {
+   "level": {
+    "$ref": "#/components/schemas/ScopeLevel"
+   },
+   "parentId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Required for every level except tenant, which the cell creates at provisioning."
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64,
+    "pattern": "^[a-z0-9_]+$",
+    "description": "Becomes the final ltree segment. Immutable once created."
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   }
+  }
+ },
+ "Direction": {
+  "type": "string",
+  "enum": [
+   "entry",
+   "exit",
+   "reentry",
+   "crossover"
+  ]
+ },
+ "ExternalCredentialSourceList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "**One `jsonb` column on the access point row** (`access.access_point.external_credential_sources`). Read with the access point when a credential is presented; a source is never queried on its own.\n",
+  "items": {
+   "type": "object",
+   "properties": {
+    "kind": {
+     "type": "string",
+     "enum": [
+      "hotelRoomCard",
+      "corporateBadge",
+      "cityPass",
+      "transitCard",
+      "partnerToken"
+     ]
+    },
+    "providerName": {
+     "type": "string"
+    },
+    "endpoint": {
+     "type": "string"
+    },
+    "credentialRef": {
+     "type": "string"
+    },
+    "grantsProductId": {
+     "type": "string",
+     "format": "uuid"
+    }
    }
   }
  },
@@ -2102,25 +3150,22 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "lane number"
    },
-   "entry": {
+   "direction": {
     "type": "string",
-    "description": "Entry"
-   },
-   "exit": {
-    "type": "string",
-    "description": "Exit"
-   },
-   "bidirectional": {
-    "type": "string",
-    "description": "Bidirectional"
+    "enum": [
+     "entry",
+     "exit",
+     "bidirectional"
+    ],
+    "description": "Lane direction, inherited from the access point unless set"
    },
    "reEntry": {
-    "type": "string",
-    "description": "Re-entry"
+    "type": "boolean",
+    "description": "Lane accepts re-entry scans"
    },
    "crossover": {
-    "type": "string",
-    "description": "Crossover"
+    "type": "boolean",
+    "description": "Lane is a crossover lane between parks"
    },
    "type": {
     "type": "string",
@@ -2135,31 +3180,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "description": "Vocabulary listed under Gate type."
    },
-   "validation": {
+   "operationalMode": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AccessPointOperatingMode"
+     }
+    ],
+    "description": "Default operating mode of the lane, in the AccessPointOperatingMode vocabulary the podium sets (R221). Aligned (decided 29 September, writers pass): the old validation, freeSpin, emergencyDropArm, manual and countOnly are normal, freeFlow, dropArm, podium and freeFlow."
+   },
+   "laneSize": {
     "type": "string",
-    "description": "Validation"
-   },
-   "freeSpin": {
-    "type": "string",
-    "description": "Free Spin"
-   },
-   "closed": {
-    "type": "integer",
-    "description": "Closed"
-   },
-   "emergencyDropArm": {
-    "type": "string",
-    "description": "Emergency / Drop Arm"
-   },
-   "manual": {
-    "type": "string",
-    "description": "Manual"
-   },
-   "countOnly": {
-    "type": "integer",
-    "description": "Count Only"
+    "enum": [
+     "standard",
+     "wide"
+    ],
+    "description": "Wide lanes take buggies and wheelchairs"
    }
-  }
+  },
+  "required": [
+   "gateId",
+   "accessPoint"
+  ]
  },
  "GateLaneConfigurationView": {
   "type": "object",
@@ -2187,25 +3228,22 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "lane number"
    },
-   "entry": {
+   "direction": {
     "type": "string",
-    "description": "Entry"
-   },
-   "exit": {
-    "type": "string",
-    "description": "Exit"
-   },
-   "bidirectional": {
-    "type": "string",
-    "description": "Bidirectional"
+    "enum": [
+     "entry",
+     "exit",
+     "bidirectional"
+    ],
+    "description": "Lane direction, inherited from the access point unless set"
    },
    "reEntry": {
-    "type": "string",
-    "description": "Re-entry"
+    "type": "boolean",
+    "description": "Lane accepts re-entry scans"
    },
    "crossover": {
-    "type": "string",
-    "description": "Crossover"
+    "type": "boolean",
+    "description": "Lane is a crossover lane between parks"
    },
    "type": {
     "type": "string",
@@ -2220,31 +3258,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "description": "Vocabulary listed under Gate type."
    },
-   "validation": {
+   "operationalMode": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AccessPointOperatingMode"
+     }
+    ],
+    "description": "Default operating mode of the lane, in the AccessPointOperatingMode vocabulary the podium sets (R221). Aligned (decided 29 September, writers pass): the old validation, freeSpin, emergencyDropArm, manual and countOnly are normal, freeFlow, dropArm, podium and freeFlow."
+   },
+   "laneSize": {
     "type": "string",
-    "description": "Validation"
-   },
-   "freeSpin": {
-    "type": "string",
-    "description": "Free Spin"
-   },
-   "closed": {
-    "type": "integer",
-    "description": "Closed"
-   },
-   "emergencyDropArm": {
-    "type": "string",
-    "description": "Emergency / Drop Arm"
-   },
-   "manual": {
-    "type": "string",
-    "description": "Manual"
-   },
-   "countOnly": {
-    "type": "integer",
-    "description": "Count Only"
+    "enum": [
+     "standard",
+     "wide"
+    ],
+    "description": "Wide lanes take buggies and wheelchairs"
    }
-  }
+  },
+  "required": [
+   "gateId",
+   "accessPoint"
+  ]
  },
  "OperatingCalendarSpecialAccessDaysView": {
   "type": "object",
@@ -2252,53 +3286,96 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Operating Calendar & Special Access Days displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "normalOperatingDays": {
+   "endsAt": {
     "type": "string",
-    "description": "normal operating days"
+    "format": "date-time"
    },
-   "weekends": {
+   "startsAt": {
     "type": "string",
-    "description": "weekends"
+    "format": "date-time"
    },
-   "holidays": {
-    "type": "string",
-    "description": "holidays"
+   "entryId": {
+    "type": "string"
    },
-   "seasonalSchedules": {
+   "dayType": {
     "type": "string",
-    "description": "seasonal schedules"
+    "enum": [
+     "normalOperatingDay",
+     "weekend",
+     "holiday",
+     "seasonalSchedule",
+     "privateEvent",
+     "freeEntryDay",
+     "maintenancePeriod",
+     "specialEvent",
+     "ladiesOnlySession",
+     "schoolGroupSession",
+     "afterHoursEvent"
+    ],
+    "description": "Kind of calendar entry"
    },
-   "privateEvents": {
-    "type": "string",
-    "description": "private events"
+   "venueId": {
+    "type": "string"
    },
-   "freeEntryDays": {
-    "type": "string",
-    "description": "free-entry days"
+   "name": {
+    "type": "string"
    },
-   "maintenancePeriods": {
+   "ticketValidationRequired": {
+    "type": "boolean",
+    "description": "False on free-entry days"
+   }
+  },
+  "required": [
+   "entryId",
+   "dayType",
+   "startsAt",
+   "endsAt"
+  ]
+ },
+ "OrgUnit": {
+  "x-ticvai-persistence": "platform.scope",
+  "type": "object",
+  "required": [
+   "id",
+   "level",
+   "path",
+   "code",
+   "name",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "maintenance periods"
+    "format": "uuid"
    },
-   "specialEvents": {
-    "type": "string",
-    "description": "special events"
+   "level": {
+    "$ref": "#/components/schemas/ScopeLevel"
    },
-   "ladiesOnlySessions": {
+   "parentId": {
     "type": "string",
-    "description": "ladies-only sessions"
+    "format": "uuid",
+    "nullable": true
    },
-   "schoolGroupSessions": {
+   "path": {
     "type": "string",
-    "description": "school/group sessions"
+    "description": "Materialised ltree path, e.g. `t_ref.b_alpha.r_north.v_alpha1`.",
+    "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$"
    },
-   "afterHoursEvents": {
+   "code": {
     "type": "string",
-    "description": "after-hours events"
+    "maxLength": 64
    },
-   "ai": {
+   "name": {
     "type": "string",
-    "description": "AI"
+    "maxLength": 200
+   },
+   "isActive": {
+    "type": "boolean",
+    "description": "False causes every permission query at or beneath this node to resolve to DENY.\n"
+   },
+   "childCount": {
+    "type": "integer",
+    "minimum": 0
    }
   }
  },
@@ -2321,53 +3398,109 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "ScanAnomalyRuleList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "**One `jsonb` column on the access point row** (`access.access_point.scan_anomaly_rules`). Read with the access point at validation, and a rule is never queried on its own.\n",
+  "items": {
+   "type": "object",
+   "properties": {
+    "rule": {
+     "type": "string",
+     "enum": [
+      "simultaneousEntry",
+      "impossibleTravelTime",
+      "rapidReentry",
+      "sharedDevice",
+      "velocityBreach"
+     ]
+    },
+    "action": {
+     "type": "string",
+     "enum": [
+      "log",
+      "flag",
+      "requireSupervisor",
+      "deny"
+     ]
+    },
+    "thresholdSeconds": {
+     "type": "integer",
+     "nullable": true
+    }
+   }
+  }
+ },
+ "ScopeLevel": {
+  "type": "string",
+  "description": "**The eight organisational levels, plus `subject`.** Restored 24 August.\n`tenancy.yaml` holds the authoritative definition of the eight levels and this mirrors them so a contract can reference a level without depending on the whole tenancy surface. **Seven organisational levels plus `outlet`** — a commercial branch beside the organisational one (CF-138, ADR-0018). **A department has requisitions and rotas; an outlet has a menu and stock**, and modelling a restaurant as a department would put it in the staffing tree.\n\n**`subject` is the one value tenancy does not have, and it is not a level.** It is here because `check-package` reads this enum as the closed vocabulary for `x-ticvai-scope-level`, and some operations act on one guest's own resources, which sit in no node of the venue hierarchy. So `subject` is valid as an operation's scope level and never as a `ScopeRef.level`: every `ScopeRef` is a row of `platform.scope`, and those carry one of the eight.\n",
+  "enum": [
+   "tenant",
+   "brand",
+   "region",
+   "venue",
+   "department",
+   "subDepartment",
+   "workstation",
+   "outlet",
+   "subject"
+  ]
+ },
  "TopologyValidationPublicationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Topology Validation & Publication submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "entireTenant": {
+   "publishMode": {
     "type": "string",
-    "description": "Entire tenant"
+    "enum": [
+     "now",
+     "scheduled"
+    ]
    },
-   "venue": {
+   "configurationVersionId": {
     "type": "string",
-    "description": "Venue"
+    "description": "Topology version being published"
    },
-   "park": {
+   "targetScope": {
     "type": "string",
-    "description": "Park"
+    "enum": [
+     "tenant",
+     "venue",
+     "park",
+     "zone",
+     "accessPoint",
+     "selectedGates",
+     "selectedDevices"
+    ],
+    "description": "What the publication covers"
    },
-   "zone": {
-    "type": "string",
-    "description": "Zone"
+   "targetIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "IDs within the target scope"
    },
-   "accessPoint": {
+   "scheduledAt": {
     "type": "string",
-    "description": "Access point"
+    "format": "date-time"
    },
-   "selectedGates": {
-    "type": "string",
-    "description": "Selected gates"
-   },
-   "selectedDevices": {
-    "type": "string",
-    "description": "Selected devices"
-   },
-   "withRollbackToPreviousConfiguration": {
-    "type": "string",
-    "description": "with rollback to previous configuration"
-   },
-   "scanned": {
-    "type": "string",
-    "description": "scanned"
-   },
-   "development": {
-    "type": "string",
-    "description": "development"
+   "validationIssues": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Blocking findings from pre-publication validation"
    }
-  }
+  },
+  "required": [
+   "configurationVersionId",
+   "targetScope",
+   "publishMode"
+  ]
  },
  "TopologyValidationPublicationView": {
   "type": "object",
@@ -2375,47 +3508,62 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Topology Validation & Publication displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "entireTenant": {
+   "publishMode": {
     "type": "string",
-    "description": "Entire tenant"
+    "enum": [
+     "now",
+     "scheduled"
+    ]
    },
-   "venue": {
+   "configurationVersionId": {
     "type": "string",
-    "description": "Venue"
+    "description": "Topology version being published"
    },
-   "park": {
+   "targetScope": {
     "type": "string",
-    "description": "Park"
+    "enum": [
+     "tenant",
+     "venue",
+     "park",
+     "zone",
+     "accessPoint",
+     "selectedGates",
+     "selectedDevices"
+    ],
+    "description": "What the publication covers"
    },
-   "zone": {
-    "type": "string",
-    "description": "Zone"
+   "targetIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "IDs within the target scope"
    },
-   "accessPoint": {
+   "scheduledAt": {
     "type": "string",
-    "description": "Access point"
+    "format": "date-time"
    },
-   "selectedGates": {
-    "type": "string",
-    "description": "Selected gates"
-   },
-   "selectedDevices": {
-    "type": "string",
-    "description": "Selected devices"
-   },
-   "withRollbackToPreviousConfiguration": {
-    "type": "string",
-    "description": "with rollback to previous configuration"
-   },
-   "scanned": {
-    "type": "string",
-    "description": "scanned"
-   },
-   "development": {
-    "type": "string",
-    "description": "development"
+   "validationIssues": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Blocking findings from pre-publication validation"
    }
-  }
+  },
+  "required": [
+   "configurationVersionId",
+   "targetScope",
+   "publishMode"
+  ]
+ },
+ "TurnstileMode": {
+  "type": "string",
+  "description": "**Reduced to two values — decided 28 September, audit R221.** Entry, exit, re-entry and crossover were the access point's `Direction` under another name, and two fields that could disagree left the gate to guess. Direction is fixed per access point; within `normal` or `podium` operation the turnstile may only be let spin free or held closed.\n",
+  "enum": [
+   "freeRotation",
+   "closed"
+  ]
  },
  "VenueParkAccessStructureView": {
   "type": "object",
@@ -2423,49 +3571,22 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Venue & Park Access Structure displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "venue": {
+   "entityType": {
     "type": "string",
-    "description": "Venue"
-   },
-   "park": {
-    "type": "string",
-    "description": "Park"
-   },
-   "building": {
-    "type": "string",
-    "description": "Building"
-   },
-   "eventSpace": {
-    "type": "string",
-    "description": "Event space"
-   },
-   "waterpark": {
-    "type": "string",
-    "description": "Waterpark"
-   },
-   "themePark": {
-    "type": "string",
-    "description": "Theme park"
-   },
-   "museum": {
-    "type": "string",
-    "description": "Museum"
-   },
-   "arena": {
-    "type": "string",
-    "description": "Arena"
-   },
-   "stadium": {
-    "type": "string",
-    "description": "Stadium"
-   },
-   "exhibition": {
-    "type": "string",
-    "description": "Exhibition"
-   },
-   "temporaryVenue": {
-    "type": "string",
-    "description": "temporary venue"
+    "enum": [
+     "venue",
+     "park",
+     "building",
+     "eventSpace",
+     "waterpark",
+     "themePark",
+     "museum",
+     "arena",
+     "stadium",
+     "exhibition",
+     "temporaryVenue"
+    ],
+    "description": "What kind of place this entity is"
    },
    "name": {
     "type": "string",
@@ -2485,8 +3606,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "timeZone": {
     "type": "string",
-    "format": "date-time",
-    "description": "Time zone"
+    "description": "IANA time zone, e.g. Asia/Dubai"
    },
    "operatingCalendar": {
     "type": "string",
@@ -2513,18 +3633,23 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Default credential rules"
    },
    "offlinePolicy": {
-    "type": "integer",
-    "description": "Offline policy"
+    "type": "string",
+    "description": "Reference to the offline validation policy the entity inherits"
    },
    "emergencyBehavior": {
     "type": "string",
     "description": "Emergency behavior"
    },
    "supportMultiParkEnvironments": {
-    "type": "string",
+    "type": "boolean",
     "description": "Support multi-park environments"
    }
-  }
+  },
+  "required": [
+   "code",
+   "name",
+   "entityType"
+  ]
  }
 }
 ```

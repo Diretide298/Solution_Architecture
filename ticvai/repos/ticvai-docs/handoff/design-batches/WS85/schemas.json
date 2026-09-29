@@ -1,1 +1,497 @@
-{}
+{
+ "DeviceTelemetryPoint": {
+  "type": "object",
+  "x-ticvai-persistence": "tenancy.device_telemetry",
+  "description": "16.4.21 and 16.4.22. **A series, because degradation is not visible in a point-in-time reading.**\n",
+  "properties": {
+   "deviceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "batteryPercent": {
+    "type": "integer",
+    "nullable": true
+   },
+   "batteryHealthPercent": {
+    "type": "integer",
+    "nullable": true
+   },
+   "charging": {
+    "type": "boolean",
+    "nullable": true
+   },
+   "signalStrength": {
+    "type": "integer",
+    "nullable": true
+   },
+   "cpuPercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "memoryPercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "storageFreeMb": {
+    "type": "integer",
+    "nullable": true
+   },
+   "consumables": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Paper, ribbon, wristband stock — whatever the device kind reports."
+   },
+   "uptimeSeconds": {
+    "type": "integer",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "GameEntitlement": {
+  "type": "object",
+  "x-ticvai-persistence": "games.entitlement",
+  "description": "Board 4. **A right to play, not money** — consumed before money is.",
+  "required": [
+   "code",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "allGamesPass",
+     "unlimitedSingleGame",
+     "limitedSingleGame",
+     "package",
+     "freePlay"
+    ]
+   },
+   "gameIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "attractionTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "playCount": {
+    "type": "integer",
+    "nullable": true,
+    "description": "For `limitedSingleGame` and `package`. Null means unlimited."
+   },
+   "validityKind": {
+    "type": "string",
+    "enum": [
+     "sameDay",
+     "days",
+     "untilDate",
+     "untilUsed"
+    ]
+   },
+   "validityDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "activationKind": {
+    "type": "string",
+    "enum": [
+     "onPurchase",
+     "onFirstUse",
+     "onDate"
+    ],
+    "default": "onFirstUse",
+    "description": "**On first use is what a guest expects from a day pass bought the night before.** On purchase is what a venue defaults to by accident, and it costs them a day.\n"
+   },
+   "dailyPlayCap": {
+    "type": "integer",
+    "nullable": true
+   },
+   "cooldownMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**Unlimited does not mean continuous.** A cooldown is how one child does not hold a popular ride all afternoon.\n"
+   },
+   "linkedProductId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "GameplayAuthorisation": {
+  "type": "object",
+  "x-ticvai-persistence": "games.authorisation",
+  "description": "Board 4.9. **The refusal reason is the product.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "decision": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "refuse"
+    ]
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "ok",
+     "cardNotFound",
+     "cardExpired",
+     "cardBlocked",
+     "retapTooSoon",
+     "heightRestriction",
+     "ageRestriction",
+     "insufficientFunds",
+     "entitlementExhausted",
+     "entitlementNotValidHere",
+     "cooldownActive",
+     "dailyCapReached",
+     "readerNotConfigured",
+     "gameUnavailable"
+    ]
+   },
+   "guestMessage": {
+    "type": "string",
+    "nullable": true,
+    "description": "***\"No plays left on your pass\"* rather than *\"Declined\"*.** One is a guest who understands; the other is a member of staff walking over.\n"
+   },
+   "chargedFrom": {
+    "type": "string",
+    "nullable": true
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "entitlementId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "remainingBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "remainingPlays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "trace": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "check": {
+       "type": "string"
+      },
+      "passed": {
+       "type": "boolean"
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "decidedOffline": {
+    "type": "boolean",
+    "default": false
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "GameplayAuthorisationRequest": {
+  "type": "object",
+  "required": [
+   "readerId"
+  ],
+  "properties": {
+   "readerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "cardId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "credentialIdentifier": {
+    "type": "string",
+    "nullable": true
+   },
+   "gameId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "guestHeightCm": {
+    "type": "integer",
+    "nullable": true
+   },
+   "offline": {
+    "type": "boolean",
+    "default": false
+   }
+  }
+ },
+ "GameplayTransaction": {
+  "type": "object",
+  "x-ticvai-persistence": "games.gameplay_transaction",
+  "description": "Boards 8.2 and 8.5. **The refused ones are the valuable half.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "readerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "gameId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "cardId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "allowed",
+     "refused",
+     "reversed"
+    ]
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "chargedFrom": {
+    "type": "string",
+    "nullable": true
+   },
+   "entitlementId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "ticketsEarned": {
+    "type": "integer",
+    "nullable": true
+   },
+   "decidedOffline": {
+    "type": "boolean",
+    "default": false
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Reader": {
+  "type": "object",
+  "x-ticvai-persistence": "games.reader",
+  "description": "Board 2. **A `tenancy` device with a game configuration on it.**",
+  "required": [
+   "deviceId"
+  ],
+  "properties": {
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "`tenancy.RegisteredDevice`. **Enrolment, firmware and tamper state live there.**\n"
+   },
+   "gameId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "readerProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "acceptedCreditTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "acceptsDirectPay": {
+    "type": "boolean",
+    "default": false
+   },
+   "retapDelaySeconds": {
+    "type": "integer",
+    "default": 3,
+    "description": "**The setting that stops a guest paying twice for one go.** A wristband held against a reader for a second and a half is two taps to the hardware and one intention to the guest.\n"
+   },
+   "displayRules": {
+    "type": "object",
+    "properties": {
+     "freeGameGlow": {
+      "type": "boolean",
+      "default": true,
+      "description": "**What tells a guest their entitlement was used rather than their money.** Without it the complaint arrives at the desk.\n"
+     },
+     "showBalance": {
+      "type": "boolean",
+      "default": true
+     },
+     "showPrice": {
+      "type": "boolean",
+      "default": true
+     },
+     "themeCode": {
+      "type": "string",
+      "nullable": true
+     },
+     "languages": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "ioMapping": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Board 9.6. Which output starts the game, which input reports it finished. **Deliberately open.** The keys are the reader model's own I/O lines, so the shape belongs to the vendor adaptor for that model (game readers are a driver, not a build — ADR-0012, ADR-0015), not to this contract.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "unconfigured",
+     "active",
+     "offline",
+     "maintenance",
+     "disabled"
+    ]
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "ReaderSyncStatus": {
+  "type": "object",
+  "description": "Board 8.8. **Revenue the platform has not seen.**",
+  "properties": {
+   "readerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "readerName": {
+    "type": "string"
+   },
+   "pendingTransactions": {
+    "type": "integer"
+   },
+   "pendingValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "oldestPendingAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastSyncAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "edgePackageVersion": {
+    "type": "integer",
+    "nullable": true
+   },
+   "edgePackageStale": {
+    "type": "boolean"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "online",
+     "offline",
+     "degraded",
+     "unreachable"
+    ]
+   }
+  }
+ }
+}

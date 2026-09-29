@@ -1,678 +1,5 @@
 [
  {
-  "id": "BO-065",
-  "name": "Venue Configuration",
-  "module": "Orders & Money",
-  "requiresModule": "ticketing",
-  "wave": 1,
-  "capability": "C00",
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/venue-operations/venue-configuration",
-   "component": "apps/venue-management-web/src/routes/venue-operations/VenueConfigurationDetail.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
-   ],
-   "inferred": true,
-   "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listDiningOutlets` reads the population and `getRefundPolicy` reads one of them — list, select, act",
-  "purpose": "Set the venue-level values everything inherits from.",
-  "gaps": [
-   {
-    "operation": "listDeliveryLocations",
-    "why": "**1 declared operation reach no component on this screen**: listDeliveryLocations. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every venue",
-       "bindsTo": "DiningOutlet",
-       "columns": [
-        "DiningOutlet.outletId",
-        "DiningOutlet.name",
-        "DiningOutlet.kind",
-        "DiningOutlet.zone",
-        "DiningOutlet.cuisine",
-        "DiningOutlet.isOpenNow",
-        "DiningOutlet.opensAt",
-        "DiningOutlet.closesAt",
-        "DiningOutlet.orderingMethod",
-        "DiningOutlet.estimatedWaitMinutes",
-        "DiningOutlet.imageAssetRef",
-        "DiningOutlet.menuId"
-       ],
-       "operation": "listDiningOutlets",
-       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected venue",
-       "bindsTo": "RefundPolicy",
-       "columns": [
-        "RefundPolicy.id",
-        "RefundPolicy.venueId",
-        "RefundPolicy.selfAuthoriseLimit",
-        "RefundPolicy.requiresSecondUserAbove",
-        "RefundPolicy.requiresApprovalAbove",
-        "RefundPolicy.timeBands",
-        "RefundPolicy.allowPartial",
-        "RefundPolicy.refundWindowDays",
-        "RefundPolicy.varianceThreshold"
-       ],
-       "operation": "getRefundPolicy",
-       "provenance": "contract orders.yaml GET /venues/{venueId}/refund-policy"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save changes",
-       "operation": "setRefundPolicy",
-       "provenance": "contract orders.yaml PUT /venues/{venueId}/refund-policy"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setVenueSettings",
-       "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listDiningOutlets",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setRefundPolicy",
-       "label": "Save refund policy",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setRefundPolicy",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The venue list.",
-   "error": "Could not load. Names which read failed and leaves the venue untouched.",
-   "emptyFirstRun": "No venue yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the venue are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getRefundPolicy",
-    "contract": "orders",
-    "purpose": "Read a venue's refund policy",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listDiningOutlets",
-    "contract": "fnb",
-    "purpose": "Where a guest can eat, right now",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setRefundPolicy",
-    "contract": "orders",
-    "purpose": "Set a venue's refund policy",
-    "trigger": "onAction",
-    "invalidates": [
-     "listDiningOutlets"
-    ]
-   },
-   {
-    "operationId": "listDeliveryLocations",
-    "contract": "fnb",
-    "purpose": "Where an order can be delivered",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setVenueSettings",
-    "contract": "tenancy",
-    "purpose": "Save the venue's configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "listDiningOutlets"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "venueId",
-     "from": "session"
-    }
-   ],
-   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
-   "preloaded": [
-    "RefundPolicy.id",
-    "RefundPolicy.venueId",
-    "RefundPolicy.selfAuthoriseLimit",
-    "RefundPolicy.requiresSecondUserAbove",
-    "RefundPolicy.requiresApprovalAbove"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-065"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-070",
-  "name": "Work Orders",
-  "module": "Orders & Money",
-  "requiresModule": "ticketing",
-  "wave": 2,
-  "capability": "C00",
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/venue-operations/work-orders",
-   "component": "apps/venue-management-web/src/routes/venue-operations/WorkOrdersDetail.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
-   ],
-   "inferred": true,
-   "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **createRefund removed 18 August** — attached by module resemblance, not by what this screen does. A screen that does not handle money should not be able to move it (CF-87's class).",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listOrders` reads the population and `getOrder` reads one of them — list, select, act",
-  "purpose": "Get something fixed, and know it was.",
-  "gaps": [
-   {
-    "operation": "getOrderStatement",
-    "why": "**2 declared operations reach no component on this screen**: getOrderStatement, listOrderRefunds. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every work orders",
-       "bindsTo": "OrderSummary",
-       "columns": [
-        "OrderSummary.id",
-        "OrderSummary.orderNumber",
-        "OrderSummary.status",
-        "OrderSummary.grossAmount",
-        "OrderSummary.refundedAmount",
-        "OrderSummary.channel",
-        "OrderSummary.lineCount"
-       ],
-       "operation": "listOrders",
-       "provenance": "contract orders.yaml GET /orders"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected work orders",
-       "bindsTo": "Order",
-       "columns": [
-        "Order.id",
-        "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
-        "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
-        "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount",
-        "Order.totalPriceVariance",
-        "Order.lines",
-        "Order.payments",
-        "Order.principalId"
-       ],
-       "operation": "getOrder",
-       "provenance": "contract orders.yaml GET /orders/{orderId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createOrder",
-       "provenance": "contract orders.yaml POST /orders"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Apply",
-       "operation": "applyManualDiscount",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Exchange",
-       "operation": "exchangeOrderLines",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Hold",
-       "operation": "holdOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Modify",
-       "operation": "modifyOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reprint",
-       "operation": "reprintOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reschedule",
-       "operation": "rescheduleOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Resume",
-       "operation": "resumeOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Void",
-       "operation": "voidOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listOrders",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createOrder",
-       "label": "Create order",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "voidOrder",
-       "label": "Void order",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createOrder",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmVoidOrder",
-    "component": "confirmDialog",
-    "trigger": "Void",
-    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A work orders this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
-   }
-  ],
-  "states": {
-   "loading": "The work orders list.",
-   "error": "Could not load. Names which read failed and leaves the work orders untouched.",
-   "emptyFirstRun": "No work orders yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the work orders are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listOrders",
-    "contract": "orders",
-    "purpose": "List orders",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getOrder",
-    "contract": "orders",
-    "purpose": "Read an order",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createOrder",
-    "contract": "orders",
-    "purpose": "Create an order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "applyManualDiscount",
-    "contract": "orders",
-    "purpose": "Apply a discount a cashier chose",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "exchangeOrderLines",
-    "contract": "orders",
-    "purpose": "Exchange lines for different products or dates",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "getOrderStatement",
-    "contract": "orders",
-    "purpose": "Full financial history of an order",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "holdOrder",
-    "contract": "orders",
-    "purpose": "Park a sale and free the till",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "listOrderRefunds",
-    "contract": "orders",
-    "purpose": "List refunds against an order",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "modifyOrder",
-    "contract": "orders",
-    "purpose": "Add or remove lines on an existing order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "reprintOrder",
-    "contract": "orders",
-    "purpose": "Reprint or resend tickets",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "rescheduleOrder",
-    "contract": "orders",
-    "purpose": "Move an order to another performance",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "resumeOrder",
-    "contract": "orders",
-    "purpose": "Bring a parked sale back to a till",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "voidOrder",
-    "contract": "orders",
-    "purpose": "Void an order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "orderId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
-   "preloaded": [
-    "Order.id",
-    "Order.orderNumber",
-    "Order.channel",
-    "Order.venueId",
-    "Order.scopePath"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-070"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
   "id": "BO-074",
   "name": "Chart of Accounts",
   "module": "Orders & Money",
@@ -687,7 +14,6 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-075",
     "BO-076",
     "BO-077"
@@ -701,22 +27,9 @@
      "provenance": "flow F16 step 5→6, F98 step 2→3"
     },
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-077",
      "trigger": "FX Rates & Variances",
-     "carries": [
-      "varianceId"
-     ],
-     "provenance": "derived — BO-077 declares entryState.params varianceId, so an edge into it must carry them"
+     "provenance": "derived — BO-077 declares entryState.params varianceId and BO-074 holds none of them, so the edge carries nothing and BO-077 opens cold"
     }
    ],
    "entryFrom": [
@@ -728,13 +41,6 @@
   "pattern": "listDetail",
   "patternReason": "`listAccounts` reads the population and `getAccount` reads one of them — list, select, act",
   "purpose": "Accounts, cost centres and legal entities.",
-  "gaps": [
-   {
-    "operation": "listCostCenters",
-    "why": "**2 declared operations reach no component on this screen**: listCostCenters, listLegalEntities. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -743,8 +49,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Legal entity id",
+       "operation": "listAccounts",
+       "notes": "Sends `?legalEntityId=` to `listAccounts`.",
+       "provenance": "contract finance.yaml GET /accounts"
+      },
+      {
+       "kind": "textField",
+       "label": "Type",
+       "operation": "listAccounts",
+       "notes": "Sends `?type=` to `listAccounts`.",
+       "provenance": "contract finance.yaml GET /accounts"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is postable",
+       "operation": "listAccounts",
+       "notes": "Sends `?isPostable=` to `listAccounts`.",
+       "provenance": "contract finance.yaml GET /accounts"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every chart accounts",
+       "label": "Every account",
        "bindsTo": "Account",
        "columns": [
         "Account.id",
@@ -762,6 +89,41 @@
        ],
        "operation": "listAccounts",
        "provenance": "contract finance.yaml GET /accounts"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every cost center",
+       "bindsTo": "CostCenter",
+       "columns": [
+        "CostCenter.id",
+        "CostCenter.code",
+        "CostCenter.name",
+        "CostCenter.parentId",
+        "CostCenter.venueId",
+        "CostCenter.isActive"
+       ],
+       "operation": "listCostCenters",
+       "provenance": "contract finance.yaml GET /cost-centers"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every legal entity",
+       "bindsTo": "LegalEntity",
+       "columns": [
+        "LegalEntity.id",
+        "LegalEntity.code",
+        "LegalEntity.name",
+        "LegalEntity.countryCode",
+        "LegalEntity.currency",
+        "LegalEntity.currencyScale",
+        "LegalEntity.taxRegistrationNumber",
+        "LegalEntity.fiscalYearStartMonth",
+        "LegalEntity.regionIds",
+        "LegalEntity.isActive",
+        "LegalEntity.scopePath"
+       ],
+       "operation": "listLegalEntities",
+       "provenance": "contract finance.yaml GET /legal-entities"
       }
      ]
     },
@@ -771,7 +133,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected chart accounts",
+       "label": "The selected account",
        "bindsTo": "Account",
        "columns": [
         "Account.id",
@@ -801,25 +163,25 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create account",
        "operation": "createAccount",
        "provenance": "contract finance.yaml POST /accounts"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save account",
        "operation": "updateAccount",
        "provenance": "contract finance.yaml PATCH /accounts/{accountId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create cost center",
        "operation": "createCostCenter",
        "provenance": "contract finance.yaml POST /cost-centers"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create legal entity",
        "operation": "createLegalEntity",
        "provenance": "contract finance.yaml POST /legal-entities"
       }
@@ -830,9 +192,9 @@
   "states": {
    "loading": "The chart accounts list.",
    "error": "Could not load. Names which read failed and leaves the chart accounts untouched.",
-   "emptyFirstRun": "No chart accounts yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the chart accounts are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No chart accounts yet. Offers Create account (`createAccount`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on legalEntityId, type, isPostable and the chart accounts are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listAccounts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -845,7 +207,7 @@
     "operationId": "getAccount",
     "contract": "finance",
     "purpose": "Read an account",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createAccount",
@@ -918,6 +280,108 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-074"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateAccount",
+    "component": "modal",
+    "trigger": "Create account",
+    "body": "**Collects what `createAccount` sends before it is called.** Required: `code`, `name`, `type`, `legalEntityId`. Optional: `externalCode`, `parentId`, `isPostable`, `isSuspense`, `subType`, `tags`, `notes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateAccountRequest",
+    "confirm": {
+     "label": "Create account",
+     "operation": "createAccount"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "type",
+      "legalEntityId",
+      "externalCode",
+      "parentId",
+      "isPostable",
+      "isSuspense",
+      "subType",
+      "tags",
+      "notes"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /accounts"
+   },
+   {
+    "id": "formUpdateAccount",
+    "component": "modal",
+    "trigger": "Save account",
+    "body": "**Collects what `updateAccount` sends before it is called.** Nothing in the body is required. Optional: `code`, `name`, `externalCode`, `isActive`, `isSuspense`, `subType`, `tags`, `notes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save account",
+     "operation": "updateAccount"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "externalCode",
+      "isActive",
+      "isSuspense",
+      "subType",
+      "tags",
+      "notes"
+     ]
+    },
+    "provenance": "contract finance.yaml PATCH /accounts/{accountId}"
+   },
+   {
+    "id": "formCreateCostCenter",
+    "component": "modal",
+    "trigger": "Create cost center",
+    "body": "**Collects what `createCostCenter` sends before it is called.** Required: `code`, `name`. Optional: `parentId`, `venueId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create cost center",
+     "operation": "createCostCenter"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "parentId",
+      "venueId"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /cost-centers"
+   },
+   {
+    "id": "formCreateLegalEntity",
+    "component": "modal",
+    "trigger": "Create legal entity",
+    "body": "**Collects what `createLegalEntity` sends before it is called.** Required: `id`, `code`, `name`, `countryCode`, `currency`, `currencyScale`, `fiscalYearStartMonth`. Optional: `taxRegistrationNumber`, `regionIds`, `isActive`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "LegalEntity",
+    "confirm": {
+     "label": "Create legal entity",
+     "operation": "createLegalEntity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "countryCode",
+      "currency",
+      "currencyScale",
+      "fiscalYearStartMonth",
+      "taxRegistrationNumber",
+      "regionIds",
+      "isActive",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /legal-entities"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -956,7 +420,6 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-074",
     "BO-076",
     "BO-077"
@@ -970,30 +433,17 @@
      "provenance": "flow F98 step 3→4"
     },
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-074",
      "trigger": "Chart of Accounts",
      "carries": [
       "accountId"
      ],
-     "provenance": "derived — BO-074 declares entryState.params accountId, so an edge into it must carry them"
+     "provenance": "derived — BO-074 declares entryState.params accountId and BO-075 holds accountId, so an edge into it carries them"
     },
     {
      "to": "BO-077",
      "trigger": "FX Rates & Variances",
-     "carries": [
-      "varianceId"
-     ],
-     "provenance": "derived — BO-077 declares entryState.params varianceId, so an edge into it must carry them"
+     "provenance": "derived — BO-077 declares entryState.params varianceId and BO-075 holds none of them, so the edge carries nothing and BO-077 opens cold"
     },
     {
      "to": "ADM-020",
@@ -1036,13 +486,7 @@
        "bindsTo": "TaxExemption",
        "operation": "listTaxExemptions",
        "provenance": "contract finance.yaml GET /tax-exemptions"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
+      },
       {
        "kind": "dataTable",
        "label": "Every account mapping",
@@ -1064,38 +508,44 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save account mappings",
        "operation": "setAccountMappings",
        "provenance": "contract finance.yaml PUT /account-mappings"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create tax code",
        "operation": "createTaxCode",
        "provenance": "contract finance.yaml POST /tax-codes"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save tax code",
        "operation": "updateTaxCode",
        "provenance": "contract finance.yaml PATCH /tax-codes/{taxCodeId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create tax exemption",
        "operation": "createTaxExemption",
        "provenance": "contract finance.yaml POST /tax-exemptions"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Verify tax exemption",
+       "operation": "verifyTaxExemption",
+       "provenance": "contract finance.yaml POST /tax-exemptions/{exemptionId}/verify (decided 29 September, VM close-out)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The account mapping list.",
+   "loading": "The account mapping figures; each tile loads on its own.",
    "error": "Could not load. Names which read failed and leaves the account mapping untouched.",
-   "emptyFirstRun": "No account mapping yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the account mapping are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No account mapping yet. Offers Create tax code (`createTaxCode`).",
+   "emptyNoResults": "Never shown: `listAccountMappings` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listAccountMappings` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1151,6 +601,12 @@
     "invalidates": [
      "listAccountMappings"
     ]
+   },
+   {
+    "operationId": "verifyTaxExemption",
+    "contract": "finance",
+    "purpose": "Verify tax exemption",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1158,6 +614,10 @@
     {
      "name": "taxCodeId",
      "from": "deepLink"
+    },
+    {
+     "name": "exemptionId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `taxCodeId`."
@@ -1168,6 +628,95 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-075"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetAccountMappings",
+    "component": "modal",
+    "trigger": "Save account mappings",
+    "body": "**Collects what `setAccountMappings` sends before it is called.** Required: `mappings`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save account mappings",
+     "operation": "setAccountMappings"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "mappings"
+     ]
+    },
+    "provenance": "contract finance.yaml PUT /account-mappings"
+   },
+   {
+    "id": "formCreateTaxCode",
+    "component": "modal",
+    "trigger": "Create tax code",
+    "body": "**Collects what `createTaxCode` sends before it is called.** Required: `code`, `name`, `countryCode`, `rate`, `accountId`, `effectiveFrom`. Optional: `compoundOnTaxCodeId`, `isInclusive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateTaxCodeRequest",
+    "confirm": {
+     "label": "Create tax code",
+     "operation": "createTaxCode"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "countryCode",
+      "rate",
+      "accountId",
+      "effectiveFrom",
+      "compoundOnTaxCodeId",
+      "isInclusive"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /tax-codes"
+   },
+   {
+    "id": "formUpdateTaxCode",
+    "component": "modal",
+    "trigger": "Save tax code",
+    "body": "**Collects what `updateTaxCode` sends before it is called.** Nothing in the body is required. Optional: `name`, `rate`, `effectiveFrom`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save tax code",
+     "operation": "updateTaxCode"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "rate",
+      "effectiveFrom",
+      "isActive"
+     ]
+    },
+    "provenance": "contract finance.yaml PATCH /tax-codes/{taxCodeId}"
+   },
+   {
+    "id": "formCreateTaxExemption",
+    "component": "modal",
+    "trigger": "Create tax exemption",
+    "body": "**Collects what `createTaxExemption` sends before it is called.** Required: `id`, `scope`, `taxCodeId`, `reason`. Optional: `scopeRef`, `certificateReference`, `validFrom`, `validTo`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "TaxExemption",
+    "confirm": {
+     "label": "Create tax exemption",
+     "operation": "createTaxExemption"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scope",
+      "taxCodeId",
+      "reason",
+      "scopeRef",
+      "certificateReference",
+      "validFrom",
+      "validTo"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /tax-exemptions"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1206,7 +755,6 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-074",
     "BO-075",
     "BO-077"
@@ -1214,38 +762,19 @@
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-074",
      "trigger": "Chart of Accounts",
-     "carries": [
-      "accountId"
-     ],
-     "provenance": "derived — BO-074 declares entryState.params accountId, so an edge into it must carry them"
+     "provenance": "derived — BO-074 declares entryState.params accountId and BO-076 holds none of them, so the edge carries nothing and BO-074 opens cold"
     },
     {
      "to": "BO-075",
      "trigger": "Account Mapping",
-     "carries": [
-      "taxCodeId"
-     ],
-     "provenance": "derived — BO-075 declares entryState.params taxCodeId, so an edge into it must carry them"
+     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-076 holds none of them, so the edge carries nothing and BO-075 opens cold"
     },
     {
      "to": "BO-077",
      "trigger": "FX Rates & Variances",
-     "carries": [
-      "varianceId"
-     ],
-     "provenance": "derived — BO-077 declares entryState.params varianceId, so an edge into it must carry them"
+     "provenance": "derived — BO-077 declares entryState.params varianceId and BO-076 holds none of them, so the edge carries nothing and BO-077 opens cold"
     }
    ]
   },
@@ -1263,7 +792,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every revenue recognition",
+       "label": "Every recognition schedule",
        "bindsTo": "RecognitionSchedule",
        "columns": [
         "RecognitionSchedule.id",
@@ -1290,10 +819,35 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected revenue recognition",
+       "label": "The selected recognition schedule",
+       "bindsTo": "RecognitionSchedule",
+       "columns": [
+        "RecognitionSchedule.id",
+        "RecognitionSchedule.name",
+        "RecognitionSchedule.method",
+        "RecognitionSchedule.priority",
+        "RecognitionSchedule.recognitionSite",
+        "RecognitionSchedule.frequency",
+        "RecognitionSchedule.revalidateOnValidityChange",
+        "RecognitionSchedule.productKinds",
+        "RecognitionSchedule.deferredAccountId",
+        "RecognitionSchedule.recognisedAccountId",
+        "RecognitionSchedule.breakageAccountId",
+        "RecognitionSchedule.noShowTrigger",
+        "RecognitionSchedule.noShowAccountId",
+        "RecognitionSchedule.breakageAfterDays",
+        "RecognitionSchedule.isActive"
+       ],
+       "operation": "listRecognitionSchedules",
+       "provenance": "contract finance.yaml GET /recognition-schedules"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The deferred revenue report",
        "bindsTo": "DeferredRevenueReport",
        "columns": [
         "DeferredRevenueReport.asAt",
+        "DeferredRevenueReport.totals",
         "DeferredRevenueReport.total",
         "DeferredRevenueReport.buckets"
        ],
@@ -1308,15 +862,21 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Run",
+       "label": "Run recognition",
        "operation": "runRecognition",
        "provenance": "contract finance.yaml POST /recognition/run"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create recognition schedule",
        "operation": "createRecognitionSchedule",
        "provenance": "contract finance.yaml POST /recognition-schedules"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Validate recognition schedules",
+       "operation": "validateRecognitionSchedules",
+       "provenance": "contract finance.yaml POST /recognition-schedules/validate"
       }
      ]
     }
@@ -1325,9 +885,9 @@
   "states": {
    "loading": "The revenue recognition list.",
    "error": "Could not load. Names which read failed and leaves the revenue recognition untouched.",
-   "emptyFirstRun": "No revenue recognition yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the revenue recognition are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No revenue recognition yet. Offers Create recognition schedule (`createRecognitionSchedule`).",
+   "emptyNoResults": "Never shown: `listRecognitionSchedules` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `getDeferredRevenue` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1359,6 +919,13 @@
     "invalidates": [
      "listRecognitionSchedules"
     ]
+   },
+   {
+    "operationId": "validateRecognitionSchedules",
+    "contract": "finance",
+    "purpose": "Find product kinds claimed by more than one schedule",
+    "trigger": "onAction",
+    "provenance": "wiring gap, 19 September 2026 — the screen showed the noun and could not act on it"
    }
   ],
   "entryState": {
@@ -1374,6 +941,58 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-076"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRunRecognition",
+    "component": "modal",
+    "trigger": "Run recognition",
+    "body": "**Collects what `runRecognition` sends before it is called.** Required: `fiscalPeriodId`. Optional: `dryRun`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Run recognition",
+     "operation": "runRecognition"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "fiscalPeriodId",
+      "dryRun"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /recognition/run"
+   },
+   {
+    "id": "formCreateRecognitionSchedule",
+    "component": "modal",
+    "trigger": "Create recognition schedule",
+    "body": "**Collects what `createRecognitionSchedule` sends before it is called.** Required: `id`, `name`, `method`, `productKinds`. Optional: `priority`, `recognitionSite`, `frequency`, `revalidateOnValidityChange`, `deferredAccountId`, `recognisedAccountId`, `breakageAccountId`, `noShowTrigger`, `noShowAccountId`, `breakageAfterDays`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RecognitionSchedule",
+    "confirm": {
+     "label": "Create recognition schedule",
+     "operation": "createRecognitionSchedule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "name",
+      "method",
+      "productKinds",
+      "priority",
+      "recognitionSite",
+      "frequency",
+      "revalidateOnValidityChange",
+      "deferredAccountId",
+      "recognisedAccountId",
+      "breakageAccountId",
+      "noShowTrigger",
+      "noShowAccountId",
+      "breakageAfterDays",
+      "isActive"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /recognition-schedules"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1412,7 +1031,6 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-074",
     "BO-075",
     "BO-076"
@@ -1420,30 +1038,14 @@
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-074",
      "trigger": "Chart of Accounts",
-     "carries": [
-      "accountId"
-     ],
-     "provenance": "derived — BO-074 declares entryState.params accountId, so an edge into it must carry them"
+     "provenance": "derived — BO-074 declares entryState.params accountId and BO-077 holds none of them, so the edge carries nothing and BO-074 opens cold"
     },
     {
      "to": "BO-075",
      "trigger": "Account Mapping",
-     "carries": [
-      "taxCodeId"
-     ],
-     "provenance": "derived — BO-075 declares entryState.params taxCodeId, so an edge into it must carry them"
+     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-077 holds none of them, so the edge carries nothing and BO-075 opens cold"
     }
    ]
   },
@@ -1452,13 +1054,6 @@
   "pattern": "approvalInbox",
   "patternReason": "`reviewPriceVariance` decides items that `listFxRates` queues — every row is waiting for a person, so the empty state is success",
   "purpose": "Rates, and the price variances waiting for review.",
-  "gaps": [
-   {
-    "operation": "listPriceVariances",
-    "why": "**1 declared operation reach no component on this screen**: listPriceVariances. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1466,6 +1061,20 @@
      "name": "contentBody",
      "slot": "queue",
      "components": [
+      {
+       "kind": "datePicker",
+       "label": "As at",
+       "operation": "listFxRates",
+       "notes": "Sends `?asAt=` to `listFxRates`.",
+       "provenance": "contract finance.yaml GET /fx-rates"
+      },
+      {
+       "kind": "textField",
+       "label": "Purpose",
+       "operation": "listFxRates",
+       "notes": "Sends `?purpose=` to `listFxRates`.",
+       "provenance": "contract finance.yaml GET /fx-rates"
+      },
       {
        "kind": "dataTable",
        "label": "Waiting for a decision",
@@ -1485,6 +1094,27 @@
        ],
        "operation": "listFxRates",
        "provenance": "contract finance.yaml GET /fx-rates"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every price variance",
+       "bindsTo": "PriceVariance",
+       "columns": [
+        "PriceVariance.id",
+        "PriceVariance.orderId",
+        "PriceVariance.orderLineId",
+        "PriceVariance.venueId",
+        "PriceVariance.variantId",
+        "PriceVariance.quotedPrice",
+        "PriceVariance.serverPrice",
+        "PriceVariance.variance",
+        "PriceVariance.catalogueBundleVersion",
+        "PriceVariance.isException",
+        "PriceVariance.reviewStatus",
+        "PriceVariance.reviewOutcome"
+       ],
+       "operation": "listPriceVariances",
+       "provenance": "contract finance.yaml GET /price-variances"
       }
      ]
     },
@@ -1494,7 +1124,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected rates variances",
+       "label": "The selected FX rate",
        "bindsTo": "FxRate",
        "columns": [
         "FxRate.id",
@@ -1520,15 +1150,21 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save FX rate",
        "operation": "setFxRate",
        "provenance": "contract finance.yaml PUT /fx-rates"
       },
       {
        "kind": "secondaryButton",
-       "label": "Review",
+       "label": "Review price variance",
        "operation": "reviewPriceVariance",
        "provenance": "contract finance.yaml POST /price-variances/{varianceId}/review"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Ingest FX rates",
+       "operation": "ingestFxRates",
+       "provenance": "contract finance.yaml POST /fx-rates/ingest"
       }
      ]
     }
@@ -1538,8 +1174,8 @@
    "loading": "The rates variances list.",
    "error": "Could not load. Names which read failed and leaves the rates variances untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
-   "emptyNoResults": "The filter narrowed it and the rates variances are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoResults": "Nothing matches the filter on asAt, purpose and the rates variances are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listFxRates` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1571,6 +1207,16 @@
     "invalidates": [
      "listFxRates"
     ]
+   },
+   {
+    "operationId": "ingestFxRates",
+    "contract": "finance",
+    "purpose": "Pull today's rates from the configured provider",
+    "trigger": "onAction",
+    "provenance": "wiring gap, 19 September 2026 — the screen showed the noun and could not act on it",
+    "invalidates": [
+     "listFxRates"
+    ]
    }
   ],
   "entryState": {
@@ -1595,6 +1241,74 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-077"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formIngestFxRates",
+    "component": "modal",
+    "trigger": "Ingest FX rates",
+    "body": "**Collects what `ingestFxRates` sends before it is called.** Required: `purpose`. Optional: `pairs`, `effectiveFrom`, `dryRun`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Ingest FX rates",
+     "operation": "ingestFxRates"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "purpose",
+      "pairs",
+      "effectiveFrom",
+      "dryRun"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /fx-rates/ingest"
+   },
+   {
+    "id": "formSetFxRate",
+    "component": "modal",
+    "trigger": "Save FX rate",
+    "body": "**Collects what `setFxRate` sends before it is called.** Required: `fromCurrency`, `toCurrency`, `rate`, `purpose`, `effectiveFrom`. Optional: `id`, `source`, `effectiveTo`, `setByPrincipalId`, `providerReference`, `fetchedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "FxRate",
+    "confirm": {
+     "label": "Save FX rate",
+     "operation": "setFxRate"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "fromCurrency",
+      "toCurrency",
+      "rate",
+      "purpose",
+      "effectiveFrom",
+      "id",
+      "source",
+      "effectiveTo",
+      "setByPrincipalId",
+      "providerReference",
+      "fetchedAt"
+     ]
+    },
+    "provenance": "contract finance.yaml PUT /fx-rates"
+   },
+   {
+    "id": "formReviewPriceVariance",
+    "component": "modal",
+    "trigger": "Review price variance",
+    "body": "**Collects what `reviewPriceVariance` sends before it is called.** Required: `outcome`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Review price variance",
+     "operation": "reviewPriceVariance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "outcome",
+      "note"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /price-variances/{varianceId}/review"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1633,7 +1347,6 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-074",
     "BO-075",
     "BO-076",
@@ -1648,30 +1361,17 @@
      "provenance": "flow F13 step 3→4"
     },
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-074",
      "trigger": "Chart of Accounts",
      "carries": [
       "accountId"
      ],
-     "provenance": "derived — BO-074 declares entryState.params accountId, so an edge into it must carry them"
+     "provenance": "derived — BO-074 declares entryState.params accountId and BO-089 holds accountId, so an edge into it carries them"
     },
     {
      "to": "BO-075",
      "trigger": "Account Mapping",
-     "carries": [
-      "taxCodeId"
-     ],
-     "provenance": "derived — BO-075 declares entryState.params taxCodeId, so an edge into it must carry them"
+     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-089 holds none of them, so the edge carries nothing and BO-075 opens cold"
     }
    ]
   },
@@ -1687,6 +1387,27 @@
      "name": "contentBody",
      "slot": "queue",
      "components": [
+      {
+       "kind": "textField",
+       "label": "Fiscal period id",
+       "operation": "listJournalEntries",
+       "notes": "Sends `?fiscalPeriodId=` to `listJournalEntries`.",
+       "provenance": "contract finance.yaml GET /journal-entries"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listJournalEntries",
+       "notes": "Sends `?status=` to `listJournalEntries`.",
+       "provenance": "contract finance.yaml GET /journal-entries"
+      },
+      {
+       "kind": "textField",
+       "label": "Source",
+       "operation": "listJournalEntries",
+       "notes": "Sends `?source=` to `listJournalEntries`.",
+       "provenance": "contract finance.yaml GET /journal-entries"
+      },
       {
        "kind": "dataTable",
        "label": "Waiting for a decision",
@@ -1716,7 +1437,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected journal entries",
+       "label": "The selected journal entry",
        "bindsTo": "JournalEntry",
        "columns": [
         "JournalEntry.id",
@@ -1747,25 +1468,25 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create journal entry",
        "operation": "createJournalEntry",
        "provenance": "contract finance.yaml POST /journal-entries"
       },
       {
        "kind": "secondaryButton",
-       "label": "Approve",
+       "label": "Approve journal entry",
        "operation": "approveJournalEntry",
        "provenance": "contract finance.yaml POST /journal-entries/{entryId}/approve"
       },
       {
        "kind": "destructiveButton",
-       "label": "Reject",
+       "label": "Reject journal",
        "operation": "rejectJournal",
        "provenance": "contract finance.yaml POST /journal-entries/{entryId}/reject"
       },
       {
        "kind": "destructiveButton",
-       "label": "Reverse",
+       "label": "Reverse journal entry",
        "operation": "reverseJournalEntry",
        "provenance": "contract finance.yaml POST /journal-entries/{entryId}/reverse"
       }
@@ -1777,24 +1498,64 @@
    {
     "id": "confirmRejectJournal",
     "component": "confirmDialog",
-    "trigger": "Reject",
-    "body": "**Names what `rejectJournal` changes and what it leaves alone**, in the consequence rather than the verb. A journal entries this affects should be identified in the dialog, not just counted.",
+    "trigger": "Reject journal",
+    "body": "**Names what `rejectJournal` changes and what it leaves alone**, in the consequence rather than the verb. A journal entries this affects should be identified in the dialog, not just counted. **Collects what `rejectJournal` sends before it is called.** Required: `reason`.",
     "provenance": "contract finance.yaml POST /journal-entries/{entryId}/reject"
    },
    {
     "id": "confirmReverseJournalEntry",
     "component": "confirmDialog",
-    "trigger": "Reverse",
-    "body": "**Names what `reverseJournalEntry` changes and what it leaves alone**, in the consequence rather than the verb. A journal entries this affects should be identified in the dialog, not just counted.",
+    "trigger": "Reverse journal entry",
+    "body": "**Names what `reverseJournalEntry` changes and what it leaves alone**, in the consequence rather than the verb. A journal entries this affects should be identified in the dialog, not just counted. **Collects what `reverseJournalEntry` sends before it is called.** Required: `reason`. Optional: `fiscalPeriodId`.",
     "provenance": "contract finance.yaml POST /journal-entries/{entryId}/reverse"
+   },
+   {
+    "id": "formCreateJournalEntry",
+    "component": "modal",
+    "trigger": "Create journal entry",
+    "body": "**Collects what `createJournalEntry` sends before it is called.** Required: `id`, `fiscalPeriodId`, `description`, `lines`. Optional: `postingDate`, `reference`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateJournalEntryRequest",
+    "confirm": {
+     "label": "Create journal entry",
+     "operation": "createJournalEntry"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "fiscalPeriodId",
+      "description",
+      "lines",
+      "postingDate",
+      "reference"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /journal-entries"
+   },
+   {
+    "id": "formApproveJournalEntry",
+    "component": "modal",
+    "trigger": "Approve journal entry",
+    "body": "**Collects what `approveJournalEntry` sends before it is called.** Nothing in the body is required. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Approve journal entry",
+     "operation": "approveJournalEntry"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "note"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /journal-entries/{entryId}/approve"
    }
   ],
   "states": {
    "loading": "The journal entries list.",
    "error": "Could not load. Names which read failed and leaves the journal entries untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
-   "emptyNoResults": "The filter narrowed it and the journal entries are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoResults": "Nothing matches the filter on fiscalPeriodId, status, source and the journal entries are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listJournalEntries` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1807,7 +1568,7 @@
     "operationId": "getJournalEntry",
     "contract": "finance",
     "purpose": "Read a journal entry",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createJournalEntry",
@@ -1906,7 +1667,6 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-040",
     "BO-074",
     "BO-075",
@@ -1921,30 +1681,17 @@
      "provenance": "flow F13 step 1→2"
     },
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-074",
      "trigger": "Chart of Accounts",
      "carries": [
       "accountId"
      ],
-     "provenance": "derived — BO-074 declares entryState.params accountId, so an edge into it must carry them"
+     "provenance": "derived — BO-074 declares entryState.params accountId and BO-090 holds accountId, so an edge into it carries them"
     },
     {
      "to": "BO-075",
      "trigger": "Account Mapping",
-     "carries": [
-      "taxCodeId"
-     ],
-     "provenance": "derived — BO-075 declares entryState.params taxCodeId, so an edge into it must carry them"
+     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-090 holds none of them, so the edge carries nothing and BO-075 opens cold"
     }
    ]
   },
@@ -1961,8 +1708,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Legal entity id",
+       "operation": "listFiscalPeriods",
+       "notes": "Sends `?legalEntityId=` to `listFiscalPeriods`.",
+       "provenance": "contract finance.yaml GET /fiscal-periods"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listFiscalPeriods",
+       "notes": "Sends `?status=` to `listFiscalPeriods`.",
+       "provenance": "contract finance.yaml GET /fiscal-periods"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every period close",
+       "label": "Every fiscal period",
        "bindsTo": "FiscalPeriod",
        "columns": [
         "FiscalPeriod.id",
@@ -1985,7 +1746,25 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected period close",
+       "label": "The selected fiscal period",
+       "bindsTo": "FiscalPeriod",
+       "columns": [
+        "FiscalPeriod.id",
+        "FiscalPeriod.legalEntityId",
+        "FiscalPeriod.name",
+        "FiscalPeriod.startDate",
+        "FiscalPeriod.endDate",
+        "FiscalPeriod.status",
+        "FiscalPeriod.closedByPrincipalId",
+        "FiscalPeriod.closedAt",
+        "FiscalPeriod.events"
+       ],
+       "operation": "listFiscalPeriods",
+       "provenance": "contract finance.yaml GET /fiscal-periods"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The trial balance",
        "bindsTo": "TrialBalance",
        "columns": [
         "TrialBalance.fiscalPeriodId",
@@ -2005,25 +1784,25 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Begin",
+       "label": "Begin period close",
        "operation": "beginPeriodClose",
        "provenance": "contract finance.yaml POST /fiscal-periods/{periodId}/begin-close"
       },
       {
        "kind": "destructiveButton",
-       "label": "Close",
+       "label": "Close fiscal period",
        "operation": "closeFiscalPeriod",
        "provenance": "contract finance.yaml POST /fiscal-periods/{periodId}/close"
       },
       {
        "kind": "destructiveButton",
-       "label": "Abandon",
+       "label": "Abandon period close",
        "operation": "abandonPeriodClose",
        "provenance": "contract finance.yaml POST /fiscal-periods/{periodId}/abandon-close"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reopen",
+       "label": "Reopen period",
        "operation": "reopenPeriod",
        "provenance": "contract finance.yaml POST /fiscal-periods/{periodId}/reopen"
       }
@@ -2035,24 +1814,41 @@
    {
     "id": "confirmCloseFiscalPeriod",
     "component": "confirmDialog",
-    "trigger": "Close",
-    "body": "**Names what `closeFiscalPeriod` changes and what it leaves alone**, in the consequence rather than the verb. A period close this affects should be identified in the dialog, not just counted.",
+    "trigger": "Close fiscal period",
+    "body": "**Names what `closeFiscalPeriod` changes and what it leaves alone**, in the consequence rather than the verb. A period close this affects should be identified in the dialog, not just counted. **Collects what `closeFiscalPeriod` sends before it is called.** Nothing in the body is required. Optional: `dryRun`. **A real close answers 202 pending a finance approver** (decided 28 September, audit R144): the period shows *close pending approval* with its `approvalRequestId` until the approver acts; a dry run answers at once.",
     "provenance": "contract finance.yaml POST /fiscal-periods/{periodId}/close"
    },
    {
     "id": "confirmAbandonPeriodClose",
     "component": "confirmDialog",
-    "trigger": "Abandon",
-    "body": "**Names what `abandonPeriodClose` changes and what it leaves alone**, in the consequence rather than the verb. A period close this affects should be identified in the dialog, not just counted.",
+    "trigger": "Abandon period close",
+    "body": "**Names what `abandonPeriodClose` changes and what it leaves alone**, in the consequence rather than the verb. A period close this affects should be identified in the dialog, not just counted. **Collects what `abandonPeriodClose` sends before it is called.** Required: `reason`.",
     "provenance": "contract finance.yaml POST /fiscal-periods/{periodId}/abandon-close"
+   },
+   {
+    "id": "formReopenPeriod",
+    "component": "modal",
+    "trigger": "Reopen period",
+    "body": "**Collects what `reopenPeriod` sends before it is called.** Required: `reason` only — the approver is not named here. **The request answers 202 with an `approvalRequestId`** and the period shows *reopen pending finance approval* until a finance approver acts (decided 28 September, audit R144). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reopen period",
+     "operation": "reopenPeriod"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /fiscal-periods/{periodId}/reopen"
    }
   ],
   "states": {
    "loading": "The period close list.",
    "error": "Could not load. Names which read failed and leaves the period close untouched.",
-   "emptyFirstRun": "No period close yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the period close are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No period close yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on legalEntityId, status and the period close are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listFiscalPeriods` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2073,7 +1869,7 @@
    {
     "operationId": "closeFiscalPeriod",
     "contract": "finance",
-    "purpose": "Close a period and lock postings",
+    "purpose": "Close a period and lock postings — 202 pending finance approval (audit R144)",
     "trigger": "onAction",
     "invalidates": [
      "listFiscalPeriods"
@@ -2091,7 +1887,7 @@
    {
     "operationId": "reopenPeriod",
     "contract": "finance",
-    "purpose": "Reopen a closed period",
+    "purpose": "Request to reopen a closed period — 202 pending finance approval (audit R144)",
     "trigger": "onAction",
     "invalidates": [
      "listFiscalPeriods"
@@ -2113,11 +1909,11 @@
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `periodId`.",
    "preloaded": [
-    "TrialBalance.fiscalPeriodId",
-    "TrialBalance.isBalanced",
-    "TrialBalance.totalDebit",
-    "TrialBalance.totalCredit",
-    "TrialBalance.accounts"
+    "FiscalPeriod.id",
+    "FiscalPeriod.legalEntityId",
+    "FiscalPeriod.name",
+    "FiscalPeriod.startDate",
+    "FiscalPeriod.endDate"
    ]
   },
   "wireframe": {
@@ -2182,12 +1978,10 @@
     "BO-043",
     "BO-047",
     "BO-048",
-    "BO-051",
     "BO-059",
     "BO-061",
     "BO-062",
     "BO-065",
-    "BO-070",
     "BO-074",
     "BO-075",
     "BO-076",
@@ -2199,37 +1993,22 @@
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-101 holds none of them, so the edge carries nothing and BO-008 opens cold"
     },
     {
      "to": "BO-022",
      "trigger": "Order Detail",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — BO-022 declares entryState.params orderId, so an edge into it must carry them"
+     "provenance": "derived — BO-022 declares entryState.params orderId and BO-101 holds none of them, so the edge carries nothing and BO-022 opens cold"
     },
     {
      "to": "BO-023",
      "trigger": "Refunds & Exchanges",
-     "carries": [
-      "orderId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-023 declares entryState.params orderId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-023 declares entryState.params orderId and BO-101 holds none of them, so the edge carries nothing and BO-023 opens cold"
     },
     {
      "to": "BO-024",
      "trigger": "Payment Exceptions",
-     "carries": [
-      "depositId",
-      "paymentId"
-     ],
-     "provenance": "derived — BO-024 declares entryState.params depositId, paymentId, so an edge into it must carry them"
+     "provenance": "derived — BO-024 declares entryState.params depositId, paymentId and BO-101 holds none of them, so the edge carries nothing and BO-024 opens cold"
     },
     {
      "to": "BO-025",
@@ -2237,65 +2016,42 @@
      "carries": [
       "settlementId"
      ],
-     "provenance": "derived — BO-025 declares entryState.params settlementId, so an edge into it must carry them"
+     "provenance": "derived — BO-025 declares entryState.params settlementId and BO-101 holds settlementId, so an edge into it carries them"
     },
     {
      "to": "BO-026",
      "trigger": "Group Bookings",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — BO-026 declares entryState.params orderId, so an edge into it must carry them"
+     "provenance": "derived — BO-026 declares entryState.params groupBookingId, orderId and BO-101 holds none of them, so the edge carries nothing and BO-026 opens cold"
     },
     {
      "to": "BO-027",
      "trigger": "Reissue & Media Replacement",
-     "carries": [
-      "mediaCode",
-      "mediaId"
-     ],
-     "provenance": "derived — BO-027 declares entryState.params mediaCode, mediaId, so an edge into it must carry them"
+     "provenance": "derived — BO-027 declares entryState.params mediaCode, mediaId and BO-101 holds none of them, so the edge carries nothing and BO-027 opens cold"
     },
     {
      "to": "BO-029",
      "trigger": "Report Builder",
-     "carries": [
-      "conversationId",
-      "reportId"
-     ],
-     "provenance": "derived — BO-029 declares entryState.params conversationId, reportId, so an edge into it must carry them"
+     "provenance": "derived — BO-029 declares entryState.params conversationId, reportId and BO-101 holds none of them, so the edge carries nothing and BO-029 opens cold"
     },
     {
      "to": "BO-039",
      "trigger": "Shift Directory",
-     "carries": [
-      "shiftId"
-     ],
-     "provenance": "derived — BO-039 declares entryState.params shiftId, so an edge into it must carry them"
+     "provenance": "derived — BO-039 declares entryState.params  and BO-101 holds none of them, so the edge carries nothing and BO-039 opens cold"
     },
     {
      "to": "BO-040",
      "trigger": "Variance Approval",
-     "carries": [
-      "shiftId"
-     ],
-     "provenance": "derived — BO-040 declares entryState.params shiftId, so an edge into it must carry them"
+     "provenance": "derived — BO-040 declares entryState.params  and BO-101 holds none of them, so the edge carries nothing and BO-040 opens cold"
     },
     {
      "to": "BO-041",
      "trigger": "Cash Movements",
-     "carries": [
-      "shiftId"
-     ],
-     "provenance": "derived — BO-041 declares entryState.params shiftId, so an edge into it must carry them"
+     "provenance": "derived — BO-041 declares entryState.params  and BO-101 holds none of them, so the edge carries nothing and BO-041 opens cold"
     },
     {
      "to": "BO-042",
      "trigger": "Banking & Safe",
-     "carries": [
-      "shiftId"
-     ],
-     "provenance": "derived — BO-042 declares entryState.params shiftId, so an edge into it must carry them"
+     "provenance": "derived — BO-042 declares entryState.params boxId and BO-101 holds none of them, so the edge carries nothing and BO-042 opens cold"
     },
     {
      "to": "BO-043",
@@ -2303,113 +2059,62 @@
      "carries": [
       "settlementId"
      ],
-     "provenance": "derived — BO-043 declares entryState.params settlementId, so an edge into it must carry them"
+     "provenance": "derived — BO-043 declares entryState.params settlementId and BO-101 holds settlementId, so an edge into it carries them"
     },
     {
      "to": "BO-047",
      "trigger": "Order Corrections & Exceptions",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — BO-047 declares entryState.params orderId, so an edge into it must carry them"
+     "provenance": "derived — BO-047 declares entryState.params orderId and BO-101 holds none of them, so the edge carries nothing and BO-047 opens cold"
     },
     {
      "to": "BO-048",
      "trigger": "Retail Products",
-     "carries": [
-      "merchandiseId"
-     ],
-     "provenance": "derived — BO-048 declares entryState.params merchandiseId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-051",
-     "trigger": "Purchase Orders",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — BO-051 declares entryState.params orderId, so an edge into it must carry them"
+     "provenance": "derived — BO-048 declares entryState.params merchandiseId and BO-101 holds none of them, so the edge carries nothing and BO-048 opens cold"
     },
     {
      "to": "BO-059",
      "trigger": "Sales Reports",
-     "carries": [
-      "conversationId",
-      "reportId"
-     ],
-     "provenance": "derived — BO-059 declares entryState.params conversationId, reportId, so an edge into it must carry them"
+     "provenance": "derived — BO-059 declares entryState.params conversationId, reportId and BO-101 holds none of them, so the edge carries nothing and BO-059 opens cold"
     },
     {
      "to": "BO-061",
      "trigger": "Scheduled Reports",
-     "carries": [
-      "conversationId",
-      "reportId"
-     ],
-     "provenance": "derived — BO-061 declares entryState.params conversationId, reportId, so an edge into it must carry them"
+     "provenance": "derived — BO-061 declares entryState.params reportId, scheduleId and BO-101 holds none of them, so the edge carries nothing and BO-061 opens cold"
     },
     {
      "to": "BO-062",
      "trigger": "Venue Profile",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-062 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-062 declares entryState.params  and BO-101 holds none of them, so the edge carries nothing and BO-062 opens cold"
     },
     {
      "to": "BO-065",
      "trigger": "Venue Configuration",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-065 declares entryState.params venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-070",
-     "trigger": "Work Orders",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — BO-070 declares entryState.params orderId, so an edge into it must carry them"
+     "provenance": "derived — BO-065 declares entryState.params  and BO-101 holds none of them, so the edge carries nothing and BO-065 opens cold"
     },
     {
      "to": "BO-074",
      "trigger": "Chart of Accounts",
-     "carries": [
-      "accountId"
-     ],
-     "provenance": "derived — BO-074 declares entryState.params accountId, so an edge into it must carry them"
+     "provenance": "derived — BO-074 declares entryState.params accountId and BO-101 holds none of them, so the edge carries nothing and BO-074 opens cold"
     },
     {
      "to": "BO-075",
      "trigger": "Account Mapping",
-     "carries": [
-      "taxCodeId"
-     ],
-     "provenance": "derived — BO-075 declares entryState.params taxCodeId, so an edge into it must carry them"
+     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-101 holds none of them, so the edge carries nothing and BO-075 opens cold"
     },
     {
      "to": "BO-077",
      "trigger": "FX Rates & Variances",
-     "carries": [
-      "varianceId"
-     ],
-     "provenance": "derived — BO-077 declares entryState.params varianceId, so an edge into it must carry them"
+     "provenance": "derived — BO-077 declares entryState.params varianceId and BO-101 holds none of them, so the edge carries nothing and BO-077 opens cold"
     },
     {
      "to": "BO-089",
      "trigger": "Journal Entries",
-     "carries": [
-      "entryId"
-     ],
-     "provenance": "derived — BO-089 declares entryState.params entryId, so an edge into it must carry them"
+     "provenance": "derived — BO-089 declares entryState.params entryId and BO-101 holds none of them, so the edge carries nothing and BO-089 opens cold"
     },
     {
      "to": "BO-090",
      "trigger": "Period Close",
-     "carries": [
-      "periodId"
-     ],
-     "provenance": "derived — BO-090 declares entryState.params periodId, so an edge into it must carry them"
+     "provenance": "derived — BO-090 declares entryState.params periodId and BO-101 holds none of them, so the edge carries nothing and BO-090 opens cold"
     }
    ]
   },
@@ -2418,13 +2123,6 @@
   "pattern": "listDetail",
   "patternReason": "`listOrders` reads the population and `getVenueSettings` reads one of them — list, select, act",
   "purpose": "Everything in orders & money, and what in it needs attention.",
-  "gaps": [
-   {
-    "operation": "listSettlements",
-    "why": "**1 declared operation reach no component on this screen**: listSettlements. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -2433,8 +2131,50 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listOrders",
+       "notes": "Sends `?venueId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Principal id",
+       "operation": "listOrders",
+       "notes": "Sends `?principalId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Shift id",
+       "operation": "listOrders",
+       "notes": "Sends `?shiftId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listOrders",
+       "notes": "Sends `?status=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created from",
+       "operation": "listOrders",
+       "notes": "Sends `?createdFrom=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created to",
+       "operation": "listOrders",
+       "notes": "Sends `?createdTo=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every orders money",
+       "label": "Every order",
        "bindsTo": "OrderSummary",
        "columns": [
         "OrderSummary.id",
@@ -2447,34 +2187,28 @@
        ],
        "operation": "listOrders",
        "provenance": "contract orders.yaml GET /orders"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
+      },
       {
-       "kind": "detailPanel",
-       "label": "The selected orders money",
-       "bindsTo": "VenueSettings",
+       "kind": "dataTable",
+       "label": "Every settlement",
+       "bindsTo": "Settlement",
        "columns": [
-        "VenueSettings.id",
-        "VenueSettings.venueId",
-        "VenueSettings.supportHours",
-        "VenueSettings.quietHours",
-        "VenueSettings.segregatedAccess",
-        "VenueSettings.alerting"
+        "Settlement.id",
+        "Settlement.currencyCode",
+        "Settlement.providerName",
+        "Settlement.periodStart",
+        "Settlement.periodEnd",
+        "Settlement.fileReference",
+        "Settlement.format",
+        "Settlement.status",
+        "Settlement.lineCount",
+        "Settlement.matchedCount",
+        "Settlement.exceptionCount",
+        "Settlement.providerGross"
        ],
-       "operation": "getVenueSettings",
-       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+       "operation": "listSettlements",
+       "provenance": "contract finance.yaml GET /settlements"
+      },
       {
        "kind": "cardList",
        "bindsTo": "screens",
@@ -2485,6 +2219,49 @@
        "kind": "searchField",
        "label": "Search orders & money",
        "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected order",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount",
+        "OrderSummary.principalId",
+        "OrderSummary.holdLabel",
+        "OrderSummary.heldUntil"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The venue settings",
+       "bindsTo": "VenueSettings",
+       "columns": [
+        "VenueSettings.id",
+        "VenueSettings.venueId",
+        "VenueSettings.currencyCode",
+        "VenueSettings.currencyScale",
+        "VenueSettings.supportHours",
+        "VenueSettings.quietHours",
+        "VenueSettings.biometrics",
+        "VenueSettings.segregatedAccess",
+        "VenueSettings.alerting"
+       ],
+       "operation": "getVenueSettings",
+       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
       }
      ]
     }

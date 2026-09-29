@@ -1,0 +1,97 @@
+{
+ "getAccessibleSeating": {
+  "method": "GET",
+  "path": "/accessible-seating",
+  "contract": "seating",
+  "summary": "Accessible seats, their routes and who may buy them",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "seatMapId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessibleSeating"
+ },
+ "getSeatRules": {
+  "method": "GET",
+  "path": "/seat-rules",
+  "contract": "seating",
+  "summary": "Kill, buffer, companion and accessibility rules",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "seatMapId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatRules"
+ },
+ "setAccessibleSeating": {
+  "method": "PUT",
+  "path": "/accessible-seating",
+  "contract": "seating",
+  "summary": "Define accessible seats, routes and eligibility",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessibleSeating",
+  "responds": "AccessibleSeating"
+ },
+ "setSeatRules": {
+  "method": "PUT",
+  "path": "/seat-rules",
+  "contract": "seating",
+  "summary": "Which seats are killed, buffered, paired or reserved for access",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SeatRules",
+  "responds": "SeatRules"
+ },
+ "validateSeatCompliance": {
+  "method": "GET",
+  "path": "/seat-compliance",
+  "contract": "seating",
+  "summary": "Whether the map still meets its obligations",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "seatMapId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatComplianceFinding"
+ }
+}

@@ -1,1 +1,593 @@
-{}
+{
+ "CreditEligibility": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.credit_eligibility",
+  "description": "Board 3.4. **Where credit may be spent** — acceptance, not funding.",
+  "properties": {
+   "creditTypeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "allowedVenueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "allowedOutletKinds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "allowedProductCategoryIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "excludedProductIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "allowedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "minimumSpend": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "maximumPercentOfBasket": {
+    "type": "number",
+    "nullable": true,
+    "description": "**Caps how much of a purchase one credit type may cover.** A venue that lets promotional credit pay for everything has run a free day it did not intend.\n"
+   },
+   "validDaysOfWeek": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "CreditLot": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.credit_lot",
+  "description": "Board 3.7. **The tranche behind a balance.** Expiry belongs here, not on the wallet.",
+  "required": [
+   "id",
+   "walletId",
+   "creditTypeId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "walletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "creditTypeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "issuedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "remainingAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "sourceKind": {
+    "type": "string",
+    "enum": [
+     "topUp",
+     "refund",
+     "promotion",
+     "giftCard",
+     "membershipBenefit",
+     "loyaltyConversion",
+     "transfer",
+     "adjustment"
+    ]
+   },
+   "sourceReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "termsSnapshot": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "**The credit type's terms as they stood at issue.** Changing a credit type must not retro-expire credit already given, so the lot carries its own terms.\n**Open on purpose, and its shape lives in `CreditType`**: the snapshot is that credit type's properties copied at issue, so it follows `CreditType` as it stood then rather than as it stands now.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "exhausted",
+     "expired",
+     "forfeited",
+     "reversed"
+    ]
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "CreditType": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.credit_type",
+  "description": "Board 1.6. **What value sits inside a wallet** — the second vocabulary, and the one the acceptance condition requires to be a table.\n",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "category": {
+    "type": "string",
+    "enum": [
+     "cash",
+     "refund",
+     "bonus",
+     "promotional",
+     "giftCard",
+     "membership",
+     "loyalty",
+     "ride",
+     "attraction",
+     "redemption",
+     "fnb",
+     "retail",
+     "parking",
+     "event",
+     "other"
+    ]
+   },
+   "monetary": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Loyalty points are not money.** A non-monetary credit has a conversion rate to money or it cannot be spent, and treating points as currency puts them on the balance sheet.\n"
+   },
+   "conversionRate": {
+    "type": "number",
+    "nullable": true
+   },
+   "refundable": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Promotional credit is not refundable and cash credit is.** A venue that refunds promotional credit to a card has converted marketing spend into cash.\n"
+   },
+   "transferable": {
+    "type": "boolean",
+    "default": false
+   },
+   "expires": {
+    "type": "boolean",
+    "default": false
+   },
+   "validityDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "breakageEligible": {
+    "type": "boolean",
+    "default": false
+   },
+   "ledgerAccountCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "priority": {
+    "type": "integer",
+    "default": 0
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "GameEntitlement": {
+  "type": "object",
+  "x-ticvai-persistence": "games.entitlement",
+  "description": "Board 4. **A right to play, not money** — consumed before money is.",
+  "required": [
+   "code",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "allGamesPass",
+     "unlimitedSingleGame",
+     "limitedSingleGame",
+     "package",
+     "freePlay"
+    ]
+   },
+   "gameIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "attractionTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "playCount": {
+    "type": "integer",
+    "nullable": true,
+    "description": "For `limitedSingleGame` and `package`. Null means unlimited."
+   },
+   "validityKind": {
+    "type": "string",
+    "enum": [
+     "sameDay",
+     "days",
+     "untilDate",
+     "untilUsed"
+    ]
+   },
+   "validityDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "activationKind": {
+    "type": "string",
+    "enum": [
+     "onPurchase",
+     "onFirstUse",
+     "onDate"
+    ],
+    "default": "onFirstUse",
+    "description": "**On first use is what a guest expects from a day pass bought the night before.** On purchase is what a venue defaults to by accident, and it costs them a day.\n"
+   },
+   "dailyPlayCap": {
+    "type": "integer",
+    "nullable": true
+   },
+   "cooldownMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**Unlimited does not mean continuous.** A cooldown is how one child does not hold a popular ride all afternoon.\n"
+   },
+   "linkedProductId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Wallet": {
+  "x-ticvai-persistence": "wallet.wallet + wallet.credit_lot",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "balance",
+   "currency",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "balance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "credits": {
+    "type": "array",
+    "description": "4.3.5 and 4.3.19. **One balance and one bonus balance with one expiry could not express what the requirement asks for** — cash, bonus and redemption credit, each with its own expiry.\n**The expiries are the reason this is a list.** Cash a guest paid for should outlive a promotional credit they were given, and a single `expiresAt` either expires the money they paid or never expires the promotion.\n**Consumed first-expiry-first-out across all three** (4.3.19), which is also the order that is fairest to the guest — spend what is about to die before what is not.\n**One entry per `active` lot in `wallet.credit_lot`** for this wallet: `amount` is the lot's `remaining_amount`, `expiresAt` its `expires_at`, `sourceRef` its `source_reference`. `kind` and `isRefundable` are not stored on the lot; they come from the lot's credit type (`listCreditLots` returns the lots themselves).\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "amount"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "cash",
+        "bonus",
+        "redemption",
+        "refund",
+        "goodwill"
+       ],
+       "description": "**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability.\n",
+       "x-ticvai-persisted": false
+      },
+      "amount": {
+       "x-ticvai-column": "remaining_amount",
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "expiresAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "sourceRef": {
+       "type": "string",
+       "nullable": true,
+       "x-ticvai-column": "source_reference"
+      },
+      "isRefundable": {
+       "type": "boolean",
+       "default": false,
+       "x-ticvai-persisted": false,
+       "description": "**True only for `cash`.** A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice.\n"
+      }
+     }
+    }
+   },
+   "bonusBalance": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Promotional value. Typically non-refundable and spent first."
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "suspended",
+     "closed"
+    ]
+   },
+   "homeCellName": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where the authoritative balance lives. Present when the guest is linked across cells.\n"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastActivityAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "WalletFundingRules": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.funding_rules",
+  "description": "Board 2, which is the 27 August minute one screen for one.",
+  "properties": {
+   "walletTypeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "minimumTopUp": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "maximumTopUp": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "presetAmounts": {
+    "type": "array",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/Money"
+    }
+   },
+   "allowedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "allowedFundingSources": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "card",
+      "cash",
+      "bankTransfer",
+      "voucher",
+      "corporateAccount",
+      "loyaltyConversion"
+     ]
+    }
+   },
+   "bonusRules": {
+    "type": "array",
+    "description": "Board 2.3. *Top up 200, get 20.* **The bonus is a separate lot of a separate credit type**, which is how it can expire on different terms from the cash.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "minimumAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "bonusAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "bonusPercent": {
+       "type": "number",
+       "nullable": true
+      },
+      "bonusCreditTypeId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "validFrom": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      },
+      "validTo": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "autoReload": {
+    "type": "object",
+    "description": "Board 2.5, matrix 4.3.28. **Fires when the balance drops.**",
+    "properties": {
+     "enabled": {
+      "type": "boolean",
+      "default": false
+     },
+     "thresholdAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "reloadAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "maximumPerDay": {
+      "type": "integer",
+      "nullable": true
+     }
+    }
+   },
+   "recurringFunding": {
+    "type": "object",
+    "description": "Board 2.6, matrix 4.3.29 — ***\"distinct from auto-reload\"***. **Fires on a date**, which is what an allowance needs.\n",
+    "properties": {
+     "enabled": {
+      "type": "boolean",
+      "default": false
+     },
+     "cadence": {
+      "type": "string",
+      "enum": [
+       "daily",
+       "weekly",
+       "monthly"
+      ]
+     },
+     "amount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "dayOfWeek": {
+      "type": "string",
+      "nullable": true
+     },
+     "dayOfMonth": {
+      "type": "integer",
+      "nullable": true
+     }
+    }
+   },
+   "approvalAboveAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "velocityLimits": {
+    "type": "object",
+    "description": "**A fraud control, not a commercial one.** Ten top-ups of ninety-nine in an hour is a card being tested, and a daily cap in total value does not catch it.\n",
+    "properties": {
+     "maxTransactionsPerHour": {
+      "type": "integer",
+      "nullable": true
+     },
+     "maxTransactionsPerDay": {
+      "type": "integer",
+      "nullable": true
+     },
+     "maxAmountPerDay": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "maxAmountPerMonth": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ }
+}

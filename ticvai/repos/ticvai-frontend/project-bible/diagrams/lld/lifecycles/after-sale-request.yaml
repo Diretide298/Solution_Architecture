@@ -1,0 +1,59 @@
+id: LLD-After-sale request
+title: After-sale request — 7 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/after-sale-request.yaml
+entity: After-sale request
+contract: orders
+enum: AfterSaleRequest.status
+enumKind: inline
+enumSchema: AfterSaleRequest
+enumProperty: status
+owner: orders
+initial:
+- requested
+terminal:
+- completed
+- rejected
+- failed
+transitions:
+- from: requested
+  to: completed
+  operation: setOrderAmendment
+  trigger: operation
+  guard: '**Within policy.** The `AfterSalePolicy` row that matches allows the change, capacity and
+    the entitlements check out, and the order lines are changed in the same call'
+- from: requested
+  to: pendingApproval
+  operation: setOrderAmendment
+  trigger: operation
+  guard: Outside the standard policy, or above a supervisor threshold. The request waits with the policy's
+    answer recorded in `policyResult`
+- from: requested
+  to: failed
+  operation: setOrderAmendment
+  trigger: operation
+  guard: Capacity, payment or entitlement checks failed; nothing on the order changed
+- from: pendingApproval
+  to: approved
+  operation: approveExceptionServiceRecovery
+  trigger: operation
+  guard: Approved by someone holding the approval permission. `escalate` leaves the request here with
+    `escalatedAt` set
+- from: pendingApproval
+  to: rejected
+  operation: approveExceptionServiceRecovery
+  trigger: operation
+  guard: Rejected, with the decision comment the guest can be told
+- from: approved
+  to: completed
+  trigger: job
+  guard: The approved change or remedy was applied (order lines, a refund through `createRefund`, a
+    voucher or a reissue)
+- from: approved
+  to: failed
+  trigger: job
+  guard: The approved change could no longer be applied (capacity gone, payment refused)
+notes: '**One lifecycle for amendments and service-recovery exceptions**, because both are a request,
+  the policy''s answer, an approval and an outcome. The money never moves on this record: a refund is
+  its own `Refund` with its own approval.'

@@ -1,0 +1,95 @@
+id: LLD-AccessDynamicPolicy
+title: AccessDynamicPolicy — 13 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/access-dynamic-policy.yaml
+entity: AccessDynamicPolicy
+contract: access
+enum: AccessDynamicPolicy.status
+enumKind: inline
+enumSchema: AccessDynamicPolicy
+enumProperty: status
+owner: access
+description: One guest-admission dynamic (attribute-based) policy with its current content (declared
+  29 September, writers pass). `setVisualDynamicPolicy` writes attribute and identity policies and `setContextTimeEvent`
+  context, time, event and occupancy policies; each write is a new `AccessDynamicPolicyVersion`. Both
+  carry `status`, where **`inactive` switches the policy off at once and `active` on a new or inactive
+  policy submits it for approval** (`pendingApproval`), plus `validFrom` and `validTo`. **Not `identity.access_policy`,
+  which is staff permission.**
+initial:
+- pendingApproval
+- inactive
+terminal:
+- expired
+transitions:
+- from: pendingApproval
+  to: active
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Granted; the pending version becomes `currentVersion`
+  requiresApproval: true
+- from: pendingApproval
+  to: draft
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Rejected, for a policy that was never active; it returns to its author
+- from: draft
+  to: pendingApproval
+  operation: setVisualDynamicPolicy
+  trigger: operation
+  guard: Body `status` `active`; the reworked policy is submitted for approval again
+- from: draft
+  to: pendingApproval
+  operation: setContextTimeEvent
+  trigger: operation
+  guard: Body `status` `active`; the reworked policy is submitted for approval again
+- from: draft
+  to: inactive
+  operation: setVisualDynamicPolicy
+  trigger: operation
+  guard: Body `status` `inactive`; kept, switched off
+- from: draft
+  to: inactive
+  operation: setContextTimeEvent
+  trigger: operation
+  guard: Body `status` `inactive`; kept, switched off
+- from: active
+  to: inactive
+  operation: setVisualDynamicPolicy
+  trigger: operation
+  guard: Body `status` `inactive`; an attribute or identity policy is switched off at once and gates
+    stop evaluating it
+- from: active
+  to: inactive
+  operation: setContextTimeEvent
+  trigger: operation
+  guard: Body `status` `inactive`; a context, time, event or occupancy policy is switched off at once
+- from: inactive
+  to: pendingApproval
+  operation: setVisualDynamicPolicy
+  trigger: operation
+  guard: Body `status` `active`; switching an inactive policy on submits it for approval
+- from: inactive
+  to: pendingApproval
+  operation: setContextTimeEvent
+  trigger: operation
+  guard: Body `status` `active`; switching an inactive policy on submits it for approval
+- from: active
+  to: expired
+  trigger: timer
+  guard: '`validTo` has passed; the grant expires automatically'
+- from: inactive
+  to: expired
+  trigger: timer
+  guard: '`validTo` passed while the policy was switched off'
+- from: pendingApproval
+  to: expired
+  trigger: timer
+  guard: '`validTo` passed before the approval was decided; the approval request is withdrawn'
+openQuestions: null
+notes: '**Created `pendingApproval`** (a write with `status` `active`, the default) **or `inactive`**;
+  `draft` is where a rejected new policy goes back to its author. **A change to an active policy leaves
+  it `active`:** the change is a new version in `pendingApproval` (see `access-dynamic-policy-version.yaml`)
+  and the current version stays in force until it is granted. **`rollbackAccessPolicy` works the same
+  way:** it writes a new version restoring older content and leaves the policy''s own status where it
+  is, so it appears on the version model and not here. Only `expired` is terminal.'

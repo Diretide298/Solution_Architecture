@@ -2443,6 +2443,13 @@ paths:
         with 400 `settlement-period-not-a-day`. Until this date the description said monthly, which
         contradicted the screen that runs it.
 
+        **Also writes `payments.provider_cost`, one line per transaction and cost kind the file
+        reports** (scheme fee, interchange, acquirer margin, FX spread), each carrying the
+        `settlementId` it was read from and the `paymentId` when the provider names the transaction; a
+        cost charged against the account rather than a transaction has none. Re-ingesting the same file
+        under its `Idempotency-Key` adds no second set of lines. `getPaymentProviderEconomics` reads
+        them (decided 29 September, writers pass; DM6).
+
         '
       tags:
       - settlement

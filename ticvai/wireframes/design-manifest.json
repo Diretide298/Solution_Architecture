@@ -1071,6 +1071,28 @@
    "status": "pending"
   },
   {
+   "id": "WS36",
+   "kind": "workshop",
+   "label": "Pricing   Revenue Management board 3",
+   "platform": "P09",
+   "screens": [
+    "ADM-068",
+    "ADM-069",
+    "ADM-070",
+    "ADM-071",
+    "ADM-072",
+    "ADM-073",
+    "ADM-074",
+    "ADM-075",
+    "ADM-076",
+    "ADM-077"
+   ],
+   "drawable": 9,
+   "thin": 1,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS61",
    "kind": "workshop",
    "label": "Ticket Media   Credential Management board 3",
@@ -1464,28 +1486,6 @@
    "status": "pending"
   },
   {
-   "id": "WS36",
-   "kind": "workshop",
-   "label": "Pricing   Revenue Management board 3",
-   "platform": "P09",
-   "screens": [
-    "ADM-068",
-    "ADM-069",
-    "ADM-070",
-    "ADM-071",
-    "ADM-072",
-    "ADM-073",
-    "ADM-074",
-    "ADM-075",
-    "ADM-076",
-    "ADM-077"
-   ],
-   "drawable": 8,
-   "thin": 2,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS40",
    "kind": "workshop",
    "label": "Pricing   Revenue Management board 7",
@@ -1501,6 +1501,50 @@
     "ADM-115",
     "ADM-116",
     "ADM-117"
+   ],
+   "drawable": 8,
+   "thin": 2,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS49",
+   "kind": "workshop",
+   "label": "Promotions   Bundles Management board 5",
+   "platform": "P09",
+   "screens": [
+    "ADM-178",
+    "ADM-179",
+    "ADM-180",
+    "ADM-181",
+    "ADM-182",
+    "ADM-183",
+    "ADM-184",
+    "ADM-185",
+    "ADM-186",
+    "ADM-187"
+   ],
+   "drawable": 8,
+   "thin": 2,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS54",
+   "kind": "workshop",
+   "label": "Promotions   Bundles Management board 10",
+   "platform": "P09",
+   "screens": [
+    "ADM-228",
+    "ADM-229",
+    "ADM-230",
+    "ADM-231",
+    "ADM-232",
+    "ADM-233",
+    "ADM-234",
+    "ADM-235",
+    "ADM-236",
+    "ADM-237"
    ],
    "drawable": 8,
    "thin": 2,
@@ -1690,6 +1734,28 @@
     "ADM-596",
     "ADM-597",
     "ADM-598"
+   ],
+   "drawable": 8,
+   "thin": 2,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS151",
+   "kind": "workshop",
+   "label": "Payment Payment Orchestration board 5",
+   "platform": "P09",
+   "screens": [
+    "ADM-599",
+    "ADM-600",
+    "ADM-601",
+    "ADM-602",
+    "ADM-603",
+    "ADM-604",
+    "ADM-605",
+    "ADM-606",
+    "ADM-607",
+    "ADM-608"
    ],
    "drawable": 8,
    "thin": 2,
@@ -1957,6 +2023,28 @@
    "status": "pending"
   },
   {
+   "id": "WS45",
+   "kind": "workshop",
+   "label": "Promotions   Bundles Management board 1",
+   "platform": "P09",
+   "screens": [
+    "ADM-138",
+    "ADM-139",
+    "ADM-140",
+    "ADM-141",
+    "ADM-142",
+    "ADM-143",
+    "ADM-144",
+    "ADM-145",
+    "ADM-146",
+    "ADM-147"
+   ],
+   "drawable": 7,
+   "thin": 3,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS48",
    "kind": "workshop",
    "label": "Promotions   Bundles Management board 4",
@@ -1972,50 +2060,6 @@
     "ADM-175",
     "ADM-176",
     "ADM-177"
-   ],
-   "drawable": 7,
-   "thin": 3,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS49",
-   "kind": "workshop",
-   "label": "Promotions   Bundles Management board 5",
-   "platform": "P09",
-   "screens": [
-    "ADM-178",
-    "ADM-179",
-    "ADM-180",
-    "ADM-181",
-    "ADM-182",
-    "ADM-183",
-    "ADM-184",
-    "ADM-185",
-    "ADM-186",
-    "ADM-187"
-   ],
-   "drawable": 7,
-   "thin": 3,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS54",
-   "kind": "workshop",
-   "label": "Promotions   Bundles Management board 10",
-   "platform": "P09",
-   "screens": [
-    "ADM-228",
-    "ADM-229",
-    "ADM-230",
-    "ADM-231",
-    "ADM-232",
-    "ADM-233",
-    "ADM-234",
-    "ADM-235",
-    "ADM-236",
-    "ADM-237"
    ],
    "drawable": 7,
    "thin": 3,
@@ -2281,28 +2325,6 @@
    "status": "pending"
   },
   {
-   "id": "WS151",
-   "kind": "workshop",
-   "label": "Payment Payment Orchestration board 5",
-   "platform": "P09",
-   "screens": [
-    "ADM-599",
-    "ADM-600",
-    "ADM-601",
-    "ADM-602",
-    "ADM-603",
-    "ADM-604",
-    "ADM-605",
-    "ADM-606",
-    "ADM-607",
-    "ADM-608"
-   ],
-   "drawable": 7,
-   "thin": 3,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS155",
    "kind": "workshop",
    "label": "Resource Management Configuration board 1",
@@ -2362,6 +2384,28 @@
     "BO-900",
     "BO-901",
     "BO-902"
+   ],
+   "drawable": 7,
+   "thin": 3,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS160",
+   "kind": "workshop",
+   "label": "Resource Management Configuration board 6",
+   "platform": "P08",
+   "screens": [
+    "BO-903",
+    "BO-904",
+    "BO-905",
+    "BO-906",
+    "BO-907",
+    "BO-908",
+    "BO-909",
+    "BO-910",
+    "BO-911",
+    "BO-912"
    ],
    "drawable": 7,
    "thin": 3,
@@ -2457,6 +2501,28 @@
    "status": "pending"
   },
   {
+   "id": "WS02",
+   "kind": "workshop",
+   "label": "Access Control board 2",
+   "platform": "P08",
+   "screens": [
+    "BO-154",
+    "BO-155",
+    "BO-156",
+    "BO-157",
+    "BO-158",
+    "BO-159",
+    "BO-160",
+    "BO-161",
+    "BO-162",
+    "BO-163"
+   ],
+   "drawable": 6,
+   "thin": 4,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS08",
    "kind": "workshop",
    "label": "Access Control board 8",
@@ -2472,6 +2538,28 @@
     "BO-221",
     "BO-222",
     "BO-223"
+   ],
+   "drawable": 6,
+   "thin": 4,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS11",
+   "kind": "workshop",
+   "label": "Access Control board 11",
+   "platform": "P08",
+   "screens": [
+    "BO-244",
+    "BO-245",
+    "BO-246",
+    "BO-247",
+    "BO-248",
+    "BO-249",
+    "BO-250",
+    "BO-251",
+    "BO-252",
+    "BO-253"
    ],
    "drawable": 6,
    "thin": 4,
@@ -2523,6 +2611,28 @@
    "status": "pending"
   },
   {
+   "id": "WS26",
+   "kind": "workshop",
+   "label": "Customer Service board 2",
+   "platform": "P12",
+   "screens": [
+    "SUP-019",
+    "SUP-020",
+    "SUP-021",
+    "SUP-022",
+    "SUP-023",
+    "SUP-024",
+    "SUP-025",
+    "SUP-026",
+    "SUP-027",
+    "SUP-028"
+   ],
+   "drawable": 6,
+   "thin": 4,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS27",
    "kind": "workshop",
    "label": "Group Sales   Corporate Booking Management board 1",
@@ -2560,28 +2670,6 @@
     "ADM-065",
     "ADM-066",
     "ADM-067"
-   ],
-   "drawable": 6,
-   "thin": 4,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS45",
-   "kind": "workshop",
-   "label": "Promotions   Bundles Management board 1",
-   "platform": "P09",
-   "screens": [
-    "ADM-138",
-    "ADM-139",
-    "ADM-140",
-    "ADM-141",
-    "ADM-142",
-    "ADM-143",
-    "ADM-144",
-    "ADM-145",
-    "ADM-146",
-    "ADM-147"
    ],
    "drawable": 6,
    "thin": 4,
@@ -2840,21 +2928,21 @@
    "status": "pending"
   },
   {
-   "id": "WS160",
+   "id": "WS164",
    "kind": "workshop",
-   "label": "Resource Management Configuration board 6",
+   "label": "Resource Management Configuration board 10",
    "platform": "P08",
    "screens": [
-    "BO-903",
-    "BO-904",
-    "BO-905",
-    "BO-906",
-    "BO-907",
-    "BO-908",
-    "BO-909",
-    "BO-910",
-    "BO-911",
-    "BO-912"
+    "BO-943",
+    "BO-944",
+    "BO-945",
+    "BO-946",
+    "BO-947",
+    "BO-948",
+    "BO-949",
+    "BO-950",
+    "BO-951",
+    "BO-952"
    ],
    "drawable": 6,
    "thin": 4,
@@ -2862,43 +2950,21 @@
    "status": "pending"
   },
   {
-   "id": "WS02",
+   "id": "WS03",
    "kind": "workshop",
-   "label": "Access Control board 2",
+   "label": "Access Control board 3",
    "platform": "P08",
    "screens": [
-    "BO-154",
-    "BO-155",
-    "BO-156",
-    "BO-157",
-    "BO-158",
-    "BO-159",
-    "BO-160",
-    "BO-161",
-    "BO-162",
-    "BO-163"
-   ],
-   "drawable": 5,
-   "thin": 5,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS26",
-   "kind": "workshop",
-   "label": "Customer Service board 2",
-   "platform": "P12",
-   "screens": [
-    "SUP-019",
-    "SUP-020",
-    "SUP-021",
-    "SUP-022",
-    "SUP-023",
-    "SUP-024",
-    "SUP-025",
-    "SUP-026",
-    "SUP-027",
-    "SUP-028"
+    "BO-164",
+    "BO-165",
+    "BO-166",
+    "BO-167",
+    "BO-168",
+    "BO-169",
+    "BO-170",
+    "BO-171",
+    "BO-172",
+    "BO-173"
    ],
    "drawable": 5,
    "thin": 5,
@@ -3164,6 +3230,28 @@
    "status": "pending"
   },
   {
+   "id": "WS158",
+   "kind": "workshop",
+   "label": "Resource Management Configuration board 4",
+   "platform": "P08",
+   "screens": [
+    "BO-883",
+    "BO-884",
+    "BO-885",
+    "BO-886",
+    "BO-887",
+    "BO-888",
+    "BO-889",
+    "BO-890",
+    "BO-891",
+    "BO-892"
+   ],
+   "drawable": 5,
+   "thin": 5,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS161",
    "kind": "workshop",
    "label": "Resource Management Configuration board 7",
@@ -3179,28 +3267,6 @@
     "BO-920",
     "BO-921",
     "BO-922"
-   ],
-   "drawable": 5,
-   "thin": 5,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS164",
-   "kind": "workshop",
-   "label": "Resource Management Configuration board 10",
-   "platform": "P08",
-   "screens": [
-    "BO-943",
-    "BO-944",
-    "BO-945",
-    "BO-946",
-    "BO-947",
-    "BO-948",
-    "BO-949",
-    "BO-950",
-    "BO-951",
-    "BO-952"
    ],
    "drawable": 5,
    "thin": 5,
@@ -3274,28 +3340,6 @@
    "status": "pending"
   },
   {
-   "id": "WS03",
-   "kind": "workshop",
-   "label": "Access Control board 3",
-   "platform": "P08",
-   "screens": [
-    "BO-164",
-    "BO-165",
-    "BO-166",
-    "BO-167",
-    "BO-168",
-    "BO-169",
-    "BO-170",
-    "BO-171",
-    "BO-172",
-    "BO-173"
-   ],
-   "drawable": 4,
-   "thin": 6,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS04",
    "kind": "workshop",
    "label": "Access Control board 4",
@@ -3340,21 +3384,21 @@
    "status": "pending"
   },
   {
-   "id": "WS11",
+   "id": "WS10",
    "kind": "workshop",
-   "label": "Access Control board 11",
+   "label": "Access Control board 10",
    "platform": "P08",
    "screens": [
-    "BO-244",
-    "BO-245",
-    "BO-246",
-    "BO-247",
-    "BO-248",
-    "BO-249",
-    "BO-250",
-    "BO-251",
-    "BO-252",
-    "BO-253"
+    "BO-234",
+    "BO-235",
+    "BO-236",
+    "BO-237",
+    "BO-238",
+    "BO-239",
+    "BO-240",
+    "BO-241",
+    "BO-242",
+    "BO-243"
    ],
    "drawable": 4,
    "thin": 6,
@@ -3421,6 +3465,28 @@
     "ADM-356",
     "ADM-357",
     "ADM-358"
+   ],
+   "drawable": 4,
+   "thin": 6,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS39",
+   "kind": "workshop",
+   "label": "Pricing   Revenue Management board 6",
+   "platform": "P09",
+   "screens": [
+    "ADM-098",
+    "ADM-099",
+    "ADM-100",
+    "ADM-101",
+    "ADM-102",
+    "ADM-103",
+    "ADM-104",
+    "ADM-105",
+    "ADM-106",
+    "ADM-107"
    ],
    "drawable": 4,
    "thin": 6,
@@ -3794,28 +3860,6 @@
    "status": "pending"
   },
   {
-   "id": "WS158",
-   "kind": "workshop",
-   "label": "Resource Management Configuration board 4",
-   "platform": "P08",
-   "screens": [
-    "BO-883",
-    "BO-884",
-    "BO-885",
-    "BO-886",
-    "BO-887",
-    "BO-888",
-    "BO-889",
-    "BO-890",
-    "BO-891",
-    "BO-892"
-   ],
-   "drawable": 4,
-   "thin": 6,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS163",
    "kind": "workshop",
    "label": "Resource Management Configuration board 9",
@@ -3986,21 +4030,21 @@
    "status": "pending"
   },
   {
-   "id": "WS10",
+   "id": "WS09",
    "kind": "workshop",
-   "label": "Access Control board 10",
+   "label": "Access Control board 9",
    "platform": "P08",
    "screens": [
-    "BO-234",
-    "BO-235",
-    "BO-236",
-    "BO-237",
-    "BO-238",
-    "BO-239",
-    "BO-240",
-    "BO-241",
-    "BO-242",
-    "BO-243"
+    "BO-224",
+    "BO-225",
+    "BO-226",
+    "BO-227",
+    "BO-228",
+    "BO-229",
+    "BO-230",
+    "BO-231",
+    "BO-232",
+    "BO-233"
    ],
    "drawable": 3,
    "thin": 7,
@@ -4024,28 +4068,6 @@
     "ADM-328"
    ],
    "drawable": 2,
-   "thin": 7,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS39",
-   "kind": "workshop",
-   "label": "Pricing   Revenue Management board 6",
-   "platform": "P09",
-   "screens": [
-    "ADM-098",
-    "ADM-099",
-    "ADM-100",
-    "ADM-101",
-    "ADM-102",
-    "ADM-103",
-    "ADM-104",
-    "ADM-105",
-    "ADM-106",
-    "ADM-107"
-   ],
-   "drawable": 3,
    "thin": 7,
    "frames": 0,
    "status": "pending"
@@ -4359,6 +4381,28 @@
    "status": "pending"
   },
   {
+   "id": "WS142",
+   "kind": "workshop",
+   "label": "Marketing CRM Configuration Reference v1.0 board 8",
+   "platform": "P08",
+   "screens": [
+    "BO-804",
+    "BO-805",
+    "BO-806",
+    "BO-807",
+    "BO-808",
+    "BO-809",
+    "BO-810",
+    "BO-811",
+    "BO-812",
+    "BO-813"
+   ],
+   "drawable": 3,
+   "thin": 7,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS153",
    "kind": "workshop",
    "label": "Payment Payment Orchestration board 7",
@@ -4462,28 +4506,6 @@
     "BO-151",
     "BO-152",
     "BO-153"
-   ],
-   "drawable": 2,
-   "thin": 8,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS09",
-   "kind": "workshop",
-   "label": "Access Control board 9",
-   "platform": "P08",
-   "screens": [
-    "BO-224",
-    "BO-225",
-    "BO-226",
-    "BO-227",
-    "BO-228",
-    "BO-229",
-    "BO-230",
-    "BO-231",
-    "BO-232",
-    "BO-233"
    ],
    "drawable": 2,
    "thin": 8,
@@ -5059,6 +5081,28 @@
    "status": "pending"
   },
   {
+   "id": "WS141",
+   "kind": "workshop",
+   "label": "Marketing CRM Configuration Reference v1.0 board 7",
+   "platform": "P08",
+   "screens": [
+    "BO-794",
+    "BO-795",
+    "BO-796",
+    "BO-797",
+    "BO-798",
+    "BO-799",
+    "BO-800",
+    "BO-801",
+    "BO-802",
+    "BO-803"
+   ],
+   "drawable": 1,
+   "thin": 9,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS145",
    "kind": "workshop",
    "label": "Marketing CRM Configuration Reference v1.0 board 11",
@@ -5294,50 +5338,6 @@
     "BO-791",
     "BO-792",
     "BO-793"
-   ],
-   "drawable": 0,
-   "thin": 10,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS141",
-   "kind": "workshop",
-   "label": "Marketing CRM Configuration Reference v1.0 board 7",
-   "platform": "P08",
-   "screens": [
-    "BO-794",
-    "BO-795",
-    "BO-796",
-    "BO-797",
-    "BO-798",
-    "BO-799",
-    "BO-800",
-    "BO-801",
-    "BO-802",
-    "BO-803"
-   ],
-   "drawable": 0,
-   "thin": 10,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS142",
-   "kind": "workshop",
-   "label": "Marketing CRM Configuration Reference v1.0 board 8",
-   "platform": "P08",
-   "screens": [
-    "BO-804",
-    "BO-805",
-    "BO-806",
-    "BO-807",
-    "BO-808",
-    "BO-809",
-    "BO-810",
-    "BO-811",
-    "BO-812",
-    "BO-813"
    ],
    "drawable": 0,
    "thin": 10,

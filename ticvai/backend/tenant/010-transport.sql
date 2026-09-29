@@ -2,7 +2,7 @@
 -- **Derived. Do not hand-edit.**
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 0 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS transport.departure (
     id                                jsonb PRIMARY KEY NOT NULL,
     route_id                          jsonb NOT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS transport.fare_passenger_type (
 );
 
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 0 write it; 2 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS transport.fare_table (
     model                             text NOT NULL CONSTRAINT fare_table_model_chk CHECK (model IN ('stopCount', 'matrix')),
     base_fare                         numeric(18,4),
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS transport.fare_table (
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 0 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS transport.favourite_route (
     id                                jsonb PRIMARY KEY NOT NULL,
     venue_id                          uuid NOT NULL,
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS transport.favourite_route (
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 3 operations read it and 0 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS transport.network_import (
     id                                jsonb PRIMARY KEY NOT NULL,
     venue_id                          uuid NOT NULL,
@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS transport.network_import (
 );
 
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 3 operations read it and 0 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS transport.pass_type (
     venue_id                          uuid NOT NULL,
     code                              text NOT NULL CONSTRAINT pass_type_code_chk CHECK (char_length(code) <= 32),
@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS transport.pass_type (
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 5 operations read it and 0 write it; 5 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS transport.route (
     venue_id                          uuid NOT NULL,
     code                              text NOT NULL CONSTRAINT route_code_chk CHECK (char_length(code) <= 32),
@@ -130,7 +130,7 @@ CREATE TABLE IF NOT EXISTS transport.route_stop (
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 8 operations read it and 0 write it; 5 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS transport.station (
     venue_id                          uuid NOT NULL,
     code                              text NOT NULL CONSTRAINT station_code_chk CHECK (char_length(code) <= 32),
@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS transport.station (
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 5 operations read it and 0 write it; 2 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS transport.timetable (
     name                              text NOT NULL CONSTRAINT timetable_name_chk CHECK (char_length(name) <= 120),
     valid_from                        date NOT NULL,

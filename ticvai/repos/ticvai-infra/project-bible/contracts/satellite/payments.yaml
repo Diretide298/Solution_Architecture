@@ -546,6 +546,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: What worked and what did not
           content:
             application/json:
@@ -2550,6 +2553,152 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
         effectiveRatePercent:
           type: number
+    PaymentAttempt:
+      type: object
+      x-ticvai-persistence: payments.payment_attempt
+      description: 'Boards 2.8 and 8.8. **One row per authorisation attempt against a provider
+        connection**, including the declined, errored and abandoned attempts that never become a
+        payment: `orders.payment` records what was taken, this records what was tried. Serves
+        `getPaymentProviderHealth` (authorisation, decline and error rates, p50/p95 latency per
+        connection) and `getPaymentPerformance` (attempts and outcomes by method, provider, card type,
+        channel, 3-D Secure outcome and venue). Written by the payment path in OrderService, one row
+        per provider call (data model, 29 September): `createPayment` and `capturePayment`
+        (spine/orders.yaml) write it, a cross-schema write from OrderService into `payments`, and no
+        payments operation does (decided 29 September, writers pass; DM6).
+
+        '
+      required:
+      - providerConnectionId
+      - outcome
+      - attemptedAt
+      - scopePath
+      properties:
+        id:
+          type: string
+          format: uuid
+        paymentId:
+          type: string
+          nullable: true
+          x-ticvai-references: orders.payment
+          description: The `orders.payment` this attempt produced or belongs to. Null for an attempt
+            abandoned before a payment was recorded.
+        orderId:
+          type: string
+          nullable: true
+          x-ticvai-references: orders.sales_order
+          description: The order being paid for, so an abandoned attempt still counts against the
+            order's conversion.
+        providerConnectionId:
+          type: string
+          format: uuid
+          x-ticvai-references: payments.provider_connection
+        paymentMethodId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: payments.method
+        cardType:
+          type: string
+          nullable: true
+          description: Scheme and funding type as the provider reported it (for example `visa-credit`).
+            Null for a non-card method.
+        channel:
+          type: string
+          nullable: true
+        outcome:
+          type: string
+          enum:
+          - authorised
+          - declined
+          - errored
+          - abandoned
+          description: The four outcomes `PaymentPerformanceRow` counts.
+        declineClass:
+          allOf:
+          - $ref: '#/components/schemas/DeclineClass'
+          nullable: true
+        declineCode:
+          type: string
+          nullable: true
+          description: The provider's own code, kept verbatim.
+        declineReason:
+          type: string
+          nullable: true
+        latencyMs:
+          type: integer
+          nullable: true
+          minimum: 0
+          description: Request to provider response. Null for an abandoned attempt.
+        authenticationOutcome:
+          type: string
+          nullable: true
+          enum:
+          - notAttempted
+          - exempted
+          - frictionless
+          - challengePassed
+          - challengeFailed
+          description: The 3-D Secure result, the `authenticationOutcome` dimension of
+            `getPaymentPerformance`.
+        amount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        attemptedAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+    ProviderCostLine:
+      type: object
+      x-ticvai-persistence: payments.provider_cost
+      description: 'Board 2.9. **What a provider actually charged, one line per transaction and cost
+        kind.** Serves `getPaymentProviderEconomics` (scheme fees, interchange, acquirer margin and FX
+        spread per connection; chargeback cost stays in `orders.chargeback`). Lines come from the
+        provider settlement file ingested by `ingestSettlementFile` (data model, 29 September): that
+        operation (spine/finance.yaml, LedgerService) writes these lines as it parses the file, a
+        cross-schema write into `payments`; no payments operation writes them (decided 29 September,
+        writers pass; DM6).
+
+        '
+      required:
+      - providerConnectionId
+      - costKind
+      - amount
+      - incurredAt
+      - scopePath
+      properties:
+        id:
+          type: string
+          format: uuid
+        paymentId:
+          type: string
+          nullable: true
+          x-ticvai-references: orders.payment
+          description: Null for a cost the provider charged against the account rather than a
+            transaction.
+        providerConnectionId:
+          type: string
+          format: uuid
+          x-ticvai-references: payments.provider_connection
+        costKind:
+          type: string
+          enum:
+          - schemeFee
+          - interchange
+          - acquirerMargin
+          - fxSpread
+        amount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        settlementId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: ledger.settlement
+          description: The settlement file the line was read from.
+        incurredAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
     PaymentTerminal:
       type: object
       x-ticvai-persistence: payments.terminal

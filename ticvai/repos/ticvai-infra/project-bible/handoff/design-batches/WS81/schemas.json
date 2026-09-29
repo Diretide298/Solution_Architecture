@@ -1,1 +1,346 @@
-{}
+{
+ "GameEntitlement": {
+  "type": "object",
+  "x-ticvai-persistence": "games.entitlement",
+  "description": "Board 4. **A right to play, not money** — consumed before money is.",
+  "required": [
+   "code",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "allGamesPass",
+     "unlimitedSingleGame",
+     "limitedSingleGame",
+     "package",
+     "freePlay"
+    ]
+   },
+   "gameIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "attractionTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "playCount": {
+    "type": "integer",
+    "nullable": true,
+    "description": "For `limitedSingleGame` and `package`. Null means unlimited."
+   },
+   "validityKind": {
+    "type": "string",
+    "enum": [
+     "sameDay",
+     "days",
+     "untilDate",
+     "untilUsed"
+    ]
+   },
+   "validityDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "activationKind": {
+    "type": "string",
+    "enum": [
+     "onPurchase",
+     "onFirstUse",
+     "onDate"
+    ],
+    "default": "onFirstUse",
+    "description": "**On first use is what a guest expects from a day pass bought the night before.** On purchase is what a venue defaults to by accident, and it costs them a day.\n"
+   },
+   "dailyPlayCap": {
+    "type": "integer",
+    "nullable": true
+   },
+   "cooldownMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**Unlimited does not mean continuous.** A cooldown is how one child does not hold a popular ride all afternoon.\n"
+   },
+   "linkedProductId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "GameplayAuthorisation": {
+  "type": "object",
+  "x-ticvai-persistence": "games.authorisation",
+  "description": "Board 4.9. **The refusal reason is the product.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "decision": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "refuse"
+    ]
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "ok",
+     "cardNotFound",
+     "cardExpired",
+     "cardBlocked",
+     "retapTooSoon",
+     "heightRestriction",
+     "ageRestriction",
+     "insufficientFunds",
+     "entitlementExhausted",
+     "entitlementNotValidHere",
+     "cooldownActive",
+     "dailyCapReached",
+     "readerNotConfigured",
+     "gameUnavailable"
+    ]
+   },
+   "guestMessage": {
+    "type": "string",
+    "nullable": true,
+    "description": "***\"No plays left on your pass\"* rather than *\"Declined\"*.** One is a guest who understands; the other is a member of staff walking over.\n"
+   },
+   "chargedFrom": {
+    "type": "string",
+    "nullable": true
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "entitlementId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "remainingBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "remainingPlays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "trace": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "check": {
+       "type": "string"
+      },
+      "passed": {
+       "type": "boolean"
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "decidedOffline": {
+    "type": "boolean",
+    "default": false
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "GameplayAuthorisationRequest": {
+  "type": "object",
+  "required": [
+   "readerId"
+  ],
+  "properties": {
+   "readerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "cardId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "credentialIdentifier": {
+    "type": "string",
+    "nullable": true
+   },
+   "gameId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "guestHeightCm": {
+    "type": "integer",
+    "nullable": true
+   },
+   "offline": {
+    "type": "boolean",
+    "default": false
+   }
+  }
+ },
+ "GameplayTransaction": {
+  "type": "object",
+  "x-ticvai-persistence": "games.gameplay_transaction",
+  "description": "Boards 8.2 and 8.5. **The refused ones are the valuable half.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "readerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "gameId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "cardId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "allowed",
+     "refused",
+     "reversed"
+    ]
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "chargedFrom": {
+    "type": "string",
+    "nullable": true
+   },
+   "entitlementId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "ticketsEarned": {
+    "type": "integer",
+    "nullable": true
+   },
+   "decidedOffline": {
+    "type": "boolean",
+    "default": false
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "GameplayValidationRules": {
+  "type": "object",
+  "x-ticvai-persistence": "games.validation_rules",
+  "description": "Boards 4.2 and 4.3. **Must be an answer, stated once**, rather than whatever the firmware happens to do.\n",
+  "properties": {
+   "deductionOrder": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "entitlement",
+      "freePlay",
+      "bonusCredit",
+      "promotionalCredit",
+      "gameCredit",
+      "cashCredit",
+      "directPay"
+     ]
+    }
+   },
+   "checkOrder": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "cardValid",
+      "cardNotExpired",
+      "cardNotBlocked",
+      "restrictionsMet",
+      "retapWindow",
+      "entitlementAvailable",
+      "fundsSufficient"
+     ]
+    }
+   },
+   "allowPartialEntitlement": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Whether an entitlement covering part of the price may be topped up with credit.** Usually no, because a guest who thinks they have a pass does not expect a charge.\n"
+   },
+   "refuseBelowBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "offlineDecisionAllowed": {
+    "type": "boolean",
+    "default": true
+   },
+   "offlineMaximumValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ }
+}

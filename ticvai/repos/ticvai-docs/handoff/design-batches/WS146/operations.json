@@ -1,0 +1,481 @@
+{
+ "getWaiverStatus": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/waiver-status",
+  "contract": "marketing-crm",
+  "summary": "Whether this guest may be issued a ticket that requires a waiver",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listComplianceEvidenceWaiver": {
+  "method": "GET",
+  "path": "/compliance-evidence-waiver",
+  "contract": "marketing-crm",
+  "summary": "Compliance Evidence, Audit & Waiver Repository",
+  "permission": "GUEST_VIEW_PII",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "participantSubjectId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerSubjectId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "signatorySubjectId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ticketId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "eventId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "formId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "formVersion",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMinorGuardianGroup": {
+  "method": "GET",
+  "path": "/minor-guardian-group",
+  "contract": "marketing-crm",
+  "summary": "Minor, Guardian & Group Consent Management",
+  "permission": "GUEST_VIEW_PII",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "groupBookingId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "guardianSubjectId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "performanceId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "consentStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "visitFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "visitTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listParticipantWaiverStatus": {
+  "method": "GET",
+  "path": "/participant-waiver-statu",
+  "contract": "marketing-crm",
+  "summary": "Participant Waiver Status & Tracking",
+  "permission": "GUEST_VIEW_PII",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "q",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "participantSubjectId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ticketId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "groupBookingId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "formId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "performanceId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "visitFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "visitTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "completionStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listVersioningEffectiveDate": {
+  "method": "GET",
+  "path": "/versioning-effective-date",
+  "contract": "marketing-crm",
+  "summary": "Versioning, Effective Dates & Legal Change Control",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "formId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "compareWith",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listWaiver": {
+  "method": "GET",
+  "path": "/waiver",
+  "contract": "marketing-crm",
+  "summary": "Waiver Operations Command Center",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "brandId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "eventId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "formId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "participantType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "bookingChannel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "breakdownBy",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "WaiverOperationsCommandCenterView"
+ },
+ "listWaiverTemplateMaster": {
+  "method": "GET",
+  "path": "/waiver-template-master",
+  "contract": "marketing-crm",
+  "summary": "Waiver Template Library & Master Setup",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "waiverType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brandId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "isMasterTemplate",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "q",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listWaiverTriggerEligibility": {
+  "method": "GET",
+  "path": "/waiver-trigger-eligibility",
+  "contract": "marketing-crm",
+  "summary": "Waiver Trigger, Eligibility & Completion Rules",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "formId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "triggerPoint",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "setDigitalWaiverForm": {
+  "method": "PUT",
+  "path": "/digital-waiver-form",
+  "contract": "marketing-crm",
+  "summary": "Save the layout of a draft waiver version",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DigitalWaiverFormBuilderInput",
+  "responds": "DigitalWaiverFormBuilderView"
+ },
+ "setSignatorySignatureGuardian": {
+  "method": "PUT",
+  "path": "/signatory-signature-guardian",
+  "contract": "marketing-crm",
+  "summary": "Set who must sign a draft waiver version, and how",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SignatorySignatureGuardianRuleConfigurationInput",
+  "responds": "SignatorySignatureGuardianRuleConfigurationView"
+ },
+ "setWaiverVerificationValidation": {
+  "method": "PUT",
+  "path": "/waiver-verification-validation",
+  "contract": "marketing-crm",
+  "summary": "Record a reviewer's verification decision on a waiver submission",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WaiverVerificationValidationWorkspaceInput",
+  "responds": "WaiverVerificationValidationWorkspaceView"
+ }
+}

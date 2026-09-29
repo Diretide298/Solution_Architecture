@@ -118,7 +118,7 @@ BEGIN
 END
 $$;
 
--- **49 tables: 6 scoped by `scope_path`, 0 by `venue_id`, 1 through the parent that owns them, 41 with no policy.**
+-- **73 tables: 28 scoped by `scope_path`, 0 by `venue_id`, 5 through the parent that owns them, 39 with no policy.**
 -- A table with no policy is listed at the end of this file with the reason. It is not
 -- claimed to be reference data: for most of them that is a scoping decision nobody has
 -- made yet, and they stay readable by every connection to this database until it is.
@@ -128,6 +128,28 @@ $$;
 SELECT platform.apply_scope_rls('control.channel_listing'::regclass);
 SELECT platform.apply_scope_rls('control.content_block'::regclass);
 SELECT platform.apply_scope_rls('control.migration_plan'::regclass);
+SELECT platform.apply_scope_rls('control.partner'::regclass);
+SELECT platform.apply_scope_rls('control.partner_agreement'::regclass);
+SELECT platform.apply_scope_rls('control.partner_allocation'::regclass);
+SELECT platform.apply_scope_rls('control.partner_application'::regclass);
+SELECT platform.apply_scope_rls('control.partner_billing_profile'::regclass);
+SELECT platform.apply_scope_rls('control.partner_booking_limit'::regclass);
+SELECT platform.apply_scope_rls('control.partner_capability_grant'::regclass);
+SELECT platform.apply_scope_rls('control.partner_case'::regclass);
+SELECT platform.apply_scope_rls('control.partner_change_request'::regclass);
+SELECT platform.apply_scope_rls('control.partner_commercial_exception'::regclass);
+SELECT platform.apply_scope_rls('control.partner_commission_line'::regclass);
+SELECT platform.apply_scope_rls('control.partner_commission_rule'::regclass);
+SELECT platform.apply_scope_rls('control.partner_contact'::regclass);
+SELECT platform.apply_scope_rls('control.partner_credit_profile'::regclass);
+SELECT platform.apply_scope_rls('control.partner_distribution_right'::regclass);
+SELECT platform.apply_scope_rls('control.partner_document'::regclass);
+SELECT platform.apply_scope_rls('control.partner_rate'::regclass);
+SELECT platform.apply_scope_rls('control.partner_reconciliation_exception'::regclass);
+SELECT platform.apply_scope_rls('control.partner_scope_assignment'::regclass);
+SELECT platform.apply_scope_rls('control.partner_security'::regclass);
+SELECT platform.apply_scope_rls('control.partner_settlement_batch'::regclass);
+SELECT platform.apply_scope_rls('control.partner_status_history'::regclass);
 SELECT platform.apply_scope_rls('control.seo_metadata'::regclass);
 SELECT platform.apply_scope_rls('control.support_notice'::regclass);
 SELECT platform.apply_scope_rls('control.url_redirect'::regclass);
@@ -137,6 +159,10 @@ SELECT platform.apply_scope_rls('control.url_redirect'::regclass);
 
 -- Scoped through the parent that owns the row (a NOT NULL declared foreign key).
 SELECT platform.apply_parent_rls('control.migration_plan_cell'::regclass, 'migration_plan_id', 'control.migration_plan'::regclass, 'id');
+SELECT platform.apply_parent_rls('control.partner_application_review_task'::regclass, 'partner_application_id', 'control.partner_application'::regclass, 'id');
+SELECT platform.apply_parent_rls('control.partner_commission_rule_tier'::regclass, 'partner_commission_rule_id', 'control.partner_commission_rule'::regclass, 'id');
+SELECT platform.apply_parent_rls('control.partner_rate_volume_band'::regclass, 'partner_rate_id', 'control.partner_rate'::regclass, 'id');
+SELECT platform.apply_parent_rls('control.partner_user'::regclass, 'partner_id', 'control.partner'::regclass, 'id');
 
 -- No policy. Each needs a scoping decision (carry scope_path or venue_id, or a
 -- NOT NULL owning reference) before row-level security can hold for it.
@@ -164,8 +190,6 @@ SELECT platform.apply_parent_rls('control.migration_plan_cell'::regclass, 'migra
 --   control.migration_run_cell  -- its owner control.migration_run has no policy either
 --   control.migration_run_tenant  -- its owner control.migration_run has no policy either
 --   control.onboarding_application  -- only nullable references (venue_type_template_id -> control.venue_type_template)
---   control.partner_agreement  -- no scope column and no declared owner
---   control.partner_user  -- no scope column and no declared owner
 --   control.release  -- no scope column and no declared owner
 --   control.release_component  -- its owner control.release has no policy either
 --   control.rollout  -- its owner control.release has no policy either

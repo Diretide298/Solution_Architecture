@@ -4179,7 +4179,25 @@ components:
     IdentityMembershipHistory:
       type: object
       x-ticvai-persistence: identity.membership_history
-      description: '**Taken from the backend workbook, 20 September.** Stores every status change made to a customer''s membership.'
+      description: '**Taken from the backend workbook, 20 September.** Stores every status change made to a customer''s membership.
+
+
+        **A freeze or suspension episode is the row that starts it** (decided 29 September, DM4; writers pass).
+        That row carries the episode and how it treats the membership: `interruptionType`, the planned
+        `episodeStartDate` and `episodeEndDate` (null for an open-ended suspension), `validityTreatment` with
+        the `newExpiryDate` it produced, and the five entitlement treatment flags (pack pp.27-28, the Membership
+        Freeze, Suspension & Reactivation Management screen). The resume or reactivation is its own row whose
+        `endsEpisodeHistoryId` points at the row that started the episode, so the history stays append-only and
+        an episode''s status (scheduled, active, ended, cancelled) is read from the pair rather than updated
+        in place. Defaults follow the membership state model: `extendExpiry` for a freeze and `doNotExtend` for
+        a suspension; admission, reservations, benefits and the credential blocked, and renewal allowed during
+        a freeze and blocked during a suspension (decided 29 September, readiness close-out).
+
+
+        **Written by the identity service, not by an operation of its own**: it records the row when it consumes
+        the entitlement status change that `catalogue.freezeEntitlement`, `suspendEntitlement` and
+        `reinstateEntitlement` and `orders.renewMembership` publish, with the episode fields those carry. Read
+        by `getMembership`.'
       required:
       - customerMembershipId
       - toStatus
@@ -4209,6 +4227,71 @@ components:
         changedAt:
           type: string
           format: date-time
+        interruptionType:
+          type: string
+          enum:
+          - freeze
+          - suspension
+          - administrativeHold
+          nullable: true
+          description: Set on the row that starts a freeze or suspension episode; null on every other status change
+        suspensionReason:
+          type: string
+          enum:
+          - paymentIssue
+          - membershipMisuse
+          - credentialMisuse
+          - eligibilityIssue
+          - chargeback
+          - administrativeReview
+          - other
+          nullable: true
+          description: For a suspension or administrative hold (pack p.28)
+        episodeStartDate:
+          type: string
+          format: date
+          nullable: true
+        episodeEndDate:
+          type: string
+          format: date
+          nullable: true
+          description: Planned end; null for an open-ended suspension
+        validityTreatment:
+          type: string
+          enum:
+          - extendExpiry
+          - doNotExtend
+          nullable: true
+        newExpiryDate:
+          type: string
+          format: date
+          nullable: true
+          description: The expiry after the extension, when validityTreatment is extendExpiry
+        admissionBlocked:
+          type: boolean
+          nullable: true
+        reservationsRestricted:
+          type: boolean
+          nullable: true
+        benefitsRestricted:
+          type: boolean
+          nullable: true
+        renewalAllowed:
+          type: boolean
+          nullable: true
+        credentialDisabled:
+          type: boolean
+          nullable: true
+        approvalRequestId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          nullable: true
+          description: The `approvals.request` that approved the episode, where one was needed
+        endsEpisodeHistoryId:
+          type: string
+          format: uuid
+          nullable: true
+          description: On a resume or reactivation row, the row that started the episode it ends
     IdentityModule:
       type: object
       x-ticvai-persistence: identity.module

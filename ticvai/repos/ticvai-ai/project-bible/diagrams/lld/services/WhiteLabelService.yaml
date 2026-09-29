@@ -102,8 +102,8 @@ operationsByContract:
     scope: venue
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 4
+    writes: 4
   - operation: deletePromoBlock
     verb: DELETE
     path: /tenant-config/promo-blocks/{promoBlockId}
@@ -525,6 +525,7 @@ tables:
   - createPromoBlock
   - deleteBanner
   - deleteContentPage
+  - deleteGuidedChoice
   - deletePromoBlock
   - publishContentBlock
   - publishTenantConfig
@@ -558,6 +559,7 @@ tables:
   - createPromoBlock
   - deleteBanner
   - deleteContentPage
+  - deleteGuidedChoice
   - deletePromoBlock
   - publishContentBlock
   - publishTenantConfig

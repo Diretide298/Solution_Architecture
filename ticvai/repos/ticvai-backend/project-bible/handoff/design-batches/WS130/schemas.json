@@ -1,0 +1,362 @@
+{
+ "EventResourcePlan": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.event_resource_plan",
+  "description": "Event board 6. **Secured against required is the only number an event manager wants.**\n",
+  "properties": {
+   "eventId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "requirements": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "space",
+        "equipment",
+        "staff",
+        "contractor",
+        "vehicle",
+        "service"
+       ]
+      },
+      "resourceTypeId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "roleCode": {
+       "type": "string",
+       "nullable": true
+      },
+      "quantity": {
+       "type": "integer"
+      },
+      "from": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "to": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "locationScopePath": {
+       "type": "string",
+       "nullable": true
+      },
+      "securedCount": {
+       "type": "integer",
+       "readOnly": true
+      },
+      "status": {
+       "type": "string",
+       "enum": [
+        "required",
+        "partiallySecured",
+        "secured",
+        "atRisk"
+       ]
+      },
+      "bookingIds": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       }
+      }
+     }
+    }
+   },
+   "contractors": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "organisationId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "role": {
+       "type": "string"
+      },
+      "headcount": {
+       "type": "integer"
+      },
+      "accreditationProgrammeId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "insuranceVerified": {
+       "type": "boolean",
+       "default": false
+      }
+     }
+    }
+   },
+   "readiness": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "notPlanned",
+     "planning",
+     "atRisk",
+     "ready"
+    ]
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "RotaAssignment": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.rota_assignment",
+  "required": [
+   "principalId",
+   "venueId",
+   "startsAt",
+   "endsAt",
+   "position"
+  ],
+  "properties": {
+   "overtimeMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "description": "BL-044, 1.2.83. **UAE labour law limits working hours and mandates rest periods**, and nothing in the package counted either. Derived from attendance against the shift.\n"
+   },
+   "restPeriodBefore": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Minutes since the previous shift ended. **The check that stops a closing shift followed by an opening one**, which is legal in most places and unsafe in all of them.\n"
+   },
+   "breachesWorkingHourLimit": {
+    "type": "boolean",
+    "default": false,
+    "readOnly": true,
+    "description": "**Flagged at assignment, not discovered at payroll.** A rota that breaches a statutory limit is a rota somebody has to redo, and finding out a month later means it was worked.\n"
+   },
+   "labourCost": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "**Cost at the point of scheduling.** A manager building a rota without seeing its cost is a manager who finds out from finance.\n"
+   },
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "departmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "position": {
+    "type": "string",
+    "description": "What they are rostered to do — gate steward, cashier, lifeguard, technician. **Most positions never touch a till**, which is why a rota assignment is not a shift.\n**A position code, not a label.** It is the same value as `StaffingRules.minimumCover[].positionCode`, `OpenShift.positionCode` and `StaffingCoverage.positionCode`: coverage counts rostered people per position, so an assignment spelled differently from the rule it fills is counted against nothing and the gap stays open. Tenant-defined, which is why it is not an enum here.\n"
+   },
+   "requiredRoleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Checked on assignment. A rota naming someone unqualified is a rota that gets overridden."
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where the position needs a till. **The link between a rota and a cash session**, without merging the two.\n"
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "endsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "$ref": "#/components/schemas/RotaStatus"
+   },
+   "breakMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "RotaStatus": {
+  "type": "string",
+  "enum": [
+   "planned",
+   "published",
+   "confirmed",
+   "swapPending",
+   "cancelled",
+   "completed",
+   "noShow"
+  ]
+ },
+ "ShiftTemplate": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.shift_template",
+  "description": "Resource board 3.7. **The unit a manager actually thinks in.**",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "early",
+     "late",
+     "middle",
+     "split",
+     "double",
+     "night",
+     "onCall",
+     "overtime"
+    ]
+   },
+   "startsAt": {
+    "type": "string"
+   },
+   "endsAt": {
+    "type": "string"
+   },
+   "breaks": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "afterMinutes": {
+       "type": "integer"
+      },
+      "minutes": {
+       "type": "integer"
+      },
+      "paid": {
+       "type": "boolean",
+       "default": false
+      }
+     }
+    }
+   },
+   "requiredQualifications": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "roleCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "costCentre": {
+    "type": "string",
+    "nullable": true
+   },
+   "hourlyRate": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "StaffingCoverage": {
+  "type": "object",
+  "description": "Resource board 4.4. **The gap is the product.**",
+  "properties": {
+   "date": {
+    "type": "string",
+    "format": "date"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "positionCode": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "from": {
+    "type": "string"
+   },
+   "to": {
+    "type": "string"
+   },
+   "required": {
+    "type": "integer"
+   },
+   "rostered": {
+    "type": "integer"
+   },
+   "qualified": {
+    "type": "integer",
+    "description": "**A position filled by somebody not qualified for it is still a gap.**"
+   },
+   "gap": {
+    "type": "integer"
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "covered",
+     "tight",
+     "short",
+     "blocking"
+    ]
+   },
+   "openShiftIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   }
+  }
+ }
+}

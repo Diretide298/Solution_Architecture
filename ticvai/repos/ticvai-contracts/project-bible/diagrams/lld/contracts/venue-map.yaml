@@ -137,7 +137,10 @@ operations:
   - staff
   - guest
   offline: true
-  reads: []
+  reads:
+  - venuemap.map
+  - venuemap.map_version
+  - venuemap.placed_resource
   writes: []
 - operation: listVenueMaps
   verb: GET

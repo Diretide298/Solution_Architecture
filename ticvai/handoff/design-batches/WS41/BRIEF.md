@@ -1,6 +1,6 @@
 # WS41 — Privacy  Consent   Preference Management board 1
 
-**10 screens · 10 operations · 16 schemas · 3 permissions**
+**10 screens · 11 operations · 16 schemas · 3 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -48,10 +48,9 @@ convincingly. It is never a caption.
 ## Rules that are not style preferences
 
 - **Every control that can be refused must be gated.** 3 permissions apply here:
-  `GUEST_MANAGE, MARKETING_MANAGE, MARKETING_VIEW`. A control nobody can use must say so,
+  `GUEST_MANAGE, GUEST_VIEW, GUEST_VIEW_PII`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,7 +60,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `CMS-021` | Privacy & Consent Configuration Command Center | configEditor | 1 | 0 | — |
+| `CMS-021` | Privacy & Consent Configuration Command Center | configEditor | 2 | 0 | — |
 | `CMS-022` | Data Processing Purpose & Lawful Basis Registry | listDetail | 1 | 0 | — |
 | `CMS-023` | Consent Purpose & Consent Type Builder | configEditor | 1 | 0 | — |
 | `CMS-024` | Communication Preference & Marketing Permission Configuration | configEditor | 1 | 0 | — |

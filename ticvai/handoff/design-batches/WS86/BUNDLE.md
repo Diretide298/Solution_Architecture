@@ -1,6 +1,6 @@
 # WS86 — Game and Ride board 9
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 6 operations · 4 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `DEVELOPER_ADMIN, DEVICE_CONFIGURE, DEVICE_VIEW, PRODUCT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-474` | Reader Integration Command Center | commandCentre | 0 | 0 | — |
-| `BO-475` | Reader Manufacturer & Model Profile | configEditor | 0 | 0 | — |
-| `BO-476` | Communication Protocol Configuration | configEditor | 0 | 0 | — |
-| `BO-477` | Reader Command & Event Mapping | listDetail | 0 | 0 | — |
-| `BO-478` | Reader Configuration Deployment & Synchronization | listDetail | 0 | 0 | — |
-| `BO-479` | Game Trigger & I/O Control Mapping | listDetail | 0 | 0 | — |
-| `BO-480` | Reader Screen, LED & Sound Output Mapping | listDetail | 0 | 0 | — |
-| `BO-481` | Edge Cache & Offline Rule Package | listDetail | 0 | 0 | — |
-| `BO-482` | Device Diagnostics & Integration Logs | listDetail | 0 | 0 | — |
-| `BO-483` | Integration Certification & Test Console | listDetail | 0 | 0 | — |
+| `BO-474` | Reader Integration Command Center | commandCentre | 1 | 0 | — |
+| `BO-475` | Reader Manufacturer & Model Profile | configEditor | 1 | 0 | — |
+| `BO-476` | Communication Protocol Configuration | configEditor | 1 | 0 | — |
+| `BO-477` | Reader Command & Event Mapping | listDetail | 1 | 0 | — |
+| `BO-478` | Reader Configuration Deployment & Synchronization | listDetail | 1 | 0 | — |
+| `BO-479` | Game Trigger & I/O Control Mapping | listDetail | 1 | 0 | — |
+| `BO-480` | Reader Screen, LED & Sound Output Mapping | listDetail | 1 | 0 | — |
+| `BO-481` | Edge Cache & Offline Rule Package | listDetail | 1 | 0 | — |
+| `BO-482` | Device Diagnostics & Integration Logs | listDetail | 1 | 0 | — |
+| `BO-483` | Integration Certification & Test Console | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -261,10 +260,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the reader integration are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listReaders",
+    "contract": "games",
+    "purpose": "Integrations by reader",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-474"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-474",
+   "workshopBoard": "wireframes/WS66 Game and Ride Board 9.dc.html#bo-474"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 86. 0 of 7 labels bound to a contract property; 15 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -391,10 +399,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setReaderProfile",
+    "contract": "games",
+    "purpose": "Manufacturer and model",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-475"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-475",
+   "workshopBoard": "wireframes/WS66 Game and Ride Board 9.dc.html#bo-475"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 87. 0 of 0 labels bound to a contract property; 9 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -527,10 +544,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setReaderProfile",
+    "contract": "games",
+    "purpose": "Communication protocol",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-476"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-476",
+   "workshopBoard": "wireframes/WS66 Game and Ride Board 9.dc.html#bo-476"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 88. 0 of 0 labels bound to a contract property; 10 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -609,7 +635,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setReaderConfiguration",
+       "label": "Save reader configuration",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setReaderConfiguration"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The reader command event list.",
@@ -618,12 +664,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the reader command event are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setReaderConfiguration",
+    "contract": "games",
+    "purpose": "Command and event mapping",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listReaders"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-477"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-477",
+   "workshopBoard": "wireframes/WS66 Game and Ride Board 9.dc.html#bo-477"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 89. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -699,7 +765,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "deployReaderConfiguration",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "deployReaderConfiguration"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Pushes prices, entitlements and display rules to the reader, and its edge package with them.** The reader decides offline from what it last received, so a change not deployed is a change that did not happen.",
+       "provenance": "authored — required by check-screens, 19 September 2026"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The reader deployment synchronization list.",
@@ -708,12 +799,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the reader deployment synchronization are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "deployReaderConfiguration",
+    "contract": "games",
+    "purpose": "Deploy and synchronise",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listReaders",
+     "getGameplaySyncStatus"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-478"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-478",
+   "workshopBoard": "wireframes/WS66 Game and Ride Board 9.dc.html#bo-478"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 89. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -836,7 +948,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the game trigger mapping are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setReaderConfiguration",
+    "contract": "games",
+    "purpose": "Trigger and I/O mapping",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listReaders"
+    ]
+   }
+  ],
   "entryState": {
    "preloaded": [
     "→ TICVAI Authorization",
@@ -845,11 +968,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "→ Reader sends output",
     "→ Game Controller",
     "→ GAME START"
+   ],
+   "params": [
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-479"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-479",
+   "workshopBoard": "wireframes/WS66 Game and Ride Board 9.dc.html#bo-479"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 90. 0 of 6 labels bound to a contract property; 6 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -927,7 +1057,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setReaderConfiguration",
+       "label": "Save reader configuration",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setReaderConfiguration"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The reader screen led list.",
@@ -936,12 +1086,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the reader screen led are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setReaderConfiguration",
+    "contract": "games",
+    "purpose": "Screen, LED and sound",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listReaders"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-480"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-480",
+   "workshopBoard": "wireframes/WS66 Game and Ride Board 9.dc.html#bo-480"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 91. 0 of 0 labels bound to a contract property; 0 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1018,7 +1188,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "deployReaderConfiguration",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "deployReaderConfiguration"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Pushes prices, entitlements and display rules to the reader, and its edge package with them.** The reader decides offline from what it last received, so a change not deployed is a change that did not happen.",
+       "provenance": "authored — required by check-screens, 19 September 2026"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The edge cache offline list.",
@@ -1027,12 +1222,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the edge cache offline are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "deployReaderConfiguration",
+    "contract": "games",
+    "purpose": "Edge cache and offline package",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listReaders",
+     "getGameplaySyncStatus"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-481"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-481",
+   "workshopBoard": "wireframes/WS66 Game and Ride Board 9.dc.html#bo-481"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 92. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1109,7 +1325,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "testReader",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "testReader"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The device diagnostics integration list.",
@@ -1118,12 +1353,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the device diagnostics integration are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "testReader",
+    "contract": "games",
+    "purpose": "Diagnostics",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-482"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-482",
+   "workshopBoard": "wireframes/WS66 Game and Ride Board 9.dc.html#bo-482"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 93. 0 of 0 labels bound to a contract property; 0 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1247,7 +1499,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the integration certification test are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "certifyIntegration",
+    "contract": "public-api",
+    "purpose": "Integration certification",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "RFID Tap",
@@ -1256,11 +1516,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "Text",
     "Price",
     "Balance"
+   ],
+   "params": [
+    {
+     "name": "listingId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-483"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-483",
+   "workshopBoard": "wireframes/WS66 Game and Ride Board 9.dc.html#bo-483"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 93. 0 of 6 labels bound to a contract property; 6 of 75 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1294,7 +1561,127 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
-{}
+{
+ "certifyIntegration": {
+  "method": "POST",
+  "path": "/listings/{listingId}/certify",
+  "contract": "public-api",
+  "summary": "Approve, reject or revoke a certification",
+  "permission": "DEVELOPER_ADMIN",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "IntegrationListing"
+ },
+ "deployReaderConfiguration": {
+  "method": "POST",
+  "path": "/readers/{readerId}/deploy",
+  "contract": "games",
+  "summary": "Push configuration and the offline rule package to a reader",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listReaders": {
+  "method": "GET",
+  "path": "/readers",
+  "contract": "games",
+  "summary": "Readers, their attractions and their health",
+  "permission": "DEVICE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Reader"
+ },
+ "setReaderConfiguration": {
+  "method": "PUT",
+  "path": "/readers/{readerId}",
+  "contract": "games",
+  "summary": "What this reader charges, opens, shows and refuses",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Reader",
+  "responds": "Reader"
+ },
+ "setReaderProfile": {
+  "method": "PUT",
+  "path": "/reader-profiles",
+  "contract": "games",
+  "summary": "How a reader behaves and what it shows",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ReaderProfile",
+  "responds": "ReaderProfile"
+ },
+ "testReader": {
+  "method": "POST",
+  "path": "/readers/{readerId}/test",
+  "contract": "games",
+  "summary": "Prove a reader works before a guest finds out it does not",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ReaderTestResult"
+ }
+}
 ```
 
 ## `schemas.json`
@@ -1302,5 +1689,302 @@ Method, path, parameters, request and response for every operation these screens
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
-{}
+{
+ "IntegrationListing": {
+  "type": "object",
+  "x-ticvai-persistence": "control.integration_listing",
+  "description": "13.1.50, decision D1. **A listing, not an installation.** The integration runs on the developer's own infrastructure.\n**Third-party code does not execute inside TICVAI** — stated rather than assumed, because that is a different product with a different threat model.\n",
+  "required": [
+   "id",
+   "developerId",
+   "name",
+   "category",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "developerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "category": {
+    "type": "string",
+    "enum": [
+     "crm",
+     "marketing",
+     "accounting",
+     "hotel",
+     "transport",
+     "analytics",
+     "accessibility",
+     "other"
+    ]
+   },
+   "description": {
+    "type": "string"
+   },
+   "integrationUrl": {
+    "type": "string"
+   },
+   "requiredScopes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "submitted",
+     "inReview",
+     "certified",
+     "rejected",
+     "revoked",
+     "delisted"
+    ],
+    "readOnly": true
+   },
+   "certifiedUntil": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Certification expires.** An integration certified against v1 and still listed after v3 is TICVAI vouching for something it has not looked at in two years.\n"
+   },
+   "certifiedAgainstVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "listingFeeModel": {
+    "type": "string",
+    "enum": [
+     "none",
+     "flat",
+     "revenueShare"
+    ],
+    "nullable": true
+   }
+  }
+ },
+ "Reader": {
+  "type": "object",
+  "x-ticvai-persistence": "games.reader",
+  "description": "Board 2. **A `tenancy` device with a game configuration on it.**",
+  "required": [
+   "deviceId"
+  ],
+  "properties": {
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "`tenancy.RegisteredDevice`. **Enrolment, firmware and tamper state live there.**\n"
+   },
+   "gameId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "readerProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "acceptedCreditTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "acceptsDirectPay": {
+    "type": "boolean",
+    "default": false
+   },
+   "retapDelaySeconds": {
+    "type": "integer",
+    "default": 3,
+    "description": "**The setting that stops a guest paying twice for one go.** A wristband held against a reader for a second and a half is two taps to the hardware and one intention to the guest.\n"
+   },
+   "displayRules": {
+    "type": "object",
+    "properties": {
+     "freeGameGlow": {
+      "type": "boolean",
+      "default": true,
+      "description": "**What tells a guest their entitlement was used rather than their money.** Without it the complaint arrives at the desk.\n"
+     },
+     "showBalance": {
+      "type": "boolean",
+      "default": true
+     },
+     "showPrice": {
+      "type": "boolean",
+      "default": true
+     },
+     "themeCode": {
+      "type": "string",
+      "nullable": true
+     },
+     "languages": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "ioMapping": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Board 9.6. Which output starts the game, which input reports it finished. **Deliberately open.** The keys are the reader model's own I/O lines, so the shape belongs to the vendor adaptor for that model (game readers are a driver, not a build — ADR-0012, ADR-0015), not to this contract.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "unconfigured",
+     "active",
+     "offline",
+     "maintenance",
+     "disabled"
+    ]
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "ReaderProfile": {
+  "type": "object",
+  "x-ticvai-persistence": "games.reader_profile",
+  "description": "BL-153. **`games` is well built on the money and what is missing sits at the reader.**\n10.2.14 and 10.2.17 want a different colour for a free game and a different one for insufficient credit — **because a guest at an arcade machine cannot read a message, they can only see a light.** The whole interaction is a second long and happens across a noisy room.\n",
+  "required": [
+   "id",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "displayBehaviour": {
+    "type": "object",
+    "description": "**What the reader shows, per outcome.** Colour and tone, because the guest is looking at a machine rather than a screen.\n",
+    "properties": {
+     "accepted": {
+      "type": "string"
+     },
+     "freeGame": {
+      "type": "string"
+     },
+     "insufficientCredit": {
+      "type": "string"
+     },
+     "cardBlocked": {
+      "type": "string"
+     },
+     "readError": {
+      "type": "string"
+     }
+    }
+   },
+   "retryPricing": {
+    "type": "object",
+    "nullable": true,
+    "description": "**A retry after a machine fault is not a second play.** Without this a guest whose game crashed pays twice, and the attendant refunds by hand — which is how an arcade loses money and goodwill at once.\n",
+    "properties": {
+     "isFree": {
+      "type": "boolean",
+      "default": true
+     },
+     "withinSeconds": {
+      "type": "integer",
+      "default": 60
+     },
+     "maxRetries": {
+      "type": "integer",
+      "default": 1
+     }
+    }
+   },
+   "rePlayWindowSeconds": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**A second tap within this window is the same play, not a new one.** A guest tapping twice because nothing appeared to happen should not be charged twice.\n"
+   },
+   "entitlementProductIds": {
+    "type": "array",
+    "description": "**Per-game entitlement.** A pass that includes ten specific rides needs the reader to know which, and a card that works everywhere is a different product.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "ReaderTestResult": {
+  "type": "object",
+  "description": "Boards 2.10 and 9.9. **Each check separately**, because they send an engineer to different places.\n",
+  "properties": {
+   "readerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "testedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "checks": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "check": {
+       "type": "string",
+       "enum": [
+        "connectivity",
+        "cardRead",
+        "balanceCheck",
+        "display",
+        "sound",
+        "gameTrigger",
+        "gameCompleteSignal"
+       ]
+      },
+      "passed": {
+       "type": "boolean"
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "overall": {
+    "type": "string",
+    "enum": [
+     "pass",
+     "partial",
+     "fail"
+    ]
+   }
+  }
+ }
+}
 ```

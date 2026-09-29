@@ -91,13 +91,6 @@
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Central management screen for all rental pricing and commercial policies.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: + Create Pricing Profile. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Rental_Management.pdf, page 38 §Actions"
-   }
-  ],
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -194,7 +187,25 @@
    "emptyNoResults": "The filter narrowed it and the rental pricing are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listRentalPricingProfiles",
+    "contract": "rental",
+    "purpose": "Profiles, and products without one",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createRentalPricingProfile",
+    "contract": "rental",
+    "purpose": "Create a new rental pricing profile",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) + Create Pricing Profile",
+    "invalidates": [
+     "listRentalPricingProfiles"
+    ]
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Active Pricing Profiles",
@@ -207,9 +218,10 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-524"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-524",
+   "workshopBoard": "wireframes/WS119 Rental Management Board 4.dc.html#bo-524"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 38. 0 of 8 labels bound to a contract property; 17 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 38. 0 of 8 labels bound to a contract property; 17 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** + Create Pricing Profile: `createRentalPricingProfile`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -336,12 +348,42 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createRentalPricingProfile",
+    "contract": "rental",
+    "purpose": "Build a profile",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listRentalPricingProfiles"
+    ]
+   },
+   {
+    "operationId": "updateRentalPricingProfile",
+    "contract": "rental",
+    "purpose": "Change it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listRentalPricingProfiles"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-525"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-525",
+   "workshopBoard": "wireframes/WS119 Rental Management Board 4.dc.html#bo-525"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 39. 0 of 0 labels bound to a contract property; 8 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "profileId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -456,12 +498,32 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "updateRentalPricingProfile",
+    "contract": "rental",
+    "purpose": "Duration and tiered rates",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listRentalPricingProfiles"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-526"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-526",
+   "workshopBoard": "wireframes/WS119 Rental Management Board 4.dc.html#bo-526"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 40. 0 of 0 labels bound to a contract property; 7 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "profileId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -537,7 +599,27 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateRentalPricingProfile",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateRentalPricingProfile"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The calendar peak seasonal list.",
@@ -546,12 +628,32 @@
    "emptyNoResults": "The filter narrowed it and the calendar peak seasonal are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "updateRentalPricingProfile",
+    "contract": "rental",
+    "purpose": "Peak, weekend and seasonal rules",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listRentalPricingProfiles"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-527"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-527",
+   "workshopBoard": "wireframes/WS119 Rental Management Board 4.dc.html#bo-527"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 41. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "profileId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -616,11 +718,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Accept | Modify | Reject | Schedule. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Rental_Management.pdf, page 42 §Actions"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack Rental_Management.pdf, page 42"
    },
@@ -643,6 +740,17 @@
        "provenance": "pack Rental_Management.pdf, page 42 §Actions"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listDynamicPricingStrategy",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
     }
    ]
   },
@@ -653,12 +761,21 @@
    "emptyNoResults": "The filter narrowed it and the dynamic pricing recommendation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listDynamicPricingStrategy",
+    "contract": "catalogue",
+    "purpose": "Dynamic pricing",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-528"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-528",
+   "workshopBoard": "wireframes/WS119 Rental Management Board 4.dc.html#bo-528"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 42. 0 of 0 labels bound to a contract property; 1 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 42. 0 of 0 labels bound to a contract property; 1 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Accept | Modify | Reject | Schedule dropped (AI design pending review (accept/modify/reject/schedule acts on AI pricing recommendations; would bind ai decideProposedAction)).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -723,11 +840,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Credit Card Pre-Authorization, Card Charge, Wallet. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Rental_Management.pdf, page 43 §Enable"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack Rental_Management.pdf, page 43"
    },
@@ -760,6 +872,10 @@
        "provenance": "pack Rental_Management.pdf, page 43 §Enable"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -770,12 +886,24 @@
    "emptyNoResults": "The filter narrowed it and the deposit security hold are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setRentalDepositPolicy",
+    "contract": "rental",
+    "purpose": "Deposit basis, limits and instruments",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listRentalPricingProfiles"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-529"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-529",
+   "workshopBoard": "wireframes/WS119 Rental Management Board 4.dc.html#bo-529"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 43. 0 of 0 labels bound to a contract property; 3 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 43. 0 of 0 labels bound to a contract property; 3 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Credit Card Pre-Authorization, Card Charge, Wallet are choices sent by `setRentalDepositPolicy` (instruments cardPreAuthorisation|cardCharge|wallet).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -890,10 +1018,22 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setRentalDepositPolicy",
+    "contract": "rental",
+    "purpose": "Release, capture and approval thresholds",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listRentalPricingProfiles"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-530"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-530",
+   "workshopBoard": "wireframes/WS119 Rental Management Board 4.dc.html#bo-530"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 44. 0 of 0 labels bound to a contract property; 7 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1010,10 +1150,22 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setRentalFeePolicy",
+    "contract": "rental",
+    "purpose": "Grace, late fee and extension pricing",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listRentalPricingProfiles"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-531"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-531",
+   "workshopBoard": "wireframes/WS119 Rental Management Board 4.dc.html#bo-531"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 44. 0 of 0 labels bound to a contract property; 7 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1091,7 +1243,26 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "requestRentalCommercialOverride",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "requestRentalCommercialOverride"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The commercial exceptions waivers list.",
@@ -1100,10 +1271,19 @@
    "emptyNoResults": "The filter narrowed it and the commercial exceptions waivers are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "requestRentalCommercialOverride",
+    "contract": "rental",
+    "purpose": "Waive or adjust, with approval",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-532"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-532",
+   "workshopBoard": "wireframes/WS119 Rental Management Board 4.dc.html#bo-532"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 45. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1181,7 +1361,32 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listCommercialPricing",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "simulateRentalPricing",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "simulateRentalPricing"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The pricing simulation validation list.",
@@ -1190,10 +1395,32 @@
    "emptyNoResults": "The filter narrowed it and the pricing simulation validation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listCommercialPricing",
+    "contract": "catalogue",
+    "purpose": "Commercial Pricing Command Center",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "simulateRentalPricing",
+    "contract": "rental",
+    "purpose": "Test the configuration",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "explainRentalPrice",
+    "contract": "rental",
+    "purpose": "Why the price is what it is",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-533"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-533",
+   "workshopBoard": "wireframes/WS119 Rental Management Board 4.dc.html#bo-533"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 46. 0 of 0 labels bound to a contract property; 0 of 51 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

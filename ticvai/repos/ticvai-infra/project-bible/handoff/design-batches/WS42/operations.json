@@ -4,83 +4,33 @@
   "path": "/consent-evidence-withdrawal",
   "contract": "marketing-crm",
   "summary": "Consent Evidence, History & Withdrawal Management",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "ConsentEvidenceHistoryWithdrawalManagementView"
- },
- "listCustomerPrivacyConsent": {
-  "method": "GET",
-  "path": "/customer-privacy-consent",
-  "contract": "marketing-crm",
-  "summary": "Customer Privacy, Consent & Preference 360°",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "CustomerPrivacyConsentPreference360View"
- },
- "listDataRetentionExpiry": {
-  "method": "GET",
-  "path": "/data-retention-expiry",
-  "contract": "marketing-crm",
-  "summary": "Data Retention, Expiry & Legal Hold Operations",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "DataRetentionExpiryLegalHoldOperationsView"
- },
- "listDataSubjectCustomer": {
-  "method": "GET",
-  "path": "/data-subject-customer",
-  "contract": "marketing-crm",
-  "summary": "Data Subject / Customer Privacy Request Management",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "DataSubjectCustomerPrivacyRequestManagementView"
- },
- "listDeletionAnonymizationRestriction": {
-  "method": "GET",
-  "path": "/deletion-anonymization-restriction",
-  "contract": "marketing-crm",
-  "summary": "Deletion, Anonymization & Restriction Operations",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "DeletionAnonymizationRestrictionOperationsView"
- },
- "listPrivacy": {
-  "method": "GET",
-  "path": "/privacy",
-  "contract": "marketing-crm",
-  "summary": "Privacy Operations Command Center",
-  "permission": "MARKETING_VIEW",
+  "permission": "GUEST_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "tenant",
+    "name": "subjectId",
     "in": "query",
     "required": false
    },
    {
-    "name": "brand",
+    "name": "consentPurpose",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "source",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brandId",
     "in": "query",
     "required": false
    },
@@ -90,7 +40,217 @@
     "required": false
    },
    {
-    "name": "customer",
+    "name": "propagationStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listCustomerPrivacyConsent": {
+  "method": "GET",
+  "path": "/customer-privacy-consent",
+  "contract": "marketing-crm",
+  "summary": "Customer Privacy, Consent & Preference 360°",
+  "permission": "GUEST_VIEW_PII",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "CustomerPrivacyConsentPreference360View"
+ },
+ "listDataRetentionExpiry": {
+  "method": "GET",
+  "path": "/data-retention-expiry",
+  "contract": "marketing-crm",
+  "summary": "Data Retention, Expiry & Legal Hold Operations",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "dataCategory",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "jurisdiction",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "holdStatus",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "DataRetentionExpiryLegalHoldOperationsView"
+ },
+ "listDataSubjectCustomer": {
+  "method": "GET",
+  "path": "/data-subject-customer",
+  "contract": "marketing-crm",
+  "summary": "Data Subject / Customer Privacy Request Management",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "requestType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "jurisdiction",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "slaState",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ownerPrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listDeletionAnonymizationRestriction": {
+  "method": "GET",
+  "path": "/deletion-anonymization-restriction",
+  "contract": "marketing-crm",
+  "summary": "Deletion, Anonymization & Restriction Operations",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "actionType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "requestId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPrivacy": {
+  "method": "GET",
+  "path": "/privacy",
+  "contract": "marketing-crm",
+  "summary": "Privacy Operations Command Center",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "brandId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
     "in": "query",
     "required": false
    },
@@ -110,7 +270,17 @@
     "required": false
    },
    {
-    "name": "status",
+    "name": "ownerPrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
     "in": "query",
     "required": false
    }
@@ -123,18 +293,23 @@
   "path": "/privacy-compliance",
   "contract": "marketing-crm",
   "summary": "Privacy Analytics & AI Compliance Intelligence",
-  "permission": "MARKETING_VIEW",
+  "permission": "GUEST_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "tenant",
+    "name": "from",
     "in": "query",
-    "required": false
+    "required": true
    },
    {
-    "name": "brand",
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "brandId",
     "in": "query",
     "required": false
    },
@@ -144,7 +319,7 @@
     "required": false
    },
    {
-    "name": "venue",
+    "name": "venueId",
     "in": "query",
     "required": false
    },
@@ -159,12 +334,22 @@
     "required": false
    },
    {
-    "name": "customerSegment",
+    "name": "segmentId",
     "in": "query",
     "required": false
    },
    {
-    "name": "product",
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "policyVersion",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "language",
     "in": "query",
     "required": false
    }
@@ -177,24 +362,76 @@
   "path": "/privacy-evidence-compliance",
   "contract": "marketing-crm",
   "summary": "Privacy Audit, Evidence & Compliance Reporting",
-  "permission": "MARKETING_VIEW",
+  "permission": "AUDIT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "action",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "report",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "requestId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "actorPrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PrivacyAuditEvidenceComplianceReportingView"
+  "responds": "Page"
  },
  "setDataDiscoveryAccess": {
   "method": "PUT",
   "path": "/data-discovery-access",
   "contract": "marketing-crm",
   "summary": "Data Discovery, Access, Export & Correction Workspace",
-  "permission": "MARKETING_MANAGE",
+  "permission": "GUEST_VIEW_PII",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "DataDiscoveryAccessExportCorrectionWorkspaceInput",
   "responds": "DataDiscoveryAccessExportCorrectionWorkspaceView"
  },
@@ -202,12 +439,18 @@
   "method": "PUT",
   "path": "/privacy-compliance-exception",
   "contract": "marketing-crm",
-  "summary": "Privacy Compliance, Exception & Investigation Workspace",
-  "permission": "MARKETING_MANAGE",
+  "summary": "Raise, investigate or close a privacy exception",
+  "permission": "GUEST_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PrivacyComplianceExceptionInvestigationWorkspaceInput",
   "responds": "PrivacyComplianceExceptionInvestigationWorkspaceView"
  }

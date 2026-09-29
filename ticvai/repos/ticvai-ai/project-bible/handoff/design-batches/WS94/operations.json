@@ -1,1 +1,207 @@
-{}
+{
+ "extendRental": {
+  "method": "POST",
+  "path": "/rental-bookings/{bookingId}/extend",
+  "contract": "rental",
+  "summary": "Keep it longer, if it is free and the guest accepts the price",
+  "permission": "RENTAL_OPERATE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RentalBooking"
+ },
+ "getRentalAvailability": {
+  "method": "GET",
+  "path": "/rental-availability",
+  "contract": "rental",
+  "summary": "What can be rented, when, with turnaround already subtracted",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "quantity",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RentalAvailability"
+ },
+ "getRentalBooking": {
+  "method": "GET",
+  "path": "/rental-bookings/{bookingId}",
+  "contract": "rental",
+  "summary": "One booking, its timeline and its readiness",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RentalBooking"
+ },
+ "listOverdueRentals": {
+  "method": "GET",
+  "path": "/rental-bookings/overdue",
+  "contract": "rental",
+  "summary": "What is late, by how long, and what it is accruing",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "dueWithinMinutes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RentalBooking"
+ },
+ "listRentalBookings": {
+  "method": "GET",
+  "path": "/rental-bookings",
+  "contract": "rental",
+  "summary": "Reservations across venues and locations",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RentalBooking"
+ },
+ "quoteRentalPrice": {
+  "method": "POST",
+  "path": "/rental-price",
+  "contract": "rental",
+  "summary": "What this rental would cost, and the deposit it would hold",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalQuoteRequest",
+  "responds": "RentalQuote"
+ },
+ "reportRentalIncident": {
+  "method": "POST",
+  "path": "/rental-incidents",
+  "contract": "rental",
+  "summary": "Something happened during a rental",
+  "permission": "RENTAL_OPERATE",
+  "offlineCapable": true,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalIncident",
+  "responds": "RentalIncident"
+ },
+ "sendTransactionalMessage": {
+  "method": "POST",
+  "path": "/messages",
+  "contract": "marketing-crm",
+  "summary": "Send a transactional message",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "swapRentalEquipment": {
+  "method": "POST",
+  "path": "/rental-bookings/{bookingId}/swap",
+  "contract": "rental",
+  "summary": "Replace a faulty item mid-rental",
+  "permission": "RENTAL_OPERATE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RentalBooking"
+ }
+}

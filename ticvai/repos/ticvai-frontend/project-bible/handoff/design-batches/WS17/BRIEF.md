@@ -1,6 +1,6 @@
 # WS17 — Approval Workflows and Governance board 5
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 8 operations · 6 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_VIEW, GUEST_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-384` | Delegation & Escalation Command Center | commandCentre | 0 | 0 | — |
-| `BO-385` | Delegation Management | configEditor | 0 | 0 | — |
-| `BO-386` | Temporary Delegation & Availability Calendar | listDetail | 0 | 0 | — |
-| `BO-387` | Out-of-Office & Substitute Routing | configEditor | 0 | 0 | — |
-| `BO-388` | Approval SLA Policy Configuration | configEditor | 0 | 0 | — |
-| `BO-389` | Reminder & Breach Notification Rules | listDetail | 0 | 0 | — |
-| `BO-390` | Escalation Policy Builder | listDetail | 0 | 0 | — |
-| `BO-391` | Live Escalation Operations Center | listDetail | 0 | 0 | — |
-| `BO-392` | SLA & Escalation Performance Analytics | listDetail | 0 | 0 | — |
-| `BO-393` | AI SLA & Escalation Advisor | listDetail | 0 | 0 | — |
+| `BO-384` | Delegation & Escalation Command Center | commandCentre | 2 | 0 | — |
+| `BO-385` | Delegation Management | configEditor | 4 | 0 | — |
+| `BO-386` | Temporary Delegation & Availability Calendar | listDetail | 2 | 0 | — |
+| `BO-387` | Out-of-Office & Substitute Routing | configEditor | 1 | 0 | — |
+| `BO-388` | Approval SLA Policy Configuration | configEditor | 1 | 0 | — |
+| `BO-389` | Reminder & Breach Notification Rules | listDetail | 1 | 0 | — |
+| `BO-390` | Escalation Policy Builder | listDetail | 1 | 0 | — |
+| `BO-391` | Live Escalation Operations Center | listDetail | 1 | 0 | — |
+| `BO-392` | SLA & Escalation Performance Analytics | listDetail | 1 | 0 | — |
+| `BO-393` | AI SLA & Escalation Advisor | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-385, BO-386, BO-389, BO-390, BO-391, BO-392, BO-393 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-385, BO-386, BO-389, BO-390, BO-391, BO-392 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

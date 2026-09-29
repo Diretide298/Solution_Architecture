@@ -1,0 +1,36 @@
+id: LLD-Accreditation identity conflict
+title: Accreditation identity conflict — 2 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/accreditation-identity-conflict.yaml
+entity: Accreditation identity conflict
+contract: accreditation
+enum: AccreditationIdentityConflict.status
+enumKind: inline
+enumSchema: AccreditationIdentityConflict
+enumProperty: status
+owner: accreditation
+description: '**A suspected pair of accreditation records for one person** (board 2.7). Raised `pending`
+  by the identity-conflict check that `createAccreditationApplication` and `importAccreditationHolders`
+  run, using `marketing-crm`''s identity resolution, and decided once by a reviewer.'
+initial:
+- pending
+terminal:
+- merged
+- rejected
+transitions:
+- from: pending
+  to: merged
+  operation: resolveIdentityConflict
+  trigger: operation
+  guard: The reviewer found one person, gave a reason and named `survivingHolderId` among the conflict's
+    holders. The other holders are archived and their credentials invalidated and pushed to the gates
+    at once (decided 29 September, writers pass)
+- from: pending
+  to: rejected
+  operation: resolveIdentityConflict
+  trigger: operation
+  guard: The reviewer found two different people and gave a reason; the pair is not raised again
+notes: '**Both outcomes are terminal.** A merge is not undone by reopening the conflict: records wrongly
+  merged are corrected on the holder (`updateAccreditationHolder`, `setAccreditationStatus`), and the
+  conflict stays as evidence of what was decided and why.'

@@ -1,0 +1,988 @@
+{
+ "DigitalWaiverFormBuilderInput": {
+  "description": "The request body of `setDigitalWaiverForm`, the layout record itself; read-only properties are ignored.",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/DigitalWaiverFormBuilderView"
+   }
+  ]
+ },
+ "DigitalWaiverFormBuilderView": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.waiver_form_layout",
+  "description": "The layout of one waiver version (pack 11.1.3), keyed on `formId` + `formVersion`. Immutable once the version is published, like the version itself.",
+  "required": [
+   "formId",
+   "formVersion",
+   "sections"
+  ],
+  "properties": {
+   "formId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "formVersion": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "sections": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "sectionKey",
+      "kind",
+      "blocks"
+     ],
+     "properties": {
+      "sectionKey": {
+       "type": "string",
+       "maxLength": 60
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "header",
+        "participantInformation",
+        "waiverTerms",
+        "safetyAcknowledgements",
+        "questions",
+        "consent",
+        "signature",
+        "custom"
+       ]
+      },
+      "title": {
+       "$ref": "#/components/schemas/LocalisedText"
+      },
+      "numbered": {
+       "type": "boolean",
+       "default": false
+      },
+      "mandatoryReading": {
+       "type": "boolean",
+       "default": false,
+       "description": "The signatory must tick \"I have read and understood this section\" before continuing."
+      },
+      "acknowledgementText": {
+       "$ref": "#/components/schemas/LocalisedText"
+      },
+      "showWhen": {
+       "type": "object",
+       "nullable": true,
+       "description": "Shown only when the condition holds, e.g. `isMinor` equals `true` shows the guardian section.",
+       "required": [
+        "subject",
+        "operator"
+       ],
+       "properties": {
+        "subject": {
+         "type": "string",
+         "maxLength": 60,
+         "description": "A field key of this version, or `isMinor` (resolved from the waiver's guardian threshold)."
+        },
+        "operator": {
+         "type": "string",
+         "enum": [
+          "equals",
+          "notEquals",
+          "in",
+          "lessThan",
+          "greaterThan",
+          "isAnswered"
+         ]
+        },
+        "value": {
+         "type": "string",
+         "maxLength": 200,
+         "nullable": true
+        }
+       }
+      },
+      "blocks": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "required": [
+         "blockKey",
+         "kind"
+        ],
+        "properties": {
+         "blockKey": {
+          "type": "string",
+          "maxLength": 60
+         },
+         "kind": {
+          "type": "string",
+          "enum": [
+           "heading",
+           "paragraph",
+           "legalText",
+           "instructions",
+           "imageLogo",
+           "divider",
+           "informationBox",
+           "checkbox",
+           "acknowledgement",
+           "question",
+           "signature",
+           "initials",
+           "date",
+           "customerDetails",
+           "guardianDetails"
+          ]
+         },
+         "content": {
+          "$ref": "#/components/schemas/LocalisedText"
+         },
+         "assetId": {
+          "type": "string",
+          "format": "uuid",
+          "nullable": true,
+          "description": "The image for an `imageLogo` block."
+         },
+         "fieldKey": {
+          "type": "string",
+          "maxLength": 60,
+          "nullable": true,
+          "description": "The `FormField.key` an input block collects; required for input kinds."
+         },
+         "mandatoryNotice": {
+          "type": "boolean",
+          "default": false,
+          "description": "Rendered as a notice that cannot be collapsed."
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "draft",
+     "published",
+     "superseded",
+     "retired"
+    ],
+    "description": "`FormDefinition.status` of this version."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "SignatorySignatureGuardianRuleConfigurationInput": {
+  "description": "The request body of `setSignatorySignatureGuardian`, the rule record itself; read-only properties are ignored.",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/SignatorySignatureGuardianRuleConfigurationView"
+   }
+  ]
+ },
+ "SignatorySignatureGuardianRuleConfigurationView": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.waiver_signatory_rule",
+  "description": "The signatory rules of one waiver version (pack 11.1.5), keyed on `formId` + `formVersion`; immutable once the version is published.",
+  "required": [
+   "formId",
+   "formVersion",
+   "primarySignatory",
+   "acceptanceMethod",
+   "requiresGuardianForMinors"
+  ],
+  "properties": {
+   "formId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "formVersion": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "primarySignatory": {
+    "type": "string",
+    "enum": [
+     "ticketHolder",
+     "purchaser",
+     "participant",
+     "parent",
+     "legalGuardian",
+     "groupLeader",
+     "corporateRepresentative",
+     "member",
+     "rentalCustomer",
+     "otherAuthorizedSignatory"
+    ]
+   },
+   "allowedSignatories": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "ticketHolder",
+      "purchaser",
+      "participant",
+      "parent",
+      "legalGuardian",
+      "groupLeader",
+      "corporateRepresentative",
+      "member",
+      "rentalCustomer",
+      "otherAuthorizedSignatory"
+     ]
+    },
+    "description": "Who else may sign in the primary signatory's place."
+   },
+   "coSignature": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "participantAndGuardian",
+     "customerAndAuthorizedRepresentative"
+    ],
+    "description": "Set when two people must both sign."
+   },
+   "signatureRequired": {
+    "type": "boolean",
+    "default": true
+   },
+   "initialsRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "acceptanceMethod": {
+    "type": "string",
+    "enum": [
+     "drawnSignature",
+     "typedName",
+     "checkbox"
+    ],
+    "description": "Kept equal to `FormDefinition.signatureKind` (drawn, typed, checkbox)."
+   },
+   "captureRelationship": {
+    "type": "boolean",
+    "default": true,
+    "description": "Whoever signs for someone else states their relationship."
+   },
+   "identityVerification": {
+    "type": "string",
+    "enum": [
+     "none",
+     "signedInAccount",
+     "oneTimeCode",
+     "idDocumentCheck"
+    ],
+    "default": "none"
+   },
+   "requiresGuardianForMinors": {
+    "type": "boolean",
+    "description": "Written to `FormDefinition.requiresGuardianForMinors`."
+   },
+   "guardianThresholdAge": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 25,
+    "nullable": true,
+    "description": "A participant under this age needs a guardian. Written to `FormDefinition.minimumAge`. No default."
+   },
+   "guardianThresholdByCountry": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "country",
+      "age"
+     ],
+     "properties": {
+      "country": {
+       "type": "string",
+       "pattern": "^[A-Z]{2}$"
+      },
+      "age": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 25
+      }
+     }
+    },
+    "description": "Per-country thresholds that override `guardianThresholdAge`."
+   },
+   "guardianSignsForEachMinor": {
+    "type": "boolean",
+    "default": true,
+    "description": "One guardian signature per minor, never one for the family."
+   },
+   "groupSigningModes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "eachParticipantIndividually",
+      "guardianForEachMinor",
+      "groupLeaderForGroup",
+      "organisationRepresentativeDeclaration"
+     ]
+    },
+    "description": "The modes a group booking may use. Empty means each participant signs individually."
+   },
+   "recordedEvidence": {
+    "type": "array",
+    "readOnly": true,
+    "items": {
+     "type": "string",
+     "enum": [
+      "timestamp",
+      "waiverVersion",
+      "signatory",
+      "authenticationMethod",
+      "transactionReference",
+      "customerReference",
+      "documentHash",
+      "deviceInfo",
+      "consentEvidence"
+     ]
+    },
+    "description": "Always all of them; listed so the reviewer sees what is kept."
+   },
+   "legalApprovedBy": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "`FormDefinition.legalReviewedBy`, set at the legal/compliance step of `approveWaiverTesting`."
+   },
+   "legalApprovedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "WaiverOperationsCommandCenterView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.waiver_requirement (new), marketing.form_definition, marketing.form_submission, marketing.waiver_signature, marketing.waiver_verification (new), marketing.waiver_exception (new), orders.order_line, orders.group_booking and catalogue.performance",
+  "description": "Waiver readiness for the filters given. Counts are of participant waiver requirements for activities in the window unless the name says otherwise.",
+  "required": [
+   "waiversRequired",
+   "completed",
+   "pending",
+   "completionRate",
+   "byPeriod",
+   "breakdown",
+   "upcomingActivities"
+  ],
+  "properties": {
+   "waiversRequired": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Requirements assigned, excluding `superseded`."
+   },
+   "completed": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Requirements `completed` or `verified`."
+   },
+   "pending": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Requirements `assigned`, `sent` or `opened`, not yet started."
+   },
+   "partiallyCompleted": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Requirements `inProgress`, and participants with some but not all waivers complete."
+   },
+   "expiring": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Completed requirements whose acceptance (`FormSubmission.expiresAt`) ends before the activity starts."
+   },
+   "invalid": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Requirements `expired`, or completed against a superseded version."
+   },
+   "rejected": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "guardianConsentPending": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Minor participants whose guardian has not yet signed."
+   },
+   "upcomingParticipantsMissingWaiver": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Participants with at least one mandatory requirement not complete."
+   },
+   "accessBlocked": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Participants whose ticket download, activation, check-in or access is currently blocked by a waiver."
+   },
+   "manualExceptions": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Approved exceptions (`setWaiverException`) in force."
+   },
+   "completionRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "description": "`completed` / `waiversRequired`."
+   },
+   "byPeriod": {
+    "type": "array",
+    "description": "Today, tomorrow and this week, in that order, whatever the window.",
+    "items": {
+     "type": "object",
+     "required": [
+      "period",
+      "waiversRequired",
+      "completed",
+      "missing"
+     ],
+     "properties": {
+      "period": {
+       "type": "string",
+       "enum": [
+        "today",
+        "tomorrow",
+        "thisWeek"
+       ]
+      },
+      "waiversRequired": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "completed": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "missing": {
+       "type": "integer",
+       "minimum": 0
+      }
+     }
+    }
+   },
+   "breakdown": {
+    "type": "array",
+    "maxItems": 100,
+    "description": "One entry per value of `breakdownBy`, lowest completion first.",
+    "items": {
+     "type": "object",
+     "required": [
+      "key",
+      "label",
+      "waiversRequired",
+      "completed",
+      "completionRate"
+     ],
+     "properties": {
+      "key": {
+       "type": "string",
+       "description": "The id of the venue, event, product, performance, group booking, booking or waiver form."
+      },
+      "label": {
+       "type": "string"
+      },
+      "waiversRequired": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "completed": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "missing": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "completionRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      }
+     }
+    }
+   },
+   "upcomingActivities": {
+    "type": "array",
+    "maxItems": 100,
+    "description": "Performances in the window, most at risk first, then by `dateTime`.",
+    "items": {
+     "type": "object",
+     "required": [
+      "performanceId",
+      "eventActivity",
+      "dateTime",
+      "participants",
+      "waiversRequired",
+      "completed",
+      "missing",
+      "completion",
+      "operationalRisk"
+     ],
+     "properties": {
+      "performanceId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "eventId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "eventActivity": {
+       "type": "string",
+       "description": "The event or activity name."
+      },
+      "venueId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "venue": {
+       "type": "string",
+       "description": "The venue name."
+      },
+      "dateTime": {
+       "type": "string",
+       "format": "date-time",
+       "description": "When the performance starts."
+      },
+      "participants": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "waiversRequired": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "completed": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "missing": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "completion": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1,
+       "description": "The performance's waiver readiness (the pack's Readiness Score)."
+      },
+      "guardianPending": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "exceptions": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "admissionAtRisk": {
+       "type": "boolean",
+       "description": "At least one missing requirement is configured to block check-in or access."
+      },
+      "operationalRisk": {
+       "type": "string",
+       "enum": [
+        "ready",
+        "attention",
+        "critical"
+       ],
+       "description": "`critical` when a missing requirement would block admission; `attention` when anything is missing; otherwise `ready`."
+      }
+     }
+    }
+   },
+   "insights": {
+    "type": "array",
+    "maxItems": 20,
+    "description": "Advisory predictions, e.g. participants unlikely to complete before arrival without another reminder. Never change a status.",
+    "items": {
+     "type": "object",
+     "required": [
+      "message"
+     ],
+     "properties": {
+      "performanceId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "predictedIncomplete": {
+       "type": "integer",
+       "minimum": 0,
+       "nullable": true
+      },
+      "message": {
+       "type": "string",
+       "maxLength": 500
+      }
+     }
+    }
+   }
+  }
+ },
+ "WaiverVerificationValidationWorkspaceInput": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.waiver_verification",
+  "description": "A reviewer's decision on one waiver submission. The automatic checks are the server's and are not sent; the reviewer records the checks only a person can make.",
+  "required": [
+   "submissionId",
+   "result"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "submissionId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The `FormSubmission` reviewed; the natural key."
+   },
+   "result": {
+    "type": "string",
+    "enum": [
+     "verified",
+     "rejected",
+     "correctionRequired",
+     "escalated"
+    ]
+   },
+   "participantMatch": {
+    "type": "boolean",
+    "nullable": true,
+    "description": "The reviewer confirmed the signed participant is the booked participant."
+   },
+   "bookingMatch": {
+    "type": "boolean",
+    "nullable": true
+   },
+   "guardianRelationshipPresent": {
+    "type": "boolean",
+    "nullable": true,
+    "description": "The reviewer confirmed the signatory's guardianship under the configured policy."
+   },
+   "requiredEvidencePresent": {
+    "type": "boolean",
+    "nullable": true,
+    "description": "Any supporting document the form requires was seen."
+   },
+   "reasonCode": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "signatoryNotAuthorised",
+     "participantMismatch",
+     "wrongVersion",
+     "incompleteAnswers",
+     "evidenceMissing",
+     "suspectedFraud",
+     "other"
+    ]
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 2000,
+    "nullable": true,
+    "description": "Required for `rejected`, `correctionRequired`, `escalated`, and for changing an earlier decision."
+   },
+   "escalatedTo": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The staff member the review is escalated to; required for `escalated`."
+   },
+   "reviewedBy": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "reviewedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "WaiverVerificationValidationWorkspaceView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.form_submission, marketing.waiver_signature, marketing.form_definition, marketing.waiver_verification (new) and marketing.waiver_requirement (new); names from pii.subject",
+  "description": "One waiver submission in the verification queue, with its automatic checks, the reviewer's findings and any anomalies flagged.",
+  "required": [
+   "submissionId",
+   "participant",
+   "waiver",
+   "version",
+   "submitted",
+   "status",
+   "checks"
+  ],
+  "properties": {
+   "submissionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "requirementId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "participant": {
+    "type": "object",
+    "properties": {
+     "subjectId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "name": {
+      "type": "string"
+     },
+     "age": {
+      "type": "integer",
+      "minimum": 0,
+      "nullable": true
+     }
+    }
+   },
+   "waiver": {
+    "type": "object",
+    "properties": {
+     "formId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "name": {
+      "type": "string"
+     }
+    }
+   },
+   "version": {
+    "type": "integer",
+    "minimum": 1,
+    "description": "The form version signed."
+   },
+   "booking": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "signatory": {
+    "type": "object",
+    "properties": {
+     "subjectId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "name": {
+      "type": "string"
+     },
+     "signatoryType": {
+      "type": "string",
+      "enum": [
+       "participant",
+       "guardian",
+       "organisationRepresentative"
+      ]
+     }
+    }
+   },
+   "submitted": {
+    "type": "string",
+    "format": "date-time",
+    "description": "`FormSubmission.submittedAt`, the device time of signing."
+   },
+   "verificationReason": {
+    "type": "string",
+    "enum": [
+     "configuredManualReview",
+     "automaticCheckFailed",
+     "minorSignedAsAdult",
+     "guardianDiscrepancy",
+     "participantMismatch",
+     "evidenceRequired",
+     "aiAnomaly",
+     "sampleReview"
+    ]
+   },
+   "risk": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "automaticallyValidated",
+     "pendingManualVerification",
+     "verified",
+     "correctionRequired",
+     "rejected",
+     "escalated"
+    ]
+   },
+   "checks": {
+    "type": "object",
+    "description": "Each check the form's configuration applies; null when it does not apply. The first seven are evaluated by the server, the last three recorded by the reviewer.",
+    "properties": {
+     "requiredFieldsComplete": {
+      "type": "boolean",
+      "nullable": true
+     },
+     "requiredQuestionsAnswered": {
+      "type": "boolean",
+      "nullable": true
+     },
+     "requiredAcknowledgementsAccepted": {
+      "type": "boolean",
+      "nullable": true
+     },
+     "signaturePresent": {
+      "type": "boolean",
+      "nullable": true
+     },
+     "correctWaiverVersion": {
+      "type": "boolean",
+      "nullable": true
+     },
+     "effectiveDateValid": {
+      "type": "boolean",
+      "nullable": true,
+      "description": "The version signed was in effect at signing and the acceptance covers the visit."
+     },
+     "guardianRelationshipPresent": {
+      "type": "boolean",
+      "nullable": true,
+      "description": "Evaluated from `GuestRelationship` where recorded, otherwise the reviewer's."
+     },
+     "participantMatch": {
+      "type": "boolean",
+      "nullable": true
+     },
+     "bookingMatch": {
+      "type": "boolean",
+      "nullable": true
+     },
+     "requiredEvidencePresent": {
+      "type": "boolean",
+      "nullable": true
+     }
+    }
+   },
+   "anomalies": {
+    "type": "array",
+    "description": "Advisory flags for the reviewer; never a decision.",
+    "items": {
+     "type": "object",
+     "required": [
+      "code",
+      "message"
+     ],
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "minorSignedAsAdult",
+        "guardianSurnameDiffers",
+        "signatoryIsMinor",
+        "signedAfterActivity",
+        "duplicateSubmission",
+        "other"
+       ]
+      },
+      "message": {
+       "type": "string",
+       "maxLength": 500
+      },
+      "source": {
+       "type": "string",
+       "enum": [
+        "rule",
+        "ai"
+       ]
+      }
+     }
+    }
+   },
+   "reviewedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "reviewedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ }
+}

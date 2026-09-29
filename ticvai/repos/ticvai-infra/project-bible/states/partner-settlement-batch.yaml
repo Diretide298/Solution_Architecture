@@ -1,0 +1,121 @@
+# Partner settlement batch — state model
+# Contract: subscription.PartnerSettlementBatch.status
+# Checked by tools/check-states.py. Added 29 September (writers pass; data model DM4).
+
+entity: Partner settlement batch
+contract: subscription
+enum: PartnerSettlementBatch.status
+enumKind: inline
+enumSchema: PartnerSettlementBatch
+enumProperty: status
+owner: subscription
+initial:
+- calculated
+terminal:
+- paid
+- reversed
+transitions:
+- from: calculated
+  to: reconciled
+  trigger: job
+  guard: Every line in the batch is `reconciled` and no reconciliation exception is open against the partner and
+    period
+- from: reconciled
+  to: financeReview
+  operation: actOnPartnerSettlementBatch
+  trigger: operation
+  guard: '`action: submitForReview` (decided 29 September, writers pass; DM4)'
+- from: financeReview
+  to: approved
+  operation: actOnPartnerSettlementBatch
+  trigger: operation
+  guard: '`action: approve`, with step-up; the approver is not the submitter. Its total is the sum of its lines,
+    never an edited figure (decided 29 September, writers pass; DM4)'
+- from: approved
+  to: scheduled
+  operation: actOnPartnerSettlementBatch
+  trigger: operation
+  guard: '`action: schedule` with the `scheduledDate` of the payment run for its legal entity and currency (decided
+    29 September, writers pass; DM4)'
+- from: scheduled
+  to: paid
+  trigger: externalEvent
+  guard: The payment is confirmed (the bank remittance or the ledger posting through Finance)
+- from: calculated
+  to: onHold
+  operation: actOnPartnerSettlementBatch
+  trigger: operation
+  guard: '`action: hold` with a reason: the partner is suspended, on a credit hold, or owes more than it is owed
+    (decided 29 September, writers pass; DM4)'
+- from: reconciled
+  to: onHold
+  operation: actOnPartnerSettlementBatch
+  trigger: operation
+  guard: '`action: hold`, before review (decided 29 September, writers pass; DM4)'
+- from: financeReview
+  to: onHold
+  operation: actOnPartnerSettlementBatch
+  trigger: operation
+  guard: '`action: hold` by Finance during review (decided 29 September, writers pass; DM4)'
+- from: approved
+  to: onHold
+  operation: actOnPartnerSettlementBatch
+  trigger: operation
+  guard: '`action: hold` after approval (decided 29 September, writers pass; DM4)'
+- from: scheduled
+  to: onHold
+  operation: actOnPartnerSettlementBatch
+  trigger: operation
+  guard: '`action: hold`: pulled from the payment run (decided 29 September, writers pass; DM4)'
+- from: onHold
+  to: reconciled
+  operation: actOnPartnerSettlementBatch
+  trigger: operation
+  guard: '`action: release`: the hold is lifted; the batch goes back through review (decided 29 September, writers
+    pass; DM4)'
+  isReversal: true
+- from: reconciled
+  to: disputed
+  operation: actOnPartnerSettlementBatch
+  trigger: operation
+  guard: '`action: dispute` against a partner case (category `settlementDispute`) (decided 29 September, writers
+    pass; DM4)'
+- from: financeReview
+  to: disputed
+  operation: actOnPartnerSettlementBatch
+  trigger: operation
+  guard: '`action: dispute`, during Finance review (decided 29 September, writers pass; DM4)'
+- from: approved
+  to: disputed
+  operation: actOnPartnerSettlementBatch
+  trigger: operation
+  guard: '`action: dispute`, after approval, before payment (decided 29 September, writers pass; DM4)'
+- from: disputed
+  to: reconciled
+  operation: actOnPartnerSettlementBatch
+  trigger: operation
+  guard: '`action: resolveDispute`: the batch is rebuilt from its lines and reviewed again (decided 29 September,
+    writers pass; DM4)'
+  isReversal: true
+- from: disputed
+  to: reversed
+  operation: actOnPartnerSettlementBatch
+  trigger: operation
+  guard: '`action: void`: the dispute is resolved against the batch; it is voided and its lines released to the next
+    batch (decided 29 September, writers pass; DM4)'
+- from: calculated
+  to: reversed
+  operation: actOnPartnerSettlementBatch
+  trigger: operation
+  guard: '`action: void` before review: every line in it was reversed, or the batch was built for the wrong period
+    (decided 29 September, writers pass; DM4)'
+notes: '**Commission settlement is Finance''s money and Finance''s approval** (decided 29 September, writers pass).
+  The batch groups one partner''s lines for one currency, period and legal entity; its states are the line states,
+  and a line follows its batch from `financeReview` to `paid` (states/partner-commission-line.yaml).
+
+
+
+  **`paid` is terminal.** Money recovered after payment is a new adjustment line in a later batch, never a reopened
+  batch. The settlement run creates batches; Finance submits, approves, schedules, holds, releases, disputes and
+  voids them with actOnPartnerSettlementBatch (decided 29 September, writers pass; DM4). `paid` arrives from the
+  payment confirmation. `listCommissionCalculationSettlement` only reads.'

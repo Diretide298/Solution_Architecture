@@ -1,0 +1,1415 @@
+{
+ "AiCustomerServiceCopilotKnowledgeWorkspaceInput": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.service_copilot_config",
+  "description": "The customer-service copilot's configuration for one scope (pack 10.1.10). A field left out takes its default, not its old value.",
+  "required": [
+   "scopeLevel",
+   "dataSources",
+   "draftChannels"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopeLevel": {
+    "type": "string",
+    "enum": [
+     "tenant",
+     "venue"
+    ]
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005), and the upsert key: one row per scope."
+   },
+   "isEnabled": {
+    "type": "boolean",
+    "default": false
+   },
+   "dataSources": {
+    "type": "array",
+    "description": "The authorised data the copilot may read, always within the asking agent's own permissions.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "customer",
+      "cases",
+      "orders",
+      "tickets",
+      "products",
+      "servicePolicies",
+      "pricing",
+      "payments",
+      "membership",
+      "wallet",
+      "groupBookings",
+      "interactionHistory",
+      "knowledgeBase"
+     ]
+    }
+   },
+   "knowledgeCollectionIds": {
+    "type": "array",
+    "description": "`ai.knowledge_collection` rows holding service procedures, product information, refund rules, ticket policies, venue instructions, FAQs and internal SOPs.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "draftChannels": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "email",
+      "chat",
+      "whatsapp",
+      "caseResponse",
+      "internalEscalation"
+     ]
+    }
+   },
+   "brandTone": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true,
+    "description": "Tone guidance applied to every draft."
+   },
+   "replyInCustomerLanguage": {
+    "type": "boolean",
+    "default": true
+   },
+   "autoSend": {
+    "type": "array",
+    "default": [],
+    "description": "Channels where an approved automation may send without an agent. Empty means every customer-facing message waits for a person.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "email",
+      "chat",
+      "whatsapp"
+     ]
+    }
+   },
+   "patternDetection": {
+    "type": "object",
+    "description": "Flags a systemic problem when many cases share one cause.",
+    "properties": {
+     "isEnabled": {
+      "type": "boolean",
+      "default": true
+     },
+     "minimumCases": {
+      "type": "integer",
+      "minimum": 2,
+      "default": 25
+     },
+     "windowHours": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 720,
+      "default": 168
+     }
+    }
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AiCustomerServiceCopilotKnowledgeWorkspaceView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.service_copilot_config (new), ai.policy and ai.knowledge_collection",
+  "description": "The stored configuration and what is in effect at that scope after the tenant row and the AI policy are applied.",
+  "required": [
+   "configuration",
+   "effective"
+  ],
+  "properties": {
+   "configuration": {
+    "$ref": "#/components/schemas/AiCustomerServiceCopilotKnowledgeWorkspaceInput"
+   },
+   "effective": {
+    "type": "object",
+    "description": "The narrowest of this row, its tenant row and `getAiPolicy`.",
+    "properties": {
+     "isEnabled": {
+      "type": "boolean"
+     },
+     "dataSources": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "draftChannels": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "autoSend": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "aiCapabilities": {
+      "type": "array",
+      "description": "`AiPolicy.enabledCapabilities` at this scope.",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "knowledgeCollections": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "documentCount": {
+       "type": "integer",
+       "minimum": 0
+      }
+     }
+    }
+   }
+  }
+ },
+ "CallDisposition": {
+  "type": "object",
+  "description": "BL-082. **A conversation could be closed and nothing recorded why it ended** — information, no sale, sale successful. **That is the measure a contact centre runs on**, and its absence makes every conversation look identical in a report.\n",
+  "required": [
+   "outcome"
+  ],
+  "properties": {
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "information",
+     "resolved",
+     "noSale",
+     "saleCompleted",
+     "callbackScheduled",
+     "escalated",
+     "wrongNumber",
+     "abandoned",
+     "unreachable"
+    ]
+   },
+   "callbackAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**An agent could not schedule a callback with the case attached**, so a promise to ring back lived in somebody's notebook.\n"
+   },
+   "callbackAssignedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "Case": {
+  "x-ticvai-persistence": "marketing.case",
+  "x-ticvai-retired-columns": [
+   "guest_name",
+   "subject",
+   "is_sla_breached"
+  ],
+  "type": "object",
+  "required": [
+   "id",
+   "caseNumber",
+   "subject",
+   "status",
+   "priority",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a ULID."
+   },
+   "caseNumber": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity. Assigned when the case reaches the server, so a retry with the same `id` keeps its number.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "guestName": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from `pii.subject` when the case is read, never stored on the case.** A name copied onto a case row is personal data outside the erasable store (ADR-0023), and it had no source anyway — no request carries it. Returned only to callers holding `GUEST_VIEW_PII`, as `searchGuests` does.\n"
+   },
+   "subject": {
+    "type": "string",
+    "x-ticvai-column": "title",
+    "description": "**The case's one-line title**, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps `subject` because screens bind it.\n"
+   },
+   "kind": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CaseKind"
+     }
+    ],
+    "nullable": true,
+    "description": "What the guest said it was about, where the guest raised it."
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MessageChannel"
+     }
+    ],
+    "description": "How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`."
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time the case was raised — the start of the SLA clock."
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "Server time the case arrived. Equal to `recordedAt` for a case raised online."
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "queueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `ServiceQueue` the case waits in, set by routing (`CaseRoutingRule.queueId`). Null once routed straight to an agent. (decided 29 September, data model for the agreed operations)"
+   },
+   "membershipId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. (decided 29 September, coordinator decision DM4, writers pass)"
+   },
+   "status": {
+    "$ref": "#/components/schemas/CaseStatus"
+   },
+   "priority": {
+    "$ref": "#/components/schemas/CasePriority"
+   },
+   "assignedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "relatedOrderId": {
+    "type": "string",
+    "nullable": true
+   },
+   "slaDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isSlaBreached": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Computed when read, never stored.** True once the case has been open longer than its SLA allows — the time from `recordedAt` to `resolvedAt` (or to now, while unresolved), less `slaPausedSeconds`, is past the target that set `slaDueAt`. A stored flag would need a job to flip it at the moment of breach, and no such job is designed; `listCases?breachedSla` filters on the same computation.\n"
+   },
+   "slaPausedSeconds": {
+    "type": "integer",
+    "description": "Accrued only while awaiting the guest. Waiting on an internal team does not pause the clock.\n"
+   },
+   "escalationCount": {
+    "type": "integer"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "CaseKind": {
+  "type": "string",
+  "description": "**What the guest says the case is about**, in their words rather than the venue's taxonomy — `raiseMyCase` asks for it and `categoryId` is what staff file it under. Stored on the case, because a lost-property report that forgets it was one cannot be routed to the lost and found desk.\n**`other` only with a note (decided 28 September, audit R222).** A case raised as `other` must carry a non-empty `detail` (`raiseMyCase`), or it is refused with 400; the notes are reviewed quarterly to add the real kinds they reveal.\n",
+  "enum": [
+   "lostProperty",
+   "complaint",
+   "question",
+   "accessibility",
+   "refundRequest",
+   "other"
+  ]
+ },
+ "CasePriority": {
+  "type": "string",
+  "enum": [
+   "low",
+   "normal",
+   "high",
+   "urgent"
+  ]
+ },
+ "CaseStatus": {
+  "type": "string",
+  "enum": [
+   "open",
+   "inProgress",
+   "awaitingGuest",
+   "escalated",
+   "resolved",
+   "closed"
+  ]
+ },
+ "Conversation": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.conversation",
+  "description": "22.8. **A conversation is not a case.** A case is a ticket measured in hours; a conversation is a live session measured in seconds, with somebody waiting. A conversation may create a case; it is not one.\n",
+  "required": [
+   "id",
+   "channel",
+   "state"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "telephony": {
+    "type": "object",
+    "nullable": true,
+    "description": "BL-083. **`ConversationChannel` included `voice` with nothing behind it** — the model anticipated telephony and stopped at the enum.\n**Not an integration, a binding.** Genesys, Avaya, Amazon Connect, Teams and 3CX all do call control themselves; what the platform needs is the call bound to the guest and the case, so **an agent who answers already knows who is calling and what about.**\n",
+    "properties": {
+     "providerCallId": {
+      "type": "string"
+     },
+     "direction": {
+      "type": "string",
+      "enum": [
+       "inbound",
+       "outbound",
+       "transferred"
+      ]
+     },
+     "fromNumberMasked": {
+      "type": "string",
+      "nullable": true,
+      "description": "**Masked, and it is still personal data.** A phone number identifies a person more reliably than a name does.\n"
+     },
+     "recordingRef": {
+      "type": "string",
+      "nullable": true,
+      "description": "Held by the provider, referenced here. **Recording consent is jurisdictional and the platform does not assume it** — a reference with no consent record is a recording nobody may play.\n"
+     },
+     "agentState": {
+      "type": "string",
+      "enum": [
+       "available",
+       "onCall",
+       "wrapUp",
+       "away",
+       "offline"
+      ],
+      "nullable": true
+     }
+    }
+   },
+   "assistSessionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "BL-094. **`startKioskAssist` recorded a staff member helping a guest and `createCase` recorded a service interaction, and neither referenced the other** — so the traceability 2.13.20 asks for had no link to follow.\n**The link is here rather than on the assist session**, because a case may span several assists and an assist belongs to at most one case.\n"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/ConversationChannel"
+   },
+   "state": {
+    "$ref": "#/components/schemas/ConversationState"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "22.8.3. Resolved from phone, email, membership number or a signed-in session. **A conversation with none of those stays anonymous rather than being guessed at.**\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "assignedPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "queueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "queuePosition": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "Place among the unclaimed conversations in `queueId`, from the live agent queue (audit R149). Null once claimed."
+   },
+   "estimatedWaitSeconds": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "From the live agent queue — the conversations ahead divided across that queue's agents online now (audit R149). Null once claimed."
+   },
+   "handoverReason": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "guestRequested",
+     "assistantRefused",
+     "assistantFailed",
+     "outOfScope",
+     "negativeSentiment",
+     "complexIntent",
+     "paymentIssue"
+    ]
+   },
+   "handoverSummary": {
+    "type": "string",
+    "nullable": true,
+    "description": "**The assistant's own account of what the guest wants**, so an agent opens with context rather than reading a transcript while somebody waits.\n"
+   },
+   "sentiment": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "positive",
+     "neutral",
+     "negative",
+     "escalating"
+    ],
+    "description": "22.8.16. **`escalating` is a routing signal**, not a report line."
+   },
+   "intent": {
+    "type": "string",
+    "nullable": true,
+    "description": "22.8.13. What the guest appears to want, used for routing."
+   },
+   "locale": {
+    "type": "string"
+   },
+   "caseId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "22.8.12. Where the conversation raised one."
+   },
+   "messages": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ConversationMessage"
+    }
+   },
+   "firstResponseSeconds": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "outcome": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "resolved",
+     "caseRaised",
+     "abandonedByGuest",
+     "timedOut",
+     "spam"
+    ]
+   }
+  }
+ },
+ "ConversationChannel": {
+  "type": "string",
+  "enum": [
+   "webChat",
+   "inAppChat",
+   "whatsapp",
+   "sms",
+   "email",
+   "kiosk",
+   "voice"
+  ]
+ },
+ "ConversationMessage": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.conversation_message + marketing.conversation_message_attachment",
+  "required": [
+   "id",
+   "sender",
+   "body",
+   "sentAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sender": {
+    "type": "string",
+    "enum": [
+     "guest",
+     "agent",
+     "assistant",
+     "system"
+    ],
+    "description": "**Resolved, never declared.** The assistant is labelled as one — a guest talking to a bot that presents as a person is a complaint waiting for the moment they find out.\n"
+   },
+   "senderPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "body": {
+    "type": "string"
+   },
+   "attachments": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "assetId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "image",
+        "video",
+        "document",
+        "ticket",
+        "qr",
+        "paymentLink"
+       ]
+      }
+     }
+    }
+   },
+   "aiInteractionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where the assistant sent it. **Links the message to its tokens and cost**, so a conversation's spend is attributable (CF-14).\n"
+   },
+   "sentAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "readAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "ConversationState": {
+  "type": "string",
+  "description": "**`withAssistant` and `queued` are different, and the second has a person waiting.** Merging them makes the service level unmeasurable, because time with a bot is not time in a queue.\n",
+  "enum": [
+   "withAssistant",
+   "queued",
+   "withAgent",
+   "waitingOnGuest",
+   "resolved",
+   "abandoned",
+   "timedOut"
+  ]
+ },
+ "GuestTimelineEvent": {
+  "type": "object",
+  "description": "Board 1.5. **Facts, notes and predictions distinguished on the row.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "purchase",
+     "ticketUsed",
+     "reservation",
+     "visit",
+     "membershipChange",
+     "loyalty",
+     "wallet",
+     "campaign",
+     "message",
+     "case",
+     "survey",
+     "waiver",
+     "note",
+     "prediction"
+    ]
+   },
+   "nature": {
+    "type": "string",
+    "enum": [
+     "operationalFact",
+     "userNote",
+     "aiDerived"
+    ],
+    "description": "**A prediction and a gate scan are both useful and only one happened.**"
+   },
+   "summary": {
+    "type": "string"
+   },
+   "channel": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "sourceContract": {
+    "type": "string",
+    "nullable": true
+   },
+   "sourceReferenceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "value": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "outcome": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "IntelligentRoutingSkillsAssignmentEngineInput": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.case_routing_rule",
+  "description": "One case routing rule (pack 10.2.3). Empty match lists match everything; all non-empty lists must match.",
+  "required": [
+   "code",
+   "name",
+   "strategy",
+   "rank",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 60,
+    "description": "The natural key, e.g. `eventDayArabic`."
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "rank": {
+    "type": "integer",
+    "minimum": 1,
+    "description": "Lower is tried first."
+   },
+   "queueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The queue this rule routes into; null routes straight to an agent."
+   },
+   "match": {
+    "type": "object",
+    "properties": {
+     "categoryIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "description": "Case categories and subcategories (`Case.categoryId`)."
+     },
+     "kinds": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/CaseKind"
+      }
+     },
+     "channels": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/MessageChannel"
+      }
+     },
+     "customerLanguages": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "maxLength": 10
+      },
+      "description": "BCP-47 tags, e.g. `ar`, `en`."
+     },
+     "customerTypes": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "individual",
+        "member",
+        "vip",
+        "corporate",
+        "group",
+        "partner"
+       ]
+      }
+     },
+     "membershipTierIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "venueIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "eventIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "productIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "priorities": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/CasePriority"
+      }
+     },
+     "eventWithinHours": {
+      "type": "integer",
+      "minimum": 0,
+      "nullable": true,
+      "description": "Event proximity - matches only when the case's event starts within this many hours."
+     }
+    }
+   },
+   "strategy": {
+    "type": "string",
+    "enum": [
+     "roundRobin",
+     "leastBusy",
+     "skillBased",
+     "priorityBased",
+     "languageBased",
+     "customerTierBased",
+     "aiRecommended"
+    ]
+   },
+   "requiredSkills": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "maxLength": 60
+    },
+    "description": "Skills an agent must hold (`AgentServiceProfile.skills`), e.g. `ticketing`, `refunds`."
+   },
+   "requireLanguageMatch": {
+    "type": "boolean",
+    "default": true,
+    "description": "Only agents who speak the customer's language are candidates."
+   },
+   "maxUtilizationRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "description": "Agents above this workload are skipped."
+   },
+   "respectSlaCapability": {
+    "type": "boolean",
+    "default": true,
+    "description": "Skip agents whose current queue would push the case past its SLA."
+   },
+   "stickyOwnership": {
+    "type": "boolean",
+    "default": false,
+    "description": "Prefer the agent who last handled the customer or the reopened case, if available."
+   },
+   "stickyWindowHours": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true
+   },
+   "fallbackQueueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where the case goes when no candidate agent is available."
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "IntelligentRoutingSkillsAssignmentEngineView": {
+  "description": "A routing rule as stored, with how often it has matched.",
+  "x-ticvai-persistence": "none — the marketing.case_routing_rule (new) row plus a count over marketing.case",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/IntelligentRoutingSkillsAssignmentEngineInput"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "matchedLast7Days": {
+      "type": "integer",
+      "minimum": 0,
+      "readOnly": true
+     },
+     "lastMatchedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true
+     }
+    }
+   }
+  ]
+ },
+ "KioskAssistSession": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.kiosk_assist_session",
+  "description": "2.1.25. A staff member acting on a kiosk session remotely. **The guest can always see it and always end it** — remote assistance a guest cannot see or stop is surveillance.\n",
+  "required": [
+   "id",
+   "deviceId",
+   "staffPrincipalId",
+   "startedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "deviceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "staffPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "staffDisplayName": {
+    "type": "string",
+    "description": "**Shown on the kiosk.** A guest being helped should know by whom.\n"
+   },
+   "cartId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "enum": [
+     "guestCalled",
+     "healthAlert",
+     "stuckSession",
+     "paymentIssue",
+     "proactive"
+    ]
+   },
+   "endedBy": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "staff",
+     "guest",
+     "timeout"
+    ]
+   },
+   "actionsTaken": {
+    "type": "array",
+    "description": "**Every action recorded as the staff member's**, not the kiosk's. A cashier completing a guest's checkout remotely is a staff action on a guest cart.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "operationId": {
+       "type": "string"
+      },
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "endedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
+ "OrderBookingTicketServiceWorkspaceInput": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.case_service_action",
+  "x-ticvai-record-definition": "Permitted Service Actions (one per executed action)",
+  "description": "One service action on an order, taken from a case. Only an `execute` stores a row.",
+  "required": [
+   "id",
+   "mode",
+   "orderId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID; equals the `Idempotency-Key` header."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "mode": {
+    "type": "string",
+    "enum": [
+     "evaluate",
+     "execute"
+    ]
+   },
+   "caseId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Required with `execute`; the action is recorded on this case."
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "lineIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "description": "Omit for the whole order."
+   },
+   "action": {
+    "type": "string",
+    "description": "Required with `execute`.",
+    "enum": [
+     "resendTicket",
+     "downloadTicket",
+     "reissue",
+     "transfer",
+     "changeName",
+     "reschedule",
+     "exchange",
+     "upgrade",
+     "cancel"
+    ]
+   },
+   "targetPerformanceId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "For `reschedule` and `exchange`, the option chosen from the evaluation."
+   },
+   "targetProductId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "For `exchange` and `upgrade`."
+   },
+   "recipientSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "For `transfer` and `changeName`, the new ticket holder."
+   },
+   "deliveryChannel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MessageChannel"
+     }
+    ],
+    "description": "For `resendTicket`."
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "completed",
+     "pendingPayment",
+     "refused",
+     "failed"
+    ]
+   },
+   "downstreamOperation": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The operation that performed it, e.g. `rescheduleOrder`."
+   },
+   "downstreamReference": {
+    "type": "string",
+    "readOnly": true,
+    "nullable": true
+   },
+   "performedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "OrderBookingTicketServiceWorkspaceView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over orders.sales_order, orders.order_line, orders.payment, access.entitlement, marketing.case_service_action (new) and the policies each owning operation reads",
+  "description": "The order as a service agent sees it, what may be done to it, and what was done.",
+  "required": [
+   "orderId",
+   "order",
+   "availableActions"
+  ],
+  "properties": {
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "order": {
+    "type": "string",
+    "description": "The order number shown to the guest."
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "purchaseDate": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "channel": {
+    "type": "string",
+    "description": "The sales channel the order came through."
+   },
+   "products": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "tickets": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The performance start."
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "payment": {
+    "type": "string",
+    "enum": [
+     "paid",
+     "partiallyPaid",
+     "unpaid",
+     "partiallyRefunded",
+     "refunded"
+    ]
+   },
+   "fulfillment": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "issued",
+     "delivered",
+     "failed"
+    ]
+   },
+   "ticketStatus": {
+    "type": "string",
+    "enum": [
+     "valid",
+     "partiallyUsed",
+     "used",
+     "expired",
+     "cancelled"
+    ]
+   },
+   "availableActions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "action",
+      "isPermitted"
+     ],
+     "properties": {
+      "action": {
+       "type": "string",
+       "enum": [
+        "resendTicket",
+        "downloadTicket",
+        "reissue",
+        "transfer",
+        "changeName",
+        "reschedule",
+        "exchange",
+        "upgrade",
+        "cancel",
+        "requestRefund"
+       ]
+      },
+      "isPermitted": {
+       "type": "boolean"
+      },
+      "refusedBy": {
+       "type": "string",
+       "nullable": true,
+       "enum": [
+        "ticketPolicy",
+        "servicePolicy",
+        "orderStatus",
+        "eventDate",
+        "customerEntitlement",
+        "permission"
+       ]
+      },
+      "policyReference": {
+       "type": "string",
+       "nullable": true
+      },
+      "options": {
+       "type": "array",
+       "description": "Alternatives for `reschedule`, `exchange` and `upgrade`, earliest first.",
+       "items": {
+        "type": "object",
+        "properties": {
+         "performanceId": {
+          "type": "string",
+          "format": "uuid",
+          "nullable": true
+         },
+         "productId": {
+          "type": "string",
+          "format": "uuid",
+          "nullable": true
+         },
+         "startsAt": {
+          "type": "string",
+          "format": "date-time",
+          "nullable": true
+         },
+         "available": {
+          "type": "boolean"
+         },
+         "priceDifferencePerTicket": {
+          "$ref": "../shared/common.yaml#/components/schemas/Money"
+         },
+         "priceDifferenceTotal": {
+          "$ref": "../shared/common.yaml#/components/schemas/Money"
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "lastAction": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OrderBookingTicketServiceWorkspaceInput"
+     }
+    ],
+    "nullable": true,
+    "description": "The action just executed; null on `evaluate`."
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ServiceQueue": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.service_queue",
+  "description": "**A customer-service queue** (e.g. `eventDaySupport`). Cases (`Case.queueId`), routing rules (`queueId`, `fallbackQueueId`) and agents (`AgentAvailability.queueIds`) name it; `listContact` and `listAgentWorkloadAvailability` report per queue. Maintained by `setServiceQueueDefinition`, read by `listServiceQueues` (decided 29 September, writers pass). (decided 29 September, data model for the agreed operations)\n",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 60
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "overflowWaitSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "The queue's overflow threshold; a case waiting longer marks the queue `critical`."
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ }
+}

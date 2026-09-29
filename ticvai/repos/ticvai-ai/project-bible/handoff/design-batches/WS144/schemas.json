@@ -1,0 +1,850 @@
+{
+ "Challenge": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.challenge",
+  "description": "BL-022, CF-137. **Section 22.6 is twenty requirements and 19.2.73–75 three more** — checked against the matrix on 18 August rather than assumed. It is asked for explicitly.\n**Gamification is not loyalty.** Loyalty pays for spend; a challenge pays for behaviour the venue wants and spend does not produce — a second visit, a quiet Tuesday, a ride nobody rides. **A challenge that only rewards spending is a loyalty programme with worse arithmetic.**\n",
+  "required": [
+   "id",
+   "name",
+   "kind",
+   "goal",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "description": "What an entrant does to progress. `scan`, `activity` and `purchase` were added from the BO-825 pack (decided 28 September, audit R275 (c)): `scan` counts scans of a named code or point (a trail marker, a stand), `activity` counts completions of a named attraction or activity that is not a ride, and `purchase` counts purchases of named products or categories. **`purchase` is not `spend`**: `spend` counts money, whatever was bought; `purchase` counts items bought.\n",
+    "enum": [
+     "visit",
+     "spend",
+     "ride",
+     "collection",
+     "streak",
+     "referral",
+     "survey",
+     "social",
+     "milestone",
+     "scan",
+     "activity",
+     "purchase"
+    ]
+   },
+   "scope": {
+    "type": "string",
+    "enum": [
+     "individual",
+     "family",
+     "group",
+     "team"
+    ],
+    "default": "individual",
+    "description": "22.6.7 and 22.6.8. **A family challenge is not a per-person challenge counted twice** — members contribute toward one shared goal, and a school competing against another school is a group scoring against a group.\n**This is the field that needs the portfolio work** (CF-132): a family challenge without a family is an individual challenge with a label.\n"
+   },
+   "goal": {
+    "type": "object",
+    "description": "What completes it.",
+    "properties": {
+     "metric": {
+      "type": "string"
+     },
+     "target": {
+      "type": "number"
+     },
+     "withinDays": {
+      "type": "integer",
+      "nullable": true
+     }
+    }
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "rewardKind": {
+    "type": "string",
+    "enum": [
+     "badge",
+     "loyaltyPoints",
+     "walletCredit",
+     "voucher",
+     "entitlement",
+     "none"
+    ],
+    "description": "22.6.13. **A reward that issues wallet credit is money**, and it goes through the same stored-value mechanism as everything else rather than a parallel one.\n"
+   },
+   "rewardValue": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 1,
+    "description": "**Points, for `rewardKind: loyaltyPoints` only.** A count, not an amount — a money reward is `rewardAmount`, never this.\n"
+   },
+   "rewardAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**The credit, for `rewardKind: walletCredit` only.** The shared `Money`, stored as `numeric(18,4)` with currency and scale resolved from the region, because a wallet credit is money and naming-and-style 5.1 forbids money as a bare number.\n"
+   },
+   "badgeAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "endsAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "status": {
+    "readOnly": true,
+    "type": "string",
+    "enum": [
+     "draft",
+     "active",
+     "paused",
+     "ended",
+     "archived"
+    ]
+   },
+   "scopePath": {
+    "readOnly": true,
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "GuestIntelligence": {
+  "type": "object",
+  "description": "Board 1.10. **Explainable, or an agent will ignore it or over-trust it.**",
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scores": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "historicalLtv",
+        "predictedLtv",
+        "engagement",
+        "churnRisk",
+        "inactivityRisk",
+        "cancellationRisk",
+        "upgradePropensity",
+        "nextPurchasePropensity"
+       ]
+      },
+      "value": {
+       "type": "number"
+      },
+      "band": {
+       "type": "string",
+       "nullable": true
+      },
+      "confidence": {
+       "type": "number",
+       "nullable": true
+      },
+      "modelId": {
+       "type": "string",
+       "nullable": true
+      },
+      "modelVersion": {
+       "type": "string",
+       "nullable": true
+      },
+      "computedAt": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "factors": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "properties": {
+         "factor": {
+          "type": "string"
+         },
+         "contribution": {
+          "type": "number"
+         }
+        }
+       }
+      },
+      "limitations": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       },
+       "description": "**Policy and data limitations travel with the score**, so the rule that prediction never overrides consent cannot be forgotten downstream.\n"
+      }
+     }
+    }
+   },
+   "affinities": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "productCategoryId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "label": {
+       "type": "string"
+      },
+      "strength": {
+       "type": "number"
+      }
+     }
+    }
+   },
+   "nextBestActions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "action": {
+       "type": "string"
+      },
+      "expectedImpact": {
+       "type": "string",
+       "nullable": true
+      },
+      "confidence": {
+       "type": "number",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "LoyaltyProgramme": {
+  "x-ticvai-persistence": "marketing.loyalty_programme + marketing.points_earning_rule + marketing.programme_tier",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "earnRules",
+   "tiers"
+  ],
+  "properties": {
+   "tiers": {
+    "type": "array",
+    "description": "**Rows of `marketing.programme_tier`**, the same shape `MarketingProgrammeTier` has — one definition of a tier, not a second copy that cannot round-trip. `loyaltyProgrammeId` and `id` are the server's on create.\n",
+    "items": {
+     "$ref": "#/components/schemas/MarketingProgrammeTier"
+    }
+   },
+   "id": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "x-ticvai-unique": "tenant",
+    "description": "**Unique per tenant** (decided 28 September, audit R108). A code already used by any loyalty programme in the tenant, at any venue, is refused with `409 duplicate-code`.\n"
+   },
+   "name": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "pointsLiabilityAccountId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Points post here on accrual. They are a liability from the moment they are earned, not from the moment they are spent.\n"
+   },
+   "earnRules": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "trigger",
+      "points"
+     ],
+     "properties": {
+      "trigger": {
+       "type": "string",
+       "enum": [
+        "perCurrencyUnit",
+        "perVisit",
+        "perProduct",
+        "onSignup",
+        "onBirthday",
+        "onReview"
+       ]
+      },
+      "points": {
+       "type": "number"
+      },
+      "productKinds": {
+       "type": "array",
+       "description": "Limits a `perProduct` or `perCurrencyUnit` rule to these kinds. Empty means every kind.",
+       "items": {
+        "$ref": "../spine/catalogue.yaml#/components/schemas/ProductKind"
+       }
+      },
+      "multiplier": {
+       "type": "number"
+      }
+     }
+    }
+   },
+   "pointsExpireAfterMonths": {
+    "type": "integer",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "LoyaltyRuleSet": {
+  "type": "object",
+  "x-ticvai-persistence": "none — composed from the rule tables of one programme",
+  "description": "**Every rule a programme runs on, read and written as one thing.** Earning, redemption and campaign rules only make sense against each other: a 500-point redemption beside a 5-point earning rule is a hundred visits, and that ratio is the artefact being configured.\nEarning rules are not repeated here — they are `LoyaltyProgramme.earnRules[]` and reached through the programme, which is where they were already declared.\n",
+  "required": [
+   "programmeId"
+  ],
+  "properties": {
+   "programmeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "campaignRules": {
+    "type": "array",
+    "description": "Bonus, multiplier and condition rules, each scoped to a campaign window.",
+    "items": {
+     "$ref": "#/components/schemas/MarketingLoyaltyRule"
+    }
+   },
+   "tiers": {
+    "type": "array",
+    "description": "The programme's tiers, in `rank` order. **Read with the rules because a redemption rule that is tier-gated is meaningless without them** — 500 points off for Gold members is two facts, and reviewing one without the other is how a tier nobody can reach acquires a benefit.\n",
+    "items": {
+     "$ref": "#/components/schemas/MarketingProgrammeTier"
+    }
+   },
+   "redemptionRules": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/MarketingPointsRedemptionRule"
+    }
+   }
+  }
+ },
+ "MarketingBadge": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.badge",
+  "description": "**Taken from the backend workbook, 20 September.** Defines a digital badge that can be awarded to a customer for challenge completion or other engagement achievement.",
+  "required": [
+   "code",
+   "name",
+   "type",
+   "isActive",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "iconUrl": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "type": {
+    "type": "string",
+    "maxLength": 30
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "MarketingCustomerBadge": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.customer_badge",
+  "description": "**Taken from the backend workbook, 20 September.** Stores badges actually awarded to customers and the source that generated each award.",
+  "required": [
+   "customerId",
+   "badgeId",
+   "awardedAt",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "customerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "badgeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "challengeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "sourceType": {
+    "type": "string",
+    "maxLength": 30,
+    "nullable": true
+   },
+   "sourceReferenceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "awardedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "maxLength": 20
+   }
+  }
+ },
+ "MarketingLoyaltyCampaign": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.loyalty_campaign",
+  "description": "**Taken from the backend workbook, 20 September.** Links a marketing campaign to temporary loyalty bonuses, rewards, or earning changes.",
+  "required": [
+   "programId",
+   "code",
+   "name",
+   "startAt",
+   "endAt",
+   "isActive",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "programId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "campaignId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "startAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "endAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "MarketingLoyaltyRule": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.loyalty_rule",
+  "description": "**Taken from the backend workbook, 20 September.** Defines temporary bonus points, multipliers, earning rules, or rewards applied by a loyalty campaign.",
+  "required": [
+   "campaignId",
+   "type",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "campaignId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "type": {
+    "type": "string",
+    "maxLength": 30
+   },
+   "pointsEarningRuleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "rewardId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "bonusPoints": {
+    "type": "number",
+    "nullable": true
+   },
+   "multiplier": {
+    "type": "number",
+    "nullable": true
+   },
+   "conditionsJson": {
+    "type": "string",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "MarketingPointsRedemptionRule": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.points_redemption_rule",
+  "description": "**Taken from the backend workbook, 20 September.** Defines how loyalty points can be exchanged for discounts, products, or other benefits.",
+  "required": [
+   "loyaltyProgramId",
+   "pointRedemptionRuleCode",
+   "name",
+   "redemptionType",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "loyaltyProgramId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "pointRedemptionRuleCode": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "redemptionType": {
+    "type": "string",
+    "maxLength": 30
+   },
+   "required": {
+    "type": "number",
+    "nullable": true
+   },
+   "monetaryValue": {
+    "type": "number",
+    "nullable": true
+   },
+   "minimumPoints": {
+    "type": "number",
+    "nullable": true
+   },
+   "maximumPoints": {
+    "type": "number",
+    "nullable": true
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "MarketingProgrammeTier": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.programme_tier",
+  "description": "**The tier definition decision 8 promised and nobody built.** `marketing.loyalty_position` carried `tierCode`, `tierName` and `pointsToNextTier` as denormalised strings and a number, with no table saying what tiers exist or what each one requires — so `pointsToNextTier` was computed from a threshold that lived nowhere.\n**Not named `marketing.loyalty_tier`**: that name is recorded in `schema-history.json` as renamed to `marketing.points_earning_rule` on 20 September, and a rename record that contradicts the schema is worse than a longer name. Not named `marketing.tier` either, because `subscription.tier_allowance` is a SaaS plan's tier and one bare `tier` in a package with two tier concepts is how `plan_id` came to point at `subscription.plan`.\n**The denormalised copy on the position stays.** A till rendering *Gold* beside a balance must not join, and must certainly not cross a cell boundary to print a word. This table is the source of truth and those columns are its cache.\n",
+  "required": [
+   "loyaltyProgrammeId",
+   "code",
+   "name",
+   "rank"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "loyaltyProgrammeId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 40
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 120
+   },
+   "rank": {
+    "type": "integer",
+    "description": "**Order, not threshold.** Two tiers can share a qualifying rule and still have an order, and sorting by points breaks the moment a tier is granted rather than earned.\n"
+   },
+   "minLifetimePoints": {
+    "type": "integer",
+    "nullable": true,
+    "description": "What reaching this tier requires. **`pointsToNextTier` on the position is this minus the guest's lifetime points**, and until now it was this minus nothing.\n"
+   },
+   "retainLifetimePoints": {
+    "type": "integer",
+    "nullable": true,
+    "description": "What keeping it requires, per review period. **Usually lower than reaching it**, and a scheme that cannot express the difference either never demotes or demotes on the day a guest stops earning.\n"
+   },
+   "validityMonths": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Null means the tier does not lapse on its own."
+   },
+   "benefits": {
+    "type": "array",
+    "description": "What the tier gives, as the guest reads it. Text shown, not rules enforced.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "earnMultiplier": {
+    "type": "number",
+    "nullable": true,
+    "description": "Applied to every earn rule while the guest holds this tier. Null means 1."
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "MarketingReward": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.reward",
+  "description": "**Taken from the backend workbook, 20 September.** Defines a loyalty reward that can be issued to eligible customers.",
+  "required": [
+   "loyaltyProgramId",
+   "code",
+   "name",
+   "type",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "loyaltyProgramId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "type": {
+    "type": "string",
+    "maxLength": 30
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "pointsCost": {
+    "type": "number",
+    "nullable": true
+   },
+   "discountValue": {
+    "type": "number",
+    "nullable": true
+   },
+   "validityDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Referral": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.referral",
+  "description": "BL-034. **No referrer, no reward, nothing anywhere.**\n**The reward fires on the referee's qualifying act, not on the sign-up**, because a referral that pays on registration pays for accounts rather than for guests.\n",
+  "required": [
+   "id",
+   "referrerSubjectId",
+   "code",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid"
+   },
+   "referrerSubjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "refereeSubjectId": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "code": {
+    "readOnly": true,
+    "type": "string"
+   },
+   "status": {
+    "readOnly": true,
+    "type": "string",
+    "enum": [
+     "issued",
+     "registered",
+     "qualified",
+     "rewarded",
+     "expired",
+     "void"
+    ]
+   },
+   "qualifyingAction": {
+    "type": "string",
+    "enum": [
+     "firstPurchase",
+     "firstVisit",
+     "membershipPurchase"
+    ]
+   },
+   "referrerRewardId": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "refereeRewardId": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "readOnly": true,
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ }
+}

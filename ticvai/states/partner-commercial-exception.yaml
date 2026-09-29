@@ -1,0 +1,63 @@
+# Partner commercial exception — state model
+# Contract: subscription.PartnerCommercialException.status
+# Checked by tools/check-states.py. Added 29 September (writers pass; data model DM4).
+
+entity: Partner commercial exception
+contract: subscription
+enum: PartnerCommercialException.status
+enumKind: inline
+enumSchema: PartnerCommercialException
+enumProperty: status
+owner: subscription
+initial:
+- pendingApproval
+terminal:
+- rejected
+- expired
+transitions:
+- from: pendingApproval
+  to: approved
+  operation: approveBookingLimitCommercial
+  trigger: operation
+  requiresApproval: true
+  guard: '`decision: approve` on `exceptionId` at the last level of the chain (Account Manager -> Commercial Director
+    -> Finance -> Final, by exception type and value). The chain and the thresholds are approvals-engine rules;
+    **AI informs and never approves**'
+- from: pendingApproval
+  to: rejected
+  operation: approveBookingLimitCommercial
+  trigger: operation
+  guard: '`decision: reject`, with a reason'
+- from: pendingApproval
+  to: returned
+  operation: approveBookingLimitCommercial
+  trigger: operation
+  guard: '`decision: returnForChanges`: the requester must change the exception asked for, its amount or its period'
+- from: returned
+  to: pendingApproval
+  operation: approveBookingLimitCommercial
+  trigger: operation
+  guard: 'Resubmitted: the same call with `exceptionId` and no `decision`, carrying the changed request; the approval
+    chain starts again'
+- from: pendingApproval
+  to: expired
+  trigger: timer
+  guard: The effective period ends before anyone decides
+- from: returned
+  to: expired
+  trigger: timer
+  guard: The effective period ends before the requester resubmits
+- from: approved
+  to: expired
+  trigger: timer
+  guard: '`effectiveTo` passes. **The exception lapses on its own**; the rule it departed from applies again from
+    the next day'
+notes: '**One call raises, resubmits and decides** (decided 29 September, writers pass). `approveBookingLimitCommercial`
+  creates the row `pendingApproval` when it is called with a `requestType` and no `exceptionId`, and records an
+  approver''s `decision` on an existing `exceptionId`; the decision itself runs through the approvals engine (`approvals.request`),
+  and this row is what was asked and what it changes.
+
+
+
+  **`approved` is not terminal** because every exception has an end date. A rejected exception is never reopened:
+  a changed request is a new request.'

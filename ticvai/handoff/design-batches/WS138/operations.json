@@ -1,0 +1,278 @@
+{
+ "approveCampaignWorkflow": {
+  "method": "PUT",
+  "path": "/campaign-workflow",
+  "contract": "promotions",
+  "summary": "Campaign Approval Workflow Designer",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CampaignApprovalWorkflowDesignerInput",
+  "responds": "CampaignApprovalWorkflowDesignerView"
+ },
+ "createApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests",
+  "contract": "approvals",
+  "summary": "Raise a request",
+  "permission": "APPROVAL_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateApprovalRequest",
+  "responds": "ApprovalRequest"
+ },
+ "createCampaign": {
+  "method": "POST",
+  "path": "/campaigns",
+  "contract": "marketing-crm",
+  "summary": "Create a campaign",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateCampaignRequest",
+  "responds": "Campaign"
+ },
+ "createInvitationCampaign": {
+  "method": "POST",
+  "path": "/invitation-campaigns",
+  "contract": "marketing-crm",
+  "summary": "A quota-bounded, addressed invitation",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "InvitationCampaign",
+  "responds": "InvitationCampaign"
+ },
+ "getCampaign": {
+  "method": "GET",
+  "path": "/campaigns/{campaignId}",
+  "contract": "marketing-crm",
+  "summary": "Read a campaign with performance",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CampaignDetail"
+ },
+ "getCampaignPerformance": {
+  "method": "GET",
+  "path": "/campaigns/{campaignId}/performance",
+  "contract": "marketing-crm",
+  "summary": "Delivery and engagement",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CampaignPerformance"
+ },
+ "listCampaignCalendarTimeline": {
+  "method": "GET",
+  "path": "/campaign-calendar-timeline",
+  "contract": "promotions",
+  "summary": "Campaign Calendar & Timeline",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "attraction",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "campaign",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "promotionFamily",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "view",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "CampaignCalendarTimelineView"
+ },
+ "listCampaigns": {
+  "method": "GET",
+  "path": "/campaigns",
+  "contract": "marketing-crm",
+  "summary": "List campaigns",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMessageTemplates": {
+  "method": "GET",
+  "path": "/message-templates",
+  "contract": "marketing-crm",
+  "summary": "List message templates",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSegments": {
+  "method": "GET",
+  "path": "/segments",
+  "contract": "marketing-crm",
+  "summary": "List segments",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "recordTouchPoint": {
+  "method": "POST",
+  "path": "/attribution/touches",
+  "contract": "marketing-crm",
+  "summary": "Record a marketing touch",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TouchPoint",
+  "responds": "TouchPoint"
+ },
+ "updateCampaign": {
+  "method": "PATCH",
+  "path": "/campaigns/{campaignId}",
+  "contract": "marketing-crm",
+  "summary": "Amend, pause or resume a campaign",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Campaign"
+ }
+}

@@ -1,6 +1,6 @@
 # WS07 — Access Control board 7
 
-**10 screens · 10 operations · 12 schemas · 3 permissions**
+**10 screens · 13 operations · 12 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, SCOPE_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, ACCESS_VALIDATE, SCOPE_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -64,17 +63,17 @@ convincingly. It is never a caption.
 | `BO-204` | Offline & Edge Operations Command Center | listDetail | 1 | 0 | — |
 | `BO-205` | Edge Node & Local Processing Configuration | configEditor | 1 | 0 | — |
 | `BO-206` | Offline Validation Policy Builder | listDetail | 1 | 0 | — |
-| `BO-207` | Edge Package & Data Distribution | configEditor | 1 | 0 | — |
+| `BO-207` | Edge Package & Data Distribution | configEditor | 3 | 0 | — |
 | `BO-208` | Offline Credential & Revocation Cache | listDetail | 1 | 0 | — |
 | `BO-209` | Offline Entitlement & Usage Ledger | listDetail | 1 | 0 | — |
-| `BO-210` | Connectivity Failure & Degraded Mode Policy | listDetail | 1 | 0 | — |
+| `BO-210` | Connectivity Failure & Degraded Mode Policy | listDetail | 3 | 0 | — |
 | `BO-211` | Reconnection, Synchronization & Conflict Resolution | listDetail | 1 | 0 | — |
 | `BO-212` | Offline Simulation & Resilience Testing | listDetail | 1 | 0 | — |
 | `BO-213` | Edge Security, Audit & Deployment | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-204, BO-206, BO-208, BO-209, BO-210, BO-211, BO-212, BO-213 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-206, BO-208, BO-209, BO-210, BO-211, BO-212 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-204 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-205",
@@ -186,13 +182,82 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations can immediately determine whether each venue, gate and device is capable of safely operating offline.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide a real-time overview of offline readiness across the entire access-control estate.",
-  "purposeNote": "Operations can immediately determine whether each venue, gate and device is capable of safely operating offline.",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Offline-Ready Devices",
+       "bindsTo": "OfflineEdgeOperationsCommandCenterViewSummary.offlineReadyDevices",
+       "operation": "listOfflineEdge",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Currently Online",
+       "bindsTo": "OfflineEdgeOperationsCommandCenterViewSummary.currentlyOnline",
+       "operation": "listOfflineEdge",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Currently Offline",
+       "bindsTo": "OfflineEdgeOperationsCommandCenterViewSummary.currentlyOffline",
+       "operation": "listOfflineEdge",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Devices in Degraded Mode",
+       "bindsTo": "OfflineEdgeOperationsCommandCenterViewSummary.devicesInDegradedMode",
+       "operation": "listOfflineEdge",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Edge Nodes Online",
+       "bindsTo": "OfflineEdgeOperationsCommandCenterViewSummary.edgeNodesOnline",
+       "operation": "listOfflineEdge",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Packages Current",
+       "bindsTo": "OfflineEdgeOperationsCommandCenterViewSummary.packagesCurrent",
+       "operation": "listOfflineEdge",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Packages Expiring",
+       "bindsTo": "OfflineEdgeOperationsCommandCenterViewSummary.packagesExpiring",
+       "operation": "listOfflineEdge",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending Offline Transactions",
+       "bindsTo": "OfflineEdgeOperationsCommandCenterViewSummary.pendingOfflineTransactions",
+       "operation": "listOfflineEdge",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Offline Security Alerts",
+       "bindsTo": "OfflineEdgeOperationsCommandCenterViewSummary.offlineSecurityAlerts",
+       "operation": "listOfflineEdge",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -201,16 +266,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every offline edge operations",
        "columns": [
-        "OfflineEdgeOperationsCommandCenterView.offlineReadyDevices",
-        "OfflineEdgeOperationsCommandCenterView.currentlyOnline",
-        "OfflineEdgeOperationsCommandCenterView.currentlyOffline",
-        "OfflineEdgeOperationsCommandCenterView.devicesInDegradedMode",
-        "OfflineEdgeOperationsCommandCenterView.edgeNodesOnline",
-        "OfflineEdgeOperationsCommandCenterView.packagesCurrent",
-        "OfflineEdgeOperationsCommandCenterView.packagesExpiring",
-        "OfflineEdgeOperationsCommandCenterView.pendingOfflineTransactions",
-        "Sync Conflicts",
-        "OfflineEdgeOperationsCommandCenterView.offlineSecurityAlerts"
+        "Sync Conflicts"
        ],
        "bindsTo": "OfflineEdgeOperationsCommandCenterView",
        "operation": "listOfflineEdge",
@@ -227,16 +283,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected offline edge operations",
        "bindsTo": "OfflineEdgeOperationsCommandCenterView",
        "columns": [
-        "OfflineEdgeOperationsCommandCenterView.offlineReadyDevices",
-        "OfflineEdgeOperationsCommandCenterView.currentlyOnline",
-        "OfflineEdgeOperationsCommandCenterView.currentlyOffline",
-        "OfflineEdgeOperationsCommandCenterView.devicesInDegradedMode",
-        "OfflineEdgeOperationsCommandCenterView.edgeNodesOnline",
-        "OfflineEdgeOperationsCommandCenterView.packagesCurrent",
-        "OfflineEdgeOperationsCommandCenterView.packagesExpiring",
-        "OfflineEdgeOperationsCommandCenterView.pendingOfflineTransactions",
-        "Sync Conflicts",
-        "OfflineEdgeOperationsCommandCenterView.offlineSecurityAlerts"
+        "Sync Conflicts"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Venue Readiness”, “Checks”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 86 §Display"
@@ -262,18 +309,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "OfflineEdgeOperationsCommandCenterView.offlineReadyDevices",
-    "OfflineEdgeOperationsCommandCenterView.currentlyOnline",
-    "OfflineEdgeOperationsCommandCenterView.currentlyOffline",
-    "OfflineEdgeOperationsCommandCenterView.devicesInDegradedMode",
-    "OfflineEdgeOperationsCommandCenterView.edgeNodesOnline",
-    "OfflineEdgeOperationsCommandCenterView.packagesCurrent"
+    "OfflineEdgeOperationsCommandCenterViewSummary.offlineReadyDevices",
+    "OfflineEdgeOperationsCommandCenterViewSummary.currentlyOnline",
+    "OfflineEdgeOperationsCommandCenterViewSummary.currentlyOffline",
+    "OfflineEdgeOperationsCommandCenterViewSummary.devicesInDegradedMode",
+    "OfflineEdgeOperationsCommandCenterViewSummary.edgeNodesOnline",
+    "OfflineEdgeOperationsCommandCenterViewSummary.packagesCurrent"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-204"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-204",
+   "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-204"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 86. 9 of 10 labels bound to a contract property; 10 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -336,10 +384,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can define which edge component is responsible for local access decisions for every deployed device.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Fields) and no display directory — it is settings, not a population",
   "purpose": "Configure where local access decisions are processed when central services cannot be reached.",
-  "purposeNote": "Administrators can define which edge component is responsible for local access decisions for every deployed device.",
   "layout": {
    "template": "form",
    "regions": [
@@ -423,16 +471,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setEdgeNodeLocal",
     "contract": "access",
     "purpose": "Edge Node & Local Processing Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setEdgeNodeLocal"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-205"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-205",
+   "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-205"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 87. 0 of 0 labels bound to a contract property; 10 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -495,10 +541,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators explicitly control which admission decisions may be performed without central connectivity.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Define exactly which access checks are allowed to run locally. The matrix identifies key offline criteria including eligible media, eligible site, eligible time, ticket validity and eligible access mode.",
-  "purposeNote": "Administrators explicitly control which admission decisions may be performed without central connectivity.",
   "gaps": [
    {
     "operation": null,
@@ -551,16 +597,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setOfflinePolicy",
     "contract": "tenancy",
     "purpose": "setOfflinePolicy",
-    "trigger": "onAction",
-    "invalidates": [
-     "setOfflinePolicy"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-206"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-206",
+   "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-206"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 88. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -623,10 +667,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Only approved, intact and authorized edge packages can become active on access-control devices.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Access Configuration; Credential Configuration) and no display directory — it is settings, not a population",
   "purpose": "Define what configuration and operational data is securely distributed to edge devices.",
-  "purposeNote": "Only approved, intact and authorized edge packages can become active on access-control devices.",
   "layout": {
    "template": "form",
    "regions": [
@@ -675,6 +719,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 89 §Credential Configuration"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "operation": "publishHardwareDeployment",
+       "notes": "**Names the configuration version, the target (pilot, selected gates, device group or venue) and the devices that failed the compatibility test and will be skipped**, before it runs.",
+       "provenance": "contract access.yaml POST /hardware-deployments (authored: required by check-screens)"
+      }
+     ]
     }
    ]
   },
@@ -690,12 +747,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Edge Package & Data Distribution",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getOfflinePackage",
+    "contract": "access",
+    "purpose": "The access package an edge node holds, with its version",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "publishHardwareDeployment",
+    "contract": "access",
+    "purpose": "Publish a new offline package to the edge nodes: deploys the access configuration version, which devices pick up at their next package refresh (replaces publishBundle, a catalogue bundle, bound in error on 29 September)",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-207"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-207",
+   "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-207"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 89. 0 of 0 labels bound to a contract property; 8 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -758,10 +829,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Offline devices have a controlled and measurable mechanism for receiving credential invalidations and security changes.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Manage the local information required to reject credentials that should no longer be usable. This is especially important because Board 3 requires refunded, cancelled, transferred, exchanged, upgraded and reissued credentials to be invalidated.",
-  "purposeNote": "Offline devices have a controlled and measurable mechanism for receiving credential invalidations and security changes.",
   "gaps": [
    {
     "operation": null,
@@ -807,17 +878,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "OfflineCredentialRevocationCacheView.fraudLock",
-    "OfflineCredentialRevocationCacheView.cancellation",
-    "OfflineCredentialRevocationCacheView.lostCredential",
-    "OfflineCredentialRevocationCacheView.manualInvalidation",
-    "OfflineCredentialRevocationCacheView.canTrigger"
+    "OfflineCredentialRevocationCacheView.triggerEvents"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-208"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-208",
+   "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-208"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 90. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -880,10 +948,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Offline usage is recorded locally and prevents repeated consumption within the available edge synchronization scope.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Track entitlement consumption while the central system is unavailable. This is necessary for tickets such as: 3 Fast Pass uses 1 park entry 1 meal 1 re-entry where usage can occur during an outage.",
-  "purposeNote": "Offline usage is recorded locally and prevents repeated consumption within the available edge synchronization scope.",
   "gaps": [
    {
     "operation": null,
@@ -929,9 +997,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "OfflineEntitlementUsageLedgerView.fastPassRemaining3",
-    "OfflineEntitlementUsageLedgerView.rideA1",
-    "OfflineEntitlementUsageLedgerView.rideB1",
     "OfflineEntitlementUsageLedgerView.credential",
     "OfflineEntitlementUsageLedgerView.device"
    ]
@@ -939,7 +1004,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-209"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-209",
+   "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-209"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 91. 0 of 0 labels bound to a contract property; 0 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1002,10 +1068,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Connectivity failures trigger predefined operating modes rather than unpredictable gate behavior.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure how devices transition from normal online operation to offline/degraded operation.",
-  "purposeNote": "Connectivity failures trigger predefined operating modes rather than unpredictable gate behavior.",
   "gaps": [
    {
     "operation": null,
@@ -1029,6 +1095,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "derived": true,
        "impliedBy": "listConnectivityFailureDegraded",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setOfflinePolicy",
+       "label": "Save offline policy",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setOfflinePolicy"
       }
      ]
     }
@@ -1047,19 +1127,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Connectivity Failure & Degraded Mode Policy",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setOfflinePolicy",
+    "contract": "tenancy",
+    "purpose": "Save what a device may do with no network, and for how long",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "setConnectivityThresholds",
+    "contract": "tenancy",
+    "purpose": "Save when a device switches to degraded mode",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
    }
   ],
   "entryState": {
    "preloaded": [
-    "ConnectivityFailureDegradedModePolicyView.centralServicesReachable",
-    "ConnectivityFailureDegradedModePolicyView.someServicesUnavailable",
-    "ConnectivityFailureDegradedModePolicyView.onlyDeviceLocalProcessingAvailable"
+    "ConnectivityFailureDegradedModePolicyView.operatingModes"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-210"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-210",
+   "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-210"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 93. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1122,10 +1215,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Offline events synchronize back to the central platform with deterministic reconciliation and a complete audit trail.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Synchronize everything that occurred offline when connectivity returns.",
-  "purposeNote": "Offline events synchronize back to the central platform with deterministic reconciliation and a complete audit trail.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1136,14 +1229,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "dataTable",
        "label": "Every reconnection synchronization conflict",
-       "columns": [
-        "ReconnectionSynchronizationConflictResolutionView.pendingScans4821",
-        "ReconnectionSynchronizationConflictResolutionView.entitlementEvents682",
-        "ReconnectionSynchronizationConflictResolutionView.entries3240",
-        "ReconnectionSynchronizationConflictResolutionView.exits1204",
-        "ReconnectionSynchronizationConflictResolutionView.overrides18",
-        "ReconnectionSynchronizationConflictResolutionView.securityEvents7"
-       ],
        "bindsTo": "ReconnectionSynchronizationConflictResolutionView",
        "operation": "listReconnectionSynchronizationConflict",
        "provenance": "pack Access Control Module_Reference.pdf, page 94 §Show"
@@ -1158,14 +1243,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "detailPanel",
        "label": "The selected reconnection synchronization conflict",
        "bindsTo": "ReconnectionSynchronizationConflictResolutionView",
-       "columns": [
-        "ReconnectionSynchronizationConflictResolutionView.pendingScans4821",
-        "ReconnectionSynchronizationConflictResolutionView.entitlementEvents682",
-        "ReconnectionSynchronizationConflictResolutionView.entries3240",
-        "ReconnectionSynchronizationConflictResolutionView.exits1204",
-        "ReconnectionSynchronizationConflictResolutionView.overrides18",
-        "ReconnectionSynchronizationConflictResolutionView.securityEvents7"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “Connectivity Restored”, “Authenticate”, “Upload Offline Transactions”, “Sequence Events”, “Reconcile Credential State”, “Reconcile Entitlements”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 94 §Show"
       }
@@ -1189,19 +1266,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    }
   ],
   "entryState": {
-   "preloaded": [
-    "ReconnectionSynchronizationConflictResolutionView.pendingScans4821",
-    "ReconnectionSynchronizationConflictResolutionView.entitlementEvents682",
-    "ReconnectionSynchronizationConflictResolutionView.entries3240",
-    "ReconnectionSynchronizationConflictResolutionView.exits1204",
-    "ReconnectionSynchronizationConflictResolutionView.overrides18",
-    "ReconnectionSynchronizationConflictResolutionView.securityEvents7"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-211"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-211",
+   "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-211"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 94. 6 of 6 labels bound to a contract property; 7 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1319,16 +1390,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "simulateOfflineResilienceTesting",
     "contract": "access",
     "purpose": "Offline Simulation & Resilience Testing",
-    "trigger": "onAction",
-    "invalidates": [
-     "simulateOfflineResilienceTesting"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-212"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-212",
+   "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-212"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 95. 0 of 0 labels bound to a contract property; 0 of 12 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1383,13 +1452,61 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from BO-204, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Offline and edge configurations are version-controlled, secured, approved, deployable and fully auditable. Board 7 — Final 10-Screen Structure # Backend Screen Main Responsibility 7.1 Offline & Edge Operations Command Center Estate-wide offline readiness 7.2 Edge Node & Local Processing Configuration Venue/device edge architecture 7.3 Offline Validation Policy Builder Determine which rules work offline 7.4 Edge Package & Data Distribution Secure local configuration packages 7.5 Offline Credential & Revocation Cache Local invalidation/security state 7.6 Offline Entitlement & Usage Ledger Track",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Govern the complete offline/edge environment.",
-  "purposeNote": "Offline and edge configurations are version-controlled, secured, approved, deployable and fully auditable. Board 7 — Final 10-Screen Structure # Backend Screen Main Responsibility 7.1 Offline & Edge Operations Command Center Estate-wide offline readiness 7.2 Edge Node & Local Processing Configuration Venue/device edge architecture 7.3 Offline Validation Policy Builder Determine which rules work offline 7.4 Edge Package & Data Distribution Secure local configuration packages 7.5 Offline Credential & Revocation Cache Local invalidation/security state 7.6 Offline Entitlement & Usage Ledger Track",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Package signatures",
+       "bindsTo": "EdgeSecurityAuditDeploymentViewSummary.packageSignatures",
+       "operation": "listEdgeSecurityDeployment",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Authorized devices",
+       "bindsTo": "EdgeSecurityAuditDeploymentViewSummary.authorizedDevices",
+       "operation": "listEdgeSecurityDeployment",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Revoked devices",
+       "bindsTo": "EdgeSecurityAuditDeploymentViewSummary.revokedDevices",
+       "operation": "listEdgeSecurityDeployment",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Failed package validation",
+       "bindsTo": "EdgeSecurityAuditDeploymentViewSummary.failedPackageValidation",
+       "operation": "listEdgeSecurityDeployment",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "unauthorized connection attempts",
+       "bindsTo": "EdgeSecurityAuditDeploymentViewSummary.unauthorizedConnectionAttempts",
+       "operation": "listEdgeSecurityDeployment",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "configuration changes",
+       "bindsTo": "EdgeSecurityAuditDeploymentViewSummary.configurationChanges",
+       "operation": "listEdgeSecurityDeployment",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -1398,13 +1515,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every edge security audit",
        "columns": [
-        "Edge certificates/credentials",
-        "EdgeSecurityAuditDeploymentView.packageSignatures",
-        "EdgeSecurityAuditDeploymentView.authorizedDevices",
-        "EdgeSecurityAuditDeploymentView.revokedDevices",
-        "EdgeSecurityAuditDeploymentView.failedPackageValidation",
-        "EdgeSecurityAuditDeploymentView.unauthorizedConnectionAttempts",
-        "EdgeSecurityAuditDeploymentView.configurationChanges"
+        "Edge certificates/credentials"
        ],
        "bindsTo": "EdgeSecurityAuditDeploymentView",
        "operation": "listEdgeSecurityDeployment",
@@ -1421,13 +1532,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected edge security audit",
        "bindsTo": "EdgeSecurityAuditDeploymentView",
        "columns": [
-        "Edge certificates/credentials",
-        "EdgeSecurityAuditDeploymentView.packageSignatures",
-        "EdgeSecurityAuditDeploymentView.authorizedDevices",
-        "EdgeSecurityAuditDeploymentView.revokedDevices",
-        "EdgeSecurityAuditDeploymentView.failedPackageValidation",
-        "EdgeSecurityAuditDeploymentView.unauthorizedConnectionAttempts",
-        "EdgeSecurityAuditDeploymentView.configurationChanges"
+        "Edge certificates/credentials"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Draft”, “Deployment Scope”, “Current Production”, “Scheduled”, “Rollback”, “FORCE ONLINE-ONLY”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 96 §Show"
@@ -1454,17 +1559,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "entryState": {
    "preloaded": [
     "Edge certificates/credentials",
-    "EdgeSecurityAuditDeploymentView.packageSignatures",
-    "EdgeSecurityAuditDeploymentView.authorizedDevices",
-    "EdgeSecurityAuditDeploymentView.revokedDevices",
-    "EdgeSecurityAuditDeploymentView.failedPackageValidation",
-    "EdgeSecurityAuditDeploymentView.unauthorizedConnectionAttempts"
+    "EdgeSecurityAuditDeploymentViewSummary.packageSignatures",
+    "EdgeSecurityAuditDeploymentViewSummary.authorizedDevices",
+    "EdgeSecurityAuditDeploymentViewSummary.revokedDevices",
+    "EdgeSecurityAuditDeploymentViewSummary.failedPackageValidation",
+    "EdgeSecurityAuditDeploymentViewSummary.unauthorizedConnectionAttempts"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-213"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-213",
+   "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-213"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 96. 6 of 7 labels bound to a contract property; 7 of 76 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1499,6 +1605,35 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "getOfflinePackage": {
+  "method": "GET",
+  "path": "/access/offline-package",
+  "contract": "access",
+  "summary": "Entitlement and rule set for offline validation",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": "validFrom",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "validTo",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "If-None-Match",
+    "in": "header",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OfflinePackage"
+ },
  "listConnectivityFailureDegraded": {
   "method": "GET",
   "path": "/connectivity-failure-degraded",
@@ -1521,9 +1656,20 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "EdgePackageDataDistributionView"
+  "responds": "Page"
  },
  "listEdgeSecurityDeployment": {
   "method": "GET",
@@ -1534,9 +1680,20 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "EdgeSecurityAuditDeploymentView"
+  "responds": "Page"
  },
  "listOfflineCredentialRevocation": {
   "method": "GET",
@@ -1560,9 +1717,20 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "OfflineEdgeOperationsCommandCenterView"
+  "responds": "Page"
  },
  "listOfflineEntitlementUsage": {
   "method": "GET",
@@ -1573,9 +1741,20 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "OfflineEntitlementUsageLedgerView"
+  "responds": "Page"
  },
  "listReconnectionSynchronizationConflict": {
   "method": "GET",
@@ -1586,9 +1765,58 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ReconnectionSynchronizationConflictResolutionView"
+  "responds": "Page"
+ },
+ "publishHardwareDeployment": {
+  "method": "POST",
+  "path": "/hardware-deployments",
+  "contract": "access",
+  "summary": "Deploy a gate configuration version",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "HardwareDeploymentInput",
+  "responds": "HardwareDeploymentView"
+ },
+ "setConnectivityThresholds": {
+  "method": "PUT",
+  "path": "/connectivity-policy",
+  "contract": "tenancy",
+  "summary": "When a workstation decides it is offline, and when it is back",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ConnectivityPolicy",
+  "responds": "ConnectivityPolicy"
  },
  "setEdgeNodeLocal": {
   "method": "PUT",
@@ -1599,7 +1827,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "EdgeNodeLocalProcessingConfigurationInput",
   "responds": "EdgeNodeLocalProcessingConfigurationView"
  },
@@ -1631,7 +1865,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "OfflineSimulationResilienceTestingInput",
   "responds": "OfflineSimulationResilienceTestingView"
  }
@@ -1650,17 +1890,101 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Connectivity Failure & Degraded Mode Policy displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "centralServicesReachable": {
+   "venueId": {
     "type": "string",
-    "description": "Central services reachable"
+    "description": "Venue"
    },
-   "someServicesUnavailable": {
-    "type": "string",
-    "description": "Some services unavailable"
+   "operatingModes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "online",
+      "degraded",
+      "edgeMode",
+      "localOffline",
+      "unsafeExpired"
+     ]
+    },
+    "description": "Operating modes a device moves through as connectivity fails"
    },
-   "onlyDeviceLocalProcessingAvailable": {
+   "centralUnavailableAfterSeconds": {
+    "type": "integer",
+    "description": "Seconds without central services before switching to edge mode"
+   },
+   "edgeUnavailableAfterSeconds": {
+    "type": "integer",
+    "description": "Seconds without the venue edge before switching to local offline"
+   },
+   "automaticSwitch": {
+    "type": "boolean",
+    "description": "Switch modes automatically without stopping guest flow"
+   },
+   "lastSyncAt": {
     "type": "string",
-    "description": "Only device-local processing available"
+    "format": "date-time",
+    "description": "Last successful synchronization"
+   }
+  },
+  "required": [
+   "venueId"
+  ]
+ },
+ "ConnectivityPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "platform.connectivity_policy",
+  "description": "Board 5 of the client's POS set, and the second of the two genuine gaps. **Nothing in the package held a threshold**, so a device that flips offline on one dropped packet and one that waits five minutes were the same product.\n**Going offline and coming back need different thresholds.** Symmetric ones produce a workstation that flaps — offline, online, offline — across a marginal connection, and each flap is a sync.\n**One per scope node, keyed on `scopePath`.** `id` is server-owned and absent where `getConnectivityPolicy` returns the defaults for a node with nothing saved.\n**The `minimum` and `maximum` on each field are proposed, client to correct (decided 28 September, audit R129).** A value outside them, or a broken cross-field rule, is refused `400` with `errors[]` naming the field.\n",
+  "required": [
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$",
+    "description": "**The node these thresholds are for, and the key `setConnectivityThresholds` upserts on.** The body names its target here, because the path does not.\n"
+   },
+   "failuresBeforeOffline": {
+    "type": "integer",
+    "default": 3,
+    "minimum": 1,
+    "maximum": 10,
+    "description": "**Consecutive, not cumulative.** One dropped request on a busy till is normal; three in a row is a network.\n"
+   },
+   "probeIntervalSeconds": {
+    "type": "integer",
+    "default": 15,
+    "minimum": 5,
+    "maximum": 300
+   },
+   "probeTimeoutMs": {
+    "type": "integer",
+    "default": 2000,
+    "minimum": 500,
+    "maximum": 30000,
+    "description": "Shorter than `probeIntervalSeconds`, or the body is refused `400` (audit R129)."
+   },
+   "successesBeforeOnline": {
+    "type": "integer",
+    "default": 5,
+    "minimum": 1,
+    "maximum": 20,
+    "description": "**Higher than the offline threshold, deliberately.** Coming back is where the cost is — a workstation that returns online and immediately fails has resynced for nothing. **Never below `failuresBeforeOffline`**, or the body is refused `400` (audit R129).\n"
+   },
+   "minimumStableSeconds": {
+    "type": "integer",
+    "default": 30,
+    "minimum": 10,
+    "maximum": 600,
+    "description": "How long the connection must hold before the workstation trusts it. **This is what stops the flapping**, and it is the field a venue with poor wifi will actually tune.\n"
+   },
+   "autoSwitch": {
+    "type": "boolean",
+    "default": true
    }
   }
  },
@@ -1670,27 +1994,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Edge Node & Local Processing Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "localProcessingAtGateLevel": {
+   "nodeType": {
     "type": "string",
-    "description": "Local processing at gate level"
-   },
-   "embeddedDeviceProcessing": {
-    "type": "string",
-    "description": "Embedded device processing"
-   },
-   "mobileOfflineProcessing": {
-    "type": "string",
-    "description": "Mobile offline processing"
+    "enum": [
+     "venueEdgeNode",
+     "gateController",
+     "turnstileLocalEngine",
+     "handheldLocalEngine"
+    ],
+    "description": "Which edge component makes local access decisions"
    },
    "edgeNodeId": {
     "type": "string",
     "description": "Edge Node ID"
    },
-   "tenant": {
+   "tenantId": {
     "type": "string",
     "description": "Tenant"
    },
-   "venue": {
+   "venueId": {
     "type": "string",
     "description": "Venue"
    },
@@ -1717,7 +2039,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "lastHeartbeat": {
     "type": "string",
     "format": "date-time",
-    "description": "last heartbeat"
+    "description": "Last heartbeat, set by the node, read only"
    },
    "softwareVersion": {
     "type": "string",
@@ -1726,12 +2048,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "securityStatus": {
     "type": "string",
     "description": "security status"
-   },
-   "failure": {
-    "type": "string",
-    "description": "failure"
    }
-  }
+  },
+  "required": [
+   "edgeNodeId",
+   "venueId",
+   "nodeType"
+  ]
  },
  "EdgeNodeLocalProcessingConfigurationView": {
   "type": "object",
@@ -1739,27 +2062,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Edge Node & Local Processing Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "localProcessingAtGateLevel": {
+   "nodeType": {
     "type": "string",
-    "description": "Local processing at gate level"
-   },
-   "embeddedDeviceProcessing": {
-    "type": "string",
-    "description": "Embedded device processing"
-   },
-   "mobileOfflineProcessing": {
-    "type": "string",
-    "description": "Mobile offline processing"
+    "enum": [
+     "venueEdgeNode",
+     "gateController",
+     "turnstileLocalEngine",
+     "handheldLocalEngine"
+    ],
+    "description": "Which edge component makes local access decisions"
    },
    "edgeNodeId": {
     "type": "string",
     "description": "Edge Node ID"
    },
-   "tenant": {
+   "tenantId": {
     "type": "string",
     "description": "Tenant"
    },
-   "venue": {
+   "venueId": {
     "type": "string",
     "description": "Venue"
    },
@@ -1786,7 +2107,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "lastHeartbeat": {
     "type": "string",
     "format": "date-time",
-    "description": "last heartbeat"
+    "description": "Last heartbeat, set by the node, read only"
    },
    "softwareVersion": {
     "type": "string",
@@ -1795,230 +2116,146 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "securityStatus": {
     "type": "string",
     "description": "security status"
-   },
-   "failure": {
+   }
+  },
+  "required": [
+   "edgeNodeId",
+   "venueId",
+   "nodeType"
+  ]
+ },
+ "HardwareDeploymentInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only (decided 29 September, VM close-out)",
+  "description": "Deploy one gate configuration version to a target set (decided 29 September, VM close-out).",
+  "required": [
+   "id",
+   "configurationVersion",
+   "targetScope",
+   "venueId"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "failure"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated deployment id"
+   },
+   "configurationVersion": {
+    "type": "string",
+    "description": "The access configuration version being deployed"
+   },
+   "targetScope": {
+    "type": "string",
+    "enum": [
+     "pilot",
+     "selectedGates",
+     "deviceGroup",
+     "venue"
+    ]
+   },
+   "venueId": {
+    "type": "string"
+   },
+   "gateIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Required for pilot and selectedGates"
+   },
+   "deviceGroupId": {
+    "type": "string",
+    "description": "Required for deviceGroup"
+   },
+   "runCompatibilityTestFirst": {
+    "type": "boolean",
+    "default": true,
+    "description": "Devices that fail the compatibility test are skipped and named in the result"
+   },
+   "scheduledAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Empty deploys now"
    }
   }
  },
- "EdgePackageDataDistributionView": {
+ "HardwareDeploymentView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Edge Package & Data Distribution displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "access.hardware_deployment",
+  "description": "**One rollout of one gate configuration version to one target set** (decided 29 September, VM close-out). The lifecycle is the one `tenancy.ProfileDeployment` uses for configuration profiles, so a partial failure is visible and retried or rolled back, never an end state.",
+  "required": [
+   "id",
+   "configurationVersion",
+   "targetScope",
+   "status"
+  ],
   "properties": {
-   "venues": {
+   "id": {
     "type": "string",
-    "description": "venues"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
-   "zones": {
+   "configurationVersion": {
+    "type": "string"
+   },
+   "targetScope": {
     "type": "string",
-    "description": "zones"
+    "enum": [
+     "pilot",
+     "selectedGates",
+     "deviceGroup",
+     "venue"
+    ]
    },
-   "gates": {
+   "venueId": {
+    "type": "string"
+   },
+   "gateIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "deviceGroupId": {
+    "type": "string"
+   },
+   "status": {
     "type": "string",
-    "description": "gates"
+    "enum": [
+     "queued",
+     "inProgress",
+     "completed",
+     "partiallyFailed",
+     "rolledBack"
+    ]
    },
-   "accessRules": {
+   "devicesTargeted": {
+    "type": "integer"
+   },
+   "devicesAcknowledged": {
+    "type": "integer"
+   },
+   "failedDeviceIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Devices that failed the compatibility test or did not acknowledge"
+   },
+   "requestedByPrincipalId": {
+    "type": "string"
+   },
+   "requestedAt": {
     "type": "string",
-    "description": "access rules"
+    "format": "date-time"
    },
-   "calendars": {
+   "scheduledAt": {
     "type": "string",
-    "description": "calendars"
+    "format": "date-time",
+    "nullable": true
    },
-   "mediaProfiles": {
+   "scopePath": {
     "type": "string",
-    "description": "media profiles"
-   },
-   "verificationProfiles": {
-    "type": "string",
-    "description": "verification profiles"
-   },
-   "entitlementDefinitions": {
-    "type": "string",
-    "description": "entitlement definitions"
-   },
-   "trustedVerificationMaterial": {
-    "type": "string",
-    "description": "trusted verification material"
-   },
-   "revocationInformation": {
-    "type": "string",
-    "description": "revocation information"
-   },
-   "credentialSecurityParameters": {
-    "type": "string",
-    "description": "credential security parameters"
-   },
-   "reasonCodes": {
-    "type": "string",
-    "description": "reason codes"
-   },
-   "gateResponses": {
-    "type": "string",
-    "description": "gate responses"
-   },
-   "languages": {
-    "type": "string",
-    "description": "languages"
-   },
-   "operatorPermissions": {
-    "type": "string",
-    "description": "operator permissions"
-   },
-   "version": {
-    "type": "string",
-    "description": "Version (the pack shows 24.6, 89 | Pag e)"
-   },
-   "devices": {
-    "type": "integer",
-    "description": "Devices (the pack shows 84)"
-   },
-   "signatureValid": {
-    "type": "string",
-    "description": "✓ Signature valid"
-   },
-   "packageComplete": {
-    "type": "string",
-    "description": "✓ Package complete"
-   },
-   "versionValid": {
-    "type": "string",
-    "description": "✓ Version valid"
-   },
-   "deviceAuthorized": {
-    "type": "string",
-    "description": "✓ Device authorized"
-   }
-  }
- },
- "EdgeSecurityAuditDeploymentView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Edge Security, Audit & Deployment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "edgeCertificates": {
-    "type": "integer",
-    "description": "Edge certificates"
-   },
-   "edgeCredentials": {
-    "type": "integer",
-    "description": "Edge credentials"
-   },
-   "packageSignatures": {
-    "type": "integer",
-    "description": "Package signatures"
-   },
-   "authorizedDevices": {
-    "type": "integer",
-    "description": "Authorized devices"
-   },
-   "revokedDevices": {
-    "type": "integer",
-    "description": "Revoked devices"
-   },
-   "failedPackageValidation": {
-    "type": "integer",
-    "description": "Failed package validation"
-   },
-   "unauthorizedConnectionAttempts": {
-    "type": "integer",
-    "description": "unauthorized connection attempts"
-   },
-   "configurationChanges": {
-    "type": "integer",
-    "description": "configuration changes"
-   },
-   "offlineOverrideActivity": {
-    "type": "integer",
-    "description": "offline override activity"
-   },
-   "tenant": {
-    "type": "string",
-    "description": "Tenant"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "park": {
-    "type": "string",
-    "description": "Park"
-   },
-   "edgeCluster": {
-    "type": "string",
-    "description": "Edge Cluster"
-   },
-   "gateGroup": {
-    "type": "string",
-    "description": "Gate Group"
-   },
-   "deviceGroup": {
-    "type": "string",
-    "description": "Device Group"
-   },
-   "individualDevice": {
-    "type": "string",
-    "description": "Individual Device"
-   },
-   "v47": {
-    "type": "string",
-    "description": "V4.7"
-   },
-   "v48Tonight0200": {
-    "type": "string",
-    "description": "V4.8 — Tonight 02:00"
-   },
-   "rollbackToV47": {
-    "type": "string",
-    "description": "ROLLBACK TO V4.7"
-   },
-   "offlineRules": {
-    "type": "integer",
-    "description": "Offline rules"
-   },
-   "deviceConfiguration": {
-    "type": "string",
-    "description": "Device configuration"
-   },
-   "securityPolicy": {
-    "type": "string",
-    "description": "Security policy"
-   },
-   "edgePackageDefinitions": {
-    "type": "string",
-    "description": "edge package definitions"
-   },
-   "whereOperationallyAppropriate": {
-    "type": "string",
-    "description": "where operationally appropriate"
-   },
-   "theCloudGoesDown": {
-    "type": "string",
-    "description": "the cloud goes down"
-   },
-   "venueEdgeActive": {
-    "type": "string",
-    "description": "VENUE EDGE — ACTIVE ✓"
-   },
-   "venueExecutives": {
-    "type": "string",
-    "description": "venue executives"
-   },
-   "processesOnSpecialDates": {
-    "type": "string",
-    "description": "processes on special dates"
-   },
-   "definesTheUnderlyingRules": {
-    "type": "string",
-    "description": "defines the underlying rules"
-   },
-   "thisTicketAllows3Entries": {
-    "type": "string",
-    "description": "\"This ticket allows 3 entries.\""
+    "description": "The partition key (ADR-0005). Written at venue scope"
    }
   }
  },
@@ -2028,209 +2265,263 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Offline Credential & Revocation Cache displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "fraudLock": {
+   "venueId": {
     "type": "string",
-    "description": "Fraud Lock"
+    "description": "Venue"
    },
-   "cancellation": {
+   "triggerEvents": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "fraudLock",
+      "refund",
+      "cancellation",
+      "lostCredential",
+      "transfer",
+      "reissue",
+      "manualInvalidation"
+     ]
+    },
+    "description": "Events that push an invalidation into the offline cache"
+   },
+   "stalenessAction": {
     "type": "string",
-    "description": "Cancellation"
+    "enum": [
+     "continue",
+     "continueWithWarning",
+     "restrictedProductsOnly",
+     "supervisorMode",
+     "denySelectedCredentialClasses",
+     "failClosed"
+    ],
+    "description": "What devices do when the cache is older than the maximum allowed age"
    },
-   "lostCredential": {
-    "type": "string",
-    "description": "Lost Credential"
-   },
-   "manualInvalidation": {
-    "type": "string",
-    "description": "Manual Invalidation"
-   },
-   "canTrigger": {
-    "type": "boolean",
-    "description": "can trigger"
-   },
-   "continue": {
-    "type": "string",
-    "description": "Continue"
-   },
-   "continueWithWarning": {
-    "type": "string",
-    "description": "Continue with warning"
-   },
-   "restrictedProductsOnly": {
-    "type": "string",
-    "description": "Restricted products only"
-   },
-   "supervisorMode": {
-    "type": "string",
-    "description": "Supervisor mode"
-   },
-   "denySelectedCredentialClasses": {
-    "type": "string",
-    "description": "Deny selected credential classes"
-   },
-   "failClosed": {
-    "type": "integer",
-    "description": "Fail closed"
-   }
-  }
- },
- "OfflineEdgeOperationsCommandCenterView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Offline & Edge Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "offlineReadyDevices": {
-    "type": "integer",
-    "description": "Offline-Ready Devices"
-   },
-   "currentlyOnline": {
-    "type": "integer",
-    "description": "Currently Online"
-   },
-   "currentlyOffline": {
-    "type": "integer",
-    "description": "Currently Offline"
-   },
-   "devicesInDegradedMode": {
-    "type": "string",
-    "description": "Devices in Degraded Mode"
-   },
-   "edgeNodesOnline": {
-    "type": "integer",
-    "description": "Edge Nodes Online"
-   },
-   "packagesCurrent": {
-    "type": "string",
-    "description": "Packages Current"
-   },
-   "packagesExpiring": {
-    "type": "string",
-    "description": "Packages Expiring"
-   },
-   "pendingOfflineTransactions": {
-    "type": "integer",
-    "description": "Pending Offline Transactions"
-   },
-   "offlineSecurityAlerts": {
-    "type": "integer",
-    "description": "Offline Security Alerts"
-   },
-   "rulesCached": {
-    "type": "string",
-    "description": "✓ Rules cached"
-   },
-   "verificationMaterialCurrent": {
-    "type": "string",
-    "description": "✓ Verification material current"
-   },
-   "revocationDataCurrent": {
-    "type": "string",
-    "description": "✓ Revocation data current"
-   },
-   "credentialDefinitionsAvailable": {
-    "type": "string",
-    "description": "✓ Credential definitions available"
-   },
-   "deviceStorageHealthy": {
-    "type": "string",
-    "description": "✓ Device storage healthy"
-   },
-   "lastSynchronizationSuccessful": {
-    "type": "string",
-    "description": "✓ Last synchronization successful"
-   }
-  }
- },
- "OfflineEntitlementUsageLedgerView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Offline Entitlement & Usage Ledger displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "fastPassRemaining3": {
-    "type": "string",
-    "description": "Fast Pass Remaining: 3"
-   },
-   "rideA1": {
-    "type": "string",
-    "description": "Ride A → -1"
-   },
-   "rideB1": {
-    "type": "string",
-    "description": "Ride B → -1"
-   },
-   "credential": {
-    "type": "string",
-    "description": "Credential"
-   },
-   "device": {
-    "type": "string",
-    "description": "Device"
-   },
-   "gate": {
-    "type": "string",
-    "description": "Gate"
-   },
-   "entitlement": {
-    "type": "string",
-    "description": "Entitlement"
-   },
-   "quantity": {
-    "type": "integer",
-    "description": "Quantity"
-   },
-   "timestamp": {
+   "lastUpdated": {
     "type": "string",
     "format": "date-time",
-    "description": "Timestamp"
+    "description": "When the cache was last refreshed"
    },
-   "localSequence": {
-    "type": "string",
-    "description": "local sequence"
-   },
-   "operator": {
-    "type": "string",
-    "description": "operator"
-   },
-   "decision": {
-    "type": "string",
-    "description": "decision"
-   },
-   "packageVersion": {
-    "type": "string",
-    "description": "package version"
-   },
-   "shareCurrentUsageState": {
-    "type": "number",
-    "description": "share current usage state"
-   },
-   "offlineAllowedMaximum1": {
+   "ageSeconds": {
     "type": "integer",
-    "description": "Offline Allowed — Maximum 1"
+    "description": "Current cache age"
+   },
+   "maxAllowedAgeMinutes": {
+    "type": "integer",
+    "description": "Maximum allowed cache age"
+   }
+  },
+  "required": [
+   "venueId"
+  ]
+ },
+ "OfflinePackage": {
+  "x-ticvai-persistence": "none — generated artefact in object storage",
+  "type": "object",
+  "required": [
+   "etag",
+   "generatedAt",
+   "validFrom",
+   "validTo",
+   "accessPointId",
+   "entitlements"
+  ],
+  "properties": {
+   "etag": {
+    "type": "string"
+   },
+   "generatedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "entitlements": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "ticketId",
+      "mediaCodes",
+      "validFrom",
+      "validTo",
+      "entriesAllowed",
+      "reentryAllowed"
+     ],
+     "properties": {
+      "ticketId": {
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "description": "The `Entitlement.id`."
+      },
+      "mediaCodes": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       },
+       "description": "A ticket may carry several media over its life."
+      },
+      "validFrom": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "validTo": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "performanceId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "entriesAllowed": {
+       "type": "integer",
+       "nullable": true
+      },
+      "entriesUsed": {
+       "type": "integer"
+      },
+      "reentryAllowed": {
+       "type": "boolean"
+      },
+      "admissionRulesId": {
+       "type": "string",
+       "format": "uuid"
+      }
+     }
+    }
+   },
+   "delegatedRights": {
+    "type": "array",
+    "description": "Redemption rights issued by other cells and valid at this access point. Included in the package so a cross-region entitlement still admits when the inter-cell link is down — the same reason locally issued entitlements are included.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "rightId",
+      "ticketId",
+      "issuingCellId",
+      "validFrom",
+      "validTo",
+      "entriesAllowed",
+      "entriesConsumed"
+     ],
+     "properties": {
+      "rightId": {
+       "type": "string"
+      },
+      "ticketId": {
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "description": "The `Entitlement.id` in the issuing cell."
+      },
+      "issuingCellId": {
+       "type": "string"
+      },
+      "guestLinkId": {
+       "type": "string",
+       "nullable": true
+      },
+      "mediaCodes": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "validFrom": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "validTo": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "entriesAllowed": {
+       "type": "integer",
+       "nullable": true
+      },
+      "entriesConsumed": {
+       "type": "integer"
+      },
+      "admissionRulesId": {
+       "type": "string",
+       "format": "uuid"
+      }
+     }
+    }
+   },
+   "blacklist": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Media codes to deny outright regardless of entitlement state."
+   },
+   "admissionRules": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "id",
+      "openMinutesBefore",
+      "closeMinutesAfter"
+     ],
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "openMinutesBefore": {
+       "type": "integer"
+      },
+      "closeMinutesAfter": {
+       "type": "integer"
+      },
+      "maxDurationMinutes": {
+       "type": "integer",
+       "nullable": true
+      },
+      "requiresExitBeforeReentry": {
+       "type": "boolean"
+      }
+     }
+    }
    }
   }
  },
  "OfflinePolicy": {
   "type": "object",
   "x-ticvai-persistence": "platform.offline_policy",
-  "description": "Board 5 of the client's POS set. **ADR-0013 makes the POS local-first and nothing configured the policy** — one of only two things in 36 board screens the package genuinely could not do.\nCF-115 reframed offline into three data classes: catalogue and policy always local, contended inventory leased, transactional facts journalled. **This is where a venue says how far that goes for them.**\n",
+  "description": "Board 5 of the client's POS set. **ADR-0013 makes the POS local-first and nothing configured the policy** — one of only two things in 36 board screens the package genuinely could not do.\nCF-115 reframed offline into three data classes: catalogue and policy always local, contended inventory leased, transactional facts journalled. **This is where a venue says how far that goes for them.**\n**One per scope node, keyed on `scopePath`** (pull audit R162). `id` is server-owned and absent where `getOfflinePolicy` returns the defaults for a node with nothing saved.\n**The `minimum` and `maximum` on each field are proposed, client to correct (decided 28 September, audit R129).** A value outside them is refused `400`, `errors[]` naming the field.\n",
   "required": [
-   "id",
    "scopePath"
   ],
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "scopePath": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$",
+    "description": "**The node this policy is for, and the key `setOfflinePolicy` upserts on.** The body names its target here, because the path does not.\n"
    },
    "maxOfflineHours": {
     "type": "integer",
     "default": 24,
-    "description": "**After which the workstation refuses to sell rather than keep journalling.** A till three days offline holding 900 unsynced sales is a reconciliation nobody can do and a fraud nobody can detect.\n"
+    "minimum": 1,
+    "maximum": 72,
+    "description": "**After which the workstation refuses to sell rather than keep journalling.** A till three days offline holding 900 unsynced sales is a reconciliation nobody can do and a fraud nobody can detect. Bounds 1 to 72 hours: proposed, client to correct (audit R129).\n"
    },
    "allowedOffline": {
     "type": "array",
@@ -2254,12 +2545,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     }
    },
    "offlineValueCeiling": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Above zero, and in the currency of the venue the policy resolves to; a ceiling in another currency is refused `400` (decided 28 September, audit R129).\n"
    },
    "offlineTransactionCeiling": {
     "type": "integer",
     "nullable": true,
-    "description": "**A ceiling on count as well as value.** Nine hundred small sales and one large one are different risks, and a value ceiling alone catches only the second.\n"
+    "minimum": 1,
+    "maximum": 5000,
+    "description": "**A ceiling on count as well as value.** Nine hundred small sales and one large one are different risks, and a value ceiling alone catches only the second. Bounds 1 to 5,000: proposed, client to correct (audit R129).\n"
    },
    "onCeilingBreach": {
     "type": "string",
@@ -2282,36 +2580,68 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Offline Simulation & Resilience Testing submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "dynamicQrVerifiedLocally": {
+   "scenario": {
     "type": "string",
+    "enum": [
+     "centralOutage",
+     "edgeOutage",
+     "fullOffline"
+    ],
+    "description": "Outage scenario to simulate"
+   },
+   "venueId": {
+    "type": "string",
+    "description": "Venue under test"
+   },
+   "dynamicQrVerifiedLocally": {
+    "type": "boolean",
     "description": "✓ Dynamic QR verified locally"
    },
    "ticketDateVerified": {
-    "type": "string",
-    "format": "date-time",
+    "type": "boolean",
     "description": "✓ Ticket date verified"
    },
    "entryEntitlementVerified": {
-    "type": "string",
+    "type": "boolean",
     "description": "✓ Entry entitlement verified"
    },
    "antiPassbackEnforced": {
-    "type": "string",
+    "type": "boolean",
     "description": "✓ Anti-passback enforced"
    },
    "gateOpens": {
-    "type": "string",
+    "type": "boolean",
     "description": "✓ Gate opens"
    },
    "attendanceStoredLocally": {
-    "type": "integer",
+    "type": "boolean",
     "description": "✓ Attendance stored locally"
    },
    "transactionQueued": {
-    "type": "string",
+    "type": "boolean",
     "description": "✓ Transaction queued"
+   },
+   "validationCount": {
+    "type": "integer",
+    "description": "Number of simulated validations"
+   },
+   "switchedToEdgeMode": {
+    "type": "boolean",
+    "description": "Gate switched to edge mode"
+   },
+   "result": {
+    "type": "string",
+    "enum": [
+     "passed",
+     "failed"
+    ],
+    "description": "Offline readiness result, read only"
    }
-  }
+  },
+  "required": [
+   "venueId",
+   "scenario"
+  ]
  },
  "OfflineSimulationResilienceTestingView": {
   "type": "object",
@@ -2319,94 +2649,85 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Offline Simulation & Resilience Testing displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "dynamicQrVerifiedLocally": {
+   "scenario": {
     "type": "string",
+    "enum": [
+     "centralOutage",
+     "edgeOutage",
+     "fullOffline"
+    ],
+    "description": "Outage scenario to simulate"
+   },
+   "venueId": {
+    "type": "string",
+    "description": "Venue under test"
+   },
+   "dynamicQrVerifiedLocally": {
+    "type": "boolean",
     "description": "✓ Dynamic QR verified locally"
    },
    "ticketDateVerified": {
-    "type": "string",
-    "format": "date-time",
+    "type": "boolean",
     "description": "✓ Ticket date verified"
    },
    "entryEntitlementVerified": {
-    "type": "string",
+    "type": "boolean",
     "description": "✓ Entry entitlement verified"
    },
    "antiPassbackEnforced": {
-    "type": "string",
+    "type": "boolean",
     "description": "✓ Anti-passback enforced"
    },
    "gateOpens": {
-    "type": "string",
+    "type": "boolean",
     "description": "✓ Gate opens"
    },
    "attendanceStoredLocally": {
-    "type": "integer",
+    "type": "boolean",
     "description": "✓ Attendance stored locally"
    },
    "transactionQueued": {
-    "type": "string",
-    "description": "✓ Transaction queued"
-   }
-  }
- },
- "ReconnectionSynchronizationConflictResolutionView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Reconnection, Synchronization & Conflict Resolution displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "returnOnline": {
-    "type": "integer",
-    "description": "Return Online"
-   },
-   "pendingScans4821": {
-    "type": "integer",
-    "description": "Pending Scans: 4,821"
-   },
-   "entitlementEvents682": {
-    "type": "string",
-    "description": "Entitlement Events: 682"
-   },
-   "entries3240": {
-    "type": "string",
-    "description": "Entries: 3,240"
-   },
-   "exits1204": {
-    "type": "string",
-    "description": "Exits: 1,204"
-   },
-   "overrides18": {
-    "type": "string",
-    "description": "Overrides: 18"
-   },
-   "securityEvents7": {
-    "type": "string",
-    "description": "Security Events: 7"
-   },
-   "centralRemainingBalanceBeforeOutage": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Central remaining balance before outage (the pack shows 1)"
-   },
-   "preserveBothFlag": {
     "type": "boolean",
-    "description": "Preserve both + flag"
+    "description": "✓ Transaction queued"
    },
-   "earliestTransactionWins": {
-    "type": "string",
-    "description": "earliest transaction wins"
+   "validationCount": {
+    "type": "integer",
+    "description": "Number of simulated validations"
    },
-   "configuredBusinessRule": {
-    "type": "string",
-    "description": "configured business rule"
+   "switchedToEdgeMode": {
+    "type": "boolean",
+    "description": "Gate switched to edge mode"
    },
-   "supervisorReview": {
+   "result": {
     "type": "string",
-    "description": "supervisor review"
+    "enum": [
+     "passed",
+     "failed"
+    ],
+    "description": "Offline readiness result, read only"
+   }
+  },
+  "required": [
+   "venueId",
+   "scenario"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
    },
-   "securityInvestigation": {
-    "type": "string",
-    "description": "security investigation"
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
    }
   }
  }

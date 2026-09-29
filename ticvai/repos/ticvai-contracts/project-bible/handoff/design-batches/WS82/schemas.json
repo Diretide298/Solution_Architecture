@@ -1,1 +1,1014 @@
-{}
+{
+ "DynamicPriceRuleDetail": {
+  "type": "object",
+  "x-ticvai-persistence": "none — composed from a rule, its conditions and its actions",
+  "description": "**A rule is unreadable without both halves.** The conditions say when it fires, the actions say what it does to the price, and `minPrice`/`maxPrice` on the action are the guard rails a reviewer looks for first.\n",
+  "required": [
+   "rule"
+  ],
+  "properties": {
+   "rule": {
+    "$ref": "#/components/schemas/PricingDynamicPriceRule"
+   },
+   "conditions": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/PricingDynamicPriceCondition"
+    }
+   },
+   "actions": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/PricingDynamicPriceAction"
+    }
+   }
+  }
+ },
+ "GamePriceResolution": {
+  "type": "object",
+  "description": "Board 5.9. **What will this actually charge.**",
+  "properties": {
+   "gameId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "effectivePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "appliedRule": {
+    "type": "string"
+   },
+   "trace": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "rule": {
+       "type": "string"
+      },
+      "applied": {
+       "type": "boolean"
+      },
+      "price": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "skippedBecause": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "GamePricing": {
+  "type": "object",
+  "x-ticvai-persistence": "games.pricing",
+  "description": "Board 5. **Priority is explicit**, because evaluation order is not a decision anybody made.\n`groupPricing`, `peakPricing` and `calendarExceptions` are stored one row per entry in `games.pricing_exception` (`GamePricingException`); the rest of this shape is `games.pricing`.\n",
+  "properties": {
+   "gameId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "standardPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "vipPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "groupPricing": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "minimumPlayers": {
+       "type": "integer"
+      },
+      "pricePerPlayer": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "peakPricing": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "daysOfWeek": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "from": {
+       "type": "string"
+      },
+      "to": {
+       "type": "string"
+      },
+      "price": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "calendarExceptions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "date": {
+       "type": "string",
+       "format": "date"
+      },
+      "price": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "closed": {
+       "type": "boolean",
+       "default": false
+      }
+     }
+    }
+   },
+   "retryPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "retryWindowSeconds": {
+    "type": "integer",
+    "nullable": true
+   },
+   "priority": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "calendarException",
+      "peak",
+      "group",
+      "vip",
+      "retry",
+      "standard"
+     ]
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PricingDynamicPriceAction": {
+  "type": "object",
+  "x-ticvai-persistence": "pricing.dynamic_price_action",
+  "description": "**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price action.",
+  "required": [
+   "dynamicPriceRuleId",
+   "type",
+   "value"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "dynamicPriceRuleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "type": {
+    "type": "string",
+    "maxLength": 30
+   },
+   "value": {
+    "type": "number"
+   },
+   "minPrice": {
+    "type": "number",
+    "nullable": true
+   },
+   "maxPrice": {
+    "type": "number",
+    "nullable": true
+   }
+  }
+ },
+ "PricingDynamicPriceCondition": {
+  "type": "object",
+  "x-ticvai-persistence": "pricing.dynamic_price_condition",
+  "description": "**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price rule condition.",
+  "required": [
+   "actionId",
+   "dynamicPriceRuleId",
+   "type",
+   "ruleOperator",
+   "valueJson",
+   "sequenceNo"
+  ],
+  "properties": {
+   "actionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "dynamicPriceRuleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "type": {
+    "type": "string",
+    "maxLength": 50
+   },
+   "ruleOperator": {
+    "type": "string",
+    "maxLength": 20
+   },
+   "valueJson": {
+    "type": "string"
+   },
+   "sequenceNo": {
+    "type": "integer"
+   }
+  }
+ },
+ "PricingDynamicPriceRule": {
+  "type": "object",
+  "x-ticvai-persistence": "pricing.dynamic_price_rule",
+  "description": "**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price rule.",
+  "required": [
+   "pricingRuleCode",
+   "name",
+   "priority",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "pricingRuleCode": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "priceListId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "nullable": true
+   },
+   "channelId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "priority": {
+    "type": "integer"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PricingPublicationEffectiveDateSchedulerInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Pricing Publication & Effective-Date Scheduler submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "version": {
+    "type": "string",
+    "description": "Approved pricing version to publish"
+   },
+   "publicationDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Publish configuration at (empty for immediate)",
+    "nullable": true
+   },
+   "effectiveDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Sales effective from; must not be in the past (never retroactive)"
+   },
+   "expiryDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry; empty for open-ended",
+    "nullable": true
+   },
+   "venue": {
+    "type": "string",
+    "description": "Scope: venue; empty for all venues in the version",
+    "nullable": true
+   },
+   "market": {
+    "type": "string",
+    "description": "Scope: market; empty for all",
+    "nullable": true
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+     }
+    ],
+    "nullable": true,
+    "description": "Scope: channel; empty for all"
+   },
+   "changeRequestId": {
+    "type": "string",
+    "description": "Change request being published"
+   },
+   "publicationMode": {
+    "type": "string",
+    "enum": [
+     "immediate",
+     "scheduled",
+     "futureEffectiveDate",
+     "staged"
+    ],
+    "description": "Publication Mode (pack p.66)"
+   },
+   "visitEffectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Visit dates from which the new prices apply, when different from the sales effective date",
+    "nullable": true
+   },
+   "stages": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "dimension": {
+       "type": "string",
+       "enum": [
+        "market",
+        "venue",
+        "channel"
+       ],
+       "description": "Staged by"
+      },
+      "target": {
+       "type": "string",
+       "description": "Market, venue or channel ID"
+      },
+      "publicationDate": {
+       "type": "string",
+       "format": "date-time",
+       "description": "Publish at"
+      },
+      "effectiveDate": {
+       "type": "string",
+       "format": "date-time",
+       "description": "Effective from"
+      }
+     },
+     "description": "One stage"
+    },
+    "description": "Stages for staged publication (market-by-market, venue-by-venue, channel-by-channel)"
+   },
+   "cancel": {
+    "type": "boolean",
+    "description": "True cancels this scheduled publication; allowed only before activation"
+   }
+  }
+ },
+ "PricingPublicationEffectiveDateSchedulerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Pricing Publication & Effective-Date Scheduler displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "publicationDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Publish configuration at (empty for immediate)",
+    "nullable": true
+   },
+   "effectiveDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Sales effective from; must not be in the past (never retroactive)"
+   },
+   "expiryDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry; empty for open-ended",
+    "nullable": true
+   },
+   "venue": {
+    "type": "string",
+    "description": "Scope: venue; empty for all venues in the version",
+    "nullable": true
+   },
+   "market": {
+    "type": "string",
+    "description": "Scope: market; empty for all",
+    "nullable": true
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+     }
+    ],
+    "nullable": true,
+    "description": "Scope: channel; empty for all"
+   },
+   "version": {
+    "type": "string",
+    "description": "Approved pricing version to publish"
+   },
+   "changeRequestId": {
+    "type": "string",
+    "description": "Change request being published"
+   },
+   "publicationMode": {
+    "type": "string",
+    "enum": [
+     "immediate",
+     "scheduled",
+     "futureEffectiveDate",
+     "staged"
+    ],
+    "description": "Publication Mode (pack p.66)"
+   },
+   "visitEffectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Visit dates from which the new prices apply, when different from the sales effective date",
+    "nullable": true
+   },
+   "stages": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "dimension": {
+       "type": "string",
+       "enum": [
+        "market",
+        "venue",
+        "channel"
+       ],
+       "description": "Staged by"
+      },
+      "target": {
+       "type": "string",
+       "description": "Market, venue or channel ID"
+      },
+      "publicationDate": {
+       "type": "string",
+       "format": "date-time",
+       "description": "Publish at"
+      },
+      "effectiveDate": {
+       "type": "string",
+       "format": "date-time",
+       "description": "Effective from"
+      }
+     },
+     "description": "One stage"
+    },
+    "description": "Stages for staged publication (market-by-market, venue-by-venue, channel-by-channel)"
+   },
+   "cancel": {
+    "type": "boolean",
+    "description": "True cancels this scheduled publication; allowed only before activation"
+   },
+   "prePublicationChecks": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "check": {
+       "type": "string",
+       "enum": [
+        "approvalComplete",
+        "validationPassed",
+        "noCriticalConflicts",
+        "dependenciesAvailable",
+        "channelsReady",
+        "effectiveDatesValid"
+       ],
+       "description": "Pre-Publication Check (pack p.67)"
+      },
+      "passed": {
+       "type": "boolean",
+       "description": "Passed"
+      },
+      "message": {
+       "type": "string",
+       "description": "Detail, e.g. the colliding version",
+       "nullable": true
+      }
+     },
+     "description": "One check"
+    },
+    "description": "Pre-publication check results"
+   },
+   "collisions": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Other versions scheduled to become effective for the same object and date"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: scheduled, blocked, published, cancelled or failed"
+   }
+  }
+ },
+ "RulePriorityConflictInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; the saved hierarchy and test cases are the rows listRulePriorityConflict reads",
+  "description": "What `setRulePriorityConflict` takes (decided 29 September, readiness close-out; VM close-out for BO-441 Reorder, Validate, Test, Save).",
+  "required": [
+   "mode"
+  ],
+  "properties": {
+   "orderedRuleIds": {
+    "type": "array",
+    "description": "The rules in priority order, highest first. Reorder is this list.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "resolutionMethod": {
+    "type": "string",
+    "enum": [
+     "highestPriorityWins",
+     "mostSpecificRuleWins",
+     "cumulativeAdjustment",
+     "maximumAdjustmentWins",
+     "minimumAdjustmentWins",
+     "weightedCombination",
+     "stopProcessing",
+     "customGovernedResolution"
+    ],
+    "default": "highestPriorityWins",
+    "description": "How two applicable rules are resolved; the same vocabulary as `RulePriorityConflictResolutionDynamicPricingTestConsSummary.resolutionMethod`. Never lowest-price-wins by default (decided 29 September, readiness close-out)."
+   },
+   "priorityHierarchy": {
+    "type": "array",
+    "description": "The priority matrix, highest first; defaults to the pack's order.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "commercialProtection",
+      "contractMemberProtection",
+      "eventSpecificStrategy",
+      "inventoryOccupancy",
+      "bookingVelocity",
+      "timeToEvent",
+      "seasonDayTimeslot",
+      "basePrice"
+     ]
+    }
+   },
+   "mode": {
+    "type": "string",
+    "enum": [
+     "save",
+     "validate",
+     "test"
+    ],
+    "description": "`validate` checks the order and returns conflicts without saving; `test` runs `testScenario` against the order and saves it as a test case; `save` stores the order and method, refused with `409` while a critical conflict is open."
+   },
+   "testScenario": {
+    "$ref": "#/components/schemas/RulePriorityTestScenario"
+   }
+  }
+ },
+ "RulePriorityConflictResolutionDynamicPricingTestConsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Rule Priority, Conflict Resolution & Dynamic Pricing Test Console displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "product": {
+    "type": "string",
+    "description": "Test input: product"
+   },
+   "event": {
+    "type": "string",
+    "description": "Test input: event",
+    "nullable": true
+   },
+   "performance": {
+    "type": "string",
+    "description": "Test input: performance",
+    "nullable": true
+   },
+   "date": {
+    "type": "string",
+    "format": "date",
+    "description": "Test input: visit/event date"
+   },
+   "timeslot": {
+    "type": "string",
+    "description": "Test input: timeslot",
+    "nullable": true
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+     }
+    ],
+    "description": "Test input: channel"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Test input: customer segment"
+   },
+   "basePrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Test input: base price"
+   },
+   "occupancy": {
+    "type": "number",
+    "description": "Test input: occupancy percent"
+   },
+   "inventory": {
+    "type": "integer",
+    "description": "Test input: remaining inventory"
+   },
+   "bookingVelocity": {
+    "type": "number",
+    "description": "Test input: booking velocity, percent against expected pace"
+   },
+   "timeToEvent": {
+    "type": "integer",
+    "description": "Test input: days to event (0 = same day)"
+   },
+   "calculationPath": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Explainability: the complete calculation path, one step per line"
+   },
+   "testCaseId": {
+    "type": "string",
+    "description": "Test case ID"
+   },
+   "caseName": {
+    "type": "string",
+    "description": "Test case name"
+   },
+   "caseType": {
+    "type": "string",
+    "enum": [
+     "lowDemand",
+     "highDemand",
+     "nearSellOut",
+     "earlyBird",
+     "lastMinute",
+     "weekendPeak",
+     "memberPurchase",
+     "b2bContract",
+     "custom"
+    ],
+    "description": "Test case type (pack p.91)"
+   },
+   "rulesMatched": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "ruleId": {
+       "type": "string",
+       "description": "Rule"
+      },
+      "ruleName": {
+       "type": "string",
+       "description": "Rule name"
+      },
+      "priorityLevel": {
+       "type": "string",
+       "enum": [
+        "commercialProtection",
+        "contractMemberProtection",
+        "eventSpecificStrategy",
+        "inventoryOccupancy",
+        "bookingVelocity",
+        "timeToEvent",
+        "seasonDayTimeslot",
+        "basePrice"
+       ],
+       "description": "Hierarchy level"
+      },
+      "adjustmentPercent": {
+       "type": "number",
+       "description": "Adjustment in percent",
+       "nullable": true
+      },
+      "applied": {
+       "type": "boolean",
+       "description": "Applied after resolution"
+      }
+     },
+     "description": "One matched rule"
+    },
+    "description": "Rules matched"
+   },
+   "rawCalculatedPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Raw calculated price"
+   },
+   "ladderPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Nearest allowed band"
+   },
+   "guardrailOutcome": {
+    "type": "string",
+    "enum": [
+     "passed",
+     "cappedAtMaximum",
+     "raisedToMinimum",
+     "protectedRateApplied"
+    ],
+    "description": "Guardrail result"
+   },
+   "finalPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Final dynamic price"
+   },
+   "conflicts": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "contradictoryRules",
+        "samePriority",
+        "impossibleCondition",
+        "overlappingStrategy",
+        "circularDependency",
+        "missingFallback",
+        "guardrailConflict"
+       ],
+       "description": "Conflict type (pack p.90)"
+      },
+      "message": {
+       "type": "string",
+       "description": "Message"
+      },
+      "ruleIds": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       },
+       "description": "Rules involved"
+      }
+     },
+     "description": "One conflict"
+    },
+    "description": "Conflicts met while resolving this case"
+   },
+   "lastRunAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last run"
+   },
+   "passed": {
+    "type": "boolean",
+    "description": "Final price matched the expected price saved with the case",
+    "nullable": true
+   },
+   "expectedPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Expected final price for regression",
+    "nullable": true
+   }
+  }
+ },
+ "RulePriorityConflictView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over the saved priority order and test cases",
+  "description": "What `setRulePriorityConflict` returns: the order in force, the conflicts it has and, in `test` mode, the result.",
+  "properties": {
+   "mode": {
+    "type": "string",
+    "enum": [
+     "save",
+     "validate",
+     "test"
+    ]
+   },
+   "saved": {
+    "type": "boolean"
+   },
+   "orderedRuleIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "resolutionMethod": {
+    "type": "string"
+   },
+   "priorityHierarchy": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "conflicts": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "contradictoryRules",
+        "samePriority",
+        "impossibleCondition",
+        "overlappingStrategy",
+        "circularDependency",
+        "missingFallback",
+        "guardrailConflict"
+       ]
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "critical",
+        "warning"
+       ]
+      },
+      "ruleIds": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "testResult": {
+    "nullable": true,
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/RulePriorityConflictResolutionDynamicPricingTestConsView"
+     }
+    ],
+    "description": "The saved test case with its deterministic result, in `test` mode."
+   },
+   "savedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "RulePriorityTestScenario": {
+  "type": "object",
+  "description": "A sample booking for the conflict test console (pack p.90), the same inputs as a saved test case.",
+  "properties": {
+   "caseName": {
+    "type": "string",
+    "maxLength": 120
+   },
+   "caseType": {
+    "type": "string",
+    "enum": [
+     "lowDemand",
+     "highDemand",
+     "nearSellOut",
+     "earlyBird",
+     "lastMinute",
+     "weekendPeak",
+     "memberPurchase",
+     "b2bContract",
+     "custom"
+    ]
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "date": {
+    "type": "string",
+    "format": "date"
+   },
+   "timeslot": {
+    "type": "string",
+    "nullable": true
+   },
+   "channel": {
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+   },
+   "customerSegment": {
+    "type": "string",
+    "nullable": true
+   },
+   "basePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "occupancy": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100
+   },
+   "inventory": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "bookingVelocity": {
+    "type": "number"
+   },
+   "timeToEvent": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "expectedPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   }
+  }
+ }
+}

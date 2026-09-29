@@ -40,7 +40,7 @@ import os
 import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SRC = os.path.join(ROOT, "docs", "reports", "build-readiness-28-september.md")  # the latest; earlier reports stay as written
+SRC = os.path.join(ROOT, "docs", "reports", "build-readiness-29-september.md")  # the latest; earlier reports stay as written
 REPORT = os.path.join(ROOT, "handoff", "package-report.json")
 OUT = os.path.join(ROOT, "handoff", "Build Readiness.html")
 

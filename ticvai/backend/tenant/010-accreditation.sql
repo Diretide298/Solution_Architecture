@@ -1,4 +1,4 @@
--- accreditation — 13 tables
+-- accreditation — 14 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -135,6 +135,23 @@ CREATE TABLE IF NOT EXISTS accreditation.holder_access (
     effective_zones                   text[],
     scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 12 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS accreditation.identity_conflict (
+    id                                uuid PRIMARY KEY NOT NULL,
+    holder_ids                        text[] NOT NULL,
+    score                             numeric(18,4),
+    matched_on                        text[],
+    differing_access                  boolean,
+    status                            text NOT NULL CONSTRAINT identity_conflict_status_chk CHECK (status IN ('pending', 'merged', 'rejected')),
+    detected_at                       timestamptz,
+    surviving_holder_id               uuid,
+    resolution_reason                 text CONSTRAINT identity_conflict_resolution_reason_chk CHECK (char_length(resolution_reason) <= 500),
+    resolved_by_principal_id          uuid,
+    resolved_at                       timestamptz,
+    scope_path                        ltree NOT NULL
 );
 
 -- Holds 3 columns. No description has been written for this table — the name is the only thing

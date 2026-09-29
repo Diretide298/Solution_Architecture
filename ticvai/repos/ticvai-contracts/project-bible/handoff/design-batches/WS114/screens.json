@@ -1,0 +1,1357 @@
+[
+ {
+  "id": "BO-674",
+  "name": "Accreditation Communications Command Center",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "7",
+   "number": "1",
+   "page": 55
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/accreditation-communications-command-center-bo-674",
+   "component": "apps/venue-management-web/src/routes/access-venue/AccreditationCommunicationsCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-675",
+    "BO-676",
+    "BO-677",
+    "BO-678",
+    "BO-679",
+    "BO-680",
+    "BO-681",
+    "BO-682",
+    "BO-683"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-675",
+     "trigger": "Notification Rule Management",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-676",
+     "trigger": "Expiry & Renewal Notification Scheduler",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-677",
+     "trigger": "Communication Template Library",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-678",
+     "trigger": "Channel, Language & Branding Configuration",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-679",
+     "trigger": "Manual & Bulk Communication Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-680",
+     "trigger": "Accreditation Bulk Import",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-681",
+     "trigger": "Import Validation & Processing Monitor",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-682",
+     "trigger": "Accreditation Export & Data Extract Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-683",
+     "trigger": "Delivery, Batch & Operational History",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Dashboard analytics shall show) and no metric row",
+  "purpose": "Central dashboard for accreditation notifications and operational communications.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack ACCREDITATION.pdf, page 55 §Dashboard analytics shall show"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every accreditation communications",
+       "columns": [
+        "Delivery success rate",
+        "Notifications by type",
+        "Notifications by channel",
+        "Failure trends",
+        "Upcoming scheduled communications"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack ACCREDITATION.pdf, page 55 §Dashboard analytics shall show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected accreditation communications",
+       "bindsTo": null,
+       "columns": [
+        "Delivery success rate",
+        "Notifications by type",
+        "Notifications by channel",
+        "Failure trends",
+        "Upcoming scheduled communications"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Scope of Work”, “Key requirements”.",
+       "provenance": "pack ACCREDITATION.pdf, page 55 §Dashboard analytics shall show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The accreditation communications list.",
+   "error": "Could not load. Names which read failed and leaves the accreditation communications untouched.",
+   "emptyFirstRun": "No accreditation communications yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the accreditation communications are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setAccreditationNotificationRules",
+    "contract": "accreditation",
+    "purpose": "Notifications at a glance",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Delivery success rate",
+    "Notifications by type",
+    "Notifications by channel",
+    "Failure trends",
+    "Upcoming scheduled communications"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-674",
+   "workshopBoard": "wireframes/WS07 ACCREDITATION Board 7.dc.html#bo-674"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 55. 0 of 5 labels bound to a contract property; 5 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-675",
+  "name": "Notification Rule Management",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "7",
+   "number": "2",
+   "page": 56
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/notification-rule-management-bo-675",
+   "component": "apps/venue-management-web/src/routes/access-venue/NotificationRuleManagement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-674"
+   ],
+   "exitTo": [
+    "BO-674"
+   ],
+   "transitions": [
+    {
+     "to": "BO-674",
+     "trigger": "Back to Accreditation Communications Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Each rule shall define) and no display directory — it is settings, not a population",
+  "purpose": "Configure when accreditation notifications are automatically triggered.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Trigger",
+       "provenance": "pack ACCREDITATION.pdf, page 56 §Each rule shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Recipient",
+       "provenance": "pack ACCREDITATION.pdf, page 56 §Each rule shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Communication channel",
+       "provenance": "pack ACCREDITATION.pdf, page 56 §Each rule shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Template",
+       "provenance": "pack ACCREDITATION.pdf, page 56 §Each rule shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Timing",
+       "provenance": "pack ACCREDITATION.pdf, page 56 §Each rule shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Event/program scope",
+       "provenance": "pack ACCREDITATION.pdf, page 56 §Each rule shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Category",
+       "provenance": "pack ACCREDITATION.pdf, page 56 §Each rule shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Language",
+       "provenance": "pack ACCREDITATION.pdf, page 56 §Each rule shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Active/inactive status",
+       "provenance": "pack ACCREDITATION.pdf, page 56 §Each rule shall define"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The notification rule configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the notification rule untouched.",
+   "emptyFirstRun": "No notification rule configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "setAccreditationNotificationRules",
+    "contract": "accreditation",
+    "purpose": "Notification rules",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-675",
+   "workshopBoard": "wireframes/WS07 ACCREDITATION Board 7.dc.html#bo-675"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 56. 0 of 0 labels bound to a contract property; 9 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-676",
+  "name": "Expiry & Renewal Notification Scheduler",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "7",
+   "number": "3",
+   "page": 57
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/expiry-renewal-notification-scheduler-bo-676",
+   "component": "apps/venue-management-web/src/routes/access-venue/ExpiryRenewalNotificationScheduler.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-674"
+   ],
+   "exitTo": [
+    "BO-674"
+   ],
+   "transitions": [
+    {
+     "to": "BO-674",
+     "trigger": "Back to Accreditation Communications Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Administrators shall define) and no display directory — it is settings, not a population",
+  "purpose": "Configure proactive reminders before accreditation expiry or renewal.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Days before/after event",
+       "provenance": "pack ACCREDITATION.pdf, page 57 §Administrators shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Recipient",
+       "provenance": "pack ACCREDITATION.pdf, page 57 §Administrators shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Template",
+       "provenance": "pack ACCREDITATION.pdf, page 57 §Administrators shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Channel",
+       "provenance": "pack ACCREDITATION.pdf, page 57 §Administrators shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Escalation rule",
+       "provenance": "pack ACCREDITATION.pdf, page 57 §Administrators shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Retry policy",
+       "provenance": "pack ACCREDITATION.pdf, page 57 §Administrators shall define"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The expiry renewal notification configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the expiry renewal notification untouched.",
+   "emptyFirstRun": "No expiry renewal notification configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "setAccreditationNotificationRules",
+    "contract": "accreditation",
+    "purpose": "Expiry and renewal scheduling",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-676",
+   "workshopBoard": "wireframes/WS07 ACCREDITATION Board 7.dc.html#bo-676"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 57. 0 of 0 labels bound to a contract property; 6 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-677",
+  "name": "Communication Template Library",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "7",
+   "number": "4",
+   "page": 58
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/communication-template-library-bo-677",
+   "component": "apps/venue-management-web/src/routes/access-venue/CommunicationTemplateLibrary.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-674"
+   ],
+   "exitTo": [
+    "BO-674"
+   ],
+   "transitions": [
+    {
+     "to": "BO-674",
+     "trigger": "Back to Accreditation Communications Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Manage reusable accreditation communication templates.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 58"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 58"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMessageTemplates",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The communication template list.",
+   "error": "Could not load. Names which read failed and leaves the communication template untouched.",
+   "emptyFirstRun": "No communication template yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the communication template are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listMessageTemplates",
+    "contract": "marketing-crm",
+    "purpose": "Template library",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-677",
+   "workshopBoard": "wireframes/WS07 ACCREDITATION Board 7.dc.html#bo-677"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 58. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-678",
+  "name": "Channel, Language & Branding Configuration",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "7",
+   "number": "5",
+   "page": 59
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/channel-language-branding-configuration-bo-678",
+   "component": "apps/venue-management-web/src/routes/access-venue/ChannelLanguageBrandingConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-674"
+   ],
+   "exitTo": [
+    "BO-674"
+   ],
+   "transitions": [
+    {
+     "to": "BO-674",
+     "trigger": "Back to Accreditation Communications Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Administrators shall configure) and no display directory — it is settings, not a population",
+  "purpose": "Control how communications are delivered and branded.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Sender identity",
+       "provenance": "pack ACCREDITATION.pdf, page 59 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reply information",
+       "provenance": "pack ACCREDITATION.pdf, page 59 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Default language",
+       "provenance": "pack ACCREDITATION.pdf, page 59 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Alternative languages",
+       "provenance": "pack ACCREDITATION.pdf, page 59 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tenant logo",
+       "provenance": "pack ACCREDITATION.pdf, page 59 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Event branding",
+       "provenance": "pack ACCREDITATION.pdf, page 59 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue branding",
+       "provenance": "pack ACCREDITATION.pdf, page 59 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Header/footer",
+       "provenance": "pack ACCREDITATION.pdf, page 59 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Contact information",
+       "provenance": "pack ACCREDITATION.pdf, page 59 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Key requirement: 12.1.57",
+       "provenance": "pack ACCREDITATION.pdf, page 59 §Administrators shall configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The channel language branding configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the channel language branding untouched.",
+   "emptyFirstRun": "No channel language branding configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "setLocalizationBrandingCustomer",
+    "contract": "marketing-crm",
+    "purpose": "Channel, language and branding",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-678",
+   "workshopBoard": "wireframes/WS07 ACCREDITATION Board 7.dc.html#bo-678"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 59. 0 of 0 labels bound to a contract property; 10 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-679",
+  "name": "Manual & Bulk Communication Center",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "7",
+   "number": "6",
+   "page": 59
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/manual-bulk-communication-center-bo-679",
+   "component": "apps/venue-management-web/src/routes/access-venue/ManualBulkCommunicationCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-674"
+   ],
+   "exitTo": [
+    "BO-674"
+   ],
+   "transitions": [
+    {
+     "to": "BO-674",
+     "trigger": "Back to Accreditation Communications Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow authorized operators to communicate with selected accreditation populations.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 59"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 59"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "sendTransactionalMessage",
+       "label": "Send transactional message",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "sendTransactionalMessage"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The manual bulk communication list.",
+   "error": "Could not load. Names which read failed and leaves the manual bulk communication untouched.",
+   "emptyFirstRun": "No manual bulk communication yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the manual bulk communication are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "sendTransactionalMessage",
+    "contract": "marketing-crm",
+    "purpose": "Bulk communication",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-679",
+   "workshopBoard": "wireframes/WS07 ACCREDITATION Board 7.dc.html#bo-679"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 59. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-680",
+  "name": "Accreditation Bulk Import",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "7",
+   "number": "7",
+   "page": 60
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/accreditation-bulk-import-bo-680",
+   "component": "apps/venue-management-web/src/routes/access-venue/AccreditationBulkImport.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-674"
+   ],
+   "exitTo": [
+    "BO-674"
+   ],
+   "transitions": [
+    {
+     "to": "BO-674",
+     "trigger": "Back to Accreditation Communications Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Import accreditation records at scale.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 60"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 60"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "importAccreditationHolders",
+       "label": "Import accreditation holders",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "importAccreditationHolders"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The accreditation bulk import list.",
+   "error": "Could not load. Names which read failed and leaves the accreditation bulk import untouched.",
+   "emptyFirstRun": "No accreditation bulk import yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the accreditation bulk import are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "importAccreditationHolders",
+    "contract": "accreditation",
+    "purpose": "Bulk import a roster",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listAccreditationHolders"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-680",
+   "workshopBoard": "wireframes/WS07 ACCREDITATION Board 7.dc.html#bo-680"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 60. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-681",
+  "name": "Import Validation & Processing Monitor",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "7",
+   "number": "8",
+   "page": 61
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/import-validation-processing-monitor-bo-681",
+   "component": "apps/venue-management-web/src/routes/access-venue/ImportValidationProcessingMonitor.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-674"
+   ],
+   "exitTo": [
+    "BO-674"
+   ],
+   "transitions": [
+    {
+     "to": "BO-674",
+     "trigger": "Back to Accreditation Communications Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§The screen shall display) and no metric row",
+  "purpose": "Govern and monitor bulk accreditation imports.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack ACCREDITATION.pdf, page 61 §The screen shall display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every import validation processing",
+       "columns": [
+        "Import batch ID",
+        "File name",
+        "Uploaded by",
+        "Upload date/time",
+        "Total records",
+        "Valid records",
+        "Warning records",
+        "Failed records",
+        "Duplicate records",
+        "Processing status"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack ACCREDITATION.pdf, page 61 §The screen shall display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected import validation processing",
+       "bindsTo": null,
+       "columns": [
+        "Import batch ID",
+        "File name",
+        "Uploaded by",
+        "Upload date/time",
+        "Total records",
+        "Valid records",
+        "Warning records",
+        "Failed records",
+        "Duplicate records",
+        "Processing status"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Processing statuses shall include”.",
+       "provenance": "pack ACCREDITATION.pdf, page 61 §The screen shall display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The import validation processing list.",
+   "error": "Could not load. Names which read failed and leaves the import validation processing untouched.",
+   "emptyFirstRun": "No import validation processing yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the import validation processing are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "importAccreditationHolders",
+    "contract": "accreditation",
+    "purpose": "Validation and processing",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listAccreditationHolders"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Import batch ID",
+    "File name",
+    "Uploaded by",
+    "Upload date/time",
+    "Total records",
+    "Valid records"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-681",
+   "workshopBoard": "wireframes/WS07 ACCREDITATION Board 7.dc.html#bo-681"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 61. 0 of 10 labels bound to a contract property; 10 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-682",
+  "name": "Accreditation Export & Data Extract Center",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "7",
+   "number": "9",
+   "page": 61
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/accreditation-export-data-extract-center-bo-682",
+   "component": "apps/venue-management-web/src/routes/access-venue/AccreditationExportDataExtractCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-674"
+   ],
+   "exitTo": [
+    "BO-674"
+   ],
+   "transitions": [
+    {
+     "to": "BO-674",
+     "trigger": "Back to Accreditation Communications Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§The system shall capture) and no display directory — it is settings, not a population",
+  "purpose": "Export authorized accreditation data for operational or reporting purposes.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Requested by",
+       "provenance": "pack ACCREDITATION.pdf, page 61 §The system shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Export date/time",
+       "provenance": "pack ACCREDITATION.pdf, page 61 §The system shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Filters",
+       "provenance": "pack ACCREDITATION.pdf, page 61 §The system shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Fields exported",
+       "provenance": "pack ACCREDITATION.pdf, page 61 §The system shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Number of records",
+       "provenance": "pack ACCREDITATION.pdf, page 61 §The system shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Export status",
+       "provenance": "pack ACCREDITATION.pdf, page 61 §The system shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Key requirement: 12.1.55",
+       "provenance": "pack ACCREDITATION.pdf, page 61 §The system shall capture"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The accreditation export data configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the accreditation export data untouched.",
+   "emptyFirstRun": "No accreditation export data configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "listAccreditationHolders",
+    "contract": "accreditation",
+    "purpose": "Export",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-682",
+   "workshopBoard": "wireframes/WS07 ACCREDITATION Board 7.dc.html#bo-682"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 61. 0 of 0 labels bound to a contract property; 7 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-683",
+  "name": "Delivery, Batch & Operational History",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "7",
+   "number": "10",
+   "page": 62
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/delivery-batch-operational-history-bo-683",
+   "component": "apps/venue-management-web/src/routes/access-venue/DeliveryBatchOperationalHistory.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-674"
+   ],
+   "exitTo": [
+    "BO-674"
+   ],
+   "transitions": [
+    {
+     "to": "BO-674",
+     "trigger": "Back to Accreditation Communications Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide a consolidated history of notifications, communications, imports and exports.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 62"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 62"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAccreditationAudit",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The delivery batch operational list.",
+   "error": "Could not load. Names which read failed and leaves the delivery batch operational untouched.",
+   "emptyFirstRun": "No delivery batch operational yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the delivery batch operational are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAccreditationAudit",
+    "contract": "accreditation",
+    "purpose": "Import and export audit",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-683",
+   "workshopBoard": "wireframes/WS07 ACCREDITATION Board 7.dc.html#bo-683"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 62. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

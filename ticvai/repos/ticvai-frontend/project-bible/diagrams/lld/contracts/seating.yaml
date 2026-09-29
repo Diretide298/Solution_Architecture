@@ -28,8 +28,22 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - seating.group_request
+  - seating.seat
+  - seating.seat_block
+  - seating.seat_category
+  - seating.seat_hold
+  - seating.seat_hold_item
+  - seating.seat_price_band
+  - seating.seating_rules
+  - seating.section
+  writes:
+  - cache:idempotency
+  - seating.group_request
+  - seating.seat_hold
+  - seating.seat_hold_item
 - operation: assignSeats
   verb: POST
   path: /performances/{performanceId}/assign-seats
@@ -273,7 +287,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - seating.hold_pool
+  - seating.seat
+  - seating.seat_block
+  - seating.seat_block_item
+  - seating.seat_category
+  - seating.seat_hold
+  - seating.seat_hold_item
+  - seating.seat_rules
   writes: []
 - operation: getSeatMap
   verb: GET
@@ -317,7 +339,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - seating.seat
+  - seating.seat_block_item
+  - seating.seat_hold
+  - seating.seat_hold_item
   writes: []
 - operation: getSeatRules
   verb: GET
@@ -533,8 +559,13 @@ operations:
   - staff
   - partner
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - seating.seat_block
+  - seating.seat_block_item
+  writes:
+  - cache:idempotency
+  - seating.seat_block
 - operation: relinquishSeatHold
   verb: DELETE
   path: /seat-holds/{holdId}
@@ -567,8 +598,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - seating.group_request
+  - seating.group_request_participant
+  - seating.seat_hold_item
+  writes:
+  - cache:idempotency
+  - seating.group_request_participant
 - operation: setMapZones
   verb: PUT
   path: /seat-maps/{seatMapId}/zones
@@ -686,7 +723,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - seating.accessible
+  - seating.seat
+  - seating.seat_map
+  - seating.seat_rules
+  - seating.seating_rules
   writes: []
 - operation: validateSeatMap
   verb: POST

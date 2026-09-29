@@ -12,9 +12,9 @@
   "appOnly": 7
  },
  "severity": {
-  "high": 32,
-  "medium": 183,
-  "low": 212,
+  "high": 33,
+  "medium": 184,
+  "low": 211,
   "info": 3
  },
  "findings": [
@@ -127,7 +127,7 @@
    "severity": "high",
    "dimension": "operations",
    "where": "app only",
-   "detail": "enrolFacePass, getOrderCalendarEvent, getVisitReminder, reserveMerchandise, setVisitReminder",
+   "detail": "bindCredentialDevice, enrolFacePass, getOrderCalendarEvent, getVisitReminder, reserveMerchandise, setVisitReminder",
    "fix": ""
   },
   {
@@ -156,6 +156,13 @@
    "dimension": "operations",
    "where": "ticket-selection (WEB-005 ↔ GST-008)",
    "detail": "the web calls evaluatePromotions and the app cannot call it anywhere",
+   "fix": ""
+  },
+  {
+   "severity": "high",
+   "dimension": "operations",
+   "where": "tickets (WEB-018 ↔ GST-012/GST-013)",
+   "detail": "the app calls bindCredentialDevice and the web cannot call it anywhere",
    "fix": ""
   },
   {
@@ -919,6 +926,13 @@
    "dimension": "entry parameters",
    "where": "ticket-selection (WEB-005 ↔ GST-008)",
    "detail": "web opens with ['productId', 'venueId'], app with ['cartId', 'performanceId', 'productId', 'venueId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "tickets (WEB-018 ↔ GST-012/GST-013)",
+   "detail": "web opens with ['entitlementId', 'orderId'], app with ['credentialId', 'entitlementId', 'orderId'] — one shared link cannot open both",
    "fix": "one deep-link shape per capability"
   },
   {
@@ -2002,13 +2016,6 @@
   {
    "severity": "low",
    "dimension": "components",
-   "where": "tickets (WEB-018 ↔ GST-012/GST-013)",
-   "detail": "web only ['secondaryButton'], app only — (10 vs 12 components)",
-   "fix": ""
-  },
-  {
-   "severity": "low",
-   "dimension": "components",
    "where": "venue-info (WEB-028 ↔ GST-029)",
    "detail": "web only —, app only ['dataTable', 'textField', 'toggle'] (2 vs 6 components)",
    "fix": ""
@@ -2058,7 +2065,7 @@
   {
    "severity": "low",
    "dimension": "documents",
-   "where": "contracts/spine/catalogue.yaml:954",
+   "where": "contracts/spine/catalogue.yaml:964",
    "detail": "\"browses by category and cannot search\" — GST-063 Search exists since 17 August",
    "fix": "rewrite to the 12 September rule"
   },
@@ -3011,7 +3018,7 @@
    "severity": "info",
    "dimension": "coverage",
    "where": "dynamic-qr-ticket",
-   "detail": "GST-055 Dynamic QR Ticket — app only (deliberate). The 2 September session decided a dynamic-QR ticket bought on the web is redirected into the app, because a credential that needs a network round trip at a gate fails at the gate (_components.yaml, credentialPresenter). Since 28 September the code is derived on the device from the `rotation` seed (audit R230), and the web's My Tickets shows the same rotating code.",
+   "detail": "GST-055 Dynamic QR Ticket — app only (deliberate). The 2 September session decided a dynamic-QR ticket bought on the web is redirected into the app, because a credential that needs a network round trip at a gate fails at the gate (_components.yaml, credentialPresenter). Since 28 September the code is derived on the device from the `rotation` seed (audit R230), and the web's My Tickets shows the same rotating code. Not callable on the web: bindCredentialDevice.",
    "fix": ""
   },
   {

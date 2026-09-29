@@ -39,10 +39,7 @@
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-254 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-255",
@@ -101,13 +98,117 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Management can understand the overall access operation from one screen.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Provide a single executive and operational overview of access performance across all TICVAI-controlled venues.",
-  "purposeNote": "Management can understand the overall access operation from one screen.",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Total Admissions Today",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.totalAdmissionsToday",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Entries",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.entries",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Exits",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.exits",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Currently In Venue",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.currentlyInVenue",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Re-entries",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.reEntries",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Crossovers",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.crossovers",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Group Admissions",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.groupAdmissions",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Fast Pass Uses",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.fastPassUses",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Valid Scans",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.validScans",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Rejected Scans",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.rejectedScans",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Intervention Rate",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.interventionRate",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Seconds",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.averageValidationTime",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Active Gates",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.activeGates",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Offline Devices",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.offlineDevices",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -115,22 +216,6 @@
       {
        "kind": "dataTable",
        "label": "Every access monitoring analytics",
-       "columns": [
-        "AccessMonitoringAnalyticsCommandCenterView.totalAdmissionsToday",
-        "AccessMonitoringAnalyticsCommandCenterView.entries",
-        "AccessMonitoringAnalyticsCommandCenterView.exits",
-        "AccessMonitoringAnalyticsCommandCenterView.currentlyInVenue",
-        "AccessMonitoringAnalyticsCommandCenterView.reEntries",
-        "AccessMonitoringAnalyticsCommandCenterView.crossovers",
-        "AccessMonitoringAnalyticsCommandCenterView.groupAdmissions",
-        "AccessMonitoringAnalyticsCommandCenterView.fastPassUses",
-        "AccessMonitoringAnalyticsCommandCenterView.validScans",
-        "AccessMonitoringAnalyticsCommandCenterView.rejectedScans",
-        "AccessMonitoringAnalyticsCommandCenterView.interventionRate",
-        "AccessMonitoringAnalyticsCommandCenterView.averageValidationTime",
-        "AccessMonitoringAnalyticsCommandCenterView.activeGates",
-        "AccessMonitoringAnalyticsCommandCenterView.offlineDevices"
-       ],
        "bindsTo": "AccessMonitoringAnalyticsCommandCenterView",
        "operation": "listAccessMonitoring",
        "provenance": "pack Access Control Module_Reference.pdf, page 168 §Show"
@@ -145,22 +230,6 @@
        "kind": "detailPanel",
        "label": "The selected access monitoring analytics",
        "bindsTo": "AccessMonitoringAnalyticsCommandCenterView",
-       "columns": [
-        "AccessMonitoringAnalyticsCommandCenterView.totalAdmissionsToday",
-        "AccessMonitoringAnalyticsCommandCenterView.entries",
-        "AccessMonitoringAnalyticsCommandCenterView.exits",
-        "AccessMonitoringAnalyticsCommandCenterView.currentlyInVenue",
-        "AccessMonitoringAnalyticsCommandCenterView.reEntries",
-        "AccessMonitoringAnalyticsCommandCenterView.crossovers",
-        "AccessMonitoringAnalyticsCommandCenterView.groupAdmissions",
-        "AccessMonitoringAnalyticsCommandCenterView.fastPassUses",
-        "AccessMonitoringAnalyticsCommandCenterView.validScans",
-        "AccessMonitoringAnalyticsCommandCenterView.rejectedScans",
-        "AccessMonitoringAnalyticsCommandCenterView.interventionRate",
-        "AccessMonitoringAnalyticsCommandCenterView.averageValidationTime",
-        "AccessMonitoringAnalyticsCommandCenterView.activeGates",
-        "AccessMonitoringAnalyticsCommandCenterView.offlineDevices"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “TOTAL ADMISSIONS”, “CURRENTLY IN VENUE”, “Venue Comparison”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 168 §Show"
       }
@@ -185,18 +254,19 @@
   ],
   "entryState": {
    "preloaded": [
-    "AccessMonitoringAnalyticsCommandCenterView.totalAdmissionsToday",
-    "AccessMonitoringAnalyticsCommandCenterView.entries",
-    "AccessMonitoringAnalyticsCommandCenterView.exits",
-    "AccessMonitoringAnalyticsCommandCenterView.currentlyInVenue",
-    "AccessMonitoringAnalyticsCommandCenterView.reEntries",
-    "AccessMonitoringAnalyticsCommandCenterView.crossovers"
+    "AccessMonitoringAnalyticsCommandCenterViewSummary.totalAdmissionsToday",
+    "AccessMonitoringAnalyticsCommandCenterViewSummary.entries",
+    "AccessMonitoringAnalyticsCommandCenterViewSummary.exits",
+    "AccessMonitoringAnalyticsCommandCenterViewSummary.currentlyInVenue",
+    "AccessMonitoringAnalyticsCommandCenterViewSummary.reEntries",
+    "AccessMonitoringAnalyticsCommandCenterViewSummary.crossovers"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-254"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-254",
+   "workshopBoard": "wireframes/WS29 Access Control Board 12.dc.html#bo-254"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 168. 14 of 14 labels bound to a contract property; 14 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -317,7 +387,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-255"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-255",
+   "workshopBoard": "wireframes/WS29 Access Control Board 12.dc.html#bo-255"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 170. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -380,10 +451,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations can visually identify where access bottlenecks or abnormal conditions are occurring.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Turn the graphical access topology created in Board 1 into a live operational analytics map.",
-  "purposeNote": "Operations can visually identify where access bottlenecks or abnormal conditions are occurring.",
   "layout": {
    "template": "split",
    "regions": [
@@ -395,14 +466,7 @@
        "kind": "dataTable",
        "label": "Every graphical access map",
        "columns": [
-        "GraphicalAccessMapLiveGatePerformanceView.gates",
-        "GraphicalAccessMapLiveGatePerformanceView.turnstiles",
-        "GraphicalAccessMapLiveGatePerformanceView.entryPoints",
-        "GraphicalAccessMapLiveGatePerformanceView.exitPoints",
-        "GraphicalAccessMapLiveGatePerformanceView.reEntryGates",
-        "GraphicalAccessMapLiveGatePerformanceView.groupGates",
-        "GraphicalAccessMapLiveGatePerformanceView.vipGates",
-        "GraphicalAccessMapLiveGatePerformanceView.attractionAccess"
+        "GraphicalAccessMapLiveGatePerformanceView.pointType"
        ],
        "bindsTo": "GraphicalAccessMapLiveGatePerformanceView",
        "operation": "listGraphicalAccessMap",
@@ -419,14 +483,7 @@
        "label": "The selected graphical access map",
        "bindsTo": "GraphicalAccessMapLiveGatePerformanceView",
        "columns": [
-        "GraphicalAccessMapLiveGatePerformanceView.gates",
-        "GraphicalAccessMapLiveGatePerformanceView.turnstiles",
-        "GraphicalAccessMapLiveGatePerformanceView.entryPoints",
-        "GraphicalAccessMapLiveGatePerformanceView.exitPoints",
-        "GraphicalAccessMapLiveGatePerformanceView.reEntryGates",
-        "GraphicalAccessMapLiveGatePerformanceView.groupGates",
-        "GraphicalAccessMapLiveGatePerformanceView.vipGates",
-        "GraphicalAccessMapLiveGatePerformanceView.attractionAccess"
+        "GraphicalAccessMapLiveGatePerformanceView.pointType"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Guests”, “Throughput”, “Success”, “Reject”, “Yellow”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 171 §Display"
@@ -452,18 +509,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "GraphicalAccessMapLiveGatePerformanceView.gates",
-    "GraphicalAccessMapLiveGatePerformanceView.turnstiles",
-    "GraphicalAccessMapLiveGatePerformanceView.entryPoints",
-    "GraphicalAccessMapLiveGatePerformanceView.exitPoints",
-    "GraphicalAccessMapLiveGatePerformanceView.reEntryGates",
-    "GraphicalAccessMapLiveGatePerformanceView.groupGates"
+    "GraphicalAccessMapLiveGatePerformanceView.pointType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-256"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-256",
+   "workshopBoard": "wireframes/WS29 Access Control Board 12.dc.html#bo-256"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 171. 8 of 8 labels bound to a contract property; 12 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -545,15 +598,11 @@
        "kind": "multiSelect",
        "label": "Filter by",
        "columns": [
-        "AttendanceAdmissionAnalyticsView.ticketType",
         "Product",
-        "AttendanceAdmissionAnalyticsView.event",
         "Timeslot",
         "Membership",
-        "AttendanceAdmissionAnalyticsView.channel",
         "B2B Partner",
         "Reseller",
-        "AttendanceAdmissionAnalyticsView.customerSegment",
         "Guest Category"
        ],
        "notes": "The pack filters this screen by ticket type, product, event, timeslot, membership, channel and 4 more — which are present is a decision the pack already made.",
@@ -577,11 +626,7 @@
         "AttendanceAdmissionAnalyticsView.groupAttendance",
         "AttendanceAdmissionAnalyticsView.membershipAttendance",
         "AttendanceAdmissionAnalyticsView.repeatEntry",
-        "AttendanceAdmissionAnalyticsView.noShowRate",
-        "AttendanceAdmissionAnalyticsView.ticketType",
-        "AttendanceAdmissionAnalyticsView.channel",
-        "AttendanceAdmissionAnalyticsView.event",
-        "AttendanceAdmissionAnalyticsView.dateTime"
+        "AttendanceAdmissionAnalyticsView.noShowRate"
        ],
        "bindsTo": "AttendanceAdmissionAnalyticsView",
        "operation": "listAttendanceAdmission",
@@ -606,11 +651,7 @@
         "AttendanceAdmissionAnalyticsView.groupAttendance",
         "AttendanceAdmissionAnalyticsView.membershipAttendance",
         "AttendanceAdmissionAnalyticsView.repeatEntry",
-        "AttendanceAdmissionAnalyticsView.noShowRate",
-        "AttendanceAdmissionAnalyticsView.ticketType",
-        "AttendanceAdmissionAnalyticsView.channel",
-        "AttendanceAdmissionAnalyticsView.event",
-        "AttendanceAdmissionAnalyticsView.dateTime"
+        "AttendanceAdmissionAnalyticsView.noShowRate"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Sold”, “Eligible”, “Attended”, “ATTENDANCE RATE”, “Purchased”, “Actual Attendance”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 172 §Show"
@@ -647,7 +688,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-257"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-257",
+   "workshopBoard": "wireframes/WS29 Access Control Board 12.dc.html#bo-257"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 172. 17 of 23 labels bound to a contract property; 23 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -710,10 +752,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Management can understand actual movement patterns rather than only total admission counts.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Measure) and no metric row",
   "purpose": "Analyze complete guest movement across the access journey.",
-  "purposeNote": "Management can understand actual movement patterns rather than only total admission counts.",
   "layout": {
    "template": "split",
    "regions": [
@@ -729,8 +771,6 @@
         "EntryExitReEntryCrossoverAnalyticsView.averageTimeOutside",
         "EntryExitReEntryCrossoverAnalyticsView.mostUsedReEntryGates",
         "EntryExitReEntryCrossoverAnalyticsView.rejectedReEntry",
-        "EntryExitReEntryCrossoverAnalyticsView.parkAParkB",
-        "EntryExitReEntryCrossoverAnalyticsView.parkBParkA",
         "EntryExitReEntryCrossoverAnalyticsView.crossoverTime",
         "EntryExitReEntryCrossoverAnalyticsView.crossoverProduct"
        ],
@@ -753,8 +793,6 @@
         "EntryExitReEntryCrossoverAnalyticsView.averageTimeOutside",
         "EntryExitReEntryCrossoverAnalyticsView.mostUsedReEntryGates",
         "EntryExitReEntryCrossoverAnalyticsView.rejectedReEntry",
-        "EntryExitReEntryCrossoverAnalyticsView.parkAParkB",
-        "EntryExitReEntryCrossoverAnalyticsView.parkBParkA",
         "EntryExitReEntryCrossoverAnalyticsView.crossoverTime",
         "EntryExitReEntryCrossoverAnalyticsView.crossoverProduct"
        ],
@@ -785,15 +823,14 @@
     "EntryExitReEntryCrossoverAnalyticsView.reEntryRate",
     "EntryExitReEntryCrossoverAnalyticsView.averageTimeOutside",
     "EntryExitReEntryCrossoverAnalyticsView.mostUsedReEntryGates",
-    "EntryExitReEntryCrossoverAnalyticsView.rejectedReEntry",
-    "EntryExitReEntryCrossoverAnalyticsView.parkAParkB",
-    "EntryExitReEntryCrossoverAnalyticsView.parkBParkA"
+    "EntryExitReEntryCrossoverAnalyticsView.rejectedReEntry"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-258"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-258",
+   "workshopBoard": "wireframes/WS29 Access Control Board 12.dc.html#bo-258"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 174. 8 of 8 labels bound to a contract property; 8 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -856,10 +893,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Management can identify why specific gates or lanes are underperforming.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Show) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Measure the operational efficiency of gates and validation devices.",
-  "purposeNote": "Management can identify why specific gates or lanes are underperforming.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -946,7 +983,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-259"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-259",
+   "workshopBoard": "wireframes/WS29 Access Control Board 12.dc.html#bo-259"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 175. 7 of 7 labels bound to a contract property; 8 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1009,10 +1047,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Management can identify the operational root cause behind access failures.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Analyze why guests are denied or require manual intervention.",
-  "purposeNote": "Management can identify the operational root cause behind access failures.",
   "gaps": [
    {
     "operation": null,
@@ -1071,7 +1109,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-260"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-260",
+   "workshopBoard": "wireframes/WS29 Access Control Board 12.dc.html#bo-260"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 176. 0 of 9 labels bound to a contract property; 9 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1134,10 +1173,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "systems.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Show) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Use access events to understand how guests move through and use the venue.",
-  "purposeNote": "systems.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -1219,7 +1258,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-261"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-261",
+   "workshopBoard": "wireframes/WS29 Access Control Board 12.dc.html#bo-261"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 177. 7 of 7 labels bound to a contract property; 7 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1282,10 +1322,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can create, schedule and export access-control reports without development support.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide configurable operational and management reports.",
-  "purposeNote": "Authorized users can create, schedule and export access-control reports without development support.",
   "gaps": [
    {
     "operation": null,
@@ -1308,19 +1348,6 @@
       {
        "kind": "multiSelect",
        "label": "Filter by",
-       "columns": [
-        "AccessReportsScheduledReportingDataExportView.tenant",
-        "AccessReportsScheduledReportingDataExportView.venue",
-        "AccessReportsScheduledReportingDataExportView.park",
-        "AccessReportsScheduledReportingDataExportView.zone",
-        "AccessReportsScheduledReportingDataExportView.event",
-        "AccessReportsScheduledReportingDataExportView.date",
-        "AccessReportsScheduledReportingDataExportView.ticketType",
-        "AccessReportsScheduledReportingDataExportView.product",
-        "AccessReportsScheduledReportingDataExportView.gate",
-        "AccessReportsScheduledReportingDataExportView.device",
-        "AccessReportsScheduledReportingDataExportView.channel"
-       ],
        "notes": "The pack filters this screen by tenant, venue, park, zone, event, date and 5 more — which are present is a decision the pack already made.",
        "provenance": "pack Access Control Module_Reference.pdf, page 179 §Filters"
       }
@@ -1341,14 +1368,80 @@
     "contract": "access",
     "purpose": "Access Reports, Scheduled Reporting & Data Export",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listReportSchedules",
+    "contract": "reporting",
+    "purpose": "The scheduled access reports",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "runReport",
+    "contract": "reporting",
+    "purpose": "Run an access report now",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listReportSchedules"
+    ]
+   },
+   {
+    "operationId": "createReportSchedule",
+    "contract": "reporting",
+    "purpose": "Schedule an access report or export",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listReportSchedules"
+    ]
+   },
+   {
+    "operationId": "updateReportSchedule",
+    "contract": "reporting",
+    "purpose": "Amend, pause or resume a schedule",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listReportSchedules"
+    ]
+   },
+   {
+    "operationId": "deleteReportSchedule",
+    "contract": "reporting",
+    "purpose": "Delete a schedule",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listReportSchedules"
+    ]
+   },
+   {
+    "operationId": "listReports",
+    "contract": "reporting",
+    "purpose": "The access reports to run or schedule",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-262"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-262",
+   "workshopBoard": "wireframes/WS29 Access Control Board 12.dc.html#bo-262"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 179. 11 of 11 labels bound to a contract property; 11 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "reportId",
+     "from": "navigation"
+    },
+    {
+     "name": "scheduleId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1401,10 +1494,10 @@
    "notes": "**Reached from BO-254, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "dashboards alone. Board 12 — Final 10-Screen Structure # Backend Screen Main Responsibility 12.1 Access Monitoring & Analytics Command Center Executive access overview 12.2 Live Venue Occupancy & People Counting Real-time occupancy 12.3 Graphical Access Map & Live Gate Performance Visual venue/gate monitoring 12.4 Attendance & Admission Analytics Actual attendance and no-shows 12.5 Entry, Exit, Re-entry & Crossover Analytics Complete guest movement 12.6 Throughput, Queue & Validation Performance Analytics Gate operational efficiency 12.7 Validation Outcome & Rejection Analytics Failure and int",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Forecast) and no metric row",
   "purpose": "Turn access-control data into proactive operational intelligence. This should be the final intelligence screen of the entire Access Control module.",
-  "purposeNote": "dashboards alone. Board 12 — Final 10-Screen Structure # Backend Screen Main Responsibility 12.1 Access Monitoring & Analytics Command Center Executive access overview 12.2 Live Venue Occupancy & People Counting Real-time occupancy 12.3 Graphical Access Map & Live Gate Performance Visual venue/gate monitoring 12.4 Attendance & Admission Analytics Actual attendance and no-shows 12.5 Entry, Exit, Re-entry & Crossover Analytics Complete guest movement 12.6 Throughput, Queue & Validation Performance Analytics Gate operational efficiency 12.7 Validation Outcome & Rejection Analytics Failure and int",
   "layout": {
    "template": "split",
    "regions": [
@@ -1484,7 +1577,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-263"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-263",
+   "workshopBoard": "wireframes/WS29 Access Control Board 12.dc.html#bo-263"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 180. 8 of 8 labels bound to a contract property; 8 of 62 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

@@ -1,0 +1,333 @@
+{
+ "AccessProfile": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.access_profile",
+  "description": "Board 5.2. **How an estate stays governable.**",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "zoneIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "venueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "operationalAreas": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "schedule": {
+    "type": "array",
+    "description": "**Zone, date and time are three dimensions and all three are needed.**",
+    "items": {
+     "type": "object",
+     "properties": {
+      "zoneId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "daysOfWeek": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "dateFrom": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      },
+      "dateTo": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      },
+      "from": {
+       "type": "string",
+       "nullable": true
+      },
+      "to": {
+       "type": "string",
+       "nullable": true
+      },
+      "eventPhase": {
+       "type": "string",
+       "nullable": true,
+       "enum": [
+        "build",
+        "rehearsal",
+        "doorsOpen",
+        "liveShow",
+        "breakdown"
+       ]
+      }
+     }
+    }
+   },
+   "escortRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "holderCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "AccreditationHolder": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.holder",
+  "description": "**A subject who may never sign in to anything.** `identity` owns principals; this owns accredited people.\n",
+  "required": [
+   "id",
+   "fullName"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "accreditationNumber": {
+    "type": "string"
+   },
+   "fullName": {
+    "type": "string"
+   },
+   "photoAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "dateOfBirth": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "nationality": {
+    "type": "string",
+    "nullable": true
+   },
+   "identityDocumentVerified": {
+    "type": "boolean",
+    "default": false
+   },
+   "organisationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "affiliationRole": {
+    "type": "string",
+    "nullable": true
+   },
+   "programmeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "categoryCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "suspended",
+     "revoked",
+     "expired",
+     "archived"
+    ]
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "completenessPercent": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "AccreditationProgramme": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.programme",
+  "description": "Boards 1.5 and 1.6. **The thing an application is made against.**",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "venueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "eventIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "categories": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string"
+      },
+      "name": {
+       "type": "string"
+      },
+      "defaultAccessProfileId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "quota": {
+       "type": "integer",
+       "nullable": true,
+       "description": "**A cap on how many may be accredited in this category.** Without one, a category is a promise nobody counted.\n"
+      }
+     }
+    }
+   },
+   "applicantTypes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "applicationsOpenAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "applicationsCloseAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "approvalWorkflowId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "open",
+     "closed",
+     "archived"
+    ]
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "AccreditationValidity": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.validity",
+  "description": "Board 6.3. **The control most often configured as never.**",
+  "properties": {
+   "programmeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "validityKind": {
+    "type": "string",
+    "enum": [
+     "eventDuration",
+     "fixedPeriod",
+     "seasonal",
+     "rolling",
+     "permanent"
+    ]
+   },
+   "validityMonths": {
+    "type": "integer",
+    "nullable": true
+   },
+   "renewalWindowDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "renewalRequiresReverification": {
+    "type": "boolean",
+    "default": true,
+    "description": "**The point of an expiry is that somebody looks again.**"
+   },
+   "onExpiry": {
+    "type": "string",
+    "enum": [
+     "revokeAccess",
+     "gracePeriod",
+     "autoRenew"
+    ],
+    "default": "revokeAccess"
+   },
+   "gracePeriodDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ }
+}

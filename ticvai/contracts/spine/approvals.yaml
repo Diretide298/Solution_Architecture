@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Approvals
   version: 1.0.0
-  x-ticvai-screen-count: 44
+  x-ticvai-screen-count: 45
   x-ticvai-module: 11 — Approval Workflows and Governance
   x-ticvai-platforms:
   - P04 POS
@@ -1184,6 +1184,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Visual Business Rule Builder
           content:
             application/json:
@@ -1281,6 +1284,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Visual Workflow Designer
           content:
             application/json:
@@ -1332,6 +1338,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Approval Matrix & Multi-Level Approval Configuration
           content:
             application/json:
@@ -1387,6 +1396,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Roles, Authority, Delegation & Approval Limits
           content:
             application/json:
@@ -1489,6 +1501,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Trigger, Action & Cross-Module Orchestration Configuration
           content:
             application/json:
@@ -1540,6 +1555,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Workflow Testing, Simulation & Impact Analysis
           content:
             application/json:
@@ -1595,6 +1613,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Versioning, Governance, Approval & Publication
           content:
             application/json:
@@ -1725,6 +1746,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Unified Approval Inbox & Decision Workspace
           content:
             application/json:
@@ -1760,9 +1784,11 @@ paths:
         rule evaluation and decision is kept so the path to the current state can be reconstructed.
 
 
-        **The screen''s actions are behaviour, not fields:** Reassign (no operation yet); Retry Step (no operation
-        yet); Skip Step where explicitly allowed (no operation yet); Cancel Workflow (no operation yet); Resume
-        (no operation yet); Escalate (`escalateApprovalRequest`); Open Source Record (no operation yet).
+        **The screen''s actions are behaviour, not fields:** Reassign, Retry Step, Skip Step where explicitly
+        allowed, Cancel Workflow and Resume are `actOnWorkflowInstance` (decided 29 September, writers pass),
+        whose `approvals.workflow_intervention` rows this timeline also shows; Escalate is `escalateApprovalRequest`;
+        Open Source Record is navigation to the source module''s screen by `businessObjectType` and `businessObjectId`,
+        not an operation.
 
         '
       tags:
@@ -1833,9 +1859,10 @@ paths:
         compensated; that is engine behaviour.
 
 
-        **The screen''s actions are behaviour, not fields:** Retry (no operation yet); Retry From Step (no
-        operation yet); Reassign (no operation yet); Correct Data (no operation yet); Use Approved Alternative
-        (no operation yet); Resume (no operation yet); Cancel (no operation yet); Escalate (no operation yet).
+        **The screen''s actions are behaviour, not fields:** all eight are `actOnWorkflowInstance` with the
+        exception''s `workflowExceptionId` (decided 29 September, writers pass): Retry and Retry From Step are
+        `retryStep`; Reassign is `reassign`; Correct Data is `resume` with `correctedInput`; Use Approved Alternative
+        is `skipStep` with `alternativeNodeId`; Resume, Cancel and Escalate are `resume`, `cancel` and `escalateException`.
 
         '
       tags:
@@ -1911,9 +1938,9 @@ paths:
         where required.
 
 
-        **The screen''s actions are behaviour, not fields:** Reassign (no operation yet); Escalate (`escalateApprovalRequest`);
-        Extend SLA (no operation yet); Add Backup Approver (no operation yet); Change Priority (no operation
-        yet).
+        **The screen''s actions are behaviour, not fields:** Escalate is `escalateApprovalRequest`; Reassign,
+        Extend SLA, Add Backup Approver and Change Priority are `actOnWorkflowInstance` (decided 29 September,
+        writers pass), each with its mandatory reason.
 
         '
       tags:
@@ -2010,6 +2037,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Automation Execution & Autonomous Action Monitor
           content:
             application/json:
@@ -2966,6 +2996,114 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+  /workflow-instances/{instanceId}/actions:
+    parameters:
+    - name: instanceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: actOnWorkflowInstance
+      x-ticvai-consumed-by:
+        - "P08 BO-384 Delegation & Escalation Command Center"
+        - "P08 BO-391 Live Escalation Operations Center"
+        - "P09 ADM-250 Workflow Instance Monitor & Process Timeline"
+        - "P09 ADM-251 Workflow Exception, Failure & Recovery Center"
+        - "P09 ADM-252 SLA, Escalation & Bottleneck Monitor"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass; pack 13.2.3 p.27 (Reassign, Retry Step, Skip Step where
+        explicitly allowed, Cancel Workflow, Resume), 13.2.4 p.28-29 (Retry From Step, Correct Data, Use Approved
+        Alternative, Escalate), 13.2.5 p.30 (Extend SLA, Add Backup Approver, Change Priority; mandatory reason);
+        shape follows resolveApprovedActionExecution'
+      summary: An operator's intervention in a running workflow
+      description: '**The monitors'' action buttons, as one operation** (decided 29 September, writers pass).
+        The Workflow Instance Monitor, the Exception, Failure & Recovery Center and the SLA, Escalation &
+        Bottleneck Monitor list instances; this is what an operator does to one. **Every action carries a
+        reason and is kept** as an `approvals.workflow_intervention` row with the acting principal and the
+        values before and after, because an intervention in a running workflow is evidence of the same kind
+        as a decision.
+
+
+        - `reassign` hands the waiting task step (`workflowStepExecutionId`) to `assigneePrincipalId`. On an
+        approval step it re-routes the pending approver of the step''s `approvals.request`; the requester can
+        never be the assignee (segregation of duties, `422`).
+
+        - `retryStep` re-runs the failed step, or the step named by `workflowStepExecutionId` (Retry From Step);
+        the instance goes `failed` to `running` and its open exception to `retrying`.
+
+        - `skipStep` moves past the step to the next node, or to `alternativeNodeId` (Use Approved Alternative),
+        **only where the published version''s graph marks the node skippable or the alternative as an allowed
+        edge** (`422` otherwise). **An approval node is never skipped** (`409`): skipping it would grant
+        an approval nobody gave.
+
+        - `resume` continues a `failed` instance from its recorded step; `correctedInput` (Correct Data) replaces
+        the step''s input, and the original is kept on the intervention row.
+
+        - `cancel` ends the instance (`cancelled`). An open approval request it raised is withdrawn, and partial
+        executions are compensated where the trigger says `compensate`.
+
+        - `extendSla` moves `slaDueAt` on by `extendByMinutes` (1 to 43,200). A breach already recorded stays
+        recorded: extending the clock does not rewrite `slaBreached`.
+
+        - `addBackupApprover` adds `assigneePrincipalId` to the pending approval request of the step. **It
+        adds an approver and replaces nobody**, as `escalateApprovalRequest` does.
+
+        - `changePriority` sets the instance''s `priority`.
+
+        - `escalateException` passes the exception `workflowExceptionId` to `assigneePrincipalId` (`escalated`).
+
+
+        A `completed` or `cancelled` instance cannot be acted on (`409`). When the action is taken from the
+        exception center, `workflowExceptionId` names the exception, and it is `resolved` when the instance
+        continues or `cancelled` with the instance. **The engine still executes**: this records the operator''s
+        instruction and the engine carries it out, re-checking the called action''s authority as it does
+        for every call (pack 13.1.8). Transitions in `states/workflow-instance.yaml`.
+
+        '
+      tags:
+      - approvals
+      x-ticvai-permission: APPROVAL_ACT
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowInstanceActionInput'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: Intervention recorded; the instance as it now stands
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowInstance'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The instance is completed or cancelled, the action does not apply in its current status
+            (for example `resume` on an instance that has not failed), or the step to skip is an approval node
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: A field the action needs is missing (assigneePrincipalId, extendByMinutes, priority,
+            workflowExceptionId), the node is not skippable or the alternative is not an allowed edge, or the
+            assignee is the requester of the approval
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
 
 components:
   securitySchemes:
@@ -2974,6 +3112,156 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    WorkflowInterventionAction:
+      type: string
+      description: What an operator did to a running workflow instance (pack 13.2.3, 13.2.4 and 13.2.5; decided
+        29 September, writers pass). The effect of each is on `actOnWorkflowInstance`.
+      enum:
+      - reassign
+      - retryStep
+      - skipStep
+      - resume
+      - cancel
+      - extendSla
+      - addBackupApprover
+      - changePriority
+      - escalateException
+    WorkflowInstanceActionInput:
+      type: object
+      x-ticvai-persistence: 'none — request only; writes approvals.workflow_intervention (schema WorkflowIntervention)
+        (decided 29 September, writers pass)'
+      description: One operator action on a running workflow instance (decided 29 September, writers pass).
+      required:
+      - action
+      - reason
+      properties:
+        action:
+          $ref: '#/components/schemas/WorkflowInterventionAction'
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+          description: Mandatory for every action (pack 13.2.5, "actions capture a mandatory reason")
+        workflowStepExecutionId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The step acted on; for `retryStep` the step to retry from. Defaults to the instance's
+            current step
+        workflowExceptionId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The exception the action is taken from; required for `escalateException`
+        assigneePrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Required for `reassign`, `addBackupApprover` and `escalateException`
+        alternativeNodeId:
+          type: string
+          nullable: true
+          description: For `skipStep`, the node to continue at instead of the next one (Use Approved Alternative)
+        correctedInput:
+          type: object
+          additionalProperties: true
+          nullable: true
+          description: For `resume`, the corrected input of the failed step (Correct Data)
+        extendByMinutes:
+          type: integer
+          minimum: 1
+          maximum: 43200
+          nullable: true
+          description: Required for `extendSla`
+        priority:
+          type: string
+          maxLength: 30
+          nullable: true
+          description: Required for `changePriority`
+    WorkflowIntervention:
+      type: object
+      x-ticvai-persistence: approvals.workflow_intervention
+      description: '**One operator action on a running workflow instance, kept whole** (decided 29 September,
+        writers pass). Written by `actOnWorkflowInstance`; append-only. The Workflow Instance Monitor shows these
+        rows on the instance''s timeline beside its steps, so "who skipped this step and why" has an answer.'
+      required:
+      - id
+      - workflowInstanceId
+      - action
+      - reason
+      - actorPrincipalId
+      - actedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        workflowInstanceId:
+          type: string
+          format: uuid
+        workflowStepExecutionId:
+          type: string
+          format: uuid
+          nullable: true
+        workflowExceptionId:
+          type: string
+          format: uuid
+          nullable: true
+        action:
+          $ref: '#/components/schemas/WorkflowInterventionAction'
+        reason:
+          type: string
+          maxLength: 500
+        fromStatus:
+          $ref: '#/components/schemas/WorkflowInstanceStatus'
+        toStatus:
+          $ref: '#/components/schemas/WorkflowInstanceStatus'
+        assigneePrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        previousAssigneePrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        alternativeNodeId:
+          type: string
+          nullable: true
+        previousInput:
+          type: object
+          additionalProperties: true
+          nullable: true
+          description: The step's input before `correctedInput` replaced it
+        correctedInput:
+          type: object
+          additionalProperties: true
+          nullable: true
+        slaDueAtBefore:
+          type: string
+          format: date-time
+          nullable: true
+        slaDueAtAfter:
+          type: string
+          format: date-time
+          nullable: true
+        previousPriority:
+          type: string
+          maxLength: 30
+          nullable: true
+        priority:
+          type: string
+          maxLength: 30
+          nullable: true
+        actorPrincipalId:
+          type: string
+          format: uuid
+        actedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        scopePath:
+          type: string
+          description: The partition key (ADR-0005). Written at venue scope
     ApprovedActionExecutionActionInput:
       type: object
       x-ticvai-persistence: none — request only (decided 29 September, VM close-out)
@@ -3265,6 +3553,27 @@ components:
                 - approverManager
                 - requester
                 - escalationGroup
+        firstReminderAtPercent:
+          type: integer
+          minimum: 1
+          maximum: 100
+          nullable: true
+          description: '**Percent of `targetMinutes` at which the first reminder goes** (decided 29 September,
+            readiness close-out: the reminder steps are percentages of target). A column so the SLA, Escalation,
+            Reminder & Timeout Rules screen reads it rather than unpacking `reminders`; the reminder in
+            `reminders` at this percentage says whom it notifies (data model for the agreed operations, 29 September).'
+        secondReminderAtPercent:
+          type: integer
+          minimum: 1
+          maximum: 100
+          nullable: true
+          description: Percent of `targetMinutes` at which the second reminder goes; above `firstReminderAtPercent`
+        escalateAtPercent:
+          type: integer
+          minimum: 1
+          maximum: 100
+          nullable: true
+          description: Percent of `targetMinutes` at which the request or workflow escalates; at or above `secondReminderAtPercent`
         onBreach:
           type: string
           enum:
@@ -3486,6 +3795,10 @@ components:
         recounting a stock count and a retail return above the venue threshold take a supervisor''s
         step-up on the same device instead, and never raise a request.
 
+        **Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September,
+        writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval
+        under these two kinds, so a venue can route product edits and price edits to different approvers.
+
         '
       enum:
       - refund
@@ -3505,6 +3818,8 @@ components:
       - purchaseOrderCancel
       - purchaseOrderShortClose
       - tenantMigration
+      - productChange
+      - pricingChange
     ApprovalStatus:
       type: string
       enum:
@@ -4189,8 +4504,7 @@ components:
     RulesWorkflowCommandCenterView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
-        already exist
+      x-ticvai-persistence: 'none — projection over approvals.workflow_definition, workflow_version, business_rule, decision_table, automation, matrix and rule; one row per configuration (data model for the agreed operations, 29 September)'
       description: '**What Rules & Workflow Command Center displays.** Read from the workshop pack''s own
         display and configuration directory for this screen; each property names the sentence it came from.
         **Not a row** - the screen is a view over the module''s existing state.'
@@ -4290,8 +4604,7 @@ components:
     VisualBusinessRuleBuilderView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
-        already exist
+      x-ticvai-persistence: 'none — projection over approvals.business_rule, the row setVisualBusinessRule writes (data model for the agreed operations, 29 September)'
       description: '**What Visual Business Rule Builder displays.** Read from the workshop pack''s own display
         and configuration directory for this screen; each property names the sentence it came from. **Not
         a row** - the screen is a view over the module''s existing state.'
@@ -4348,8 +4661,7 @@ components:
     VisualBusinessRuleBuilderInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; writes approvals.business_rule (schema BusinessRule) (data model for the agreed operations, 29 September)'
       description: '**What Visual Business Rule Builder submits.** The configurable fields from the pack''s
         directory for this screen; the metrics the screen displays are deliberately absent, because a figure
         the system computed is not a figure a client may send back.'
@@ -4406,8 +4718,7 @@ components:
     ConditionsDecisionLogicDecisionTablesView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
-        already exist
+      x-ticvai-persistence: 'none — projection over approvals.decision_table and decision_table_row (schema DecisionTable) (data model for the agreed operations, 29 September)'
       description: '**What Conditions, Decision Logic & Decision Tables displays.** Read from the workshop
         pack''s own display and configuration directory for this screen; each property names the sentence
         it came from. **Not a row** - the screen is a view over the module''s existing state.'
@@ -4448,8 +4759,7 @@ components:
     VisualWorkflowDesignerView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
-        already exist
+      x-ticvai-persistence: 'none — projection over approvals.workflow_definition and its draft approvals.workflow_version (data model for the agreed operations, 29 September)'
       description: '**What Visual Workflow Designer displays.** Read from the workshop pack''s own display
         and configuration directory for this screen; each property names the sentence it came from. **Not
         a row** - the screen is a view over the module''s existing state.'
@@ -4526,9 +4836,7 @@ components:
     VisualWorkflowDesignerInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest is
-        approvals.decision at 4%, so this is not an update to anything the package stores today and no new
-        table has been decided
+      x-ticvai-persistence: 'none — request only; writes approvals.workflow_definition and a draft approvals.workflow_version (data model for the agreed operations, 29 September)'
       description: '**What Visual Workflow Designer submits.** The configurable fields from the pack''s directory
         for this screen; the metrics the screen displays are deliberately absent, because a figure the system
         computed is not a figure a client may send back.'
@@ -4925,8 +5233,7 @@ components:
     SlaEscalationReminderTimeoutRulesView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
-        already exist
+      x-ticvai-persistence: 'none — projection over approvals.sla_policy (schema ApprovalSlaPolicy), including its reminder-percentage columns (data model for the agreed operations, 29 September)'
       description: '**What SLA, Escalation, Reminder & Timeout Rules displays.** Read from the workshop pack''s
         own display and configuration directory for this screen; each property names the sentence it came
         from. **Not a row** - the screen is a view over the module''s existing state.'
@@ -5001,8 +5308,7 @@ components:
     TriggerActionCrossModuleOrchestrationConfigurationView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
-        already exist
+      x-ticvai-persistence: 'none — projection over approvals.workflow_trigger (schema WorkflowTrigger) (data model for the agreed operations, 29 September)'
       description: '**What Trigger, Action & Cross-Module Orchestration Configuration displays.** Read from
         the workshop pack''s own display and configuration directory for this screen; each property names
         the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
@@ -5059,8 +5365,7 @@ components:
     TriggerActionCrossModuleOrchestrationConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; writes approvals.workflow_trigger (schema WorkflowTrigger) (data model for the agreed operations, 29 September)'
       description: '**What Trigger, Action & Cross-Module Orchestration Configuration submits.** The configurable
         fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'
@@ -5117,8 +5422,7 @@ components:
     WorkflowTestingSimulationImpactAnalysisView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
-        already exist
+      x-ticvai-persistence: 'none — computed by simulation over approvals.workflow_version and the rules it calls; never executes actions (data model for the agreed operations, 29 September)'
       description: '**What Workflow Testing, Simulation & Impact Analysis displays.** Read from the workshop
         pack''s own display and configuration directory for this screen; each property names the sentence
         it came from. **Not a row** - the screen is a view over the module''s existing state.'
@@ -5182,8 +5486,7 @@ components:
     WorkflowTestingSimulationImpactAnalysisInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; the outcome is recorded as approvals.workflow_version test results (data model for the agreed operations, 29 September)'
       description: '**What Workflow Testing, Simulation & Impact Analysis submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -5223,8 +5526,7 @@ components:
     VersioningGovernanceApprovalPublicationView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
-        already exist
+      x-ticvai-persistence: 'none — projection over approvals.workflow_version (schema WorkflowVersion) (data model for the agreed operations, 29 September)'
       description: '**What Versioning, Governance, Approval & Publication displays.** Read from the workshop
         pack''s own display and configuration directory for this screen; each property names the sentence
         it came from. **Not a row** - the screen is a view over the module''s existing state.'
@@ -5328,8 +5630,7 @@ components:
     VersioningGovernanceApprovalPublicationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; writes approvals.workflow_version and raises an approvals.request for publication (data model for the agreed operations, 29 September)'
       description: '**What Versioning, Governance, Approval & Publication submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -5433,8 +5734,7 @@ components:
     WorkflowOperationsCommandCenterView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
-        already exist
+      x-ticvai-persistence: 'none — projection over approvals.workflow_instance (schema WorkflowInstance) (data model for the agreed operations, 29 September)'
       description: '**What Workflow Operations Command Center displays.** Read from the workshop pack''s own
         display and configuration directory for this screen; each property names the sentence it came from.
         **Not a row** - the screen is a view over the module''s existing state.'
@@ -5623,8 +5923,7 @@ components:
     WorkflowInstanceMonitorProcessTimelineView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
-        already exist
+      x-ticvai-persistence: 'none — projection over approvals.workflow_instance and approvals.workflow_step_execution (data model for the agreed operations, 29 September)'
       description: '**What Workflow Instance Monitor & Process Timeline displays.** Read from the workshop
         pack''s own display and configuration directory for this screen; each property names the sentence
         it came from. **Not a row** - the screen is a view over the module''s existing state.'
@@ -5733,8 +6032,7 @@ components:
     WorkflowExceptionFailureRecoveryCenterView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
-        already exist
+      x-ticvai-persistence: 'none — projection over approvals.workflow_exception (schema WorkflowException) (data model for the agreed operations, 29 September)'
       description: '**What Workflow Exception, Failure & Recovery Center displays.** Read from the workshop
         pack''s own display and configuration directory for this screen; each property names the sentence
         it came from. **Not a row** - the screen is a view over the module''s existing state.'
@@ -5790,8 +6088,7 @@ components:
     SlaEscalationBottleneckMonitorView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
-        already exist
+      x-ticvai-persistence: 'none — projection over approvals.workflow_instance, whose SLA and reminder timestamps it lists (data model for the agreed operations, 29 September)'
       description: '**What SLA, Escalation & Bottleneck Monitor displays.** Read from the workshop pack''s
         own display and configuration directory for this screen; each property names the sentence it came
         from. **Not a row** - the screen is a view over the module''s existing state.'
@@ -5876,8 +6173,7 @@ components:
     AutomationExecutionAutonomousActionMonitorView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
-        already exist
+      x-ticvai-persistence: 'none — projection over approvals.automation and approvals.automation_execution (data model for the agreed operations, 29 September)'
       description: '**What Automation Execution & Autonomous Action Monitor displays.** Read from the workshop
         pack''s own display and configuration directory for this screen; each property names the sentence
         it came from. **Not a row** - the screen is a view over the module''s existing state.'
@@ -5956,8 +6252,7 @@ components:
     AutomationExecutionAutonomousActionMonitorInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; updates approvals.automation status (schema Automation) (data model for the agreed operations, 29 September)'
       description: '**What Automation Execution & Autonomous Action Monitor submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -5982,8 +6277,7 @@ components:
     CrossModuleOrchestrationMonitorView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
-        already exist
+      x-ticvai-persistence: 'none — projection over approvals.workflow_step_execution joined to approvals.workflow_instance by correlation id (data model for the agreed operations, 29 September)'
       description: '**What Cross-Module Orchestration Monitor displays.** Read from the workshop pack''s own
         display and configuration directory for this screen; each property names the sentence it came from.
         **Not a row** - the screen is a view over the module''s existing state.'
@@ -6039,8 +6333,7 @@ components:
     WorkflowAnalyticsProcessPerformanceView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
-        already exist
+      x-ticvai-persistence: 'none — aggregated from approvals.workflow_instance, workflow_step_execution, automation_execution, request, decision and escalation (data model for the agreed operations, 29 September)'
       description: '**What Workflow Analytics & Process Performance displays.** Read from the workshop pack''s
         own display and configuration directory for this screen; each property names the sentence it came
         from. **Not a row** - the screen is a view over the module''s existing state.'
@@ -6102,8 +6395,7 @@ components:
     ProcessOptimizationAutomationOpportunityCenterView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
-        already exist
+      x-ticvai-persistence: 'none — aggregated from approvals.workflow_instance and workflow_step_execution per process (data model for the agreed operations, 29 September)'
       description: '**What Process Optimization & Automation Opportunity Center displays.** Read from the
         workshop pack''s own display and configuration directory for this screen; each property names the
         sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
@@ -6153,8 +6445,7 @@ components:
     AiWorkflowIntelligenceAutonomousGovernanceCenterView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
-        already exist
+      x-ticvai-persistence: 'none — projection over the AI use-case register, which belongs to the AI service (the AI design is under review, 29 September); not an approvals table and not read directly from here'
       description: '**What AI Workflow Intelligence & Autonomous Governance Center displays.** Read from the
         workshop pack''s own display and configuration directory for this screen; each property names the
         sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
@@ -6260,3 +6551,1012 @@ components:
         setAt:
           type: string
           format: date-time
+    WorkflowModule:
+      type: string
+      description: 'The module a workflow, rule or automation belongs to and a workflow instance originates
+        from. The same values as `WorkflowOperationsCommandCenterView.module` (decided 29 September, readiness
+        close-out), named so the workflow engine''s tables share one vocabulary (data model for the agreed
+        operations, 29 September).'
+      enum:
+      - ticketing
+      - pricing
+      - finance
+      - procurement
+      - crm
+      - resourceManagement
+      - fnb
+      - retail
+      - groupSales
+      - customerService
+      - membership
+      - wallet
+      - waiver
+      - subscriptionLicensing
+    WorkflowConfigurationStatus:
+      type: string
+      description: 'Lifecycle of a configured workflow, business rule or decision table, as the Rules & Workflow
+        Command Center lists it (pack 13.1.1; decided 29 September, readiness close-out). **Only a configuration
+        whose version was tested and approved goes `active`**, through the approvals engine; the version
+        itself moves through `WorkflowVersionStatus`.'
+      enum:
+      - draft
+      - testing
+      - review
+      - pendingApproval
+      - approved
+      - scheduled
+      - active
+      - suspended
+      - retired
+    WorkflowVersionStatus:
+      type: string
+      description: 'Lifecycle of one workflow version (pack 13.1.10; decided 29 September, readiness close-out).
+        Modelled in `states/workflow-version.yaml`.'
+      enum:
+      - draft
+      - tested
+      - businessReview
+      - technicalValidation
+      - approval
+      - scheduled
+      - active
+      - suspended
+      - retired
+    WorkflowInstanceStatus:
+      type: string
+      description: 'Where one running workflow stands (pack 13.2.1 and 13.2.3; decided 29 September, readiness
+        close-out). Modelled in `states/workflow-instance.yaml`.'
+      enum:
+      - running
+      - waitingApproval
+      - waitingTask
+      - waitingSystem
+      - escalated
+      - failed
+      - completed
+      - cancelled
+    WorkflowNodeType:
+      type: string
+      description: The node kinds of the Visual Workflow Designer palette (pack 13.1.4; decided 29 September,
+        readiness close-out).
+      enum:
+      - start
+      - trigger
+      - task
+      - decision
+      - approval
+      - systemAction
+      - notification
+      - wait
+      - timer
+      - parallelBranch
+      - merge
+      - escalation
+      - subWorkflow
+      - end
+    WorkflowStepStatus:
+      type: string
+      description: Status of one step or participating module node of a workflow instance, as the Cross-Module
+        Orchestration Monitor shows it (pack 13.2.7; decided 29 September, readiness close-out).
+      enum:
+      - notStarted
+      - running
+      - waiting
+      - successful
+      - failed
+      - compensated
+    WorkflowAction:
+      type: string
+      description: The TICVAI actions a workflow may call (pack 13.1.8; decided 29 September, readiness close-out).
+        **Each call is still checked at run time** against workflow authority, user or system authority,
+        module policy and business rule, and a repeated event must not create a duplicate refund, order,
+        payment, approval or ticket.
+      enum:
+      - createApproval
+      - createTask
+      - updateStatus
+      - applyHold
+      - releaseHold
+      - createNotification
+      - generateDocument
+      - executeRefund
+      - updateAllocation
+      - activateMembership
+      - suspendPartner
+      - callApprovedApi
+      - callApprovedService
+      - startSubWorkflow
+    WorkflowErrorType:
+      type: string
+      description: The kinds of workflow failure the Exception, Failure & Recovery Center filters by (pack 13.2.4;
+        decided 29 September, readiness close-out).
+      enum:
+      - businessRuleFailure
+      - missingData
+      - missingApprover
+      - permissionFailure
+      - integrationFailure
+      - timeout
+      - actionFailure
+      - invalidState
+      - duplicateEvent
+      - serviceUnavailable
+      - configurationError
+    WorkflowExceptionStatus:
+      type: string
+      description: 'Recovery status of one entry in the controlled exception queue (pack 13.2.4). `open` until
+        somebody acts; `retrying` while a retry or retry-from-step runs; `escalated` when passed up; `resolved`
+        when the instance continued (retry, corrected data, approved alternative, resume); `cancelled` when
+        the instance was cancelled instead (data model for the agreed operations, 29 September).'
+      enum:
+      - open
+      - retrying
+      - escalated
+      - resolved
+      - cancelled
+    BusinessRuleOperator:
+      type: string
+      description: Comparison operator of a business-rule condition (pack 13.1.2; decided 29 September, readiness
+        close-out).
+      enum:
+      - equals
+      - notEquals
+      - greaterThan
+      - lessThan
+      - between
+      - contains
+      - inList
+      - exists
+      - doesNotExist
+      - beforeAfter
+      - percentageThreshold
+      - boolean
+    BusinessRuleOutcome:
+      type: string
+      description: 'THEN outcome of a business rule or a decision-table row (pack 13.1.2; decided 29 September,
+        readiness close-out). **`requireApproval` hands off to the approvals engine**; a rule never approves
+        or rejects a request itself.'
+      enum:
+      - allow
+      - reject
+      - requireApproval
+      - requireAdditionalInformation
+      - applyHold
+      - createTask
+      - generateAlert
+      - startWorkflow
+      - executeApprovedAction
+    AutomationStatus:
+      type: string
+      description: 'Whether an automation may act (pack 13.2.6; decided 29 September, readiness close-out). Modelled
+        in `states/automation.yaml`.'
+      enum:
+      - active
+      - paused
+      - disabled
+      - killSwitched
+    AutomationExecutionResult:
+      type: string
+      description: What one automated action came to (pack 13.2.6).
+      enum:
+      - succeeded
+      - failed
+      - awaitingConfirmation
+      - reversed
+    WorkflowDefinition:
+      type: object
+      x-ticvai-persistence: approvals.workflow_definition
+      description: '**One configured workflow: what it is, where it belongs and who owns it** (pack 13.1.1 and
+        13.1.4; data model for the agreed operations, 29 September). The graph itself is versioned in
+        `WorkflowVersion`; `activeWorkflowVersionId` names the version in force. Written by `setVisualWorkflow`, listed
+        by `listRuleWorkflow`. **The engine orchestrates and does not own the business transaction**: an
+        approval node raises an `approvals.request`, a system action calls the owning module''s operation.'
+      required:
+      - id
+      - name
+      - kind
+      - sourceModule
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+          description: Workflow name, as the designer shows it (`workflowName`)
+        kind:
+          type: string
+          enum:
+          - approvalWorkflow
+          - operationalWorkflow
+          - crossModuleWorkflow
+          description: Which of the command centre's configuration types this workflow is
+        sourceModule:
+          $ref: '#/components/schemas/WorkflowModule'
+        businessProcess:
+          type: string
+          maxLength: 200
+          nullable: true
+        ownerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: A principal id (`identity.Principal.id`); the name comes from `identity.getPrincipal`
+        priority:
+          type: string
+          maxLength: 30
+          nullable: true
+        activeWorkflowVersionId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The `WorkflowVersion` in force; null until a version is published
+        status:
+          $ref: '#/components/schemas/WorkflowConfigurationStatus'
+        scopePath:
+          type: string
+          description: The partition key (ADR-0005). Written at venue scope
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    WorkflowVersion:
+      type: object
+      x-ticvai-persistence: approvals.workflow_version
+      description: '**One version of a workflow''s graph, and its path to production** (pack 13.1.4 and 13.1.10;
+        data model for the agreed operations, 29 September). **(`workflowDefinitionId`, `version`) is unique,
+        and a version past `draft` is never edited**: a change is a new version. **An instance keeps the
+        version it started on** (audit R129), so `WorkflowInstance.workflowVersionId` names exactly one graph.
+        Only a version that was tested and approved goes `active`, through the approvals engine
+        (`approvalRequestId`); publishing a new version retires the one it replaces.'
+      required:
+      - id
+      - workflowDefinitionId
+      - version
+      - definition
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        workflowDefinitionId:
+          type: string
+          format: uuid
+        version:
+          type: integer
+          minimum: 1
+          readOnly: true
+        definition:
+          type: object
+          additionalProperties: true
+          description: The workflow graph (nodes and connections), as the designer saved it
+        nodeTypes:
+          type: array
+          readOnly: true
+          description: Node kinds the graph uses, taken from `definition` on save
+          items:
+            $ref: '#/components/schemas/WorkflowNodeType'
+        effectiveFrom:
+          type: string
+          format: date-time
+          nullable: true
+          description: Scheduled activation; null means it goes active when approved
+        effectiveTo:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          $ref: '#/components/schemas/WorkflowVersionStatus'
+        changeReason:
+          type: string
+          maxLength: 1000
+          nullable: true
+        whatChanged:
+          type: string
+          maxLength: 2000
+          nullable: true
+        changedAreas:
+          type: array
+          readOnly: true
+          description: Areas that differ from the version it replaces, computed on save
+          items:
+            type: string
+            enum:
+            - conditions
+            - thresholds
+            - approvers
+            - actions
+            - sla
+            - escalation
+            - integrations
+        riskClassification:
+          type: string
+          maxLength: 30
+          nullable: true
+        testResults:
+          type: string
+          maxLength: 2000
+          nullable: true
+          description: The last test or simulation outcome, written by `simulateWorkflowTestingImpact`
+        businessOwnerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        technicalOwnerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        approvalRequestId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          nullable: true
+          description: The `approvals.request` that authorised publication
+        rolloutScope:
+          type: string
+          enum:
+          - allScopes
+          - selectedTenant
+          - selectedVenue
+          - selectedBrand
+          - controlledRollout
+          nullable: true
+        scopeIds:
+          type: array
+          description: Tenant, venue or brand ids for a selected rollout
+          items:
+            type: string
+        createdBy:
+          type: string
+          format: uuid
+          readOnly: true
+        testedBy:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        approvedBy:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        publishedBy:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        scopePath:
+          type: string
+          description: The partition key (ADR-0005). Written at venue scope
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    WorkflowTrigger:
+      type: object
+      x-ticvai-persistence: approvals.workflow_trigger
+      description: '**What starts a workflow, what it may call and what it does when a call fails** (pack 13.1.8;
+        data model for the agreed operations, 29 September). One row per trigger; a workflow may be started
+        by an event and by a schedule. Written by `setTriggerActionCross`, keyed on (`workflowDefinitionId`,
+        `triggerType`, `triggerDefinition`).'
+      required:
+      - id
+      - workflowDefinitionId
+      - triggerType
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        workflowDefinitionId:
+          type: string
+          format: uuid
+        triggerType:
+          type: string
+          enum:
+          - event
+          - dataCondition
+          - schedule
+          - manual
+        triggerDefinition:
+          type: string
+          maxLength: 1000
+          nullable: true
+          description: Event name, data condition (e.g. Balance > Limit) or schedule
+        allowedActions:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowAction'
+        onFailure:
+          type: string
+          enum:
+          - retry
+          - rollback
+          - compensate
+          - exceptionQueue
+          - humanIntervention
+        maxRetries:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: Retries before `onFailure` applies
+        isActive:
+          type: boolean
+          default: true
+        scopePath:
+          type: string
+          description: The partition key (ADR-0005). Written at venue scope
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    WorkflowInstance:
+      type: object
+      x-ticvai-persistence: approvals.workflow_instance
+      description: '**One running workflow** (pack 13.2.1, 13.2.3 and 13.2.5; data model for the agreed operations,
+        29 September). Started by a `WorkflowTrigger`, on the version in force at that moment and kept on
+        it to the end (audit R129). Its steps are `WorkflowStepExecution` rows, keyed by the same
+        `correlationId` the participating services trace with. **The SLA clock and its reminder and escalation
+        timestamps are held here**, not in a table of their own: there is one clock per instance, and the
+        SLA, Escalation & Bottleneck Monitor lists instances. Lifecycle in `states/workflow-instance.yaml`.
+        The engine writes this row; an operator changes it only through `actOnWorkflowInstance`, which keeps
+        each change as a `WorkflowIntervention` (decided 29 September, writers pass).'
+      required:
+      - id
+      - workflowDefinitionId
+      - workflowVersionId
+      - sourceModule
+      - status
+      - correlationId
+      - startedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        workflowDefinitionId:
+          type: string
+          format: uuid
+        workflowVersionId:
+          type: string
+          format: uuid
+          description: The version the instance started on; never changes
+        workflowTriggerId:
+          type: string
+          format: uuid
+          nullable: true
+        sourceModule:
+          $ref: '#/components/schemas/WorkflowModule'
+        businessObjectType:
+          type: string
+          maxLength: 100
+          nullable: true
+        businessObjectId:
+          type: string
+          nullable: true
+          description: '**A reference, never a copy**, as `ApprovalRequest.subjectId`'
+        initiatedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Null when a system event or schedule started it
+        ownerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        priority:
+          type: string
+          maxLength: 30
+          nullable: true
+        currentNodeId:
+          type: string
+          nullable: true
+          description: The node of the version's graph the instance is at
+        status:
+          $ref: '#/components/schemas/WorkflowInstanceStatus'
+        correlationId:
+          type: string
+          maxLength: 100
+          description: The shared correlation id every participating service logs, for distributed tracing
+        slaPolicyId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The `ApprovalSlaPolicy` whose clock runs on this instance
+        slaDueAt:
+          type: string
+          format: date-time
+          nullable: true
+        slaBreached:
+          type: boolean
+          default: false
+        escalationLevel:
+          type: integer
+          minimum: 0
+          default: 0
+        firstReminderAt:
+          type: string
+          format: date-time
+          nullable: true
+        secondReminderAt:
+          type: string
+          format: date-time
+          nullable: true
+        managerEscalatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        executiveEscalatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        slaOutcome:
+          type: string
+          enum:
+          - metWithinTarget
+          - metAfterReminder
+          - metAfterEscalation
+          - breached
+          nullable: true
+          description: How the instance finished against its SLA; set on completion (the monitor's Final Outcome)
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        scopePath:
+          type: string
+          description: The partition key (ADR-0005). Written at venue scope
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    WorkflowStepExecution:
+      type: object
+      x-ticvai-persistence: approvals.workflow_step_execution
+      description: '**One step of one workflow instance, kept whole** (pack 13.2.3 and 13.2.7; data model for
+        the agreed operations, 29 September). Every step, rule evaluation and decision is kept so the path
+        to the current state can be reconstructed; a step that calls another module is one participating
+        node of the Cross-Module Orchestration Monitor. An approval step points at its `approvals.request`
+        rather than copying the decision.'
+      required:
+      - id
+      - workflowInstanceId
+      - nodeId
+      - nodeType
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        workflowInstanceId:
+          type: string
+          format: uuid
+        nodeId:
+          type: string
+          description: The node of the version's graph this step executes
+        stepName:
+          type: string
+          maxLength: 200
+          nullable: true
+        nodeType:
+          $ref: '#/components/schemas/WorkflowNodeType'
+        service:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: The TICVAI service a system action called
+        action:
+          type: string
+          maxLength: 200
+          nullable: true
+        assignedToPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        approvalRequestId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          nullable: true
+        inputPayload:
+          type: object
+          additionalProperties: true
+          nullable: true
+        outputPayload:
+          type: object
+          additionalProperties: true
+          nullable: true
+        decision:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: The branch or decision the step took
+        ruleEvaluations:
+          type: integer
+          minimum: 0
+          default: 0
+        retries:
+          type: integer
+          minimum: 0
+          default: 0
+        failureHandling:
+          type: string
+          enum:
+          - waits
+          - retries
+          - rollsBack
+          - continuesPartially
+          - requiresHumanIntervention
+          nullable: true
+        status:
+          $ref: '#/components/schemas/WorkflowStepStatus'
+        startedAt:
+          type: string
+          format: date-time
+          nullable: true
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        scopePath:
+          type: string
+          description: The partition key (ADR-0005). Written at venue scope
+    WorkflowException:
+      type: object
+      x-ticvai-persistence: approvals.workflow_exception
+      description: '**The controlled exception queue** (pack 13.2.4; data model for the agreed operations, 29
+        September). A step that fails beyond its trigger''s retries, or an event the engine cannot process,
+        lands here rather than being dropped; the instance sits at `failed` until the exception is resolved
+        or the instance cancelled.'
+      required:
+      - id
+      - workflowInstanceId
+      - errorType
+      - status
+      - raisedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        workflowInstanceId:
+          type: string
+          format: uuid
+        workflowStepExecutionId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The step that failed
+        errorType:
+          $ref: '#/components/schemas/WorkflowErrorType'
+        sourceModule:
+          $ref: '#/components/schemas/WorkflowModule'
+        detail:
+          type: string
+          maxLength: 2000
+          nullable: true
+        businessImpact:
+          type: string
+          maxLength: 500
+          nullable: true
+        priority:
+          type: string
+          maxLength: 30
+          nullable: true
+        ownerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        retryCount:
+          type: integer
+          minimum: 0
+          default: 0
+        status:
+          $ref: '#/components/schemas/WorkflowExceptionStatus'
+        raisedAt:
+          type: string
+          format: date-time
+        resolvedAt:
+          type: string
+          format: date-time
+          nullable: true
+        resolvedBy:
+          type: string
+          format: uuid
+          nullable: true
+        scopePath:
+          type: string
+          description: The partition key (ADR-0005). Written at venue scope
+    BusinessRule:
+      type: object
+      x-ticvai-persistence: approvals.business_rule
+      description: '**One IF/THEN business rule** (pack 13.1.2; data model for the agreed operations, 29 September).
+        Written by `setVisualBusinessRule`. **Not `ApprovalRule`**, which is an amount band in an approval
+        matrix saying who approves; this says what happens to a business object when a governed field meets
+        a condition, and `requireApproval` is how it hands over to the matrix. Rules are deterministic and
+        configured by people.'
+      required:
+      - id
+      - name
+      - businessObjectField
+      - operator
+      - outcome
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        businessObjectField:
+          type: string
+          maxLength: 200
+          description: Governed field from a registered module, e.g. Refund.Amount
+        operator:
+          $ref: '#/components/schemas/BusinessRuleOperator'
+        value:
+          type: string
+          maxLength: 1000
+          nullable: true
+          x-ticvai-column: comparison_value
+          description: Comparison value; absent for `exists` and `doesNotExist`
+        outcome:
+          $ref: '#/components/schemas/BusinessRuleOutcome'
+        explanation:
+          type: string
+          maxLength: 1000
+          nullable: true
+        status:
+          $ref: '#/components/schemas/WorkflowConfigurationStatus'
+        version:
+          type: integer
+          minimum: 1
+          readOnly: true
+        scopePath:
+          type: string
+          description: The partition key (ADR-0005). Written at venue scope
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    DecisionTable:
+      type: object
+      x-ticvai-persistence: approvals.decision_table + approvals.decision_table_row
+      description: '**Decision logic for where one IF/THEN rule is not enough** (pack 13.1.3; data model for
+        the agreed operations, 29 September). The table and its rows; `resolutionStrategy` and `onMatch`
+        say how rows combine. `conflicts` is what the engine detected on save and is read-only.'
+      required:
+      - id
+      - name
+      - resolutionStrategy
+      - onMatch
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        resolutionStrategy:
+          type: string
+          enum:
+          - priority
+          - sequence
+          - specificity
+        onMatch:
+          type: string
+          enum:
+          - stopProcessing
+          - continueEvaluation
+        rows:
+          type: array
+          items:
+            type: object
+            required:
+            - id
+            - priority
+            - conditions
+            - outcome
+            properties:
+              id:
+                type: string
+                format: uuid
+              priority:
+                type: integer
+                minimum: 1
+                description: Evaluation order under `priority` and `sequence` resolution
+              conditions:
+                type: object
+                additionalProperties: true
+                description: The row's conditions, one per governed field
+              outcome:
+                $ref: '#/components/schemas/BusinessRuleOutcome'
+              explanation:
+                type: string
+                maxLength: 1000
+                nullable: true
+        conflicts:
+          type: array
+          readOnly: true
+          items:
+            type: string
+            enum:
+            - contradictoryRules
+            - overlappingConditions
+            - unreachableOutcomes
+            - circularLogic
+            - missingOutcomes
+        status:
+          $ref: '#/components/schemas/WorkflowConfigurationStatus'
+        version:
+          type: integer
+          minimum: 1
+          readOnly: true
+        scopePath:
+          type: string
+          description: The partition key (ADR-0005). Written at venue scope
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    Automation:
+      type: object
+      x-ticvai-persistence: approvals.automation
+      description: '**One automation and whether it may act** (pack 13.2.6; data model for the agreed operations,
+        29 September). Controlled by `createAutomationAutonomouAction` (pause, resume, disable, kill switch)
+        with a reason. **Auto-approve and auto-reject exist only as deterministic rules people configured**
+        (`businessRuleId`); an AI-assisted automation never approves or rejects a request. Lifecycle in
+        `states/automation.yaml`.'
+      required:
+      - id
+      - name
+      - action
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        sourceModule:
+          $ref: '#/components/schemas/WorkflowModule'
+        businessRuleId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The rule that fires it
+        workflowDefinitionId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The workflow it runs inside, where it is a workflow's system action
+        action:
+          $ref: '#/components/schemas/WorkflowAction'
+        isAiAssisted:
+          type: boolean
+          default: false
+        status:
+          $ref: '#/components/schemas/AutomationStatus'
+        statusReason:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: Why it was last paused, resumed, disabled or kill-switched
+        statusChangedBy:
+          type: string
+          format: uuid
+          nullable: true
+        statusChangedAt:
+          type: string
+          format: date-time
+          nullable: true
+        scopePath:
+          type: string
+          description: The partition key (ADR-0005). Written at venue scope
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    AutomationExecution:
+      type: object
+      x-ticvai-persistence: approvals.automation_execution
+      description: '**One action an automation took** (pack 13.2.6; data model for the agreed operations, 29 September).
+        Every automated action traces to its trigger, rule, workflow version, authority, action and result.
+        Append-only: a reversal is a new row with result `reversed`, not an edit.'
+      required:
+      - id
+      - automationId
+      - result
+      - executedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        automationId:
+          type: string
+          format: uuid
+        workflowInstanceId:
+          type: string
+          format: uuid
+          nullable: true
+        workflowVersionId:
+          type: string
+          format: uuid
+          nullable: true
+        businessRuleId:
+          type: string
+          format: uuid
+          nullable: true
+        businessObjectType:
+          type: string
+          maxLength: 100
+          nullable: true
+        businessObjectId:
+          type: string
+          nullable: true
+        action:
+          $ref: '#/components/schemas/WorkflowAction'
+        executedUnderPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The authority the action ran under
+        result:
+          $ref: '#/components/schemas/AutomationExecutionResult'
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+          nullable: true
+          description: Confidence of an AI-assisted non-approval action; never set for approve or reject
+        failureReason:
+          type: string
+          maxLength: 1000
+          nullable: true
+        executedAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+          description: The partition key (ADR-0005). Written at venue scope

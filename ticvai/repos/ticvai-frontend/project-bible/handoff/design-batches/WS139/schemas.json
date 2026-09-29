@@ -1,0 +1,329 @@
+{
+ "Journey": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.journey + marketing.journey_step",
+  "description": "22.3.1b to 22.3.10b, CF-137. **A journey is a sequence with branches; a `MessageTrigger` is one step of it.** The trigger already handles *\"send this when that happens\"* — a journey is what you need when the next message depends on what the guest did about the last one.\nFive of the ten requirements are named lifecycles — abandoned cart, membership, loyalty, wallet, birthday. **They are not five features.** Each is a journey with a different entry event and a different set of steps, which is why this is one entity and a template library rather than five contracts.\n**Consent is checked at every send, not at entry.** A guest who opts out mid-journey stops receiving, and the journey does not need to know — the same rule `MessageTrigger` follows and the one PDPL Article 17(1) makes unconditional.\n",
+  "required": [
+   "id",
+   "name",
+   "entryEvent",
+   "status",
+   "steps"
+  ],
+  "properties": {
+   "id": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "templateKind": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "abandonedCart",
+     "membershipLifecycle",
+     "loyaltyLifecycle",
+     "walletLifecycle",
+     "birthday",
+     "onboarding",
+     "winBack",
+     "custom"
+    ],
+    "description": "Which named lifecycle this implements. **Set for reporting and for the library**, not for behaviour — the steps decide what happens.\n"
+   },
+   "entryEvent": {
+    "type": "string",
+    "description": "22.3.2b. From the event catalogue, so a journey cannot enter on something nothing publishes.\n"
+   },
+   "entryConditions": {
+    "type": "object",
+    "nullable": true,
+    "description": "Narrows entry — a segment, a tier, a venue. **Evaluated once at entry**, unlike step conditions.\n"
+   },
+   "steps": {
+    "type": "array",
+    "description": "22.3.1b. What the builder produces. **The visual builder is a frontend over this** — the contract holds the graph and the canvas is a rendering of it.\n",
+    "items": {
+     "$ref": "#/components/schemas/JourneyStep"
+    }
+   },
+   "status": {
+    "readOnly": true,
+    "type": "string",
+    "enum": [
+     "draft",
+     "active",
+     "paused",
+     "archived"
+    ]
+   },
+   "maxDurationDays": {
+    "type": "integer",
+    "default": 30,
+    "description": "**A journey with no end is a guest who never leaves it.** After this, entrants exit wherever they are.\n"
+   },
+   "reentryPolicy": {
+    "type": "string",
+    "enum": [
+     "never",
+     "afterCompletion",
+     "always"
+    ],
+    "default": "afterCompletion",
+    "description": "22.3.6b. **Abandoned cart is the case that needs this.** A guest who abandons three carts in an hour should not get three recovery sequences, and `never` is wrong too — they may genuinely abandon one next month.\n"
+   },
+   "scopePath": {
+    "readOnly": true,
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "JourneyPerformance": {
+  "type": "object",
+  "x-ticvai-persistence": "none — aggregated from marketing.journey_enrollment",
+  "required": [
+   "journeyId",
+   "entrants"
+  ],
+  "properties": {
+   "journeyId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "entrants": {
+    "type": "integer",
+    "description": "Everyone who entered, in any status."
+   },
+   "byStatus": {
+    "type": "object",
+    "description": "Entrants per `JourneyEntrant.status`.",
+    "properties": {
+     "active": {
+      "type": "integer"
+     },
+     "paused": {
+      "type": "integer"
+     },
+     "completed": {
+      "type": "integer"
+     },
+     "exited": {
+      "type": "integer"
+     },
+     "suppressed": {
+      "type": "integer"
+     }
+    }
+   },
+   "goalReached": {
+    "type": "integer",
+    "description": "**The number that matters.** Entrants who left at a step of kind `goal` — their `JourneyEntrant.stepId` when they exited.\n"
+   },
+   "goalRate": {
+    "type": "number",
+    "nullable": true,
+    "description": "`goalReached` over `entrants`. Null while there are no entrants."
+   }
+  }
+ },
+ "JourneyStep": {
+  "type": "object",
+  "description": "One node. **A step either sends, waits, or branches** — three kinds rather than a general graph, because a marketing user drawing an arbitrary graph draws a loop.\n",
+  "required": [
+   "id",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "x-ticvai-column": "type",
+    "enum": [
+     "send",
+     "wait",
+     "branch",
+     "exit",
+     "goal"
+    ]
+   },
+   "templateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-column": "message_template_id",
+    "description": "For `send`. Channel is resolved from the guest's preference at the moment of sending."
+   },
+   "channelPreference": {
+    "type": "array",
+    "nullable": true,
+    "description": "22.3.3b. Ordered fallback — email, then SMS, then push. **A guest with no email address does not get an email step**, and the step does not fail, it moves down the list.\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "email",
+      "sms",
+      "whatsapp",
+      "push",
+      "inApp"
+     ]
+    }
+   },
+   "waitMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "waitUntil": {
+    "type": "object",
+    "nullable": true,
+    "description": "22.3.5b. **Business hours, time zone and blackout windows** — a wallet low-balance alert at 3am is a complaint, and the venue's quiet hours are venue configuration rather than a property of this step.\n",
+    "properties": {
+     "businessHoursOnly": {
+      "type": "boolean",
+      "default": false
+     },
+     "timezone": {
+      "type": "string",
+      "nullable": true
+     },
+     "respectQuietHours": {
+      "type": "boolean",
+      "default": true
+     },
+     "notBefore": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   },
+   "condition": {
+    "type": "object",
+    "nullable": true,
+    "description": "22.3.4b. IF/THEN over guest profile, behaviour and prior steps. **The most common condition is whether the previous message worked** — a recovery sequence must stop when the guest buys.\n",
+    "properties": {
+     "field": {
+      "type": "string"
+     },
+     "operator": {
+      "type": "string",
+      "enum": [
+       "eq",
+       "neq",
+       "gt",
+       "lt",
+       "contains",
+       "exists",
+       "notExists"
+      ]
+     },
+     "value": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   },
+   "onTrue": {
+    "type": "string",
+    "nullable": true,
+    "description": "Next step id."
+   },
+   "onFalse": {
+    "type": "string",
+    "nullable": true
+   },
+   "next": {
+    "type": "string",
+    "nullable": true,
+    "x-ticvai-column": "next_journey_step_id"
+   },
+   "goalEvent": {
+    "type": "string",
+    "nullable": true,
+    "description": "For `goal`. **The event that means this journey worked and the guest should leave it** — a purchase for abandoned cart, a renewal for membership. **Reaching a goal exits immediately**, which is what stops a recovered cart from being chased.\n"
+   }
+  }
+ },
+ "MessageTrigger": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.message_trigger",
+  "description": "**What fires a message.** Before, during and after a visit are one mechanism with a different sign on the offset.\n",
+  "required": [
+   "id",
+   "event",
+   "templateId",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid"
+   },
+   "event": {
+    "type": "string",
+    "description": "The platform event that fires it — `order.completed`, `access.validated`, `queue.turnApproaching`. **Named from the event catalogue** (`BusinessEvent.eventType`), so a trigger cannot bind to something nothing publishes. Its conditions are `MessageTriggerCondition` rows.\n"
+   },
+   "templateId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "offsetMinutes": {
+    "type": "integer",
+    "default": 0,
+    "description": "Negative fires before the anchor, positive after. **A reminder the day before a visit is -1440 against the performance**, not a separate concept.\n"
+   },
+   "anchor": {
+    "type": "string",
+    "enum": [
+     "eventTime",
+     "performanceStart",
+     "visitEnd"
+    ],
+    "default": "eventTime"
+   },
+   "priority": {
+    "type": "string",
+    "enum": [
+     "operational",
+     "transactional",
+     "marketing"
+    ],
+    "default": "transactional",
+    "description": "**A queue-turn alert and a monthly newsletter are not the same urgency and were the same dispatch.** `operational` bypasses batching and quiet hours; `marketing` never does.\n"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   },
+   "scopePath": {
+    "readOnly": true,
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ }
+}

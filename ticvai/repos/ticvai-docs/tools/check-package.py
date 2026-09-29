@@ -897,6 +897,11 @@ def main() -> int:
         # Renamed from `retail.wallet` on 19 September when the wallet runtime left `retail.yaml`
         # for `wallet.yaml`; the allowlist entry moved with the table, and the reason is unchanged.
         "wallet.wallet",
+        # **Four from the data model of 29 September**, each denominated in its own right:
+        "catalogue.rounding_profile",        # one rounding profile per currency - the currency is the key
+        "control.partner_settlement_batch",  # a partner settles in its agreement's currency, not the venue's
+        "control.partner_security",          # a guarantee or deposit is issued in its own currency
+        "control.partner_user",              # the currency a partner's user sells in; empty means the agreement's
         # **Seven more from the backend workbook, 20 September.** Their schema stores a
         # currency on anything holding money, which is what a money table usually looks
         # like; it cannot know a region owns the answer here. These seven genuinely

@@ -1,5 +1,5 @@
 id: LLD-resources
-title: resources — 58 operations
+title: resources — 61 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -32,6 +32,8 @@ operations:
   - cache:idempotency
   - resources.booking
   - resources.resource
+  - resources.resource_hold
+  - resources.selection_policy
   writes:
   - cache:idempotency
   - resources.booking
@@ -143,6 +145,22 @@ operations:
   - resources.resource_category
   writes:
   - resources.resource_category
+- operation: createResourceCost
+  verb: POST
+  path: /resource-costs
+  scope: venue
+  permission: RESOURCE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - resources.resource
+  - resources.resource_cost
+  - resources.venue_assignment
+  writes:
+  - cache:idempotency
+  - resources.resource_cost
 - operation: createResourceHold
   verb: POST
   path: /resource-holds
@@ -181,6 +199,21 @@ operations:
   - resources.resource_type
   writes:
   - resources.resource_type
+- operation: deleteResourceCost
+  verb: DELETE
+  path: /resource-costs/{costId}
+  scope: venue
+  permission: RESOURCE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - resources.resource_cost
+  writes:
+  - cache:idempotency
+  - resources.resource_audit
+  - resources.resource_cost
 - operation: extendResourceHold
   verb: POST
   path: /resource-holds/{holdId}/extend
@@ -213,7 +246,15 @@ operations:
   - staff
   - guest
   offline: false
-  reads: []
+  reads:
+  - maintenance.work_order
+  - resources.booking
+  - resources.resource
+  - resources.resource_block
+  - resources.resource_hold
+  - venuemap.map
+  - venuemap.map_version
+  - venuemap.placed_resource
   writes: []
 - operation: getPerformanceManifest
   verb: GET
@@ -283,7 +324,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - maintenance.work_order
+  - resources.booking
+  - resources.resource
+  - resources.resource_block
+  - resources.resource_category
+  - resources.resource_hold
+  - resources.resource_schedule
+  - resources.resource_type
   writes: []
 - operation: getResourceCostAnalytics
   verb: GET
@@ -293,7 +342,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - maintenance.work_order
+  - resources.booking
+  - resources.resource
+  - resources.resource_category
+  - resources.resource_cost
+  - resources.venue_assignment
   writes: []
 - operation: getResourceDependencies
   verb: GET
@@ -359,7 +414,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - resources.booking
+  - resources.resource
+  - resources.resource_block
+  - resources.resource_category
+  - resources.resource_schedule
+  - resources.resource_type
+  - resources.venue_assignment
   writes: []
 - operation: listProductStartTimes
   verb: GET
@@ -370,7 +432,13 @@ operations:
   - staff
   - guest
   offline: false
-  reads: []
+  reads:
+  - resources.booking
+  - resources.resource
+  - resources.resource_block
+  - resources.resource_hold
+  - resources.resource_requirement
+  - resources.resource_schedule
   writes: []
 - operation: listResourceAttributes
   verb: GET
@@ -415,6 +483,18 @@ operations:
   offline: false
   reads:
   - resources.resource_category
+  writes: []
+- operation: listResourceCosts
+  verb: GET
+  path: /resource-costs
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource
+  - resources.resource_cost
   writes: []
 - operation: listResourcePackages
   verb: GET
@@ -469,8 +549,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - resources.resource_block
+  writes:
+  - cache:idempotency
+  - resources.resource_block
 - operation: relinquishResourceHold
   verb: DELETE
   path: /resource-holds/{holdId}
@@ -480,8 +564,12 @@ operations:
   - staff
   - guest
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - resources.resource_hold
+  writes:
+  - cache:idempotency
+  - resources.resource_hold
 - operation: reorderPerformanceManifest
   verb: PUT
   path: /performances/{performanceId}/manifest
@@ -613,8 +701,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - resources.resource_type
+  - resources.selection_policy
+  writes:
+  - cache:idempotency
+  - resources.selection_policy
 - operation: setResourceVenueAssignment
   verb: PUT
   path: /resources/{resourceId}/venues

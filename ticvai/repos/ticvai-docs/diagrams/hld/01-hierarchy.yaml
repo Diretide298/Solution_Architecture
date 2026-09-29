@@ -34,8 +34,8 @@ levels:
 - level: tenant
   branch: root
   parent: null
-  operations: 451
-  configurations: 80
+  operations: 475
+  configurations: 88
   configuredBy:
   - claimCustomDomain
   - createAccessPolicy
@@ -91,8 +91,8 @@ levels:
 - level: venue
   branch: organisational
   parent: region
-  operations: 1725
-  configurations: 136
+  operations: 1808
+  configurations: 164
   configuredBy:
   - cloneReaderConfiguration
   - cloneTicketTemplate

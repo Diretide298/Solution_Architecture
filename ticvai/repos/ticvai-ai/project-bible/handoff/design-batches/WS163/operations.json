@@ -1,0 +1,353 @@
+{
+ "checkInResource": {
+  "method": "POST",
+  "path": "/resource-bookings/{bookingId}/check-in",
+  "contract": "resources",
+  "summary": "Take it back, and settle the deposit",
+  "permission": "RESOURCE_BOOK",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceBooking"
+ },
+ "checkOutResource": {
+  "method": "POST",
+  "path": "/resource-bookings/{bookingId}/check-out",
+  "contract": "resources",
+  "summary": "Hand it over, with a deposit against it",
+  "permission": "RESOURCE_BOOK",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceBooking"
+ },
+ "decideApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests/{requestId}/decide",
+  "contract": "approvals",
+  "summary": "Approve, reject, return or ask for information",
+  "permission": "APPROVAL_DECIDE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalRequest"
+ },
+ "getGameplaySyncStatus": {
+  "method": "GET",
+  "path": "/gameplay-sync-status",
+  "contract": "games",
+  "summary": "What readers took offline and have not sent",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ReaderSyncStatus"
+ },
+ "getResource": {
+  "method": "GET",
+  "path": "/resources/{resourceId}",
+  "contract": "resources",
+  "summary": "One resource, with every configured section",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Resource"
+ },
+ "getResourceCalendar": {
+  "method": "GET",
+  "path": "/resource-calendar",
+  "contract": "resources",
+  "summary": "Every resource against time, with conflicts already marked",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "resourceTypeId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "granularity",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceCalendarRow"
+ },
+ "listAnnouncements": {
+  "method": "GET",
+  "path": "/announcements",
+  "contract": "workforce",
+  "summary": "What staff have been told",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "unacknowledgedOnly",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Announcement"
+ },
+ "listApprovalRequests": {
+  "method": "GET",
+  "path": "/approval-requests",
+  "contract": "approvals",
+  "summary": "Requests awaiting a decision, or already decided",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "assignedToMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "raisedByMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "breachingWithinMinutes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listResourceBookings": {
+  "method": "GET",
+  "path": "/resource-bookings",
+  "contract": "resources",
+  "summary": "Bookings, filtered",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "resourceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceBooking"
+ },
+ "listShiftSwapRequests": {
+  "method": "GET",
+  "path": "/shift-swaps",
+  "contract": "workforce",
+  "summary": "Swap requests and their state",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ShiftSwap"
+ },
+ "raiseMyCase": {
+  "method": "POST",
+  "path": "/my/cases",
+  "contract": "marketing-crm",
+  "summary": "Report something — lost property, a complaint, a question",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Case"
+ },
+ "raiseResourceRequest": {
+  "method": "POST",
+  "path": "/resource-requests",
+  "contract": "resources",
+  "summary": "Ask for a replacement, extra equipment or a change to an assignment",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourceRequestInput",
+  "responds": "ResourceRequest"
+ },
+ "recordAttendance": {
+  "method": "POST",
+  "path": "/attendance/clock",
+  "contract": "workforce",
+  "summary": "Clock in, clock out, or take a break",
+  "permission": "ATTENDANCE_RECORD",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AttendanceRecord"
+ },
+ "reportIncident": {
+  "method": "POST",
+  "path": "/incidents",
+  "contract": "maintenance",
+  "summary": "Report an incident",
+  "permission": "INCIDENT_REPORT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ReportIncidentRequest",
+  "responds": "Incident"
+ },
+ "requestShiftSwap": {
+  "method": "POST",
+  "path": "/rota-assignments/{assignmentId}/swap",
+  "contract": "workforce",
+  "summary": "Ask someone to take your shift",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setResourceBookingProgress": {
+  "method": "POST",
+  "path": "/resource-bookings/{bookingId}/progress",
+  "contract": "resources",
+  "summary": "Start or complete a staff or instructor assignment",
+  "permission": "RESOURCE_BOOK",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourceBookingProgressInput",
+  "responds": "ResourceBooking"
+ }
+}

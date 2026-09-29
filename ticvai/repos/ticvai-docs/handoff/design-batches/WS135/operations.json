@@ -1,0 +1,414 @@
+{
+ "adjustLoyaltyPoints": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/loyalty/adjust",
+  "contract": "marketing-crm",
+  "summary": "Manually adjust points",
+  "permission": "LEDGER_POST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AdjustLoyaltyPointsRequest",
+  "responds": "LoyaltyAdjustmentResult"
+ },
+ "getConsentHistory": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/consents/history",
+  "contract": "marketing-crm",
+  "summary": "Full consent history",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "getGuestAttributeModel": {
+  "method": "GET",
+  "path": "/guest-attribute-model",
+  "contract": "marketing-crm",
+  "summary": "The shared guest data model",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestAttributeModel"
+ },
+ "getGuestIntelligence": {
+  "method": "GET",
+  "path": "/guests/{guestId}/intelligence",
+  "contract": "marketing-crm",
+  "summary": "Value, engagement, churn and propensity, with their reasons",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestIntelligence"
+ },
+ "getGuestLoyalty": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/loyalty",
+  "contract": "marketing-crm",
+  "summary": "A guest's loyalty position",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "programmeId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "LoyaltyPosition"
+ },
+ "getGuestProfile": {
+  "method": "GET",
+  "path": "/guests/{subjectId}",
+  "contract": "marketing-crm",
+  "summary": "Read a guest profile",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestProfileDetail"
+ },
+ "getGuestRelationships": {
+  "method": "GET",
+  "path": "/guests/{guestId}/relationships",
+  "contract": "marketing-crm",
+  "summary": "Household, guardians, corporate and group links",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestRelationship"
+ },
+ "getGuestTimeline": {
+  "method": "GET",
+  "path": "/guests/{guestId}/timeline",
+  "contract": "marketing-crm",
+  "summary": "Everything this guest did, in order, across the platform",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kinds",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestTimelineEvent"
+ },
+ "listCustomerSegmentProfile": {
+  "method": "GET",
+  "path": "/customer-segment-profile",
+  "contract": "catalogue",
+  "summary": "Customer Segment & Profile Pricing Rules",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "dimension",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "segmentSource",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listCustomerServiceProfile": {
+  "method": "GET",
+  "path": "/customer-service-profile",
+  "contract": "marketing-crm",
+  "summary": "Customer 360° Service Profile",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "Customer360ServiceProfileView"
+ },
+ "listSegments": {
+  "method": "GET",
+  "path": "/segments",
+  "contract": "marketing-crm",
+  "summary": "List segments",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "mergeGuestProfiles": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/merge",
+  "contract": "marketing-crm",
+  "summary": "Merge a duplicate profile into this one",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MergeResult"
+ },
+ "searchGuests": {
+  "method": "GET",
+  "path": "/guests",
+  "contract": "marketing-crm",
+  "summary": "Search guest profiles",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "segmentId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "hasConsentFor",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "setGuestAttributeModel": {
+  "method": "PUT",
+  "path": "/guest-attribute-model",
+  "contract": "marketing-crm",
+  "summary": "Change the model, as a version",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GuestAttributeModel",
+  "responds": "GuestAttributeModel"
+ },
+ "setGuestExtraFields": {
+  "method": "PUT",
+  "path": "/guest-extra-fields",
+  "contract": "marketing-crm",
+  "summary": "Define the extra guest fields",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GuestExtraFieldDefinition",
+  "responds": "GuestExtraFieldDefinition"
+ },
+ "setGuestRelationships": {
+  "method": "PUT",
+  "path": "/guests/{guestId}/relationships",
+  "contract": "marketing-crm",
+  "summary": "Link people without merging them",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestRelationship"
+ },
+ "updateGuestPreferences": {
+  "method": "PUT",
+  "path": "/guests/{subjectId}/preferences",
+  "contract": "marketing-crm",
+  "summary": "The things a regular should not have to say twice",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GuestPreferences",
+  "responds": "GuestPreferences"
+ },
+ "updateGuestProfile": {
+  "method": "PATCH",
+  "path": "/guests/{subjectId}",
+  "contract": "marketing-crm",
+  "summary": "Amend a guest profile",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestProfileDetail"
+ },
+ "uploadGuestDocument": {
+  "method": "POST",
+  "path": "/guest-documents",
+  "contract": "marketing-crm",
+  "summary": "Store a guest photo, ID or signed document",
+  "permission": "GUEST_VIEW_PII",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GuestDocument",
+  "responds": "GuestDocument"
+ }
+}

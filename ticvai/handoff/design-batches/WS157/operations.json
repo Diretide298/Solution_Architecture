@@ -1,0 +1,651 @@
+{
+ "createResourceBlock": {
+  "method": "POST",
+  "path": "/resource-blocks",
+  "contract": "resources",
+  "summary": "Take a resource out of service for a window, with a reason",
+  "permission": "RESOURCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourceBlock",
+  "responds": "ResourceBlock"
+ },
+ "getEmployee": {
+  "method": "GET",
+  "path": "/employees/{employeeId}",
+  "contract": "workforce",
+  "summary": "One person, with their employment, postings and leave balances",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "employeeId",
+    "in": "path",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkforceEmployeeProfile"
+ },
+ "getFieldOwnership": {
+  "method": "GET",
+  "path": "/integration-sources/{sourceId}/field-ownership",
+  "contract": "workforce",
+  "summary": "Which fields this source masters",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "sourceId",
+    "in": "path",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkforceFieldOwnership"
+ },
+ "getPrincipal": {
+  "method": "GET",
+  "path": "/principals/{principalId}",
+  "contract": "identity",
+  "summary": "Read a principal",
+  "permission": "USER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Principal"
+ },
+ "getResourceSchedule": {
+  "method": "GET",
+  "path": "/resources/{resourceId}/schedule",
+  "contract": "resources",
+  "summary": "The pattern of when it is normally available",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResourceSchedule"
+ },
+ "listIntegrationSources": {
+  "method": "GET",
+  "path": "/integration-sources",
+  "contract": "workforce",
+  "summary": "External systems that master workforce data, and their health",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WorkforceIntegrationSource"
+ },
+ "listLeaveBalances": {
+  "method": "GET",
+  "path": "/leave-balances",
+  "contract": "workforce",
+  "summary": "What each person has left, by leave type",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "employeeId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "leaveTypeId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkforceLeaveBalance"
+ },
+ "listLeaveRequests": {
+  "method": "GET",
+  "path": "/leave-requests",
+  "contract": "workforce",
+  "summary": "Leave, absence and their effect on cover",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LeaveRequest"
+ },
+ "listLeaveTypes": {
+  "method": "GET",
+  "path": "/leave-types",
+  "contract": "workforce",
+  "summary": "Leave types and how each accrues",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WorkforceLeaveType"
+ },
+ "listPrincipals": {
+  "method": "GET",
+  "path": "/principals",
+  "contract": "identity",
+  "summary": "List principals",
+  "permission": "USER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isActive",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listResources": {
+  "method": "GET",
+  "path": "/resources",
+  "contract": "resources",
+  "summary": "Resources at this venue",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "availableFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "availableTo",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Resource"
+ },
+ "listRotaAssignments": {
+  "method": "GET",
+  "path": "/rota-assignments",
+  "contract": "workforce",
+  "summary": "The rota",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "departmentId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listShiftPatterns": {
+  "method": "GET",
+  "path": "/shift-patterns",
+  "contract": "workforce",
+  "summary": "Named shift patterns",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WorkforceShift"
+ },
+ "listShiftTemplates": {
+  "method": "GET",
+  "path": "/shift-templates",
+  "contract": "workforce",
+  "summary": "Named shift patterns a rota is built from",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ShiftTemplate"
+ },
+ "listSyncConflicts": {
+  "method": "GET",
+  "path": "/sync-conflicts",
+  "contract": "workforce",
+  "summary": "Disagreements a person has to settle",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "sourceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSyncRuns": {
+  "method": "GET",
+  "path": "/sync-runs",
+  "contract": "workforce",
+  "summary": "Synchronisation history, with counts",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "sourceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "requestLeave": {
+  "method": "POST",
+  "path": "/leave-requests",
+  "contract": "workforce",
+  "summary": "Ask for time off, against the cover it would cost",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "LeaveRequest",
+  "responds": "LeaveRequest"
+ },
+ "resolveSyncConflict": {
+  "method": "POST",
+  "path": "/sync-conflicts",
+  "contract": "workforce",
+  "summary": "Settle a disagreement",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResolveSyncConflictRequest",
+  "responds": "WorkforceSyncConflict"
+ },
+ "setExperienceResourceRequirements": {
+  "method": "PUT",
+  "path": "/experiences/{experienceId}/resource-requirements",
+  "contract": "resources",
+  "summary": "Bind resource requirements to an experience",
+  "permission": "RESOURCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceRequirement"
+ },
+ "setFieldOwnership": {
+  "method": "PUT",
+  "path": "/integration-sources/{sourceId}/field-ownership",
+  "contract": "workforce",
+  "summary": "Declare who masters each field",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "sourceId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WorkforceFieldOwnership",
+  "responds": "WorkforceFieldOwnership"
+ },
+ "setIntegrationSource": {
+  "method": "PUT",
+  "path": "/integration-sources",
+  "contract": "workforce",
+  "summary": "Connect or reconfigure an external workforce system",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WorkforceIntegrationSource",
+  "responds": "WorkforceIntegrationSource"
+ },
+ "setLeaveType": {
+  "method": "PUT",
+  "path": "/leave-types",
+  "contract": "workforce",
+  "summary": "Define a leave type",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WorkforceLeaveType",
+  "responds": "WorkforceLeaveType"
+ },
+ "setResourceQualifications": {
+  "method": "PUT",
+  "path": "/resources/{resourceId}/qualifications",
+  "contract": "resources",
+  "summary": "What a person resource is certified to do, and until when",
+  "permission": "RESOURCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Qualification"
+ },
+ "setResourceSchedule": {
+  "method": "PUT",
+  "path": "/resources/{resourceId}/schedule",
+  "contract": "resources",
+  "summary": "Operating hours, working pattern and bookable slots",
+  "permission": "RESOURCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourceSchedule",
+  "responds": "ResourceSchedule"
+ },
+ "setShiftPattern": {
+  "method": "PUT",
+  "path": "/shift-patterns",
+  "contract": "workforce",
+  "summary": "Define a shift pattern and its break",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WorkforceShift",
+  "responds": "WorkforceShift"
+ },
+ "setShiftTemplate": {
+  "method": "PUT",
+  "path": "/shift-templates",
+  "contract": "workforce",
+  "summary": "Define a shift pattern, its breaks and its qualifications",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ShiftTemplate",
+  "responds": "ShiftTemplate"
+ },
+ "setStaffingRules": {
+  "method": "PUT",
+  "path": "/staffing-rules",
+  "contract": "workforce",
+  "summary": "Minimum cover, working-hour limits and overtime",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "StaffingRules",
+  "responds": "StaffingRules"
+ },
+ "startSync": {
+  "method": "POST",
+  "path": "/sync-runs",
+  "contract": "workforce",
+  "summary": "Run a synchronisation now",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "suggestResources": {
+  "method": "GET",
+  "path": "/resource-suggestions",
+  "contract": "resources",
+  "summary": "Resources matching a requirement, by attribute",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "resourceTypeId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "attributes",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Resource"
+ },
+ "validateWorkforceCompliance": {
+  "method": "GET",
+  "path": "/workforce-compliance",
+  "contract": "workforce",
+  "summary": "Where the rota breaks a rule",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkforceComplianceFinding"
+ }
+}

@@ -12,6 +12,44 @@
   "requestBody": null,
   "responds": "ConflictAnalysis"
  },
+ "assignCoupon": {
+  "method": "POST",
+  "path": "/coupon-codes/{code}/assign",
+  "contract": "promotions",
+  "summary": "Assign a coupon to a named guest",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "bulkChangePrices": {
+  "method": "POST",
+  "path": "/products/bulk-price",
+  "contract": "catalogue",
+  "summary": "Reprice a category or a whole catalogue",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "BulkPriceResult"
+ },
  "bulkUpdateProducts": {
   "method": "POST",
   "path": "/products/bulk",
@@ -92,7 +130,7 @@
   "method": "POST",
   "path": "/channel-capacities",
   "contract": "catalogue",
-  "summary": "Create a capacity envelope",
+  "summary": "Create a channel capacity",
   "permission": "CAPACITY_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -106,6 +144,25 @@
   ],
   "requestBody": "CreateEnvelopeRequest",
   "responds": "ChannelCapacity"
+ },
+ "createCombo": {
+  "method": "POST",
+  "path": "/combos",
+  "contract": "fnb",
+  "summary": "A meal deal, priced as one thing",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Combo",
+  "responds": "Combo"
  },
  "createCouponCampaign": {
   "method": "POST",
@@ -259,6 +316,25 @@
   "requestBody": "CreatePromotionRequest",
   "responds": "Promotion"
  },
+ "createVoucherBatch": {
+  "method": "POST",
+  "path": "/voucher-batches",
+  "contract": "promotions",
+  "summary": "Issue a voucher batch",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateVoucherBatchRequest",
+  "responds": "VoucherBatch"
+ },
  "endPromotion": {
   "method": "POST",
   "path": "/promotions/{promotionId}/end",
@@ -348,6 +424,25 @@
   "requestBody": null,
   "responds": "DashboardData"
  },
+ "getDynamicPriceRule": {
+  "method": "GET",
+  "path": "/pricing/dynamic-rules/{ruleId}",
+  "contract": "catalogue",
+  "summary": "One rule with its conditions and actions",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "ruleId",
+    "in": "path",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "DynamicPriceRuleDetail"
+ },
  "getEvent": {
   "method": "GET",
   "path": "/events/{eventId}",
@@ -360,6 +455,25 @@
   "parameters": [],
   "requestBody": null,
   "responds": "Event"
+ },
+ "getGroupPackageDefinition": {
+  "method": "GET",
+  "path": "/products/{productId}/group-package",
+  "contract": "catalogue",
+  "summary": "A school-trip format or party package",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "path",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "GroupPackageDefinition"
  },
  "getLatestBundle": {
   "method": "GET",
@@ -501,7 +615,7 @@
   "method": "GET",
   "path": "/catalogue/bundles",
   "contract": "catalogue",
-  "summary": "List published bundles",
+  "summary": "List published catalogue bundles",
   "permission": "PRODUCT_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
@@ -514,7 +628,7 @@
   "method": "GET",
   "path": "/channel-capacities",
   "contract": "catalogue",
-  "summary": "List capacity envelopes",
+  "summary": "List channel capacities",
   "permission": "PRODUCT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -592,6 +706,11 @@
     "required": null
    },
    {
+    "name": "batchId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -604,6 +723,19 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "listDynamicPriceRules": {
+  "method": "GET",
+  "path": "/pricing/dynamic-rules",
+  "contract": "catalogue",
+  "summary": "Dynamic pricing rules",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PricingDynamicPriceRule"
  },
  "listEntitlementTemplates": {
   "method": "GET",
@@ -720,6 +852,19 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listPerformanceTemplates": {
+  "method": "GET",
+  "path": "/performance-templates",
+  "contract": "catalogue",
+  "summary": "Slot templates, peak bands and walk-in rules",
+  "permission": "PERFORMANCE_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PerformanceTemplate"
+ },
  "listPerformances": {
   "method": "GET",
   "path": "/events/{eventId}/performances",
@@ -737,6 +882,11 @@
    },
    {
     "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "language",
     "in": "query",
     "required": null
    },
@@ -857,6 +1007,16 @@
     "required": null
    },
    {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "segmentTag",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -908,6 +1068,68 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "listVoucherBatches": {
+  "method": "GET",
+  "path": "/voucher-batches",
+  "contract": "promotions",
+  "summary": "List voucher batches",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listWaitlistEntries": {
+  "method": "GET",
+  "path": "/waitlist-entries",
+  "contract": "catalogue",
+  "summary": "Who is waiting for capacity",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "performanceId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WaitlistEntry"
+ },
+ "offerWaitlistCapacity": {
+  "method": "POST",
+  "path": "/waitlist-entries/{entryId}/offer",
+  "contract": "catalogue",
+  "summary": "Tell a waiting guest that capacity appeared",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WaitlistEntry"
  },
  "pausePromotion": {
   "method": "POST",
@@ -975,7 +1197,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "SeatRecommendationRequest",
   "responds": null
  },
@@ -1083,7 +1311,7 @@
   "method": "PUT",
   "path": "/channel-capacities/{channelCapacityId}/channel-allocations",
   "contract": "catalogue",
-  "summary": "Allocate envelope capacity across channels",
+  "summary": "Allocate a channel capacity across sales channels",
   "permission": "CAPACITY_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -1117,6 +1345,73 @@
   "requestBody": "ChannelListing",
   "responds": "ChannelListing"
  },
+ "setComboSlots": {
+  "method": "PUT",
+  "path": "/combos/{comboId}/slots",
+  "contract": "fnb",
+  "summary": "What the guest chooses, and what it costs extra",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Combo"
+ },
+ "setDynamicPriceRule": {
+  "method": "PUT",
+  "path": "/pricing/dynamic-rules/{ruleId}",
+  "contract": "catalogue",
+  "summary": "Replace a rule, its conditions and its actions",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "ruleId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DynamicPriceRuleDetail",
+  "responds": "DynamicPriceRuleDetail"
+ },
+ "setGroupPackageDefinition": {
+  "method": "PUT",
+  "path": "/products/{productId}/group-package",
+  "contract": "catalogue",
+  "summary": "Define a school-trip format or party package",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "productId",
+    "in": "path",
+    "required": true
+   }
+  ],
+  "requestBody": "GroupPackageDefinition",
+  "responds": "GroupPackageDefinition"
+ },
  "setItemAvailability": {
   "method": "PUT",
   "path": "/menu-items/{itemId}/availability",
@@ -1135,6 +1430,25 @@
   ],
   "requestBody": null,
   "responds": "MenuItem"
+ },
+ "setPerformanceTemplate": {
+  "method": "PUT",
+  "path": "/performance-templates",
+  "contract": "catalogue",
+  "summary": "Define slot length, capacity, bands and walk-in policy",
+  "permission": "PERFORMANCE_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PerformanceTemplate",
+  "responds": "PerformanceTemplate"
  },
  "setPrices": {
   "method": "PUT",
@@ -1174,6 +1488,25 @@
   "requestBody": null,
   "responds": null
  },
+ "setPromotionVariants": {
+  "method": "PUT",
+  "path": "/promotions/{promotionId}/variants",
+  "contract": "promotions",
+  "summary": "A/B test two versions against each other",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "simulatePromotion": {
   "method": "POST",
   "path": "/promotions/{promotionId}/simulate",
@@ -1183,7 +1516,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": null
  },
@@ -1225,11 +1564,30 @@
   "requestBody": null,
   "responds": null
  },
+ "updateBundle": {
+  "method": "PATCH",
+  "path": "/bundles/{bundleId}",
+  "contract": "promotions",
+  "summary": "Amend a bundle",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Bundle"
+ },
  "updateChannelCapacity": {
   "method": "PATCH",
   "path": "/channel-capacities/{channelCapacityId}",
   "contract": "catalogue",
-  "summary": "Amend an envelope",
+  "summary": "Amend a channel capacity",
   "permission": "CAPACITY_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -1357,5 +1715,24 @@
   ],
   "requestBody": null,
   "responds": "CouponCode"
+ },
+ "voidVoucher": {
+  "method": "POST",
+  "path": "/vouchers/{voucherId}/void",
+  "contract": "promotions",
+  "summary": "Cancel a voucher",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Voucher"
  }
 }

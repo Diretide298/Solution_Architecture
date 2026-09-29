@@ -1,9 +1,9 @@
--- marketing — 113 tables
+-- marketing — 127 tables
 -- **Derived. Do not hand-edit.**
 
 -- Available, busy, away or offline, with a concurrency limit. Expires — an agent who forgets to go
 -- offline is one conversations queue for Hangs off: reaches marketing.guest_profile through its
--- keys; references identity.principal. Reached by: 3 operations read it and 1 write it.
+-- keys; references identity.principal. Reached by: 6 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS marketing.agent_availability (
     id                                uuid PRIMARY KEY,
     principal_id                      uuid NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS marketing.agent_availability (
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.agent_service_profile (
     id                                uuid PRIMARY KEY,
     principal_id                      uuid NOT NULL,
@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS marketing.badge (
 );
 
 -- Holds 20 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 0 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.booking_consent_record (
     id                                text PRIMARY KEY NOT NULL,
     question_id                       text NOT NULL,
@@ -124,6 +124,20 @@ CREATE TABLE IF NOT EXISTS marketing.booking_consent_record (
     answered_at                       timestamptz NOT NULL,
     superseded_at                     timestamptz,
     scope_path                        ltree NOT NULL
+);
+
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.business_event (
+    id                                uuid PRIMARY KEY NOT NULL,
+    event_type                        text NOT NULL CONSTRAINT business_event_event_type_chk CHECK (char_length(event_type) <= 100),
+    source_module                     text NOT NULL CONSTRAINT business_event_source_module_chk CHECK (source_module IN ('crm', 'ticketing', 'membership', 'waiver', 'groupSales', 'customerService', 'finance', 'wallet', 'resourceManagement', 'accessControl', 'other')),
+    event_state                       text CONSTRAINT business_event_event_state_chk CHECK (char_length(event_state) <= 100),
+    payload_fields                    text[],
+    priority                          text NOT NULL DEFAULT 'P3' CONSTRAINT business_event_priority_chk CHECK (priority IN ('P1', 'P2', 'P3', 'P4')),
+    status                            text NOT NULL DEFAULT 'active' CONSTRAINT business_event_status_chk CHECK (status IN ('active', 'inactive')),
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
 );
 
 -- A send with an audience and a schedule. Every dispatch it produces is a message_dispatch row,
@@ -174,6 +188,8 @@ CREATE TABLE IF NOT EXISTS marketing."case" (
     recorded_at                       timestamptz,
     synced_at                         timestamptz,
     category_id                       uuid,
+    queue_id                          uuid,
+    membership_id                     uuid,
     status                            text NOT NULL CONSTRAINT case_status_chk CHECK (status IN ('open', 'inProgress', 'awaitingGuest', 'escalated', 'resolved', 'closed')),
     priority                          text NOT NULL CONSTRAINT case_priority_chk CHECK (priority IN ('low', 'normal', 'high', 'urgent')),
     assigned_to_principal_id          uuid,
@@ -188,8 +204,22 @@ CREATE TABLE IF NOT EXISTS marketing."case" (
     resolution_note                   text
 );
 
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.case_category (
+    id                                uuid PRIMARY KEY NOT NULL,
+    code                              text NOT NULL CONSTRAINT case_category_code_chk CHECK (char_length(code) <= 60),
+    name                              text NOT NULL CONSTRAINT case_category_name_chk CHECK (char_length(name) <= 150),
+    parent_category_id                uuid,
+    default_priority                  text,
+    is_active                         boolean NOT NULL DEFAULT true,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.case_compensation_request (
     id                                text PRIMARY KEY NOT NULL,
     scope_path                        ltree NOT NULL,
@@ -210,8 +240,24 @@ CREATE TABLE IF NOT EXISTS marketing.case_compensation_request (
     updated_at                        timestamptz
 );
 
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.case_escalation (
+    id                                uuid PRIMARY KEY NOT NULL,
+    case_id                           text NOT NULL,
+    reason                            text NOT NULL CONSTRAINT case_escalation_reason_chk CHECK (char_length(reason) <= 500),
+    reason_category                   text CONSTRAINT case_escalation_reason_category_chk CHECK (reason_category IN ('slaRisk', 'customerComplaint', 'repeatedContact', 'highValue', 'refundException', 'operationalFailure', 'systemFailure', 'legalCompliance', 'vipCustomer', 'supervisorRequested', 'other')),
+    is_automatic                      boolean DEFAULT false,
+    escalated_by_principal_id         uuid,
+    escalated_to_principal_id         uuid,
+    previous_priority                 text CONSTRAINT case_escalation_previous_priority_chk CHECK (previous_priority IN ('low', 'normal', 'high', 'urgent')),
+    new_priority                      text,
+    escalated_at                      timestamptz NOT NULL,
+    scope_path                        ltree NOT NULL
+);
+
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.case_internal_request (
     id                                text PRIMARY KEY NOT NULL,
     scope_path                        ltree NOT NULL,
@@ -233,7 +279,7 @@ CREATE TABLE IF NOT EXISTS marketing.case_internal_request (
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.case_linked_record (
     id                                uuid PRIMARY KEY,
     scope_path                        ltree NOT NULL,
@@ -262,7 +308,7 @@ CREATE TABLE IF NOT EXISTS marketing.case_message (
 );
 
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.case_resolution (
     id                                uuid PRIMARY KEY,
     scope_path                        ltree NOT NULL,
@@ -281,7 +327,7 @@ CREATE TABLE IF NOT EXISTS marketing.case_resolution (
 );
 
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.case_routing_rule (
     id                                uuid PRIMARY KEY,
     code                              text NOT NULL CONSTRAINT case_routing_rule_code_chk CHECK (char_length(code) <= 60),
@@ -303,7 +349,7 @@ CREATE TABLE IF NOT EXISTS marketing.case_routing_rule (
 );
 
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.case_service_action (
     id                                text PRIMARY KEY NOT NULL,
     scope_path                        ltree NOT NULL,
@@ -357,8 +403,31 @@ CREATE TABLE IF NOT EXISTS marketing.challenge_progress (
     reward_issued_at                  timestamptz
 );
 
+-- Holds 18 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.communication_policy_decision (
+    id                                uuid PRIMARY KEY NOT NULL,
+    communication_id                  text NOT NULL,
+    subject_id                        uuid NOT NULL,
+    message_class                     text NOT NULL CONSTRAINT communication_policy_decision_message_class_chk CHECK (message_class IN ('transactional', 'operational', 'service', 'marketing')),
+    channel                           text NOT NULL CONSTRAINT communication_policy_decision_channel_chk CHECK (channel IN ('email', 'sms', 'whatsapp', 'push', 'inApp', 'post')),
+    marketing_consent                 text CONSTRAINT communication_policy_decision_marketing_consent_chk CHECK (marketing_consent IN ('granted', 'withdrawn', 'notAsked')),
+    email_preference                  boolean,
+    sms_preference                    boolean,
+    whatsapp_preference               boolean,
+    push_preference                   boolean,
+    language                          text,
+    is_contact_restricted             boolean,
+    jurisdiction                      text,
+    suppression_reason                text CONSTRAINT communication_policy_decision_suppression_reason_chk CHECK (suppression_reason IN ('unsubscribed', 'invalidEmail', 'invalidMobile', 'hardBounce', 'complaint', 'administrative')),
+    decision                          text NOT NULL CONSTRAINT communication_policy_decision_decision_chk CHECK (decision IN ('allowed', 'blocked', 'rerouted', 'suppressed')),
+    reasons                           text[],
+    rerouted_to_channel               text CONSTRAINT communication_policy_decision_rerouted_to_channel_chk CHECK (rerouted_to_channel IN ('email', 'sms', 'whatsapp', 'push', 'inApp', 'post')),
+    evaluated_at                      timestamptz NOT NULL
+);
+
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 0 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.communication_preference_type (
     category_code                     text NOT NULL CONSTRAINT communication_preference_type_category_code_chk CHECK (char_length(category_code) <= 60),
     name                              text NOT NULL CONSTRAINT communication_preference_type_name_chk CHECK (char_length(name) <= 150),
@@ -380,7 +449,7 @@ CREATE TABLE IF NOT EXISTS marketing.communication_preference_type (
 );
 
 -- Holds 21 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 1 write it; 1 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.communication_provider (
     id                                uuid PRIMARY KEY,
     scope_path                        ltree NOT NULL,
@@ -406,7 +475,7 @@ CREATE TABLE IF NOT EXISTS marketing.communication_provider (
 );
 
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.communication_routing_rule (
     id                                uuid PRIMARY KEY NOT NULL,
     scope_path                        ltree NOT NULL,
@@ -425,7 +494,7 @@ CREATE TABLE IF NOT EXISTS marketing.communication_routing_rule (
 );
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 0 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.consent_capture_point (
     capture_point                     text NOT NULL CONSTRAINT consent_capture_point_capture_point_chk CHECK (capture_point IN ('accountRegistration', 'guestCheckout', 'ticketPurchase', 'membershipEnrolment', 'annualPassEnrolment', 'mobileAppRegistration', 'posCustomerCreation', 'kiosk', 'crmCustomerCreation', 'walletEnrolment', 'faceEnrolment', 'newsletterSignup', 'customerPortal', 'competitionPromotion', 'apiPartnerJourney')),
     channel                           text NOT NULL CONSTRAINT consent_capture_point_channel_chk CHECK (channel IN ('guestApp', 'website', 'kiosk', 'pos', 'callCentre', 'import', 'agentRecorded')),
@@ -439,6 +508,20 @@ CREATE TABLE IF NOT EXISTS marketing.consent_capture_point (
     version                           integer NOT NULL,
     publication_status                text NOT NULL CONSTRAINT consent_capture_point_publication_status_chk CHECK (publication_status IN ('draft', 'review', 'approved', 'published', 'superseded')),
     scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
+);
+
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.consent_propagation (
+    id                                uuid PRIMARY KEY NOT NULL,
+    consent_record_id                 text NOT NULL,
+    target                            text NOT NULL CONSTRAINT consent_propagation_target_chk CHECK (target IN ('crm', 'marketing', 'campaignAudience', 'connectedSystem')),
+    target_name                       text CONSTRAINT consent_propagation_target_name_chk CHECK (char_length(target_name) <= 200),
+    status                            text NOT NULL DEFAULT 'requested' CONSTRAINT consent_propagation_status_chk CHECK (status IN ('requested', 'processed', 'propagated', 'acknowledged', 'failed', 'retryRequired')),
+    attempts                          integer DEFAULT 0,
+    error                             text CONSTRAINT consent_propagation_error_chk CHECK (char_length(error) <= 500),
+    created_at                        timestamptz,
     updated_at                        timestamptz
 );
 
@@ -463,7 +546,7 @@ CREATE TABLE IF NOT EXISTS marketing.consent_purpose_channel (
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 11 operations read it and 2 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.consent_question (
     id                                text PRIMARY KEY NOT NULL,
     kind                              text NOT NULL CONSTRAINT consent_question_kind_chk CHECK (kind IN ('swim', 'scuba', 'risk', 'custom')),
@@ -478,13 +561,15 @@ CREATE TABLE IF NOT EXISTS marketing.consent_question (
     updated_at                        timestamptz
 );
 
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.consent_question_version (
-    id                                uuid PRIMARY KEY NOT NULL,
     question_id                       text NOT NULL,
     version                           integer NOT NULL,
     text                              jsonb NOT NULL,
     published_at                      timestamptz NOT NULL,
-    published_by                      uuid
+    published_by                      uuid,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- What a guest agreed to and when. A merge takes the narrower of two (CF-160)
@@ -509,7 +594,7 @@ CREATE TABLE IF NOT EXISTS marketing.consent_record_channel (
 );
 
 -- Holds 22 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.contact_automation (
     id                                uuid PRIMARY KEY,
     code                              text NOT NULL CONSTRAINT contact_automation_code_chk CHECK (char_length(code) <= 60),
@@ -538,7 +623,7 @@ CREATE TABLE IF NOT EXISTS marketing.contact_automation (
 -- A live session with somebody waiting. Not a case — a case is a ticket measured in hours, this is
 -- measured in seconds. A conversation may create a case; it is not one Hangs off: reaches
 -- marketing.guest_profile through its keys; references identity.principal, marketing.case,
--- marketing.kiosk_assist_session. Reached by: 8 operations read it and 6 write it; 2 tables
+-- marketing.kiosk_assist_session. Reached by: 13 operations read it and 6 write it; 2 tables
 -- reference it.
 CREATE TABLE IF NOT EXISTS marketing.conversation (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -567,7 +652,7 @@ CREATE TABLE IF NOT EXISTS marketing.conversation (
 -- One message. The sender is resolved, never declared, and the assistant is labelled as one — a
 -- guest talking to a bot that presents as a person is a complaint waiting to happen Hangs off: a
 -- child of marketing.conversation; reaches marketing.guest_profile through its keys; references
--- ai.activity, identity.principal, marketing.conversation. Reached by: 7 operations read it and 1
+-- ai.activity, identity.principal, marketing.conversation. Reached by: 8 operations read it and 1
 -- write it; 1 tables re
 CREATE TABLE IF NOT EXISTS marketing.conversation_message (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -590,7 +675,7 @@ CREATE TABLE IF NOT EXISTS marketing.conversation_message_attachment (
 );
 
 -- Holds 16 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.cookie_banner_design (
     id                                uuid PRIMARY KEY,
     brand_id                          uuid,
@@ -636,6 +721,22 @@ CREATE TABLE IF NOT EXISTS marketing.duplicate_candidate (
     status                            text CONSTRAINT duplicate_candidate_status_chk CHECK (status IN ('pending', 'merged', 'rejected', 'split')),
     decided_by                        uuid,
     decided_at                        timestamptz,
+    scope_path                        ltree NOT NULL
+);
+
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.feedback_classification (
+    id                                uuid PRIMARY KEY NOT NULL,
+    source                            text NOT NULL CONSTRAINT feedback_classification_source_chk CHECK (source IN ('csatSurvey', 'serviceRating', 'nps', 'postCaseSurvey', 'complaint', 'appFeedback', 'webFeedback', 'directComment')),
+    form_submission_id                uuid,
+    review_id                         text,
+    case_id                           text,
+    sentiment                         text CONSTRAINT feedback_classification_sentiment_chk CHECK (sentiment IN ('positive', 'neutral', 'negative')),
+    topic                             text CONSTRAINT feedback_classification_topic_chk CHECK (char_length(topic) <= 100),
+    confidence                        numeric(18,4),
+    model_version                     text CONSTRAINT feedback_classification_model_version_chk CHECK (char_length(model_version) <= 100),
+    classified_at                     timestamptz NOT NULL,
     scope_path                        ltree NOT NULL
 );
 
@@ -689,7 +790,7 @@ CREATE TABLE IF NOT EXISTS marketing.form_definition_field (
 
 -- The acceptance record, and it is evidence (2.15.13). Bound to the version accepted, not to the
 -- form. Hangs off: reaches marketing.guest_profile through its keys; references
--- assets.media_asset, pii.subject. Reached by: 3 operations read it and 1 write it; 1 tables
+-- assets.media_asset, pii.subject. Reached by: 18 operations read it and 1 write it; 3 tables
 -- reference it.
 CREATE TABLE IF NOT EXISTS marketing.form_submission (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -978,7 +1079,7 @@ CREATE TABLE IF NOT EXISTS marketing.journey_step (
 -- A staff member acting on a kiosk session remotely (2.1.25). The guest can always see it and
 -- always end it — assistance a guest cannot stop is surveillance Hangs off: reaches
 -- marketing.guest_profile through its keys; references identity.principal, orders.cart,
--- platform.scope. Reached by: 2 operations read it and 2 write it; 1 tables reference it.
+-- platform.scope. Reached by: 3 operations read it and 2 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS marketing.kiosk_assist_session (
     id                                uuid PRIMARY KEY NOT NULL,
     device_id                         uuid NOT NULL,
@@ -993,7 +1094,7 @@ CREATE TABLE IF NOT EXISTS marketing.kiosk_assist_session (
 );
 
 -- Holds 16 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.legal_hold (
     hold_id                           uuid,
     kind                              text DEFAULT 'legal' CONSTRAINT legal_hold_kind_chk CHECK (kind IN ('legal', 'operational', 'fraudInvestigation', 'regulatorRequest')),
@@ -1124,6 +1225,7 @@ CREATE TABLE IF NOT EXISTS marketing.message_dispatch (
     campaign_id                       uuid,
     channel                           text NOT NULL CONSTRAINT message_dispatch_channel_chk CHECK (channel IN ('email', 'sms', 'whatsapp', 'push', 'inApp', 'post')),
     template_id                       uuid,
+    message_trigger_id                uuid,
     status                            text NOT NULL CONSTRAINT message_dispatch_status_chk CHECK (status IN ('queued', 'sent', 'delivered', 'opened', 'clicked', 'bounced', 'failed', 'suppressed')),
     failure_reason                    text,
     provider_reference                text,
@@ -1134,6 +1236,26 @@ CREATE TABLE IF NOT EXISTS marketing.message_dispatch (
     clicked_at                        timestamptz,
     complained_at                     timestamptz,
     unsubscribed_at                   timestamptz
+);
+
+-- Holds 15 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.message_dispatch_attempt (
+    id                                uuid PRIMARY KEY NOT NULL,
+    message_dispatch_id               text NOT NULL,
+    attempt_number                    integer NOT NULL,
+    communication_provider_id         uuid NOT NULL,
+    channel                           text NOT NULL CONSTRAINT message_dispatch_attempt_channel_chk CHECK (channel IN ('email', 'sms', 'whatsapp', 'push', 'inApp', 'post')),
+    is_fallback                       boolean DEFAULT false,
+    outcome                           text NOT NULL CONSTRAINT message_dispatch_attempt_outcome_chk CHECK (outcome IN ('accepted', 'delivered', 'failed', 'rateLimited', 'timedOut')),
+    failure_category                  text CONSTRAINT message_dispatch_attempt_failure_category_chk CHECK (failure_category IN ('providerUnavailable', 'invalidAddress', 'invalidMobile', 'rateLimited', 'authenticationError', 'templateRejected', 'timeout', 'consentBlock', 'unknownError')),
+    failure_message                   text CONSTRAINT message_dispatch_attempt_failure_message_chk CHECK (char_length(failure_message) <= 1000),
+    provider_reference                text,
+    api_latency_ms                    integer,
+    cost                              numeric(18,4),
+    attempted_at                      timestamptz NOT NULL,
+    delivered_at                      timestamptz,
+    next_attempt_at                   timestamptz
 );
 
 -- Reusable content for a channel, with the variables a dispatch fills
@@ -1147,7 +1269,30 @@ CREATE TABLE IF NOT EXISTS marketing.message_template (
     merge_fields                      text[],
     missing_languages                 text[],
     provider_template_id              text,
+    brand_id                          uuid,
+    ownership                         text DEFAULT 'crm' CONSTRAINT message_template_ownership_chk CHECK (ownership IN ('platform', 'crm')),
     tenant_id                         uuid NOT NULL
+);
+
+-- Holds 16 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.message_template_version (
+    id                                uuid PRIMARY KEY NOT NULL,
+    message_template_id               uuid NOT NULL,
+    language                          text NOT NULL CONSTRAINT message_template_version_language_chk CHECK (char_length(language) <= 35),
+    version                           integer NOT NULL,
+    status                            text NOT NULL CONSTRAINT message_template_version_status_chk CHECK (status IN ('draft', 'published', 'archived')),
+    subject                           text CONSTRAINT message_template_version_subject_chk CHECK (char_length(subject) <= 500),
+    header                            text,
+    body                              text,
+    footer                            text,
+    cta_label                         text CONSTRAINT message_template_version_cta_label_chk CHECK (char_length(cta_label) <= 100),
+    cta_url                           text CONSTRAINT message_template_version_cta_url_chk CHECK (char_length(cta_url) <= 2000),
+    attachment_kinds                  text[],
+    variables                         text[],
+    published_at                      timestamptz,
+    published_by_principal_id         uuid,
+    created_at                        timestamptz
 );
 
 -- What fires a message (BL-052). Before, during and after a visit are one mechanism with a
@@ -1163,8 +1308,19 @@ CREATE TABLE IF NOT EXISTS marketing.message_trigger (
     scope_path                        ltree NOT NULL
 );
 
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.message_trigger_condition (
+    id                                uuid PRIMARY KEY NOT NULL,
+    message_trigger_id                uuid NOT NULL,
+    dimension                         text NOT NULL CONSTRAINT message_trigger_condition_dimension_chk CHECK (dimension IN ('product', 'event', 'venue', 'brand', 'customer', 'channel', 'time', 'transactionStatus', 'membership', 'bookingType')),
+    operator                          text NOT NULL CONSTRAINT message_trigger_condition_operator_chk CHECK (operator IN ('equals', 'notEquals', 'in', 'withinMinutes', 'isValid', 'isPermitted')),
+    value                             text CONSTRAINT message_trigger_condition_value_chk CHECK (char_length(value) <= 500),
+    scope_path                        ltree NOT NULL
+);
+
 -- Holds 15 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 0 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.minor_privacy_rule (
     country                           text NOT NULL,
     minor_below_age                   integer NOT NULL,
@@ -1212,7 +1368,7 @@ CREATE TABLE IF NOT EXISTS marketing.points_redemption_rule (
 );
 
 -- Holds 16 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.privacy_action (
     action_id                         uuid,
     request_id                        uuid,
@@ -1233,7 +1389,7 @@ CREATE TABLE IF NOT EXISTS marketing.privacy_action (
 );
 
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 0 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.privacy_audit_event (
     event_id                          uuid NOT NULL,
     subject_id                        uuid,
@@ -1255,7 +1411,7 @@ CREATE TABLE IF NOT EXISTS marketing.privacy_audit_event (
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 0 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.privacy_change_set (
     change_set_id                     uuid NOT NULL,
     status                            text NOT NULL CONSTRAINT privacy_change_set_status_chk CHECK (status IN ('draft', 'validated', 'submitted', 'approved', 'scheduled', 'published', 'rolledBack', 'rejected')),
@@ -1268,7 +1424,7 @@ CREATE TABLE IF NOT EXISTS marketing.privacy_change_set (
 );
 
 -- Holds 24 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.privacy_exception (
     id                                uuid PRIMARY KEY NOT NULL,
     category                          text NOT NULL CONSTRAINT privacy_exception_category_chk CHECK (category IN ('missingConsentEvidence', 'consentPropagationFailure', 'marketingAfterWithdrawal', 'policyVersionMismatch', 'missingGuardianConsent', 'retentionFailure', 'deletionFailure', 'unknownTrackingTechnology', 'unauthorisedDataAccess', 'unmappedProcessingPurpose', 'biometricPrivacyException', 'dataExportFailure', 'other')),
@@ -1297,7 +1453,7 @@ CREATE TABLE IF NOT EXISTS marketing.privacy_exception (
 );
 
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.privacy_export_package (
     sources                           text[],
     request_id                        uuid NOT NULL,
@@ -1325,8 +1481,27 @@ CREATE TABLE IF NOT EXISTS marketing.privacy_incident (
     scope_path                        ltree NOT NULL
 );
 
+-- Holds 14 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.privacy_notice_governance (
+    id                                uuid PRIMARY KEY NOT NULL,
+    policy_id                         uuid NOT NULL,
+    document_type                     text NOT NULL CONSTRAINT privacy_notice_governance_document_type_chk CHECK (document_type IN ('privacyPolicy', 'privacyNotice', 'cookieNotice', 'marketingNotice', 'biometricPrivacyNotice', 'childrensPrivacyNotice', 'locationServicesNotice', 'other')),
+    status                            text NOT NULL DEFAULT 'draft' CONSTRAINT privacy_notice_governance_status_chk CHECK (status IN ('draft', 'review', 'approved', 'scheduled', 'published', 'superseded', 'archived')),
+    change_classification             text CONSTRAINT privacy_notice_governance_change_classification_chk CHECK (change_classification IN ('minor', 'material')),
+    requires_re_acceptance            boolean DEFAULT false,
+    requires_notification             boolean DEFAULT false,
+    owner_principal_id                uuid,
+    approved_by_principal_id          uuid,
+    approval_request_id               uuid,
+    approved_at                       timestamptz,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
 -- Holds 29 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it; 3 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.privacy_request (
     request_id                        uuid,
     subject_id                        uuid NOT NULL,
@@ -1368,7 +1543,7 @@ CREATE TABLE IF NOT EXISTS marketing.privacy_request_deadline (
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 1 write it; 1 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.privacy_request_type (
     id                                uuid PRIMARY KEY,
     code                              text NOT NULL CONSTRAINT privacy_request_type_code_chk CHECK (char_length(code) <= 60),
@@ -1381,7 +1556,7 @@ CREATE TABLE IF NOT EXISTS marketing.privacy_request_type (
 );
 
 -- Holds 26 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.processing_purpose (
     purpose_id                        uuid,
     purpose_code                      text NOT NULL CONSTRAINT processing_purpose_purpose_code_chk CHECK (char_length(purpose_code) <= 60),
@@ -1428,7 +1603,7 @@ CREATE TABLE IF NOT EXISTS marketing.programme_tier (
 );
 
 -- Holds 18 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.quality_evaluation (
     id                                uuid PRIMARY KEY NOT NULL,
     agent_principal_id                uuid NOT NULL,
@@ -1481,6 +1656,20 @@ CREATE TABLE IF NOT EXISTS marketing.retention_policy (
     is_approval_required              boolean DEFAULT true,
     schedule                          text,
     scope_path                        ltree NOT NULL
+);
+
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.retention_run (
+    id                                uuid PRIMARY KEY,
+    policy_id                         uuid,
+    mode                              text CONSTRAINT retention_run_mode_chk CHECK (mode IN ('preview', 'execute')),
+    records_affected                  integer,
+    by_action                         jsonb,
+    held_back                         integer,
+    held_back_reasons                 jsonb,
+    evidence_asset_id                 uuid,
+    completed_at                      timestamptz
 );
 
 -- What a guest said afterwards, with the venue’s response and whether it is public
@@ -1557,8 +1746,8 @@ CREATE TABLE IF NOT EXISTS marketing.segment (
 );
 
 -- One condition in a segment rule. Hangs off: a child of marketing.segment; reaches
--- marketing.guest_profile through its keys; references marketing.segment. Reached by: 9 operations
--- read it and 4 write it.
+-- marketing.guest_profile through its keys; references marketing.segment. Reached by: 10
+-- operations read it and 4 write it.
 CREATE TABLE IF NOT EXISTS marketing.segment_criterion (
     segment_id                        uuid NOT NULL,
     attribute                         text NOT NULL,
@@ -1569,7 +1758,7 @@ CREATE TABLE IF NOT EXISTS marketing.segment_criterion (
 );
 
 -- Holds 22 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.sender_identity (
     id                                uuid PRIMARY KEY,
     scope_path                        ltree NOT NULL,
@@ -1596,7 +1785,7 @@ CREATE TABLE IF NOT EXISTS marketing.sender_identity (
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.service_copilot_config (
     id                                uuid PRIMARY KEY,
     scope_level                       text NOT NULL CONSTRAINT service_copilot_config_scope_level_chk CHECK (scope_level IN ('tenant', 'venue')),
@@ -1609,6 +1798,19 @@ CREATE TABLE IF NOT EXISTS marketing.service_copilot_config (
     reply_in_customer_language        boolean DEFAULT true,
     auto_send                         text[],
     pattern_detection                 jsonb,
+    updated_at                        timestamptz
+);
+
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.service_queue (
+    id                                uuid PRIMARY KEY NOT NULL,
+    code                              text NOT NULL CONSTRAINT service_queue_code_chk CHECK (char_length(code) <= 60),
+    name                              text NOT NULL CONSTRAINT service_queue_name_chk CHECK (char_length(name) <= 150),
+    overflow_wait_seconds             integer,
+    is_active                         boolean NOT NULL DEFAULT true,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
     updated_at                        timestamptz
 );
 
@@ -1667,7 +1869,7 @@ CREATE TABLE IF NOT EXISTS marketing.touch_point (
 );
 
 -- Holds 23 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.tracking_technology (
     technology_id                     uuid,
     name                              text NOT NULL CONSTRAINT tracking_technology_name_chk CHECK (char_length(name) <= 200),
@@ -1695,7 +1897,7 @@ CREATE TABLE IF NOT EXISTS marketing.tracking_technology (
 );
 
 -- Holds 15 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it; 1 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.waiver_association (
     id                                uuid PRIMARY KEY,
     form_id                           uuid NOT NULL,
@@ -1715,7 +1917,7 @@ CREATE TABLE IF NOT EXISTS marketing.waiver_association (
 );
 
 -- Holds 19 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.waiver_exception (
     id                                uuid PRIMARY KEY,
     requirement_id                    uuid NOT NULL,
@@ -1749,7 +1951,7 @@ CREATE TABLE IF NOT EXISTS marketing.waiver_field_rule (
 );
 
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.waiver_form_layout (
     form_id                           uuid NOT NULL,
     form_version                      integer NOT NULL,
@@ -1760,7 +1962,7 @@ CREATE TABLE IF NOT EXISTS marketing.waiver_form_layout (
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.waiver_localisation (
     form_id                           uuid NOT NULL,
     form_version                      integer NOT NULL,
@@ -1773,7 +1975,7 @@ CREATE TABLE IF NOT EXISTS marketing.waiver_localisation (
 );
 
 -- Holds 26 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.waiver_master (
     waiver_id                         uuid NOT NULL,
     waiver_name                       text,
@@ -1803,8 +2005,59 @@ CREATE TABLE IF NOT EXISTS marketing.waiver_master (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS marketing.waiver_signatory_rule (
+-- Holds 30 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.waiver_requirement (
     id                                uuid PRIMARY KEY NOT NULL,
+    participant_subject_id            uuid NOT NULL,
+    order_id                          text NOT NULL,
+    order_line_id                     text,
+    ticket_id                         text,
+    product_id                        uuid,
+    performance_id                    uuid,
+    group_booking_id                  uuid,
+    venue_id                          uuid,
+    form_definition_id                uuid NOT NULL,
+    form_version                      integer,
+    is_mandatory                      boolean NOT NULL,
+    status                            text NOT NULL DEFAULT 'assigned' CONSTRAINT waiver_requirement_status_chk CHECK (status IN ('notAssigned', 'assigned', 'sent', 'opened', 'inProgress', 'completed', 'verified', 'rejected', 'expired', 'superseded')),
+    is_declined                       boolean DEFAULT false,
+    signatory_subject_id              uuid,
+    signatory_type                    text CONSTRAINT waiver_requirement_signatory_type_chk CHECK (signatory_type IN ('participant', 'guardian', 'organisationRepresentative')),
+    delivery_channel                  text CONSTRAINT waiver_requirement_delivery_channel_chk CHECK (delivery_channel IN ('email', 'sms', 'whatsapp', 'push', 'inApp', 'qrCode', 'pos', 'kiosk', 'staffAssistedDevice', 'groupPortal')),
+    link_use                          text DEFAULT 'singleUse' CONSTRAINT waiver_requirement_link_use_chk CHECK (link_use IN ('singleUse', 'multiUse')),
+    link_authentication               text DEFAULT 'oneTimeCode' CONSTRAINT waiver_requirement_link_authentication_chk CHECK (link_authentication IN ('oneTimeCode', 'accountSignIn', 'bookingReference')),
+    link_issued_at                    timestamptz,
+    link_expires_at                   timestamptz,
+    link_used_at                      timestamptz,
+    last_sent_at                      timestamptz,
+    next_reminder_at                  timestamptz,
+    form_submission_id                uuid,
+    completed_at                      timestamptz,
+    owner_staff_id                    uuid,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.waiver_requirement_event (
+    id                                uuid PRIMARY KEY NOT NULL,
+    waiver_requirement_id             uuid NOT NULL,
+    event                             text NOT NULL CONSTRAINT waiver_requirement_event_event_chk CHECK (event IN ('linkIssued', 'linkSent', 'reminderSent', 'qrGenerated', 'deliveryFailed', 'linkOpened', 'linkExpired', 'participantIdentified', 'guardianInformationCompleted', 'questionsCompleted', 'acknowledgementsAccepted', 'signatureSubmitted', 'validationPassed', 'validationFailed', 'evidenceStored', 'markedComplete', 'verified', 'rejected', 'correctionRequested', 'resignRequested', 'versionAssigned', 'signatoryReplaced', 'ownerAssigned', 'groupLeaderNotified', 'exceptionApproved', 'evidenceViewed')),
+    actor                             text NOT NULL CONSTRAINT waiver_requirement_event_actor_chk CHECK (actor IN ('participant', 'guardian', 'staff', 'system')),
+    staff_id                          uuid,
+    channel                           text,
+    message_dispatch_id               text,
+    reason                            text CONSTRAINT waiver_requirement_event_reason_chk CHECK (char_length(reason) <= 500),
+    occurred_at                       timestamptz NOT NULL,
+    scope_path                        ltree NOT NULL
+);
+
+-- Holds 20 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.waiver_signatory_rule (
     form_id                           uuid NOT NULL,
     form_version                      integer NOT NULL,
     primary_signatory                 text NOT NULL CONSTRAINT waiver_signatory_rule_primary_signatory_chk CHECK (primary_signatory IN ('ticketHolder', 'purchaser', 'participant', 'parent', 'legalGuardian', 'groupLeader', 'corporateRepresentative', 'member', 'rentalCustomer', 'otherAuthorizedSignatory')),
@@ -1823,11 +2076,12 @@ CREATE TABLE IF NOT EXISTS marketing.waiver_signatory_rule (
     legal_approved_by                 text,
     legal_approved_at                 timestamptz,
     scope_path                        ltree NOT NULL,
-    updated_at                        timestamptz
+    updated_at                        timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- Holds 20 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.waiver_signatory_rule (guardian threshold and flag on marketing.form_definition) (
     id                                uuid PRIMARY KEY NOT NULL,
     form_id                           uuid NOT NULL,
@@ -1872,7 +2126,7 @@ CREATE TABLE IF NOT EXISTS marketing.waiver_signature (
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.waiver_trigger_rule (
     id                                uuid PRIMARY KEY,
     form_id                           uuid NOT NULL,
@@ -1887,7 +2141,7 @@ CREATE TABLE IF NOT EXISTS marketing.waiver_trigger_rule (
 );
 
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 0 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.waiver_verification (
     id                                uuid PRIMARY KEY,
     submission_id                     uuid NOT NULL,
@@ -1905,8 +2159,9 @@ CREATE TABLE IF NOT EXISTS marketing.waiver_verification (
     updated_at                        timestamptz
 );
 
+-- Holds 15 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.waiver_version_control (
-    id                                uuid PRIMARY KEY NOT NULL,
     form_id                           uuid NOT NULL,
     form_version                      integer NOT NULL,
     lifecycle_status                  text NOT NULL CONSTRAINT waiver_version_control_lifecycle_status_chk CHECK (lifecycle_status IN ('draft', 'review', 'pendingApproval', 'approved', 'scheduled', 'published', 'suspended', 'expired', 'archived')),
@@ -1920,11 +2175,12 @@ CREATE TABLE IF NOT EXISTS marketing.waiver_version_control (
     suspension_reason                 text,
     audit                             jsonb,
     scope_path                        ltree NOT NULL,
-    updated_at                        timestamptz
+    updated_at                        timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- Holds 15 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 0 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.waiver_version_control (checklist, simulation and aiFindings computed at read time) (
     id                                uuid PRIMARY KEY NOT NULL,
     form_id                           uuid NOT NULL,

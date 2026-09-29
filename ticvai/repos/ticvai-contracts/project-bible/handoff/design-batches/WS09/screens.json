@@ -39,10 +39,7 @@
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-224 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-225",
@@ -78,7 +75,10 @@
      "to": "BO-230",
      "trigger": "Works in Live Gate Mode & Lane Control",
      "provenance": "flow F119 step 11→12",
-     "operation": "listLiveAccess"
+     "operation": "listLiveAccess",
+     "carries": [
+      "accessPointId"
+     ]
     },
     {
      "to": "BO-231",
@@ -101,13 +101,103 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations can understand the live access state of the entire venue without opening individual device screens.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide the venue control room with a real-time view of access operations across all gates, parks, zones, and attractions.",
-  "purposeNote": "Operations can understand the live access state of the entire venue without opening individual device screens.",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Guests Entered Today",
+       "bindsTo": "LiveAccessOperationsCommandCenterViewSummary.guestsEnteredToday",
+       "operation": "listLiveAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Guests Exited",
+       "bindsTo": "LiveAccessOperationsCommandCenterViewSummary.guestsExited",
+       "operation": "listLiveAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Guests Currently In Park",
+       "bindsTo": "LiveAccessOperationsCommandCenterViewSummary.guestsCurrentlyInPark",
+       "operation": "listLiveAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Valid Scans",
+       "bindsTo": "LiveAccessOperationsCommandCenterViewSummary.validScans",
+       "operation": "listLiveAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Rejected Scans",
+       "bindsTo": "LiveAccessOperationsCommandCenterViewSummary.rejectedScans",
+       "operation": "listLiveAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Yellow / Intervention Scans",
+       "bindsTo": "LiveAccessOperationsCommandCenterViewSummary.yellowInterventionScans",
+       "operation": "listLiveAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Overrides",
+       "bindsTo": "LiveAccessOperationsCommandCenterViewSummary.overrides",
+       "operation": "listLiveAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Active Gates",
+       "bindsTo": "LiveAccessOperationsCommandCenterViewSummary.activeGates",
+       "operation": "listLiveAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Offline Gates",
+       "bindsTo": "LiveAccessOperationsCommandCenterViewSummary.offlineGates",
+       "operation": "listLiveAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Average validation time in seconds",
+       "bindsTo": "LiveAccessOperationsCommandCenterViewSummary.averageValidationTime",
+       "operation": "listLiveAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Guests per minute",
+       "bindsTo": "LiveAccessOperationsCommandCenterViewSummary.guestsMinute",
+       "operation": "listLiveAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Active Operational Alerts",
+       "bindsTo": "LiveAccessOperationsCommandCenterViewSummary.activeOperationalAlerts",
+       "operation": "listLiveAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -115,20 +205,6 @@
       {
        "kind": "dataTable",
        "label": "Every live access operations",
-       "columns": [
-        "LiveAccessOperationsCommandCenterView.guestsEnteredToday",
-        "LiveAccessOperationsCommandCenterView.guestsExited",
-        "LiveAccessOperationsCommandCenterView.guestsCurrentlyInPark",
-        "LiveAccessOperationsCommandCenterView.validScans",
-        "LiveAccessOperationsCommandCenterView.rejectedScans",
-        "LiveAccessOperationsCommandCenterView.yellowInterventionScans",
-        "LiveAccessOperationsCommandCenterView.overrides",
-        "LiveAccessOperationsCommandCenterView.activeGates",
-        "LiveAccessOperationsCommandCenterView.offlineGates",
-        "LiveAccessOperationsCommandCenterView.averageValidationTime",
-        "LiveAccessOperationsCommandCenterView.guestsMinute",
-        "LiveAccessOperationsCommandCenterView.activeOperationalAlerts"
-       ],
        "bindsTo": "LiveAccessOperationsCommandCenterView",
        "operation": "listLiveAccess",
        "provenance": "pack Access Control Module_Reference.pdf, page 116 §Display"
@@ -143,20 +219,6 @@
        "kind": "detailPanel",
        "label": "The selected live access operations",
        "bindsTo": "LiveAccessOperationsCommandCenterView",
-       "columns": [
-        "LiveAccessOperationsCommandCenterView.guestsEnteredToday",
-        "LiveAccessOperationsCommandCenterView.guestsExited",
-        "LiveAccessOperationsCommandCenterView.guestsCurrentlyInPark",
-        "LiveAccessOperationsCommandCenterView.validScans",
-        "LiveAccessOperationsCommandCenterView.rejectedScans",
-        "LiveAccessOperationsCommandCenterView.yellowInterventionScans",
-        "LiveAccessOperationsCommandCenterView.overrides",
-        "LiveAccessOperationsCommandCenterView.activeGates",
-        "LiveAccessOperationsCommandCenterView.offlineGates",
-        "LiveAccessOperationsCommandCenterView.averageValidationTime",
-        "LiveAccessOperationsCommandCenterView.guestsMinute",
-        "LiveAccessOperationsCommandCenterView.activeOperationalAlerts"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “Live Venue Map”, “Adventure Park”, “MAIN GATE 03”, “QUEUE WARNING”, “REJECTION SPIKE”, “DEVICE WARNING”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 116 §Display"
       }
@@ -181,18 +243,19 @@
   ],
   "entryState": {
    "preloaded": [
-    "LiveAccessOperationsCommandCenterView.guestsEnteredToday",
-    "LiveAccessOperationsCommandCenterView.guestsExited",
-    "LiveAccessOperationsCommandCenterView.guestsCurrentlyInPark",
-    "LiveAccessOperationsCommandCenterView.validScans",
-    "LiveAccessOperationsCommandCenterView.rejectedScans",
-    "LiveAccessOperationsCommandCenterView.yellowInterventionScans"
+    "LiveAccessOperationsCommandCenterViewSummary.guestsEnteredToday",
+    "LiveAccessOperationsCommandCenterViewSummary.guestsExited",
+    "LiveAccessOperationsCommandCenterViewSummary.guestsCurrentlyInPark",
+    "LiveAccessOperationsCommandCenterViewSummary.validScans",
+    "LiveAccessOperationsCommandCenterViewSummary.rejectedScans",
+    "LiveAccessOperationsCommandCenterViewSummary.yellowInterventionScans"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-224"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-224",
+   "workshopBoard": "wireframes/WS26 Access Control Board 9.dc.html#bo-224"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 116. 12 of 12 labels bound to a contract property; 12 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -255,10 +318,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized attendants can control assigned access devices from one operational interface.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide the operational interface described in the matrix for attendants controlling one or more turnstiles.",
-  "purposeNote": "Authorized attendants can control assigned access devices from one operational interface.",
   "layout": {
    "template": "split",
    "regions": [
@@ -269,14 +332,6 @@
       {
        "kind": "dataTable",
        "label": "Every podium operations console",
-       "columns": [
-        "PodiumOperationsConsoleView.gate01Entry",
-        "PodiumOperationsConsoleView.gate02Entry",
-        "PodiumOperationsConsoleView.gate03Entry",
-        "PodiumOperationsConsoleView.gate04Entry",
-        "PodiumOperationsConsoleView.gate05Closed",
-        "PodiumOperationsConsoleView.gate06Group"
-       ],
        "bindsTo": "PodiumOperationsConsoleView",
        "operation": "listPodiumConsole",
        "provenance": "pack Access Control Module_Reference.pdf, page 117 §Display"
@@ -291,16 +346,46 @@
        "kind": "detailPanel",
        "label": "The selected podium operations console",
        "bindsTo": "PodiumOperationsConsoleView",
-       "columns": [
-        "PodiumOperationsConsoleView.gate01Entry",
-        "PodiumOperationsConsoleView.gate02Entry",
-        "PodiumOperationsConsoleView.gate03Entry",
-        "PodiumOperationsConsoleView.gate04Entry",
-        "PodiumOperationsConsoleView.gate05Closed",
-        "PodiumOperationsConsoleView.gate06Group"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “The podium may be”, “Controls”, “Operator”, “Shift”, “Authorized actions”, “Important”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 117 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save podium",
+       "operation": "setPodium",
+       "permission": "DEVICE_CONFIGURE",
+       "notes": "**A podium is an attendant interface that controls one or more access points** (BO-225 Podium Operations Console): a physical panel, tablet, workstation or handheld.",
+       "provenance": "contract access.yaml PUT /podiums"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Delete podium",
+       "operation": "deletePodium",
+       "permission": "DEVICE_CONFIGURE",
+       "notes": "Deletes a podium.",
+       "provenance": "contract access.yaml DELETE /podiums/{podiumId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Start podium shift",
+       "operation": "startPodiumShift",
+       "permission": "TURNSTILE_MODE_SET",
+       "notes": "**The operator signs in to a podium** (BO-225; P07 SCN-002 where the scanner picks its access point).",
+       "provenance": "contract access.yaml POST /podiums/{podiumId}/shifts"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "End podium shift",
+       "operation": "endPodiumShift",
+       "permission": "TURNSTILE_MODE_SET",
+       "notes": "**The operator signs out of the podium**: sets `logoutAt`.",
+       "provenance": "contract access.yaml POST /podium-shifts/{shiftId}/end"
       }
      ]
     }
@@ -319,24 +404,128 @@
     "contract": "access",
     "purpose": "Podium Operations Console",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPodium",
+    "contract": "access",
+    "purpose": "Create or replace a podium",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPodiumConsole"
+    ]
+   },
+   {
+    "operationId": "deletePodium",
+    "contract": "access",
+    "purpose": "Delete a podium",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPodiumConsole"
+    ]
+   },
+   {
+    "operationId": "startPodiumShift",
+    "contract": "access",
+    "purpose": "Start an operator shift on a podium",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPodiumConsole"
+    ]
+   },
+   {
+    "operationId": "endPodiumShift",
+    "contract": "access",
+    "purpose": "End an operator shift on a podium",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPodiumConsole"
+    ]
    }
   ],
   "entryState": {
-   "preloaded": [
-    "PodiumOperationsConsoleView.gate01Entry",
-    "PodiumOperationsConsoleView.gate02Entry",
-    "PodiumOperationsConsoleView.gate03Entry",
-    "PodiumOperationsConsoleView.gate04Entry",
-    "PodiumOperationsConsoleView.gate05Closed",
-    "PodiumOperationsConsoleView.gate06Group"
+   "preloaded": [],
+   "params": [
+    {
+     "name": "shiftId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-225"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-225",
+   "workshopBoard": "wireframes/WS26 Access Control Board 9.dc.html#bo-225"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 117. 6 of 6 labels bound to a contract property; 6 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPodium",
+    "component": "modal",
+    "trigger": "Save podium",
+    "body": "**Collects what `setPodium` sends before it is called.** Required: `id`, `venueId`, `podiumType`, `name`, `scopePath`. Optional: `accessPointIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessPodium",
+    "confirm": {
+     "label": "Save podium",
+     "operation": "setPodium"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "podiumType",
+      "name",
+      "scopePath",
+      "accessPointIds"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /podiums"
+   },
+   {
+    "id": "confirmDeletePodium",
+    "component": "confirmDialog",
+    "trigger": "Delete podium",
+    "body": "**Names what `deletePodium` changes and what it leaves alone**, in the consequence rather than the verb. A record this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract access.yaml DELETE /podiums/{podiumId}"
+   },
+   {
+    "id": "formStartPodiumShift",
+    "component": "modal",
+    "trigger": "Start podium shift",
+    "body": "**Collects what `startPodiumShift` sends before it is called.** Nothing in the body is required. Optional: `role`, `accessDeviceId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Start podium shift",
+     "operation": "startPodiumShift"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "role",
+      "accessDeviceId"
+     ]
+    },
+    "provenance": "contract access.yaml POST /podiums/{podiumId}/shifts"
+   },
+   {
+    "id": "formEndPodiumShift",
+    "component": "modal",
+    "trigger": "End podium shift",
+    "body": "**Collects what `endPodiumShift` sends before it is called.** Nothing in the body is required. Optional: `handoverNote`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "End podium shift",
+     "operation": "endPodiumShift"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "handoverNote"
+     ]
+    },
+    "provenance": "contract access.yaml POST /podium-shifts/{shiftId}/end"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -397,10 +586,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "An operator can understand the ticket's complete operational access state from one screen without navigating across multiple modules.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Allow operators to quickly investigate why a guest cannot enter.",
-  "purposeNote": "An operator can understand the ticket's complete operational access state from one screen without navigating across multiple modules.",
   "gaps": [
    {
     "operation": null,
@@ -461,7 +650,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-226"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-226",
+   "workshopBoard": "wireframes/WS26 Access Control Board 9.dc.html#bo-226"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 118. 0 of 11 labels bound to a contract property; 11 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -524,16 +714,11 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every validation failure returns a standardized reason and configured operational response.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Standardize what happens when access is not automatically granted. The matrix requires the scanner to display a reason code when a ticket is invalid.",
-  "purposeNote": "Every validation failure returns a standardized reason and configured operational response.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**Validation Exception & Reason Code Manager declares no operation that writes anything** — its only declared call is `listValidationExceptionReason`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -558,6 +743,28 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save reason code",
+       "operation": "setReasonCode",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind the Validation Exception & Reason Code Manager** (BO-227): one reason code (e.g.",
+       "provenance": "contract access.yaml PUT /reason-codes"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Delete reason code",
+       "operation": "deleteReasonCode",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "Deletes a reason code no scan has used.",
+       "provenance": "contract access.yaml DELETE /reason-codes/{reasonCodeId}"
+      }
+     ]
     }
    ]
   },
@@ -574,23 +781,73 @@
     "contract": "access",
     "purpose": "Validation Exception & Reason Code Manager",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setReasonCode",
+    "contract": "access",
+    "purpose": "Create or replace a validation reason code",
+    "trigger": "onAction",
+    "invalidates": [
+     "listValidationExceptionReason"
+    ]
+   },
+   {
+    "operationId": "deleteReasonCode",
+    "contract": "access",
+    "purpose": "Delete a validation reason code",
+    "trigger": "onAction",
+    "invalidates": [
+     "listValidationExceptionReason"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "ValidationExceptionReasonCodeManagerView.ticketDate02Sep2026",
-    "ValidationExceptionReasonCodeManagerView.deny",
-    "ValidationExceptionReasonCodeManagerView.operatorReview",
-    "ValidationExceptionReasonCodeManagerView.supervisorRequired",
-    "ValidationExceptionReasonCodeManagerView.allowWithWarning"
+    "ValidationExceptionReasonCodeManagerView.operationalResponse"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-227"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-227",
+   "workshopBoard": "wireframes/WS26 Access Control Board 9.dc.html#bo-227"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 120. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetReasonCode",
+    "component": "modal",
+    "trigger": "Save reason code",
+    "body": "**Collects what `setReasonCode` sends before it is called.** Required: `id`, `code`, `name`, `operationalResponse`, `scopePath`. Optional: `venueId`, `guestMessage`, `operatorMessage`, `followUpAction`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessReasonCode",
+    "confirm": {
+     "label": "Save reason code",
+     "operation": "setReasonCode"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "operationalResponse",
+      "scopePath",
+      "venueId",
+      "guestMessage",
+      "operatorMessage",
+      "followUpAction"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /reason-codes"
+   },
+   {
+    "id": "confirmDeleteReasonCode",
+    "component": "confirmDialog",
+    "trigger": "Delete reason code",
+    "body": "**Names what `deleteReasonCode` changes and what it leaves alone**, in the consequence rather than the verb. A record this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract access.yaml DELETE /reason-codes/{reasonCodeId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -646,15 +903,15 @@
      "to": "BO-224",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F119 step 8→9",
-     "operation": "approveManualOverrideSupervisor"
+     "operation": "overrideAccess"
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Only authorized users can override eligible rules, with reason, approval, timestamp, operator, device and original decision retained.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configured Date; Select) and no display directory — it is settings, not a population",
   "purpose": "Allow authorized staff to bypass selected access restrictions when operationally justified. The matrix explicitly requires Allow Override and operator-based ticket override.",
-  "purposeNote": "Only authorized users can override eligible rules, with reason, approval, timestamp, operator, device and original decision retained.",
   "layout": {
    "template": "form",
    "regions": [
@@ -706,7 +963,9 @@
       {
        "kind": "primaryButton",
        "label": "Approve",
-       "provenance": "contract operation approveManualOverrideSupervisor"
+       "operation": "overrideAccess",
+       "permission": "ACCESS_OVERRIDE",
+       "provenance": "contract operation overrideAccess (decided 29 September, readiness close-out (QA wiring note))"
       }
      ]
     }
@@ -716,23 +975,22 @@
    "loading": "The manual override supervisor configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the manual override supervisor untouched.",
    "emptyFirstRun": "No manual override supervisor configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission, **ACCESS_OVERRIDE** (was ACCESS_POINT_CONFIGURE until 29 September, K1: recording an admission against a failed validation is an override, not gate configuration). Never an empty table."
   },
   "apis": [
    {
-    "operationId": "approveManualOverrideSupervisor",
+    "operationId": "overrideAccess",
     "contract": "access",
-    "purpose": "Manual Override & Supervisor Approval",
+    "purpose": "Record a supervisor-approved manual override",
     "trigger": "onAction",
-    "invalidates": [
-     "approveManualOverrideSupervisor"
-    ]
+    "provenance": "decided 29 September, readiness close-out (QA wiring note)"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-228"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-228",
+   "workshopBoard": "wireframes/WS26 Access Control Board 9.dc.html#bo-228"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 121. 0 of 0 labels bound to a contract property; 7 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -795,10 +1053,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can immediately restrict credential access across the configured venue environment.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide immediate operational security control over individual credentials.",
-  "purposeNote": "Authorized users can immediately restrict credential access across the configured venue environment.",
   "gaps": [
    {
     "operation": null,
@@ -844,17 +1102,15 @@
   ],
   "entryState": {
    "preloaded": [
-    "CredentialDisableBlacklistWhitelistOperationsView.blacklistWhitelistCapability",
-    "CredentialDisableBlacklistWhitelistOperationsView.manualTicketInvalidation",
     "CredentialDisableBlacklistWhitelistOperationsView.reason",
-    "CredentialDisableBlacklistWhitelistOperationsView.entireCredential",
-    "CredentialDisableBlacklistWhitelistOperationsView.venueAccess"
+    "CredentialDisableBlacklistWhitelistOperationsView.disableScope"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-229"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-229",
+   "workshopBoard": "wireframes/WS26 Access Control Board 9.dc.html#bo-229"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 122. 0 of 0 labels bound to a contract property; 0 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -917,10 +1173,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations can change the active mode of one or multiple authorized gates without modifying their underlying hardware configuration.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Allow operations to change access-point modes during live operations without entering the Board 6 engineering configuration. Board 6 defines which modes a device can support. Board 9 controls which permitted mode it is currently running.",
-  "purposeNote": "Operations can change the active mode of one or multiple authorized gates without modifying their underlying hardware configuration.",
   "layout": {
    "template": "split",
    "regions": [
@@ -932,7 +1188,6 @@
        "kind": "dataTable",
        "label": "Every live gate mode",
        "columns": [
-        "LiveGateModeLaneControlView.affectedGates",
         "LiveGateModeLaneControlView.currentMode",
         "LiveGateModeLaneControlView.targetMode",
         "LiveGateModeLaneControlView.operator",
@@ -953,7 +1208,6 @@
        "label": "The selected live gate mode",
        "bindsTo": "LiveGateModeLaneControlView",
        "columns": [
-        "LiveGateModeLaneControlView.affectedGates",
         "LiveGateModeLaneControlView.currentMode",
         "LiveGateModeLaneControlView.targetMode",
         "LiveGateModeLaneControlView.operator",
@@ -961,6 +1215,20 @@
        ],
        "notes": "The pack groups this record's detail under its own headings: “ENTRY”, “Available”, “Bulk Command”, “Optional”, “Emergency”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 124 §Show"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel gate mode change",
+       "operation": "cancelGateModeChange",
+       "permission": "TURNSTILE_MODE_SET",
+       "notes": "Cancels a `pending` gate mode change, one `setTurnstileMode` scheduled with a future `effectiveAt`.",
+       "provenance": "contract access.yaml POST /gate-mode-changes/{changeId}/cancel"
       }
      ]
     }
@@ -979,23 +1247,69 @@
     "contract": "access",
     "purpose": "Live Gate Mode & Lane Control",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setTurnstileMode",
+    "contract": "access",
+    "purpose": "Switch a gate or lane mode live (entry, exit, free spin, closed)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listLiveGateMode"
+    ]
+   },
+   {
+    "operationId": "listAccessPoints",
+    "contract": "access",
+    "purpose": "The gates and lanes whose mode is set",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "cancelGateModeChange",
+    "contract": "access",
+    "purpose": "Cancel a scheduled gate mode change",
+    "trigger": "onAction",
+    "invalidates": [
+     "listLiveGateMode",
+     "listAccessPoints"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "LiveGateModeLaneControlView.affectedGates",
     "LiveGateModeLaneControlView.currentMode",
     "LiveGateModeLaneControlView.targetMode",
     "LiveGateModeLaneControlView.operator",
     "LiveGateModeLaneControlView.reason"
+   ],
+   "params": [
+    {
+     "name": "accessPointId",
+     "from": "navigation"
+    },
+    {
+     "name": "changeId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-230"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-230",
+   "workshopBoard": "wireframes/WS26 Access Control Board 9.dc.html#bo-230"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 124. 5 of 5 labels bound to a contract property; 9 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "confirmCancelGateModeChange",
+    "component": "confirmDialog",
+    "trigger": "Cancel gate mode change",
+    "body": "**Names what `cancelGateModeChange` changes and what it leaves alone**, in the consequence rather than the verb. A access gate mode change this affects should be identified in the dialog, not just counted. **Collects what `cancelGateModeChange` sends before it is called.** Nothing in the body is required. Optional: `reason`.",
+    "provenance": "contract access.yaml POST /gate-mode-changes/{changeId}/cancel"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1056,10 +1370,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations can monitor throughput and proactively adjust available lane capacity.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Manage entrance flow in real time. This addresses the matrix requirement to improve entrance flow and queuing, particularly for large B2B groups.",
-  "purposeNote": "Operations can monitor throughput and proactively adjust available lane capacity.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1071,12 +1385,7 @@
        "kind": "dataTable",
        "label": "Every queue throughput lane",
        "columns": [
-        "QueueThroughputLaneOptimizationView.standard",
-        "QueueThroughputLaneOptimizationView.family",
-        "QueueThroughputLaneOptimizationView.groupB2b",
-        "QueueThroughputLaneOptimizationView.vip",
-        "QueueThroughputLaneOptimizationView.podAccessible",
-        "QueueThroughputLaneOptimizationView.reEntry"
+        "QueueThroughputLaneOptimizationView.laneType"
        ],
        "bindsTo": "QueueThroughputLaneOptimizationView",
        "operation": "listQueueThroughputLane",
@@ -1093,12 +1402,7 @@
        "label": "The selected queue throughput lane",
        "bindsTo": "QueueThroughputLaneOptimizationView",
        "columns": [
-        "QueueThroughputLaneOptimizationView.standard",
-        "QueueThroughputLaneOptimizationView.family",
-        "QueueThroughputLaneOptimizationView.groupB2b",
-        "QueueThroughputLaneOptimizationView.vip",
-        "QueueThroughputLaneOptimizationView.podAccessible",
-        "QueueThroughputLaneOptimizationView.reEntry"
+        "QueueThroughputLaneOptimizationView.laneType"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Guests Waiting”, “Active Lanes”, “Current Throughput”, “Estimated Wait”, “Lane Performance”, “Reason”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 125 §Show"
@@ -1124,18 +1428,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "QueueThroughputLaneOptimizationView.standard",
-    "QueueThroughputLaneOptimizationView.family",
-    "QueueThroughputLaneOptimizationView.groupB2b",
-    "QueueThroughputLaneOptimizationView.vip",
-    "QueueThroughputLaneOptimizationView.podAccessible",
-    "QueueThroughputLaneOptimizationView.reEntry"
+    "QueueThroughputLaneOptimizationView.laneType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-231"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-231",
+   "workshopBoard": "wireframes/WS26 Access Control Board 9.dc.html#bo-231"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 125. 6 of 6 labels bound to a contract property; 6 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1198,10 +1498,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Complex access exceptions can be formally investigated and resolved with complete operational evidence.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Manage access incidents that require more than a simple override.",
-  "purposeNote": "Complex access exceptions can be formally investigated and resolved with complete operational evidence.",
   "gaps": [
    {
     "operation": null,
@@ -1224,6 +1524,8 @@
       {
        "kind": "primaryButton",
        "label": "Save changes",
+       "operation": "setOperationalIncidentException",
+       "permission": "INCIDENT_MANAGE",
        "provenance": "contract operation setOperationalIncidentException"
       }
      ]
@@ -1247,23 +1549,21 @@
    "error": "Could not load. Names which read failed and leaves the operational incident exception untouched.",
    "emptyFirstRun": "No operational incident exception yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the operational incident exception are still there. The pack's own statuses are Open → Investigating → Resolved → Closed — the state names which is selected.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission, **INCIDENT_MANAGE** (was ACCESS_POINT_CONFIGURE until 29 September, K1: investigating, assigning and closing an incident is incident management, as for F&B and maintenance incidents). Never an empty table."
   },
   "apis": [
    {
     "operationId": "setOperationalIncidentException",
     "contract": "access",
     "purpose": "Operational Incident & Exception Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setOperationalIncidentException"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-232"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-232",
+   "workshopBoard": "wireframes/WS26 Access Control Board 9.dc.html#bo-232"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 127. 0 of 0 labels bound to a contract property; 1 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1318,10 +1618,10 @@
    "notes": "**Reached from BO-224, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Every operational intervention is attributable to a user and can be reviewed during audit, investigation and shift handover. Board 9 — Final 10-Screen Structure # Backend Screen Main Responsibility 9.1 Live Access Operations Command Center Real-time venue admission operations 9.2 Podium Operations Console Operator control of gates/turnstiles 9.3 Ticket & Credential Investigation Console Investigate guest access state",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide full accountability for everything operators and supervisors changed during live access operations.",
-  "purposeNote": "Every operational intervention is attributable to a user and can be reviewed during audit, investigation and shift handover. Board 9 — Final 10-Screen Structure # Backend Screen Main Responsibility 9.1 Live Access Operations Command Center Real-time venue admission operations 9.2 Podium Operations Console Operator control of gates/turnstiles 9.3 Ticket & Credential Investigation Console Investigate guest access state",
   "gaps": [
    {
     "operation": null,
@@ -1337,6 +1637,25 @@
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Operations Audit, Shift Handover & Control",
+       "provenance": "pack Access Control Module_Reference.pdf, page 128 §Operations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "End podium shift",
+       "operation": "endPodiumShift",
+       "permission": "TURNSTILE_MODE_SET",
+       "notes": "**The operator signs out of the podium**: sets `logoutAt`.",
+       "provenance": "contract access.yaml POST /podium-shifts/{shiftId}/end"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "components": [
@@ -1363,6 +1682,15 @@
     "contract": "access",
     "purpose": "Operations Audit, Shift Handover & Control Summary",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "endPodiumShift",
+    "contract": "access",
+    "purpose": "End an operator shift on a podium",
+    "trigger": "onAction",
+    "invalidates": [
+     "listShiftHandoverSummary"
+    ]
    }
   ],
   "entryState": {
@@ -1372,14 +1700,41 @@
     "OperationsAuditShiftHandoverControlSummaryView.podium",
     "OperationsAuditShiftHandoverControlSummaryView.device",
     "OperationsAuditShiftHandoverControlSummaryView.login"
+   ],
+   "params": [
+    {
+     "name": "shiftId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-233"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-233",
+   "workshopBoard": "wireframes/WS26 Access Control Board 9.dc.html#bo-233"
   },
-  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 128. 0 of 0 labels bound to a contract property; 0 of 88 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 128. 0 of 0 labels bound to a contract property; 1 of 88 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Operations Audit, Shift Handover & Control dropped (heading (screen title fragment)).",
+  "overlays": [
+   {
+    "id": "formEndPodiumShift",
+    "component": "modal",
+    "trigger": "End podium shift",
+    "body": "**Collects what `endPodiumShift` sends before it is called.** Nothing in the body is required. Optional: `handoverNote`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "End podium shift",
+     "operation": "endPodiumShift"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "handoverNote"
+     ]
+    },
+    "provenance": "contract access.yaml POST /podium-shifts/{shiftId}/end"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

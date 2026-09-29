@@ -1,0 +1,51 @@
+id: LLD-Live dynamic price execution
+title: Live dynamic price execution — 7 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/price-execution.yaml
+entity: Live dynamic price execution
+contract: catalogue
+enum: PriceExecution.status
+enumKind: inline
+enumSchema: PriceExecution
+enumProperty: status
+owner: catalogue
+initial:
+- scheduled
+- executing
+terminal:
+- failed
+- reverted
+transitions:
+- from: scheduled
+  to: executing
+  trigger: timer
+  guard: '`scheduledFor` is reached and the guardrails still pass'
+- from: executing
+  to: deployed
+  trigger: job
+  guard: Every channel deployment reports a consistent price
+- from: executing
+  to: partiallyDeployed
+  trigger: job
+  guard: Some channels deployed, some did not
+- from: executing
+  to: failed
+  trigger: job
+  guard: No channel accepted the price; the previous price stays live
+- from: partiallyDeployed
+  to: deployed
+  trigger: job
+  guard: The failed channels are retried and succeed
+- from: deployed
+  to: reverted
+  trigger: cascade
+  guard: A pricing `catalogue.rollback_action` restores the previous price
+  isReversal: true
+- from: partiallyDeployed
+  to: reverted
+  trigger: cascade
+  guard: The partial deployment is rolled back rather than completed
+  isReversal: true
+notes: '**Created by `createLiveDynamicPrice`**, `executing` at once or `scheduled` for `scheduledFor`.
+  Refused without an approval reference unless the scope''s automation policy allows it.'

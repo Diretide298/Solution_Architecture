@@ -4807,5 +4807,2808 @@
     "GST-030"
    ]
   }
- ]
+ ],
+ "dataModel": {
+  "why": "Mapping the agreed operations' lineage showed the tables they need did not exist: the packs gave screens, not tables.",
+  "tables": [
+   {
+    "table": "access.access_area",
+    "schema": "AccessAccessArea",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.access_attribute",
+    "schema": "AccessAccessAttribute",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.access_device",
+    "schema": "AccessAccessDevice",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.access_incident",
+    "schema": "AccessAccessIncident",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.access_map",
+    "schema": "AccessAccessMap",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.access_point_configuration",
+    "schema": "AccessAccessPointConfiguration",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.access_point_group",
+    "schema": "AccessAccessPointGroup",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.attraction_access",
+    "schema": "AccessAttractionAccess",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.biometric_audit_event",
+    "schema": "AccessBiometricAuditEvent",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.biometric_profile",
+    "schema": "AccessBiometricProfile",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.branding_profile",
+    "schema": "AccessBrandingProfile",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.companion_rule",
+    "schema": "AccessCompanionRule",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.configuration_change",
+    "schema": "AccessConfigurationChange",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.configuration_version",
+    "schema": "AccessConfigurationVersion",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.consumption_rule",
+    "schema": "AccessConsumptionRule",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.credential_binding",
+    "schema": "AccessCredentialBinding",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.credential_delivery",
+    "schema": "AccessCredentialDelivery",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.credential_event",
+    "schema": "AccessCredentialEvent",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.credential_event_propagation_rule",
+    "schema": "AccessCredentialEventPropagationRule",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.credential_exception",
+    "schema": "AccessCredentialException",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.credential_issuance",
+    "schema": "AccessCredentialIssuance",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.credential_policy",
+    "schema": "AccessCredentialPolicy",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.credential_security_profile",
+    "schema": "AccessCredentialSecurityProfile",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.credential_sharing_case",
+    "schema": "AccessCredentialSharingCase",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.device_binding",
+    "schema": "AccessDeviceBinding",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.device_configuration",
+    "schema": "AccessDeviceConfiguration",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.dynamic_field",
+    "schema": "AccessDynamicField",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.dynamic_policy",
+    "schema": "AccessDynamicPolicy",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.dynamic_policy_version",
+    "schema": "AccessDynamicPolicyVersion",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.edge_node",
+    "schema": "AccessEdgeNode",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.edge_package",
+    "schema": "AccessEdgePackage",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.external_credential_integration",
+    "schema": "AccessExternalCredentialIntegration",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.face_reenrolment_attempt",
+    "schema": "AccessFaceReenrolmentAttempt",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.fast_pass_profile",
+    "schema": "AccessFastPassProfile",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.fraud_rule",
+    "schema": "AccessFraudRule",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.gate_lane",
+    "schema": "AccessGateLane",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.gate_mode_change",
+    "schema": "AccessGateModeChange",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.gate_mode_policy",
+    "schema": "AccessGateModePolicy",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.gate_outcome_profile",
+    "schema": "AccessGateOutcomeProfile",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.group_admission_rule",
+    "schema": "AccessGroupAdmissionRule",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.hardware_model",
+    "schema": "AccessHardwareModel",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.identity_lock",
+    "schema": "AccessIdentityLock",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.journey_profile",
+    "schema": "AccessJourneyProfile",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.journey_sequence_rule",
+    "schema": "AccessJourneySequenceRule",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.media_binding_rule",
+    "schema": "AccessMediaBindingRule",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.media_compatibility_test",
+    "schema": "AccessMediaCompatibilityTest",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.media_encoding_profile",
+    "schema": "AccessMediaEncodingProfile",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.media_replacement_policy",
+    "schema": "AccessMediaReplacementPolicy",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.media_template",
+    "schema": "AccessMediaTemplate",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.media_template_version",
+    "schema": "AccessMediaTemplateVersion",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.media_type",
+    "schema": "AccessMediaType",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.offline_policy",
+    "schema": "AccessOfflinePolicy",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.operating_calendar_entry",
+    "schema": "AccessOperatingCalendarEntry",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.podium",
+    "schema": "AccessPodium",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.podium_shift",
+    "schema": "AccessPodiumShift",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.policy_evaluation_setting",
+    "schema": "AccessPolicyEvaluationSetting",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.policy_scope_assignment",
+    "schema": "AccessPolicyScopeAssignment",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.reason_code",
+    "schema": "AccessReasonCode",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.risk_scoring_config",
+    "schema": "AccessRiskScoringConfig",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.security_alert",
+    "schema": "AccessSecurityAlert",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.security_investigation",
+    "schema": "AccessSecurityInvestigation",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.security_playbook",
+    "schema": "AccessSecurityPlaybook",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.ticket_status_transition",
+    "schema": "AccessTicketStatusTransition",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "access.verification_method_policy",
+    "schema": "AccessVerificationMethodPolicy",
+    "contract": "contracts/spine/access.yaml",
+    "group": "DM1",
+    "merged": ""
+   },
+   {
+    "table": "approvals.workflow_definition",
+    "schema": "WorkflowDefinition",
+    "contract": "contracts/spine/approvals.yaml",
+    "group": "DM2",
+    "merged": ""
+   },
+   {
+    "table": "approvals.workflow_version",
+    "schema": "WorkflowVersion",
+    "contract": "contracts/spine/approvals.yaml",
+    "group": "DM2",
+    "merged": ""
+   },
+   {
+    "table": "approvals.workflow_trigger",
+    "schema": "WorkflowTrigger",
+    "contract": "contracts/spine/approvals.yaml",
+    "group": "DM2",
+    "merged": ""
+   },
+   {
+    "table": "approvals.workflow_instance",
+    "schema": "WorkflowInstance",
+    "contract": "contracts/spine/approvals.yaml",
+    "group": "DM2",
+    "merged": ""
+   },
+   {
+    "table": "approvals.workflow_step_execution",
+    "schema": "WorkflowStepExecution",
+    "contract": "contracts/spine/approvals.yaml",
+    "group": "DM2",
+    "merged": ""
+   },
+   {
+    "table": "approvals.workflow_exception",
+    "schema": "WorkflowException",
+    "contract": "contracts/spine/approvals.yaml",
+    "group": "DM2",
+    "merged": ""
+   },
+   {
+    "table": "approvals.business_rule",
+    "schema": "BusinessRule",
+    "contract": "contracts/spine/approvals.yaml",
+    "group": "DM2",
+    "merged": ""
+   },
+   {
+    "table": "approvals.decision_table",
+    "schema": "DecisionTable",
+    "contract": "contracts/spine/approvals.yaml",
+    "group": "DM2",
+    "merged": ""
+   },
+   {
+    "table": "approvals.decision_table_row",
+    "schema": "DecisionTable (child: rows[])",
+    "contract": "contracts/spine/approvals.yaml",
+    "group": "DM2",
+    "merged": ""
+   },
+   {
+    "table": "approvals.automation",
+    "schema": "Automation",
+    "contract": "contracts/spine/approvals.yaml",
+    "group": "DM2",
+    "merged": ""
+   },
+   {
+    "table": "approvals.automation_execution",
+    "schema": "AutomationExecution",
+    "contract": "contracts/spine/approvals.yaml",
+    "group": "DM2",
+    "merged": ""
+   },
+   {
+    "table": "workforce.position_requirement",
+    "schema": "StaffingRules (child: minimumCover[])",
+    "contract": "contracts/satellite/workforce.yaml",
+    "group": "DM2",
+    "merged": ""
+   },
+   {
+    "table": "workforce.labour_budget",
+    "schema": "LabourBudget",
+    "contract": "contracts/satellite/workforce.yaml",
+    "group": "DM2",
+    "merged": ""
+   },
+   {
+    "table": "accreditation.identity_conflict",
+    "schema": "AccreditationIdentityConflict (re-tagged)",
+    "contract": "contracts/satellite/accreditation.yaml",
+    "group": "DM2",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.lifecycle_workflow",
+    "schema": "LifecycleWorkflowPolicy",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.approval_policy",
+    "schema": "CatalogueApprovalPolicy",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.change_request",
+    "schema": "CatalogueChangeRequest",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.change_request_line",
+    "schema": "CatalogueChangeRequestLine",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.lifecycle_action",
+    "schema": "LifecycleAction",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.product_channel_assignment",
+    "schema": "ProductChannelAssignment",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.product_link",
+    "schema": "ProductLink",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.rollback_action",
+    "schema": "CatalogueRollbackAction",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.audit_entry",
+    "schema": "CatalogueAuditEntry",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.ai_finding",
+    "schema": "CatalogueAiFinding",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.configuration_template",
+    "schema": "ConfigurationTemplate",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.ai_catalogue_session",
+    "schema": "AiCatalogueSession",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.performance_media",
+    "schema": "PerformanceMediaAssignment",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.sales_channel",
+    "schema": "SalesChannelProfile",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.channel_connection",
+    "schema": "ChannelConnection",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.channel_sync",
+    "schema": "ChannelSync",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.channel_sales_rule",
+    "schema": "ChannelSalesRule",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.channel_incident",
+    "schema": "ChannelIncident",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.price_category",
+    "schema": "PriceCategory",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.rate",
+    "schema": "PriceListRate",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.price_assignment",
+    "schema": "PriceAssignment",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.package_pricing",
+    "schema": "PackagePricing",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.pricing_market",
+    "schema": "PricingMarket",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.price_resolution_policy",
+    "schema": "PriceResolutionPolicy",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.fee",
+    "schema": "PricingFee",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.fee_rule",
+    "schema": "FeeRule",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.tax_profile",
+    "schema": "TaxProfile",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.tax_rule",
+    "schema": "TaxRule",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.calculation_profile",
+    "schema": "CalculationProfile",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.calculation_step",
+    "schema": "CalculationStep",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.rounding_profile",
+    "schema": "RoundingProfile",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.pricing_test_case",
+    "schema": "PricingTestCase",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.price_list_version",
+    "schema": "PriceListVersion",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.pricing_publication",
+    "schema": "PricingPublication",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.pricing_publication_target",
+    "schema": "PricingPublicationTarget",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.dynamic_pricing_strategy",
+    "schema": "DynamicPricingStrategy",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.dynamic_pricing_control",
+    "schema": "DynamicPricingControl",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.price_ladder",
+    "schema": "PriceLadder",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.demand_signal",
+    "schema": "DemandSignal",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.signal_registry",
+    "schema": "SignalRegistryEntry",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.demand_forecast",
+    "schema": "DemandForecast",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.pricing_recommendation",
+    "schema": "PricingRecommendation",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.pricing_simulation",
+    "schema": "PricingSimulation",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.pricing_experiment",
+    "schema": "PricingExperiment",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "catalogue.price_execution",
+    "schema": "PriceExecution",
+    "contract": "contracts/spine/catalogue.yaml",
+    "group": "DM3",
+    "merged": ""
+   },
+   {
+    "table": "subscription.membership_product",
+    "schema": "MembershipProduct",
+    "contract": "contracts/satellite/subscription.yaml",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "subscription.membership_eligibility_rule",
+    "schema": "MembershipEligibilityRule",
+    "contract": "contracts/satellite/subscription.yaml",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "subscription.membership_entitlement",
+    "schema": "MembershipEntitlement",
+    "contract": "contracts/satellite/subscription.yaml",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "subscription.membership_usage_policy",
+    "schema": "MembershipUsagePolicy",
+    "contract": "contracts/satellite/subscription.yaml",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "subscription.membership_household_policy",
+    "schema": "MembershipHouseholdPolicy",
+    "contract": "contracts/satellite/subscription.yaml",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "subscription.membership_household_policy_role_limit",
+    "schema": "MembershipHouseholdRoleLimit",
+    "contract": "contracts/satellite/subscription.yaml",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "subscription.membership_renewal_policy",
+    "schema": "MembershipRenewalPolicy",
+    "contract": "contracts/satellite/subscription.yaml",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "subscription.membership_product_history",
+    "schema": "MembershipProductHistory",
+    "contract": "contracts/satellite/subscription.yaml",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner",
+    "schema": "Partner",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner_application",
+    "schema": "PartnerApplication",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner_application_review_task",
+    "schema": "PartnerApplication",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner_contact",
+    "schema": "PartnerContact",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner_distribution_right",
+    "schema": "PartnerDistributionRight",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner_scope_assignment",
+    "schema": "PartnerScopeAssignment",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner_document",
+    "schema": "PartnerDocument",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner_capability_grant",
+    "schema": "PartnerCapabilityGrant",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner_status_history",
+    "schema": "PartnerStatusHistory",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner_rate",
+    "schema": "PartnerRate",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner_rate_volume_band",
+    "schema": "PartnerRate",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner_commission_rule",
+    "schema": "PartnerCommissionRule",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner_commission_rule_tier",
+    "schema": "PartnerCommissionRule",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner_credit_profile",
+    "schema": "PartnerCreditProfile",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner_security",
+    "schema": "PartnerSecurity",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner_billing_profile",
+    "schema": "PartnerBillingProfile",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner_allocation",
+    "schema": "PartnerAllocation",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner_booking_limit",
+    "schema": "PartnerBookingLimit",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner_commercial_exception",
+    "schema": "PartnerCommercialException",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner_change_request",
+    "schema": "PartnerChangeRequest",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner_reconciliation_exception",
+    "schema": "PartnerReconciliationException",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner_commission_line",
+    "schema": "PartnerCommissionLine",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner_settlement_batch",
+    "schema": "PartnerSettlementBatch",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "control.partner_case",
+    "schema": "PartnerCase",
+    "contract": "subscription",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "resources.selection_policy",
+    "schema": "ResourceSelectionPolicy",
+    "contract": "contracts/satellite/resources.yaml",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "resources.resource_cost",
+    "schema": "ResourceCostEntry",
+    "contract": "contracts/satellite/resources.yaml",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "seating.group_request_participant",
+    "schema": "GroupSeatParticipant",
+    "contract": "contracts/satellite/seating.yaml",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "rental.quote",
+    "schema": "RentalQuote",
+    "contract": "contracts/satellite/rental.yaml",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "assets.media_fingerprint",
+    "schema": "MediaFingerprint",
+    "contract": "contracts/satellite/assets.yaml",
+    "group": "DM4",
+    "merged": ""
+   },
+   {
+    "table": "orders.upgrade_rule",
+    "schema": "UpgradeRule",
+    "contract": "orders",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "orders.after_sale_policy",
+    "schema": "AfterSalePolicy",
+    "contract": "orders",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "orders.after_sale_policy_window",
+    "schema": "AfterSalePolicy.cancellationWindows",
+    "contract": "orders",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "orders.after_sale_request",
+    "schema": "AfterSaleRequest",
+    "contract": "orders",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "orders.order_event",
+    "schema": "OrderEvent",
+    "contract": "orders",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "orders.order_relationship",
+    "schema": "OrderRelationship",
+    "contract": "orders",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "orders.order_source_channel",
+    "schema": "OrderSourceChannel",
+    "contract": "orders",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "orders.payment_allocation_rule",
+    "schema": "PaymentAllocationRule",
+    "contract": "orders",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "orders.reservation_hold_policy",
+    "schema": "ReservationHoldPolicy",
+    "contract": "orders",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "orders.status_transition_rule",
+    "schema": "OrderStatusTransitionRule",
+    "contract": "orders",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "orders.external_reference_mapping",
+    "schema": "ExternalReferenceMapping",
+    "contract": "orders",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "orders.group_quote",
+    "schema": "GroupQuote",
+    "contract": "orders",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "orders.group_quote_line",
+    "schema": "GroupQuote.lines",
+    "contract": "orders",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "orders.group_visit_plan",
+    "schema": "GroupVisitPlan",
+    "contract": "orders",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "orders.group_task",
+    "schema": "GroupTask",
+    "contract": "orders",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "orders.resale_marketplace_config",
+    "schema": "ResaleMarketplaceConfig",
+    "contract": "orders",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "orders.resale_eligibility_rule",
+    "schema": "ResaleEligibilityRule",
+    "contract": "orders",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "orders.resale_recommendation",
+    "schema": "ResaleRecommendation",
+    "contract": "orders",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "orders.resale_settlement",
+    "schema": "ResaleSettlement",
+    "contract": "orders",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "promotions.campaign",
+    "schema": "CommercialCampaign",
+    "contract": "promotions",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "promotions.campaign_budget",
+    "schema": "CampaignBudget",
+    "contract": "promotions",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "promotions.promotion_audit",
+    "schema": "PromotionAuditEvent",
+    "contract": "promotions",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "promotions.promotion_channel_publication",
+    "schema": "PromotionChannelPublication",
+    "contract": "promotions",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "promotions.promotion_alert",
+    "schema": "PromotionAlert",
+    "contract": "promotions",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "promotions.promotion_rule",
+    "schema": "PromotionRule",
+    "contract": "promotions",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "promotions.stacking_rule",
+    "schema": "StackingRule",
+    "contract": "promotions",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "promotions.promotion_conflict",
+    "schema": "PromotionConflict",
+    "contract": "promotions",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "promotions.promotion_evaluation_trace",
+    "schema": "PromotionEvaluationTrace",
+    "contract": "promotions",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "promotions.partner_bundle_product",
+    "schema": "PartnerBundleProduct",
+    "contract": "promotions",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "promotions.bundle_capacity_policy",
+    "schema": "BundleCapacityPolicy",
+    "contract": "promotions",
+    "group": "DM5",
+    "merged": ""
+   },
+   {
+    "table": "marketing.business_event",
+    "schema": "BusinessEvent",
+    "contract": "contracts/satellite/marketing-crm.yaml",
+    "group": "DM6",
+    "merged": ""
+   },
+   {
+    "table": "marketing.message_trigger_condition",
+    "schema": "MessageTriggerCondition",
+    "contract": "contracts/satellite/marketing-crm.yaml",
+    "group": "DM6",
+    "merged": ""
+   },
+   {
+    "table": "marketing.message_template_version",
+    "schema": "MessageTemplateVersion",
+    "contract": "contracts/satellite/marketing-crm.yaml",
+    "group": "DM6",
+    "merged": ""
+   },
+   {
+    "table": "marketing.message_dispatch_attempt",
+    "schema": "MessageDispatchAttempt",
+    "contract": "contracts/satellite/marketing-crm.yaml",
+    "group": "DM6",
+    "merged": ""
+   },
+   {
+    "table": "marketing.communication_policy_decision",
+    "schema": "ConsentPreferenceCommunicationPolicyEnforcementView (re-tagged: the view is the row)",
+    "contract": "contracts/satellite/marketing-crm.yaml",
+    "group": "DM6",
+    "merged": ""
+   },
+   {
+    "table": "marketing.consent_propagation",
+    "schema": "ConsentPropagation",
+    "contract": "contracts/satellite/marketing-crm.yaml",
+    "group": "DM6",
+    "merged": ""
+   },
+   {
+    "table": "marketing.privacy_notice_governance",
+    "schema": "PrivacyNoticeGovernance",
+    "contract": "contracts/satellite/marketing-crm.yaml",
+    "group": "DM6",
+    "merged": ""
+   },
+   {
+    "table": "marketing.case_category",
+    "schema": "CaseCategory",
+    "contract": "contracts/satellite/marketing-crm.yaml",
+    "group": "DM6",
+    "merged": ""
+   },
+   {
+    "table": "marketing.service_queue",
+    "schema": "ServiceQueue",
+    "contract": "contracts/satellite/marketing-crm.yaml",
+    "group": "DM6",
+    "merged": ""
+   },
+   {
+    "table": "marketing.case_escalation",
+    "schema": "CaseEscalation",
+    "contract": "contracts/satellite/marketing-crm.yaml",
+    "group": "DM6",
+    "merged": ""
+   },
+   {
+    "table": "marketing.feedback_classification",
+    "schema": "FeedbackClassification",
+    "contract": "contracts/satellite/marketing-crm.yaml",
+    "group": "DM6",
+    "merged": ""
+   },
+   {
+    "table": "marketing.waiver_requirement",
+    "schema": "WaiverRequirement",
+    "contract": "contracts/satellite/marketing-crm.yaml",
+    "group": "DM6",
+    "merged": ""
+   },
+   {
+    "table": "marketing.waiver_requirement_event",
+    "schema": "WaiverRequirementEvent",
+    "contract": "contracts/satellite/marketing-crm.yaml",
+    "group": "DM6",
+    "merged": ""
+   },
+   {
+    "table": "marketing.retention_run",
+    "schema": "RetentionRunResult (re-tagged: the response is the row; runId stored as id)",
+    "contract": "contracts/satellite/marketing-crm.yaml",
+    "group": "DM6",
+    "merged": ""
+   },
+   {
+    "table": "payments.payment_attempt",
+    "schema": "PaymentAttempt",
+    "contract": "contracts/satellite/payments.yaml",
+    "group": "DM6",
+    "merged": ""
+   },
+   {
+    "table": "payments.provider_cost",
+    "schema": "ProviderCostLine",
+    "contract": "contracts/satellite/payments.yaml",
+    "group": "DM6",
+    "merged": ""
+   },
+   {
+    "table": "games.pricing_exception",
+    "schema": "GamePricingException",
+    "contract": "contracts/satellite/games.yaml",
+    "group": "DM6",
+    "merged": ""
+   },
+   {
+    "table": "games.reader_sync_status",
+    "schema": "ReaderOfflineQueue",
+    "contract": "contracts/satellite/games.yaml",
+    "group": "DM6",
+    "merged": ""
+   },
+   {
+    "table": "wallet.configuration_version_snapshot",
+    "schema": "WalletConfigurationSnapshot",
+    "contract": "contracts/satellite/wallet.yaml",
+    "group": "DM6",
+    "merged": ""
+   },
+   {
+    "table": "reporting.site_normalisation_basis",
+    "schema": "SiteNormalisationBasis",
+    "contract": "contracts/satellite/reporting.yaml",
+    "group": "DM6",
+    "merged": ""
+   },
+   {
+    "table": "reporting.dashboard_view",
+    "schema": "DashboardView",
+    "contract": "contracts/satellite/reporting.yaml",
+    "group": "DM6",
+    "merged": ""
+   }
+  ],
+  "writersAdded": [
+   {
+    "op": "setAccessPointGroup",
+    "group": "WA",
+    "writes": [
+     "access.access_point_group",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-151 Access Location Grouping"
+    ]
+   },
+   {
+    "op": "deleteAccessPointGroup",
+    "group": "WA",
+    "writes": [
+     "access.access_point_group",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-151 Access Location Grouping"
+    ]
+   },
+   {
+    "op": "setOfflinePolicy",
+    "group": "WA",
+    "writes": [
+     "access.offline_policy",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-171 Offline Cryptographic Validation Profile",
+     "P08 BO-208 Offline Credential & Revocation Cache",
+     "P08 BO-210 Connectivity Failure & Degraded Mode Policy"
+    ]
+   },
+   {
+    "op": "setOperatingCalendarEntry",
+    "group": "WA",
+    "writes": [
+     "access.operating_calendar_entry",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-152 Operating Calendar & Special Access Days",
+     "P08 BO-222 Special Event, Free View & Alternative Admission"
+    ]
+   },
+   {
+    "op": "deleteOperatingCalendarEntry",
+    "group": "WA",
+    "writes": [
+     "access.operating_calendar_entry",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-152 Operating Calendar & Special Access Days"
+    ]
+   },
+   {
+    "op": "setHardwareModel",
+    "group": "WA",
+    "writes": [
+     "access.hardware_model",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-195 Device Type & Hardware Library"
+    ]
+   },
+   {
+    "op": "registerAccessDevice",
+    "group": "WA",
+    "writes": [
+     "access.access_device",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-196 Physical Device Registration & Provisioning"
+    ]
+   },
+   {
+    "op": "updateAccessDevice",
+    "group": "WA",
+    "writes": [
+     "access.access_device",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-196 Physical Device Registration & Provisioning",
+     "P08 BO-194 Device & Gate Command Center"
+    ]
+   },
+   {
+    "op": "setGateModePolicy",
+    "group": "WA",
+    "writes": [
+     "access.gate_mode_policy",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-201 Gate Modes, Free Spin & Emergency Controls"
+    ]
+   },
+   {
+    "op": "cancelGateModeChange",
+    "group": "WA",
+    "writes": [
+     "access.gate_mode_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-230 Live Gate Mode & Lane Control",
+     "P07 SCN-016 Gate mode"
+    ]
+   },
+   {
+    "op": "setPodium",
+    "group": "WA",
+    "writes": [
+     "access.podium",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-225 Podium Operations Console"
+    ]
+   },
+   {
+    "op": "deletePodium",
+    "group": "WA",
+    "writes": [
+     "access.podium",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-225 Podium Operations Console"
+    ]
+   },
+   {
+    "op": "startPodiumShift",
+    "group": "WA",
+    "writes": [
+     "access.podium_shift",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-225 Podium Operations Console",
+     "P07 SCN-002 Access point & direction"
+    ]
+   },
+   {
+    "op": "endPodiumShift",
+    "group": "WA",
+    "writes": [
+     "access.podium_shift",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-225 Podium Operations Console",
+     "P08 BO-233 Operations Audit, Shift Handover & Control Summary",
+     "P07 SCN-002 Access point & direction"
+    ]
+   },
+   {
+    "op": "setReasonCode",
+    "group": "WA",
+    "writes": [
+     "access.reason_code",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-227 Validation Exception & Reason Code Manager"
+    ]
+   },
+   {
+    "op": "deleteReasonCode",
+    "group": "WA",
+    "writes": [
+     "access.reason_code",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-227 Validation Exception & Reason Code Manager"
+    ]
+   },
+   {
+    "op": "setCredentialEventPropagationRule",
+    "group": "WA",
+    "writes": [
+     "access.credential_event_propagation_rule",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-340 Entitlement & Cross-Media Synchronization Rules",
+     "P08 BO-170 Credential Revocation & Lifecycle Events"
+    ]
+   },
+   {
+    "op": "setMediaBindingRule",
+    "group": "WA",
+    "writes": [
+     "access.media_binding_rule",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-338 Multi-Media Binding & Association Rules"
+    ]
+   },
+   {
+    "op": "deleteMediaBindingRule",
+    "group": "WA",
+    "writes": [
+     "access.media_binding_rule",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-338 Multi-Media Binding & Association Rules"
+    ]
+   },
+   {
+    "op": "setTicketStatusTransition",
+    "group": "WA",
+    "writes": [
+     "access.ticket_status_transition",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-336 Virtual Ticket Status & Lifecycle Model"
+    ]
+   },
+   {
+    "op": "setVerificationMethodPolicy",
+    "group": "WA",
+    "writes": [
+     "access.verification_method_policy",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-177 Verification Method Selection & Locking"
+    ]
+   },
+   {
+    "op": "setDeviceBindingPolicy",
+    "group": "WA",
+    "writes": [
+     "access.credential_policy",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-167 Device Binding & Session Security",
+     "P08 BO-164 Digital Credential Security Command Center"
+    ]
+   },
+   {
+    "op": "bindCredentialDevice",
+    "group": "WA",
+    "writes": [
+     "access.device_binding",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P02 GST-055 Dynamic QR Ticket",
+     "P02 GST-013 Ticket Details"
+    ]
+   },
+   {
+    "op": "releaseCredentialDevice",
+    "group": "WA",
+    "writes": [
+     "access.device_binding",
+     "access.credential_event",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-167 Device Binding & Session Security",
+     "P08 BO-169 Credential Transfer & Rebinding"
+    ]
+   },
+   {
+    "op": "setJourneySequenceRule",
+    "group": "WA",
+    "writes": [
+     "access.journey_sequence_rule",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-157 Anti-Passback & Journey Sequence"
+    ]
+   },
+   {
+    "op": "deleteJourneySequenceRule",
+    "group": "WA",
+    "writes": [
+     "access.journey_sequence_rule",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-157 Anti-Passback & Journey Sequence"
+    ]
+   },
+   {
+    "op": "setJourneyProfile",
+    "group": "WA",
+    "writes": [
+     "access.journey_profile",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-214 Guest Journey Command Center"
+    ]
+   },
+   {
+    "op": "setFastPassProfile",
+    "group": "WA",
+    "writes": [
+     "access.fast_pass_profile",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-221 Fast Pass & Attraction Access Journey"
+    ]
+   },
+   {
+    "op": "setPolicyEvaluationSetting",
+    "group": "WA",
+    "writes": [
+     "access.policy_evaluation_setting",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-241 Policy Evaluation Architecture & Offline Distribution"
+    ]
+   },
+   {
+    "op": "setRiskScoringConfig",
+    "group": "WA",
+    "writes": [
+     "access.risk_scoring_config",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-250 Access Risk Scoring & Decision Engine"
+    ]
+   },
+   {
+    "op": "setRelationshipFraudRule",
+    "group": "WA",
+    "writes": [
+     "access.fraud_rule",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-249 Relationship & Companion Fraud Monitoring"
+    ]
+   },
+   {
+    "op": "lockIdentity",
+    "group": "WA",
+    "writes": [
+     "access.identity_lock",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-247 Unified Identity & Credential Lock Manager",
+     "P08 BO-244 Access Security & Fraud Command Center"
+    ]
+   },
+   {
+    "op": "releaseIdentityLock",
+    "group": "WA",
+    "writes": [
+     "access.identity_lock",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-247 Unified Identity & Credential Lock Manager"
+    ]
+   },
+   {
+    "op": "updateSecurityAlert",
+    "group": "WA",
+    "writes": [
+     "access.security_alert",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-244 Access Security & Fraud Command Center",
+     "P08 BO-246 Credential Sharing & Concurrent Usage Detection",
+     "P08 BO-248 Biometric & Identity Integrity Monitoring",
+     "P08 BO-213 Edge Security, Audit & Deployment",
+     "P08 BO-253 Security Analytics, AI Detection & Governance"
+    ]
+   },
+   {
+    "op": "reviewFaceReenrolment",
+    "group": "WA",
+    "writes": [
+     "access.face_reenrolment_attempt",
+     "pii.subject_biometric",
+     "access.security_alert",
+     "access.biometric_audit_event",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-190 Face Change, Re-enrollment & Identity Protection",
+     "P08 BO-248 Biometric & Identity Integrity Monitoring"
+    ]
+   },
+   {
+    "op": "archiveMediaTemplate",
+    "group": "WA",
+    "writes": [
+     "access.media_template",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-344 Media Design Studio Command Center"
+    ]
+   },
+   {
+    "op": "rollbackConfigurationVersion",
+    "group": "WA",
+    "writes": [
+     "access.configuration_version",
+     "access.configuration_change",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-153 Topology Validation & Publication"
+    ]
+   },
+   {
+    "op": "actOnWorkflowInstance",
+    "group": "WB",
+    "writes": [
+     "approvals.workflow_intervention",
+     "approvals.workflow_instance",
+     "approvals.workflow_step_execution",
+     "approvals.workflow_exception",
+     "approvals.request",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P09 ADM-250 Workflow Instance Monitor & Process Timeline",
+     "P09 ADM-251 Workflow Exception, Failure & Recovery Center",
+     "P09 ADM-252 SLA, Escalation & Bottleneck Monitor",
+     "P08 BO-384 Delegation & Escalation Command Center",
+     "P08 BO-391 Live Escalation Operations Center"
+    ]
+   },
+   {
+    "op": "listLabourBudgets",
+    "group": "WB",
+    "writes": [],
+    "screens": [
+     "P08 BO-891 Labor Cost & Staffing Budget Control"
+    ]
+   },
+   {
+    "op": "setLabourBudget",
+    "group": "WB",
+    "writes": [
+     "workforce.labour_budget",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-891 Labor Cost & Staffing Budget Control"
+    ]
+   },
+   {
+    "op": "resolveIdentityConflict",
+    "group": "WB",
+    "writes": [
+     "accreditation.identity_conflict",
+     "accreditation.holder",
+     "accreditation.application",
+     "accreditation.document",
+     "accreditation.credential",
+     "accreditation.holder_access",
+     "cache:idempotency"
+    ],
+    "screens": [
+     "P08 BO-631 Duplicate & Identity Conflict Detection"
+    ]
+   },
+   {
+    "op": "getResaleMarketplaceConfig",
+    "group": "WC",
+    "writes": [],
+    "screens": [
+     "ADM-280",
+     "ADM-282",
+     "ADM-278"
+    ]
+   },
+   {
+    "op": "setResaleMarketplaceConfig",
+    "group": "WC",
+    "writes": [
+     "orders.resale_marketplace_config"
+    ],
+    "screens": [
+     "ADM-280",
+     "ADM-282"
+    ]
+   },
+   {
+    "op": "holdResaleSettlement",
+    "group": "WC",
+    "writes": [
+     "orders.resale_settlement",
+     "platform.outbox"
+    ],
+    "screens": [
+     "ADM-294",
+     "ADM-295"
+    ]
+   },
+   {
+    "op": "releaseResaleSettlementHold",
+    "group": "WC",
+    "writes": [
+     "orders.resale_settlement",
+     "platform.outbox"
+    ],
+    "screens": [
+     "ADM-294",
+     "ADM-295"
+    ]
+   },
+   {
+    "op": "recordGroupCheckIn",
+    "group": "WC",
+    "writes": [
+     "orders.group_visit_plan",
+     "orders.order_event"
+    ],
+    "screens": [
+     "BO-280"
+    ]
+   },
+   {
+    "op": "mergeOrders",
+    "group": "WC",
+    "writes": [
+     "orders.sales_order",
+     "orders.order_line",
+     "orders.payment",
+     "orders.order_relationship",
+     "orders.order_event",
+     "ledger.journal_entry",
+     "ledger.posting",
+     "platform.outbox"
+    ],
+    "screens": [
+     "BO-328"
+    ]
+   },
+   {
+    "op": "listExternalReferenceMappings",
+    "group": "WC",
+    "writes": [],
+    "screens": [
+     "BO-330"
+    ]
+   },
+   {
+    "op": "recordExternalReference",
+    "group": "WC",
+    "writes": [
+     "orders.external_reference_mapping"
+    ],
+    "screens": [
+     "BO-330"
+    ]
+   },
+   {
+    "op": "listPaymentAllocationRules",
+    "group": "WC",
+    "writes": [],
+    "screens": [
+     "BO-326",
+     "ADM-601"
+    ]
+   },
+   {
+    "op": "listCommercialCampaigns",
+    "group": "WC",
+    "writes": [],
+    "screens": [
+     "ADM-139",
+     "ADM-142",
+     "ADM-219",
+     "ADM-229",
+     "ADM-179",
+     "BO-010",
+     "BO-011"
+    ]
+   },
+   {
+    "op": "createCommercialCampaign",
+    "group": "WC",
+    "writes": [
+     "promotions.campaign",
+     "promotions.promotion_audit"
+    ],
+    "screens": [
+     "ADM-139",
+     "ADM-219"
+    ]
+   },
+   {
+    "op": "updateCommercialCampaign",
+    "group": "WC",
+    "writes": [
+     "promotions.campaign",
+     "promotions.promotion_audit"
+    ],
+    "screens": [
+     "ADM-139",
+     "ADM-219"
+    ]
+   },
+   {
+    "op": "listBundleCapacityPolicies",
+    "group": "WC",
+    "writes": [],
+    "screens": [
+     "ADM-191",
+     "ADM-195"
+    ]
+   },
+   {
+    "op": "setBundleCapacityPolicy",
+    "group": "WC",
+    "writes": [
+     "promotions.bundle_capacity_policy",
+     "promotions.promotion_audit"
+    ],
+    "screens": [
+     "ADM-191",
+     "ADM-195"
+    ]
+   },
+   {
+    "op": "listBundlePartnerProductMappings",
+    "group": "WC",
+    "writes": [],
+    "screens": [
+     "ADM-185"
+    ]
+   },
+   {
+    "op": "setBundlePartnerProductMappings",
+    "group": "WC",
+    "writes": [
+     "promotions.partner_bundle_product",
+     "promotions.promotion_audit"
+    ],
+    "screens": [
+     "ADM-185"
+    ]
+   },
+   {
+    "op": "recordDashboardView",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "reporting.dashboard_view"
+    ],
+    "screens": [
+     "P16 ANL-001",
+     "P16 ANL-002",
+     "P16 ANL-003",
+     "P16 ANL-004",
+     "P16 ANL-005",
+     "P16 ANL-006",
+     "P16 ANL-007",
+     "P16 ANL-008",
+     "P16 ANL-021",
+     "P16 ANL-023",
+     "P16 ANL-030",
+     "P08 BO-010",
+     "P09 ADM-031",
+     "P15 KIT-010"
+    ]
+   },
+   {
+    "op": "listSiteNormalisationBases",
+    "group": "WD",
+    "writes": [],
+    "screens": [
+     "P16 ANL-064",
+     "P16 ANL-020"
+    ]
+   },
+   {
+    "op": "setSiteNormalisationBasis",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "reporting.site_normalisation_basis"
+    ],
+    "screens": [
+     "P16 ANL-064"
+    ]
+   },
+   {
+    "op": "reportReaderQueue",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "games.reader_sync_status"
+    ],
+    "screens": []
+   },
+   {
+    "op": "listResourceCosts",
+    "group": "WD",
+    "writes": [],
+    "screens": [
+     "P08 BO-945",
+     "P08 BO-903",
+     "P08 BO-912"
+    ]
+   },
+   {
+    "op": "createResourceCost",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "resources.resource_cost"
+    ],
+    "screens": [
+     "P08 BO-945",
+     "P08 BO-903",
+     "P08 BO-912",
+     "P08 BO-910"
+    ]
+   },
+   {
+    "op": "deleteResourceCost",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "resources.resource_cost",
+     "resources.resource_audit"
+    ],
+    "screens": [
+     "P08 BO-945"
+    ]
+   },
+   {
+    "op": "setPrivacyNoticePolicyGovernance",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "marketing.privacy_notice_governance"
+    ],
+    "screens": [
+     "CMS-028",
+     "CMS-030"
+    ]
+   },
+   {
+    "op": "listCaseCategories",
+    "group": "WD",
+    "writes": [],
+    "screens": [
+     "BO-807",
+     "BO-806",
+     "BO-805",
+     "BO-800",
+     "SUP-012",
+     "SUP-021"
+    ]
+   },
+   {
+    "op": "setCaseCategoryDefinition",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "marketing.case_category"
+    ],
+    "screens": [
+     "BO-807"
+    ]
+   },
+   {
+    "op": "listServiceQueues",
+    "group": "WD",
+    "writes": [],
+    "screens": [
+     "BO-800",
+     "SUP-020",
+     "SUP-021",
+     "BO-808",
+     "BO-805"
+    ]
+   },
+   {
+    "op": "setServiceQueueDefinition",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "marketing.service_queue"
+    ],
+    "screens": [
+     "BO-800",
+     "SUP-020"
+    ]
+   },
+   {
+    "op": "setMembershipUsagePolicy",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "subscription.membership_usage_policy",
+     "subscription.membership_product",
+     "subscription.membership_product_history"
+    ],
+    "screens": [
+     "P08 BO-289 Membership Usage, Visit & Consumption Rules"
+    ]
+   },
+   {
+    "op": "setMembershipCommercialConfig",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "subscription.membership_product",
+     "subscription.membership_product_history"
+    ],
+    "screens": [
+     "P08 BO-291 Membership Commercial, Pricing & Channel Association"
+    ]
+   },
+   {
+    "op": "actOnPartnerApplicationReview",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "control.partner_application",
+     "control.partner_application_review_task",
+     "control.partner",
+     "control.partner_status_history",
+     "approvals.request"
+    ],
+    "screens": [
+     "P10 PTR-024 Partner Onboarding & Application Workflow"
+    ]
+   },
+   {
+    "op": "setPartnerContact",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "control.partner_contact",
+     "control.partner_user"
+    ],
+    "screens": [
+     "P10 PTR-025 Partner Contacts & User Administration"
+    ]
+   },
+   {
+    "op": "setPartnerDistributionRights",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "control.partner_distribution_right"
+    ],
+    "screens": [
+     "P10 PTR-026 Territory, Market & Distribution Rights"
+    ]
+   },
+   {
+    "op": "setPartnerCapabilityGrants",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "control.partner_capability_grant"
+    ],
+    "screens": [
+     "P10 PTR-029 Partner Access, Roles & Permission Profile"
+    ]
+   },
+   {
+    "op": "setPartnerCommissionRules",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "control.partner_commission_rule",
+     "control.partner_commission_rule_tier",
+     "approvals.request"
+    ],
+    "screens": [
+     "P10 PTR-035 Commission, Margin & Incentive Management"
+    ]
+   },
+   {
+    "op": "setPartnerCreditProfile",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "control.partner_credit_profile",
+     "approvals.request"
+    ],
+    "screens": [
+     "P10 PTR-036 Credit Limit & Exposure Management"
+    ]
+   },
+   {
+    "op": "setPartnerSecurity",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "control.partner_security"
+    ],
+    "screens": [
+     "P10 PTR-037 Deposit, Guarantee & Financial Security Management"
+    ]
+   },
+   {
+    "op": "setPartnerAllocations",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "control.partner_allocation",
+     "approvals.request"
+    ],
+    "screens": [
+     "P10 PTR-039 Commercial Allocation, Quota & Commitment Management"
+    ]
+   },
+   {
+    "op": "createPartnerChangeRequest",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "control.partner_change_request",
+     "approvals.request"
+    ],
+    "screens": [
+     "P10 PTR-045 Partner Cancellations, Refunds & Amendments"
+    ]
+   },
+   {
+    "op": "actOnPartnerReconciliationException",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "control.partner_reconciliation_exception",
+     "control.partner_case"
+    ],
+    "screens": [
+     "P10 PTR-047 Partner Reconciliation & Exception Management"
+    ]
+   },
+   {
+    "op": "actOnPartnerCommissionLine",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "control.partner_commission_line"
+    ],
+    "screens": [
+     "P10 PTR-048 Commission Calculation & Settlement Management"
+    ]
+   },
+   {
+    "op": "actOnPartnerSettlementBatch",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "control.partner_settlement_batch",
+     "control.partner_commission_line"
+    ],
+    "screens": [
+     "P10 PTR-048 Commission Calculation & Settlement Management"
+    ]
+   },
+   {
+    "op": "createPartnerCase",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "control.partner_case",
+     "control.partner_commission_line",
+     "control.partner_settlement_batch"
+    ],
+    "screens": [
+     "P10 PTR-049 Partner Disputes, Cases & Service Management"
+    ]
+   },
+   {
+    "op": "actOnPartnerCase",
+    "group": "WD",
+    "writes": [
+     "cache:idempotency",
+     "control.partner_case",
+     "control.partner_commission_line",
+     "control.partner_settlement_batch"
+    ],
+    "screens": [
+     "P10 PTR-049 Partner Disputes, Cases & Service Management"
+    ]
+   },
+   {
+    "op": "setProductLinks",
+    "group": "WE",
+    "writes": [
+     "cache:idempotency",
+     "catalogue.audit_entry",
+     "catalogue.product_link"
+    ],
+    "screens": [
+     "P09 ADM-134 Change Propagation & Dependency Control",
+     "P09 ADM-133 Change Impact Analysis"
+    ]
+   },
+   {
+    "op": "setConfigurationTemplate",
+    "group": "WE",
+    "writes": [
+     "cache:idempotency",
+     "catalogue.audit_entry",
+     "catalogue.configuration_template"
+    ],
+    "screens": [
+     "P09 ADM-126 Product Duplication & Template Library",
+     "P09 ADM-056 Price List Templates, Clone & Reuse"
+    ]
+   },
+   {
+    "op": "requestPricingRollback",
+    "group": "WE",
+    "writes": [
+     "cache:idempotency",
+     "catalogue.audit_entry",
+     "catalogue.rollback_action",
+     "platform.outbox"
+    ],
+    "screens": [
+     "P09 ADM-086 Pricing Rollback & Emergency Control Center"
+    ]
+   },
+   {
+    "op": "cancelPricingRollback",
+    "group": "WE",
+    "writes": [
+     "cache:idempotency",
+     "catalogue.audit_entry",
+     "catalogue.rollback_action",
+     "platform.outbox"
+    ],
+    "screens": [
+     "P09 ADM-086 Pricing Rollback & Emergency Control Center"
+    ]
+   },
+   {
+    "op": "decideCatalogueAiFinding",
+    "group": "WE",
+    "writes": [
+     "cache:idempotency",
+     "catalogue.ai_finding",
+     "catalogue.audit_entry"
+    ],
+    "screens": [
+     "P09 ADM-137 Governance Risk, AI Monitoring & Control Center",
+     "P09 ADM-277 AI Channel Optimization & Intelligence Center",
+     "P09 ADM-128 Product Governance Command Center"
+    ]
+   },
+   {
+    "op": "setChannelConnectionConfiguration",
+    "group": "WE",
+    "writes": [
+     "cache:idempotency",
+     "catalogue.audit_entry",
+     "catalogue.channel_connection"
+    ],
+    "screens": [
+     "P09 ADM-269 Channel Connection & Integration Manager"
+    ]
+   },
+   {
+    "op": "testChannelConnection",
+    "group": "WE",
+    "writes": [
+     "cache:idempotency",
+     "catalogue.audit_entry",
+     "catalogue.channel_connection"
+    ],
+    "screens": [
+     "P09 ADM-269 Channel Connection & Integration Manager"
+    ]
+   },
+   {
+    "op": "setChannelSyncSetting",
+    "group": "WE",
+    "writes": [
+     "cache:idempotency",
+     "catalogue.audit_entry",
+     "catalogue.channel_sync"
+    ],
+    "screens": [
+     "P09 ADM-270 Product, Price & Availability Synchronization"
+    ]
+   },
+   {
+    "op": "setChannelSalesRule",
+    "group": "WE",
+    "writes": [
+     "cache:idempotency",
+     "catalogue.audit_entry",
+     "catalogue.channel_sales_rule"
+    ],
+    "screens": [
+     "P09 ADM-263 Channel Sales Schedule & Availability Windows",
+     "P09 ADM-264 Customer & Eligibility Rules by Channel",
+     "P09 ADM-265 Channel Sales Rules, Limits & Restrictions"
+    ]
+   },
+   {
+    "op": "updateChannelIncident",
+    "group": "WE",
+    "writes": [
+     "cache:idempotency",
+     "catalogue.audit_entry",
+     "catalogue.channel_incident"
+    ],
+    "screens": [
+     "P09 ADM-273 Channel Exceptions, Incidents & Recovery"
+    ]
+   },
+   {
+    "op": "retryChannelIncident",
+    "group": "WE",
+    "writes": [
+     "cache:idempotency",
+     "catalogue.audit_entry",
+     "catalogue.channel_incident",
+     "platform.outbox"
+    ],
+    "screens": [
+     "P09 ADM-273 Channel Exceptions, Incidents & Recovery"
+    ]
+   },
+   {
+    "op": "setPriceCategoryRateType",
+    "group": "WE",
+    "writes": [
+     "cache:idempotency",
+     "catalogue.audit_entry",
+     "catalogue.price_category"
+    ],
+    "screens": [
+     "P09 ADM-050 Price Category & Rate Type Library"
+    ]
+   },
+   {
+    "op": "setPackagePricingDefinition",
+    "group": "WE",
+    "writes": [
+     "cache:idempotency",
+     "catalogue.audit_entry",
+     "catalogue.package_pricing"
+    ],
+    "screens": [
+     "P09 ADM-053 Package, Bundle & Add-On Pricing",
+     "P08 BO-011 Packages & Bundles"
+    ]
+   },
+   {
+    "op": "setMarketPricingConfiguration",
+    "group": "WE",
+    "writes": [
+     "cache:idempotency",
+     "catalogue.audit_entry",
+     "catalogue.pricing_market"
+    ],
+    "screens": [
+     "P09 ADM-054 Market, Venue & Currency Pricing Structure"
+    ]
+   },
+   {
+    "op": "setFeeDefinition",
+    "group": "WE",
+    "writes": [
+     "cache:idempotency",
+     "catalogue.audit_entry",
+     "catalogue.fee"
+    ],
+    "screens": [
+     "P09 ADM-071 Fee & Surcharge Library"
+    ]
+   },
+   {
+    "op": "setPriceCalculationPolicy",
+    "group": "WE",
+    "writes": [
+     "cache:idempotency",
+     "catalogue.audit_entry",
+     "catalogue.calculation_profile",
+     "catalogue.calculation_step"
+    ],
+    "screens": [
+     "P09 ADM-074 Price Calculation Sequence & Formula Engine"
+    ]
+   },
+   {
+    "op": "setCurrencyRoundingRule",
+    "group": "WE",
+    "writes": [
+     "cache:idempotency",
+     "catalogue.audit_entry",
+     "catalogue.rounding_profile"
+    ],
+    "screens": [
+     "P09 ADM-075 Currency Precision, Rounding & Monetary Rules"
+    ]
+   },
+   {
+    "op": "setDynamicPricingGuardrailPolicy",
+    "group": "WE",
+    "writes": [
+     "cache:idempotency",
+     "catalogue.audit_entry",
+     "catalogue.dynamic_pricing_control",
+     "catalogue.dynamic_pricing_strategy",
+     "platform.outbox"
+    ],
+    "screens": [
+     "P09 ADM-095 Dynamic Pricing Guardrails & Commercial Protection",
+     "P09 ADM-096 Dynamic Pricing Automation Policy & Control",
+     "P09 ADM-114 Automation Policy & Autonomous Pricing Orchestrator"
+    ]
+   },
+   {
+    "op": "setPriceLadderMatrix",
+    "group": "WE",
+    "writes": [
+     "cache:idempotency",
+     "catalogue.audit_entry",
+     "catalogue.price_ladder"
+    ],
+    "screens": [
+     "P09 ADM-094 Dynamic Price Bands, Ladders & Adjustment Matrix"
+    ]
+   },
+   {
+    "op": "transitionDynamicPricingStrategy",
+    "group": "WE",
+    "writes": [
+     "cache:idempotency",
+     "catalogue.audit_entry",
+     "catalogue.dynamic_pricing_strategy"
+    ],
+    "screens": [
+     "P09 ADM-088 Dynamic Pricing Strategy Command Center",
+     "P09 ADM-089 Dynamic Pricing Strategy Builder",
+     "P08 BO-528 Dynamic Pricing & AI Recommendation"
+    ]
+   },
+   {
+    "op": "setDemandSignalConfiguration",
+    "group": "WE",
+    "writes": [
+     "cache:idempotency",
+     "catalogue.audit_entry",
+     "catalogue.demand_signal"
+    ],
+    "screens": [
+     "P09 ADM-092 Seasonal, Calendar, Day & Timeslot Dynamic Rules",
+     "P09 ADM-100 Weather Intelligence & Demand Impact Configuration",
+     "P09 ADM-101 Nearby Event, Exhibition & Local Demand Intelligence",
+     "P09 ADM-102 Competitor Pricing & Market Position Intelligence",
+     "P09 ADM-103 Market, Tourism, Holiday & Contextual Signal Hub"
+    ]
+   },
+   {
+    "op": "setSignalRegistryPolicy",
+    "group": "WE",
+    "writes": [
+     "cache:idempotency",
+     "catalogue.audit_entry",
+     "catalogue.signal_registry"
+    ],
+    "screens": [
+     "P09 ADM-107 AI Signal Registry, Data Quality & Model Governance",
+     "P09 ADM-117 AI Learning, Model Performance & Optimization Feedback"
+    ]
+   }
+  ]
+ }
 }

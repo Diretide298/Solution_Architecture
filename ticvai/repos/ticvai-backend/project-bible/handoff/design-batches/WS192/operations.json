@@ -1,0 +1,254 @@
+{
+ "adjustWallet": {
+  "method": "POST",
+  "path": "/wallets/{subjectId}/adjust",
+  "contract": "wallet",
+  "summary": "Manually adjust a wallet balance",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Wallet"
+ },
+ "createRefund": {
+  "method": "POST",
+  "path": "/orders/{orderId}/refunds",
+  "contract": "orders",
+  "summary": "Refund an order, wholly or in part",
+  "permission": "ORDER_REFUND",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateRefundRequest",
+  "responds": null
+ },
+ "listWalletDisputes": {
+  "method": "GET",
+  "path": "/wallet-disputes",
+  "contract": "wallet",
+  "summary": "Contested transactions and operational exceptions",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletDispute"
+ },
+ "listWalletTransactions": {
+  "method": "GET",
+  "path": "/wallets/{subjectId}/transactions",
+  "contract": "wallet",
+  "summary": "Wallet transaction history",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "raiseWalletDispute": {
+  "method": "POST",
+  "path": "/wallet-disputes",
+  "contract": "wallet",
+  "summary": "A guest contests a wallet transaction",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletDispute",
+  "responds": "WalletDispute"
+ },
+ "reverseWalletFunding": {
+  "method": "POST",
+  "path": "/wallet-funding/reversals",
+  "contract": "wallet",
+  "summary": "Undo a top-up, in full or in part",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletAdjustment"
+ },
+ "setApprovalMatrix": {
+  "method": "PUT",
+  "path": "/approval-matrices",
+  "contract": "approvals",
+  "summary": "Configure what requires approval",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalMatrix",
+  "responds": "ApprovalMatrix"
+ },
+ "setRefundPolicy": {
+  "method": "PUT",
+  "path": "/venues/{venueId}/refund-policy",
+  "contract": "orders",
+  "summary": "Set a venue's refund policy",
+  "permission": "REGION_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RefundPolicy",
+  "responds": "RefundPolicy"
+ },
+ "setWalletRefundPolicy": {
+  "method": "PUT",
+  "path": "/wallet-refund-policy",
+  "contract": "wallet",
+  "summary": "What a refund puts back, and where",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletRefundPolicy",
+  "responds": "WalletRefundPolicy"
+ },
+ "setWalletRestriction": {
+  "method": "POST",
+  "path": "/wallet-restrictions",
+  "contract": "wallet",
+  "summary": "Block, freeze or restrict a wallet",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletRestriction",
+  "responds": "WalletRestriction"
+ },
+ "setWalletTransferRules": {
+  "method": "PUT",
+  "path": "/wallet-transfer-rules",
+  "contract": "wallet",
+  "summary": "Whether guests may move money to each other, and on what terms",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletTransferRules",
+  "responds": "WalletTransferRules"
+ },
+ "suspendWallet": {
+  "method": "POST",
+  "path": "/wallets/{walletId}/suspend",
+  "contract": "wallet",
+  "summary": "Freeze a wallet",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Wallet"
+ },
+ "withdrawWalletDispute": {
+  "method": "POST",
+  "path": "/wallet-disputes/{disputeId}/withdraw",
+  "contract": "wallet",
+  "summary": "Withdraw a wallet dispute that is still open or under review",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletDispute"
+ }
+}

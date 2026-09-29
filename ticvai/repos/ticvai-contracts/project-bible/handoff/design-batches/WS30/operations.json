@@ -1,4 +1,61 @@
 {
+ "createApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests",
+  "contract": "approvals",
+  "summary": "Raise a request",
+  "permission": "APPROVAL_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateApprovalRequest",
+  "responds": "ApprovalRequest"
+ },
+ "createMemberException": {
+  "method": "POST",
+  "path": "/memberships/{membershipId}/exceptions",
+  "contract": "orders",
+  "summary": "Record a member exception, override or service-recovery act",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MemberExceptionInput",
+  "responds": "MemberExceptionView"
+ },
+ "freezeEntitlement": {
+  "method": "POST",
+  "path": "/entitlements/{entitlementId}/freeze",
+  "contract": "catalogue",
+  "summary": "Pause a membership at the guest's request",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Entitlement"
+ },
  "listMember": {
   "method": "GET",
   "path": "/member",
@@ -15,22 +72,17 @@
     "required": false
    },
    {
+    "name": "customerSegment",
+    "in": "query",
+    "required": false
+   },
+   {
     "name": "status",
     "in": "query",
     "required": false
    },
    {
-    "name": "memberType",
-    "in": "query",
-    "required": false
-   },
-   {
     "name": "activation",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "expiry",
     "in": "query",
     "required": false
    },
@@ -45,13 +97,48 @@
     "required": false
    },
    {
-    "name": "customerSegment",
+    "name": "memberType",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "expiringWithinDays",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "tier",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "acquisitionChannel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "atRisk",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "MemberOperationsCommandCenterView"
+  "responds": "Page"
  },
  "listMemberExceptionOverride": {
   "method": "GET",
@@ -62,9 +149,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "exceptionType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "approvalStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "membershipId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "MemberExceptionsOverridesServiceRecoveryView"
+  "responds": "Page"
  },
  "listMemberLifecycleCase": {
   "method": "GET",
@@ -75,9 +188,45 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "membershipId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "eventType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "actorType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "MemberLifecycleHistoryAuditCaseTimelineView"
+  "responds": "Page"
  },
  "listMembershipActivationCredential": {
   "method": "GET",
@@ -88,9 +237,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "queueStage",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "membershipProduct",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "MembershipActivationAssignmentCredentialManagementView"
+  "responds": "Page"
  },
  "listMembershipFreezeSuspension": {
   "method": "GET",
@@ -101,9 +281,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "interruptionType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "membershipId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "activeOnly",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "MembershipFreezeSuspensionReactivationManagementView"
+  "responds": "Page"
  },
  "listMembershipRenewalRetention": {
   "method": "GET",
@@ -126,17 +332,7 @@
     "required": false
    },
    {
-    "name": "purchaseMonth",
-    "in": "query",
-    "required": false
-   },
-   {
     "name": "venue",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "acquisitionChannel",
     "in": "query",
     "required": false
    },
@@ -154,10 +350,40 @@
     "name": "renewalCohort",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "purchaseMonth",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "acquisitionChannel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "churnFlag",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "maxRenewalProbability",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView"
+  "responds": "Page"
  },
  "listMembershipUpgradeDowngrade": {
   "method": "GET",
@@ -168,9 +394,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "movementType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "membershipProduct",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "bulkMigrationId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "MembershipUpgradeDowngradeProductMigrationOperationsView"
+  "responds": "Page"
  },
  "listRenewalAuto": {
   "method": "GET",
@@ -181,9 +433,50 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "renewalStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "membershipProduct",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "tier",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "autoRenew",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "expiringFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "expiringTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "RenewalOperationsAutoRenewalManagementView"
+  "responds": "Page"
  },
  "listVisitAdmissionEntitlement": {
   "method": "GET",
@@ -194,9 +487,150 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "membershipId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "validationResult",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "VisitAdmissionEntitlementUsageMonitorView"
+  "responds": "Page"
+ },
+ "migrateMembership": {
+  "method": "POST",
+  "path": "/memberships/{membershipId}/migrations",
+  "contract": "orders",
+  "summary": "Upgrade, downgrade or migrate an active membership to another product",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MembershipMigrationInput",
+  "responds": "MembershipMigrationView"
+ },
+ "recordBenefitUsage": {
+  "method": "POST",
+  "path": "/memberships/{membershipId}/benefit-usage",
+  "contract": "identity",
+  "summary": "Consume a benefit",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "membershipId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "IdentityBenefitUsage",
+  "responds": "IdentityBenefitUsage"
+ },
+ "reinstateEntitlement": {
+  "method": "POST",
+  "path": "/entitlements/{entitlementId}/reinstate",
+  "contract": "catalogue",
+  "summary": "Lift a suspension",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Entitlement"
+ },
+ "renewMembership": {
+  "method": "POST",
+  "path": "/memberships/{membershipId}/renewals",
+  "contract": "orders",
+  "summary": "Renew a membership",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "membershipId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "OrdersMembershipRenewal",
+  "responds": "OrdersMembershipRenewal"
+ },
+ "resolveMembershipActivation": {
+  "method": "POST",
+  "path": "/memberships/{membershipId}/activation/resolve",
+  "contract": "orders",
+  "summary": "Act on a membership in the activation queue",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MembershipActivationActionInput",
+  "responds": "MembershipActivationView"
  },
  "setMemberMembershipAccount": {
   "method": "PUT",
@@ -207,8 +641,33 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "Member360MembershipAccountWorkspaceInput",
   "responds": "Member360MembershipAccountWorkspaceView"
+ },
+ "suspendEntitlement": {
+  "method": "POST",
+  "path": "/entitlements/{entitlementId}/suspend",
+  "contract": "catalogue",
+  "summary": "Suspend or reinstate an entitlement",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  }
 }

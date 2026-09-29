@@ -684,6 +684,9 @@ paths:
                   default: validateOnly
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: What it found, and what it wrote
           content:
             application/json:
@@ -1306,6 +1309,13 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: '`quoteExpired` or `quoteMismatch`: the `acceptedQuoteId` has expired or was
+            given for a different product, location, window or quantity.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /rental-bookings/{bookingId}:
     parameters:
     - name: bookingId
@@ -1626,8 +1636,14 @@ paths:
                   type: string
                   format: uuid
                   nullable: true
+                  description: A `rental.quote` id for the extension; honoured while unexpired and
+                    matching, else `422`, as `RentalBookingRequest.acceptedQuoteId` (decided 29
+                    September, writers pass; DM4).
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Extended
           content:
             application/json:
@@ -1638,6 +1654,12 @@ paths:
             window is named, so the counter can offer a shorter extension instead of a refusal.
 
             '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: '`quoteExpired` or `quoteMismatch` on `acceptedQuoteId`.'
           content:
             application/problem+json:
               schema:
@@ -2949,14 +2971,52 @@ components:
           nullable: true
     RentalQuote:
       type: object
+      x-ticvai-persistence: rental.quote
       description: 'Board 4.10. **Rental amount and deposit are returned apart, because the deposit is
         not revenue.**
 
+        **A quote `quoteRentalPrice` issues is stored until `expiresAt`**, with what was asked, so the
+        figures it gave can be held to and checked later. `explainRentalPrice` and `simulateRentalPricing`
+        return the same shape and store nothing (decided 29 September, data model DM4).
+
+        **Consumed by `acceptedQuoteId`** on `createRentalBooking` and the extension. A quote is
+        not deleted when it is used or expires: a nightly job removes quotes 30 days past `expiresAt`
+        that no booking references, so a booking can always show the quote it was priced at (decided
+        29 September, writers pass; DM4).
+
         '
+      required:
+      - quoteId
+      - productId
+      - from
+      - to
+      - rentalAmount
+      - depositAmount
       properties:
         quoteId:
           type: string
           format: uuid
+        productId:
+          type: string
+          format: uuid
+          description: The request's product; with `locationId`, `from`, `to` and `quantity`, what was quoted.
+        locationId:
+          type: string
+          format: uuid
+          nullable: true
+        from:
+          type: string
+          format: date-time
+        to:
+          type: string
+          format: date-time
+        quantity:
+          type: integer
+          default: 1
+        customerId:
+          type: string
+          format: uuid
+          nullable: true
         rentalAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money
         taxAmount:
@@ -2976,6 +3036,14 @@ components:
           type: string
           format: date-time
           nullable: true
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005), written at `venue` scope.
     RentalPriceExplanation:
       type: object
       description: 'Board 4.10 — *"show why the price was calculated."* **The ordered trace, including
@@ -3257,6 +3325,11 @@ components:
           type: string
           format: uuid
           nullable: true
+          description: 'A `rental.quote` id from `quoteRentalPrice`. **The booking is priced at the quote''s
+            `rentalAmount` and `depositAmount`** while the quote is unexpired and its product, location,
+            window and quantity match the request; an expired or mismatched quote is `422` (`quoteExpired`,
+            `quoteMismatch`) rather than silently repriced. Without it the booking is priced now (decided
+            29 September, writers pass; DM4).'
     RentalBooking:
       type: object
       x-ticvai-persistence: rental.booking

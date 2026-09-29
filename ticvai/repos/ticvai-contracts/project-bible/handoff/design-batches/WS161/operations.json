@@ -1,0 +1,213 @@
+{
+ "allocateResources": {
+  "method": "POST",
+  "path": "/resource-allocations",
+  "contract": "resources",
+  "summary": "Fill a requirement from the pool, rotating rather than repeating",
+  "permission": "RESOURCE_BOOK",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceBooking"
+ },
+ "bookResource": {
+  "method": "POST",
+  "path": "/resource-bookings",
+  "contract": "resources",
+  "summary": "Reserve a specific resource for a window — staff only",
+  "permission": "RESOURCE_BOOK",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceBooking"
+ },
+ "createApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests",
+  "contract": "approvals",
+  "summary": "Raise a request",
+  "permission": "APPROVAL_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateApprovalRequest",
+  "responds": "ApprovalRequest"
+ },
+ "createResourcePackage": {
+  "method": "POST",
+  "path": "/resource-packages",
+  "contract": "resources",
+  "summary": "Define a reusable combination",
+  "permission": "RESOURCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourcePackage",
+  "responds": "ResourcePackage"
+ },
+ "createRotaAssignment": {
+  "method": "POST",
+  "path": "/rota-assignments",
+  "contract": "workforce",
+  "summary": "Put someone on the rota",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RotaAssignment",
+  "responds": "RotaAssignment"
+ },
+ "estimateEventResourceCost": {
+  "method": "GET",
+  "path": "/events/{eventId}/resource-cost",
+  "contract": "catalogue",
+  "summary": "What an event's resource plan costs, by kind",
+  "permission": "EVENT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "includeContractors",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "EventResourceCostEstimate"
+ },
+ "getEventResourcePlan": {
+  "method": "GET",
+  "path": "/events/{eventId}/resource-plan",
+  "contract": "catalogue",
+  "summary": "Everything an event needs, and whether it has been secured",
+  "permission": "EVENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "EventResourcePlan"
+ },
+ "getResourceCalendar": {
+  "method": "GET",
+  "path": "/resource-calendar",
+  "contract": "resources",
+  "summary": "Every resource against time, with conflicts already marked",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "resourceTypeId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "granularity",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceCalendarRow"
+ },
+ "listResourcePackages": {
+  "method": "GET",
+  "path": "/resource-packages",
+  "contract": "resources",
+  "summary": "Predefined combinations assigned as one",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResourcePackage"
+ },
+ "listSpaces": {
+  "method": "GET",
+  "path": "/spaces",
+  "contract": "catalogue",
+  "summary": "Halls, rooms and areas an event can occupy",
+  "permission": "EVENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Space"
+ },
+ "setEventResourcePlan": {
+  "method": "PUT",
+  "path": "/events/{eventId}/resource-plan",
+  "contract": "catalogue",
+  "summary": "State what the event needs, by role and by kind",
+  "permission": "EVENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EventResourcePlan",
+  "responds": "EventResourcePlan"
+ }
+}

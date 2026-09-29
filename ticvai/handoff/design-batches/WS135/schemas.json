@@ -1,0 +1,1328 @@
+{
+ "AdjustLoyaltyPointsRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — writes marketing.loyalty_points",
+  "description": "**A correction is a new entry, never an edit.** Reversing an entry writes a row pointing at it through `reversedLoyaltyPointsId`; granting goodwill writes a row with no reversal target. Either way the movement has a reason and an author, and the history stays walkable.\n",
+  "required": [
+   "programmeId",
+   "points",
+   "reason"
+  ],
+  "properties": {
+   "programmeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "points": {
+    "type": "integer",
+    "description": "Signed. Negative removes points, and the balance may not go below zero."
+   },
+   "reason": {
+    "type": "string",
+    "description": "**Goodwill, correction or expiry reversal, and nothing else (decided 28 September, audit R149).** A service-recovery grant is `goodwill`, a fraud or migration fix is `correction`, and returning points that expired in error is `expiryReversal`. None of them moves the tier or `lifetimePoints`.\n",
+    "enum": [
+     "goodwill",
+     "correction",
+     "expiryReversal"
+    ]
+   },
+   "reversedLoyaltyPointsId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The entry this reverses, when it is a reversal. **Set it and the sign is checked against the original** — a reversal that does not cancel what it names is a second grant wearing a correction's label.\n"
+   },
+   "notes": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   }
+  }
+ },
+ "ConsentDecision": {
+  "type": "string",
+  "enum": [
+   "granted",
+   "withdrawn",
+   "notAsked"
+  ]
+ },
+ "ConsentPurpose": {
+  "type": "string",
+  "enum": [
+   "marketing",
+   "personalisation",
+   "profiling",
+   "thirdPartySharing",
+   "aiProcessing",
+   "transactional"
+  ]
+ },
+ "ConsentState": {
+  "x-ticvai-persistence": "none — projection over consent_record",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "purposes"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "purposes": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "purpose",
+      "decision",
+      "requiresRenewal"
+     ],
+     "properties": {
+      "purpose": {
+       "$ref": "#/components/schemas/ConsentPurpose"
+      },
+      "decision": {
+       "$ref": "#/components/schemas/ConsentDecision"
+      },
+      "channels": {
+       "type": "array",
+       "items": {
+        "$ref": "#/components/schemas/MessageChannel"
+       }
+      },
+      "noticeVersion": {
+       "type": "string",
+       "nullable": true
+      },
+      "requiresRenewal": {
+       "type": "boolean",
+       "description": "True where the notice has been superseded since consent was given."
+      },
+      "decidedAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "Customer360ServiceProfileView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.guest_profile, pii.subject, pii.subject_contact, marketing.loyalty_position, marketing.guest_preference, marketing.consent_record, marketing.suppression, marketing.case, orders.sales_order, orders.reservation, orders.group_booking, access.entitlement and wallet.balance",
+  "description": "The service view of one guest. Fields the caller may not see are null, never omitted.",
+  "required": [
+   "customerId",
+   "customerSince",
+   "openCases",
+   "serviceAlerts"
+  ],
+  "properties": {
+   "customerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The guest's `subjectId`."
+   },
+   "customerName": {
+    "type": "string",
+    "nullable": true,
+    "description": "Null unless the caller holds GUEST_VIEW_PII."
+   },
+   "customerType": {
+    "type": "string",
+    "enum": [
+     "individual",
+     "member",
+     "groupOrganiser",
+     "corporate",
+     "partner"
+    ]
+   },
+   "membershipStatus": {
+    "type": "string",
+    "enum": [
+     "none",
+     "active",
+     "expiring",
+     "lapsed"
+    ]
+   },
+   "loyaltyTier": {
+    "type": "string",
+    "nullable": true
+   },
+   "preferredLanguage": {
+    "type": "string",
+    "maxLength": 10,
+    "nullable": true
+   },
+   "country": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$",
+    "nullable": true
+   },
+   "contactDetails": {
+    "type": "object",
+    "description": "Masked (e.g. `j***@example.com`, `+971 ** *** 4821`) unless the caller holds GUEST_VIEW_PII.",
+    "properties": {
+     "email": {
+      "type": "string",
+      "nullable": true
+     },
+     "phone": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   },
+   "customerSince": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "customerValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Lifetime net spend across the tenant."
+   },
+   "openCases": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "riskAttentionIndicator": {
+    "type": "string",
+    "enum": [
+     "none",
+     "attention",
+     "risk"
+    ],
+    "description": "`attention` with an open complaint or an unresolved refund case; `risk` with a breached SLA or a repeat contact on the same issue."
+   },
+   "upcomingTickets": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "activeMembership": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "membershipId": {
+      "type": "string"
+     },
+     "planName": {
+      "type": "string"
+     },
+     "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
+   },
+   "walletBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "activeReservations": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "futureGroupBookings": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "openOrders": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "serviceAlerts": {
+    "type": "array",
+    "maxItems": 20,
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "message"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "eventSoon",
+        "unresolvedRefundCase",
+        "membershipExpiring",
+        "openComplaint",
+        "communicationRestricted"
+       ]
+      },
+      "message": {
+       "type": "string"
+      },
+      "referenceId": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "preferredCommunicationChannel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MessageChannel"
+     }
+    ],
+    "nullable": true
+   },
+   "marketingConsent": {
+    "$ref": "#/components/schemas/ConsentDecision"
+   },
+   "accessibilityRequirements": {
+    "type": "array",
+    "nullable": true,
+    "description": "Null unless the caller holds GUEST_VIEW_PII.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "communicationRestrictions": {
+    "type": "array",
+    "description": "Channels the guest must not be contacted on (`getSuppressionList`).",
+    "items": {
+     "$ref": "#/components/schemas/MessageChannel"
+    }
+   },
+   "aiSummary": {
+    "type": "object",
+    "nullable": true,
+    "description": "Where the AI policy enables `summarise`. AI-derived and labelled as such.",
+    "properties": {
+     "text": {
+      "type": "string",
+      "maxLength": 2000
+     },
+     "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  }
+ },
+ "GuestAttributeModel": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.guest_attribute_model",
+  "description": "Board 1.3. **Visibility by jurisdiction is what makes this a model and not a form.**",
+  "properties": {
+   "version": {
+    "type": "integer"
+   },
+   "fieldGroups": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string"
+      },
+      "displayOrder": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "attributes": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string"
+      },
+      "groupCode": {
+       "type": "string"
+      },
+      "dataType": {
+       "type": "string"
+      },
+      "standard": {
+       "type": "boolean",
+       "default": false
+      },
+      "mandatory": {
+       "type": "boolean",
+       "default": false
+      },
+      "defaultValue": {
+       "nullable": true
+      },
+      "allowedValues": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "validationExpression": {
+       "type": "string",
+       "nullable": true
+      },
+      "sensitive": {
+       "type": "boolean",
+       "default": false
+      },
+      "visibleToRoles": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "editableByRoles": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "lawfulInJurisdictions": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       },
+       "description": "**Empty means everywhere.** A nationality field lawful in one jurisdiction and not another cannot be a column somebody ships.\n"
+      },
+      "countsTowardCompleteness": {
+       "type": "boolean",
+       "default": false
+      }
+     }
+    }
+   },
+   "identifiers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string"
+      },
+      "primary": {
+       "type": "boolean",
+       "default": false
+      },
+      "sourceSystem": {
+       "type": "string",
+       "nullable": true
+      },
+      "sourcePriority": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "GuestDocument": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.guest_document",
+  "description": "BL-133. **No store for guest photos, avatars, IDs or signed documents anywhere.**\nDeliberately separate from `assets`, which holds a tenant's media library. **A guest's passport scan is not a marketing asset** — it has a different retention clock, a different access rule and a different reason to exist, and putting it in the same store means one careless query returns both.\n",
+  "required": [
+   "id",
+   "subjectId",
+   "kind",
+   "storageRef",
+   "retainUntil"
+  ],
+  "properties": {
+   "id": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "avatar",
+     "idDocument",
+     "visa",
+     "signedWaiver",
+     "medicalNote",
+     "accessibilityEvidence",
+     "photo",
+     "other"
+    ]
+   },
+   "storageRef": {
+    "type": "string",
+    "description": "**The stored object's key in the guest-document store**, which is deliberately not `assets` (BL-133). No operation in this contract issues one yet: `assets` `createUpload` is staff-only and writes the media library, so the upload step for this store is still to be designed.\n"
+   },
+   "contentType": {
+    "type": "string"
+   },
+   "consentPurposeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "retainUntil": {
+    "type": "string",
+    "format": "date",
+    "description": "**Required, not optional.** A guest document with no deletion date is a guest document kept forever, and the retention question is the one CF-64 is open on.\n**Kept until its purpose ends, then for the period client counsel sets (decided 28 September, audit R149).** The caller sets `retainUntil` to the end of the purpose (the visit, the waiver's validity, the visa's expiry) plus that period. **The period per `kind` is an open value**: until counsel names it, it is zero, so the document is deleted when the purpose ends.\n"
+   },
+   "uploadedAt": {
+    "readOnly": true,
+    "type": "string",
+    "format": "date-time"
+   },
+   "uploadedByPrincipalId": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
+ "GuestExtraFieldDefinition": {
+  "type": "object",
+  "x-ticvai-persistence": "none — composed from a field and its options",
+  "description": "**A select with no options is not a field**, so the options come back with the definition rather than from a second call.\n",
+  "required": [
+   "field"
+  ],
+  "properties": {
+   "field": {
+    "$ref": "#/components/schemas/MarketingGuestExtraField"
+   },
+   "options": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/MarketingGuestExtraOption"
+    }
+   }
+  }
+ },
+ "GuestIntelligence": {
+  "type": "object",
+  "description": "Board 1.10. **Explainable, or an agent will ignore it or over-trust it.**",
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scores": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "historicalLtv",
+        "predictedLtv",
+        "engagement",
+        "churnRisk",
+        "inactivityRisk",
+        "cancellationRisk",
+        "upgradePropensity",
+        "nextPurchasePropensity"
+       ]
+      },
+      "value": {
+       "type": "number"
+      },
+      "band": {
+       "type": "string",
+       "nullable": true
+      },
+      "confidence": {
+       "type": "number",
+       "nullable": true
+      },
+      "modelId": {
+       "type": "string",
+       "nullable": true
+      },
+      "modelVersion": {
+       "type": "string",
+       "nullable": true
+      },
+      "computedAt": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "factors": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "properties": {
+         "factor": {
+          "type": "string"
+         },
+         "contribution": {
+          "type": "number"
+         }
+        }
+       }
+      },
+      "limitations": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       },
+       "description": "**Policy and data limitations travel with the score**, so the rule that prediction never overrides consent cannot be forgotten downstream.\n"
+      }
+     }
+    }
+   },
+   "affinities": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "productCategoryId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "label": {
+       "type": "string"
+      },
+      "strength": {
+       "type": "number"
+      }
+     }
+    }
+   },
+   "nextBestActions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "action": {
+       "type": "string"
+      },
+      "expectedImpact": {
+       "type": "string",
+       "nullable": true
+      },
+      "confidence": {
+       "type": "number",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "GuestPreferences": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.guest_preference",
+  "description": "**What the guest likes, kept apart from what they permit** (consent) and from who they are (the profile). One row per subject. `dietary` and `accessibility` are here rather than as tags because BL-134 gives them their own consent purpose and retention.\n",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "seatingPreference": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 200
+   },
+   "drinkPreferences": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "dietary": {
+    "type": "array",
+    "description": "Also written by `updateMyProfile`.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "accessibility": {
+    "type": "array",
+    "description": "Also written by `updateMyProfile`.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "preferredChannel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MessageChannel"
+     }
+    ],
+    "x-ticvai-persisted": false,
+    "description": "**Stored on the profile** (`GuestProfile.preferredChannel`) — carried here because the preference screen edits it beside the rest.\n"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "GuestProfile": {
+  "x-ticvai-persistence": "marketing.guest_profile",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n"
+   },
+   "displayName": {
+    "type": "string",
+    "nullable": true
+   },
+   "email": {
+    "type": "string",
+    "nullable": true
+   },
+   "phone": {
+    "type": "string",
+    "nullable": true
+   },
+   "preferredLanguage": {
+    "type": "string",
+    "nullable": true
+   },
+   "preferredChannel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "guestLinkId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Present where the guest is linked across cells. Marketing acts locally."
+   },
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "engagementScore": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 100,
+    "description": "22.2.20 and 22.2.21. **`lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not.** They are different questions: a guest who spent a lot once and a guest who visits monthly have the same LTV and need opposite treatment.\n**Recency, frequency and breadth, not spend** — spend is already `lifetimeValue`, and folding it in here would make one number twice.\n"
+   },
+   "engagementTier": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "new",
+     "active",
+     "occasional",
+     "lapsing",
+     "lapsed",
+     "dormant"
+    ],
+    "description": "5.3.19. **Automatic classification, computed rather than assigned.** `lapsing` is the tier the whole field exists for — **a guest who has not been for a while and still might is the only one marketing can change**, and lumping them with `lapsed` wastes the window.\n"
+   },
+   "lifetimeValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "visitCount": {
+    "type": "integer"
+   },
+   "lastVisitAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "mergedIntoSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Set on the absorbed profile by `mergeGuestProfiles` and `mergeGuests`**, which retain it as a redirect rather than deleting it. A read that lands here follows it; a second merge of a profile that has one is refused as `alreadyMerged`.\n"
+   },
+   "mergedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   }
+  }
+ },
+ "GuestProfileDetail": {
+  "x-ticvai-persistence": "marketing.guest_profile",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/GuestProfile"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+     },
+     "consents": {
+      "$ref": "#/components/schemas/ConsentState"
+     },
+     "loyalty": {
+      "$ref": "#/components/schemas/LoyaltyPosition"
+     },
+     "openCaseCount": {
+      "type": "integer"
+     },
+     "recentOrderIds": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "membershipIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "notes": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   }
+  ]
+ },
+ "GuestRelationship": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.guest_relationship",
+  "x-ticvai-retired-columns": [
+   "related_guest_id"
+  ],
+  "description": "Boards 1.7 and 1.8. **Links people without merging them**, which is the whole design.\n",
+  "required": [
+   "relatedSubjectId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "relatedSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "organisationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "parent",
+     "guardian",
+     "spouse",
+     "dependant",
+     "householdMember",
+     "employee",
+     "student",
+     "groupLeader",
+     "travelAgent",
+     "reseller"
+    ]
+   },
+   "authorities": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "purchaseFor",
+      "bookFor",
+      "manageProfile",
+      "signWaiver",
+      "viewHistory",
+      "receiveCommunications"
+     ]
+    },
+    "description": "**Four different permissions, not one relationship.** A guardianship granting all of them forever survives the child becoming an adult.\n"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "sharedBenefits": {
+    "type": "boolean",
+    "default": false
+   },
+   "verifiedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "GuestTimelineEvent": {
+  "type": "object",
+  "description": "Board 1.5. **Facts, notes and predictions distinguished on the row.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "purchase",
+     "ticketUsed",
+     "reservation",
+     "visit",
+     "membershipChange",
+     "loyalty",
+     "wallet",
+     "campaign",
+     "message",
+     "case",
+     "survey",
+     "waiver",
+     "note",
+     "prediction"
+    ]
+   },
+   "nature": {
+    "type": "string",
+    "enum": [
+     "operationalFact",
+     "userNote",
+     "aiDerived"
+    ],
+    "description": "**A prediction and a gate scan are both useful and only one happened.**"
+   },
+   "summary": {
+    "type": "string"
+   },
+   "channel": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "sourceContract": {
+    "type": "string",
+    "nullable": true
+   },
+   "sourceReferenceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "value": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "outcome": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "LoyaltyAdjustmentResult": {
+  "type": "object",
+  "x-ticvai-persistence": "none — composed from the entry posted and the resulting position",
+  "description": "**Both halves of an adjustment, because returning only the balance is the defect decision 8 named.** Until 20 September this operation moved `marketing.loyalty_position` and returned it, and posted nothing to `marketing.loyalty_points` — so a manual adjustment was the one movement in the system that could not be walked back to a reason.\n",
+  "required": [
+   "entry",
+   "position"
+  ],
+  "properties": {
+   "entry": {
+    "$ref": "#/components/schemas/MarketingLoyaltyPoints"
+   },
+   "position": {
+    "$ref": "#/components/schemas/LoyaltyPosition"
+   }
+  }
+ },
+ "LoyaltyPosition": {
+  "x-ticvai-persistence": "marketing.loyalty_position",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "programmeId",
+   "pointsBalance",
+   "tierCode"
+  ],
+  "properties": {
+   "leaderboardNickname": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 24,
+    "description": "BL-173. **The name shown on a leaderboard, chosen by the guest.** Offered whenever they reach the board and changeable afterwards; `setLeaderboardNickname` is the only thing that writes it.\n**Null means the guest has not chosen one yet, and the board shows a generated `Player-4821` in its place** — never `pii.subject.display_name`, which would disclose silently on the day a guest first placed and is the case this field exists to prevent.\n**The generated name is computed at read time and not stored here.** Writing it would make *\"has this guest chosen a name\"* unanswerable, and that flag is what the prompt-on-reaching-the-board depends on.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "programmeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "pointsBalance": {
+    "type": "integer"
+   },
+   "lifetimePoints": {
+    "type": "integer"
+   },
+   "tierId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The tier this row's `tierCode` and `tierName` are a copy of.** Added 20 September with `marketing.programme_tier`: the two strings were a cache of something that did not exist, and a cache with no source cannot be rebuilt or audited.\n"
+   },
+   "tierCode": {
+    "type": "string"
+   },
+   "tierName": {
+    "type": "string"
+   },
+   "pointsToNextTier": {
+    "type": "integer",
+    "nullable": true
+   },
+   "nextExpiryPoints": {
+    "type": "integer",
+    "nullable": true
+   },
+   "nextExpiryAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "MarketingGuestExtraField": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.guest_extra_field",
+  "description": "**Taken from the backend workbook, 20 September.** NEW TABLE. Defines an extra field that Admin wants to add to the customer form, such as Date of Birth, Emergency Contact, or Jersey Size.",
+  "required": [
+   "tenantId",
+   "name",
+   "type",
+   "isRequired",
+   "displayOrder",
+   "isActive",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "type": {
+    "type": "string",
+    "maxLength": 30
+   },
+   "isRequired": {
+    "type": "boolean"
+   },
+   "displayOrder": {
+    "type": "integer"
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "MarketingGuestExtraOption": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.guest_extra_option",
+  "description": "**Taken from the backend workbook, 20 September.** NEW TABLE. Stores dropdown choices only when an extra field uses SELECT type, for example Language = English, Hindi, Marathi.",
+  "required": [
+   "fieldId",
+   "name",
+   "displayOrder",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "fieldId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "displayOrder": {
+    "type": "integer"
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "MarketingLoyaltyPoints": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.loyalty_points",
+  "description": "**Taken from the backend workbook, 20 September.** Stores every loyalty point earn, redeem, expire, adjustment, or reversal transaction for a customer.",
+  "required": [
+   "programId",
+   "customerId",
+   "transactionType",
+   "points",
+   "balanceAfter",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "programId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "customerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "transactionType": {
+    "type": "string",
+    "maxLength": 30
+   },
+   "points": {
+    "type": "number"
+   },
+   "balanceAfter": {
+    "type": "number"
+   },
+   "sourceType": {
+    "type": "string",
+    "maxLength": 50,
+    "nullable": true
+   },
+   "sourceReferenceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "reversedLoyaltyPointsId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "notes": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true,
+    "description": "For a manual movement, `AdjustLoyaltyPointsRequest.reason`. Null for an accrual, a redemption or an expiry, whose `transactionType` and source already say why. The three manual types are the only ones (audit R149).",
+    "enum": [
+     "goodwill",
+     "correction",
+     "expiryReversal"
+    ]
+   },
+   "authorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Who posted a manual movement. Null where the platform posted it."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "MergeResult": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "survivingSubjectId",
+   "absorbedSubjectId",
+   "transferred"
+  ],
+  "properties": {
+   "survivingSubjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "absorbedSubjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "transferred": {
+    "type": "object",
+    "properties": {
+     "orders": {
+      "type": "integer"
+     },
+     "cases": {
+      "type": "integer"
+     },
+     "loyaltyPoints": {
+      "type": "integer",
+      "description": "The total points moved across every programme. The per-programme outcome is `loyaltyProgrammes`."
+     }
+    }
+   },
+   "loyaltyProgrammes": {
+    "type": "array",
+    "description": "**One entry per loyalty programme either record belonged to (decided 28 September, audit R149).** Points are added and the higher tier is kept, per programme — a single points number cannot say which programme it belongs to.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "programmeId",
+      "pointsAdded",
+      "resultingPoints"
+     ],
+     "properties": {
+      "programmeId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "pointsAdded": {
+       "type": "integer",
+       "description": "The absorbed record's balance in this programme, added to the survivor's."
+      },
+      "resultingPoints": {
+       "type": "integer"
+      },
+      "tierKept": {
+       "type": "string",
+       "nullable": true,
+       "description": "The higher of the two records' tiers in this programme."
+      }
+     }
+    }
+   },
+   "consentOutcome": {
+    "type": "array",
+    "description": "Per purpose, the resulting position. Where the two profiles disagreed, the more restrictive position won.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "purpose": {
+       "$ref": "#/components/schemas/ConsentPurpose"
+      },
+      "result": {
+       "$ref": "#/components/schemas/ConsentDecision"
+      },
+      "wasRestricted": {
+       "type": "boolean"
+      }
+     }
+    }
+   }
+  }
+ },
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ }
+}

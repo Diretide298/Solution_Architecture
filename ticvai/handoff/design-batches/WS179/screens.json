@@ -1,0 +1,132 @@
+[
+ {
+  "id": "BO-1082",
+  "name": "Admissions Revenue",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "TICVAI Finance Backend Structure Reference v1.0.pdf",
+   "board": "2",
+   "number": "410000",
+   "page": 29
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/admissions-revenue-bo-1082",
+   "component": "apps/venue-management-web/src/routes/orders-money/AdmissionsRevenue.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Admissions Revenue",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack TICVAI Finance Backend Structure Reference v1.0.pdf, page 29"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search admissions revenue",
+       "provenance": "pack TICVAI Finance Backend Structure Reference v1.0.pdf, page 29 §Drill-down"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "GL Entry → Journal → TICVAI Transaction"
+       ],
+       "notes": "The pack filters this screen by gl entry → journal → ticvai transaction — which are present is a decision the pack already made.",
+       "provenance": "pack TICVAI Finance Backend Structure Reference v1.0.pdf, page 29 §Drill-down"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The admissions revenue list.",
+   "error": "Could not load. Names which read failed and leaves the admissions revenue untouched.",
+   "emptyFirstRun": "No admissions revenue yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the admissions revenue are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Admissions revenue",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "runReport",
+    "contract": "reporting",
+    "purpose": "The underlying report",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1082",
+   "workshopBoard": "wireframes/WS164 TICVAI Finance Backend Structure Reference v1.0 Board 2.dc.html#bo-1082"
+  },
+  "apisNote": "Regenerated 9 September 2026 from TICVAI Finance Backend Structure Reference v1.0.pdf page 29. 0 of 1 labels bound to a contract property; 1 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "reportId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

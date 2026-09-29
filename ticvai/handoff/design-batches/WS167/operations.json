@@ -1,0 +1,270 @@
+{
+ "cloneSeatMap": {
+  "method": "POST",
+  "path": "/seat-maps/{seatMapId}/clone",
+  "contract": "seating",
+  "summary": "Clone a map, optionally into another venue",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatMap"
+ },
+ "copySeatMapSection": {
+  "method": "POST",
+  "path": "/seat-maps/{seatMapId}/sections/copy",
+  "contract": "seating",
+  "summary": "Copy one section into another map",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatMap"
+ },
+ "createSeatHoldPool": {
+  "method": "POST",
+  "path": "/seat-hold-pools",
+  "contract": "seating",
+  "summary": "Take a set of seats out of sale, for a reason, until a date",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SeatHoldPool",
+  "responds": "SeatHoldPool"
+ },
+ "createSeatMapTemplate": {
+  "method": "POST",
+  "path": "/seat-map-templates",
+  "contract": "seating",
+  "summary": "Save a map as a reusable template",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatMapTemplate"
+ },
+ "diffSeatMapVersions": {
+  "method": "GET",
+  "path": "/seat-maps/{seatMapId}/diff",
+  "contract": "seating",
+  "summary": "Compare two versions of a layout",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "fromVersion",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "toVersion",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatMapDiff"
+ },
+ "getSeatMap": {
+  "method": "GET",
+  "path": "/seat-maps/{seatMapId}",
+  "contract": "seating",
+  "summary": "Read a seat map with its structure",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SeatMap"
+ },
+ "listSeatHoldPools": {
+  "method": "GET",
+  "path": "/seat-hold-pools",
+  "contract": "seating",
+  "summary": "Held seats, by pool, with what is left and when it releases",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "performanceId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatHoldPool"
+ },
+ "listSeatHoldTypes": {
+  "method": "GET",
+  "path": "/seat-hold-types",
+  "contract": "seating",
+  "summary": "The kinds of hold a venue places, and who may release them",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SeatHoldType"
+ },
+ "listSeatMapTemplates": {
+  "method": "GET",
+  "path": "/seat-map-templates",
+  "contract": "seating",
+  "summary": "List reusable layout templates",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SeatMapTemplate"
+ },
+ "listSeatMaps": {
+  "method": "GET",
+  "path": "/seat-maps",
+  "contract": "seating",
+  "summary": "List seat maps",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "publishSeatMap": {
+  "method": "POST",
+  "path": "/seat-maps/{seatMapId}/publish",
+  "contract": "seating",
+  "summary": "Validate and publish a seat map",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatMap"
+ },
+ "releaseSeatHoldPool": {
+  "method": "POST",
+  "path": "/seat-hold-pools/{poolId}/release",
+  "contract": "seating",
+  "summary": "Put held seats back on sale, convert them, or reassign them",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatHoldPool"
+ },
+ "simulatePolicyConflictImpact": {
+  "method": "PUT",
+  "path": "/policy-conflict-impact",
+  "contract": "access",
+  "summary": "Policy Simulation, Conflict & Impact Analysis",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PolicySimulationConflictImpactAnalysisInput",
+  "responds": "PolicySimulationConflictImpactAnalysisView"
+ },
+ "validateSeatMap": {
+  "method": "POST",
+  "path": "/seat-maps/{seatMapId}/validate",
+  "contract": "seating",
+  "summary": "Run validation without publishing",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ValidationReport"
+ }
+}

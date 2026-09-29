@@ -71,7 +71,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.payment
+  - orders.sales_order
+  - payments.method
+  - payments.payment_attempt
+  - payments.provider_connection
   writes: []
 - operation: getPaymentProviderEconomics
   verb: GET
@@ -81,7 +86,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - ledger.settlement
+  - orders.chargeback
+  - orders.payment
+  - payments.fee_rule
+  - payments.provider_connection
+  - payments.provider_cost
   writes: []
 - operation: getPaymentProviderHealth
   verb: GET
@@ -91,7 +102,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.payment
+  - payments.failover_policy
+  - payments.payment_attempt
+  - payments.provider_connection
   writes: []
 - operation: getPaymentRules
   verb: GET
@@ -432,8 +447,19 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - payments.currency_rule
+  - payments.eligibility_rule
+  - payments.fee_rule
+  - payments.merchant_account
+  - payments.method
+  - payments.method_config
+  - payments.provider
+  - payments.provider_connection
+  - payments.routing_rule
+  writes:
+  - cache:idempotency
 - operation: simulatePaymentRouting
   verb: POST
   path: /payment-routing/simulate
@@ -442,8 +468,16 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - payments.failover_policy
+  - payments.fee_rule
+  - payments.method
+  - payments.provider
+  - payments.provider_connection
+  - payments.routing_rule
+  writes:
+  - cache:idempotency
 - operation: submitChargebackEvidence
   verb: POST
   path: /chargebacks/{chargebackId}/evidence
@@ -464,8 +498,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - payments.merchant_account
+  - payments.provider_connection
+  writes:
+  - cache:idempotency
+  - payments.provider_connection
 - operation: updatePaymentMethod
   verb: PUT
   path: /payment-methods/{methodId}

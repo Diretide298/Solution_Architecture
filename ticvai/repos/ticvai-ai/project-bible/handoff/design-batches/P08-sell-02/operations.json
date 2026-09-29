@@ -3,7 +3,7 @@
   "method": "POST",
   "path": "/inventory-holds",
   "contract": "catalogue",
-  "summary": "Acquire an inventory lease",
+  "summary": "Acquire an inventory hold",
   "permission": "ORDER_CREATE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -98,7 +98,7 @@
   "method": "POST",
   "path": "/inventory-holds/{inventoryHoldId}/force-release",
   "contract": "catalogue",
-  "summary": "Reclaim a stranded lease",
+  "summary": "Reclaim a stranded inventory hold",
   "permission": "CAPACITY_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -250,7 +250,7 @@
   "path": "/venues/{venueId}/settings",
   "contract": "tenancy",
   "summary": "Operational settings for this venue",
-  "permission": "TENANT_CONFIGURE",
+  "permission": "TENANT_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -262,7 +262,7 @@
   "method": "GET",
   "path": "/catalogue/bundles",
   "contract": "catalogue",
-  "summary": "List published bundles",
+  "summary": "List published catalogue bundles",
   "permission": "PRODUCT_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
@@ -299,7 +299,7 @@
   "method": "GET",
   "path": "/inventory-holds",
   "contract": "catalogue",
-  "summary": "List leases",
+  "summary": "List inventory holds",
   "permission": "PRODUCT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -389,6 +389,11 @@
     "required": null
    },
    {
+    "name": "language",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -412,6 +417,16 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "menuItemId",
+    "in": "query",
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -438,6 +453,16 @@
   "parameters": [
    {
     "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "resolved",
     "in": "query",
     "required": null
    },
@@ -565,7 +590,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "SeatRecommendationRequest",
   "responds": null
  },
@@ -592,7 +623,7 @@
   "method": "POST",
   "path": "/inventory-holds/{inventoryHoldId}/renew",
   "contract": "catalogue",
-  "summary": "Extend a lease TTL",
+  "summary": "Extend an inventory hold's TTL",
   "permission": "ORDER_CREATE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -625,6 +656,30 @@
   ],
   "requestBody": null,
   "responds": null
+ },
+ "setIngredientSubstitutes": {
+  "method": "PUT",
+  "path": "/recipes/{recipeId}/substitutes",
+  "contract": "fnb",
+  "summary": "Define approved substitutions",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "recipeId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FnbIngredientSubstitute",
+  "responds": "FnbIngredientSubstitute"
  },
  "setMenuSections": {
   "method": "PUT",
@@ -681,7 +736,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "VenuePath"
+  "responds": "PathClosureResult"
  },
  "setRecipe": {
   "method": "PUT",
@@ -730,7 +785,13 @@
   "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "OrderSyncResult"
  },
@@ -846,6 +907,6 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "AllergenVerdict"
  }
 }

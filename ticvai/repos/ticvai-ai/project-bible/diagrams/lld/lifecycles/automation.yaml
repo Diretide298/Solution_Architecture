@@ -1,0 +1,62 @@
+id: LLD-Automation
+title: Automation — 8 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/automation.yaml
+entity: Automation
+contract: approvals
+enum: AutomationStatus
+enumKind: named
+enumSchema: AutomationStatus
+owner: approvals
+description: '**Whether an automation may act** (pack 13.2.6; decided 29 September, readiness close-out;
+  data model for the agreed operations, 29 September). Every move is made by `createAutomationAutonomouAction`
+  with a reason, recorded on the automation.'
+initial:
+- active
+- disabled
+terminal: []
+transitions:
+- from: active
+  to: paused
+  operation: createAutomationAutonomouAction
+  trigger: operation
+  guard: command pause, with a reason. Actions already executing finish; no new ones start
+- from: paused
+  to: active
+  operation: createAutomationAutonomouAction
+  trigger: operation
+  guard: command resume
+- from: active
+  to: disabled
+  operation: createAutomationAutonomouAction
+  trigger: operation
+  guard: command disable, with a reason
+- from: paused
+  to: disabled
+  operation: createAutomationAutonomouAction
+  trigger: operation
+  guard: command disable, with a reason
+- from: disabled
+  to: active
+  operation: createAutomationAutonomouAction
+  trigger: operation
+  guard: command resume, re-enabling it
+- from: active
+  to: killSwitched
+  operation: createAutomationAutonomouAction
+  trigger: operation
+  guard: command killSwitch, with a reason. Stops at once, including actions queued but not started
+- from: paused
+  to: killSwitched
+  operation: createAutomationAutonomouAction
+  trigger: operation
+  guard: command killSwitch, with a reason
+- from: killSwitched
+  to: disabled
+  operation: createAutomationAutonomouAction
+  trigger: operation
+  guard: command disable once the cause is reviewed. **A kill-switched automation never resumes directly**;
+    it is disabled and then re-enabled deliberately
+notes: '**No terminal state by design.** An automation is configuration: it is disabled rather than
+  deleted, so its execution history keeps pointing at something.'

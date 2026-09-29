@@ -1629,12 +1629,12 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getEntitlement · getEntitlementCredential · getEntitlementHistory · transferOrderTickets</div>
+          <div><b>OPERATIONS</b> &middot; getEntitlement · getEntitlementCredential · getEntitlementHistory · transferOrderTickets +1</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; entitlementId&larr;deepLink, orderId&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i><br><a href="#gst-002">GST-002</a> <br><a href="#gst-055">GST-055</a>  &mdash; <i>The QR rotates as they walk to the gate</i> <span class="car">entitlementId · orderId</span></div>
+          <div><b>ARRIVES WITH</b> &middot; entitlementId&larr;deepLink, orderId&larr;deepLink, credentialId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i><br><a href="#gst-002">GST-002</a> <br><a href="#gst-055">GST-055</a>  &mdash; <i>The QR rotates as they walk to the gate</i> <span class="car">credentialId · entitlementId · orderId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formTransferOrderTickets &middot; <i>Transfer order tickets</i> &middot; <b>Transfer order tickets</b> &middot; Cancel <span class="dis">discards ticketIds · recipient · message</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formTransferOrderTickets &middot; <i>Transfer order tickets</i> &middot; <b>Transfer order tickets</b> &middot; Cancel <span class="dis">discards ticketIds · recipient · message</span></div><div class="ov"><b>modal</b> formBindCredentialDevice &middot; <i>Bind credential device</i> &middot; <b>Bind credential device</b> &middot; Cancel <span class="dis">discards deviceId · deviceReference · appInstallationId · os · otp</span></div></div>
         </div>
       </div>
       <div id="gst-018" class="scr">
@@ -1762,12 +1762,12 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listMyEntitlements · getEntitlement · getEntitlementCredential · transferOrderTickets</div>
+          <div><b>OPERATIONS</b> &middot; listMyEntitlements · getEntitlement · getEntitlementCredential · transferOrderTickets +1</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, entitlementId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, entitlementId&larr;navigation, credentialId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i><br><a href="#gst-002">GST-002</a> </div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formBindCredentialDevice &middot; <i>Bind credential device</i> &middot; <b>Bind credential device</b> &middot; Cancel <span class="dis">discards deviceId · deviceReference · appInstallationId · os · otp</span></div></div>
         </div>
       </div>
       <div id="gst-066" class="scr">

@@ -1,1 +1,364 @@
-{}
+{
+ "attachWorkOrderEvidence": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/attachments",
+  "contract": "maintenance",
+  "summary": "Photo, video, document, note or signature",
+  "permission": "MAINTENANCE_EXECUTE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrderAttachment"
+ },
+ "completeWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/complete",
+  "contract": "maintenance",
+  "summary": "Complete a work order",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ },
+ "createMaintenancePlan": {
+  "method": "POST",
+  "path": "/maintenance-plans",
+  "contract": "maintenance",
+  "summary": "Create a planned maintenance schedule",
+  "permission": "ASSET_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MaintenancePlan",
+  "responds": "MaintenancePlan"
+ },
+ "createWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders",
+  "contract": "maintenance",
+  "summary": "Raise a work order",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateWorkOrderRequest",
+  "responds": "WorkOrder"
+ },
+ "getAssetHistory": {
+  "method": "GET",
+  "path": "/assets/{assetId}/history",
+  "contract": "maintenance",
+  "summary": "Service history",
+  "permission": "ASSET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "getDueMaintenance": {
+  "method": "GET",
+  "path": "/maintenance-plans/due",
+  "contract": "maintenance",
+  "summary": "Planned tasks due or overdue",
+  "permission": "ASSET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "withinDays",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DueMaintenanceTask"
+ },
+ "getWorkOrder": {
+  "method": "GET",
+  "path": "/work-orders/{workOrderId}",
+  "contract": "maintenance",
+  "summary": "Read a work order",
+  "permission": "WORK_ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WorkOrderDetail"
+ },
+ "listMaintenancePlans": {
+  "method": "GET",
+  "path": "/maintenance-plans",
+  "contract": "maintenance",
+  "summary": "List planned maintenance schedules",
+  "permission": "ASSET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listWorkOrders": {
+  "method": "GET",
+  "path": "/work-orders",
+  "contract": "maintenance",
+  "summary": "List work orders",
+  "permission": "WORK_ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "assignedToPrincipalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "priority",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "assetId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "overdueOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "recordWorkOrderParts": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/parts",
+  "contract": "maintenance",
+  "summary": "Record parts consumed",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrderDetail"
+ },
+ "recordWorkOrderTime": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/time",
+  "contract": "maintenance",
+  "summary": "Start, pause or stop work",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ },
+ "setAssetStatus": {
+  "method": "PUT",
+  "path": "/assets/{assetId}/status",
+  "contract": "maintenance",
+  "summary": "Take an asset out of service or return it",
+  "permission": "ASSET_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SetAssetStatusRequest",
+  "responds": "AssetStatusResult"
+ },
+ "startWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/start",
+  "contract": "maintenance",
+  "summary": "Work has begun",
+  "permission": "MAINTENANCE_EXECUTE",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ },
+ "submitInspection": {
+  "method": "POST",
+  "path": "/inspections",
+  "contract": "maintenance",
+  "summary": "Submit a completed inspection",
+  "permission": "INSPECTION_SUBMIT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SubmitInspectionRequest",
+  "responds": "InspectionResult"
+ },
+ "updateMaintenancePlan": {
+  "method": "PATCH",
+  "path": "/maintenance-plans/{planId}",
+  "contract": "maintenance",
+  "summary": "Amend or suspend a plan",
+  "permission": "ASSET_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MaintenancePlan"
+ },
+ "updateWorkOrder": {
+  "method": "PATCH",
+  "path": "/work-orders/{workOrderId}",
+  "contract": "maintenance",
+  "summary": "Assign, reprioritise or amend",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ },
+ "verifyWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/verify",
+  "contract": "maintenance",
+  "summary": "Supervisor verification",
+  "permission": "WORK_ORDER_VERIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ }
+}

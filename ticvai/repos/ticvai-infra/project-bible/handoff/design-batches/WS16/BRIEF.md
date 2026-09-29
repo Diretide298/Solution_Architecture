@@ -1,6 +1,6 @@
 # WS16 — Approval Workflows and Governance board 4
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 12 operations · 15 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `APPROVAL_ACT, APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_REQUEST, APPROVAL_VIEW, PRICE_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-374` | Approval Decision Workspace | listDetail | 0 | 0 | — |
-| `BO-375` | Business Context & Evidence Viewer | listDetail | 0 | 0 | — |
-| `BO-376` | Approval Timeline & Decision Chain | listDetail | 0 | 0 | — |
-| `BO-377` | Approve & Sensitive Action Confirmation | listDetail | 0 | 0 | — |
-| `BO-378` | Reject / Return / Request Information | listDetail | 0 | 0 | — |
-| `BO-379` | Requester Modification & Resubmission | listDetail | 0 | 0 | — |
-| `BO-380` | Withdrawal, Cancellation, Expiration & Reopening | listDetail | 0 | 0 | — |
-| `BO-381` | Segregation of Duties & Four-Eyes Control | listDetail | 0 | 0 | — |
-| `BO-382` | Approved Action Execution & Status | listDetail | 0 | 0 | — |
-| `BO-383` | Decision Record & Immutable Audit View | listDetail | 0 | 0 | — |
+| `BO-374` | Approval Decision Workspace | listDetail | 1 | 0 | — |
+| `BO-375` | Business Context & Evidence Viewer | listDetail | 1 | 0 | — |
+| `BO-376` | Approval Timeline & Decision Chain | listDetail | 1 | 0 | — |
+| `BO-377` | Approve & Sensitive Action Confirmation | listDetail | 3 | 0 | — |
+| `BO-378` | Reject / Return / Request Information | listDetail | 1 | 0 | — |
+| `BO-379` | Requester Modification & Resubmission | listDetail | 1 | 0 | — |
+| `BO-380` | Withdrawal, Cancellation, Expiration & Reopening | listDetail | 1 | 0 | — |
+| `BO-381` | Segregation of Duties & Four-Eyes Control | listDetail | 1 | 0 | — |
+| `BO-382` | Approved Action Execution & Status | listDetail | 3 | 0 | — |
+| `BO-383` | Decision Record & Immutable Audit View | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-374, BO-375, BO-376, BO-377, BO-378, BO-379, BO-380, BO-381, BO-382, BO-383 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-374, BO-375, BO-376, BO-377, BO-379, BO-380, BO-381, BO-382, BO-383 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

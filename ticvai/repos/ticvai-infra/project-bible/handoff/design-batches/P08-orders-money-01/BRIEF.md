@@ -1,6 +1,6 @@
 # P08-orders-money-01 — P08 · Orders & Money (1 of 3)
 
-**10 screens · 57 operations · 61 schemas · 26 permissions**
+**10 screens · 69 operations · 78 schemas · 29 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 26 permissions apply here:
-  `ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW, CASH_LIFT, LEDGER_POST, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REFUND, ORDER_REPRINT, ORDER_RESCHEDULE, ORDER_VIEW`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 29 permissions apply here:
+  `ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW, CASH_LIFT, CASH_NO_SALE, GUEST_VIEW, LEDGER_POST, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REFUND, ORDER_REPRINT`…. A control nobody can use must say so,
   not sit enabled and fail.
-- **24 of these operations work offline**: addTip, applyManualDiscount, closeShift, createCashMovement, createOrder, createPayment, getCurrentShift, getMediaAsset
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,13 +60,13 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-008` | Product Detail & Variants | listDetail | 4 | 0 | — |
-| `BO-022` | Order Detail | listDetail | 14 | 1 | — |
-| `BO-023` | Refunds & Exchanges | listDetail | 15 | 1 | — |
-| `BO-024` | Payment Exceptions | configEditor | 6 | 1 | — |
-| `BO-025` | Chargebacks & Disputes | listDetail | 5 | 0 | — |
-| `BO-026` | Group Bookings | listDetail | 14 | 1 | — |
-| `BO-027` | Reissue & Media Replacement | statusTracker | 4 | 0 | — |
+| `BO-008` | Product Detail & Variants | listDetail | 11 | 3 | — |
+| `BO-022` | Order Detail | listDetail | 14 | 9 | — |
+| `BO-023` | Refunds & Exchanges | listDetail | 15 | 9 | — |
+| `BO-024` | Payment Exceptions | configEditor | 6 | 4 | — |
+| `BO-025` | Chargebacks & Disputes | listDetail | 5 | 2 | — |
+| `BO-026` | Group Bookings | listDetail | 17 | 11 | — |
+| `BO-027` | Reissue & Media Replacement | statusTracker | 6 | 2 | — |
 | `BO-028` | Refund Approval Queue | configEditor | 1 | 0 | — |
-| `BO-029` | Report Builder | listDetail | 9 | 1 | — |
-| `BO-039` | Shift Directory | approvalInbox | 13 | 2 | — |
+| `BO-029` | Report Builder | listDetail | 9 | 6 | — |
+| `BO-039` | Shift Directory | approvalInbox | 13 | 9 | — |

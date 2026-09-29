@@ -1,0 +1,170 @@
+{
+ "createApiClient": {
+  "method": "POST",
+  "path": "/api-clients",
+  "contract": "public-api",
+  "summary": "Create a client with scopes and an environment",
+  "permission": "DEVELOPER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApiClient",
+  "responds": null
+ },
+ "createApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests",
+  "contract": "approvals",
+  "summary": "Raise a request",
+  "permission": "APPROVAL_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateApprovalRequest",
+  "responds": "ApprovalRequest"
+ },
+ "createWebhookSubscription": {
+  "method": "POST",
+  "path": "/webhook-subscriptions",
+  "contract": "public-api",
+  "summary": "Subscribe to business events",
+  "permission": "DEVELOPER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WebhookSubscription",
+  "responds": "WebhookSubscription"
+ },
+ "getSeatReconciliation": {
+  "method": "GET",
+  "path": "/seat-reconciliation",
+  "contract": "seating",
+  "summary": "The map against the orders, seat by seat",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "performanceId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatDiscrepancy"
+ },
+ "listApiClients": {
+  "method": "GET",
+  "path": "/api-clients",
+  "contract": "public-api",
+  "summary": "Registered clients for this developer",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ApiClient"
+ },
+ "listApiVersions": {
+  "method": "GET",
+  "path": "/api-versions",
+  "contract": "public-api",
+  "summary": "Versions, their status and their sunset dates",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ApiVersion"
+ },
+ "listSeatMaps": {
+  "method": "GET",
+  "path": "/seat-maps",
+  "contract": "seating",
+  "summary": "List seat maps",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listWebhookDeliveries": {
+  "method": "GET",
+  "path": "/webhook-subscriptions/{subscriptionId}/deliveries",
+  "contract": "public-api",
+  "summary": "What was sent, what failed, and why",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WebhookDelivery"
+ },
+ "listWebhookSubscriptions": {
+  "method": "GET",
+  "path": "/webhook-subscriptions",
+  "contract": "public-api",
+  "summary": "The tenant's webhook subscriptions, filterable by API client",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "clientId",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "WebhookSubscription"
+ }
+}

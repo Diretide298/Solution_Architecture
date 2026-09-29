@@ -1,0 +1,1233 @@
+[
+ {
+  "id": "BO-844",
+  "name": "Waiver Command Center",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "12",
+   "number": "01",
+   "page": 58
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/waiver-command-center-bo-844",
+   "component": "apps/venue-management-web/src/routes/engagement-support/WaiverCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-845",
+    "BO-846",
+    "BO-847",
+    "BO-848",
+    "BO-849",
+    "BO-850",
+    "BO-851",
+    "BO-852",
+    "BO-853"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-845",
+     "trigger": "Waiver Template Builder",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-846",
+     "trigger": "Assignment Rules",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-847",
+     "trigger": "Version, Expiry & Renewal",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-848",
+     "trigger": "Signature Experience Setup",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-849",
+     "trigger": "Guardian & Group Signing",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-850",
+     "trigger": "Pre-Arrival Completion",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-851",
+     "trigger": "Verification & Access Control",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-852",
+     "trigger": "Documents, Search & Retention",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-853",
+     "trigger": "Legal Evidence & Audit",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Monitor waiver completion, expiry and operational access risk. Show required, completed, pending, expired and expiring waivers, blocked entries and guardian signatures. Analyze completion by venue, activity, event, product, channel, guest type and arrival date. Surface missing signatures, failed verification, version changes requiring re-sign and access-control exceptions. Provide operational drill-down and alerts without exposing document content to unauthorized roles. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 58"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 58"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listWaiver",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The waiver list.",
+   "error": "Could not load. Names which read failed and leaves the waiver untouched.",
+   "emptyFirstRun": "No waiver yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the waiver are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listWaiver",
+    "contract": "marketing-crm",
+    "purpose": "Waiver Operations Command Center",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-844",
+   "workshopBoard": "wireframes/WS81 Marketing CRM Configuration Reference v1.0 Board 12.dc.html#bo-844"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 58. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-845",
+  "name": "Waiver Template Builder",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "12",
+   "number": "02",
+   "page": 58
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/waiver-template-builder-bo-845",
+   "component": "apps/venue-management-web/src/routes/engagement-support/WaiverTemplateBuilder.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-844"
+   ],
+   "exitTo": [
+    "BO-844"
+   ],
+   "transitions": [
+    {
+     "to": "BO-844",
+     "trigger": "Back to Waiver Command Center",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Create legal waiver and declaration templates without development. Support liability release, general consent, parental consent, medical declaration, risk acknowledgement and activity agreement types. Provide sections, clauses, variables, conditional content, initials, attachments and signature blocks. Manage multilingual content, legal owner, jurisdiction, risk category, approval and preview. Version every legal change and prohibit publishing until required legal and business approvals complete. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Waiver Template Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 58"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 58"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listWaiver",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The waiver template list.",
+   "error": "Could not load. Names which read failed and leaves the waiver template untouched.",
+   "emptyFirstRun": "No waiver template yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the waiver template are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listWaiver",
+    "contract": "marketing-crm",
+    "purpose": "Waivers and their state",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-845",
+   "workshopBoard": "wireframes/WS81 Marketing CRM Configuration Reference v1.0 Board 12.dc.html#bo-845"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 58. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-846",
+  "name": "Assignment Rules",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "12",
+   "number": "03",
+   "page": 58
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/assignment-rules-bo-846",
+   "component": "apps/venue-management-web/src/routes/engagement-support/AssignmentRules.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-844"
+   ],
+   "exitTo": [
+    "BO-844"
+   ],
+   "transitions": [
+    {
+     "to": "BO-844",
+     "trigger": "Back to Waiver Command Center",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Determine which waiver or form each guest must complete. Build rules using product, attraction, event, activity, venue, age, membership, risk category and jurisdiction. Configuration Scope of Work | Version 1.0 58 Assign one or multiple required documents with priority, effective dates and exception handling. Detect conflicting, missing or circular rules and simulate results for sample guests/bookings. Version, approve and audit rules and retain the rule/version used for each assignment. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 58"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 58"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listWaiverTemplateMaster",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setDigitalWaiverForm",
+       "label": "Save digital waiver form",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setDigitalWaiverForm"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The rules list.",
+   "error": "Could not load. Names which read failed and leaves the rules untouched.",
+   "emptyFirstRun": "No rules yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the rules are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listWaiverTemplateMaster",
+    "contract": "marketing-crm",
+    "purpose": "Templates",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setDigitalWaiverForm",
+    "contract": "marketing-crm",
+    "purpose": "Build one",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-846",
+   "workshopBoard": "wireframes/WS81 Marketing CRM Configuration Reference v1.0 Board 12.dc.html#bo-846"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 58. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-847",
+  "name": "Version, Expiry & Renewal",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "12",
+   "number": "04",
+   "page": 59
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/version-expiry-renewal-bo-847",
+   "component": "apps/venue-management-web/src/routes/engagement-support/VersionExpiryRenewal.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-844"
+   ],
+   "exitTo": [
+    "BO-844"
+   ],
+   "transitions": [
+    {
+     "to": "BO-844",
+     "trigger": "Back to Waiver Command Center",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Control legal-document lifecycle and re-sign requirements. Maintain version history, effective dates, changed clauses, approver, status and expiry period. Configure whether a change or elapsed period requires all, selected or future guests to sign again. Define renewal reminders, grace period, replacement behavior and treatment of active bookings. Preserve every signed version and prevent current templates from altering historical evidence. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 59"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 59"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listWaiverTriggerEligibility",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The version expiry renewal list.",
+   "error": "Could not load. Names which read failed and leaves the version expiry renewal untouched.",
+   "emptyFirstRun": "No version expiry renewal yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the version expiry renewal are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listWaiverTriggerEligibility",
+    "contract": "marketing-crm",
+    "purpose": "Assignment rules",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-847",
+   "workshopBoard": "wireframes/WS81 Marketing CRM Configuration Reference v1.0 Board 12.dc.html#bo-847"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 59. 0 of 0 labels bound to a contract property; 0 of 7 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-848",
+  "name": "Signature Experience Setup",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "12",
+   "number": "05",
+   "page": 59
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/signature-experience-setup-bo-848",
+   "component": "apps/venue-management-web/src/routes/engagement-support/SignatureExperienceSetup.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-844"
+   ],
+   "exitTo": [
+    "BO-844"
+   ],
+   "transitions": [
+    {
+     "to": "BO-844",
+     "trigger": "Back to Waiver Command Center",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure secure signing across supported guest touchpoints. Support website, mobile app, kiosk, tablet, POS and dedicated waiver-station channels. Configure identity verification, signature, initials, witness, review-before-submit and completion receipt. Define accessible, multilingual flow, timeout, session recovery, device controls and offline behavior. Test the end-to-end experience and map every captured element to the evidence record. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Signature Experience Setup declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 59"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 59"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listVersioningEffectiveDate",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The signature experience list.",
+   "error": "Could not load. Names which read failed and leaves the signature experience untouched.",
+   "emptyFirstRun": "No signature experience yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the signature experience are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listVersioningEffectiveDate",
+    "contract": "marketing-crm",
+    "purpose": "Version, expiry and renewal",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-848",
+   "workshopBoard": "wireframes/WS81 Marketing CRM Configuration Reference v1.0 Board 12.dc.html#bo-848"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 59. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-849",
+  "name": "Guardian & Group Signing",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "12",
+   "number": "06",
+   "page": 59
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/guardian-group-signing-bo-849",
+   "component": "apps/venue-management-web/src/routes/engagement-support/GuardianGroupSigning.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-844"
+   ],
+   "exitTo": [
+    "BO-844"
+   ],
+   "transitions": [
+    {
+     "to": "BO-844",
+     "trigger": "Back to Waiver Command Center",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Manage authority and multi-participant signing for minors and groups. Use Customer Master family/guardian relationships and record the authority basis for each dependant. Support one authorized signer for multiple family members, students or group participants where permitted. Configure minimum self-sign age, one/both guardian requirement, partial group signing and exceptions. Show roster status and require individual signatures for documents or participants that cannot be delegated. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 59"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 59"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setSignatorySignatureGuardian",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setSignatorySignatureGuardian"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The guardian group signing list.",
+   "error": "Could not load. Names which read failed and leaves the guardian group signing untouched.",
+   "emptyFirstRun": "No guardian group signing yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the guardian group signing are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setSignatorySignatureGuardian",
+    "contract": "marketing-crm",
+    "purpose": "Signature experience",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-849",
+   "workshopBoard": "wireframes/WS81 Marketing CRM Configuration Reference v1.0 Board 12.dc.html#bo-849"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 59. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-850",
+  "name": "Pre-Arrival Completion",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "12",
+   "number": "07",
+   "page": 59
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/pre-arrival-completion-bo-850",
+   "component": "apps/venue-management-web/src/routes/engagement-support/PreArrivalCompletion.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-844"
+   ],
+   "exitTo": [
+    "BO-844"
+   ],
+   "transitions": [
+    {
+     "to": "BO-844",
+     "trigger": "Back to Waiver Command Center",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Collect required waivers before the guest reaches the venue. Link the request to booking, ticket, event, activity, participants and scheduled arrival. Configuration Scope of Work | Version 1.0 59 Send secure email, SMS or WhatsApp link/QR in the guest's language with a completion deadline. Configure reminder schedule, resend, authentication, expiry and status synchronization. Show completed, pending and not-started participants and stop reminders immediately after valid completion. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 59"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 59"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMinorGuardianGroup",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The pre-arrival completion list.",
+   "error": "Could not load. Names which read failed and leaves the pre-arrival completion untouched.",
+   "emptyFirstRun": "No pre-arrival completion yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the pre-arrival completion are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listMinorGuardianGroup",
+    "contract": "marketing-crm",
+    "purpose": "Guardian and group signing",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-850",
+   "workshopBoard": "wireframes/WS81 Marketing CRM Configuration Reference v1.0 Board 12.dc.html#bo-850"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 59. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-851",
+  "name": "Verification & Access Control",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "12",
+   "number": "08",
+   "page": 60
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/verification-access-control-bo-851",
+   "component": "apps/venue-management-web/src/routes/engagement-support/VerificationAccessControl.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-844"
+   ],
+   "exitTo": [
+    "BO-844"
+   ],
+   "transitions": [
+    {
+     "to": "BO-844",
+     "trigger": "Back to Waiver Command Center",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Enforce waiver requirements during check-in and access validation. Return real-time valid, missing, expired or wrong-version status during ticket scan or check-in. Show required documents and participant while minimizing sensitive content at the gate. Configure admit/block outcomes, supervisor override, reason, approval and offline cache/freshness. Record scan, decision, waiver evidence reference, device, operator, override and final access outcome. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 60"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 60"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listParticipantWaiverStatus",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The verification access list.",
+   "error": "Could not load. Names which read failed and leaves the verification access untouched.",
+   "emptyFirstRun": "No verification access yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the verification access are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listParticipantWaiverStatus",
+    "contract": "marketing-crm",
+    "purpose": "Pre-arrival completion",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-851",
+   "workshopBoard": "wireframes/WS81 Marketing CRM Configuration Reference v1.0 Board 12.dc.html#bo-851"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 60. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-852",
+  "name": "Documents, Search & Retention",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "12",
+   "number": "09",
+   "page": 60
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/documents-search-retention-bo-852",
+   "component": "apps/venue-management-web/src/routes/engagement-support/DocumentsSearchRetention.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-844"
+   ],
+   "exitTo": [
+    "BO-844"
+   ],
+   "transitions": [
+    {
+     "to": "BO-844",
+     "trigger": "Back to Waiver Command Center",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Securely store and retrieve signed waiver evidence. Search by guest, guardian, participant, booking, ticket, activity, event, date, version and status. Store signed PDF/evidence package, metadata, relationships, status and authorized view/download actions. Apply encryption, RBAC/PBAC, retention, legal hold, archive and deletion/anonymization policies. Track every access, download, policy action and downstream reference and prevent silent alteration. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 60"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 60"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setWaiverVerificationValidation",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getWaiverStatus",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setWaiverVerificationValidation"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The documents search retention list.",
+   "error": "Could not load. Names which read failed and leaves the documents search retention untouched.",
+   "emptyFirstRun": "No documents search retention yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the documents search retention are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setWaiverVerificationValidation",
+    "contract": "marketing-crm",
+    "purpose": "Verification and access control",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getWaiverStatus",
+    "contract": "marketing-crm",
+    "purpose": "Whether this guest may enter",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-852",
+   "workshopBoard": "wireframes/WS81 Marketing CRM Configuration Reference v1.0 Board 12.dc.html#bo-852"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 60. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-853",
+  "name": "Legal Evidence & Audit",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "12",
+   "number": "10",
+   "page": 60
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/legal-evidence-audit-bo-853",
+   "component": "apps/venue-management-web/src/routes/engagement-support/LegalEvidenceAudit.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-844"
+   ],
+   "exitTo": [
+    "BO-844"
+   ],
+   "transitions": [
+    {
+     "to": "BO-844",
+     "trigger": "Back to Waiver Command Center",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide a defensible record of signing and subsequent operational use. Record signer and participant identity, authority, timestamp, timezone, IP/device, channel and verification method. Store consent/template version, content hash, signature/initials, witness, attachments and completion receipt. Include access-control decisions, overrides, renewals, revocations and related communications in the timeline. Export a controlled evidence bundle with integrity validation and full audit history. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history. Configuration Scope of Work | Version 1.0 60",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 60"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 60"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listComplianceEvidenceWaiver",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The legal evidence audit list.",
+   "error": "Could not load. Names which read failed and leaves the legal evidence audit untouched.",
+   "emptyFirstRun": "No legal evidence audit yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the legal evidence audit are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listComplianceEvidenceWaiver",
+    "contract": "marketing-crm",
+    "purpose": "Documents, search and retention",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-853",
+   "workshopBoard": "wireframes/WS81 Marketing CRM Configuration Reference v1.0 Board 12.dc.html#bo-853"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 60. 0 of 0 labels bound to a contract property; 0 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

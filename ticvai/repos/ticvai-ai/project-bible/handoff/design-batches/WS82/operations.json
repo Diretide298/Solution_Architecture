@@ -1,1 +1,213 @@
-{}
+{
+ "getGamePricing": {
+  "method": "GET",
+  "path": "/game-pricing",
+  "contract": "games",
+  "summary": "The effective price at a reader, and why",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "gameId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "readerId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "at",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "guestTier",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GamePriceResolution"
+ },
+ "listDynamicPriceRules": {
+  "method": "GET",
+  "path": "/pricing/dynamic-rules",
+  "contract": "catalogue",
+  "summary": "Dynamic pricing rules",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PricingDynamicPriceRule"
+ },
+ "listPricing": {
+  "method": "GET",
+  "path": "/pricing",
+  "contract": "catalogue",
+  "summary": "AI Pricing Intelligence Command Center",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "urgency",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "risk",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "minConfidence",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listRulePriorityConflict": {
+  "method": "GET",
+  "path": "/rule-priority-conflict",
+  "contract": "catalogue",
+  "summary": "Rule Priority, Conflict Resolution & Dynamic Pricing Test Console",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "caseType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "conflictCode",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "strategyId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "publishPricingEffectiveDate": {
+  "method": "PUT",
+  "path": "/pricing-effective-date",
+  "contract": "catalogue",
+  "summary": "Pricing Publication & Effective-Date Scheduler",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PricingPublicationEffectiveDateSchedulerInput",
+  "responds": "PricingPublicationEffectiveDateSchedulerView"
+ },
+ "setDynamicPriceRule": {
+  "method": "PUT",
+  "path": "/pricing/dynamic-rules/{ruleId}",
+  "contract": "catalogue",
+  "summary": "Replace a rule, its conditions and its actions",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "ruleId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DynamicPriceRuleDetail",
+  "responds": "DynamicPriceRuleDetail"
+ },
+ "setGamePricing": {
+  "method": "PUT",
+  "path": "/game-pricing",
+  "contract": "games",
+  "summary": "Standard, group, peak, VIP, retry and calendar prices",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GamePricing",
+  "responds": "GamePricing"
+ },
+ "setRulePriorityConflict": {
+  "method": "PUT",
+  "path": "/rule-priority-conflict",
+  "contract": "catalogue",
+  "summary": "Reorder, validate, test or save the pricing rule priority",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RulePriorityConflictInput",
+  "responds": "RulePriorityConflictView"
+ }
+}

@@ -1,0 +1,468 @@
+{
+ "cloneResource": {
+  "method": "POST",
+  "path": "/resources/{resourceId}/clone",
+  "contract": "resources",
+  "summary": "Copy a resource and its configuration into new ones",
+  "permission": "RESOURCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Resource"
+ },
+ "createResource": {
+  "method": "POST",
+  "path": "/resources",
+  "contract": "resources",
+  "summary": "Define a bookable resource",
+  "permission": "RESOURCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Resource",
+  "responds": "Resource"
+ },
+ "createResourceAttribute": {
+  "method": "POST",
+  "path": "/resource-attributes",
+  "contract": "resources",
+  "summary": "Define a customer attribute",
+  "permission": "RESOURCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourceAttributeDefinition",
+  "responds": "ResourceAttributeDefinition"
+ },
+ "createResourceCategory": {
+  "method": "POST",
+  "path": "/resource-categories",
+  "contract": "resources",
+  "summary": "Add a category or subcategory",
+  "permission": "RESOURCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourceCategory",
+  "responds": "ResourceCategory"
+ },
+ "createResourcePackage": {
+  "method": "POST",
+  "path": "/resource-packages",
+  "contract": "resources",
+  "summary": "Define a reusable combination",
+  "permission": "RESOURCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourcePackage",
+  "responds": "ResourcePackage"
+ },
+ "createResourceType": {
+  "method": "POST",
+  "path": "/resource-types",
+  "contract": "resources",
+  "summary": "Define a class of resource",
+  "permission": "RESOURCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourceType",
+  "responds": "ResourceType"
+ },
+ "getResource": {
+  "method": "GET",
+  "path": "/resources/{resourceId}",
+  "contract": "resources",
+  "summary": "One resource, with every configured section",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Resource"
+ },
+ "getResourceAuditTrail": {
+  "method": "GET",
+  "path": "/resources/{resourceId}/audit",
+  "contract": "resources",
+  "summary": "Every material change, with who and why",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResourceAuditEntry"
+ },
+ "getResourceDependencies": {
+  "method": "GET",
+  "path": "/resources/{resourceId}/dependencies",
+  "contract": "resources",
+  "summary": "What this resource requires, conflicts with, or substitutes for",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResourceDependency"
+ },
+ "getResourceHierarchy": {
+  "method": "GET",
+  "path": "/resources/{resourceId}/hierarchy",
+  "contract": "resources",
+  "summary": "What this resource contains, and what contains it",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResourceHierarchy"
+ },
+ "getResourceUtilisation": {
+  "method": "GET",
+  "path": "/resource-utilisation",
+  "contract": "resources",
+  "summary": "How much of each resource's available time was used",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceUtilisation"
+ },
+ "listResourceAttributes": {
+  "method": "GET",
+  "path": "/resource-attributes",
+  "contract": "resources",
+  "summary": "The customer-defined fields on a resource",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResourceAttributeDefinition"
+ },
+ "listResourceCategories": {
+  "method": "GET",
+  "path": "/resource-categories",
+  "contract": "resources",
+  "summary": "The classification tree beneath the types",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResourceCategory"
+ },
+ "listResourcePackages": {
+  "method": "GET",
+  "path": "/resource-packages",
+  "contract": "resources",
+  "summary": "Predefined combinations assigned as one",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResourcePackage"
+ },
+ "listResourceTypes": {
+  "method": "GET",
+  "path": "/resource-types",
+  "contract": "resources",
+  "summary": "The classes of resource this organisation supports",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResourceType"
+ },
+ "listResources": {
+  "method": "GET",
+  "path": "/resources",
+  "contract": "resources",
+  "summary": "Resources at this venue",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "availableFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "availableTo",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Resource"
+ },
+ "setApprovalControlPolicy": {
+  "method": "PUT",
+  "path": "/approval-control-policies",
+  "contract": "approvals",
+  "summary": "Require a second, independent pair of eyes",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalControlPolicy",
+  "responds": "ApprovalControlPolicy"
+ },
+ "setApprovalMatrix": {
+  "method": "PUT",
+  "path": "/approval-matrices",
+  "contract": "approvals",
+  "summary": "Configure what requires approval",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalMatrix",
+  "responds": "ApprovalMatrix"
+ },
+ "setResourceDependencies": {
+  "method": "PUT",
+  "path": "/resources/{resourceId}/dependencies",
+  "contract": "resources",
+  "summary": "Define what must come with it, and what cannot",
+  "permission": "RESOURCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceDependency"
+ },
+ "setResourceHierarchy": {
+  "method": "PUT",
+  "path": "/resources/{resourceId}/hierarchy",
+  "contract": "resources",
+  "summary": "Re-parent a resource, or attach children to it",
+  "permission": "RESOURCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourceHierarchy",
+  "responds": "ResourceHierarchy"
+ },
+ "setResourceLifecycleState": {
+  "method": "POST",
+  "path": "/resources/{resourceId}/state",
+  "contract": "resources",
+  "summary": "Move a resource through its lifecycle, with a reason",
+  "permission": "RESOURCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Resource"
+ },
+ "setResourceVenueAssignment": {
+  "method": "PUT",
+  "path": "/resources/{resourceId}/venues",
+  "contract": "resources",
+  "summary": "Where it may operate, and whether it travels",
+  "permission": "RESOURCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourceVenueAssignment",
+  "responds": "ResourceVenueAssignment"
+ },
+ "updateResource": {
+  "method": "PUT",
+  "path": "/resources/{resourceId}",
+  "contract": "resources",
+  "summary": "Change a resource",
+  "permission": "RESOURCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Resource",
+  "responds": "Resource"
+ },
+ "updateResourceCategory": {
+  "method": "PUT",
+  "path": "/resource-categories/{categoryId}",
+  "contract": "resources",
+  "summary": "Change a category",
+  "permission": "RESOURCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourceCategory",
+  "responds": "ResourceCategory"
+ },
+ "updateResourcePackage": {
+  "method": "PUT",
+  "path": "/resource-packages/{packageId}",
+  "contract": "resources",
+  "summary": "Change a combination",
+  "permission": "RESOURCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourcePackage",
+  "responds": "ResourcePackage"
+ },
+ "updateResourceType": {
+  "method": "PUT",
+  "path": "/resource-types/{resourceTypeId}",
+  "contract": "resources",
+  "summary": "Change a class of resource",
+  "permission": "RESOURCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourceType",
+  "responds": "ResourceType"
+ }
+}

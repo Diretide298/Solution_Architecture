@@ -1,0 +1,222 @@
+{
+ "AccreditationCredential": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.credential",
+  "description": "Board 4. **Not the accreditation** — reissuing one re-vets nobody.",
+  "required": [
+   "holderId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "printedBadge",
+     "mobileCredential",
+     "nfcCard",
+     "rfidCard",
+     "wristband"
+    ]
+   },
+   "serialNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "encodedIdentifier": {
+    "type": "string",
+    "nullable": true
+   },
+   "badgeTemplateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "issuedBy": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "activatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pendingPrint",
+     "issued",
+     "active",
+     "lost",
+     "replaced",
+     "revoked",
+     "expired"
+    ]
+   },
+   "replacesCredentialId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "replacementCount": {
+    "type": "integer",
+    "default": 0
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "BadgePrintJob": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.print_job",
+  "description": "Board 4.5. **Printing fails mid-batch and the operator needs to know which landed.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "credentialIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "printerDeviceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "queuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "queued",
+     "printing",
+     "completed",
+     "partiallyFailed",
+     "failed"
+    ]
+   },
+   "printed": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "failed": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "failures": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "credentialId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "reason": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "BadgeTemplate": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.badge_template",
+  "description": "Board 4.4. **A security artefact as much as a printed card.**",
+  "required": [
+   "code"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "size": {
+    "type": "string",
+    "nullable": true
+   },
+   "showPhoto": {
+    "type": "boolean",
+    "default": true
+   },
+   "showZones": {
+    "type": "boolean",
+    "default": true
+   },
+   "colourStripe": {
+    "type": "string",
+    "nullable": true,
+    "description": "**What a security officer checks at a glance.** The stripe is the control that works at ten metres in the dark.\n"
+   },
+   "showOrganisation": {
+    "type": "boolean",
+    "default": true
+   },
+   "showValidity": {
+    "type": "boolean",
+    "default": true
+   },
+   "backgroundAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "securityFeatures": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ }
+}

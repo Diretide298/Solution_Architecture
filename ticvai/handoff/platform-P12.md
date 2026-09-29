@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 28 |
-| Operations | 56 |
+| Operations | 59 |
 | Contracts | 7 |
 | Modules | 5 |
 | Undrawn | 0 |
@@ -87,7 +87,7 @@
 | `SUP-009` | Customer Service Command Center | Support | 3 | 2 | yes |
 | `SUP-010` | Customer 360° Service Profile | Support | 3 | 2 | yes |
 | `SUP-011` | Unified Interaction & Communication History | Support | 3 | 1 | yes |
-| `SUP-012` | Case Creation, Classification & Intelligent Routing | Support | 3 | 1 | yes |
+| `SUP-012` | Case Creation, Classification & Intelligent Routing | Support | 3 | 2 | yes |
 | `SUP-013` | Case Investigation & Resolution Workspace | Support | 3 | 1 | yes |
 | `SUP-014` | Order, Booking & Ticket Service Workspace | Support | 3 | 1 | yes |
 | `SUP-015` | Refund, Compensation & Service Exception Workspace | Support | 3 | 1 | yes |
@@ -95,8 +95,8 @@
 | `SUP-017` | Case Resolution, Closure & Customer Feedback | Support | 3 | 1 | yes |
 | `SUP-018` | AI Customer Service Copilot & Knowledge Workspace | Support | 3 | 1 | yes |
 | `SUP-019` | Contact Center Operations Command Center | Support | 3 | 1 | yes |
-| `SUP-020` | Queue Configuration & Management | Support | 3 | 1 | yes |
-| `SUP-021` | Intelligent Routing, Skills & Assignment Engine | Support | 3 | 1 | yes |
+| `SUP-020` | Queue Configuration & Management | Support | 3 | 3 | yes |
+| `SUP-021` | Intelligent Routing, Skills & Assignment Engine | Support | 3 | 3 | yes |
 | `SUP-022` | SLA Policy & Service-Level Management | Support | 3 | 1 | yes |
 | `SUP-023` | Agent Workload, Availability & Workforce Control | Support | 3 | 1 | yes |
 | `SUP-024` | Escalation & Critical Case Monitor | Support | 3 | 1 | yes |

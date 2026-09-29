@@ -1,247 +1,491 @@
 {
+ "AccessAttributeCatalogInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; the write configures the rules the matching View reads back (decided 29 September, VM close-out)",
+  "description": "**What Access Attribute Catalog submits** (decided 29 September, VM close-out). The writable fields of its View; the figures the screen computes are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "required": [
+   "attributeKey",
+   "category",
+   "label",
+   "dataType"
+  ],
+  "properties": {
+   "attributeKey": {
+    "type": "string",
+    "pattern": "^[a-z][a-zA-Z0-9]*(\\.[a-z][a-zA-Z0-9]*)*$",
+    "maxLength": 100,
+    "description": "Stable key a policy condition names, e.g. guest.tier. Unique within the tenant"
+   },
+   "category": {
+    "type": "string",
+    "enum": [
+     "guest",
+     "credential",
+     "employee",
+     "location",
+     "time",
+     "operational",
+     "device",
+     "risk"
+    ]
+   },
+   "label": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "dataType": {
+    "type": "string",
+    "enum": [
+     "string",
+     "integer",
+     "number",
+     "boolean",
+     "date",
+     "dateTime",
+     "enum"
+    ]
+   },
+   "allowedValues": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Required when dataType is enum"
+   },
+   "enabled": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
  "AccessAttributeCatalogView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Access Attribute Catalog displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "age": {
+   "category": {
     "type": "string",
-    "description": "Age"
+    "enum": [
+     "guest",
+     "credential",
+     "employee",
+     "location",
+     "time",
+     "operational",
+     "device",
+     "risk"
+    ]
    },
-   "genderWhereLegallyBusinessPermitted": {
+   "attributeKey": {
     "type": "string",
-    "description": "Gender where legally/business permitted"
+    "description": "Dotted governed key, e.g. membership.tier"
    },
-   "customerSegment": {
+   "label": {
+    "type": "string"
+   },
+   "dataType": {
     "type": "string",
-    "description": "Customer Segment"
+    "enum": [
+     "string",
+     "integer",
+     "number",
+     "boolean",
+     "date",
+     "dateTime",
+     "enum"
+    ]
    },
-   "guestCategory": {
+   "allowedValues": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "For enum attributes, e.g. Standard, Silver, Gold, Platinum"
+   },
+   "enabled": {
+    "type": "boolean",
+    "description": "Whether the venue may use this attribute in policies (e.g. gender or residency only where legally and business permitted)"
+   }
+  },
+  "required": [
+   "attributeKey",
+   "category"
+  ]
+ },
+ "AccessProfile": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.access_profile",
+  "description": "Board 5.2. **How an estate stays governable.**",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Guest Category"
+    "format": "uuid"
    },
-   "countryResidencyWhereApplicable": {
-    "type": "string",
-    "description": "Country/Residency where applicable"
+   "code": {
+    "type": "string"
    },
-   "groupType": {
-    "type": "string",
-    "description": "Group Type"
+   "name": {
+    "type": "string"
    },
-   "companionRelationship": {
-    "type": "string",
-    "description": "Companion Relationship"
+   "zoneIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
    },
-   "podStatus": {
-    "type": "string",
-    "description": "POD status"
+   "venueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
    },
-   "ticketType": {
-    "type": "string",
-    "description": "Ticket Type"
+   "operationalAreas": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
    },
-   "credentialStatus": {
-    "type": "string",
-    "description": "Credential Status"
+   "schedule": {
+    "type": "array",
+    "description": "**Zone, date and time are three dimensions and all three are needed.**",
+    "items": {
+     "type": "object",
+     "properties": {
+      "zoneId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "daysOfWeek": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "dateFrom": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      },
+      "dateTo": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      },
+      "from": {
+       "type": "string",
+       "nullable": true
+      },
+      "to": {
+       "type": "string",
+       "nullable": true
+      },
+      "eventPhase": {
+       "type": "string",
+       "nullable": true,
+       "enum": [
+        "build",
+        "rehearsal",
+        "doorsOpen",
+        "liveShow",
+        "breakdown"
+       ]
+      }
+     }
+    }
    },
-   "mediaType": {
-    "type": "string",
-    "description": "Media Type"
+   "escortRequired": {
+    "type": "boolean",
+    "default": false
    },
-   "verificationMethod": {
-    "type": "string",
-    "description": "Verification Method"
-   },
-   "visitDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Visit Date"
-   },
-   "entitlements": {
-    "type": "string",
-    "description": "Entitlements"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "accreditation": {
-    "type": "string",
-    "description": "Accreditation"
-   },
-   "loyaltyTier": {
-    "type": "string",
-    "description": "Loyalty Tier"
-   },
-   "employee": {
-    "type": "string",
-    "description": "Employee"
-   },
-   "department": {
-    "type": "string",
-    "description": "Department"
-   },
-   "role": {
-    "type": "string",
-    "description": "Role"
-   },
-   "jobFunction": {
-    "type": "string",
-    "description": "Job Function"
-   },
-   "shift": {
-    "type": "string",
-    "description": "Shift"
-   },
-   "securityClearance": {
-    "type": "string",
-    "description": "Security Clearance"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "park": {
-    "type": "string",
-    "description": "Park"
-   },
-   "zone": {
-    "type": "string",
-    "description": "Zone"
-   },
-   "attraction": {
-    "type": "string",
-    "description": "Attraction"
-   },
-   "gate": {
-    "type": "string",
-    "description": "Gate"
-   },
-   "resource": {
-    "type": "string",
-    "description": "Resource"
-   },
-   "restrictedArea": {
-    "type": "string",
-    "description": "Restricted Area"
-   },
-   "date": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date"
-   },
-   "time": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Time"
-   },
-   "day": {
-    "type": "string",
-    "description": "Day"
-   },
-   "season": {
-    "type": "string",
-    "description": "Season"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "performance": {
-    "type": "string",
-    "description": "Performance"
-   },
-   "operatingCalendar": {
-    "type": "string",
-    "description": "Operating Calendar"
-   },
-   "specialDay": {
-    "type": "string",
-    "description": "Special Day"
-   },
-   "capacity": {
+   "holderCount": {
     "type": "integer",
-    "description": "Capacity"
+    "readOnly": true
    },
-   "occupancy": {
-    "type": "integer",
-    "description": "Occupancy"
+   "scopePath": {
+    "type": "string"
    }
   }
  },
- "AuthorizationGovernanceTemporaryAccessView": {
+ "ApprovalDecision": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Authorization Governance & Temporary Access displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "approvals.decision",
+  "required": [
+   "level",
+   "principalId",
+   "decision",
+   "decidedAt"
+  ],
   "properties": {
-   "leastPrivilege": {
+   "id": {
     "type": "string",
-    "description": "Least Privilege"
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
    },
-   "segregationOfDuties": {
-    "type": "string",
-    "description": "Segregation of Duties"
+   "level": {
+    "type": "integer"
    },
-   "temporaryAccess": {
+   "principalId": {
     "type": "string",
-    "description": "Temporary Access"
+    "format": "uuid"
    },
-   "expiringGrants": {
-    "type": "string",
-    "description": "Expiring Grants"
+   "displayName": {
+    "type": "string"
    },
-   "delegatedAdministration": {
-    "type": "string",
-    "description": "Delegated Administration"
+   "isDelegate": {
+    "type": "boolean"
    },
-   "approvalRequirements": {
+   "delegatedFrom": {
     "type": "string",
-    "description": "Approval Requirements"
+    "format": "uuid",
+    "nullable": true
    },
-   "at": {
+   "decision": {
     "type": "string",
-    "description": "At"
+    "enum": [
+     "approve",
+     "reject"
+    ]
    },
-   "cannot": {
+   "comment": {
     "type": "string",
-    "description": "cannot"
-   },
-   "resortGlobalSecurityPolicy": {
-    "type": "string",
-    "description": "✕ Resort Global Security Policy"
-   },
-   "adventureParkPolicies": {
-    "type": "string",
-    "description": "✕ Adventure Park Policies"
-   },
-   "with": {
-    "type": "string",
-    "description": "with"
-   },
-   "scope": {
-    "type": "string",
-    "description": "scope"
-   },
-   "duration": {
-    "type": "string",
-    "format": "date-time",
-    "description": "duration"
+    "nullable": true
    },
    "reason": {
     "type": "string",
-    "description": "reason"
+    "nullable": true
    },
-   "approver": {
-    "type": "string",
-    "description": "approver"
+   "usedMfa": {
+    "type": "boolean"
    },
-   "fullAudit": {
+   "signatureRef": {
     "type": "string",
-    "description": "full audit"
+    "nullable": true
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time"
    }
   }
+ },
+ "ApprovalKind": {
+  "type": "string",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n",
+  "enum": [
+   "refund",
+   "priceOverride",
+   "discountOverride",
+   "complimentaryTicket",
+   "membershipCancellation",
+   "accessPermissionChange",
+   "configurationChange",
+   "aiRecommendation",
+   "releasePromotion",
+   "requisition",
+   "stockWriteOff",
+   "journalEntry",
+   "periodClose",
+   "periodReopen",
+   "purchaseOrderCancel",
+   "purchaseOrderShortClose",
+   "tenantMigration",
+   "productChange",
+   "pricingChange"
+  ]
+ },
+ "ApprovalMode": {
+  "type": "string",
+  "description": "11.1.43–11.1.46. **Sequential** asks one at a time, **parallel** asks everyone at once, **consensus** needs all of them, **majority** needs more than half.\nParallel and consensus differ in when it completes: parallel completes on the first approval, consensus waits for all. Conflating them is how a four-eyes rule turns into a one-eye rule.\n",
+  "enum": [
+   "sequential",
+   "parallel",
+   "consensus",
+   "majority"
+  ]
+ },
+ "ApprovalRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.request",
+  "required": [
+   "id",
+   "kind",
+   "status",
+   "requestedByPrincipalId",
+   "requestedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ApprovalKind"
+   },
+   "rerouteOnNoApprover": {
+    "type": "boolean",
+    "default": true,
+    "description": "BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"
+   },
+   "outOfOfficeDelegateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "allowEmailApproval": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"
+   },
+   "reopenedFrom": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"
+   },
+   "status": {
+    "$ref": "#/components/schemas/ApprovalStatus"
+   },
+   "subjectContract": {
+    "type": "string"
+   },
+   "subjectType": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "summary": {
+    "type": "string"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "justification": {
+    "type": "string",
+    "nullable": true
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "matrixVersion": {
+    "type": "integer"
+   },
+   "mode": {
+    "$ref": "#/components/schemas/ApprovalMode"
+   },
+   "currentLevel": {
+    "type": "integer"
+   },
+   "totalLevels": {
+    "type": "integer"
+   },
+   "pendingApprovers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "principalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "displayName": {
+       "type": "string"
+      },
+      "isDelegate": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "decisions": {
+    "type": "array",
+    "description": "Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n",
+    "items": {
+     "$ref": "#/components/schemas/ApprovalDecision"
+    }
+   },
+   "escalations": {
+    "type": "array",
+    "description": "11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "reason": {
+       "type": "string"
+      },
+      "fromLevel": {
+       "type": "integer"
+      },
+      "toLevel": {
+       "type": "integer"
+      },
+      "wasAutomatic": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "resubmittedFromId": {
+    "type": "string",
+    "nullable": true
+   },
+   "reopenedFromId": {
+    "type": "string",
+    "nullable": true
+   },
+   "slaDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "slaBreached": {
+    "type": "boolean"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "requestedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "ApprovalStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "pending",
+   "escalated",
+   "returned",
+   "informationRequested",
+   "approved",
+   "rejected",
+   "withdrawn",
+   "expired",
+   "cancelled"
+  ]
  },
  "ContextTimeEventCapacityPolicyBuilderInput": {
   "type": "object",
@@ -249,49 +493,82 @@
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Context, Time, Event & Capacity Policy Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "date": {
+   "result": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "deny",
+     "review",
+     "requireId",
+     "requireBiometric",
+     "requireCompanion",
+     "requireSupervisor"
+    ]
+   },
+   "conditionExpression": {
+    "type": "string",
+    "description": "e.g. Zone Occupancy >= 90% AND Day = Friday AND Time BETWEEN 18:00 AND 23:59"
+   },
+   "name": {
+    "type": "string"
+   },
+   "policyId": {
+    "type": "string"
+   },
+   "contextType": {
+    "type": "string",
+    "enum": [
+     "date",
+     "day",
+     "time",
+     "season",
+     "event",
+     "performance",
+     "specialEvent",
+     "holiday",
+     "operatingCalendar",
+     "occupancy",
+     "attractionStatus"
+    ],
+    "description": "Kind of venue condition the policy reacts to"
+   },
+   "monitorThresholdPercent": {
+    "type": "integer",
+    "description": "Occupancy percent at which the band becomes Monitor"
+   },
+   "restrictThresholdPercent": {
+    "type": "integer",
+    "description": "Occupancy percent at which the band becomes Restrict"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "inactive"
+    ],
+    "default": "active",
+    "description": "`inactive` switches the policy off at once; `active` on a new or inactive policy submits it for approval (`pendingApproval`) (decided 29 September, writers pass)"
+   },
+   "validFrom": {
     "type": "string",
     "format": "date-time",
-    "description": "Date"
+    "nullable": true,
+    "description": "Start of validity; null for at once (decided 29 September, writers pass)"
    },
-   "day": {
-    "type": "string",
-    "description": "Day"
-   },
-   "time": {
+   "validTo": {
     "type": "string",
     "format": "date-time",
-    "description": "Time"
-   },
-   "season": {
-    "type": "string",
-    "description": "Season"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "performance": {
-    "type": "string",
-    "description": "Performance"
-   },
-   "specialEvent": {
-    "type": "string",
-    "description": "Special Event"
-   },
-   "holiday": {
-    "type": "string",
-    "description": "Holiday"
-   },
-   "operatingCalendar": {
-    "type": "string",
-    "description": "Operating Calendar"
-   },
-   "mayEnterSpecifiedZones": {
-    "type": "string",
-    "description": "may enter specified zones"
+    "nullable": true,
+    "description": "End of validity: after it a timer moves the policy to `expired` (decided 29 September, writers pass)"
    }
-  }
+  },
+  "required": [
+   "policyId",
+   "name",
+   "contextType",
+   "conditionExpression",
+   "result"
+  ]
  },
  "ContextTimeEventCapacityPolicyBuilderView": {
   "type": "object",
@@ -299,59 +576,116 @@
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Context, Time, Event & Capacity Policy Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "date": {
+   "result": {
     "type": "string",
-    "format": "date-time",
-    "description": "Date"
+    "enum": [
+     "allow",
+     "deny",
+     "review",
+     "requireId",
+     "requireBiometric",
+     "requireCompanion",
+     "requireSupervisor"
+    ]
    },
-   "day": {
+   "conditionExpression": {
     "type": "string",
-    "description": "Day"
+    "description": "e.g. Zone Occupancy >= 90% AND Day = Friday AND Time BETWEEN 18:00 AND 23:59"
    },
-   "time": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Time"
+   "name": {
+    "type": "string"
    },
-   "season": {
-    "type": "string",
-    "description": "Season"
+   "policyId": {
+    "type": "string"
    },
-   "event": {
+   "contextType": {
     "type": "string",
-    "description": "Event"
+    "enum": [
+     "date",
+     "day",
+     "time",
+     "season",
+     "event",
+     "performance",
+     "specialEvent",
+     "holiday",
+     "operatingCalendar",
+     "occupancy",
+     "attractionStatus"
+    ],
+    "description": "Kind of venue condition the policy reacts to"
    },
-   "performance": {
-    "type": "string",
-    "description": "Performance"
+   "monitorThresholdPercent": {
+    "type": "integer",
+    "description": "Occupancy percent at which the band becomes Monitor"
    },
-   "specialEvent": {
+   "restrictThresholdPercent": {
+    "type": "integer",
+    "description": "Occupancy percent at which the band becomes Restrict"
+   }
+  },
+  "required": [
+   "policyId",
+   "name",
+   "contextType",
+   "conditionExpression",
+   "result"
+  ]
+ },
+ "CreateApprovalRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only",
+  "required": [
+   "id",
+   "kind",
+   "subjectContract",
+   "subjectType",
+   "subjectId",
+   "scopePath",
+   "summary"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Special Event"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
-   "holiday": {
-    "type": "string",
-    "description": "Holiday"
+   "kind": {
+    "$ref": "#/components/schemas/ApprovalKind"
    },
-   "operatingCalendar": {
+   "subjectContract": {
     "type": "string",
-    "description": "Operating Calendar"
+    "description": "Which contract owns the thing being approved."
    },
-   "mayEnterSpecifiedZones": {
-    "type": "string",
-    "description": "may enter specified zones"
+   "subjectType": {
+    "type": "string"
    },
-   "normal": {
+   "subjectId": {
     "type": "string",
-    "description": "NORMAL (the pack shows 80–89%)"
+    "description": "**A reference, never a copy.** A copy goes stale between raising and deciding, and an approver reading a stale copy approves something that no longer exists.\n"
    },
-   "monitor": {
-    "type": "string",
-    "description": "MONITOR (the pack shows 90–94%)"
+   "scopePath": {
+    "type": "string"
    },
-   "restrict": {
+   "summary": {
     "type": "string",
-    "description": "RESTRICT (the pack shows 95%+)"
+    "maxLength": 300,
+    "description": "What the approver sees in their queue before opening it."
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "attributes": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "justification": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "isDraft": {
+    "type": "boolean",
+    "default": false,
+    "description": "True saves the request at `draft` without routing it; `submitApprovalRequest` sends it later (decided 28 September, audit R129).\n"
    }
   }
  },
@@ -361,43 +695,187 @@
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Dynamic Access Policy Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "activePolicies": {
+   "version": {
     "type": "integer",
-    "description": "Active Policies"
+    "minimum": 1,
+    "description": "Current version. `rollbackAccessPolicy` restores an earlier one as a new version (decided 29 September, VM close-out)"
    },
-   "draftPolicies": {
-    "type": "integer",
-    "description": "Draft Policies"
+   "policyId": {
+    "type": "string"
    },
-   "policiesPendingApproval": {
+   "policyName": {
     "type": "string",
-    "description": "Policies Pending Approval"
+    "description": "e.g. VIP Backstage Event"
    },
-   "policiesTriggeredToday": {
+   "scope": {
     "type": "string",
-    "description": "Policies Triggered Today"
+    "description": "Where the policy applies, e.g. a venue, park or all venues"
    },
-   "allowDecisions": {
-    "type": "boolean",
-    "description": "Allow Decisions"
+   "policyType": {
+    "type": "string",
+    "enum": [
+     "guestAttribute",
+     "accreditation",
+     "occupancy",
+     "employee",
+     "risk",
+     "membership",
+     "timeEvent"
+    ]
    },
-   "denyDecisions": {
-    "type": "integer",
-    "description": "Deny Decisions"
+   "priority": {
+    "type": "integer"
    },
-   "policyConflicts": {
-    "type": "integer",
-    "description": "Policy Conflicts"
-   },
-   "expiringPolicies": {
-    "type": "integer",
-    "description": "Expiring Policies"
-   },
-   "aiRecommendations": {
-    "type": "integer",
-    "description": "AI Recommendations"
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "pendingApproval",
+     "active",
+     "inactive",
+     "expired"
+    ]
    }
-  }
+  },
+  "required": [
+   "policyId"
+  ]
+ },
+ "EdgeNodeLocalProcessingConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Edge Node & Local Processing Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "nodeType": {
+    "type": "string",
+    "enum": [
+     "venueEdgeNode",
+     "gateController",
+     "turnstileLocalEngine",
+     "handheldLocalEngine"
+    ],
+    "description": "Which edge component makes local access decisions"
+   },
+   "edgeNodeId": {
+    "type": "string",
+    "description": "Edge Node ID"
+   },
+   "tenantId": {
+    "type": "string",
+    "description": "Tenant"
+   },
+   "venueId": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "network": {
+    "type": "string",
+    "description": "Network"
+   },
+   "deviceGroup": {
+    "type": "string",
+    "description": "Device Group"
+   },
+   "processingMode": {
+    "type": "string",
+    "description": "Processing Mode"
+   },
+   "storageAllocation": {
+    "type": "string",
+    "description": "Storage allocation"
+   },
+   "redundancy": {
+    "type": "string",
+    "description": "redundancy"
+   },
+   "lastHeartbeat": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last heartbeat, set by the node, read only"
+   },
+   "softwareVersion": {
+    "type": "string",
+    "description": "software version"
+   },
+   "securityStatus": {
+    "type": "string",
+    "description": "security status"
+   }
+  },
+  "required": [
+   "edgeNodeId",
+   "venueId",
+   "nodeType"
+  ]
+ },
+ "EdgeNodeLocalProcessingConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Edge Node & Local Processing Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "nodeType": {
+    "type": "string",
+    "enum": [
+     "venueEdgeNode",
+     "gateController",
+     "turnstileLocalEngine",
+     "handheldLocalEngine"
+    ],
+    "description": "Which edge component makes local access decisions"
+   },
+   "edgeNodeId": {
+    "type": "string",
+    "description": "Edge Node ID"
+   },
+   "tenantId": {
+    "type": "string",
+    "description": "Tenant"
+   },
+   "venueId": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "network": {
+    "type": "string",
+    "description": "Network"
+   },
+   "deviceGroup": {
+    "type": "string",
+    "description": "Device Group"
+   },
+   "processingMode": {
+    "type": "string",
+    "description": "Processing Mode"
+   },
+   "storageAllocation": {
+    "type": "string",
+    "description": "Storage allocation"
+   },
+   "redundancy": {
+    "type": "string",
+    "description": "redundancy"
+   },
+   "lastHeartbeat": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last heartbeat, set by the node, read only"
+   },
+   "softwareVersion": {
+    "type": "string",
+    "description": "software version"
+   },
+   "securityStatus": {
+    "type": "string",
+    "description": "security status"
+   }
+  },
+  "required": [
+   "edgeNodeId",
+   "venueId",
+   "nodeType"
+  ]
  },
  "IdentityMembershipAccreditationPoliciesView": {
   "type": "object",
@@ -405,97 +883,61 @@
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Identity, Membership & Accreditation Policies displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "guest": {
-    "type": "string",
-    "description": "Guest"
+   "policyId": {
+    "type": "string"
    },
-   "member": {
+   "identityType": {
     "type": "string",
-    "description": "Member"
+    "enum": [
+     "guest",
+     "member",
+     "annualPassHolder",
+     "employee",
+     "contractor",
+     "vendor",
+     "performer",
+     "media",
+     "vip",
+     "security",
+     "emergencyServices",
+     "eventStaff"
+    ],
+    "description": "Who the requesting person is"
    },
-   "annualPassHolder": {
-    "type": "string",
-    "description": "Annual Pass Holder"
-   },
-   "employee": {
-    "type": "string",
-    "description": "Employee"
-   },
-   "contractor": {
-    "type": "string",
-    "description": "Contractor"
-   },
-   "vendor": {
-    "type": "string",
-    "description": "Vendor"
-   },
-   "performer": {
-    "type": "string",
-    "description": "Performer"
-   },
-   "media": {
-    "type": "string",
-    "description": "Media"
-   },
-   "vip": {
-    "type": "string",
-    "description": "VIP"
-   },
-   "security": {
-    "type": "string",
-    "description": "Security"
-   },
-   "emergencyServices": {
-    "type": "string",
-    "description": "Emergency Services"
-   },
-   "eventStaff": {
-    "type": "string",
-    "description": "Event Staff"
-   },
-   "priorityEntrance": {
-    "type": "string",
-    "description": "✓ Priority Entrance"
-   },
-   "memberLounge": {
-    "type": "string",
-    "description": "✓ Member Lounge"
-   },
-   "selectedAttractions": {
-    "type": "string",
-    "description": "✓ Selected Attractions"
-   },
-   "productionZone": {
-    "type": "string",
-    "description": "✓ Production Zone"
-   },
-   "backstage": {
-    "type": "string",
-    "description": "✓ Backstage"
-   },
-   "staffEntrance": {
-    "type": "string",
-    "description": "✓ Staff Entrance"
-   },
-   "vipHospitality": {
-    "type": "string",
-    "description": "✕ VIP Hospitality"
-   },
-   "financeOffice": {
-    "type": "string",
-    "description": "✕ Finance Office"
-   },
-   "until": {
+   "validTo": {
     "type": "string",
     "format": "date-time",
     "description": "until"
    },
-   "automaticallyExpiresAfterward": {
+   "name": {
     "type": "string",
-    "format": "date-time",
-    "description": "Automatically expires afterward"
+    "description": "e.g. Event Crew, Level 3"
+   },
+   "allowedZones": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "deniedZones": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "conditionExpression": {
+    "type": "string",
+    "description": "e.g. Employee Status = Active AND Current Shift = Active"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time"
    }
-  }
+  },
+  "required": [
+   "policyId",
+   "identityType"
+  ]
  },
  "LocalisedRichText": {
   "x-ticvai-persistence": "none — jsonb column",
@@ -503,6 +945,101 @@
   "description": "Keyed by language code. Values are sanitised HTML.",
   "additionalProperties": {
    "type": "string"
+  }
+ },
+ "OfflinePolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "platform.offline_policy",
+  "description": "Board 5 of the client's POS set. **ADR-0013 makes the POS local-first and nothing configured the policy** — one of only two things in 36 board screens the package genuinely could not do.\nCF-115 reframed offline into three data classes: catalogue and policy always local, contended inventory leased, transactional facts journalled. **This is where a venue says how far that goes for them.**\n**One per scope node, keyed on `scopePath`** (pull audit R162). `id` is server-owned and absent where `getOfflinePolicy` returns the defaults for a node with nothing saved.\n**The `minimum` and `maximum` on each field are proposed, client to correct (decided 28 September, audit R129).** A value outside them is refused `400`, `errors[]` naming the field.\n",
+  "required": [
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$",
+    "description": "**The node this policy is for, and the key `setOfflinePolicy` upserts on.** The body names its target here, because the path does not.\n"
+   },
+   "maxOfflineHours": {
+    "type": "integer",
+    "default": 24,
+    "minimum": 1,
+    "maximum": 72,
+    "description": "**After which the workstation refuses to sell rather than keep journalling.** A till three days offline holding 900 unsynced sales is a reconciliation nobody can do and a fraud nobody can detect. Bounds 1 to 72 hours: proposed, client to correct (audit R129).\n"
+   },
+   "allowedOffline": {
+    "type": "array",
+    "description": "**What may happen with no network**, by data class. Selling from a cached catalogue is safe; issuing a refund is not, because the original sale cannot be verified.\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "sale",
+      "refund",
+      "exchange",
+      "entitlementIssue",
+      "entitlementValidate",
+      "loyaltyAccrual",
+      "loyaltyRedemption",
+      "walletSpend",
+      "priceOverride",
+      "discount",
+      "voidLine",
+      "noSale"
+     ]
+    }
+   },
+   "offlineValueCeiling": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Above zero, and in the currency of the venue the policy resolves to; a ceiling in another currency is refused `400` (decided 28 September, audit R129).\n"
+   },
+   "offlineTransactionCeiling": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 1,
+    "maximum": 5000,
+    "description": "**A ceiling on count as well as value.** Nine hundred small sales and one large one are different risks, and a value ceiling alone catches only the second. Bounds 1 to 5,000: proposed, client to correct (audit R129).\n"
+   },
+   "onCeilingBreach": {
+    "type": "string",
+    "enum": [
+     "warn",
+     "blockNewSales",
+     "blockAll"
+    ],
+    "default": "blockNewSales"
+   },
+   "requiresManagerToExtend": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
   }
  },
  "Policy": {
@@ -518,6 +1055,10 @@
   "properties": {
    "kind": {
     "$ref": "#/components/schemas/PolicyKind"
+   },
+   "title": {
+    "type": "string",
+    "description": "The heading a guest sees, and the field a refund question retrieves against.\n"
    },
    "version": {
     "type": "string",
@@ -543,6 +1084,7 @@
    },
    "scopePath": {
     "type": "string",
+    "readOnly": true,
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
    }
   }
@@ -553,19 +1095,43 @@
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Policy Evaluation Architecture & Offline Distribution displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "evaluatedAtVenueEdge": {
+   "evaluationMode": {
     "type": "string",
-    "description": "Evaluated at venue edge"
+    "enum": [
+     "central",
+     "edge",
+     "device",
+     "hybrid"
+    ]
    },
-   "evaluatedLocallyWhereSupported": {
+   "policyCategory": {
     "type": "string",
-    "description": "Evaluated locally where supported"
+    "description": "e.g. Ticket Status, Time Rule, Membership Tier, Live Occupancy, Live Fraud AI"
    },
-   "centralUnavailable": {
+   "supportedLocations": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Any of central, edge, device"
+   },
+   "offlineBehaviour": {
     "type": "string",
-    "description": "Central unavailable"
+    "enum": [
+     "available",
+     "conditional",
+     "unavailable"
+    ]
+   },
+   "maxDataAgeMinutes": {
+    "type": "integer",
+    "description": "Oldest cached data an offline evaluation may use"
    }
-  }
+  },
+  "required": [
+   "policyCategory",
+   "evaluationMode"
+  ]
  },
  "PolicyKind": {
   "type": "string",
@@ -577,45 +1143,131 @@
    "accessibility"
   ]
  },
+ "PolicyScopeHierarchyInheritanceInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; the write configures the rules the matching View reads back (decided 29 September, VM close-out)",
+  "description": "**What Policy Scope, Hierarchy & Inheritance submits** (decided 29 September, VM close-out). The writable fields of its View; the figures the screen computes are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "required": [
+   "policyId",
+   "scopeLevel",
+   "scopeId",
+   "policyCategory",
+   "conflictResolution"
+  ],
+  "properties": {
+   "policyId": {
+    "type": "string",
+    "description": "The dynamic access policy placed in the hierarchy"
+   },
+   "scopeLevel": {
+    "type": "string",
+    "enum": [
+     "tenant",
+     "venue",
+     "park",
+     "zone",
+     "attraction",
+     "accessPoint"
+    ]
+   },
+   "scopeId": {
+    "type": "string"
+   },
+   "policyCategory": {
+    "type": "string",
+    "enum": [
+     "emergency",
+     "securityFraud",
+     "regulatorySafety",
+     "venueRestriction",
+     "accreditation",
+     "membership",
+     "standardAccess"
+    ]
+   },
+   "categoryRank": {
+    "type": "integer",
+    "minimum": 1,
+    "description": "Lower wins; emergency is 1"
+   },
+   "conflictResolution": {
+    "type": "string",
+    "enum": [
+     "highestPriorityWins",
+     "denyOverridesAllow",
+     "mostSpecificWins",
+     "mandatoryParentWins",
+     "explicitResolution"
+    ],
+    "default": "denyOverridesAllow"
+   },
+   "mandatory": {
+    "type": "boolean",
+    "default": false,
+    "description": "A child scope cannot override a mandatory policy"
+   }
+  }
+ },
  "PolicyScopeHierarchyInheritanceView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Policy Scope, Hierarchy & Inheritance displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "appliesTo": {
-    "type": "string",
-    "description": "applies to"
+   "scopeId": {
+    "type": "string"
    },
-   "appliesOnly": {
+   "scopeLevel": {
     "type": "string",
-    "description": "applies only"
+    "enum": [
+     "tenant",
+     "venue",
+     "park",
+     "zone",
+     "attraction",
+     "accessPoint"
+    ]
    },
-   "applies": {
-    "type": "string",
-    "description": "applies"
+   "policyId": {
+    "type": "string"
    },
-   "highestPriorityWins": {
+   "conflictResolution": {
     "type": "string",
-    "description": "Highest Priority Wins"
+    "enum": [
+     "highestPriorityWins",
+     "denyOverridesAllow",
+     "mostSpecificWins",
+     "mandatoryParentWins",
+     "explicitResolution"
+    ],
+    "description": "How a conflict with another policy is resolved"
    },
-   "denyOverridesAllow": {
+   "policyCategory": {
     "type": "string",
-    "description": "Deny Overrides Allow"
+    "enum": [
+     "emergency",
+     "securityFraud",
+     "regulatorySafety",
+     "venueRestriction",
+     "accreditation",
+     "membership",
+     "standardAccess"
+    ]
    },
-   "mostSpecificWins": {
-    "type": "string",
-    "description": "Most Specific Wins"
+   "categoryRank": {
+    "type": "integer",
+    "description": "Configurable precedence of the category; 1 wins"
    },
-   "mandatoryParentWins": {
-    "type": "string",
-    "description": "Mandatory Parent Wins"
-   },
-   "explicitResolution": {
-    "type": "string",
-    "description": "Explicit Resolution"
+   "mandatory": {
+    "type": "boolean",
+    "description": "Parent policy that overrides local permissions below it"
    }
-  }
+  },
+  "required": [
+   "policyId",
+   "scopeLevel",
+   "scopeId"
+  ]
  },
  "PolicySimulationConflictImpactAnalysisInput": {
   "type": "object",
@@ -623,19 +1275,41 @@
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Policy Simulation, Conflict & Impact Analysis submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "pass": {
-    "type": "string",
-    "description": "✓ PASS"
+   "policyId": {
+    "type": "string"
    },
-   "accessAllowed": {
+   "policyVersion": {
+    "type": "string"
+   },
+   "scenarioTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Simulated moment of the scan"
+   },
+   "credentialId": {
+    "type": "string",
+    "description": "Optional credential to simulate"
+   },
+   "runSavedScenarios": {
     "type": "boolean",
-    "description": "🟢 ACCESS ALLOWED"
+    "description": "Regression: run saved scenarios against this policy version"
    },
-   "goldMembersAllow": {
-    "type": "string",
-    "description": "Gold Members → Allow"
+   "scenarioCount": {
+    "type": "integer"
+   },
+   "passedCount": {
+    "type": "integer"
+   },
+   "changedOutcomeCount": {
+    "type": "integer"
+   },
+   "affectedCredentials": {
+    "type": "integer"
    }
-  }
+  },
+  "required": [
+   "policyId"
+  ]
  },
  "PolicySimulationConflictImpactAnalysisView": {
   "type": "object",
@@ -643,24 +1317,18 @@
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Policy Simulation, Conflict & Impact Analysis displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
+   "policyId": {
+    "type": "string"
+   },
    "occupancy": {
     "type": "integer",
     "description": "Occupancy (the pack shows 82%)"
    },
-   "pass": {
-    "type": "string",
-    "description": "✓ PASS"
-   },
-   "accessAllowed": {
-    "type": "boolean",
-    "description": "🟢 ACCESS ALLOWED"
-   },
-   "goldMembersAllow": {
-    "type": "string",
-    "description": "Gold Members → Allow"
-   },
    "policiesInvolved": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "policies involved"
    },
    "hierarchy": {
@@ -668,11 +1336,20 @@
     "description": "hierarchy"
    },
    "priority": {
-    "type": "string",
+    "type": "integer",
     "description": "priority"
    },
    "resultingDecision": {
     "type": "string",
+    "enum": [
+     "allow",
+     "deny",
+     "review",
+     "requireId",
+     "requireBiometric",
+     "requireCompanion",
+     "requireSupervisor"
+    ],
     "description": "resulting decision"
    },
    "affectedProducts": {
@@ -684,10 +1361,41 @@
     "description": "affected venues"
    },
    "estimatedGuestsImpacted": {
-    "type": "string",
+    "type": "integer",
     "description": "estimated guests impacted"
+   },
+   "policyVersion": {
+    "type": "string"
+   },
+   "scenarioTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Simulated moment of the scan"
+   },
+   "credentialId": {
+    "type": "string",
+    "description": "Optional credential to simulate"
+   },
+   "runSavedScenarios": {
+    "type": "boolean",
+    "description": "Regression: run saved scenarios against this policy version"
+   },
+   "scenarioCount": {
+    "type": "integer"
+   },
+   "passedCount": {
+    "type": "integer"
+   },
+   "changedOutcomeCount": {
+    "type": "integer"
+   },
+   "affectedCredentials": {
+    "type": "integer"
    }
-  }
+  },
+  "required": [
+   "policyId"
+  ]
  },
  "VisualDynamicPolicyBuilderInput": {
   "type": "object",
@@ -695,35 +1403,61 @@
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Visual Dynamic Policy Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "allow": {
+   "conditionExpression": {
     "type": "string",
-    "description": "🟢 ALLOW"
+    "description": "Condition tree over catalogue attributes using AND, OR, NOT, IN and BETWEEN, e.g. Accreditation = VIP AND Zone = Backstage"
    },
-   "deny": {
+   "name": {
     "type": "string",
-    "description": "🔴 DENY"
+    "description": "e.g. VIP Backstage Access"
    },
-   "review": {
-    "type": "string",
-    "description": "🟡 REVIEW"
+   "policyId": {
+    "type": "string"
    },
-   "requireId": {
+   "result": {
     "type": "string",
-    "description": "🟡 REQUIRE ID"
+    "enum": [
+     "allow",
+     "deny",
+     "review",
+     "requireId",
+     "requireBiometric",
+     "requireCompanion",
+     "requireSupervisor"
+    ],
+    "description": "Decision the policy returns when its condition holds"
    },
-   "requireBiometric": {
-    "type": "string",
-    "description": "🟡 REQUIRE BIOMETRIC"
+   "priority": {
+    "type": "integer"
    },
-   "requireCompanion": {
+   "status": {
     "type": "string",
-    "description": "🟡 REQUIRE COMPANION"
+    "enum": [
+     "active",
+     "inactive"
+    ],
+    "default": "active",
+    "description": "`inactive` switches the policy off at once; `active` on a new or inactive policy submits it for approval (`pendingApproval`) (decided 29 September, writers pass)"
    },
-   "requireSupervisor": {
+   "validFrom": {
     "type": "string",
-    "description": "🟡 REQUIRE SUPERVISOR"
+    "format": "date-time",
+    "nullable": true,
+    "description": "Start of validity; null for at once (decided 29 September, writers pass)"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "End of validity: after it a timer moves the policy to `expired` (decided 29 September, writers pass)"
    }
-  }
+  },
+  "required": [
+   "policyId",
+   "name",
+   "conditionExpression",
+   "result"
+  ]
  },
  "VisualDynamicPolicyBuilderView": {
   "type": "object",
@@ -731,34 +1465,39 @@
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Visual Dynamic Policy Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "allow": {
+   "conditionExpression": {
     "type": "string",
-    "description": "🟢 ALLOW"
+    "description": "Condition tree over catalogue attributes using AND, OR, NOT, IN and BETWEEN, e.g. Accreditation = VIP AND Zone = Backstage"
    },
-   "deny": {
+   "name": {
     "type": "string",
-    "description": "🔴 DENY"
+    "description": "e.g. VIP Backstage Access"
    },
-   "review": {
-    "type": "string",
-    "description": "🟡 REVIEW"
+   "policyId": {
+    "type": "string"
    },
-   "requireId": {
+   "result": {
     "type": "string",
-    "description": "🟡 REQUIRE ID"
+    "enum": [
+     "allow",
+     "deny",
+     "review",
+     "requireId",
+     "requireBiometric",
+     "requireCompanion",
+     "requireSupervisor"
+    ],
+    "description": "Decision the policy returns when its condition holds"
    },
-   "requireBiometric": {
-    "type": "string",
-    "description": "🟡 REQUIRE BIOMETRIC"
-   },
-   "requireCompanion": {
-    "type": "string",
-    "description": "🟡 REQUIRE COMPANION"
-   },
-   "requireSupervisor": {
-    "type": "string",
-    "description": "🟡 REQUIRE SUPERVISOR"
+   "priority": {
+    "type": "integer"
    }
-  }
+  },
+  "required": [
+   "policyId",
+   "name",
+   "conditionExpression",
+   "result"
+  ]
  }
 }

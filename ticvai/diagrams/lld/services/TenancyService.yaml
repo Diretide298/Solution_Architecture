@@ -1,5 +1,5 @@
 id: LLD-TenancyService
-title: TenancyService — 168 operations, 84 tables
+title: TenancyService — 172 operations, 99 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 index: diagrams/hld/02-services.yaml
@@ -20,9 +20,9 @@ why: '**`platform.org_unit` is reached by 304 of 379 tables** — the tenancy sp
 scale: Read-heavy and highly cacheable. Config changes are rare.
 ifDown: Same as identity — nothing runs without a scope.
 coverage:
-  operations: 168
+  operations: 172
   inAFlow: 53
-  percent: 32%
+  percent: 31%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -32,17 +32,17 @@ schemas:
   - postgres
   largestTable: platform.venue_settings
 - schema: workforce
-  tables: 22
+  tables: 24
   stores:
   - postgres
   largestTable: workforce.rota_assignment
 - schema: approvals
-  tables: 16
+  tables: 28
   stores:
   - postgres
-  largestTable: approvals.request
+  largestTable: approvals.workflow_version
 - schema: accreditation
-  tables: 13
+  tables: 14
   stores:
   - postgres
   largestTable: accreditation.holder
@@ -53,40 +53,48 @@ schemas:
   largestTable: tenancy.device_telemetry
 operationsByContract:
 - contract: approvals
-  count: 48
+  count: 49
   operations:
+  - operation: actOnWorkflowInstance
+    verb: POST
+    path: /workflow-instances/{instanceId}/actions
+    scope: venue
+    permission: APPROVAL_ACT
+    offline: false
+    reads: 6
+    writes: 6
   - operation: approveMatrixMultiLevel
     verb: PUT
     path: /matrix-multi-level
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 0
-    writes: 0
+    reads: 3
+    writes: 3
   - operation: approveRoleAuthorityDelegation
     verb: PUT
     path: /role-authority-delegation
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 0
-    writes: 0
+    reads: 6
+    writes: 2
   - operation: approveUnifiedDecision
     verb: PUT
     path: /unified-decision
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 0
-    writes: 0
+    reads: 6
+    writes: 4
   - operation: approveVersioningGovernance
     verb: PUT
     path: /versioning-governance
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 0
-    writes: 0
+    reads: 4
+    writes: 3
   - operation: createApprovalDelegation
     verb: POST
     path: /delegations
@@ -117,8 +125,8 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 0
-    writes: 0
+    reads: 4
+    writes: 2
   - operation: decideApprovalRequest
     verb: POST
     path: /approval-requests/{requestId}/decide
@@ -126,7 +134,7 @@ operationsByContract:
     permission: APPROVAL_DECIDE
     offline: false
     reads: 5
-    writes: 4
+    writes: 8
   - operation: escalateApprovalRequest
     verb: POST
     path: /approval-requests/{requestId}/escalate
@@ -221,7 +229,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_VIEW
     offline: false
-    reads: 0
+    reads: 2
     writes: 0
   - operation: listCrossModuleOrchestration
     verb: GET
@@ -229,7 +237,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_VIEW
     offline: false
-    reads: 0
+    reads: 4
     writes: 0
   - operation: listProcessAutomationOpportunity
     verb: GET
@@ -237,7 +245,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_VIEW
     offline: false
-    reads: 0
+    reads: 7
     writes: 0
   - operation: listRuleWorkflow
     verb: GET
@@ -245,7 +253,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_VIEW
     offline: false
-    reads: 0
+    reads: 10
     writes: 0
   - operation: listSlaEscalationBottleneck
     verb: GET
@@ -253,7 +261,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_VIEW
     offline: false
-    reads: 0
+    reads: 9
     writes: 0
   - operation: listSlaEscalationReminder
     verb: GET
@@ -261,7 +269,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_VIEW
     offline: false
-    reads: 0
+    reads: 2
     writes: 0
   - operation: listStepUpPolicies
     verb: GET
@@ -277,7 +285,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_VIEW
     offline: false
-    reads: 0
+    reads: 8
     writes: 0
   - operation: listWorkflowAutonomouGovernance
     verb: GET
@@ -293,7 +301,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_VIEW
     offline: false
-    reads: 0
+    reads: 5
     writes: 0
   - operation: listWorkflowInstanceProcess
     verb: GET
@@ -301,7 +309,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_VIEW
     offline: false
-    reads: 0
+    reads: 11
     writes: 0
   - operation: listWorkflowProcessPerformance
     verb: GET
@@ -309,7 +317,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_VIEW
     offline: false
-    reads: 0
+    reads: 10
     writes: 0
   - operation: resolveApprovedActionExecution
     verb: POST
@@ -389,24 +397,24 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 0
-    writes: 0
+    reads: 3
+    writes: 2
   - operation: setVisualBusinessRule
     verb: PUT
     path: /visual-business-rule
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 0
-    writes: 0
+    reads: 2
+    writes: 2
   - operation: setVisualWorkflow
     verb: PUT
     path: /visual-workflow
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 0
-    writes: 0
+    reads: 3
+    writes: 3
   - operation: signApprovalDecision
     verb: POST
     path: /approval-requests/{requestId}/signature
@@ -421,8 +429,8 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 0
-    writes: 0
+    reads: 14
+    writes: 2
   - operation: submitApprovalRequest
     verb: POST
     path: /approval-requests/{requestId}/submit
@@ -720,8 +728,8 @@ operationsByContract:
     scope: venue
     permission: DEVICE_MANAGE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 2
+    writes: 3
   - operation: rollbackDeviceFirmware
     verb: POST
     path: /device-firmware/rollouts/{rolloutId}/rollback
@@ -827,7 +835,7 @@ operationsByContract:
     reads: 2
     writes: 2
 - contract: workforce
-  count: 43
+  count: 45
   operations:
   - operation: acknowledgeAnnouncement
     verb: POST
@@ -899,7 +907,7 @@ operationsByContract:
     scope: venue
     permission: WORKFORCE_VIEW
     offline: false
-    reads: 0
+    reads: 4
     writes: 0
   - operation: getStaffingCoverage
     verb: GET
@@ -907,7 +915,7 @@ operationsByContract:
     scope: venue
     permission: WORKFORCE_VIEW
     offline: false
-    reads: 0
+    reads: 6
     writes: 0
   - operation: listAnnouncements
     verb: GET
@@ -944,6 +952,14 @@ operationsByContract:
   - operation: listJobTitles
     verb: GET
     path: /job-titles
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listLabourBudgets
+    verb: GET
+    path: /labour-budgets
     scope: venue
     permission: WORKFORCE_VIEW
     offline: false
@@ -1109,6 +1125,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: setLabourBudget
+    verb: PUT
+    path: /labour-budgets
+    scope: venue
+    permission: WORKFORCE_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
   - operation: setLeaveType
     verb: PUT
     path: /leave-types
@@ -1139,8 +1163,8 @@ operationsByContract:
     scope: venue
     permission: WORKFORCE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 3
   - operation: setWorkAssignment
     verb: PUT
     path: /work-assignments
@@ -1171,10 +1195,10 @@ operationsByContract:
     scope: venue
     permission: WORKFORCE_VIEW
     offline: false
-    reads: 0
+    reads: 6
     writes: 0
 - contract: accreditation
-  count: 29
+  count: 30
   operations:
   - operation: createAccreditationApplication
     verb: POST
@@ -1182,8 +1206,8 @@ operationsByContract:
     scope: venue
     permission: ACCREDITATION_APPLY
     offline: false
-    reads: 1
-    writes: 1
+    reads: 4
+    writes: 3
   - operation: createAccreditationProgramme
     verb: POST
     path: /accreditation-programmes
@@ -1222,8 +1246,8 @@ operationsByContract:
     scope: venue
     permission: ACCREDITATION_MANAGE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 5
+    writes: 4
   - operation: issueAccreditationCredential
     verb: POST
     path: /accreditation-credentials
@@ -1246,7 +1270,7 @@ operationsByContract:
     scope: venue
     permission: ACCREDITATION_VIEW
     offline: false
-    reads: 0
+    reads: 3
     writes: 0
   - operation: listAccreditationApplications
     verb: GET
@@ -1286,7 +1310,7 @@ operationsByContract:
     scope: venue
     permission: ACCREDITATION_MANAGE
     offline: false
-    reads: 0
+    reads: 3
     writes: 0
   - operation: listAccreditationProgrammes
     verb: GET
@@ -1328,6 +1352,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: resolveIdentityConflict
+    verb: POST
+    path: /accreditation-identity-conflicts/{conflictId}/resolve
+    scope: venue
+    permission: ACCREDITATION_MANAGE
+    offline: false
+    reads: 5
+    writes: 7
   - operation: setAccessProfile
     verb: PUT
     path: /accreditation-access-profiles
@@ -1422,11 +1454,18 @@ tables:
     Monday'
   writtenBy:
   - acknowledgeAnnouncement
+  - actOnWorkflowInstance
   - amendAttendance
+  - approveMatrixMultiLevel
+  - approveRoleAuthorityDelegation
+  - approveUnifiedDecision
+  - approveVersioningGovernance
   - broadcastToGuests
   - configureWorkstation
+  - createAccreditationApplication
   - createApprovalDelegation
   - createApprovalRequest
+  - createAutomationAutonomouAction
   - createOrgUnit
   - createOutlet
   - createRotaAssignment
@@ -1435,18 +1474,27 @@ tables:
   - deployConfigurationProfile
   - escalateApprovalRequest
   - evaluateApprovalRequirement
+  - importAccreditationHolders
   - publishAnnouncement
   - recordAttendance
   - registerDevice
   - requestShiftSwap
+  - resolveIdentityConflict
   - resubmitApprovalRequest
   - revokeApprovalDelegation
+  - revokeDeviceCredential
   - setApprovalMatrix
   - setConfigurationProfile
   - setConnectivityThresholds
+  - setLabourBudget
   - setOfflinePolicy
   - setRolePermissions
+  - setStaffingRules
+  - setTriggerActionCross
   - setVenueSettings
+  - setVisualBusinessRule
+  - setVisualWorkflow
+  - simulateWorkflowTestingImpact
   - updateOrgUnit
   - updateOutlet
   - updateRegionSettings
@@ -1455,11 +1503,18 @@ tables:
   - withdrawApprovalRequest
   readBy:
   - acknowledgeAnnouncement
+  - actOnWorkflowInstance
   - amendAttendance
+  - approveMatrixMultiLevel
+  - approveRoleAuthorityDelegation
+  - approveUnifiedDecision
+  - approveVersioningGovernance
   - broadcastToGuests
   - configureWorkstation
+  - createAccreditationApplication
   - createApprovalDelegation
   - createApprovalRequest
+  - createAutomationAutonomouAction
   - createOrgUnit
   - createOutlet
   - createRotaAssignment
@@ -1468,19 +1523,27 @@ tables:
   - deployConfigurationProfile
   - escalateApprovalRequest
   - evaluateApprovalRequirement
+  - importAccreditationHolders
   - listAuditRecords
   - publishAnnouncement
   - recordAttendance
   - registerDevice
   - requestShiftSwap
+  - resolveIdentityConflict
   - resubmitApprovalRequest
   - revokeApprovalDelegation
+  - revokeDeviceCredential
   - setApprovalMatrix
   - setConfigurationProfile
   - setConnectivityThresholds
+  - setLabourBudget
   - setOfflinePolicy
   - setRolePermissions
+  - setTriggerActionCross
   - setVenueSettings
+  - setVisualBusinessRule
+  - setVisualWorkflow
+  - simulateWorkflowTestingImpact
   - updateOrgUnit
   - updateOutlet
   - updateRegionSettings
@@ -1573,6 +1636,13 @@ tables:
   writtenBy:
   - accreditation
   foreignWriters: null
+- table: accreditation.identity_conflict
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - accreditation
+  foreignWriters: null
 - table: accreditation.notification_rules
   columns: 3
   store: postgres
@@ -1628,6 +1698,26 @@ tables:
   writtenBy:
   - approvals
   foreignWriters: null
+- table: approvals.automation
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - approvals
+  foreignWriters: null
+- table: approvals.automation_execution
+  columns: 14
+  store: postgres
+  parent: approvals.automation
+  writtenBy: []
+  foreignWriters: null
+- table: approvals.business_rule
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - approvals
+  foreignWriters: null
 - table: approvals.control_policy
   columns: 13
   store: postgres
@@ -1646,6 +1736,18 @@ tables:
   columns: 12
   store: postgres
   parent: approvals.request
+  writtenBy: []
+  foreignWriters: null
+- table: approvals.decision_table
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: approvals.decision_table_row
+  columns: 6
+  store: postgres
+  parent: approvals.decision_table
   writtenBy: []
   foreignWriters: null
 - table: approvals.delegation
@@ -1706,7 +1808,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: approvals.sla_policy
-  columns: 10
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
@@ -1714,6 +1816,55 @@ tables:
   foreignWriters: null
 - table: approvals.step_up_policy
   columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - approvals
+  foreignWriters: null
+- table: approvals.workflow_definition
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - approvals
+  foreignWriters: null
+- table: approvals.workflow_exception
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - approvals
+  foreignWriters: null
+- table: approvals.workflow_instance
+  columns: 26
+  store: postgres
+  parent: null
+  writtenBy:
+  - approvals
+  foreignWriters: null
+- table: approvals.workflow_intervention
+  columns: 20
+  store: postgres
+  parent: null
+  writtenBy:
+  - approvals
+  foreignWriters: null
+- table: approvals.workflow_step_execution
+  columns: 19
+  store: postgres
+  parent: null
+  writtenBy:
+  - approvals
+  foreignWriters: null
+- table: approvals.workflow_trigger
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - approvals
+  foreignWriters: null
+- table: approvals.workflow_version
+  columns: 26
   store: postgres
   parent: null
   writtenBy:
@@ -1942,13 +2093,15 @@ tables:
   columns: 11
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - tenancy
   foreignWriters: null
 - table: tenancy.device_credential
   columns: 9
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - tenancy
   foreignWriters: null
 - table: tenancy.device_firmware
   columns: 10
@@ -2004,7 +2157,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: workforce.employee
-  columns: 14
+  columns: 15
   store: postgres
   parent: null
   writtenBy: []
@@ -2036,6 +2189,13 @@ tables:
   writtenBy:
   - workforce
   foreignWriters: null
+- table: workforce.labour_budget
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - workforce
+  foreignWriters: null
 - table: workforce.leave_balance
   columns: 9
   store: postgres
@@ -2061,6 +2221,13 @@ tables:
   store: postgres
   parent: null
   writtenBy: []
+  foreignWriters: null
+- table: workforce.position_requirement
+  columns: 13
+  store: postgres
+  parent: workforce.staffing_rules
+  writtenBy:
+  - workforce
   foreignWriters: null
 - table: workforce.rota_assignment
   columns: 17
@@ -2124,7 +2291,7 @@ tables:
   foreignWriters: null
 readsFrom:
 - service: IdentityService
-  operations: 13
+  operations: 19
 - service: AccessService
   operations: 3
 - service: MarketingService
@@ -2133,7 +2300,7 @@ readsFrom:
   operations: 1
 writesOutside:
 - service: MarketingService
-  operations: 1
+  operations: 2
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -2143,6 +2310,9 @@ writesOutside:
   - operation: broadcastToGuests
     tables:
     - marketing.message_dispatch
+  - operation: decideApprovalRequest
+    tables:
+    - marketing.privacy_notice_governance
 - service: IdentityService
   operations: 1
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
@@ -2154,6 +2324,19 @@ writesOutside:
   - operation: setRolePermissions
     tables:
     - identity.role_permission
+- service: PlatformService
+  operations: 1
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event PlatformService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: decideApprovalRequest
+    tables:
+    - control.partner_agreement
+    - control.partner_application
+    - control.partner_change_request
 screens:
 - P04:POS-001 Begin Shift
 - P04:POS-002 Sell — Ticket Catalogue
@@ -2241,8 +2424,10 @@ screens:
 - P08:BO-142 Store Rules, Controls & Permissions
 - P08:BO-143 Retail Global Settings & Controls
 - P08:BO-145 Venue & Park Access Structure
+- P08:BO-171 Offline Cryptographic Validation Profile
 - P08:BO-194 Device & Gate Command Center
 - P08:BO-206 Offline Validation Policy Builder
+- P08:BO-208 Offline Credential & Revocation Cache
 - P08:BO-210 Connectivity Failure & Degraded Mode Policy
 - P08:BO-238 Identity, Membership & Accreditation Policies
 - P08:BO-241 Policy Evaluation Architecture & Offline Distribution

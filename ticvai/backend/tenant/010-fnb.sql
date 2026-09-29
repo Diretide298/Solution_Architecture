@@ -362,7 +362,7 @@ CREATE TABLE IF NOT EXISTS fnb.order_fulfilment (
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 0 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS fnb.outlet_template (
     id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL CONSTRAINT outlet_template_code_chk CHECK (char_length(code) <= 64),
@@ -600,9 +600,9 @@ CREATE TABLE IF NOT EXISTS fnb.table_combination (
 
 -- A booking with a time and a party size. Distinct from a table session, which is a guest already
 -- sitting down Hangs off: reaches fnb.service_order through its keys; references
--- fnb.modifier_group, fnb.table_reservation (deposit_* columns; the money itself is
--- orders.deposit), fnb.table_visit. Reached by: 6 operations read it and 4 write it; 3 tables
--- reference it.
+-- catalogue.variant, fnb.modifier_group, fnb.table_reservation (deposit_* columns; the money
+-- itself is orders.deposit). Reached by: 6 operations read it and 4 write it; 3 tables reference
+-- it.
 CREATE TABLE IF NOT EXISTS fnb.table_reservation (
     id                                uuid PRIMARY KEY,
     outlet_id                         uuid NOT NULL,
@@ -628,7 +628,7 @@ CREATE TABLE IF NOT EXISTS fnb.table_reservation (
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 4 operations read it and 2 write it; 1 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS fnb.table_reservation (deposit_* columns; the money itself is orders.deposit) (
     id                                uuid PRIMARY KEY NOT NULL,
     amount                            numeric(18,4) NOT NULL,

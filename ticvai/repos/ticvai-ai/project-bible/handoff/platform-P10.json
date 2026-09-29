@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 51,
-  "operations": 136,
+  "operations": 151,
   "contracts": 10,
   "modules": 9,
   "undrawn": 0,
-  "operationsWithNoScreen": 3
+  "operationsWithNoScreen": 2
  },
  "waves": {
   "wave2": 11,
@@ -91,7 +91,7 @@
  "contracts": [
   {
    "contract": "subscription",
-   "operations": 34
+   "operations": 49
   },
   {
    "contract": "orders",
@@ -344,7 +344,7 @@
    "module": "Partners",
    "wave": 3,
    "route": "/partners/partner-onboarding-application-workflow-ptr-024",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -353,7 +353,7 @@
    "module": "Partners",
    "wave": 3,
    "route": "/partners/partner-contacts-user-administration-ptr-025",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -362,7 +362,7 @@
    "module": "Partners",
    "wave": 3,
    "route": "/partners/territory-market-distribution-rights-ptr-026",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -389,7 +389,7 @@
    "module": "Partners",
    "wave": 3,
    "route": "/partners/partner-access-roles-permission-profile-ptr-029",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -443,7 +443,7 @@
    "module": "Partners",
    "wave": 3,
    "route": "/partners/commission-margin-incentive-management-ptr-035",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -452,7 +452,7 @@
    "module": "Partners",
    "wave": 3,
    "route": "/partners/credit-limit-exposure-management-ptr-036",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -461,7 +461,7 @@
    "module": "Partners",
    "wave": 3,
    "route": "/partners/deposit-guarantee-financial-security-management-ptr-037",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -479,7 +479,7 @@
    "module": "Partners",
    "wave": 3,
    "route": "/partners/commercial-allocation-quota-commitment-management-ptr-039",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -533,7 +533,7 @@
    "module": "Partners",
    "wave": 3,
    "route": "/partners/partner-cancellations-refunds-amendments-ptr-045",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -551,7 +551,7 @@
    "module": "Partners",
    "wave": 3,
    "route": "/partners/partner-reconciliation-exception-management-ptr-047",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -560,7 +560,7 @@
    "module": "Partners",
    "wave": 3,
    "route": "/partners/commission-calculation-settlement-management-ptr-048",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -569,7 +569,7 @@
    "module": "Partners",
    "wave": 3,
    "route": "/partners/partner-disputes-cases-service-management-ptr-049",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -598,12 +598,6 @@
     "contract": "public-api",
     "verb": "POST",
     "summary": "Exchange a credential for an access token"
-   },
-   {
-    "operation": "createPartnerUser",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Add a user to a partner branch"
    },
    {
     "operation": "listPartnerUsers",

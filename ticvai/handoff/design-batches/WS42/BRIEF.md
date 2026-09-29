@@ -1,6 +1,6 @@
 # WS42 — Privacy  Consent   Preference Management board 2
 
-**10 screens · 10 operations · 12 schemas · 2 permissions**
+**10 screens · 10 operations · 13 schemas · 4 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `MARKETING_MANAGE, MARKETING_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `AUDIT_VIEW, GUEST_MANAGE, GUEST_VIEW, GUEST_VIEW_PII`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -70,8 +69,8 @@ convincingly. It is never a caption.
 | `CMS-037` | Data Retention, Expiry & Legal Hold Operations | listDetail | 1 | 2 | — |
 | `CMS-038` | Privacy Compliance, Exception & Investigation Workspace | listDetail | 1 | 0 | — |
 | `CMS-039` | Privacy Audit, Evidence & Compliance Reporting | configEditor | 1 | 0 | — |
-| `CMS-040` | Privacy Analytics & AI Compliance Intelligence | listDetail | 1 | 0 | — |
+| `CMS-040` | Privacy Analytics & AI Compliance Intelligence | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
 
-**CMS-032, CMS-033, CMS-035, CMS-036 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**CMS-032, CMS-033, CMS-035 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

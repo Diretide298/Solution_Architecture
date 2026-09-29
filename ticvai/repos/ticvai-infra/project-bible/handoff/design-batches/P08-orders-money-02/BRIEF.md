@@ -1,6 +1,6 @@
 # P08-orders-money-02 — P08 · Orders & Money (2 of 3)
 
-**10 screens · 51 operations · 54 schemas · 25 permissions**
+**10 screens · 60 operations · 63 schemas · 29 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 25 permissions apply here:
-  `CASH_LIFT, LEDGER_VIEW, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REFUND, ORDER_REPRINT, ORDER_RESCHEDULE, ORDER_VIEW, ORDER_VOID, OVERSHORT_ACCEPT`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 29 permissions apply here:
+  `CASH_LIFT, CASH_NO_SALE, LEDGER_VIEW, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REFUND, ORDER_REPRINT, ORDER_RESCHEDULE, ORDER_VIEW, ORDER_VOID`…. A control nobody can use must say so,
   not sit enabled and fail.
-- **19 of these operations work offline**: applyManualDiscount, closeShift, createCashMovement, createOrder, getCurrentShift, getOrder, getRefundPolicy, getShift
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,13 +60,13 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-040` | Variance Approval | approvalInbox | 13 | 2 | — |
-| `BO-041` | Cash Movements | approvalInbox | 13 | 2 | — |
-| `BO-042` | Banking & Safe | approvalInbox | 13 | 2 | — |
-| `BO-043` | Daily Reconciliation | listDetail | 7 | 0 | — |
-| `BO-047` | Order Corrections & Exceptions | listDetail | 14 | 1 | — |
-| `BO-048` | Retail Products | listDetail | 4 | 0 | — |
-| `BO-051` | Purchase Orders | listDetail | 13 | 1 | — |
-| `BO-059` | Sales Reports | listDetail | 9 | 1 | — |
-| `BO-061` | Scheduled Reports | listDetail | 9 | 1 | — |
-| `BO-062` | Venue Profile | listDetail | 4 | 0 | — |
+| `BO-040` | Variance Approval | approvalInbox | 13 | 9 | — |
+| `BO-041` | Cash Movements | approvalInbox | 5 | 2 | — |
+| `BO-042` | Banking & Safe | approvalInbox | 5 | 1 | — |
+| `BO-043` | Daily Reconciliation | listDetail | 7 | 2 | — |
+| `BO-047` | Order Corrections & Exceptions | listDetail | 14 | 9 | — |
+| `BO-048` | Retail Products | listDetail | 4 | 2 | — |
+| `BO-059` | Sales Reports | listDetail | 9 | 6 | — |
+| `BO-061` | Scheduled Reports | listDetail | 5 | 3 | — |
+| `BO-062` | Venue Profile | listDetail | 4 | 1 | — |
+| `BO-065` | Venue Configuration | listDetail | 6 | 2 | — |

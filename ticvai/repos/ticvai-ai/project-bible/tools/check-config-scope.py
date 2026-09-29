@@ -84,6 +84,9 @@ IS_CONFIG = re.compile(
     # and for the VM close-out (29 September): which systems a wallet reconciles against is set up
     # once and read by every reconciliation run.
     r"ReconciliationSource|"
+    # and the writers pass (29 September): a labour budget and a site normalisation basis are set once
+    # per venue and period and read by every cost or comparison report.
+    r"Budget|NormalisationBasis|"
     r"IntegrationSource|FieldOwnership|ExtraField|ExtraValue|LoyaltyCampaign|"
     # **Widened 22 September** for `setTemperatureCheckpoint`. A checkpoint is the same shape as
     # `JobTitle` and `ShiftPattern` above it: a thing defined once that other rows resolve
@@ -151,7 +154,10 @@ NOT_CONFIG = re.compile(
     # setting** (29 September, rev 3 REV3-26): it is a guest's answer to a booking's consent
     # question, an append-only record against one booking. The question itself is configuration
     # (`createConsentQuestion`, scoped); the answer is what happened.
-    r"recordConsentAnswers", re.I)
+    r"recordConsentAnswers|"
+    # **`recordDashboardView` is an event, not a setting** (29 September, writers pass): it logs that a
+    # person opened a dashboard, for the most-viewed list. It matches `Dashboard`; it configures nothing.
+    r"recordDashboardView", re.I)
 WRITES = ("put", "post", "patch")
 
 

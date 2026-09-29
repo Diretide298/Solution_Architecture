@@ -1,6 +1,6 @@
 # WS89 — Rental Management board 2
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 16 operations · 18 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `ASSET_MANAGE, ASSET_VIEW, PROCUREMENT_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-504` | Rental Inventory Command Center | commandCentre | 0 | 0 | — |
-| `BO-505` | Serialized Equipment Registry | configEditor | 0 | 0 | — |
-| `BO-506` | Equipment / Asset Profile | listDetail | 0 | 0 | — |
-| `BO-507` | Pooled Inventory Management | listDetail | 0 | 0 | — |
-| `BO-508` | Equipment Status & Condition Management | listDetail | 0 | 0 | — |
-| `BO-509` | QR / Barcode Equipment Identification | listDetail | 0 | 0 | — |
-| `BO-510` | Inventory Location Allocation | listDetail | 0 | 0 | — |
-| `BO-511` | Inventory Transfer Management | listDetail | 0 | 0 | — |
-| `BO-512` | Inventory Adjustment & Exception Management | listDetail | 0 | 0 | — |
-| `BO-513` | Inventory Intelligence & Rebalancing | listDetail | 0 | 0 | — |
+| `BO-504` | Rental Inventory Command Center | commandCentre | 2 | 0 | — |
+| `BO-505` | Serialized Equipment Registry | configEditor | 2 | 0 | — |
+| `BO-506` | Equipment / Asset Profile | listDetail | 2 | 0 | — |
+| `BO-507` | Pooled Inventory Management | listDetail | 3 | 0 | — |
+| `BO-508` | Equipment Status & Condition Management | listDetail | 2 | 0 | — |
+| `BO-509` | QR / Barcode Equipment Identification | listDetail | 1 | 0 | — |
+| `BO-510` | Inventory Location Allocation | listDetail | 2 | 0 | — |
+| `BO-511` | Inventory Transfer Management | listDetail | 3 | 0 | — |
+| `BO-512` | Inventory Adjustment & Exception Management | listDetail | 2 | 0 | — |
+| `BO-513` | Inventory Intelligence & Rebalancing | listDetail | 3 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -272,7 +271,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the rental inventory are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listInventoryItems",
+    "contract": "inventory",
+    "purpose": "Stock across locations",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getStockPositions",
+    "contract": "inventory",
+    "purpose": "What is where",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Total Inventory",
@@ -285,7 +299,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-504"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-504",
+   "workshopBoard": "wireframes/WS117 Rental Management Board 2.dc.html#bo-504"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 17. 0 of 9 labels bound to a contract property; 19 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -417,10 +432,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listSerialisedItems",
+    "contract": "inventory",
+    "purpose": "Individually identified assets",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listAssets",
+    "contract": "maintenance",
+    "purpose": "The asset register behind them",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-505"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-505",
+   "workshopBoard": "wireframes/WS117 Rental Management Board 2.dc.html#bo-505"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 18. 0 of 0 labels bound to a contract property; 10 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -498,7 +529,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getAsset",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateAsset",
+       "label": "Save asset",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateAsset"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The equipment asset profile list.",
@@ -507,12 +564,40 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the equipment asset profile are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getAsset",
+    "contract": "maintenance",
+    "purpose": "The asset profile",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "updateAsset",
+    "contract": "maintenance",
+    "purpose": "Change it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getAsset",
+     "listAssets"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-506"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-506",
+   "workshopBoard": "wireframes/WS117 Rental Management Board 2.dc.html#bo-506"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 19. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "assetId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -577,11 +662,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Increase Quantity, Decrease Quantity, Adjust Inventory, Transfer Quantity, Mark Out of Service. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Rental_Management.pdf, page 20 §Actions"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack Rental_Management.pdf, page 20"
    },
@@ -624,6 +704,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Rental_Management.pdf, page 20 §Actions"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -634,12 +718,42 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the pooled inventory are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getStockPositions",
+    "contract": "inventory",
+    "purpose": "Pooled quantities",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createStockMovement",
+    "contract": "inventory",
+    "purpose": "Adjust the pool",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getStockPositions",
+     "listStockMovements"
+    ]
+   },
+   {
+    "operationId": "createStockTransfer",
+    "contract": "inventory",
+    "purpose": "Move pooled quantity to another location",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Transfer Quantity",
+    "invalidates": [
+     "getStockPositions"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-507"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-507",
+   "workshopBoard": "wireframes/WS117 Rental Management Board 2.dc.html#bo-507"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 20. 0 of 0 labels bound to a contract property; 5 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 20. 0 of 0 labels bound to a contract property; 5 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Increase Quantity, Decrease Quantity, Adjust Inventory are choices sent by `createStockMovement` (kind adjustmentIn|adjustmentOut with reason); Mark Out of Service are choices sent by `createStockMovement` (kind adjustmentOut with reason outOfService; return with adjustmentIn); Transfer Quantity: `createStockTransfer`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -715,7 +829,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setAssetStatus",
+       "label": "Save asset status",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getAsset",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setAssetStatus"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The equipment status condition list.",
@@ -724,12 +864,40 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the equipment status condition are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setAssetStatus",
+    "contract": "maintenance",
+    "purpose": "Available, rented or faulty",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getAsset",
+     "listAssets"
+    ]
+   },
+   {
+    "operationId": "getAsset",
+    "contract": "maintenance",
+    "purpose": "Current condition",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-508"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-508",
+   "workshopBoard": "wireframes/WS117 Rental Management Board 2.dc.html#bo-508"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 20. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "assetId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -805,7 +973,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "searchField",
+       "derived": true,
+       "impliedBy": "lookupAsset",
+       "label": "Search",
+       "notes": "A search that returns nothing must say so differently from a search not yet run."
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The barcode equipment identification list.",
@@ -814,10 +995,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the barcode equipment identification are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "lookupAsset",
+    "contract": "maintenance",
+    "purpose": "Scan a QR or barcode",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-509"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-509",
+   "workshopBoard": "wireframes/WS117 Rental Management Board 2.dc.html#bo-509"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 21. 0 of 0 labels bound to a contract property; 0 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -895,7 +1085,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listStockLocations",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createStockLocation",
+       "label": "Create stock location",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createStockLocation"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The inventory location allocation list.",
@@ -904,10 +1120,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the inventory location allocation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listStockLocations",
+    "contract": "inventory",
+    "purpose": "Where stock may sit",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createStockLocation",
+    "contract": "inventory",
+    "purpose": "Add a location",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listStockLocations"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-510"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-510",
+   "workshopBoard": "wireframes/WS117 Rental Management Board 2.dc.html#bo-510"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 22. 0 of 0 labels bound to a contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -974,11 +1209,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Serialized asset transfer, Pooled quantity transfer, Bulk transfer, Scheduled transfer, Emergency transfer. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Rental_Management.pdf, page 23 §Support"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack Rental_Management.pdf, page 23"
    },
@@ -1021,6 +1251,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Rental_Management.pdf, page 23 §Support"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Inbound and outbound transfers",
+       "bindsTo": "StockTransfer",
+       "columns": [
+        "StockTransfer.transferNumber",
+        "StockTransfer.fromLocationId",
+        "StockTransfer.toLocationId",
+        "StockTransfer.fromVenueId",
+        "StockTransfer.toVenueId",
+        "StockTransfer.status",
+        "StockTransfer.dispatchedAt",
+        "StockTransfer.receivedAt"
+       ],
+       "operation": "listStockTransfers",
+       "notes": "**Every transfer whose source or destination is this venue**, marked inbound or outbound (decided 28 September, audit R183).",
+       "provenance": "contract inventory.yaml GET /stock-transfers"
+      }
+     ]
     }
    ]
   },
@@ -1031,12 +1284,51 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the inventory transfer are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listStockTransfers",
+    "contract": "inventory",
+    "purpose": "Transfers in flight, inbound and outbound for this venue (decided 28 September, audit R183)",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createStockTransfer",
+    "contract": "inventory",
+    "purpose": "Move stock between stations",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listStockTransfers",
+     "getStockPositions"
+    ]
+   },
+   {
+    "operationId": "receiveStockTransfer",
+    "contract": "inventory",
+    "purpose": "Receive it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listStockTransfers",
+     "getStockPositions"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-511"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-511",
+   "workshopBoard": "wireframes/WS117 Rental Management Board 2.dc.html#bo-511"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 23. 0 of 0 labels bound to a contract property; 5 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 23. 0 of 0 labels bound to a contract property; 5 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Pooled quantity transfer, Bulk transfer are choices sent by `createStockTransfer` (lines[] carry one or many items); Serialized asset transfer are choices sent by `createStockTransfer` (serialised item moved as a quantity-1 line; field gap: lines have no serial/assetId); Scheduled transfer, Emergency transfer are choices sent by `createStockTransfer` (field gap: add scheduledFor and priority (normal|emergency) to CreateStockTransferRequest).",
+  "entryState": {
+   "params": [
+    {
+     "name": "transferId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1112,7 +1404,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createStockMovement",
+       "label": "Create stock movement",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listStockMovements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createStockMovement"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The inventory adjustment exception list.",
@@ -1121,10 +1439,30 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the inventory adjustment exception are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createStockMovement",
+    "contract": "inventory",
+    "purpose": "Adjust with a reason",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getStockPositions",
+     "listStockMovements"
+    ]
+   },
+   {
+    "operationId": "listStockMovements",
+    "contract": "inventory",
+    "purpose": "Adjustments so far",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-512"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-512",
+   "workshopBoard": "wireframes/WS117 Rental Management Board 2.dc.html#bo-512"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 23. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1189,11 +1527,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Use operational data and AI to improve rental inventory distribution and utilization. This is one of the areas where TICVAI should go beyond the original matrix.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Review Recommendation | Create Transfer | Dismiss. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Rental_Management.pdf, page 24 §Actions"
-   },
    {
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
@@ -1269,7 +1602,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the inventory intelligence rebalancing are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getStockPositions",
+    "contract": "inventory",
+    "purpose": "Imbalance across locations",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getSuggestedRequisitions",
+    "contract": "inventory",
+    "purpose": "What to move, and where",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createStockTransfer",
+    "contract": "inventory",
+    "purpose": "Act on a rebalancing recommendation by raising the transfer (review/dismiss are client-side)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Review Recommendation | Create Transfer | Dismiss",
+    "invalidates": [
+     "getStockPositions",
+     "getSuggestedRequisitions"
+    ]
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Utilization by product",
@@ -1282,9 +1641,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-513"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-513",
+   "workshopBoard": "wireframes/WS117 Rental Management Board 2.dc.html#bo-513"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 24. 0 of 8 labels bound to a contract property; 9 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 24. 0 of 8 labels bound to a contract property; 9 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Review Recommendation | Create Transfer | Dismiss: `createStockTransfer`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1316,7 +1676,441 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
-{}
+{
+ "createStockLocation": {
+  "method": "POST",
+  "path": "/stock-locations",
+  "contract": "inventory",
+  "summary": "Create a stock location",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "StockLocation"
+ },
+ "createStockMovement": {
+  "method": "POST",
+  "path": "/stock-movements",
+  "contract": "inventory",
+  "summary": "Record an issue, return or adjustment",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateStockMovementRequest",
+  "responds": "StockMovement"
+ },
+ "createStockTransfer": {
+  "method": "POST",
+  "path": "/stock-transfers",
+  "contract": "inventory",
+  "summary": "Send stock to another location",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateStockTransferRequest",
+  "responds": "StockTransfer"
+ },
+ "getAsset": {
+  "method": "GET",
+  "path": "/assets/{assetId}",
+  "contract": "maintenance",
+  "summary": "Read an asset with history and documents",
+  "permission": "ASSET_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AssetDetail"
+ },
+ "getStockPositions": {
+  "method": "GET",
+  "path": "/stock",
+  "contract": "inventory",
+  "summary": "Stock on hand by item and location",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "itemId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeZero",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "getSuggestedRequisitions": {
+  "method": "GET",
+  "path": "/requisitions/suggested",
+  "contract": "inventory",
+  "summary": "Draft requisitions from reorder points",
+  "permission": "PROCUREMENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listAssets": {
+  "method": "GET",
+  "path": "/assets",
+  "contract": "maintenance",
+  "summary": "List assets",
+  "permission": "ASSET_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "maintenanceDue",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listInventoryItems": {
+  "method": "GET",
+  "path": "/inventory-items",
+  "contract": "inventory",
+  "summary": "List inventory items",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "belowReorderPoint",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSerialisedItems": {
+  "method": "GET",
+  "path": "/serialised-items",
+  "contract": "inventory",
+  "summary": "Where each individual item is",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "serial",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listStockLocations": {
+  "method": "GET",
+  "path": "/stock-locations",
+  "contract": "inventory",
+  "summary": "List stock locations",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listStockMovements": {
+  "method": "GET",
+  "path": "/stock-movements",
+  "contract": "inventory",
+  "summary": "The movement ledger",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "itemId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "recordedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "recordedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listStockTransfers": {
+  "method": "GET",
+  "path": "/stock-transfers",
+  "contract": "inventory",
+  "summary": "List transfers",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "lookupAsset": {
+  "method": "GET",
+  "path": "/assets/lookup",
+  "contract": "maintenance",
+  "summary": "Find an asset by tag or QR",
+  "permission": "ASSET_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "assetTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "serialNumber",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AssetDetail"
+ },
+ "receiveStockTransfer": {
+  "method": "POST",
+  "path": "/stock-transfers/{transferId}/receive",
+  "contract": "inventory",
+  "summary": "Receive a transfer",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "StockTransfer"
+ },
+ "setAssetStatus": {
+  "method": "PUT",
+  "path": "/assets/{assetId}/status",
+  "contract": "maintenance",
+  "summary": "Take an asset out of service or return it",
+  "permission": "ASSET_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SetAssetStatusRequest",
+  "responds": "AssetStatusResult"
+ },
+ "updateAsset": {
+  "method": "PATCH",
+  "path": "/assets/{assetId}",
+  "contract": "maintenance",
+  "summary": "Amend an asset",
+  "permission": "ASSET_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Asset"
+ }
+}
 ```
 
 ## `schemas.json`
@@ -1324,5 +2118,1002 @@ Method, path, parameters, request and response for every operation these screens
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
-{}
+{
+ "Asset": {
+  "x-ticvai-persistence": "maintenance.asset",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateAssetRequest"
+   },
+   {
+    "type": "object",
+    "x-ticvai-retired-columns": [
+     "is_maintenance_overdue",
+     "document_refs"
+    ],
+    "required": [
+     "id",
+     "status"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "resourceId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "1.2.x. **Where this asset is also bookable.** An AV rig is an asset to maintain and a resource to allocate, and they are the same object seen from two sides.\n**`resources` owns the calendar and this owns the condition.** An asset out of service makes its resource unbookable, which is one link rather than two models of availability.\n"
+     },
+     "deviceId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "BL-160. **Where this asset is also a registered device.** A turnstile is an asset to maintain and a device to operate, and — exactly as with `resourceId` above — they are the same object seen from two sides.\n**Nothing joined them before this.** A turnstile controller reporting `needsAttention` could not raise a work order against itself, and an engineer closing one had no way back to the device whose firmware caused it.\n**Null for most assets and for most devices.** A chiller is not a device and a signature pad is not on the asset register; the link is sparse, and it lives here rather than on `platform.device` because `platform` is the foundation tier and a foreign key pointing from it into `maintenance` would invert the tiers — every cell running a spine would carry a column for a satellite it may not deploy.\n"
+     },
+     "acquisitionCost": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "acquiredOn": {
+      "type": "string",
+      "format": "date",
+      "nullable": true
+     },
+     "depreciation": {
+      "type": "object",
+      "nullable": true,
+      "description": "**Recorded here and posted by `finance`.** Depreciation is an accounting act and the asset register is where the useful life is actually known — an engineer knows a chiller lasts fifteen years and an accountant knows what to do about it.\n",
+      "properties": {
+       "method": {
+        "type": "string",
+        "enum": [
+         "straightLine",
+         "reducingBalance",
+         "unitsOfProduction",
+         "none"
+        ]
+       },
+       "usefulLifeMonths": {
+        "type": "integer"
+       },
+       "residualValue": {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       },
+       "accumulatedDepreciation": {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      }
+     },
+     "retiredOn": {
+      "type": "string",
+      "format": "date",
+      "nullable": true,
+      "description": "**Retirement is not deletion.** A work order from three years ago still names this asset, and an inspection record with no asset is an inspection of nothing.\n"
+     },
+     "disposalProceeds": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "status": {
+      "$ref": "#/components/schemas/AssetStatus"
+     },
+     "statusReason": {
+      "type": "string",
+      "nullable": true
+     },
+     "openWorkOrderCount": {
+      "type": "integer",
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "Work orders on this asset whose status is `open`, `assigned`, `inProgress`, `paused` or `awaitingParts` — the same set `AssetDetail.openWorkOrders` returns. **Maintained on write**: `createWorkOrder` and every transition into or out of that set (complete, cancel, close, reject back to open) adjust it in the same transaction as the work-order row.\n"
+     },
+     "nextMaintenanceDueAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "The earliest `nextDueAt` among this asset's active maintenance plans; null when none has one. **Maintained on write**: recomputed whenever one of those plans is created, amended, suspended or has its `nextDueAt` moved by a completed work order. `listAssets?maintenanceDue` filters on this column against the clock.\n"
+     },
+     "isMaintenanceOverdue": {
+      "type": "boolean",
+      "readOnly": true,
+      "x-ticvai-persisted": false,
+      "x-ticvai-derived": "onRead",
+      "description": "`nextMaintenanceDueAt` is in the past at the moment of the read. **Computed on read and not stored** — it depends on the clock, so a stored copy is stale the minute after it is written.\n"
+     },
+     "lastInspectionAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "`performedAt` of the latest inspection submitted against this asset. **Maintained on write** by `submitInspection`, in the same transaction as the inspection row; an inspection synced late with an earlier `performedAt` does not move it back.\n"
+     },
+     "usageCounter": {
+      "type": "number",
+      "nullable": true,
+      "description": "Cycles, hours or kilometres. Drives usage-based maintenance."
+     }
+    }
+   }
+  ]
+ },
+ "AssetDetail": {
+  "x-ticvai-persistence": "maintenance.asset",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/Asset"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "openWorkOrders": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/WorkOrder"
+      }
+     },
+     "maintenancePlans": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/MaintenancePlan"
+      }
+     },
+     "documents": {
+      "type": "array",
+      "description": "Manuals, procedures, certificates. What a technician needs on site. Read from `maintenance.asset_document`.\n",
+      "items": {
+       "$ref": "#/components/schemas/AssetDocument"
+      }
+     }
+    }
+   }
+  ]
+ },
+ "AssetDocument": {
+  "x-ticvai-persistence": "maintenance.asset_document",
+  "type": "object",
+  "description": "A document attached to an asset — manual, procedure, certificate — with the name and kind a technician needs on site. **One row per document**, because `AssetDetail.documents` returns a name and a kind for each and a `text[]` of refs has nowhere to hold either.\n",
+  "required": [
+   "id",
+   "assetId",
+   "ref"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "ref": {
+    "type": "string",
+    "description": "The document in the media store."
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "kind": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AssetDocumentKind"
+     }
+    ],
+    "nullable": true,
+    "description": "Null where the document arrived as a bare ref in `documentRefs`."
+   }
+  }
+ },
+ "AssetStatus": {
+  "type": "string",
+  "enum": [
+   "inService",
+   "outOfService",
+   "underMaintenance",
+   "awaitingParts",
+   "retired",
+   "disposed"
+  ]
+ },
+ "AssetStatusResult": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "asset",
+   "downstreamEffects"
+  ],
+  "properties": {
+   "asset": {
+    "$ref": "#/components/schemas/Asset"
+   },
+   "downstreamEffects": {
+    "type": "object",
+    "description": "What else changed. Surfaced so the person taking a ride out of service sees the commercial consequence at the moment they do it.\n",
+    "properties": {
+     "productsSuspended": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "accessPointBlocked": {
+      "type": "boolean"
+     },
+     "performancesAffected": {
+      "type": "integer"
+     },
+     "workOrderId": {
+      "type": "string",
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "nullable": true
+     }
+    }
+   }
+  }
+ },
+ "CreateAssetRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "assetTag",
+   "name",
+   "venueId",
+   "criticality"
+  ],
+  "properties": {
+   "assetTag": {
+    "type": "string",
+    "maxLength": 64,
+    "x-ticvai-unique": "venue",
+    "description": "**Unique per venue** (decided 28 September, audit R108). Two assets in one venue never share a tag; `createAsset` refuses a duplicate with `409` `duplicate-code`. Two venues may each have an `A-001`.\n"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationDescription": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "criticality": {
+    "$ref": "#/components/schemas/AssetCriticality"
+   },
+   "manufacturer": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "model": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "serialNumber": {
+    "type": "string",
+    "maxLength": 128
+   },
+   "commissionedAt": {
+    "type": "string",
+    "format": "date"
+   },
+   "warrantyExpiresAt": {
+    "type": "string",
+    "format": "date"
+   },
+   "supplierId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "linkedProductIds": {
+    "type": "array",
+    "description": "Products this asset delivers. A fault here can stop them selling.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "linkedAccessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Access point this asset controls. Out of service blocks it."
+   },
+   "requiresInspectionToReturn": {
+    "type": "boolean",
+    "default": false,
+    "description": "True means a completed inspection is required before return to service. A technician cannot simply declare a ride safe.\n"
+   },
+   "documents": {
+    "type": "array",
+    "description": "Manuals, procedures, certificates, each with its name and kind. Stored one row per document in `maintenance.asset_document`, which is where `AssetDetail.documents` reads them from.\n",
+    "items": {
+     "$ref": "#/components/schemas/AssetDocumentInput"
+    }
+   },
+   "documentRefs": {
+    "type": "array",
+    "x-ticvai-persisted": false,
+    "description": "**The refs alone, kept for callers that predate `documents`.** Each ref sent here is stored as an `asset_document` row with no name and no kind. Returned as the refs of `documents`, computed on read — there is no second copy to fall out of step.\n",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "CreateStockMovementRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "itemId",
+   "locationId",
+   "kind",
+   "quantity",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "itemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MovementKind"
+   },
+   "quantity": {
+    "type": "number",
+    "exclusiveMinimum": 0,
+    "description": "Always positive. **The `kind` decides whether it adds or removes stock**, not the sign (decided 28 September, audit R171).\n"
+   },
+   "unit": {
+    "type": "string"
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 500,
+    "description": "**Required for `adjustmentIn`, `adjustmentOut` and `waste`** (decided 28 September, audit R171); adjustments are reported separately.\n"
+   },
+   "costCenterId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CreateStockTransferRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "fromLocationId",
+   "toLocationId",
+   "lines",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "fromLocationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "toLocationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "lines": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "itemId",
+      "quantity"
+     ],
+     "properties": {
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "quantity": {
+       "type": "number",
+       "minimum": 0
+      },
+      "unit": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "LocationKind": {
+  "type": "string",
+  "enum": [
+   "mainStore",
+   "subStore",
+   "kitchen",
+   "bar",
+   "retailFloor",
+   "cellar",
+   "transit"
+  ]
+ },
+ "MaintenancePlan": {
+  "x-ticvai-persistence": "maintenance.preventive_plan",
+  "type": "object",
+  "required": [
+   "id",
+   "name",
+   "assetId",
+   "taskTemplate"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "assetCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Applies to every asset in the category rather than one."
+   },
+   "intervalDays": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Elapsed-time trigger."
+   },
+   "usageInterval": {
+    "type": "number",
+    "nullable": true,
+    "description": "Usage trigger — cycles, hours, kilometres. **Whichever comes first** when both are set. A ride serviced every three months or ten thousand cycles is one plan.\n"
+   },
+   "leadTimeDays": {
+    "type": "integer",
+    "default": 7,
+    "description": "How far ahead the work order is generated, so parts can be ordered before the job is already late.\n"
+   },
+   "taskTemplate": {
+    "type": "object",
+    "required": [
+     "title",
+     "priority"
+    ],
+    "properties": {
+     "title": {
+      "type": "string"
+     },
+     "description": {
+      "type": "string"
+     },
+     "priority": {
+      "$ref": "#/components/schemas/WorkOrderPriority"
+     },
+     "estimatedMinutes": {
+      "type": "integer"
+     },
+     "inspectionTemplateId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "requiredPartIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     }
+    }
+   },
+   "lastCompletedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "nextDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "MovementKind": {
+  "type": "string",
+  "description": "**The kind decides the direction** (decided 28 September, audit R171). In: `receipt`, `transferIn`, `adjustmentIn`, `countGain`, `production` (the finished item entering stock; the ingredients leave as `issue`). Out: `issue`, `saleDepletion`, `waste`, `adjustmentOut`, `transferOut`, `countLoss`, `supplierReturn`. `adjustment` and `countAdjustment` were split into an in and an out kind so that no kind has two directions.\n",
+  "enum": [
+   "receipt",
+   "issue",
+   "saleDepletion",
+   "waste",
+   "adjustmentIn",
+   "adjustmentOut",
+   "transferOut",
+   "transferIn",
+   "countGain",
+   "countLoss",
+   "supplierReturn",
+   "production"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "SetAssetStatusRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "status",
+   "reason",
+   "recordedAt"
+  ],
+  "properties": {
+   "status": {
+    "$ref": "#/components/schemas/AssetStatus"
+   },
+   "reason": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 1000
+   },
+   "inspectionId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "Required for return to service where the asset demands it."
+   },
+   "raiseWorkOrder": {
+    "type": "boolean",
+    "default": false
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "StockLocation": {
+  "x-ticvai-persistence": "inventory.location",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "venueId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/LocationKind"
+   },
+   "parentLocationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "StockMovement": {
+  "x-ticvai-persistence": "inventory.movement",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateStockMovementRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "balanceAfter",
+     "principalId",
+     "createdAt"
+    ],
+    "properties": {
+     "balanceAfter": {
+      "type": "number"
+     },
+     "unitCost": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "totalCost": {
+      "x-ticvai-column": "net_cost_amount",
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "principalId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "sourceType": {
+      "type": "string",
+      "nullable": true,
+      "description": "What generated it — an order, a count, a transfer."
+     },
+     "sourceId": {
+      "type": "string",
+      "nullable": true
+     },
+     "journalEntryId": {
+      "type": "string",
+      "nullable": true
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  ]
+ },
+ "StockTransfer": {
+  "x-ticvai-persistence": "inventory.transfer + inventory.transfer_line",
+  "type": "object",
+  "required": [
+   "id",
+   "fromLocationId",
+   "toLocationId",
+   "status",
+   "lines",
+   "dispatchedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "transferNumber": {
+    "type": "string"
+   },
+   "fromLocationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "toLocationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "status": {
+    "$ref": "#/components/schemas/TransferStatus"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "itemName": {
+       "type": "string"
+      },
+      "dispatchedQuantity": {
+       "type": "number"
+      },
+      "receivedQuantity": {
+       "type": "number",
+       "nullable": true
+      },
+      "discrepancy": {
+       "type": "number",
+       "nullable": true
+      },
+      "discrepancyReason": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "dispatchedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "receivedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "dispatchedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "receivedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "closeShortReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Why the balance was written off, from `closeTransferShort`."
+   },
+   "closeShortSignedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The supervisor whose step-up closed the transfer short (audit R144)."
+   },
+   "fromVenueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The venue of `fromLocationId`. Set by the server (audit R183)."
+   },
+   "toVenueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The venue of `toLocationId`. Set by the server (audit R183)."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). `fromLocationId` and `toLocationId` give the endpoints; **this gives the owner**, the source venue's scope.\n\n**Both venues see a transfer between them** (decided 28 September, audit R183). It used to sit at the tenant above both, where neither venue could see it. The row is owned at the source venue and `toScopePath` admits the destination venue too."
+   },
+   "toScopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The destination venue's scope. Row-level security admits a caller whose scope matches `scopePath` or `toScopePath`, so both venues read the transfer (decided 28 September, audit R183).\n"
+   }
+  }
+ },
+ "TransferStatus": {
+  "type": "string",
+  "enum": [
+   "dispatched",
+   "inTransit",
+   "received",
+   "partiallyReceived",
+   "cancelled"
+  ]
+ },
+ "WorkOrder": {
+  "x-ticvai-persistence": "maintenance.work_order",
+  "x-ticvai-retired-columns": [
+   "is_overdue"
+  ],
+  "type": "object",
+  "required": [
+   "id",
+   "workOrderNumber",
+   "title",
+   "venueId",
+   "status",
+   "priority",
+   "kind",
+   "createdAt"
+  ],
+  "properties": {
+   "downtimeMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "**Measured from out-of-service to back-in-service, not from work start to work end.** A ride down for six hours of which two were spent working is down six hours, and the gap between the two numbers is the thing worth managing.\n**Maintained on write**: set when the asset returns to service, as the minutes from the `maintenance.asset_status_change` row that took it out carrying this work order's id to the asset's next change back to `inService`. Null while the asset is still out, and for a work order that never took it out.\n"
+   },
+   "rootCause": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "wearAndTear",
+     "operatorError",
+     "guestDamage",
+     "manufacturingDefect",
+     "environmental",
+     "softwareFault",
+     "powerFailure",
+     "deferredMaintenance",
+     "unknown"
+    ],
+    "description": "**Structured, because free text cannot be counted.** *Deferred maintenance* is the value a venue least wants to see and most needs to — a fault caused by work that was postponed is an argument for a budget.\n"
+   },
+   "rootCauseNote": {
+    "type": "string",
+    "nullable": true
+   },
+   "escalatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "escalationLevel": {
+    "type": "integer",
+    "default": 0,
+    "description": "**Escalation is a clock, not a decision.** A work order on a ride nobody has accepted after twenty minutes escalates itself, because the alternative is somebody noticing.\n"
+   },
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "workOrderNumber": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.\n"
+   },
+   "title": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "assetName": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "The asset's name, copied when the work order is raised or its asset changes, and not updated when the asset is later renamed — the record reads as it was raised.\n"
+   },
+   "status": {
+    "$ref": "#/components/schemas/WorkOrderStatus"
+   },
+   "priority": {
+    "$ref": "#/components/schemas/WorkOrderPriority"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/WorkOrderKind"
+   },
+   "assignedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "raisedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "As raised in `CreateWorkOrderRequest.categoryId`, amendable by `updateWorkOrder`. The category is what `completeWorkOrder` reads to decide whether completion photographs are required.\n"
+   },
+   "locationDescription": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "Where the fault is, as raised. Needed where there is no asset — a broken tile, a leak in a corridor.\n"
+   },
+   "elapsedMinutes": {
+    "type": "integer",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Labour minutes accumulated up to the last pause or stop. **Maintained on write** by `recordWorkOrderTime`, `pauseWorkOrder` and `completeWorkOrder`; while `isTimerRunning` is true the interval since the last start is not yet included.\n"
+   },
+   "isTimerRunning": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Maintained on write by `startWorkOrder`, `resumeWorkOrder`, `recordWorkOrderTime`, `pauseWorkOrder` and `completeWorkOrder`.\n"
+   },
+   "dueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isOverdue": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "`dueAt` is in the past and the status is still `open`, `assigned`, `inProgress`, `paused` or `awaitingParts`. **Computed on read and not stored** — it depends on the clock. `listWorkOrders?overdueOnly` applies the same test to `due_at`.\n"
+   },
+   "requiresVerification": {
+    "type": "boolean"
+   },
+   "sourcePlanId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "sourceInspectionId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "sourceIncidentId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ }
+}
 ```

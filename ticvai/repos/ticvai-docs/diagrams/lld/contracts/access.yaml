@@ -1,5 +1,5 @@
 id: LLD-access
-title: access — 206 operations
+title: access — 243 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -27,8 +27,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.access_point
+  - access.scan_event
+  - cache:idempotency
+  - identity.principal
+  writes:
+  - access.scan_event
+  - cache:idempotency
 - operation: approveMultiMediaPreview
   verb: PUT
   path: /multi-media-preview
@@ -37,8 +43,60 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.media_template
+  - access.media_template_version
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.media_template
+  - access.media_template_version
+  - cache:idempotency
+- operation: archiveMediaTemplate
+  verb: POST
+  path: /media-templates/{templateId}/archive
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.media_template
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.media_template
+  - cache:idempotency
+- operation: bindCredentialDevice
+  verb: POST
+  path: /my/credentials/{credentialId}/device-bindings
+  scope: tenant
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - access.credential_policy
+  - access.device_binding
+  - access.entitlement
+  - cache:idempotency
+  writes:
+  - access.device_binding
+  - cache:idempotency
+- operation: cancelGateModeChange
+  verb: POST
+  path: /gate-mode-changes/{changeId}/cancel
+  scope: venue
+  permission: TURNSTILE_MODE_SET
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.gate_mode_change
+  - cache:idempotency
+  writes:
+  - access.gate_mode_change
+  - cache:idempotency
 - operation: createAccessPoint
   verb: POST
   path: /access-points
@@ -52,6 +110,7 @@ operations:
   - cache:idempotency
   writes:
   - access.access_point
+  - access.configuration_change
   - cache:idempotency
 - operation: createAdmissionRules
   verb: POST
@@ -66,6 +125,7 @@ operations:
   - cache:idempotency
   writes:
   - access.admission_rules
+  - access.configuration_change
   - cache:idempotency
 - operation: createParkingEntitlement
   verb: POST
@@ -84,6 +144,98 @@ operations:
   writes:
   - access.parking_entitlement
   - cache:idempotency
+- operation: deleteAccessPointGroup
+  verb: DELETE
+  path: /access-point-groups/{groupId}
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.access_point_group
+  - access.gate_mode_policy
+  - cache:idempotency
+  writes:
+  - access.access_point_group
+  - access.configuration_change
+  - cache:idempotency
+- operation: deleteJourneySequenceRule
+  verb: DELETE
+  path: /journey-sequence-rules/{ruleId}
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.journey_sequence_rule
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.journey_sequence_rule
+  - cache:idempotency
+- operation: deleteMediaBindingRule
+  verb: DELETE
+  path: /media-binding-rules/{ruleId}
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.media_binding_rule
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.media_binding_rule
+  - cache:idempotency
+- operation: deleteOperatingCalendarEntry
+  verb: DELETE
+  path: /operating-calendar-entries/{entryId}
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.operating_calendar_entry
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.operating_calendar_entry
+  - cache:idempotency
+- operation: deletePodium
+  verb: DELETE
+  path: /podiums/{podiumId}
+  scope: venue
+  permission: DEVICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.podium_shift
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.podium
+  - cache:idempotency
+- operation: deleteReasonCode
+  verb: DELETE
+  path: /reason-codes/{reasonCodeId}
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.reason_code
+  - access.scan_event
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.reason_code
+  - cache:idempotency
 - operation: deliverCredential
   verb: POST
   path: /credentials/{credentialId}/deliveries
@@ -92,8 +244,29 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.credential_binding
+  - access.credential_delivery
+  - access.entitlement
+  - cache:idempotency
+  writes:
+  - access.credential_delivery
+  - access.credential_event
+  - cache:idempotency
+- operation: endPodiumShift
+  verb: POST
+  path: /podium-shifts/{shiftId}/end
+  scope: venue
+  permission: TURNSTILE_MODE_SET
+  audience:
+  - staff
+  offline: true
+  reads:
+  - access.podium_shift
+  - cache:idempotency
+  writes:
+  - access.podium_shift
+  - cache:idempotency
 - operation: enrolFacePass
   verb: POST
   path: /face-pass/enrolments
@@ -104,11 +277,15 @@ operations:
   - guest
   offline: false
   reads:
+  - access.biometric_profile
+  - access.face_reenrolment_attempt
   - cache:idempotency
   - marketing.consent_record
   - pii.subject
   - pii.subject_biometric
   writes:
+  - access.biometric_audit_event
+  - access.face_reenrolment_attempt
   - cache:idempotency
   - marketing.consent_record
   - pii.subject_biometric
@@ -225,7 +402,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_point
+  - access.scan_event
+  - sync.rejection
   writes: []
 - operation: listAccessAttributeCatalog
   verb: GET
@@ -235,7 +415,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_attribute
   writes: []
 - operation: listAccessChanges
   verb: GET
@@ -256,7 +437,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_point
+  - access.entitlement
+  - access.scan_event
   writes: []
 - operation: listAccessLocationGrouping
   verb: GET
@@ -266,7 +450,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_point
+  - access.access_point_group
   writes: []
 - operation: listAccessMonitoring
   verb: GET
@@ -276,7 +462,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_point
+  - access.entitlement
+  - access.scan_event
+  - catalogue.entitlement_template
   writes: []
 - operation: listAccessPoints
   verb: GET
@@ -307,7 +497,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.risk_scoring_config
   writes: []
 - operation: listAccessRule
   verb: GET
@@ -317,7 +508,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.admission_rules
+  - access.configuration_version
+  - access.entry_rule_point
   writes: []
 - operation: listAccessSecurityFraud
   verb: GET
@@ -327,7 +521,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.blacklist
+  - access.identity_lock
+  - access.scan_event
+  - access.security_alert
+  - access.security_investigation
   writes: []
 - operation: listAccessValidityTime
   verb: GET
@@ -337,7 +536,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.admission_rules
+  - catalogue.entitlement_template
   writes: []
 - operation: listAdmissionRules
   verb: GET
@@ -358,7 +559,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_point
+  - access.admission_rules
+  - access.journey_sequence_rule
   writes: []
 - operation: listAttendanceAdmission
   verb: GET
@@ -368,7 +572,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - access.scan_event
+  - catalogue.entitlement_template
+  - catalogue.product
+  - orders.sales_order
   writes: []
 - operation: listAuthorizationGovernanceTemporary
   verb: GET
@@ -378,7 +587,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - identity.delegated_access
+  - identity.principal
   writes: []
 - operation: listBiometric
   verb: GET
@@ -388,7 +599,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.biometric_audit_event
   writes: []
 - operation: listBiometricAccess
   verb: GET
@@ -398,7 +610,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.biometric_profile
+  - access.scan_event
+  - pii.subject_biometric
   writes: []
 - operation: listBiometricConsentGuardian
   verb: GET
@@ -418,7 +633,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.face_reenrolment_attempt
+  - access.scan_event
+  - access.security_alert
+  - pii.subject_biometric
   writes: []
 - operation: listBiometricLifecycleRetention
   verb: GET
@@ -438,7 +657,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_point
+  - access.access_point_configuration
+  - access.gate_outcome_profile
   writes: []
 - operation: listBlacklist
   verb: GET
@@ -459,7 +681,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.branding_profile
   writes: []
 - operation: listConnectivityFailureDegraded
   verb: GET
@@ -469,7 +692,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.offline_policy
+  - access.scan_event
   writes: []
 - operation: listCredential
   verb: GET
@@ -479,7 +704,16 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.credential_binding
+  - access.credential_delivery
+  - access.credential_exception
+  - access.credential_issuance
+  - access.entitlement
+  - access.media_type
+  - access.scan_event
+  - catalogue.product
+  - pii.subject
   writes: []
 - operation: listCredentialActivationDisplay
   verb: GET
@@ -489,7 +723,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.credential_policy
   writes: []
 - operation: listCredentialDeliveryDistribution
   verb: GET
@@ -499,7 +734,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.credential_binding
+  - access.credential_delivery
+  - access.entitlement
+  - access.media_type
+  - pii.subject
   writes: []
 - operation: listCredentialDisableBlacklist
   verb: GET
@@ -509,7 +749,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.blacklist
   writes: []
 - operation: listCredentialGenerationIssuance
   verb: GET
@@ -519,7 +760,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.credential_issuance
+  - access.entitlement
+  - access.media_template
+  - access.media_template_version
+  - access.media_type
+  - catalogue.product
+  - pii.subject
   writes: []
 - operation: listCredentialIdentityToken
   verb: GET
@@ -529,7 +777,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.credential_binding
+  - access.credential_security_profile
+  - access.entitlement
+  - access.media_type
   writes: []
 - operation: listCredentialReplacementReissue
   verb: GET
@@ -539,7 +791,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.media_replacement_policy
   writes: []
 - operation: listCredentialRevocationLifecycle
   verb: GET
@@ -549,7 +802,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.credential_event_propagation_rule
   writes: []
 - operation: listCredentialSecurity
   verb: GET
@@ -559,7 +813,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_change
+  - access.access_point
+  - access.credential_event
+  - access.entitlement
+  - access.scan_event
   writes: []
 - operation: listCredentialSecurityOperational
   verb: GET
@@ -569,7 +828,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_change
+  - access.credential_binding
+  - access.credential_event
+  - access.entitlement
+  - access.media_type
+  - identity.principal
   writes: []
 - operation: listCredentialSharingConcurrent
   verb: GET
@@ -579,7 +844,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.credential_sharing_case
+  - access.entitlement
   writes: []
 - operation: listCredentialTransferRebinding
   verb: GET
@@ -589,7 +856,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.credential_policy
+  - catalogue.entitlement_template
   writes: []
 - operation: listCredentialUsageCross
   verb: GET
@@ -599,7 +868,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_point
+  - access.credential_binding
+  - access.credential_event
+  - access.entitlement
+  - access.media_type
+  - access.scan_event
   writes: []
 - operation: listDeviceBindingSession
   verb: GET
@@ -609,7 +884,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.credential_policy
+  - access.device_binding
+  - access.entitlement
+  - pii.subject
   writes: []
 - operation: listDeviceGate
   verb: GET
@@ -619,7 +898,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_device
+  - access.access_point
+  - access.hardware_deployment
   writes: []
 - operation: listDeviceTypeHardware
   verb: GET
@@ -629,7 +911,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.hardware_model
   writes: []
 - operation: listDigitalCredentialSecurity
   verb: GET
@@ -639,7 +922,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_change
+  - access.credential_event
+  - access.credential_security_profile
+  - access.device_binding
+  - access.entitlement
   writes: []
 - operation: listDynamicAccessPolicy
   verb: GET
@@ -649,7 +937,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.dynamic_policy
+  - access.dynamic_policy_version
+  - access.policy_scope_assignment
+  - access.scan_event
   writes: []
 - operation: listEdgePackageData
   verb: GET
@@ -659,7 +951,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.edge_package
   writes: []
 - operation: listEdgeSecurityDeployment
   verb: GET
@@ -669,7 +962,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.hardware_deployment
+  - access.scan_event
+  - access.security_alert
   writes: []
 - operation: listEntitlementConsumption
   verb: GET
@@ -679,7 +975,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.consumption_rule
   writes: []
 - operation: listEntitlementCrossMedia
   verb: GET
@@ -689,7 +986,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.credential_event_propagation_rule
   writes: []
 - operation: listEntitlements
   verb: GET
@@ -712,7 +1010,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_point
+  - access.admission_rules
+  - access.entitlement
+  - access.scan_event
+  - catalogue.product
   writes: []
 - operation: listEntryExitRule
   verb: GET
@@ -722,7 +1025,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.admission_rules
   writes: []
 - operation: listEntryRulePoints
   verb: GET
@@ -743,7 +1047,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.admission_rules
   writes: []
 - operation: listExternalPartnerCredential
   verb: GET
@@ -753,7 +1058,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_point
+  - access.external_credential_integration
   writes: []
 - operation: listFaceChangeEnrollment
   verb: GET
@@ -763,7 +1070,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.face_reenrolment_attempt
+  - pii.subject_biometric
   writes: []
 - operation: listFaceMatchingVerification
   verb: GET
@@ -773,7 +1082,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.biometric_profile
   writes: []
 - operation: listFaceTagTemporary
   verb: GET
@@ -783,7 +1093,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.biometric_profile
   writes: []
 - operation: listFailedGenerationDelivery
   verb: GET
@@ -793,7 +1104,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.credential_binding
+  - access.credential_delivery
+  - access.credential_exception
+  - access.credential_issuance
+  - access.entitlement
+  - access.media_type
+  - pii.subject
   writes: []
 - operation: listFamilyChildPod
   verb: GET
@@ -803,7 +1121,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.companion_rule
+  - catalogue.entitlement_template
   writes: []
 - operation: listFastPassAttraction
   verb: GET
@@ -813,7 +1133,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.admission_rules
+  - access.fast_pass_profile
+  - catalogue.entitlement_template
   writes: []
 - operation: listFraudDetectionRule
   verb: GET
@@ -823,7 +1146,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.fraud_rule
   writes: []
 - operation: listGateModeFree
   verb: GET
@@ -833,7 +1157,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.gate_mode_policy
   writes: []
 - operation: listGraphicalAccessMap
   verb: GET
@@ -843,7 +1168,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_point
+  - access.scan_event
+  - venuemap.map
+  - venuemap.point
   writes: []
 - operation: listGroupAdmissionQuantity
   verb: GET
@@ -853,7 +1182,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.admission_rules
+  - access.group_admission_rule
   writes: []
 - operation: listGroupAttendancePartial
   verb: GET
@@ -863,7 +1194,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_point
+  - access.entitlement
+  - access.scan_event
+  - identity.principal
+  - pii.subject
   writes: []
 - operation: listGroupLeaderFast
   verb: GET
@@ -873,7 +1209,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.admission_rules
+  - access.entitlement
+  - catalogue.product
+  - orders.sales_order
   writes: []
 - operation: listGuestCompanionEligibility
   verb: GET
@@ -883,7 +1223,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.companion_rule
   writes: []
 - operation: listGuestDwellTime
   verb: GET
@@ -893,7 +1234,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_point
+  - access.entitlement
+  - access.scan_event
+  - catalogue.entitlement_template
+  - venuemap.point
   writes: []
 - operation: listGuestJourney
   verb: GET
@@ -903,7 +1249,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.admission_rules
+  - access.entitlement
+  - access.journey_profile
+  - access.scan_event
   writes: []
 - operation: listHardwareCompatibilityHealth
   verb: GET
@@ -913,7 +1263,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_device
+  - access.hardware_deployment
+  - access.hardware_model
   writes: []
 - operation: listHotelWalletExternal
   verb: GET
@@ -923,7 +1276,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.external_credential_integration
   writes: []
 - operation: listIdentityMembershipAccreditation
   verb: GET
@@ -933,7 +1287,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.dynamic_policy
   writes: []
 - operation: listLiveAccess
   verb: GET
@@ -943,7 +1298,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_point
+  - access.scan_event
   writes: []
 - operation: listLiveGateMode
   verb: GET
@@ -953,7 +1310,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_point
+  - access.device_configuration
+  - access.gate_mode_change
   writes: []
 - operation: listLiveVenueOccupancy
   verb: GET
@@ -963,7 +1323,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_area
+  - access.access_point
+  - access.scan_event
   writes: []
 - operation: listMediaActivationPriority
   verb: GET
@@ -973,7 +1336,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.media_type
   writes: []
 - operation: listMediaCredential
   verb: GET
@@ -983,7 +1347,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.credential_binding
+  - access.credential_event
+  - access.entitlement
+  - access.media_type
+  - access.scan_event
   writes: []
 - operation: listMediaDesign
   verb: GET
@@ -993,7 +1362,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.media_template
   writes: []
 - operation: listMediaIssuanceEncoding
   verb: GET
@@ -1003,7 +1373,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.media_encoding_profile
   writes: []
 - operation: listMediaReplacementRevocation
   verb: GET
@@ -1013,7 +1384,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.media_replacement_policy
   writes: []
 - operation: listMediaSwapReplacement
   verb: GET
@@ -1023,7 +1395,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.credential_event
+  - access.entitlement
+  - access.media_type
   writes: []
 - operation: listMediaTypeCredential
   verb: GET
@@ -1033,7 +1408,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.media_type
   writes: []
 - operation: listMediaTypeTechnology
   verb: GET
@@ -1043,7 +1419,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.media_type
   writes: []
 - operation: listMultiMediaBinding
   verb: GET
@@ -1053,7 +1430,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.media_binding_rule
   writes: []
 - operation: listMultiParkCrossover
   verb: GET
@@ -1063,7 +1441,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.admission_rules
   writes: []
 - operation: listMultiParkCrossover2
   verb: GET
@@ -1073,7 +1452,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_point
+  - access.admission_rules
+  - access.scan_event
   writes: []
 - operation: listMyEntitlements
   verb: GET
@@ -1098,7 +1480,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_change
+  - access.blacklist
+  - access.offline_policy
   writes: []
 - operation: listOfflineCryptographicValidation
   verb: GET
@@ -1108,7 +1493,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.offline_policy
   writes: []
 - operation: listOfflineEdge
   verb: GET
@@ -1118,7 +1504,16 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_device
+  - access.access_point
+  - access.admission_rules
+  - access.blacklist
+  - access.edge_node
+  - access.edge_package
+  - access.scan_event
+  - catalogue.entitlement_template
+  - sync.rejection
   writes: []
 - operation: listOfflineEntitlementUsage
   verb: GET
@@ -1128,7 +1523,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - access.scan_event
   writes: []
 - operation: listOperatingCalendarSpecial
   verb: GET
@@ -1138,7 +1535,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.operating_calendar_entry
   writes: []
 - operation: listParkingFacilities
   verb: GET
@@ -1160,7 +1558,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_area
+  - access.access_device
+  - access.access_point
+  - access.gate_lane
+  - access.hardware_model
   writes: []
 - operation: listPodiumConsole
   verb: GET
@@ -1170,7 +1573,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_point
+  - access.podium
+  - access.podium_shift
+  - identity.principal
   writes: []
 - operation: listPolicyEvaluationArchitecture
   verb: GET
@@ -1180,7 +1587,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.policy_evaluation_setting
   writes: []
 - operation: listPolicyScopeHierarchy
   verb: GET
@@ -1190,7 +1598,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.policy_scope_assignment
   writes: []
 - operation: listQueueThroughputLane
   verb: GET
@@ -1200,7 +1609,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_point
+  - access.scan_event
   writes: []
 - operation: listReconnectionSynchronizationConflict
   verb: GET
@@ -1210,7 +1621,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - access.scan_event
+  - sync.rejection
   writes: []
 - operation: listRelationshipCompanionFraud
   verb: GET
@@ -1220,7 +1634,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.fraud_rule
   writes: []
 - operation: listScans
   verb: GET
@@ -1241,7 +1656,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.blacklist
+  - access.credential_sharing_case
+  - access.entitlement
+  - access.identity_lock
+  - access.scan_event
+  - access.security_alert
+  - access.security_investigation
   writes: []
 - operation: listShiftHandoverSummary
   verb: GET
@@ -1251,7 +1673,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_incident
+  - access.blacklist
+  - access.gate_mode_change
+  - access.podium_shift
+  - access.scan_event
+  - identity.principal
   writes: []
 - operation: listSpecialEventFree
   verb: GET
@@ -1261,7 +1689,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.operating_calendar_entry
+  - access.scan_event
   writes: []
 - operation: listThroughputQueueValidation
   verb: GET
@@ -1271,7 +1701,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_point
+  - access.scan_event
   writes: []
 - operation: listTicketCredentialInvestigation
   verb: GET
@@ -1281,7 +1713,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - access.scan_event
+  - catalogue.entitlement_template
+  - identity.principal
+  - orders.sales_order
+  - pii.subject
   writes: []
 - operation: listTicketMedia
   verb: GET
@@ -1291,7 +1729,16 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.credential_binding
+  - access.credential_delivery
+  - access.credential_event
+  - access.credential_exception
+  - access.credential_issuance
+  - access.entitlement
+  - access.media_type
+  - access.scan_event
+  - pii.subject_biometric
   writes: []
 - operation: listUnifiedIdentityCredential
   verb: GET
@@ -1301,7 +1748,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - access.identity_lock
+  - pii.subject
   writes: []
 - operation: listValidationExceptionReason
   verb: GET
@@ -1311,7 +1761,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.reason_code
   writes: []
 - operation: listValidationOutcomeRejection
   verb: GET
@@ -1321,7 +1772,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_point
+  - access.entitlement
+  - access.scan_event
+  - catalogue.product
+  - orders.sales_order
   writes: []
 - operation: listVenueParkAccess
   verb: GET
@@ -1331,7 +1787,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.access_area
   writes: []
 - operation: listVerificationMethodSelection
   verb: GET
@@ -1341,7 +1798,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.verification_method_policy
   writes: []
 - operation: listVirtualCredentialMedia
   verb: GET
@@ -1351,7 +1809,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.credential_binding
+  - access.entitlement
+  - access.media_type
+  - catalogue.entitlement_template
   writes: []
 - operation: listVirtualTicket
   verb: GET
@@ -1361,7 +1823,17 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.credential_binding
+  - access.credential_exception
+  - access.credential_issuance
+  - access.entitlement
+  - access.media_type
+  - access.scan_event
+  - catalogue.entitlement_template
+  - catalogue.product
+  - orders.sales_order
+  - pii.subject
   writes: []
 - operation: listVirtualTicketArchitecture
   verb: GET
@@ -1371,7 +1843,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.configuration_change
+  - identity.principal
   writes: []
 - operation: listVirtualTicketStatus
   verb: GET
@@ -1381,8 +1855,25 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.ticket_status_transition
   writes: []
+- operation: lockIdentity
+  verb: POST
+  path: /identity-locks
+  scope: venue
+  permission: INCIDENT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.entitlement
+  - access.identity_lock
+  - access.security_investigation
+  - cache:idempotency
+  writes:
+  - access.identity_lock
+  - cache:idempotency
 - operation: lookupTicket
   verb: GET
   path: /access/lookup
@@ -1432,8 +1923,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.access_point
+  - access.hardware_deployment
+  - access.media_compatibility_test
+  - access.media_type
+  - cache:idempotency
+  writes:
+  - access.media_compatibility_test
+  - cache:idempotency
 - operation: publishRuleConflictCheck
   verb: PUT
   path: /rule-conflict-check
@@ -1442,8 +1940,19 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.access_point
+  - access.admission_rules
+  - access.blacklist
+  - access.configuration_version
+  - access.entitlement
+  - access.entry_rule_point
+  - cache:idempotency
+  - catalogue.entitlement_template
+  writes:
+  - access.configuration_change
+  - access.configuration_version
+  - cache:idempotency
 - operation: publishTopologyValidation
   verb: PUT
   path: /topology-validation
@@ -1452,8 +1961,70 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.access_area
+  - access.access_device
+  - access.access_point
+  - access.admission_rules
+  - access.configuration_version
+  - access.entry_rule_point
+  - access.hardware_deployment
+  - access.offline_policy
+  - access.operating_calendar_entry
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.configuration_version
+  - access.hardware_deployment
+  - cache:idempotency
+- operation: registerAccessDevice
+  verb: POST
+  path: /access-devices
+  scope: venue
+  permission: DEVICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.access_area
+  - access.access_device
+  - access.access_point
+  - access.hardware_model
+  - cache:idempotency
+  writes:
+  - access.access_device
+  - access.configuration_change
+  - cache:idempotency
+- operation: releaseCredentialDevice
+  verb: POST
+  path: /device-bindings/{bindingId}/release
+  scope: venue
+  permission: GUEST_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.device_binding
+  - cache:idempotency
+  writes:
+  - access.credential_event
+  - access.device_binding
+  - cache:idempotency
+- operation: releaseIdentityLock
+  verb: POST
+  path: /identity-locks/{lockId}/release
+  scope: venue
+  permission: INCIDENT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.identity_lock
+  - access.security_investigation
+  - cache:idempotency
+  writes:
+  - access.identity_lock
+  - cache:idempotency
 - operation: removeBlacklistEntry
   verb: DELETE
   path: /blacklist/{mediaCode}
@@ -1476,8 +2047,19 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.access_change
+  - access.credential_binding
+  - access.entitlement
+  - access.media_replacement_policy
+  - access.media_type
+  - cache:idempotency
+  writes:
+  - access.access_change
+  - access.credential_binding
+  - access.credential_event
+  - access.entitlement
+  - cache:idempotency
 - operation: resolveCredentialException
   verb: POST
   path: /credential-exceptions/{exceptionId}/resolve
@@ -1486,8 +2068,21 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.credential_binding
+  - access.credential_delivery
+  - access.credential_exception
+  - access.credential_issuance
+  - access.credential_issuance_retry_policy
+  - access.entitlement
+  - cache:idempotency
+  writes:
+  - access.credential_binding
+  - access.credential_event
+  - access.credential_exception
+  - access.credential_issuance
+  - access.entitlement
+  - cache:idempotency
 - operation: retryCredentialGeneration
   verb: POST
   path: /credential-generation-issuance/retry
@@ -1496,8 +2091,30 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.credential_issuance
+  - access.credential_issuance_retry_policy
+  - cache:idempotency
+  writes:
+  - access.credential_issuance
+  - cache:idempotency
+- operation: reviewFaceReenrolment
+  verb: POST
+  path: /face-reenrolment-attempts/{attemptId}/review
+  scope: venue
+  permission: GUEST_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.face_reenrolment_attempt
+  - cache:idempotency
+  writes:
+  - access.biometric_audit_event
+  - access.face_reenrolment_attempt
+  - access.security_alert
+  - cache:idempotency
+  - pii.subject_biometric
 - operation: revokeFacePass
   verb: DELETE
   path: /face-pass/enrolments/{enrolmentId}
@@ -1511,6 +2128,7 @@ operations:
   - cache:idempotency
   - pii.subject_biometric
   writes:
+  - access.biometric_audit_event
   - cache:idempotency
   - pii.subject_biometric
 - operation: rollbackAccessPolicy
@@ -1521,8 +2139,30 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.dynamic_policy
+  - access.dynamic_policy_version
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.dynamic_policy
+  - access.dynamic_policy_version
+  - cache:idempotency
+- operation: rollbackConfigurationVersion
+  verb: POST
+  path: /configuration-versions/{versionId}/rollback
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.configuration_version
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.configuration_version
+  - cache:idempotency
 - operation: setAccessAreaZone
   verb: PUT
   path: /access-area-zone
@@ -1531,8 +2171,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.access_area
+  - cache:idempotency
+  writes:
+  - access.access_area
+  - access.configuration_change
+  - cache:idempotency
 - operation: setAccessAttributeCatalog
   verb: PUT
   path: /access-attribute-catalog
@@ -1541,8 +2186,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.access_attribute
+  - access.dynamic_policy
+  - cache:idempotency
+  writes:
+  - access.access_attribute
+  - access.configuration_change
+  - cache:idempotency
 - operation: setAccessGraphicalMap
   verb: PUT
   path: /access-graphical-map
@@ -1551,8 +2202,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.access_map
+  - cache:idempotency
+  - venuemap.map
+  writes:
+  - access.access_map
+  - access.configuration_change
+  - cache:idempotency
 - operation: setAccessPointGeofence
   verb: PUT
   path: /access-points/{accessPointId}/geofence
@@ -1566,6 +2223,23 @@ operations:
   - cache:idempotency
   writes:
   - access.access_point
+  - access.configuration_change
+  - cache:idempotency
+- operation: setAccessPointGroup
+  verb: PUT
+  path: /access-point-groups
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.access_point
+  - access.access_point_group
+  - cache:idempotency
+  writes:
+  - access.access_point_group
+  - access.configuration_change
   - cache:idempotency
 - operation: setAppleWalletPass
   verb: PUT
@@ -1575,8 +2249,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.media_template
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.media_template
+  - cache:idempotency
 - operation: setAttractionAccess
   verb: PUT
   path: /attraction-access
@@ -1585,8 +2264,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.access_point
+  - access.attraction_access
+  - cache:idempotency
+  writes:
+  - access.attraction_access
+  - access.configuration_change
+  - cache:idempotency
 - operation: setBiometricLifecycleRetention
   verb: PUT
   path: /biometric-lifecycle-retention
@@ -1605,8 +2290,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.access_point
+  - access.biometric_profile
+  - cache:idempotency
+  writes:
+  - access.biometric_profile
+  - access.configuration_change
+  - cache:idempotency
 - operation: setBleBeaconGeofence
   verb: PUT
   path: /ble-beacon-geofence
@@ -1615,8 +2306,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.access_device
+  - access.access_point
+  - cache:idempotency
+  writes:
+  - access.access_device
+  - access.access_point
+  - access.configuration_change
+  - cache:idempotency
 - operation: setBrandingLocalizationTemplate
   verb: PUT
   path: /branding-localization-template
@@ -1625,8 +2323,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.branding_profile
+  - cache:idempotency
+  writes:
+  - access.branding_profile
+  - access.configuration_change
+  - cache:idempotency
 - operation: setContextTimeEvent
   verb: PUT
   path: /context-time-event
@@ -1635,8 +2338,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.dynamic_policy
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.dynamic_policy
+  - access.dynamic_policy_version
+  - cache:idempotency
 - operation: setCredentialActivationDisplay
   verb: PUT
   path: /credential-activation-display
@@ -1645,8 +2354,28 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.credential_policy
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.credential_policy
+  - cache:idempotency
+- operation: setCredentialEventPropagationRule
+  verb: PUT
+  path: /credential-event-propagation-rules
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.credential_event_propagation_rule
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.credential_event_propagation_rule
+  - cache:idempotency
 - operation: setCredentialIssuanceRetryPolicy
   verb: PUT
   path: /credential-issuance-retry-policy
@@ -1657,7 +2386,24 @@ operations:
   offline: false
   reads:
   - access.credential_issuance_retry_policy
-  writes: []
+  writes:
+  - access.configuration_change
+  - access.credential_issuance_retry_policy
+- operation: setDeviceBindingPolicy
+  verb: PUT
+  path: /device-binding-policy
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.credential_policy
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.credential_policy
+  - cache:idempotency
 - operation: setDeviceSoftwareContent
   verb: PUT
   path: /device-software-content
@@ -1666,8 +2412,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.device_configuration
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.device_configuration
+  - cache:idempotency
 - operation: setDigitalBarcodeTicket
   verb: PUT
   path: /digital-barcode-ticket
@@ -1676,8 +2427,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.media_template
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.media_template
+  - cache:idempotency
 - operation: setDigitalCardMembership
   verb: PUT
   path: /digital-card-membership
@@ -1686,8 +2442,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.media_template
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.media_template
+  - cache:idempotency
 - operation: setDynamicFieldData
   verb: PUT
   path: /dynamic-field-data
@@ -1696,8 +2457,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.dynamic_field
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.dynamic_field
+  - cache:idempotency
 - operation: setDynamicSecurityProfile
   verb: PUT
   path: /dynamic-security-profile
@@ -1706,8 +2472,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.credential_security_profile
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.credential_security_profile
+  - cache:idempotency
 - operation: setEdgeNodeLocal
   verb: PUT
   path: /edge-node-local
@@ -1716,8 +2487,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.edge_node
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.edge_node
+  - cache:idempotency
 - operation: setEmbeddedEntitlementPayload
   verb: PUT
   path: /embedded-entitlement-payload
@@ -1726,8 +2502,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.credential_security_profile
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.credential_security_profile
+  - cache:idempotency
 - operation: setEntitlementConsumption
   verb: PUT
   path: /entitlement-consumption
@@ -1736,8 +2517,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.consumption_rule
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.consumption_rule
+  - cache:idempotency
 - operation: setEntryRulePoints
   verb: PUT
   path: /admission-rules/{ruleId}/points
@@ -1749,6 +2535,7 @@ operations:
   reads:
   - access.entry_rule_point
   writes:
+  - access.configuration_change
   - access.entry_rule_point
 - operation: setFaceMatchingVerification
   verb: PUT
@@ -1758,8 +2545,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.biometric_profile
+  - cache:idempotency
+  writes:
+  - access.biometric_profile
+  - access.configuration_change
+  - cache:idempotency
 - operation: setFacePassEnrollment
   verb: PUT
   path: /face-pass-enrollment
@@ -1768,8 +2560,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.biometric_profile
+  - cache:idempotency
+  writes:
+  - access.biometric_profile
+  - access.configuration_change
+  - cache:idempotency
 - operation: setFaceTagTemporaryEnrollment
   verb: PUT
   path: /face-tag-temporary
@@ -1778,8 +2575,28 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.biometric_profile
+  - cache:idempotency
+  writes:
+  - access.biometric_profile
+  - access.configuration_change
+  - cache:idempotency
+- operation: setFastPassProfile
+  verb: PUT
+  path: /fast-pass-profiles
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.fast_pass_profile
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.fast_pass_profile
+  - cache:idempotency
 - operation: setFraudDetectionRule
   verb: PUT
   path: /fraud-detection-rule
@@ -1788,8 +2605,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.fraud_rule
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.fraud_rule
+  - cache:idempotency
 - operation: setGateLane
   verb: PUT
   path: /gate-lane
@@ -1798,8 +2620,45 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.access_point
+  - access.gate_lane
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.gate_lane
+  - cache:idempotency
+- operation: setGateModePolicy
+  verb: PUT
+  path: /gate-mode-policies
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.access_point_group
+  - access.gate_mode_policy
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.gate_mode_policy
+  - cache:idempotency
+- operation: setGateOfflinePolicy
+  verb: PUT
+  path: /offline-policies
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.offline_policy
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.offline_policy
+  - cache:idempotency
 - operation: setGoogleWalletPass
   verb: PUT
   path: /google-wallet-pass
@@ -1808,8 +2667,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.media_template
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.media_template
+  - cache:idempotency
 - operation: setGroupAdmissionProfile
   verb: PUT
   path: /group-admission-profile
@@ -1818,8 +2682,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.group_admission_rule
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.group_admission_rule
+  - cache:idempotency
 - operation: setGuestCompanionEligibility
   verb: PUT
   path: /guest-companion-eligibility
@@ -1828,8 +2697,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.companion_rule
+  - cache:idempotency
+  writes:
+  - access.companion_rule
+  - access.configuration_change
+  - cache:idempotency
 - operation: setHandheldMobileAccess
   verb: PUT
   path: /handheld-mobile-access
@@ -1838,8 +2712,28 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.device_configuration
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.device_configuration
+  - cache:idempotency
+- operation: setHardwareModel
+  verb: PUT
+  path: /hardware-models
+  scope: tenant
+  permission: DEVICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.hardware_model
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.hardware_model
+  - cache:idempotency
 - operation: setHotelWalletExternal
   verb: PUT
   path: /hotel-wallet-external
@@ -1848,8 +2742,43 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.external_credential_integration
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.external_credential_integration
+  - cache:idempotency
+- operation: setJourneyProfile
+  verb: PUT
+  path: /journey-profiles
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.journey_profile
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.journey_profile
+  - cache:idempotency
+- operation: setJourneySequenceRule
+  verb: PUT
+  path: /journey-sequence-rules
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.journey_sequence_rule
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.journey_sequence_rule
+  - cache:idempotency
 - operation: setMediaBindingActivation
   verb: PUT
   path: /media-binding-activation
@@ -1858,8 +2787,33 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.credential_binding
+  - access.entitlement
+  - access.media_binding_rule
+  - access.media_type
+  - cache:idempotency
+  - pii.subject_biometric
+  writes:
+  - access.credential_binding
+  - access.credential_event
+  - cache:idempotency
+- operation: setMediaBindingRule
+  verb: PUT
+  path: /media-binding-rules
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.media_binding_rule
+  - access.media_type
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.media_binding_rule
+  - cache:idempotency
 - operation: setMediaIssuanceEncoding
   verb: PUT
   path: /media-issuance-encoding
@@ -1868,8 +2822,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.media_encoding_profile
+  - access.media_type
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.media_encoding_profile
+  - cache:idempotency
 - operation: setMediaReplacementRevocation
   verb: PUT
   path: /media-replacement-revocation
@@ -1878,8 +2838,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.media_replacement_policy
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.media_replacement_policy
+  - cache:idempotency
 - operation: setMediaTypeTechnology
   verb: PUT
   path: /media-type-technology
@@ -1888,8 +2853,29 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.media_encoding_profile
+  - access.media_type
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.media_type
+  - cache:idempotency
+- operation: setOperatingCalendarEntry
+  verb: PUT
+  path: /operating-calendar-entries
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.operating_calendar_entry
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.operating_calendar_entry
+  - cache:idempotency
 - operation: setOperationalIncidentException
   verb: PUT
   path: /operational-incident-exception
@@ -1898,8 +2884,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.access_incident
+  - access.scan_event
+  - cache:idempotency
+  writes:
+  - access.access_incident
+  - cache:idempotency
 - operation: setParkingFacility
   verb: PUT
   path: /parking-facilities
@@ -1912,6 +2903,7 @@ operations:
   - access.parking_facility
   - cache:idempotency
   writes:
+  - access.configuration_change
   - access.parking_facility
   - cache:idempotency
 - operation: setPdfPrintablePos
@@ -1922,8 +2914,44 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.media_template
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.media_template
+  - cache:idempotency
+- operation: setPodium
+  verb: PUT
+  path: /podiums
+  scope: venue
+  permission: DEVICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.access_point
+  - access.podium
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.podium
+  - cache:idempotency
+- operation: setPolicyEvaluationSetting
+  verb: PUT
+  path: /policy-evaluation-settings
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.policy_evaluation_setting
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.policy_evaluation_setting
+  - cache:idempotency
 - operation: setPolicyScopeHierarchy
   verb: PUT
   path: /policy-scope-hierarchy
@@ -1932,8 +2960,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.dynamic_policy
+  - access.policy_scope_assignment
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.policy_scope_assignment
+  - cache:idempotency
 - operation: setReaderScannerPeripheral
   verb: PUT
   path: /reader-scanner-peripheral
@@ -1942,8 +2976,16 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.access_device
+  - access.access_point
+  - access.access_point_configuration
+  - access.hardware_model
+  - cache:idempotency
+  writes:
+  - access.access_point_configuration
+  - access.configuration_change
+  - cache:idempotency
 - operation: setRealTimeSecurity
   verb: PUT
   path: /real-time-security
@@ -1952,8 +2994,43 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.security_playbook
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.security_playbook
+  - cache:idempotency
+- operation: setReasonCode
+  verb: PUT
+  path: /reason-codes
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.reason_code
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.reason_code
+  - cache:idempotency
+- operation: setRelationshipFraudRule
+  verb: PUT
+  path: /relationship-fraud-rules
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.fraud_rule
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.fraud_rule
+  - cache:idempotency
 - operation: setRfidNfc
   verb: PUT
   path: /rfid-nfc
@@ -1962,8 +3039,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.access_point
+  - access.media_encoding_profile
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.media_encoding_profile
+  - cache:idempotency
 - operation: setRfidNfcCard
   verb: PUT
   path: /rfid-nfc-card
@@ -1972,8 +3055,28 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.media_template
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.media_template
+  - cache:idempotency
+- operation: setRiskScoringConfig
+  verb: PUT
+  path: /risk-scoring-config
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.risk_scoring_config
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.risk_scoring_config
+  - cache:idempotency
 - operation: setSecurityInvestigationEvidence
   verb: PUT
   path: /security-investigation-evidence
@@ -1982,8 +3085,29 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.entitlement
+  - access.scan_event
+  - access.security_investigation
+  - cache:idempotency
+  writes:
+  - access.security_investigation
+  - cache:idempotency
+- operation: setTicketStatusTransition
+  verb: PUT
+  path: /ticket-status-transitions
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.ticket_status_transition
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.ticket_status_transition
+  - cache:idempotency
 - operation: setTurnstileLaneBehavior
   verb: PUT
   path: /turnstile-lane-behavior
@@ -1992,8 +3116,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.access_point
+  - access.access_point_configuration
+  - cache:idempotency
+  writes:
+  - access.access_point_configuration
+  - access.configuration_change
+  - cache:idempotency
 - operation: setTurnstileMode
   verb: PUT
   path: /access-points/{accessPointId}/mode
@@ -2004,9 +3134,14 @@ operations:
   offline: true
   reads:
   - access.access_point
+  - access.access_point_group
+  - access.gate_mode_change
+  - access.gate_mode_policy
   - cache:idempotency
   writes:
+  - access.access_incident
   - access.access_point
+  - access.gate_mode_change
   - cache:idempotency
 - operation: setValidationOutcomeGuest
   verb: PUT
@@ -2016,8 +3151,29 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.gate_outcome_profile
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.gate_outcome_profile
+  - cache:idempotency
+- operation: setVerificationMethodPolicy
+  verb: PUT
+  path: /verification-method-policies
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.verification_method_policy
+  - cache:idempotency
+  - catalogue.product
+  writes:
+  - access.configuration_change
+  - access.verification_method_policy
+  - cache:idempotency
 - operation: setVirtualTicketCredential
   verb: PUT
   path: /virtual-ticket-credential
@@ -2026,8 +3182,18 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.credential_binding
+  - access.entitlement
+  - access.media_type
+  - access.scan_event
+  - cache:idempotency
+  - catalogue.entitlement_template
+  - catalogue.product
+  - orders.sales_order
+  - pii.subject
+  writes:
+  - cache:idempotency
 - operation: setVirtualTicketIdentity
   verb: PUT
   path: /virtual-ticket-identity
@@ -2036,8 +3202,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.credential_policy
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.credential_policy
+  - cache:idempotency
 - operation: setVisualAccessRule
   verb: PUT
   path: /visual-access-rule
@@ -2046,8 +3217,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.admission_rules
+  - access.entry_rule_point
+  - cache:idempotency
+  writes:
+  - access.admission_rules
+  - access.configuration_change
+  - access.entry_rule_point
+  - cache:idempotency
 - operation: setVisualDynamicPolicy
   verb: PUT
   path: /visual-dynamic-policy
@@ -2056,8 +3234,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.access_attribute
+  - access.dynamic_policy
+  - cache:idempotency
+  writes:
+  - access.configuration_change
+  - access.dynamic_policy
+  - access.dynamic_policy_version
+  - cache:idempotency
 - operation: simulateBiometricConfiguration
   verb: POST
   path: /biometric/simulate
@@ -2066,8 +3251,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.biometric_profile
+  - cache:idempotency
+  writes:
+  - access.biometric_audit_event
+  - cache:idempotency
 - operation: simulateGuestJourney
   verb: POST
   path: /guest-journey/simulate
@@ -2076,8 +3265,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.access_point
+  - access.admission_rules
+  - access.entitlement
+  - access.journey_profile
+  - cache:idempotency
+  - catalogue.entitlement_template
+  writes:
+  - cache:idempotency
 - operation: simulateOfflineResilienceTesting
   verb: PUT
   path: /offline-resilience-testing
@@ -2086,8 +3282,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.access_point
+  - access.admission_rules
+  - access.blacklist
+  - access.entitlement
+  - cache:idempotency
+  - catalogue.entitlement_template
+  writes:
+  - cache:idempotency
 - operation: simulatePolicyConflictImpact
   verb: PUT
   path: /policy-conflict-impact
@@ -2096,8 +3299,31 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.access_point
+  - access.dynamic_policy
+  - access.dynamic_policy_version
+  - access.entitlement
+  - access.policy_scope_assignment
+  - cache:idempotency
+  - catalogue.product
+  writes:
+  - cache:idempotency
+- operation: startPodiumShift
+  verb: POST
+  path: /podiums/{podiumId}/shifts
+  scope: venue
+  permission: TURNSTILE_MODE_SET
+  audience:
+  - staff
+  offline: true
+  reads:
+  - access.podium
+  - access.podium_shift
+  - cache:idempotency
+  writes:
+  - access.podium_shift
+  - cache:idempotency
 - operation: syncScans
   verb: POST
   path: /access/scans
@@ -2111,6 +3337,22 @@ operations:
   writes:
   - access.scan_event
   - sync.rejection
+- operation: updateAccessDevice
+  verb: PUT
+  path: /access-devices/{deviceId}
+  scope: venue
+  permission: DEVICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.access_device
+  - access.hardware_model
+  - cache:idempotency
+  writes:
+  - access.access_device
+  - access.configuration_change
+  - cache:idempotency
 - operation: updateAccessPoint
   verb: PATCH
   path: /access-points/{accessPointId}
@@ -2124,6 +3366,7 @@ operations:
   - cache:idempotency
   writes:
   - access.access_point
+  - access.configuration_change
   - cache:idempotency
 - operation: updateAdmissionRules
   verb: PUT
@@ -2138,6 +3381,7 @@ operations:
   - cache:idempotency
   writes:
   - access.admission_rules
+  - access.configuration_change
   - cache:idempotency
 - operation: updateParkingEntitlement
   verb: PATCH
@@ -2152,6 +3396,21 @@ operations:
   - cache:idempotency
   writes:
   - access.parking_entitlement
+  - cache:idempotency
+- operation: updateSecurityAlert
+  verb: POST
+  path: /security-alerts/{alertId}/status
+  scope: venue
+  permission: INCIDENT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.security_alert
+  - access.security_investigation
+  - cache:idempotency
+  writes:
+  - access.security_alert
   - cache:idempotency
 - operation: validateAccess
   verb: POST
@@ -2169,6 +3428,7 @@ operations:
   - cache:idempotency
   - catalogue.entitlement_template
   writes:
+  - access.biometric_audit_event
   - access.scan_event
   - cache:idempotency
   - platform.outbox
@@ -2196,5 +3456,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.access_point
+  - access.entitlement
+  - cache:idempotency
+  - pii.subject
+  - pii.subject_biometric
+  writes:
+  - access.biometric_audit_event
+  - access.scan_event
+  - cache:idempotency

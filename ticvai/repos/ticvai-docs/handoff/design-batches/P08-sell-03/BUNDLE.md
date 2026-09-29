@@ -1,6 +1,6 @@
 # P08-sell-03 — P08 · Sell (3 of 4)
 
-**10 screens · 23 operations · 26 schemas · 10 permissions**
+**10 screens · 28 operations · 31 schemas · 10 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 10 permissions apply here:
   `AI_USE, MARKETING_MANAGE, MARKETING_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE, ROLE_MANAGE, SCOPE_VIEW, TENANT_CONFIGURE, WORKSTATION_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **5 of these operations work offline**: getUpsellSuggestions, listMerchandise, listProductCategories, listSaleBoards, listSerialisedItems
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -62,19 +61,15 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `BO-114` | Variants, Attributes, Barcode & RFID Management | listDetail | 2 | 0 | — |
-| `BO-115` | Category, Brand & Merchandise Hierarchy | listDetail | 5 | 0 | — |
-| `BO-116` | Merchandising & Product Presentation | commandCentre | 7 | 0 | — |
-| `BO-117` | Product Import, Governance & AI Configuration Assistant | listDetail | 5 | 0 | — |
-| `BO-118` | Campaign & Audience Management | commandCentre | 6 | 0 | — |
-| `BO-119` | Cross-Sell, Upsell & Recommendation Rules | statusTracker | 2 | 0 | — |
-| `BO-120` | Omnichannel Commerce & Journey Configuration | listDetail | 2 | 0 | — |
-| `BO-121` | Personalized Offers & Guest Engagement | listDetail | 2 | 0 | — |
+| `BO-115` | Category, Brand & Merchandise Hierarchy | listDetail | 5 | 3 | — |
+| `BO-116` | Merchandising & Product Presentation | commandCentre | 7 | 4 | — |
+| `BO-117` | Product Import, Governance & AI Configuration Assistant | listDetail | 6 | 4 | — |
+| `BO-118` | Campaign & Audience Management | commandCentre | 6 | 3 | — |
+| `BO-119` | Cross-Sell, Upsell & Recommendation Rules | statusTracker | 4 | 0 | — |
+| `BO-120` | Omnichannel Commerce & Journey Configuration | listDetail | 2 | 1 | — |
+| `BO-121` | Personalized Offers & Guest Engagement | listDetail | 2 | 1 | — |
 | `BO-122` | POS Experience Dashboard | listDetail | 1 | 0 | — |
-| `BO-123` | POS Profile Management | listDetail | 2 | 0 | — |
-
-## Thin screens in this batch
-
-**BO-119, BO-122 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+| `BO-1190` | Donation Campaigns | listDetail | 3 | 1 | — |
 
 ---
 
@@ -109,10 +104,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-114 holds none of them, so the edge carries nothing and BO-102 opens cold"
     }
    ]
   },
@@ -132,8 +124,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Serial",
+       "operation": "listSerialisedItems",
+       "notes": "Sends `?serial=` to `listSerialisedItems`.",
+       "provenance": "contract inventory.yaml GET /serialised-items"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listSerialisedItems",
+       "notes": "Sends `?status=` to `listSerialisedItems`.",
+       "provenance": "contract inventory.yaml GET /serialised-items"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every variants attributes barcode",
+       "label": "Every serialised",
        "bindsTo": "SerialisedItem",
        "columns": [
         "SerialisedItem.id",
@@ -148,6 +154,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listSerialisedItems",
        "provenance": "contract inventory.yaml GET /serialised-items"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search variants, attributes, barcode",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -157,7 +168,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected variants attributes barcode",
+       "label": "The selected serialised",
        "bindsTo": "SerialisedItem",
        "columns": [
         "SerialisedItem.id",
@@ -181,20 +192,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Lookup",
+       "label": "Lookup merchandise",
        "operation": "lookupMerchandise",
        "provenance": "contract retail.yaml GET /merchandise/lookup"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search variants, attributes, barcode",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -203,9 +203,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The variants attributes barcode list.",
    "error": "Could not load. Names which read failed and leaves the variants attributes barcode untouched.",
-   "emptyFirstRun": "No variants attributes barcode yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the variants attributes barcode are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No variants attributes barcode yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on serial, status and the variants attributes barcode are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listSerialisedItems` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -218,7 +218,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "lookupMerchandise",
     "contract": "retail",
     "purpose": "Price and stock check by barcode",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -241,6 +241,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-114",
+   "derivedFrom": "wireframes/reference/Retail Board 4.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
@@ -292,17 +293,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
     {
-     "to": "BO-116",
-     "trigger": "Merchandising & Product Presentation",
-     "provenance": "flow F86 step 1→2"
-    },
-    {
      "to": "BO-102",
      "trigger": "Sell",
+     "provenance": "derived — BO-102 declares entryState.params  and BO-115 holds none of them, so the edge carries nothing and BO-102 opens cold"
+    },
+    {
+     "to": "BO-116",
+     "trigger": "Merchandising & Product Presentation",
+     "provenance": "flow F86 step 1→2",
      "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+      "saleBoardId"
+     ]
     }
    ]
   },
@@ -314,13 +315,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listProductCategories` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "Category, Brand & Merchandise Hierarchy — from the client design board, 20 August.",
-  "gaps": [
-   {
-    "operation": "listSaleBoards",
-    "why": "**1 declared operation reach no component on this screen**: listSaleBoards. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -330,7 +324,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every category brand merchandise",
+       "label": "Every product category",
        "bindsTo": "ProductCategory",
        "columns": [
         "ProductCategory.id",
@@ -341,10 +335,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "ProductCategory.scopePath",
         "ProductCategory.displayOrder",
         "ProductCategory.imageAssetId",
+        "ProductCategory.description",
         "ProductCategory.isActive"
        ],
        "operation": "listProductCategories",
        "provenance": "contract catalogue.yaml GET /product-categories"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every sale board",
+       "bindsTo": "SaleBoard",
+       "columns": [
+        "SaleBoard.id",
+        "SaleBoard.code",
+        "SaleBoard.name",
+        "SaleBoard.venueId",
+        "SaleBoard.kind",
+        "SaleBoard.pages",
+        "SaleBoard.isActive"
+       ],
+       "operation": "listSaleBoards",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search category, brand",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -354,7 +370,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected category brand merchandise",
+       "label": "The selected product category",
        "bindsTo": "ProductCategory",
        "columns": [
         "ProductCategory.id",
@@ -365,6 +381,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "ProductCategory.scopePath",
         "ProductCategory.displayOrder",
         "ProductCategory.imageAssetId",
+        "ProductCategory.description",
         "ProductCategory.isActive"
        ],
        "operation": "listProductCategories",
@@ -378,32 +395,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save product categories",
        "operation": "setProductCategories",
        "provenance": "contract catalogue.yaml PUT /product-categories"
       },
       {
        "kind": "secondaryButton",
-       "label": "Request",
+       "label": "Request suggestion",
        "operation": "requestSuggestion",
        "provenance": "contract ai.yaml POST /ai/suggestions"
       },
       {
        "kind": "secondaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search category, brand",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -412,9 +418,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The category brand merchandise list.",
    "error": "Could not load. Names which read failed and leaves the category brand merchandise untouched.",
-   "emptyFirstRun": "No category brand merchandise yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the category brand merchandise are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No category brand merchandise yet. Offers Request suggestion (`requestSuggestion`).",
+   "emptyNoResults": "Never shown: `listProductCategories` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProductCategories` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -481,10 +487,72 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-115",
+   "derivedFrom": "wireframes/reference/POS Board 4.dc.html",
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetProductCategories",
+    "component": "modal",
+    "trigger": "Save product categories",
+    "body": "**Collects what `setProductCategories` sends before it is called.** Required: `categories`. Each category may carry a `description` per language: the short text under the option in the guest's \"Choose your experience\" list (decided 29 September, rev 3 REV3-19). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save product categories",
+     "operation": "setProductCategories"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "categories"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /product-categories"
+   },
+   {
+    "id": "formRequestSuggestion",
+    "component": "modal",
+    "trigger": "Request suggestion",
+    "body": "**Collects what `requestSuggestion` sends before it is called.** Required: `kind`. Optional: `subjectRef`, `horizon`, `context`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Request suggestion",
+     "operation": "requestSuggestion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "subjectRef",
+      "horizon",
+      "context"
+     ]
+    },
+    "provenance": "contract ai.yaml POST /ai/suggestions"
+   },
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -533,17 +601,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
     {
-     "to": "BO-117",
-     "trigger": "Product Import, Governance & AI Configuration Assistant",
-     "provenance": "flow F86 step 2→3"
-    },
-    {
      "to": "BO-102",
      "trigger": "Sell",
+     "provenance": "derived — BO-102 declares entryState.params  and BO-116 holds none of them, so the edge carries nothing and BO-102 opens cold"
+    },
+    {
+     "to": "BO-117",
+     "trigger": "Product Import, Governance & AI Configuration Assistant",
+     "provenance": "flow F86 step 2→3",
      "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+      "saleBoardId"
+     ]
     }
    ]
   },
@@ -582,16 +650,38 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "Workstation",
        "operation": "listWorkstations",
        "provenance": "contract tenancy.yaml GET /workstations"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
+      },
+      {
+       "kind": "textField",
+       "label": "Outlet id",
+       "operation": "listMerchandise",
+       "notes": "Sends `?outletId=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "textField",
+       "label": "Category id",
+       "operation": "listMerchandise",
+       "notes": "Sends `?categoryId=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "toggle",
+       "label": "In stock only",
+       "operation": "listMerchandise",
+       "notes": "Sends `?inStockOnly=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "listMerchandise",
+       "notes": "Sends `?search=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
       {
        "kind": "dataTable",
-       "label": "Every merchandising product presentation",
+       "label": "Every merchandise",
        "bindsTo": "MerchandiseItem",
        "columns": [
         "MerchandiseItem.id",
@@ -609,6 +699,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listMerchandise",
        "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search merchandising",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -618,49 +713,38 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save merchandise",
        "operation": "updateMerchandise",
        "provenance": "contract retail.yaml PATCH /merchandise/{merchandiseId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save role permissions",
        "operation": "setRolePermissions",
        "provenance": "contract tenancy.yaml PUT /roles/{roleId}/permissions"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save venue settings",
        "operation": "setVenueSettings",
        "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save sale board",
        "operation": "updateSaleBoard",
        "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search merchandising",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The merchandising product presentation list.",
+   "loading": "The merchandising product presentation figures; each tile loads on its own.",
    "error": "Could not load. Names which read failed and leaves the merchandising product presentation untouched.",
-   "emptyFirstRun": "No merchandising product presentation yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the merchandising product presentation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No merchandising product presentation yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on outletId, categoryId, inStockOnly, search and the merchandising product presentation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listMerchandise` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -743,10 +827,107 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-116",
+   "derivedFrom": "wireframes/reference/POS Board 4.dc.html",
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formUpdateMerchandise",
+    "component": "modal",
+    "trigger": "Save merchandise",
+    "body": "**Collects what `updateMerchandise` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `barcode`, `categoryId`, `inventoryItemId`, `imageAssetRef`, `isReturnable`, `returnWindowDays`, `requiresSerialNumber`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save merchandise",
+     "operation": "updateMerchandise"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "description",
+      "barcode",
+      "categoryId",
+      "inventoryItemId",
+      "imageAssetRef",
+      "isReturnable",
+      "returnWindowDays",
+      "requiresSerialNumber",
+      "isActive"
+     ]
+    },
+    "provenance": "contract retail.yaml PATCH /merchandise/{merchandiseId}"
+   },
+   {
+    "id": "formSetRolePermissions",
+    "component": "modal",
+    "trigger": "Save role permissions",
+    "body": "**Collects what `setRolePermissions` sends before it is called.** Required: `permissions`. Optional: `inheritsFromRoleId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save role permissions",
+     "operation": "setRolePermissions"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "inheritsFromRoleId"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /roles/{roleId}/permissions"
+   },
+   {
+    "id": "formSetVenueSettings",
+    "component": "modal",
+    "trigger": "Save venue settings",
+    "body": "**Collects what `setVenueSettings` sends before it is called.** Nothing in the body is required. Optional: `id`, `venueId`, `currencyCode`, `currencyScale`, `supportHours`, `quietHours`, `biometrics`, `segregatedAccess`, `alerting`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "VenueSettings",
+    "confirm": {
+     "label": "Save venue settings",
+     "operation": "setVenueSettings"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "currencyCode",
+      "currencyScale",
+      "supportHours",
+      "quietHours",
+      "biometrics",
+      "segregatedAccess",
+      "alerting"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
+   },
+   {
+    "id": "formUpdateSaleBoard",
+    "component": "modal",
+    "trigger": "Save sale board",
+    "body": "**Collects what `updateSaleBoard` sends before it is called.** Required: `id`, `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SaleBoard",
+    "confirm": {
+     "label": "Save sale board",
+     "operation": "updateSaleBoard"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "venueId",
+      "kind",
+      "pages",
+      "isActive"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -795,17 +976,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
     {
-     "to": "BO-118",
-     "trigger": "Campaign & Audience Management",
-     "provenance": "flow F86 step 3→4"
-    },
-    {
      "to": "BO-102",
      "trigger": "Sell",
+     "provenance": "derived — BO-102 declares entryState.params  and BO-117 holds none of them, so the edge carries nothing and BO-102 opens cold"
+    },
+    {
+     "to": "BO-118",
+     "trigger": "Campaign & Audience Management",
+     "provenance": "flow F86 step 3→4",
      "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+      "saleBoardId"
+     ]
     }
    ]
   },
@@ -825,8 +1006,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listSaleBoards",
+       "notes": "Sends `?venueId=` to `listSaleBoards`.",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listSaleBoards",
+       "notes": "Sends `?kind=` to `listSaleBoards`.",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every product import governance",
+       "label": "Every sale board",
        "bindsTo": "SaleBoard",
        "columns": [
         "SaleBoard.id",
@@ -839,6 +1034,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listSaleBoards",
        "provenance": "contract tenancy.yaml GET /sale-boards"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search product import, governance",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -848,7 +1048,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected product import governance",
+       "label": "The selected sale board",
        "bindsTo": "SaleBoard",
        "columns": [
         "SaleBoard.id",
@@ -870,38 +1070,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Import",
+       "label": "Import product catalogue",
        "operation": "importProductCatalogue",
        "provenance": "contract catalogue.yaml POST /products/import"
       },
       {
        "kind": "secondaryButton",
-       "label": "Generate",
+       "label": "Generate configuration",
        "operation": "generateConfiguration",
        "provenance": "contract ai.yaml POST /generate/configuration"
       },
       {
        "kind": "secondaryButton",
-       "label": "Request",
+       "label": "Request suggestion",
        "operation": "requestSuggestion",
        "provenance": "contract ai.yaml POST /ai/suggestions"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save sale board",
        "operation": "updateSaleBoard",
        "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search product import, governance",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -910,9 +1099,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The product import governance list.",
    "error": "Could not load. Names which read failed and leaves the product import governance untouched.",
-   "emptyFirstRun": "No product import governance yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the product import governance are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No product import governance yet. Offers Import product catalogue (`importProductCatalogue`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on venueId, kind and the product import governance are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listSaleBoards` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -956,6 +1145,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listSaleBoards"
     ]
+   },
+   {
+    "operationId": "commitCatalogueImport",
+    "contract": "catalogue",
+    "purpose": "Apply a parsed catalogue import",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
    }
   ],
   "entryState": {
@@ -967,6 +1163,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "saleBoardId",
      "from": "deepLink"
+    },
+    {
+     "name": "jobId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders.",
@@ -982,10 +1182,95 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-117",
+   "derivedFrom": "wireframes/reference/POS Board 4.dc.html",
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formImportProductCatalogue",
+    "component": "modal",
+    "trigger": "Import product catalogue",
+    "body": "**Collects what `importProductCatalogue` sends before it is called.** Required: `format`, `sourceRef`. Optional: `mode`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Import product catalogue",
+     "operation": "importProductCatalogue"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "format",
+      "sourceRef",
+      "mode"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /products/import"
+   },
+   {
+    "id": "formGenerateConfiguration",
+    "component": "modal",
+    "trigger": "Generate configuration",
+    "body": "**Collects what `generateConfiguration` sends before it is called.** Required: `kind`, `description`. Optional: `conversationId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Generate configuration",
+     "operation": "generateConfiguration"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "description",
+      "conversationId"
+     ]
+    },
+    "provenance": "contract ai.yaml POST /generate/configuration"
+   },
+   {
+    "id": "formRequestSuggestion",
+    "component": "modal",
+    "trigger": "Request suggestion",
+    "body": "**Collects what `requestSuggestion` sends before it is called.** Required: `kind`. Optional: `subjectRef`, `horizon`, `context`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Request suggestion",
+     "operation": "requestSuggestion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "subjectRef",
+      "horizon",
+      "context"
+     ]
+    },
+    "provenance": "contract ai.yaml POST /ai/suggestions"
+   },
+   {
+    "id": "formUpdateSaleBoard",
+    "component": "modal",
+    "trigger": "Save sale board",
+    "body": "**Collects what `updateSaleBoard` sends before it is called.** Required: `id`, `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SaleBoard",
+    "confirm": {
+     "label": "Save sale board",
+     "operation": "updateSaleBoard"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "venueId",
+      "kind",
+      "pages",
+      "isActive"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1034,18 +1319,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
     {
+     "to": "BO-102",
+     "trigger": "Sell",
+     "provenance": "derived — BO-102 declares entryState.params  and BO-118 holds none of them, so the edge carries nothing and BO-102 opens cold"
+    },
+    {
      "to": "BO-126",
      "trigger": "Deployment, Preview & Audit",
      "provenance": "flow F86 step 4→5",
-     "operation": "createCampaign"
-    },
-    {
-     "to": "BO-102",
-     "trigger": "Sell",
+     "operation": "createCampaign",
      "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+      "reportId",
+      "saleBoardId"
+     ]
     }
    ]
   },
@@ -1084,16 +1370,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "SaleBoard",
        "operation": "listSaleBoards",
        "provenance": "contract tenancy.yaml GET /sale-boards"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listCampaigns",
+       "notes": "Sends `?status=` to `listCampaigns`.",
+       "provenance": "contract marketing-crm.yaml GET /campaigns"
+      },
       {
        "kind": "dataTable",
-       "label": "Every campaign audience",
+       "label": "Every campaign",
        "bindsTo": "Campaign",
        "columns": [
         "Campaign.name",
@@ -1111,6 +1398,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listCampaigns",
        "provenance": "contract marketing-crm.yaml GET /campaigns"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search campaign",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1120,43 +1412,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create campaign",
        "operation": "createCampaign",
        "provenance": "contract marketing-crm.yaml POST /campaigns"
       },
       {
        "kind": "secondaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save sale board",
        "operation": "updateSaleBoard",
        "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search campaign",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The campaign audience list.",
+   "loading": "The campaign audience figures; each tile loads on its own.",
    "error": "Could not load. Names which read failed and leaves the campaign audience untouched.",
-   "emptyFirstRun": "No campaign audience yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the campaign audience are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No campaign audience yet. Offers Create campaign (`createCampaign`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on status and the campaign audience are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listCampaigns` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1226,10 +1507,86 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-118",
+   "derivedFrom": "wireframes/reference/POS Board 4.dc.html",
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateCampaign",
+    "component": "modal",
+    "trigger": "Create campaign",
+    "body": "**Collects what `createCampaign` sends before it is called.** Required: `name`, `kind`, `channel`, `segmentId`, `content`. Optional: `venueId`, `trigger`, `scheduledFor`, `consentPurpose`, `sendWindow`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateCampaignRequest",
+    "confirm": {
+     "label": "Create campaign",
+     "operation": "createCampaign"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "kind",
+      "channel",
+      "segmentId",
+      "content",
+      "venueId",
+      "trigger",
+      "scheduledFor",
+      "consentPurpose",
+      "sendWindow"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /campaigns"
+   },
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   },
+   {
+    "id": "formUpdateSaleBoard",
+    "component": "modal",
+    "trigger": "Save sale board",
+    "body": "**Collects what `updateSaleBoard` sends before it is called.** Required: `id`, `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SaleBoard",
+    "confirm": {
+     "label": "Save sale board",
+     "operation": "updateSaleBoard"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "venueId",
+      "kind",
+      "pages",
+      "isActive"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1284,14 +1641,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-119 holds none of them, so the edge carries nothing and BO-102 opens cold"
     }
    ]
   },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not.",
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Upsell rules are read-only here** (decided 28 September, audit R183): rules are created and deleted at region level, and this venue screen only shows what they suggest.",
   "density": "compact",
   "boardFrames": [
    "Retail Board 5.dc.html#ret-5d"
@@ -1302,8 +1656,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": "getRecommendations",
-    "why": "**2 declared operations reach no component on this screen**: getRecommendations, getUpsellSuggestions. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "why": "**`getRecommendations` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
+    "source": "contract promotions.yaml POST /recommendations"
    }
   ],
   "layout": {
@@ -1319,28 +1673,46 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "carried from the previous definition"
       },
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "getRecommendations",
-       "notes": "The act the screen exists for."
-      },
-      {
        "kind": "secondaryButton",
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "getRecommendations"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Recommendations",
+       "operation": "getRecommendations",
+       "notes": "Shows `productId`, `reason`, `confidence` from `getRecommendations`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
+       "provenance": "contract promotions.yaml POST /recommendations"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The upsell suggestion",
+       "bindsTo": "UpsellSuggestion",
+       "columns": [
+        "UpsellSuggestion.variantId",
+        "UpsellSuggestion.bundleId",
+        "UpsellSuggestion.name",
+        "UpsellSuggestion.price",
+        "UpsellSuggestion.discountedPrice",
+        "UpsellSuggestion.source",
+        "UpsellSuggestion.ruleId",
+        "UpsellSuggestion.rank",
+        "UpsellSuggestion.rationale"
+       ],
+       "operation": "getUpsellSuggestions",
+       "provenance": "contract promotions.yaml POST /upsell-suggestions"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The cross-sell upsell recommendation list.",
+   "loading": "The cross-sell upsell recommendation, read by `getUpsellSuggestions`.",
    "error": "Could not load. Names which read failed and leaves the cross-sell upsell recommendation untouched.",
-   "emptyFirstRun": "No cross-sell upsell recommendation yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the cross-sell upsell recommendation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No cross-sell upsell recommendation yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getRecommendations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1354,6 +1726,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "promotions",
     "purpose": "Suggestions for a cart",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "createUpsellRule",
+    "contract": "promotions",
+    "purpose": "Create an upsell rule",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "deleteUpsellRule",
+    "contract": "promotions",
+    "purpose": "Remove an upsell rule",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
    }
   ],
   "entryState": {
@@ -1361,6 +1747,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "ruleId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders."
@@ -1369,6 +1759,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-119",
+   "derivedFrom": "wireframes/reference/Retail Board 5.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
@@ -1421,10 +1812,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-120 holds none of them, so the edge carries nothing and BO-102 opens cold"
     }
    ]
   },
@@ -1445,7 +1833,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every omnichannel commerce journey",
+       "label": "Every journey",
        "bindsTo": "Journey",
        "columns": [
         "Journey.id",
@@ -1461,6 +1849,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listJourneys",
        "provenance": "contract marketing-crm.yaml GET /journeys"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search omnichannel commerce",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1470,7 +1863,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected omnichannel commerce journey",
+       "label": "The selected journey",
        "bindsTo": "Journey",
        "columns": [
         "Journey.id",
@@ -1495,20 +1888,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create journey",
        "operation": "createJourney",
        "provenance": "contract marketing-crm.yaml POST /journeys"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search omnichannel commerce",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1517,9 +1899,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The omnichannel commerce journey list.",
    "error": "Could not load. Names which read failed and leaves the omnichannel commerce journey untouched.",
-   "emptyFirstRun": "No omnichannel commerce journey yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the omnichannel commerce journey are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No omnichannel commerce journey yet. Offers Create journey (`createJourney`).",
+   "emptyNoResults": "Never shown: `listJourneys` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listJourneys` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1558,9 +1940,39 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-120",
+   "derivedFrom": "wireframes/reference/Retail Board 5.dc.html",
    "note": "**Drawn by Claude Design on `Retail Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateJourney",
+    "component": "modal",
+    "trigger": "Create journey",
+    "body": "**Collects what `createJourney` sends before it is called.** Required: `id`, `name`, `entryEvent`, `steps`, `status`. Optional: `templateKind`, `entryConditions`, `maxDurationDays`, `reentryPolicy`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "Journey",
+    "confirm": {
+     "label": "Create journey",
+     "operation": "createJourney"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "name",
+      "entryEvent",
+      "steps",
+      "status",
+      "templateKind",
+      "entryConditions",
+      "maxDurationDays",
+      "reentryPolicy",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /journeys"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1609,10 +2021,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-121 holds none of them, so the edge carries nothing and BO-102 opens cold"
     }
    ]
   },
@@ -1632,8 +2041,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "listSegments",
+       "notes": "Sends `?search=` to `listSegments`.",
+       "provenance": "contract marketing-crm.yaml GET /segments"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every personalized offers guest",
+       "label": "Every segment",
        "bindsTo": "Segment",
        "columns": [
         "Segment.name",
@@ -1648,6 +2064,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listSegments",
        "provenance": "contract marketing-crm.yaml GET /segments"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search personalized offers",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1657,7 +2078,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected personalized offers guest",
+       "label": "The selected segment",
        "bindsTo": "Segment",
        "columns": [
         "Segment.name",
@@ -1681,20 +2102,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create campaign",
        "operation": "createCampaign",
        "provenance": "contract marketing-crm.yaml POST /campaigns"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search personalized offers",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1703,9 +2113,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The personalized offers guest list.",
    "error": "Could not load. Names which read failed and leaves the personalized offers guest untouched.",
-   "emptyFirstRun": "No personalized offers guest yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the personalized offers guest are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No personalized offers guest yet. Offers Create campaign (`createCampaign`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on search and the personalized offers guest are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listSegments` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1744,10 +2154,40 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-121",
+   "derivedFrom": "wireframes/reference/Retail Board 5.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateCampaign",
+    "component": "modal",
+    "trigger": "Create campaign",
+    "body": "**Collects what `createCampaign` sends before it is called.** Required: `name`, `kind`, `channel`, `segmentId`, `content`. Optional: `venueId`, `trigger`, `scheduledFor`, `consentPurpose`, `sendWindow`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateCampaignRequest",
+    "confirm": {
+     "label": "Create campaign",
+     "operation": "createCampaign"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "kind",
+      "channel",
+      "segmentId",
+      "content",
+      "venueId",
+      "trigger",
+      "scheduledFor",
+      "consentPurpose",
+      "sendWindow"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /campaigns"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1796,10 +2236,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-122 holds none of them, so the edge carries nothing and BO-102 opens cold"
     }
    ]
   },
@@ -1819,8 +2256,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listSaleBoards",
+       "notes": "Sends `?venueId=` to `listSaleBoards`.",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listSaleBoards",
+       "notes": "Sends `?kind=` to `listSaleBoards`.",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every pos experience",
+       "label": "Every sale board",
        "bindsTo": "SaleBoard",
        "columns": [
         "SaleBoard.id",
@@ -1833,6 +2284,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listSaleBoards",
        "provenance": "contract tenancy.yaml GET /sale-boards"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search pos experience dashboard",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1842,7 +2298,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected pos experience",
+       "label": "The selected sale board",
        "bindsTo": "SaleBoard",
        "columns": [
         "SaleBoard.id",
@@ -1857,26 +2313,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "contract tenancy.yaml GET /sale-boards"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search pos experience dashboard",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The pos experience list.",
    "error": "Could not load. Names which read failed and leaves the pos experience untouched.",
-   "emptyFirstRun": "No pos experience yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the pos experience are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No pos experience yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on venueId, kind and the pos experience are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listSaleBoards` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1906,6 +2351,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-122",
+   "derivedFrom": "wireframes/reference/Retail Board 5.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
@@ -1934,15 +2380,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   }
  },
  {
-  "id": "BO-123",
-  "name": "POS Profile Management",
+  "id": "BO-1190",
+  "name": "Donation Campaigns",
   "module": "Sell",
-  "requiresModule": "core",
+  "requiresModule": "ticketing",
   "wave": 2,
   "implementation": {
    "app": "venue-management-web",
-   "route": "/sell/pos-profile-management",
-   "component": "apps/venue-management-web/src/routes/sell/PosProfileManagementList.tsx",
+   "route": "/sell/donation-campaigns",
+   "component": "apps/venue-management-web/src/routes/sell/DonationCampaigns.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1953,45 +2399,55 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "BO-102"
    ],
    "inferred": false,
-   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "notes": "Reached from BO-102 Sell. New 29 September (VM close-out): donations are a configuration area with operations and no screen.",
    "transitions": [
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "decided 29 September, VM close-out (venue management and configuration)"
     }
    ]
   },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not.",
+  "notes": "**Created 29 September (VM close-out)** because `listDonationCampaigns`, `createDonationCampaign` and `updateDonationCampaign` had no screen (matrix 1.1.128-1.1.133). **The amounts are configuration, not code**: fixed choices, a free amount or round-up. **Donations post to a liability account, not revenue** (1.1.132), so the liability account is required before a campaign goes live.",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "`listSaleBoards` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "POS Profile Management — from the client design board, 20 August.",
+  "patternReason": "`listDonationCampaigns` reads the population and the panel edits one of them — list, select, act",
+  "purpose": "Create, run and close the donation campaigns guests can give to at checkout.",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "filters",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "toggle",
+       "label": "Active only",
+       "notes": "Filters the loaded list on `isActive`.",
+       "provenance": "our build plan"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every pos profile",
-       "bindsTo": "SaleBoard",
+       "label": "Every donation campaign",
+       "bindsTo": "DonationCampaign",
        "columns": [
-        "SaleBoard.id",
-        "SaleBoard.code",
-        "SaleBoard.name",
-        "SaleBoard.venueId",
-        "SaleBoard.kind",
-        "SaleBoard.pages",
-        "SaleBoard.isActive"
+        "DonationCampaign.name",
+        "DonationCampaign.beneficiary",
+        "DonationCampaign.amountMode",
+        "DonationCampaign.channels",
+        "DonationCampaign.validFrom",
+        "DonationCampaign.validTo",
+        "DonationCampaign.isActive",
+        "DonationCampaign.raisedTotal"
        ],
-       "operation": "listSaleBoards",
-       "provenance": "contract tenancy.yaml GET /sale-boards"
+       "operation": "listDonationCampaigns",
+       "provenance": "contract catalogue.yaml GET /donation-campaigns"
       }
      ]
     },
@@ -2001,19 +2457,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected pos profile",
-       "bindsTo": "SaleBoard",
+       "label": "The selected campaign",
+       "bindsTo": "DonationCampaign",
        "columns": [
-        "SaleBoard.id",
-        "SaleBoard.code",
-        "SaleBoard.name",
-        "SaleBoard.venueId",
-        "SaleBoard.kind",
-        "SaleBoard.pages",
-        "SaleBoard.isActive"
+        "DonationCampaign.name",
+        "DonationCampaign.description",
+        "DonationCampaign.beneficiary",
+        "DonationCampaign.venueIds",
+        "DonationCampaign.amountMode",
+        "DonationCampaign.fixedAmounts",
+        "DonationCampaign.minAmount",
+        "DonationCampaign.maxAmount",
+        "DonationCampaign.liabilityAccountId",
+        "DonationCampaign.channels",
+        "DonationCampaign.validFrom",
+        "DonationCampaign.validTo",
+        "DonationCampaign.isActive",
+        "DonationCampaign.raisedTotal"
        ],
-       "operation": "listSaleBoards",
-       "provenance": "contract tenancy.yaml GET /sale-boards"
+       "operation": "listDonationCampaigns",
+       "provenance": "contract catalogue.yaml GET /donation-campaigns"
       }
      ]
     },
@@ -2023,47 +2486,62 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
-       "operation": "setConfigurationProfile",
-       "provenance": "contract tenancy.yaml PUT /configuration-profiles"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+       "label": "New campaign",
+       "operation": "createDonationCampaign",
+       "provenance": "contract catalogue.yaml POST /donation-campaigns"
+      },
       {
-       "kind": "searchField",
-       "label": "Search pos profile management",
-       "provenance": "carried from the previous definition"
+       "kind": "secondaryButton",
+       "label": "Save campaign",
+       "operation": "updateDonationCampaign",
+       "provenance": "contract catalogue.yaml PATCH /donation-campaigns/{campaignId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Close campaign",
+       "operation": "updateDonationCampaign",
+       "notes": "Sends `isActive` false. **Closing does not reverse donations already given**; the raised total is still owed to the beneficiary.",
+       "provenance": "contract catalogue.yaml PATCH /donation-campaigns/{campaignId}"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The pos profile list.",
-   "error": "Could not load. Names which read failed and leaves the pos profile untouched.",
-   "emptyFirstRun": "No pos profile yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the pos profile are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The tenant's donation campaigns, read by `listDonationCampaigns`.",
+   "error": "Could not load. Names which read failed and leaves the campaigns untouched.",
+   "emptyFirstRun": "No donation campaigns yet. Offers New campaign; checkout shows no donation prompt until one is active.",
+   "emptyNoResults": "The Active only filter matched nothing and the closed campaigns are still there. Offers to clear it.",
+   "emptyNoAccess": "Names the missing permission (`PRODUCT_VIEW` to see, `PRODUCT_CONFIGURE` to change). **Never an empty table.**",
+   "validation": "`400` on a missing name or amount mode, fixed amounts missing when the mode is fixed choices, or a minimum above the maximum; marked on the field. A campaign without a liability account cannot be activated."
   },
   "apis": [
    {
-    "operationId": "setConfigurationProfile",
-    "contract": "tenancy",
-    "purpose": "setConfigurationProfile",
+    "operationId": "listDonationCampaigns",
+    "contract": "catalogue",
+    "purpose": "Every campaign with what it has raised",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "createDonationCampaign",
+    "contract": "catalogue",
+    "purpose": "Create a campaign with its amounts, channels and liability account",
     "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
     "invalidates": [
-     "listSaleBoards"
+     "listDonationCampaigns"
     ]
    },
    {
-    "operationId": "listSaleBoards",
-    "contract": "tenancy",
-    "purpose": "List sale boards",
-    "trigger": "onLoad"
+    "operationId": "updateDonationCampaign",
+    "contract": "catalogue",
+    "purpose": "Amend or close a campaign",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listDonationCampaigns"
+    ]
    }
   ],
   "entryState": {
@@ -2071,23 +2549,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "campaignId",
+     "from": "navigation"
     }
    ],
-   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders.",
-   "preloaded": [
-    "SaleBoard.id",
-    "SaleBoard.code",
-    "SaleBoard.name",
-    "SaleBoard.venueId",
-    "SaleBoard.kind"
-   ]
+   "coldEntry": "Resolves the tenant and venue from the session; a cold arrival is the ordinary case."
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-123"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1190"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateDonationCampaign",
+    "component": "modal",
+    "trigger": "New campaign",
+    "body": "**Collects what `createDonationCampaign` sends.** Required: `name`, `amountMode`, `isActive`. With fixed choices, `fixedAmounts`; with a free amount, `minAmount` and `maxAmount`; always the `liabilityAccountId` before activation. Optional: `description`, `beneficiary`, `venueIds`, `channels`, `validFrom`, `validTo`.",
+    "bindsTo": "DonationCampaign",
+    "confirm": {
+     "label": "Create campaign",
+     "operation": "createDonationCampaign"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract catalogue.yaml POST /donation-campaigns"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2120,6 +2611,25 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "commitCatalogueImport": {
+  "method": "POST",
+  "path": "/products/import/{jobId}/commit",
+  "contract": "catalogue",
+  "summary": "Apply a parsed catalogue import",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CatalogueImportJob"
+ },
  "createCampaign": {
   "method": "POST",
   "path": "/campaigns",
@@ -2139,6 +2649,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "CreateCampaignRequest",
   "responds": "Campaign"
  },
+ "createDonationCampaign": {
+  "method": "POST",
+  "path": "/donation-campaigns",
+  "contract": "catalogue",
+  "summary": "Create a campaign",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DonationCampaign",
+  "responds": "DonationCampaign"
+ },
  "createJourney": {
   "method": "POST",
   "path": "/journeys",
@@ -2157,6 +2686,44 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "Journey",
   "responds": "Journey"
+ },
+ "createUpsellRule": {
+  "method": "POST",
+  "path": "/upsell-rules",
+  "contract": "promotions",
+  "summary": "Create an upsell rule",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "UpsellRule",
+  "responds": "UpsellRule"
+ },
+ "deleteUpsellRule": {
+  "method": "DELETE",
+  "path": "/upsell-rules/{ruleId}",
+  "contract": "promotions",
+  "summary": "Remove an upsell rule",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "generateConfiguration": {
   "method": "POST",
@@ -2186,7 +2753,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": null
  },
@@ -2257,6 +2830,19 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
+ "listDonationCampaigns": {
+  "method": "GET",
+  "path": "/donation-campaigns",
+  "contract": "catalogue",
+  "summary": "Campaigns a guest can give to",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "DonationCampaign"
+ },
  "listJourneys": {
   "method": "GET",
   "path": "/journeys",
@@ -2279,7 +2865,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Journey"
+  "responds": "Page"
  },
  "listMerchandise": {
   "method": "GET",
@@ -2336,7 +2922,7 @@ Method, path, parameters, request and response for every operation these screens
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "ProductCategory"
+  "responds": "ProductCategoryNode"
  },
  "listSaleBoards": {
   "method": "GET",
@@ -2372,6 +2958,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -2418,7 +3009,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "SerialisedItem"
+  "responds": "Page"
  },
  "listWorkstations": {
   "method": "GET",
@@ -2478,6 +3069,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": "includeSiblingOutlets",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -2520,25 +3116,6 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "RunReportRequest",
   "responds": "ReportResult"
- },
- "setConfigurationProfile": {
-  "method": "PUT",
-  "path": "/configuration-profiles",
-  "contract": "tenancy",
-  "summary": "What a class of workstation is configured to be",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ConfigurationProfile",
-  "responds": "ConfigurationProfile"
  },
  "setProductCategories": {
   "method": "PUT",
@@ -2596,6 +3173,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "VenueSettings",
   "responds": "VenueSettings"
+ },
+ "updateDonationCampaign": {
+  "method": "PATCH",
+  "path": "/donation-campaigns/{campaignId}",
+  "contract": "catalogue",
+  "summary": "Amend or close a campaign",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DonationCampaign",
+  "responds": "DonationCampaign"
  },
  "updateMerchandise": {
   "method": "PATCH",
@@ -2697,6 +3293,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "type": "string",
       "format": "date-time",
       "nullable": true
+     },
+     "sentCount": {
+      "type": "integer",
+      "readOnly": true,
+      "x-ticvai-persisted": false,
+      "description": "**How many messages went out**, counted from `marketing.message_dispatch` at read time rather than kept as a counter on the campaign row, so it cannot drift from the dispatch records it summarises. Test sends are not dispatches of the campaign and are not counted.\n"
      }
     }
    }
@@ -2721,7 +3323,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "mergeDefaults": {
     "type": "object",
-    "additionalProperties": true
+    "description": "Fallback values for the template's `mergeFields`, by name, used where a guest has no value.",
+    "additionalProperties": {
+     "type": "string"
+    }
    },
    "promotionId": {
     "type": "string",
@@ -2779,62 +3384,73 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
- "ConfigurationProfile": {
+ "CatalogueImportJob": {
   "type": "object",
-  "x-ticvai-persistence": "platform.configuration_profile",
-  "description": "Board 1 of the client's POS design set, 20 August. **The board shows 1,248 workstations across four versions and the package modelled none of it** — a firmware version field on the workstation, and nothing that says what a workstation is configured to be.\n**A profile is what a venue changes; a version is what it deploys.** Conflating them means a venue cannot say *roll the ticketing counters back and leave the kiosks alone*, which is the only reason to version a profile at all.\n",
+  "x-ticvai-persistence": "catalogue.import_job",
+  "description": "1.4.2. **Two-phase, following `seating.ImportJob`** — and carrying the same lesson: a job that parses zero products is not a parsed job.\n",
   "required": [
    "id",
-   "name",
-   "venueKindScope",
-   "version",
-   "status"
+   "status",
+   "parsedCount"
   ],
   "properties": {
    "id": {
     "type": "string",
     "format": "uuid"
    },
-   "name": {
-    "type": "string"
-   },
-   "scopePath": {
-    "type": "string"
-   },
-   "venueKindScope": {
-    "type": "array",
-    "description": "Which workstation types it applies to. **A ticketing counter and a kitchen display do not share a profile**, and a profile that claims to is a profile somebody deploys to the wrong fleet.\n",
-    "items": {
-     "type": "string"
-    }
-   },
-   "version": {
-    "type": "integer",
-    "description": "**Immutable once deployed anywhere.** A change makes a new version, and the old one stays readable — a workstation still running v2.3 must be able to say what v2.3 was.\n"
-   },
-   "settings": {
-    "type": "object",
-    "additionalProperties": true
-   },
    "status": {
     "type": "string",
     "enum": [
-     "draft",
-     "published",
-     "deploying",
-     "deployed",
-     "superseded",
-     "rolledBack"
+     "parsing",
+     "previewReady",
+     "committing",
+     "committed",
+     "failed"
     ]
    },
-   "deployedCount": {
-    "type": "integer",
-    "readOnly": true
-   },
-   "publishedAt": {
+   "outcome": {
     "type": "string",
-    "format": "date-time",
-    "nullable": true
+    "enum": [
+     "parsed",
+     "parsedWithFindings",
+     "nothingFound",
+     "unreadable"
+    ]
+   },
+   "parsedCount": {
+    "type": "integer"
+   },
+   "createCount": {
+    "type": "integer"
+   },
+   "updateCount": {
+    "type": "integer"
+   },
+   "findings": {
+    "type": "array",
+    "description": "**What an operator sees before committing** — missing prices, duplicate codes, unknown categories, codes that do not match the tenant's schema.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "row": {
+       "type": "integer"
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "error",
+        "warning"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
    }
   }
  },
@@ -2913,6 +3529,98 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "DonationAmountMode": {
+  "type": "string",
+  "enum": [
+   "fixedChoices",
+   "freeAmount",
+   "roundUp"
+  ]
+ },
+ "DonationCampaign": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.donation_campaign",
+  "required": [
+   "name",
+   "amountMode",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "beneficiary": {
+    "type": "string",
+    "description": "Who the money is for. Shown to the guest, and it is the reason they give."
+   },
+   "venueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "amountMode": {
+    "$ref": "#/components/schemas/DonationAmountMode"
+   },
+   "fixedAmounts": {
+    "type": "array",
+    "description": "1.1.129. Predefined values, e.g. 5, 10, 25.",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/Money"
+    }
+   },
+   "minAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "maxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "liabilityAccountId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "**Donations post here, not to revenue** (1.1.132). Money collected for a charity is not the venue's to recognise, and treating it as revenue is a restatement waiting to happen.\n"
+   },
+   "channels": {
+    "type": "array",
+    "description": "1.1.133. Where it may be solicited — POS, kiosk, web, app.",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+    }
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "raisedTotal": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "**Not reversed when the campaign closes.** The money is still owed.\n"
+   }
+  }
+ },
  "FieldType": {
   "type": "string",
   "enum": [
@@ -2929,16 +3637,34 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "GeneratedConfiguration": {
   "type": "object",
-  "x-ticvai-persistence": "none — a draft, applied through the owning contract",
+  "x-ticvai-persistence": "none — a draft, applied through the owning contract; the draft itself is the ai.proposed_action row named by proposedActionId",
   "required": [
+   "proposedActionId",
    "kind",
    "targetContract",
    "targetOperation",
    "payload"
   ],
   "properties": {
+   "proposedActionId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "**The `ai.proposed_action` row this draft was written as**, and the id `decideProposedAction` takes. Without it a reviewer (BO-598) has a draft and no way to approve it.\n"
+   },
    "kind": {
-    "type": "string"
+    "type": "string",
+    "enum": [
+     "product",
+     "membership",
+     "pass",
+     "promotion",
+     "discountRule",
+     "pricingCalendar",
+     "seatingZone",
+     "operatingHours",
+     "campaign"
+    ],
+    "description": "The `kind` the request asked for."
    },
    "targetContract": {
     "type": "string"
@@ -2948,7 +3674,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "payload": {
     "type": "object",
-    "additionalProperties": true
+    "additionalProperties": true,
+    "description": "**Open on purpose: its shape is the request body of `targetOperation` in `targetContract`**, validated against that operation before it is returned — this contract does not restate thirty other contracts' request schemas.\n"
    },
    "assumptions": {
     "type": "array",
@@ -2986,7 +3713,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "Journey": {
   "type": "object",
-  "x-ticvai-persistence": "marketing.journey",
+  "x-ticvai-persistence": "marketing.journey + marketing.journey_step",
   "description": "22.3.1b to 22.3.10b, CF-137. **A journey is a sequence with branches; a `MessageTrigger` is one step of it.** The trigger already handles *\"send this when that happens\"* — a journey is what you need when the next message depends on what the guest did about the last one.\nFive of the ten requirements are named lifecycles — abandoned cart, membership, loyalty, wallet, birthday. **They are not five features.** Each is a journey with a different entry event and a different set of steps, which is why this is one entity and a template library rather than five contracts.\n**Consent is checked at every send, not at entry.** A guest who opts out mid-journey stops receiving, and the journey does not need to know — the same rule `MessageTrigger` follows and the one PDPL Article 17(1) makes unconditional.\n",
   "required": [
    "id",
@@ -2997,6 +3724,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -3035,6 +3763,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     }
    },
    "status": {
+    "readOnly": true,
     "type": "string",
     "enum": [
      "draft",
@@ -3059,6 +3788,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "22.3.6b. **Abandoned cart is the case that needs this.** A guest who abandons three carts in an hour should not get three recovery sequences, and `never` is wrong too — they may genuinely abandon one next month.\n"
    },
    "scopePath": {
+    "readOnly": true,
     "type": "string",
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
    }
@@ -3077,6 +3807,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "kind": {
     "type": "string",
+    "x-ticvai-column": "type",
     "enum": [
      "send",
      "wait",
@@ -3089,6 +3820,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid",
     "nullable": true,
+    "x-ticvai-column": "message_template_id",
     "description": "For `send`. Channel is resolved from the guest's preference at the moment of sending."
    },
    "channelPreference": {
@@ -3170,13 +3902,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "next": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "x-ticvai-column": "next_journey_step_id"
    },
    "goalEvent": {
     "type": "string",
     "nullable": true,
     "description": "For `goal`. **The event that means this journey worked and the guest should leave it** — a purchase for abandoned cart, a renewal for membership. **Reaching a goal exits immediately**, which is what stops a recovered cart from being chased.\n"
    }
+  }
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
   }
  },
  "MerchandiseItem": {
@@ -3193,6 +3933,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "isActive"
   ],
   "properties": {
+   "description": {
+    "type": "string",
+    "description": "What the item is, in the guest's words. Indexed for guest-app search.\n"
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -3228,7 +3972,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "The stock item depleted on sale. Null means the item sells but never runs out, which is almost always a configuration error.\n"
    },
    "price": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "x-ticvai-column": "list_price"
    },
    "onHand": {
     "type": "number"
@@ -3299,6 +4044,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid"
    },
+   "outletId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The outlet whose price and stock this is: the asking workstation's outlet, or `outletId` for a caller with none (decided 28 September, audit R215).\n"
+   },
    "sku": {
     "type": "string"
    },
@@ -3364,6 +4114,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "name": {
     "type": "string"
    },
+   "code": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true,
+    "x-ticvai-unique": "tenant",
+    "description": "**Taken from their category tables, 20 September.** Ours had a uuid and a localised name, so an importer matching *Beverages* had to match on a display string that a venue is free to translate.\n**Unique per tenant where set** (decided 28 September, audit R108): two categories in one tenant never share a code, and `setProductCategories` refuses a body that would, with `409 duplicate-code`.\n"
+   },
    "nameLocalised": {
     "type": "object",
     "additionalProperties": {
@@ -3387,7 +4144,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "**One tree, not four.** A brand under a department under a category is how a real merchandise hierarchy runs, and separate tables for each level cannot express a venue that nests them differently.\n"
    },
    "scopePath": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "Set by the server from the venue the caller acts at; not sent."
    },
    "displayOrder": {
     "type": "integer",
@@ -3398,12 +4157,45 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid",
     "nullable": true
    },
+   "description": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "The short line a guest reads under a category option, e.g. *Surf lessons: learn on the beginner wave with a coach* (decided 29 September, rev 3 REV3-19). Each language value at most 200 characters.\n"
+   },
    "isActive": {
     "type": "boolean",
     "default": true,
     "description": "**Deactivated rather than deleted.** A category with a season behind it still names the products sold under it, and removing it rewrites last year's report.\n"
    }
   }
+ },
+ "ProductCategoryNode": {
+  "x-ticvai-persistence": "none — projection over catalogue.product_category",
+  "description": "**One node of the tree `listProductCategories` returns.** A `ProductCategory` with its children nested under it, in `displayOrder`, so no caller reassembles the hierarchy from `parentId`. `setProductCategories` still takes the flat list, because a write names each parent by id.\n",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/ProductCategory"
+   },
+   {
+    "type": "object",
+    "required": [
+     "children"
+    ],
+    "properties": {
+     "children": {
+      "type": "array",
+      "description": "Empty on a leaf.",
+      "items": {
+       "$ref": "#/components/schemas/ProductCategoryNode"
+      }
+     }
+    }
+   }
+  ]
  },
  "ReportResult": {
   "x-ticvai-persistence": "none — result set, cached in object storage",
@@ -3436,6 +4228,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "rows": {
     "type": "array",
+    "description": "**Open on purpose; the shape is `columns`.** Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a `Money`, dates, date-times and uuids as strings. A report's columns are chosen at run time, so no fixed schema can name them.\n",
     "items": {
      "type": "object",
      "additionalProperties": true
@@ -3443,7 +4236,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "totals": {
     "type": "object",
-    "additionalProperties": true
+    "additionalProperties": true,
+    "description": "Aggregated columns only, keyed and typed as a row is."
    },
    "rowCount": {
     "type": "integer"
@@ -3469,7 +4263,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "parameters": {
     "type": "object",
-    "additionalProperties": true
+    "additionalProperties": true,
+    "description": "**Open on purpose; its shape is the report's.** Keyed by `ReportParameter.key` of the definition being run, each value of that parameter's `type`. An `isRequired` parameter with no value here and no `defaultValue` is the `400` `runReport` lists.\n"
    },
    "venueId": {
     "type": "string",
@@ -3478,11 +4273,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "dateFrom": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158)."
    },
    "dateTo": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "Defaults to today in the venue's time zone when not sent (audit R158)."
    },
    "forceAsync": {
     "type": "boolean",
@@ -3505,7 +4302,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "code": {
     "type": "string",
@@ -3596,69 +4394,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "mixed"
   ]
  },
- "SerialisedItem": {
-  "type": "object",
-  "x-ticvai-persistence": "inventory.serialised_item",
-  "description": "Retail Board 4 of the client's design set, 20 August. **`StockBatch` was added on 18 August with a lot number, and serialisation to the individual item is a step beyond it.**\nA lot answers *which delivery did this come from*. A serial answers *where is this exact one* — which is what a jewellery counter, a phone, a ticketed collectible or anything with a warranty needs.\n**Most stock is not serialised and should not be.** Turning it on for a 2 AED keyring creates a row per keyring, so it is a per-item decision rather than a policy.\n",
-  "required": [
-   "id",
-   "itemId",
-   "serial",
-   "status"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "itemId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "batchId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The batch it arrived in, where the item is both lotted and serialised."
-   },
-   "serial": {
-    "type": "string",
-    "description": "**Unique within the item, not globally.** Two manufacturers reuse serial numbers and a global constraint would refuse the second one.\n"
-   },
-   "locationId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "inStock",
-     "reserved",
-     "sold",
-     "returned",
-     "damaged",
-     "lost",
-     "inTransit",
-     "warranty"
-    ]
-   },
-   "soldOnOrderLineId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "**The link that makes serialisation worth having.** A warranty claim, a recall and a proof of purchase all start with *which sale was this exact item*.\n"
-   },
-   "warrantyUntil": {
-    "type": "string",
-    "format": "date",
-    "nullable": true
-   },
-   "receivedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
  "Suggestion": {
   "type": "object",
   "x-ticvai-persistence": "ai.suggestion",
@@ -3738,7 +4473,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "SuggestionKind": {
   "type": "string",
-  "description": "What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n",
+  "description": "What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n**What each kind is based on, and how much history is enough. Proposed, client to correct (decided 28 September, audit R213).** With less than the minimum, `requestSuggestion` answers 422 with `InsufficientDataProblem` naming the input, what there is and this minimum.\n- `price`: unit cost plus the category's target margin, held inside the price band. Minimum: a current cost, no history.\n- `replenishment`: par level minus on-hand plus expected use over the supplier lead time. Minimum: 14 days of stock movements.\n- `requisition`: the next service's prep-plan ingredient needs minus kitchen stock. Minimum: 14 days of sales.\n- `demandForecast`: the average of the same weekday over the last 8 weeks, adjusted by admissions already booked. Minimum: 8 weeks of sales.\n- `prepPlan`: forecast covers for the service times each item's share of the last 4 same weekdays. Minimum: 4 weeks of sales.\n- `menuEngineering`: each item placed by popularity against margin, over 90 days. Minimum: 90 days of sales.\n- `staffing`: forecast demand divided by the role's standard covers per staff hour. Minimum: 8 weeks of sales (the forecast it rests on).\n- `slaTarget`: the 80th percentile of actual times over the last 30 days. Minimum: 30 days of timed events.\n- `waitTime`: people ahead divided by the throughput of the last 30 minutes. Minimum: 30 minutes of throughput today.\n- `upsell`: the item most often bought with the basket's items over 90 days. Minimum: 90 days of orders.\n- `segmentation`: recency, frequency and spend scores over 12 months. Minimum: 90 days of orders.\n- `anomaly`: a value outside three standard deviations of the same weekday over 8 weeks. Minimum: 8 weeks of the measure.\n- `scenario`: the demand forecast re-run with the stated changes. Minimum: as `demandForecast`.\n",
   "enum": [
    "price",
    "replenishment",
@@ -3755,10 +4490,96 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "scenario"
   ]
  },
+ "UpsellPlacement": {
+  "type": "string",
+  "enum": [
+   "productDetail",
+   "cart",
+   "checkout",
+   "postPurchase",
+   "atGate",
+   "inVenue"
+  ]
+ },
+ "UpsellRule": {
+  "x-ticvai-persistence": "promotions.upsell_rule",
+  "type": "object",
+  "required": [
+   "id",
+   "name",
+   "placement",
+   "triggerVariantIds",
+   "suggestedVariantIds"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The region that owns the rule. Upsell rules are owned at region and read at venue (decided 28 September, audit R183); set from the caller's region scope on create.\n"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "placement": {
+    "$ref": "#/components/schemas/UpsellPlacement"
+   },
+   "triggerVariantIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "triggerCategoryIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "suggestedVariantIds": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "suggestedBundleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "channels": {
+    "type": "array",
+    "description": "Empty applies to every channel. Restriction is opt-in — a rule that fires on the website but not at a counter is a guest experience inconsistency.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "priority": {
+    "type": "integer",
+    "default": 0
+   },
+   "maxSuggestions": {
+    "type": "integer",
+    "default": 3
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
  "VenueSettings": {
   "type": "object",
   "x-ticvai-persistence": "platform.venue_settings",
-  "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n",
+  "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n**And the configured limits** (decided 28 September, audit R094): every limit the contracts call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`, `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a null field here inherits it. Each field's `default` is the proposed tenant default, marked proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the sheet the client corrects, and where the two differ this contract is what runs.\n",
   "properties": {
    "id": {
     "type": "string",
@@ -3768,7 +4589,24 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "venueId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true,
+    "description": "From the path of `setVenueSettings`."
+   },
+   "currencyCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**`readOnly` is the freeze.** `setVenueSettings` takes this whole schema as its request body, so without it any settings save could rewrite the currency of a venue that had already traded — which is the one thing ADR-0018's amendment forbids. It is set when the venue is provisioned, defaulted from the region, and changed only by an operation whose precondition is that the venue has not yet traded.\n**The venue's trading currency, defaulted from its region and frozen once the venue has traded** (ADR-0018, amended 20 September). Currency was a region-only fact, grouped with tax rates on the reasoning that *\"a venue cannot choose its VAT\"* -- true of tax and over-applied to currency, because a free-zone unit, a duty-free shop and a cruise terminal genuinely trade in a currency their region does not.\n**This column exists because the freeze needs somewhere to live.** A venue that resolved purely from its region would silently follow a region currency change after it had already traded, and every dated artefact beneath it -- a price list is a `validFrom`/`validTo` range -- would render retrospectively wrong. Null means \"resolve from the region\", which is the answer for every venue that has not overridden.\n"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4,
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Scale travels with currency** (ADR-0008), and so does the freeze. OMR is three decimal places because Oman says so; overriding the currency without the scale gets rounding wrong. Set together or not at all.\n"
    },
    "supportHours": {
     "type": "object",
@@ -3784,7 +4622,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       ]
      },
      "timezone": {
-      "type": "string"
+      "type": "string",
+      "description": "IANA zone the `windows` are read in. Absent, they are read in the region's `timeZone`, like every other wall-clock time in this contract.\n"
      },
      "windows": {
       "type": "array",
@@ -3804,10 +4643,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
          ]
         },
         "from": {
-         "type": "string"
+         "type": "string",
+         "description": "Wall-clock time the desk opens."
         },
         "to": {
-         "type": "string"
+         "type": "string",
+         "description": "Wall-clock time the desk closes."
         }
        }
       }
@@ -3824,10 +4665,51 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "**When the platform does not send.** A wallet low-balance alert at 3am is a complaint, and journeys and message triggers both respect this.\n**Operational messages ignore it** — a queue-turn alert is why a guest is holding the phone.\n",
     "properties": {
      "from": {
-      "type": "string"
+      "type": "string",
+      "description": "Wall-clock time sending stops",
+      "in the region's time zone.": null
      },
      "to": {
-      "type": "string"
+      "type": "string",
+      "description": "Wall-clock time sending resumes",
+      "in the region's time zone.": null
+     }
+    }
+   },
+   "biometrics": {
+    "type": "object",
+    "nullable": true,
+    "description": "CF-35, BL-096, BL-105, BL-106. **The venue-level master switch, and the one place a person is asked whether the paperwork exists.** Biometric data is sensitive under PDPL (Federal Decree-Law 45/2021) — heightened protection, explicit consent, and an Article 21 assessment before the processing rather than after it.\n**Nothing below this switch operates while it is off.** `AdmissionRules` may carry a `biometricPolicy` per ticket type and those rules are inert until a venue enables biometrics here, which means a profile copied between venues cannot start capturing faces at the destination.\n**Venue level because that is where the assessment is filed.** Region owns tax and currency; the DPIA, the consent notice and the hardware are a venue's.\n",
+    "properties": {
+     "isEnabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "**Off by default, and turning it on is refused without the two fields below.** `setVenueSettings` answers 422 rather than accepting an enable it cannot evidence — **a DPIA nobody can name is a DPIA nobody did**, and the point of the refusal is that the person switching this on is asked at the moment they switch it on rather than by an auditor a year later.\n"
+     },
+     "dpiaReference": {
+      "type": "string",
+      "nullable": true,
+      "maxLength": 200,
+      "description": "**The venue's own reference for its Article 21 assessment.** The platform does not hold the document and does not judge it; it records that one was named, by whom, and when — which is what an audit asks for and what the venue can produce.\n"
+     },
+     "consentNoticeAcknowledgedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "description": "**When somebody confirmed the consent forms are in place at the point of capture.** A guest consenting in an app is a record; a guest consenting at a ticket counter is a notice somebody has to have printed and a question somebody has to have asked.\n"
+     },
+     "acknowledgedByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "readOnly": true,
+      "description": "**Who confirmed it.** An acknowledgement with no name behind it cannot be followed up, and this is the field that makes the switch an act rather than a setting. Recorded by the server as the caller whose save carried the acknowledgement, so it cannot name somebody else.\n"
+     },
+     "faceTagPurgeMinutesAfterClose": {
+      "type": "integer",
+      "nullable": true,
+      "default": 0,
+      "description": "BL-106. **How long a same-visit Face Tag survives past the close of the operating day**, and zero is the default because that is what 3.2.44 describes. A non-zero value is an operational allowance for a late reconciliation, not a retention period — **`facePass` ignores this entirely** and is bounded by its entitlement.\n"
      }
     }
    },
@@ -3853,13 +4735,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        "type": "object",
        "properties": {
         "day": {
-         "type": "string"
+         "type": "string",
+         "enum": [
+          "mon",
+          "tue",
+          "wed",
+          "thu",
+          "fri",
+          "sat",
+          "sun"
+         ]
         },
         "from": {
-         "type": "string"
+         "type": "string",
+         "description": "Wall-clock time",
+         "in the region's time zone.": null
         },
         "to": {
-         "type": "string"
+         "type": "string",
+         "description": "Wall-clock time",
+         "in the region's time zone.": null
         },
         "admits": {
          "type": "string",
@@ -3883,11 +4778,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "genderVerification": {
       "type": "string",
       "enum": [
-       false,
+       "off",
        "staffAssisted",
        "deviceAssisted"
       ],
-      "default": false,
+      "default": "off",
       "description": "`off` — the entitlement decides and a steward handles exceptions. **The default, and what is contracted.**\n`staffAssisted` — the steward's screen shows the ticket type so they can ask. No inference anywhere.\n`deviceAssisted` — **the venue's access hardware performs the check, not the platform.** Available only where the driver reports the capability, and the result is **advisory to the steward rather than decisive at the turnstile** (3.2.45 asks for rejection; this deviates deliberately).\n"
      },
      "overrideRateAlertThreshold": {
@@ -3917,6 +4812,326 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "escalateAfterMinutes": {
       "type": "integer",
       "nullable": true
+     }
+    }
+   },
+   "displayCurrencies": {
+    "type": "array",
+    "nullable": true,
+    "description": "**Which currencies this venue shows guests** (decided 28 September, audit R120 (a)). ISO 4217 codes, each one its region holds an `FxRate` for; the rate itself stays per region and is never set here. `finance.listFxRates` with `venueId` narrows the region's rates to these. Null or empty shows the trading currency only. A code the region has no rate for is refused `400`.\n",
+    "items": {
+     "type": "string",
+     "pattern": "^[A-Z]{3}$"
+    }
+   },
+   "cartLeaseSeconds": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 30,
+    "maximum": 3600,
+    "default": 900,
+    "description": "**How long a cart holds capacity** (decided 28 September, audit R169): 15 minutes, the default `catalogue.acquireInventoryHold` takes for `ttlSeconds`. Proposed, client to correct (audit R094).\n"
+   },
+   "cartHoldExtensionMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 1,
+    "maximum": 30,
+    "default": 5,
+    "description": "How long one `orders.extendCart` extension adds. Proposed, client to correct (audit R094)."
+   },
+   "cartMaxExtensions": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 5,
+    "default": 1,
+    "description": "How many extensions a cart may take before `extensionCapReached` (`Cart.maxExtensions`). Proposed, client to correct (audit R094)."
+   },
+   "resaleCutoffHours": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 168,
+    "default": 24,
+    "description": "Hours before the performance after which a ticket can no longer be listed for resale (`orders.createResaleListing`). Proposed, client to correct (audit R094)."
+   },
+   "exchangeCutoffHours": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 720,
+    "default": 24,
+    "description": "Hours before the original performance after which lines can no longer be exchanged (`orders.exchangeOrderLines`, `outsideExchangeWindow`). Proposed, client to correct (audit R094)."
+   },
+   "rescheduleCutoffHours": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 720,
+    "default": 24,
+    "description": "Hours before the original performance after which an order can no longer be rescheduled (`orders.rescheduleOrder`, `outsideRescheduleWindow`). Proposed, client to correct (audit R094)."
+   },
+   "reservationMaxExtensions": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 5,
+    "default": 1,
+    "description": "How many times `orders.extendReservation` may extend one reservation. Proposed, client to correct (audit R094)."
+   },
+   "shiftVarianceThreshold": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in the venue currency; client finance to correct (audit R094).**\n"
+   },
+   "catalogue": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "maxVariantsPerProduct": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "maximum": 2000,
+      "default": 200,
+      "description": "Variants one product may generate from its attributes (`setProductAttributes` refuses above it). Proposed, client to correct (audit R094)."
+     },
+     "waitlistOfferHoldMinutes": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "maximum": 1440,
+      "default": 30,
+      "description": "How long a waitlist offer holds the released capacity for the guest it was offered to. Proposed, client to correct (audit R094)."
+     },
+     "bulkPriceChangeEscalationPercent": {
+      "type": "number",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 100,
+      "default": 10,
+      "description": "A `bulkChangePrices` run changing any price by more than this percentage needs `PRICE_CONFIGURE` (audit R197). Proposed, client to correct (audit R094)."
+     },
+     "bulkPriceChangeEscalationCount": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "default": 50,
+      "description": "A `bulkChangePrices` run touching more prices than this needs `PRICE_CONFIGURE` (audit R197). Proposed, client to correct (audit R094)."
+     }
+    }
+   },
+   "inventory": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "overReceiptTolerancePercent": {
+      "type": "number",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 25,
+      "default": 5,
+      "description": "Percent above the outstanding ordered quantity a goods receipt line may record (`createGoodsReceipt`). Proposed, client to correct (audit R094)."
+     },
+     "countVarianceTolerancePercent": {
+      "type": "number",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 25,
+      "default": 2,
+      "description": "Percent difference between counted and expected quantity before a count line is an exception (`getCountVariance`). Proposed, client to correct (audit R094)."
+     },
+     "countVarianceApprovalAmount": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "nullable": true,
+      "description": "Total variance value of a count above which posting it needs approval (`postStockCount`). **Proposed tenant default 1,000.00 in the venue currency, client finance to correct (audit R094).**\n"
+     }
+    }
+   },
+   "seating": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "seatHoldExtensionSeconds": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 60,
+      "maximum": 1800,
+      "default": 300,
+      "description": "What one `extendSeatHold` adds. No hold outlives 30 minutes in all (audit R169). Proposed, client to correct (audit R094)."
+     },
+     "seatHoldMaxExtensions": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 5,
+      "default": 2,
+      "description": "How many times a seat hold may be extended. Proposed, client to correct (audit R094). A resource hold on a venue map (`resources.extendResourceHold`) uses the same two bounds (decided 29 September, rev 3 REV3-15)."
+     },
+     "maxSeatsPerGuestOrder": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "maximum": 50,
+      "default": 10,
+      "description": "**Seats one guest may take in one booking on a guest channel** (Guest Web, Guest App), decided 29 September, rev 3 REV3-7. `seating.createSeatHold` counts the seats in the request plus the seats the same guest already holds on the same performance, and refuses above this with `422` `seat-limit-exceeded`, naming the limit. Default 10, bounds 1 to 50; a venue sets its own in Venue Management. Staff and POS sales keep 10 per sale (audit R080 (c)) and do not read this field.\n"
+     }
+    }
+   },
+   "promotions": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "maxDiscountPercent": {
+      "type": "number",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 100,
+      "default": 30,
+      "description": "The largest discount one promotion may give (`createPromotion` refuses above it). Proposed, client to correct (audit R094)."
+     },
+     "nearZeroLinePrice": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "nullable": true,
+      "description": "Net line price below which a stacked combination is flagged near-zero in `analysePromotionConflicts` (audit R096 (5)); a warning, not a refusal. **Proposed tenant default AED 1.00, client to correct (audit R094).**\n"
+     }
+    }
+   },
+   "fnb": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "recallWindowMinutes": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 60,
+      "default": 10,
+      "description": "Minutes after a bump during which `recallKitchenTicket` still recalls; after it the act is a refire. Proposed, client to correct (audit R094)."
+     },
+     "compEscalationAmount": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "nullable": true,
+      "description": "Line value above which `compItem` needs `ORDER_DISCOUNT` (audit R197). **Proposed tenant default AED 100.00, client to correct (audit R094).**\n"
+     },
+     "foodSafetyLeadPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "**The venue's food-safety lead**, to whom `escalateCorrectiveAction` sends every escalation (decided 28 September, audit R096 (9)). A venue fact, so it has no tenant default; while it is null an escalation is refused `409 no-food-safety-lead`.\n"
+     }
+    }
+   },
+   "queue": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "crossQueueLimit": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "maximum": 10,
+      "default": 2,
+      "description": "Virtual queues one guest party may wait in at once (`joinQueue`, `crossQueueLimitReached`). Proposed, client to correct (audit R094)."
+     }
+    }
+   },
+   "reporting": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "inlineRunRowLimit": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1000,
+      "maximum": 100000,
+      "default": 5000,
+      "description": "Estimated rows above which `runReport` answers `202` and runs in the background. Proposed, client to correct (audit R094)."
+     },
+     "dashboardRefreshBudgetPerMinute": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "default": 24,
+      "description": "Tile refreshes per minute, summed over a dashboard's tiles, that `createDashboard` allows. Proposed, client to correct (audit R094)."
+     }
+    }
+   },
+   "marketing": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "attributionWindowDays": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "maximum": 30,
+      "default": 7,
+      "description": "Days after a campaign touch within which a booking is attributed to it (`getCampaignPerformance`). Proposed, client to correct (audit R094)."
+     }
+    }
+   },
+   "identity": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "guestOtpMaxAttempts": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 3,
+      "maximum": 10,
+      "default": 5,
+      "description": "Wrong entries allowed per guest one-time code before `verifyGuestOtp` invalidates it. A guest code is tenant-scoped, so the tenant default is the value used. Proposed, client to correct (audit R094).\n"
+     },
+     "guestTwoStep": {
+      "type": "object",
+      "nullable": true,
+      "description": "**Guest two-step verification: a venue option, off unless the venue enables it in Venue Management** (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of audit R167, \"no guest MFA\"; an earlier draft of the same day put it on the tenant's `PasswordPolicy`, which no longer carries it). **The guest's enrolment stays tenant-wide**: one guest account across the tenant's venues, so a method enrolled once is used in every venue that has this on, and is never asked in a venue that has it off. Identity learns the venue from `venueId` on the guest sign-in (`verifyGuestOtp`, `guestPasswordLogin`, `guestSocialLogin`, `guestUaePassLogin`) and on `createMfaChallenge`: the venue the guest app or booking is in; with no venue given, an enrolled guest is asked when any venue of the tenant has it on. Guests may enrol `totp` with `emailOtp` as the fallback, as staff do (audit R126 (5)); it is never forced. Guests still never use enterprise SSO (R167, first part). A null inherits the tenant default set with `setVenueSettingsDefaults`.\n",
+      "properties": {
+       "enabled": {
+        "type": "boolean",
+        "default": false,
+        "description": "Off unless the venue enables it. While no venue of the tenant has it on, guests cannot enrol (`enrolMfaMethod` answers 403 `guest-two-step-disabled`)."
+       },
+       "stepUpActions": {
+        "type": "array",
+        "uniqueItems": true,
+        "description": "The guest actions in this venue that ask an enrolled guest for the factor again, whatever the age of the session. The service performing the action passes this venue to `createMfaChallenge`. Proposed, client to correct (rev 3 GAP-B1).\n",
+        "items": {
+         "type": "string",
+         "enum": [
+          "changeContactDetails",
+          "changePassword",
+          "managePaymentMethods",
+          "transferTickets",
+          "deleteAccount"
+         ]
+        },
+        "default": [
+         "changeContactDetails",
+         "changePassword",
+         "managePaymentMethods",
+         "deleteAccount"
+        ]
+       }
+      }
      }
     }
    }

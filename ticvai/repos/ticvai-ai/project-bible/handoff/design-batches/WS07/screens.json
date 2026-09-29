@@ -39,10 +39,7 @@
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-204 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-205",
@@ -101,13 +98,82 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations can immediately determine whether each venue, gate and device is capable of safely operating offline.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide a real-time overview of offline readiness across the entire access-control estate.",
-  "purposeNote": "Operations can immediately determine whether each venue, gate and device is capable of safely operating offline.",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Offline-Ready Devices",
+       "bindsTo": "OfflineEdgeOperationsCommandCenterViewSummary.offlineReadyDevices",
+       "operation": "listOfflineEdge",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Currently Online",
+       "bindsTo": "OfflineEdgeOperationsCommandCenterViewSummary.currentlyOnline",
+       "operation": "listOfflineEdge",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Currently Offline",
+       "bindsTo": "OfflineEdgeOperationsCommandCenterViewSummary.currentlyOffline",
+       "operation": "listOfflineEdge",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Devices in Degraded Mode",
+       "bindsTo": "OfflineEdgeOperationsCommandCenterViewSummary.devicesInDegradedMode",
+       "operation": "listOfflineEdge",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Edge Nodes Online",
+       "bindsTo": "OfflineEdgeOperationsCommandCenterViewSummary.edgeNodesOnline",
+       "operation": "listOfflineEdge",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Packages Current",
+       "bindsTo": "OfflineEdgeOperationsCommandCenterViewSummary.packagesCurrent",
+       "operation": "listOfflineEdge",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Packages Expiring",
+       "bindsTo": "OfflineEdgeOperationsCommandCenterViewSummary.packagesExpiring",
+       "operation": "listOfflineEdge",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending Offline Transactions",
+       "bindsTo": "OfflineEdgeOperationsCommandCenterViewSummary.pendingOfflineTransactions",
+       "operation": "listOfflineEdge",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Offline Security Alerts",
+       "bindsTo": "OfflineEdgeOperationsCommandCenterViewSummary.offlineSecurityAlerts",
+       "operation": "listOfflineEdge",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -116,16 +182,7 @@
        "kind": "dataTable",
        "label": "Every offline edge operations",
        "columns": [
-        "OfflineEdgeOperationsCommandCenterView.offlineReadyDevices",
-        "OfflineEdgeOperationsCommandCenterView.currentlyOnline",
-        "OfflineEdgeOperationsCommandCenterView.currentlyOffline",
-        "OfflineEdgeOperationsCommandCenterView.devicesInDegradedMode",
-        "OfflineEdgeOperationsCommandCenterView.edgeNodesOnline",
-        "OfflineEdgeOperationsCommandCenterView.packagesCurrent",
-        "OfflineEdgeOperationsCommandCenterView.packagesExpiring",
-        "OfflineEdgeOperationsCommandCenterView.pendingOfflineTransactions",
-        "Sync Conflicts",
-        "OfflineEdgeOperationsCommandCenterView.offlineSecurityAlerts"
+        "Sync Conflicts"
        ],
        "bindsTo": "OfflineEdgeOperationsCommandCenterView",
        "operation": "listOfflineEdge",
@@ -142,16 +199,7 @@
        "label": "The selected offline edge operations",
        "bindsTo": "OfflineEdgeOperationsCommandCenterView",
        "columns": [
-        "OfflineEdgeOperationsCommandCenterView.offlineReadyDevices",
-        "OfflineEdgeOperationsCommandCenterView.currentlyOnline",
-        "OfflineEdgeOperationsCommandCenterView.currentlyOffline",
-        "OfflineEdgeOperationsCommandCenterView.devicesInDegradedMode",
-        "OfflineEdgeOperationsCommandCenterView.edgeNodesOnline",
-        "OfflineEdgeOperationsCommandCenterView.packagesCurrent",
-        "OfflineEdgeOperationsCommandCenterView.packagesExpiring",
-        "OfflineEdgeOperationsCommandCenterView.pendingOfflineTransactions",
-        "Sync Conflicts",
-        "OfflineEdgeOperationsCommandCenterView.offlineSecurityAlerts"
+        "Sync Conflicts"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Venue Readiness”, “Checks”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 86 §Display"
@@ -177,18 +225,19 @@
   ],
   "entryState": {
    "preloaded": [
-    "OfflineEdgeOperationsCommandCenterView.offlineReadyDevices",
-    "OfflineEdgeOperationsCommandCenterView.currentlyOnline",
-    "OfflineEdgeOperationsCommandCenterView.currentlyOffline",
-    "OfflineEdgeOperationsCommandCenterView.devicesInDegradedMode",
-    "OfflineEdgeOperationsCommandCenterView.edgeNodesOnline",
-    "OfflineEdgeOperationsCommandCenterView.packagesCurrent"
+    "OfflineEdgeOperationsCommandCenterViewSummary.offlineReadyDevices",
+    "OfflineEdgeOperationsCommandCenterViewSummary.currentlyOnline",
+    "OfflineEdgeOperationsCommandCenterViewSummary.currentlyOffline",
+    "OfflineEdgeOperationsCommandCenterViewSummary.devicesInDegradedMode",
+    "OfflineEdgeOperationsCommandCenterViewSummary.edgeNodesOnline",
+    "OfflineEdgeOperationsCommandCenterViewSummary.packagesCurrent"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-204"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-204",
+   "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-204"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 86. 9 of 10 labels bound to a contract property; 10 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -251,10 +300,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can define which edge component is responsible for local access decisions for every deployed device.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Fields) and no display directory — it is settings, not a population",
   "purpose": "Configure where local access decisions are processed when central services cannot be reached.",
-  "purposeNote": "Administrators can define which edge component is responsible for local access decisions for every deployed device.",
   "layout": {
    "template": "form",
    "regions": [
@@ -338,16 +387,14 @@
     "operationId": "setEdgeNodeLocal",
     "contract": "access",
     "purpose": "Edge Node & Local Processing Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setEdgeNodeLocal"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-205"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-205",
+   "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-205"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 87. 0 of 0 labels bound to a contract property; 10 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -410,10 +457,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators explicitly control which admission decisions may be performed without central connectivity.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Define exactly which access checks are allowed to run locally. The matrix identifies key offline criteria including eligible media, eligible site, eligible time, ticket validity and eligible access mode.",
-  "purposeNote": "Administrators explicitly control which admission decisions may be performed without central connectivity.",
   "gaps": [
    {
     "operation": null,
@@ -466,16 +513,14 @@
     "operationId": "setOfflinePolicy",
     "contract": "tenancy",
     "purpose": "setOfflinePolicy",
-    "trigger": "onAction",
-    "invalidates": [
-     "setOfflinePolicy"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-206"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-206",
+   "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-206"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 88. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -538,10 +583,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Only approved, intact and authorized edge packages can become active on access-control devices.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Access Configuration; Credential Configuration) and no display directory — it is settings, not a population",
   "purpose": "Define what configuration and operational data is securely distributed to edge devices.",
-  "purposeNote": "Only approved, intact and authorized edge packages can become active on access-control devices.",
   "layout": {
    "template": "form",
    "regions": [
@@ -590,6 +635,19 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 89 §Credential Configuration"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "operation": "publishHardwareDeployment",
+       "notes": "**Names the configuration version, the target (pilot, selected gates, device group or venue) and the devices that failed the compatibility test and will be skipped**, before it runs.",
+       "provenance": "contract access.yaml POST /hardware-deployments (authored: required by check-screens)"
+      }
+     ]
     }
    ]
   },
@@ -605,12 +663,26 @@
     "contract": "access",
     "purpose": "Edge Package & Data Distribution",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getOfflinePackage",
+    "contract": "access",
+    "purpose": "The access package an edge node holds, with its version",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "publishHardwareDeployment",
+    "contract": "access",
+    "purpose": "Publish a new offline package to the edge nodes: deploys the access configuration version, which devices pick up at their next package refresh (replaces publishBundle, a catalogue bundle, bound in error on 29 September)",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-207"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-207",
+   "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-207"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 89. 0 of 0 labels bound to a contract property; 8 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -673,10 +745,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Offline devices have a controlled and measurable mechanism for receiving credential invalidations and security changes.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Manage the local information required to reject credentials that should no longer be usable. This is especially important because Board 3 requires refunded, cancelled, transferred, exchanged, upgraded and reissued credentials to be invalidated.",
-  "purposeNote": "Offline devices have a controlled and measurable mechanism for receiving credential invalidations and security changes.",
   "gaps": [
    {
     "operation": null,
@@ -722,17 +794,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "OfflineCredentialRevocationCacheView.fraudLock",
-    "OfflineCredentialRevocationCacheView.cancellation",
-    "OfflineCredentialRevocationCacheView.lostCredential",
-    "OfflineCredentialRevocationCacheView.manualInvalidation",
-    "OfflineCredentialRevocationCacheView.canTrigger"
+    "OfflineCredentialRevocationCacheView.triggerEvents"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-208"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-208",
+   "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-208"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 90. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -795,10 +864,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Offline usage is recorded locally and prevents repeated consumption within the available edge synchronization scope.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Track entitlement consumption while the central system is unavailable. This is necessary for tickets such as: 3 Fast Pass uses 1 park entry 1 meal 1 re-entry where usage can occur during an outage.",
-  "purposeNote": "Offline usage is recorded locally and prevents repeated consumption within the available edge synchronization scope.",
   "gaps": [
    {
     "operation": null,
@@ -844,9 +913,6 @@
   ],
   "entryState": {
    "preloaded": [
-    "OfflineEntitlementUsageLedgerView.fastPassRemaining3",
-    "OfflineEntitlementUsageLedgerView.rideA1",
-    "OfflineEntitlementUsageLedgerView.rideB1",
     "OfflineEntitlementUsageLedgerView.credential",
     "OfflineEntitlementUsageLedgerView.device"
    ]
@@ -854,7 +920,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-209"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-209",
+   "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-209"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 91. 0 of 0 labels bound to a contract property; 0 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -917,10 +984,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Connectivity failures trigger predefined operating modes rather than unpredictable gate behavior.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure how devices transition from normal online operation to offline/degraded operation.",
-  "purposeNote": "Connectivity failures trigger predefined operating modes rather than unpredictable gate behavior.",
   "gaps": [
    {
     "operation": null,
@@ -944,6 +1011,20 @@
        "derived": true,
        "impliedBy": "listConnectivityFailureDegraded",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setOfflinePolicy",
+       "label": "Save offline policy",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setOfflinePolicy"
       }
      ]
     }
@@ -962,19 +1043,32 @@
     "contract": "access",
     "purpose": "Connectivity Failure & Degraded Mode Policy",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setOfflinePolicy",
+    "contract": "tenancy",
+    "purpose": "Save what a device may do with no network, and for how long",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "setConnectivityThresholds",
+    "contract": "tenancy",
+    "purpose": "Save when a device switches to degraded mode",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
    }
   ],
   "entryState": {
    "preloaded": [
-    "ConnectivityFailureDegradedModePolicyView.centralServicesReachable",
-    "ConnectivityFailureDegradedModePolicyView.someServicesUnavailable",
-    "ConnectivityFailureDegradedModePolicyView.onlyDeviceLocalProcessingAvailable"
+    "ConnectivityFailureDegradedModePolicyView.operatingModes"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-210"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-210",
+   "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-210"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 93. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1037,10 +1131,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Offline events synchronize back to the central platform with deterministic reconciliation and a complete audit trail.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Synchronize everything that occurred offline when connectivity returns.",
-  "purposeNote": "Offline events synchronize back to the central platform with deterministic reconciliation and a complete audit trail.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1051,14 +1145,6 @@
       {
        "kind": "dataTable",
        "label": "Every reconnection synchronization conflict",
-       "columns": [
-        "ReconnectionSynchronizationConflictResolutionView.pendingScans4821",
-        "ReconnectionSynchronizationConflictResolutionView.entitlementEvents682",
-        "ReconnectionSynchronizationConflictResolutionView.entries3240",
-        "ReconnectionSynchronizationConflictResolutionView.exits1204",
-        "ReconnectionSynchronizationConflictResolutionView.overrides18",
-        "ReconnectionSynchronizationConflictResolutionView.securityEvents7"
-       ],
        "bindsTo": "ReconnectionSynchronizationConflictResolutionView",
        "operation": "listReconnectionSynchronizationConflict",
        "provenance": "pack Access Control Module_Reference.pdf, page 94 §Show"
@@ -1073,14 +1159,6 @@
        "kind": "detailPanel",
        "label": "The selected reconnection synchronization conflict",
        "bindsTo": "ReconnectionSynchronizationConflictResolutionView",
-       "columns": [
-        "ReconnectionSynchronizationConflictResolutionView.pendingScans4821",
-        "ReconnectionSynchronizationConflictResolutionView.entitlementEvents682",
-        "ReconnectionSynchronizationConflictResolutionView.entries3240",
-        "ReconnectionSynchronizationConflictResolutionView.exits1204",
-        "ReconnectionSynchronizationConflictResolutionView.overrides18",
-        "ReconnectionSynchronizationConflictResolutionView.securityEvents7"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “Connectivity Restored”, “Authenticate”, “Upload Offline Transactions”, “Sequence Events”, “Reconcile Credential State”, “Reconcile Entitlements”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 94 §Show"
       }
@@ -1104,19 +1182,13 @@
    }
   ],
   "entryState": {
-   "preloaded": [
-    "ReconnectionSynchronizationConflictResolutionView.pendingScans4821",
-    "ReconnectionSynchronizationConflictResolutionView.entitlementEvents682",
-    "ReconnectionSynchronizationConflictResolutionView.entries3240",
-    "ReconnectionSynchronizationConflictResolutionView.exits1204",
-    "ReconnectionSynchronizationConflictResolutionView.overrides18",
-    "ReconnectionSynchronizationConflictResolutionView.securityEvents7"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-211"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-211",
+   "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-211"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 94. 6 of 6 labels bound to a contract property; 7 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1234,16 +1306,14 @@
     "operationId": "simulateOfflineResilienceTesting",
     "contract": "access",
     "purpose": "Offline Simulation & Resilience Testing",
-    "trigger": "onAction",
-    "invalidates": [
-     "simulateOfflineResilienceTesting"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-212"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-212",
+   "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-212"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 95. 0 of 0 labels bound to a contract property; 0 of 12 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1298,13 +1368,61 @@
    "notes": "**Reached from BO-204, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Offline and edge configurations are version-controlled, secured, approved, deployable and fully auditable. Board 7 — Final 10-Screen Structure # Backend Screen Main Responsibility 7.1 Offline & Edge Operations Command Center Estate-wide offline readiness 7.2 Edge Node & Local Processing Configuration Venue/device edge architecture 7.3 Offline Validation Policy Builder Determine which rules work offline 7.4 Edge Package & Data Distribution Secure local configuration packages 7.5 Offline Credential & Revocation Cache Local invalidation/security state 7.6 Offline Entitlement & Usage Ledger Track",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Govern the complete offline/edge environment.",
-  "purposeNote": "Offline and edge configurations are version-controlled, secured, approved, deployable and fully auditable. Board 7 — Final 10-Screen Structure # Backend Screen Main Responsibility 7.1 Offline & Edge Operations Command Center Estate-wide offline readiness 7.2 Edge Node & Local Processing Configuration Venue/device edge architecture 7.3 Offline Validation Policy Builder Determine which rules work offline 7.4 Edge Package & Data Distribution Secure local configuration packages 7.5 Offline Credential & Revocation Cache Local invalidation/security state 7.6 Offline Entitlement & Usage Ledger Track",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Package signatures",
+       "bindsTo": "EdgeSecurityAuditDeploymentViewSummary.packageSignatures",
+       "operation": "listEdgeSecurityDeployment",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Authorized devices",
+       "bindsTo": "EdgeSecurityAuditDeploymentViewSummary.authorizedDevices",
+       "operation": "listEdgeSecurityDeployment",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Revoked devices",
+       "bindsTo": "EdgeSecurityAuditDeploymentViewSummary.revokedDevices",
+       "operation": "listEdgeSecurityDeployment",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Failed package validation",
+       "bindsTo": "EdgeSecurityAuditDeploymentViewSummary.failedPackageValidation",
+       "operation": "listEdgeSecurityDeployment",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "unauthorized connection attempts",
+       "bindsTo": "EdgeSecurityAuditDeploymentViewSummary.unauthorizedConnectionAttempts",
+       "operation": "listEdgeSecurityDeployment",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "configuration changes",
+       "bindsTo": "EdgeSecurityAuditDeploymentViewSummary.configurationChanges",
+       "operation": "listEdgeSecurityDeployment",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -1313,13 +1431,7 @@
        "kind": "dataTable",
        "label": "Every edge security audit",
        "columns": [
-        "Edge certificates/credentials",
-        "EdgeSecurityAuditDeploymentView.packageSignatures",
-        "EdgeSecurityAuditDeploymentView.authorizedDevices",
-        "EdgeSecurityAuditDeploymentView.revokedDevices",
-        "EdgeSecurityAuditDeploymentView.failedPackageValidation",
-        "EdgeSecurityAuditDeploymentView.unauthorizedConnectionAttempts",
-        "EdgeSecurityAuditDeploymentView.configurationChanges"
+        "Edge certificates/credentials"
        ],
        "bindsTo": "EdgeSecurityAuditDeploymentView",
        "operation": "listEdgeSecurityDeployment",
@@ -1336,13 +1448,7 @@
        "label": "The selected edge security audit",
        "bindsTo": "EdgeSecurityAuditDeploymentView",
        "columns": [
-        "Edge certificates/credentials",
-        "EdgeSecurityAuditDeploymentView.packageSignatures",
-        "EdgeSecurityAuditDeploymentView.authorizedDevices",
-        "EdgeSecurityAuditDeploymentView.revokedDevices",
-        "EdgeSecurityAuditDeploymentView.failedPackageValidation",
-        "EdgeSecurityAuditDeploymentView.unauthorizedConnectionAttempts",
-        "EdgeSecurityAuditDeploymentView.configurationChanges"
+        "Edge certificates/credentials"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Draft”, “Deployment Scope”, “Current Production”, “Scheduled”, “Rollback”, “FORCE ONLINE-ONLY”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 96 §Show"
@@ -1369,17 +1475,18 @@
   "entryState": {
    "preloaded": [
     "Edge certificates/credentials",
-    "EdgeSecurityAuditDeploymentView.packageSignatures",
-    "EdgeSecurityAuditDeploymentView.authorizedDevices",
-    "EdgeSecurityAuditDeploymentView.revokedDevices",
-    "EdgeSecurityAuditDeploymentView.failedPackageValidation",
-    "EdgeSecurityAuditDeploymentView.unauthorizedConnectionAttempts"
+    "EdgeSecurityAuditDeploymentViewSummary.packageSignatures",
+    "EdgeSecurityAuditDeploymentViewSummary.authorizedDevices",
+    "EdgeSecurityAuditDeploymentViewSummary.revokedDevices",
+    "EdgeSecurityAuditDeploymentViewSummary.failedPackageValidation",
+    "EdgeSecurityAuditDeploymentViewSummary.unauthorizedConnectionAttempts"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-213"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-213",
+   "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-213"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 96. 6 of 7 labels bound to a contract property; 7 of 76 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

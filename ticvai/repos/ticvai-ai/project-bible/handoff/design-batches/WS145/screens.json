@@ -1,0 +1,1404 @@
+[
+ {
+  "id": "BO-834",
+  "name": "Digital Experience Center",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "11",
+   "number": "01",
+   "page": 53
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/digital-experience-center-bo-834",
+   "component": "apps/venue-management-web/src/routes/engagement-support/DigitalExperienceCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-835",
+    "BO-836",
+    "BO-837",
+    "BO-838",
+    "BO-839",
+    "BO-840",
+    "BO-841",
+    "BO-842",
+    "BO-843"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-835",
+     "trigger": "Site, Brand & Domain Setup",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-836",
+     "trigger": "Design System & Components",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-837",
+     "trigger": "Page & Landing Builder",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-838",
+     "trigger": "Content, Media & Forms",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-839",
+     "trigger": "Dynamic Product Pages",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-840",
+     "trigger": "Mobile App CMS",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-841",
+     "trigger": "Personalization & Localization",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-842",
+     "trigger": "SEO Management",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-843",
+     "trigger": "Publishing, Analytics & Audit",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Monitor websites, portals, mobile experiences and content health. Show sites, apps, pages, scheduled content, approvals, conversion, accessibility score and SEO health. List digital properties with environment, brand, domain, locale, status, owner and performance. Surface broken links, stale content, publishing errors, low-performing pages and compliance issues. Provide explainable AI content and SEO opportunities with drill-down to affected pages. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 53"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "filters",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Configuration version",
+       "operation": "getTenantConfig",
+       "notes": "Sends `?version=`; defaults to live.",
+       "provenance": "contract white-label.yaml GET /tenant-config"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Sites and apps",
+       "columns": [
+        "Sites and apps"
+       ],
+       "notes": "The pack asks for sites and apps; the contract has no field for it.",
+       "provenance": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 53"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pages",
+       "columns": [
+        "Pages"
+       ],
+       "notes": "The pack asks for pages; the contract has no field for it.",
+       "provenance": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 53"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Scheduled content",
+       "columns": [
+        "Scheduled content"
+       ],
+       "notes": "The pack asks for scheduled content; the contract has no field for it.",
+       "provenance": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 53"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Accessibility score",
+       "columns": [
+        "Accessibility score"
+       ],
+       "notes": "The pack asks for accessibility score; the contract has no field for it.",
+       "provenance": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 53"
+      },
+      {
+       "kind": "metricTile",
+       "label": "SEO health",
+       "columns": [
+        "SEO health"
+       ],
+       "notes": "The pack asks for seo health; the contract has no field for it.",
+       "provenance": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 53"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Live configuration",
+       "bindsTo": "TenantConfig",
+       "columns": [
+        "TenantConfig.version",
+        "TenantConfig.isDraft",
+        "TenantConfig.updatedAt"
+       ],
+       "operation": "getTenantConfig",
+       "provenance": "contract white-label.yaml GET /tenant-config"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Digital properties",
+       "bindsTo": "TenantConfig",
+       "columns": [
+        "Property",
+        "Environment",
+        "Brand",
+        "Domain",
+        "Locale",
+        "Status",
+        "Owner",
+        "Performance",
+        "TenantConfig.languages",
+        "TenantConfig.isInMaintenance"
+       ],
+       "operation": "getTenantConfig",
+       "notes": "The pack lists many properties; the tenant config describes one. Only locale and status are bound.",
+       "provenance": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 53"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected property",
+       "bindsTo": "TenantConfig",
+       "columns": [
+        "TenantConfig.tenantId",
+        "TenantConfig.version",
+        "TenantConfig.isDraft",
+        "TenantConfig.brand",
+        "TenantConfig.theme",
+        "TenantConfig.header",
+        "TenantConfig.navigation",
+        "TenantConfig.homepage",
+        "TenantConfig.languages",
+        "TenantConfig.modules",
+        "TenantConfig.features",
+        "TenantConfig.enabledPaymentMethods",
+        "TenantConfig.isInMaintenance",
+        "TenantConfig.maintenanceMessage",
+        "TenantConfig.updatedAt"
+       ],
+       "operation": "getTenantConfig",
+       "provenance": "contract white-label.yaml GET /tenant-config"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The digital experience list.",
+   "error": "Could not load. Names which read failed and leaves the digital experience untouched.",
+   "emptyFirstRun": "No digital experience yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the digital experience are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getTenantConfig",
+    "contract": "white-label",
+    "purpose": "Site and tenant configuration",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-834",
+   "workshopBoard": "wireframes/WS80 Marketing CRM Configuration Reference v1.0 Board 11.dc.html#bo-834"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 53. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Marketing_CRM_Configuration_Reference v1.0.pdf p.53; contract white-label.yaml GET /tenant-config. Pack labels with no schema field yet (shown as plain labels): Sites and apps, Pages, Scheduled content, Accessibility score, SEO health, Approvals pending, Conversion, Broken links, Stale content, Publishing errors, Low-performing pages, Property environment / domain / owner / performance.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-835",
+  "name": "Site, Brand & Domain Setup",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "11",
+   "number": "02",
+   "page": 53
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/site-brand-domain-setup-bo-835",
+   "component": "apps/venue-management-web/src/routes/engagement-support/SiteBrandDomainSetup.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-834"
+   ],
+   "exitTo": [
+    "BO-834"
+   ],
+   "transitions": [
+    {
+     "to": "BO-834",
+     "trigger": "Back to Digital Experience Center",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure multiple white-label digital properties from one deployment. Create websites, portals, microsites and app experiences by tenant, brand, venue, destination and business unit. Configure domains, environments, logos, colors, typography, icons, headers, footers and navigation. Set locales, default language, analytics IDs, consent/cookie settings, integrations and ownership. Validate domain, certificate, branding completeness and environment promotion before go-live. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Site, Brand & Domain Setup declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 53"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 53"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "claimCustomDomain",
+       "label": "Claim custom domain",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "claimCustomDomain"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The site brand domain list.",
+   "error": "Could not load. Names which read failed and leaves the site brand domain untouched.",
+   "emptyFirstRun": "No site brand domain yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the site brand domain are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "claimCustomDomain",
+    "contract": "white-label",
+    "purpose": "Site, brand and domain",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-835",
+   "workshopBoard": "wireframes/WS80 Marketing CRM Configuration Reference v1.0 Board 11.dc.html#bo-835"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 53. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-836",
+  "name": "Design System & Components",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "11",
+   "number": "03",
+   "page": 53
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/design-system-components-bo-836",
+   "component": "apps/venue-management-web/src/routes/engagement-support/DesignSystemComponents.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-834"
+   ],
+   "exitTo": [
+    "BO-834"
+   ],
+   "transitions": [
+    {
+     "to": "BO-834",
+     "trigger": "Back to Digital Experience Center",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Maintain reusable visual tokens and content components. Configure color, type, spacing, radius, shadow, breakpoint, transition and icon tokens by brand. Configuration Scope of Work | Version 1.0 53 Provide banner, event, ticket, membership, loyalty, gallery, video, map, form, countdown, promotion and CTA components. Define component variants, data properties, allowed placement, accessibility and responsive behavior. Version and approve changes and show every page/app experience affected before publication. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 53"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 53"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setBrandIdentity",
+       "label": "Save brand identity",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setBrandIdentity"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The design system components list.",
+   "error": "Could not load. Names which read failed and leaves the design system components untouched.",
+   "emptyFirstRun": "No design system components yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the design system components are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setBrandIdentity",
+    "contract": "white-label",
+    "purpose": "Design system and components",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-836",
+   "workshopBoard": "wireframes/WS80 Marketing CRM Configuration Reference v1.0 Board 11.dc.html#bo-836"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 53. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-837",
+  "name": "Page & Landing Builder",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "11",
+   "number": "04",
+   "page": 54
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/page-landing-builder-bo-837",
+   "component": "apps/venue-management-web/src/routes/engagement-support/PageLandingBuilder.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-834"
+   ],
+   "exitTo": [
+    "BO-834"
+   ],
+   "transitions": [
+    {
+     "to": "BO-834",
+     "trigger": "Back to Digital Experience Center",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow non-technical users to build pages and campaign landing experiences. Provide drag-and-drop sections, layer tree, reusable templates and desktop/tablet/mobile preview. Support content, product widgets, forms, countdowns, personalization, analytics tags and deep links. Configure slug, navigation, visibility, start/end schedule, campaign association and conversion goal. Validate responsive layout, required content, links, accessibility, SEO and approval before publish. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Page & Landing Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 54"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 54"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createContentPage",
+       "label": "Create content page",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listContentPages",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createContentPage"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The page landing list.",
+   "error": "Could not load. Names which read failed and leaves the page landing untouched.",
+   "emptyFirstRun": "No page landing yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the page landing are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "createContentPage",
+    "contract": "white-label",
+    "purpose": "Build a page",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listContentPages",
+    "contract": "white-label",
+    "purpose": "Pages published",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-837",
+   "workshopBoard": "wireframes/WS80 Marketing CRM Configuration Reference v1.0 Board 11.dc.html#bo-837"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 54. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-838",
+  "name": "Content, Media & Forms",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "11",
+   "number": "05",
+   "page": 54
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/content-media-forms-bo-838",
+   "component": "apps/venue-management-web/src/routes/engagement-support/ContentMediaForms.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-834"
+   ],
+   "exitTo": [
+    "BO-834"
+   ],
+   "transitions": [
+    {
+     "to": "BO-834",
+     "trigger": "Back to Digital Experience Center",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Centrally manage reusable content, assets and data-capture forms. Maintain multilingual content entries, metadata, tags, owner, status, schedule and workflow. Manage images, video, PDFs, icons, audio and documents with rights, alt text, renditions and usage references. Build forms for registration, inquiry, waiver, survey, lead and custom workflows with validation and consent. Secure submissions, route them to approved services and apply retention, export and audit controls. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 54"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 54"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createForm",
+       "label": "Create form",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "searchField",
+       "derived": true,
+       "impliedBy": "searchMedia",
+       "label": "Search",
+       "notes": "A search that returns nothing must say so differently from a search not yet run."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createForm"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The content media forms list.",
+   "error": "Could not load. Names which read failed and leaves the content media forms untouched.",
+   "emptyFirstRun": "No content media forms yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the content media forms are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "createForm",
+    "contract": "marketing-crm",
+    "purpose": "Forms on a page",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "searchMedia",
+    "contract": "assets",
+    "purpose": "Media to place",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-838",
+   "workshopBoard": "wireframes/WS80 Marketing CRM Configuration Reference v1.0 Board 11.dc.html#bo-838"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 54. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-839",
+  "name": "Dynamic Product Pages",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "11",
+   "number": "06",
+   "page": 54
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/dynamic-product-pages-bo-839",
+   "component": "apps/venue-management-web/src/routes/engagement-support/DynamicProductPages.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-834"
+   ],
+   "exitTo": [
+    "BO-834"
+   ],
+   "transitions": [
+    {
+     "to": "BO-834",
+     "trigger": "Back to Digital Experience Center",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Publish live transactional content directly from TICVAI product services. Configure dynamic pages/widgets for events, attractions, tickets, capacity, pricing and availability. Display membership benefits/prices, loyalty tiers/rewards, wallet offers, resources, F&B and retail products. Define filters, sorting, related content, upsell/cross-sell, sold-out fallback and cache/refresh behavior. Ensure displayed price, inventory, eligibility and purchase actions come from authoritative shared engines. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history. Configuration Scope of Work | Version 1.0 54",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 54"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 54"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createContentBlock",
+       "label": "Create content block",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createContentBlock"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The dynamic product pages list.",
+   "error": "Could not load. Names which read failed and leaves the dynamic product pages untouched.",
+   "emptyFirstRun": "No dynamic product pages yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the dynamic product pages are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "createContentBlock",
+    "contract": "white-label",
+    "purpose": "Dynamic product blocks",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-839",
+   "workshopBoard": "wireframes/WS80 Marketing CRM Configuration Reference v1.0 Board 11.dc.html#bo-839"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 54. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-840",
+  "name": "Mobile App CMS",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "11",
+   "number": "07",
+   "page": 55
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/mobile-app-cms-bo-840",
+   "component": "apps/venue-management-web/src/routes/engagement-support/MobileAppCms.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-834"
+   ],
+   "exitTo": [
+    "BO-834"
+   ],
+   "transitions": [
+    {
+     "to": "BO-834",
+     "trigger": "Back to Digital Experience Center",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Manage guest mobile-app content and navigation without releasing code. Configure home-screen layout, menus, banners, announcements, quick actions, widgets and featured content. Define deep links, audience visibility, language, schedule, app version and offline/cache behavior. Preview content for supported device sizes and validate inaccessible, missing or unsupported components. Publish through approval and staged rollout with version, rollback and analytics tracking. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 55"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 55"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setHomepageLayout",
+       "label": "Save homepage layout",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setHomepageLayout"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The mobile app cms list.",
+   "error": "Could not load. Names which read failed and leaves the mobile app cms untouched.",
+   "emptyFirstRun": "No mobile app cms yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the mobile app cms are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setHomepageLayout",
+    "contract": "white-label",
+    "purpose": "Mobile app content",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-840",
+   "workshopBoard": "wireframes/WS80 Marketing CRM Configuration Reference v1.0 Board 11.dc.html#bo-840"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 55. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-841",
+  "name": "Personalization & Localization",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "11",
+   "number": "08",
+   "page": 55
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/personalization-localization-bo-841",
+   "component": "apps/venue-management-web/src/routes/engagement-support/PersonalizationLocalization.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-834"
+   ],
+   "exitTo": [
+    "BO-834"
+   ],
+   "transitions": [
+    {
+     "to": "BO-834",
+     "trigger": "Back to Digital Experience Center",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Deliver relevant content variants under clear governance. Build visibility and content rules by segment, profile, language, loyalty, membership, geography and behavior. Configure variant priority, conflict resolution, fallback and real-guest/test-profile preview. Use AI for draft content and translation with glossary, brand tone, protected terms and manual review. Enforce consent and minimum-audience rules and audit the rule/version that produced each experience. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 55"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 55"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setLocalizationBrandingCustomer",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setLocalizationBrandingCustomer"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The personalization localization list.",
+   "error": "Could not load. Names which read failed and leaves the personalization localization untouched.",
+   "emptyFirstRun": "No personalization localization yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the personalization localization are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setLocalizationBrandingCustomer",
+    "contract": "marketing-crm",
+    "purpose": "Personalisation and localisation",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-841",
+   "workshopBoard": "wireframes/WS80 Marketing CRM Configuration Reference v1.0 Board 11.dc.html#bo-841"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 55. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-842",
+  "name": "SEO Management",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "11",
+   "number": "09",
+   "page": 55
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/seo-management-bo-842",
+   "component": "apps/venue-management-web/src/routes/engagement-support/SeoManagement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-834"
+   ],
+   "exitTo": [
+    "BO-834"
+   ],
+   "transitions": [
+    {
+     "to": "BO-834",
+     "trigger": "Back to Digital Experience Center",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure technical and content SEO across dynamic and authored pages. Manage titles, descriptions, canonical URLs, Open Graph, keywords, slugs, aliases and 301/302 redirects. Generate XML sitemaps, hreflang and Schema.org markup for events, products, reviews, FAQs and organizations. Analyze readability, missing metadata, duplicates, broken links, crawl/index issues and internal- link opportunities. Provide AI recommendations with review and report ranking, organic traffic, conversion and revenue. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 55"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 55"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setSeoMetadata",
+       "label": "Save SEO metadata",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setSeoMetadata"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The seo list.",
+   "error": "Could not load. Names which read failed and leaves the seo untouched.",
+   "emptyFirstRun": "No seo yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the seo are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setSeoMetadata",
+    "contract": "marketing-crm",
+    "purpose": "SEO metadata",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createUrlRedirect",
+    "contract": "marketing-crm",
+    "purpose": "Redirects",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-842",
+   "workshopBoard": "wireframes/WS80 Marketing CRM Configuration Reference v1.0 Board 11.dc.html#bo-842"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 55. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-843",
+  "name": "Publishing, Analytics & Audit",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "11",
+   "number": "10",
+   "page": 55
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/publishing-analytics-audit-bo-843",
+   "component": "apps/venue-management-web/src/routes/engagement-support/PublishingAnalyticsAudit.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-834"
+   ],
+   "exitTo": [
+    "BO-834"
+   ],
+   "transitions": [
+    {
+     "to": "BO-834",
+     "trigger": "Back to Digital Experience Center",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Govern content release and measure digital-experience performance. Support draft, review, approval, scheduled publication, expiration, environment promotion and emergency unpublish. Maintain versions, visual/text comparison, rollback, accessibility validation and dependency checks. Configuration Scope of Work | Version 1.0 55 Report page/app views, engagement, conversion, product sales, search behavior and personalized- variant results. Audit authored and AI-generated content, translations, approvals, publications, rollbacks and administrative actions. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history. Configuration Scope of Work | Version 1.0 56 Board 12 - Digital Waivers & Signature Management Figure 12. High-definition configuration board with all 10 screens. Configuration Scope of Work | Version 1.0 57",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 55"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 55"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "publishTenantConfig",
+       "label": "Publish tenant config",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "publishTenantConfig"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Goes live on the tenant’s own domains**, for every guest, at once. The previous version stays restorable.",
+       "provenance": "authored — required by check-screens, 19 September 2026"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The publishing analytics audit list.",
+   "error": "Could not load. Names which read failed and leaves the publishing analytics audit untouched.",
+   "emptyFirstRun": "No publishing analytics audit yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the publishing analytics audit are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "publishTenantConfig",
+    "contract": "white-label",
+    "purpose": "Publish",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-843",
+   "workshopBoard": "wireframes/WS80 Marketing CRM Configuration Reference v1.0 Board 11.dc.html#bo-843"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 55. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

@@ -97,6 +97,7 @@
     }
    ]
   },
+  "notes": "**Moved from P09 `ADM-429` on 11 September 2026.** Board 7 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-429` is retired and never reissued.",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Setup Progress) and no display directory — it is settings, not a population",
@@ -131,13 +132,21 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getGoLiveReadiness",
+    "contract": "subscription",
+    "purpose": "Setup progress",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-595"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-595",
+   "workshopBoard": "wireframes/WS159 Subscription Licensing AI Self Service Board 7.dc.html#bo-595"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 84. 0 of 0 labels bound to a contract property; 1 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**Moved from P09 `ADM-429` on 11 September 2026.** Board 7 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-429` is retired and never reissued.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -195,6 +204,7 @@
     }
    ]
   },
+  "notes": "**Moved from P09 `ADM-430` on 11 September 2026.** Board 7 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-430` is retired and never reissued.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Each Task Shows) and no metric row",
@@ -265,7 +275,15 @@
    "emptyNoResults": "The filter narrowed it and the guided plan are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getGoLiveReadiness",
+    "contract": "subscription",
+    "purpose": "The guided plan",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Status",
@@ -278,10 +296,10 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-596"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-596",
+   "workshopBoard": "wireframes/WS159 Subscription Licensing AI Self Service Board 7.dc.html#bo-596"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 85. 0 of 6 labels bound to a contract property; 17 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**Moved from P09 `ADM-430` on 11 September 2026.** Board 7 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-430` is retired and never reissued.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -339,6 +357,7 @@
     }
    ]
   },
+  "notes": "**Moved from P09 `ADM-431` on 11 September 2026.** Board 7 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-431` is retired and never reissued.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -357,7 +376,26 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "generateConfiguration",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "generateConfiguration"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The record list.",
@@ -366,13 +404,21 @@
    "emptyNoResults": "The filter narrowed it and the record are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "generateConfiguration",
+    "contract": "ai",
+    "purpose": "Draft the configuration",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-597"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-597",
+   "workshopBoard": "wireframes/WS159 Subscription Licensing AI Self Service Board 7.dc.html#bo-597"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 86. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**Moved from P09 `ADM-431` on 11 September 2026.** Board 7 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-431` is retired and never reissued.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -430,6 +476,7 @@
     }
    ]
   },
+  "notes": "**Moved from P09 `ADM-432` on 11 September 2026.** Board 7 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-432` is retired and never reissued.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -448,7 +495,26 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "generateConfiguration",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "generateConfiguration"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The draft review approval list.",
@@ -457,13 +523,21 @@
    "emptyNoResults": "The filter narrowed it and the draft review approval are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "generateConfiguration",
+    "contract": "ai",
+    "purpose": "Review and accept a draft",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-598"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-598",
+   "workshopBoard": "wireframes/WS159 Subscription Licensing AI Self Service Board 7.dc.html#bo-598"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 87. 0 of 0 labels bound to a contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**Moved from P09 `ADM-432` on 11 September 2026.** Board 7 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-432` is retired and never reissued.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -521,16 +595,12 @@
     }
    ]
   },
+  "notes": "**Moved from P09 `ADM-433` on 11 September 2026.** Board 7 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-433` is retired and never reissued.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Allow customers who prefer traditional administration to configure TICVAI without AI.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Queue. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 88 §Operations"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -551,10 +621,19 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Access",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 88 §Operations"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Queue",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 88 §Operations"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -565,13 +644,21 @@
    "emptyNoResults": "The filter narrowed it and the manual are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getTenantConfig",
+    "contract": "white-label",
+    "purpose": "Manual configuration",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-599"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-599",
+   "workshopBoard": "wireframes/WS159 Subscription Licensing AI Self Service Board 7.dc.html#bo-599"
   },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 88. 0 of 0 labels bound to a contract property; 1 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**Moved from P09 `ADM-433` on 11 September 2026.** Board 7 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-433` is retired and never reissued.",
+  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 88. 0 of 0 labels bound to a contract property; 2 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Access, Queue dropped (navigation tiles to the Access and Queue configuration areas).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -629,6 +716,7 @@
     }
    ]
   },
+  "notes": "**Moved from P09 `ADM-434` on 11 September 2026.** Board 7 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-434` is retired and never reissued.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -652,7 +740,27 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setVenueSettings",
+       "label": "Save venue settings",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setVenueSettings"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The venue calendar operational list.",
@@ -661,13 +769,29 @@
    "emptyNoResults": "The filter narrowed it and the venue calendar operational are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setVenueSettings",
+    "contract": "tenancy",
+    "purpose": "Venue and calendar setup",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-600"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-600",
+   "workshopBoard": "wireframes/WS159 Subscription Licensing AI Self Service Board 7.dc.html#bo-600"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 89. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**Moved from P09 `ADM-434` on 11 September 2026.** Board 7 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-434` is retired and never reissued.",
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -725,6 +849,7 @@
     }
    ]
   },
+  "notes": "**Moved from P09 `ADM-435` on 11 September 2026.** Board 7 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-435` is retired and never reissued.",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configuration) and no display directory — it is settings, not a population",
@@ -789,13 +914,36 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setPrices",
+    "contract": "catalogue",
+    "purpose": "Product and pricing setup",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setChannelListing",
+    "contract": "subscription",
+    "purpose": "Sales channels",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-601"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-601",
+   "workshopBoard": "wireframes/WS159 Subscription Licensing AI Self Service Board 7.dc.html#bo-601"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 90. 0 of 0 labels bound to a contract property; 7 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**Moved from P09 `ADM-435` on 11 September 2026.** Board 7 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-435` is retired and never reissued.",
+  "entryState": {
+   "params": [
+    {
+     "name": "priceListId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -853,6 +1001,7 @@
     }
    ]
   },
+  "notes": "**Moved from P09 `ADM-436` on 11 September 2026.** Board 7 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-436` is retired and never reissued.",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configured; Configure) and no display directory — it is settings, not a population",
@@ -957,13 +1106,29 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "configureWorkstation",
+    "contract": "tenancy",
+    "purpose": "POS, payment and access setup",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-602"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-602",
+   "workshopBoard": "wireframes/WS159 Subscription Licensing AI Self Service Board 7.dc.html#bo-602"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 90. 0 of 0 labels bound to a contract property; 15 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**Moved from P09 `ADM-436` on 11 September 2026.** Board 7 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-436` is retired and never reissued.",
+  "entryState": {
+   "params": [
+    {
+     "name": "workstationId",
+     "from": "session"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1021,6 +1186,7 @@
     }
    ]
   },
+  "notes": "**Moved from P09 `ADM-437` on 11 September 2026.** Board 7 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-437` is retired and never reissued.",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configuration Health) and no display directory — it is settings, not a population",
@@ -1036,6 +1202,19 @@
        "kind": "selectField",
        "label": "84% Healthy",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 91 §Configuration Health"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "runGoLiveValidation",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "runGoLiveValidation"
       }
      ]
     }
@@ -1048,13 +1227,24 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "runGoLiveValidation",
+    "contract": "subscription",
+    "purpose": "Configuration health",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGoLiveReadiness"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-603"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-603",
+   "workshopBoard": "wireframes/WS159 Subscription Licensing AI Self Service Board 7.dc.html#bo-603"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 91. 0 of 0 labels bound to a contract property; 1 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**Moved from P09 `ADM-437` on 11 September 2026.** Board 7 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-437` is retired and never reissued.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1118,10 +1308,11 @@
     }
    ]
   },
+  "notes": "**Moved from P09 `ADM-438` on 11 September 2026.** Board 7 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-438` is retired and never reissued.",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Export Configuration Summary; AI Creates Configuration Proposal; Configuration Saved) and no display directory — it is settings, not a population",
-  "purpose": "Confirm that customer configuration is sufficiently complete to begin formal Board 8 validation.",
+  "purpose": "Confirm that customer configuration is sufficiently complete to begin formal Board 8 validation. Board 8 is the final quality and operational control layer between configuration and production launch.",
   "gaps": [
    {
     "operation": null,
@@ -1162,13 +1353,21 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getGoLiveReadiness",
+    "contract": "subscription",
+    "purpose": "Handoff to go-live",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-604"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-604",
+   "workshopBoard": "wireframes/WS159 Subscription Licensing AI Self Service Board 7.dc.html#bo-604"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 92. 0 of 0 labels bound to a contract property; 3 of 102 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**Moved from P09 `ADM-438` on 11 September 2026.** Board 7 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-438` is retired and never reissued.",
   "_platform": {
    "code": "P08",
    "audience": "staff",

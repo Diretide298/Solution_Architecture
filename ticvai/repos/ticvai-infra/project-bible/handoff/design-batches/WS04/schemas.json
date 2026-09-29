@@ -5,33 +5,108 @@
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What External & Partner Credential Mapping displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "localMapping": {
+   "validationMode": {
     "type": "string",
-    "description": "Local Mapping"
+    "enum": [
+     "localMapping",
+     "apiValidation",
+     "tokenValidation",
+     "cachedValidation",
+     "offlineMapping",
+     "hybrid"
+    ],
+    "description": "How the partner credential is validated"
    },
-   "apiValidation": {
+   "mappingId": {
+    "type": "string"
+   },
+   "partnerName": {
     "type": "string",
-    "description": "API Validation"
+    "description": "e.g. Hotel Package Provider"
    },
-   "tokenValidation": {
+   "credentialFormat": {
     "type": "string",
-    "description": "Token Validation"
+    "description": "Partner barcode/QR format"
    },
-   "cachedValidation": {
+   "fieldMappings": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Partner field to TICVAI field pairs, e.g. ProductCode, VisitDate, GuestType, Entitlement"
+   },
+   "unrecognisedOutcome": {
     "type": "string",
-    "description": "Cached Validation"
+    "enum": [
+     "deny",
+     "referToOperator"
+    ],
+    "description": "What happens when a partner credential cannot be resolved"
    },
-   "offlineMapping": {
-    "type": "integer",
-    "description": "Offline Mapping"
-   },
-   "hybrid": {
+   "status": {
     "type": "string",
-    "description": "Hybrid"
-   },
-   "dependingOnPolicy": {
+    "enum": [
+     "draft",
+     "active",
+     "inactive"
+    ]
+   }
+  }
+ },
+ "HotelWalletExternalMediaIntegrationInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; the write configures the rules the matching View reads back (decided 29 September, VM close-out)",
+  "description": "**What Hotel, Wallet & External Media Integration submits** (decided 29 September, VM close-out). The writable fields of its View; the figures the screen computes are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "required": [
+   "name",
+   "integrationType",
+   "externalSystem"
+  ],
+  "properties": {
+   "integrationId": {
     "type": "string",
-    "description": "depending on policy"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Absent creates an integration"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "integrationType": {
+    "type": "string",
+    "enum": [
+     "hotelRoomCard",
+     "hotelPms",
+     "digitalWallet",
+     "otherExternal"
+    ]
+   },
+   "externalSystem": {
+    "type": "string",
+    "maxLength": 200,
+    "description": "The external system, e.g. the hotel PMS product"
+   },
+   "connectionSecretRef": {
+    "type": "string",
+    "description": "Reference to the stored credentials of the external system. **Never the secret itself.** The client supplies the account and keys (vendor credential); the reference is set once they are stored"
+   },
+   "roomChargeEnabled": {
+    "type": "boolean",
+    "default": false
+   },
+   "mapsToVirtualCredential": {
+    "type": "boolean",
+    "default": true,
+    "description": "The external card maps to a TICVAI Virtual Ticket rather than being validated by the external system"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "active",
+     "inactive"
+    ],
+    "default": "draft"
    }
   }
  },
@@ -41,9 +116,44 @@
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Hotel, Wallet & External Media Integration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "accessDecisionProceedsNormally": {
+   "connectionSecretRef": {
     "type": "string",
-    "description": "Access decision proceeds normally"
+    "description": "Reference to the stored credentials of the external system, never the secret itself (decided 29 September, VM close-out)"
+   },
+   "integrationId": {
+    "type": "string"
+   },
+   "integrationType": {
+    "type": "string",
+    "enum": [
+     "hotelRoomCard",
+     "hotelPms",
+     "digitalWallet",
+     "otherExternal"
+    ]
+   },
+   "name": {
+    "type": "string"
+   },
+   "externalSystem": {
+    "type": "string",
+    "description": "External system name, e.g. the hotel PMS or wallet provider"
+   },
+   "roomChargeEnabled": {
+    "type": "boolean",
+    "description": "Attraction/service may be charged to the guest room via the PMS"
+   },
+   "mapsToVirtualCredential": {
+    "type": "boolean",
+    "description": "Credential resolves to a TICVAI virtual credential and follows the normal access decision"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "active",
+     "inactive"
+    ]
    }
   }
  },
@@ -53,47 +163,56 @@
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Media Compatibility, Testing & Publication submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "rfid": {
+   "mediaProfileId": {
     "type": "string",
-    "description": "RFID ✓ ✓ ✓ ✓"
+    "description": "Media profile being published"
    },
-   "nfc": {
-    "type": "string",
-    "description": "NFC ✓ ✓ ✓ ✓"
-   },
-   "tenant": {
+   "tenantId": {
     "type": "string",
     "description": "Tenant"
    },
-   "venue": {
+   "venueId": {
     "type": "string",
     "description": "Venue"
    },
-   "park": {
+   "parkId": {
     "type": "string",
     "description": "Park"
    },
-   "gate": {
+   "gateId": {
     "type": "string",
     "description": "Gate"
    },
-   "deviceGroup": {
+   "deviceGroupId": {
     "type": "string",
     "description": "Device group"
    },
-   "communicate": {
+   "stage": {
     "type": "string",
-    "description": "communicate"
+    "enum": [
+     "draft",
+     "compatibilityTest",
+     "validate",
+     "approval",
+     "published"
+    ]
    },
-   "theTicketIsFullyRedeemed": {
-    "type": "string",
-    "description": "the ticket is fully redeemed"
+   "compatibilityWarnings": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Warnings from the compatibility test, e.g. a reader that cannot validate NFC offline"
    },
-   "retentionDeletionAudit": {
+   "exceptionReason": {
     "type": "string",
-    "description": "Retention/Deletion → Audit"
+    "description": "Required when publishing to a device with a compatibility warning"
    }
-  }
+  },
+  "required": [
+   "mediaProfileId",
+   "venueId"
+  ]
  },
  "MediaCompatibilityTestingPublicationView": {
   "type": "object",
@@ -101,101 +220,104 @@
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Media Compatibility, Testing & Publication displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "rfid": {
+   "mediaProfileId": {
     "type": "string",
-    "description": "RFID ✓ ✓ ✓ ✓"
+    "description": "Media profile being published"
    },
-   "nfc": {
-    "type": "string",
-    "description": "NFC ✓ ✓ ✓ ✓"
-   },
-   "tenant": {
+   "tenantId": {
     "type": "string",
     "description": "Tenant"
    },
-   "venue": {
+   "venueId": {
     "type": "string",
     "description": "Venue"
    },
-   "park": {
+   "parkId": {
     "type": "string",
     "description": "Park"
    },
-   "gate": {
+   "gateId": {
     "type": "string",
     "description": "Gate"
    },
-   "deviceGroup": {
+   "deviceGroupId": {
     "type": "string",
     "description": "Device group"
    },
-   "communicate": {
+   "stage": {
     "type": "string",
-    "description": "communicate"
+    "enum": [
+     "draft",
+     "compatibilityTest",
+     "validate",
+     "approval",
+     "published"
+    ]
    },
-   "theTicketIsFullyRedeemed": {
-    "type": "string",
-    "description": "the ticket is fully redeemed"
+   "compatibilityWarnings": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Warnings from the compatibility test, e.g. a reader that cannot validate NFC offline"
    },
-   "retentionDeletionAudit": {
+   "exceptionReason": {
     "type": "string",
-    "description": "Retention/Deletion → Audit"
+    "description": "Required when publishing to a device with a compatibility warning"
    }
-  }
+  },
+  "required": [
+   "mediaProfileId",
+   "venueId"
+  ]
  },
- "MediaCredentialCommandCenterView": {
+ "MediaIssuanceEncodingProfileInput": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Media & Credential Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — request only; the write configures the rules the matching View reads back (decided 29 September, VM close-out)",
+  "description": "**What Media Issuance & Encoding Profile submits** (decided 29 September, VM close-out). The writable fields of its View; the figures the screen computes are deliberately absent, because a figure the system computed is not a figure a client may send back. The per-credential identifiers the View shows (credential identifier, randomised media identifier, ticket reference, secure token and reference) are generated at issue and are not writable.",
+  "required": [
+   "name",
+   "mediaTypeId",
+   "encodingFormat"
+  ],
   "properties": {
-   "activeMediaProfiles": {
-    "type": "integer",
-    "description": "Active Media Profiles"
-   },
-   "qrCredentials": {
-    "type": "integer",
-    "description": "QR Credentials"
-   },
-   "rfidCredentials": {
-    "type": "integer",
-    "description": "RFID Credentials"
-   },
-   "nfcCredentials": {
-    "type": "integer",
-    "description": "NFC Credentials"
-   },
-   "walletCredentials": {
-    "type": "integer",
-    "description": "Wallet Credentials"
-   },
-   "biometricCredentials": {
-    "type": "integer",
-    "description": "Biometric Credentials"
-   },
-   "externalCredentials": {
-    "type": "integer",
-    "description": "External Credentials"
-   },
-   "mediaSwapsToday": {
+   "encodingProfileId": {
     "type": "string",
-    "description": "Media Swaps Today"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Absent creates a profile"
    },
-   "failedMediaReads": {
-    "type": "integer",
-    "description": "Failed Media Reads"
-   },
-   "unknownCredentials": {
-    "type": "integer",
-    "description": "Unknown Credentials"
-   },
-   "verificationExceptions": {
-    "type": "integer",
-    "description": "Verification Exceptions"
-   },
-   "ai": {
+   "name": {
     "type": "string",
-    "description": "AI"
+    "maxLength": 200
+   },
+   "mediaTypeId": {
+    "type": "string",
+    "description": "The media type this profile encodes (`MediaTypeTechnologyLibraryView.mediaTypeId`)"
+   },
+   "encodingFormat": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "offlinePayloadProfile": {
+    "type": "string",
+    "description": "Which entitlement data is embedded for offline validation"
+   },
+   "checksumSignatureWhereApplicable": {
+    "type": "string",
+    "description": "Checksum or signature scheme, where the media carries one"
+   },
+   "randomizationEnabled": {
+    "type": "boolean",
+    "default": true,
+    "description": "Media identifiers are random rather than sequential"
+   },
+   "identifierCollisionCheckEnabled": {
+    "type": "boolean",
+    "default": true
+   },
+   "duplicatePreventionEnabled": {
+    "type": "boolean",
+    "default": true
    }
   }
  },
@@ -230,12 +352,12 @@
     "description": "Encoding format"
    },
    "offlinePayloadProfile": {
-    "type": "integer",
-    "description": "offline payload profile"
+    "type": "string",
+    "description": "Offline payload profile reference"
    },
    "checksumSignatureWhereApplicable": {
     "type": "string",
-    "description": "checksum/signature where applicable"
+    "description": "Reference to the signing profile managed by the secure platform layer; no key material"
    },
    "identifierCollisionCheckEnabled": {
     "type": "boolean",
@@ -245,67 +367,231 @@
     "type": "boolean",
     "description": "Randomization — ENABLED"
    },
-   "insteadAdministratorsSelectAControlled": {
+   "encodingProfileId": {
     "type": "string",
-    "description": "Instead administrators select a controlled"
+    "description": "Encoding profile identifier"
+   },
+   "name": {
+    "type": "string",
+    "description": "Profile name, e.g. RFID Wristband, Adventure Park"
+   },
+   "mediaTypeId": {
+    "type": "string",
+    "description": "Media type this profile encodes"
+   },
+   "duplicatePreventionEnabled": {
+    "type": "boolean",
+    "description": "Duplicate prevention"
    }
   }
  },
- "MediaSwapReplacementView": {
+ "MediaTypeCredentialTechnologyRegistryView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Media Swap & Replacement displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "description": "**What Media Type & Credential Technology Registry displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "to": {
+   "mediaTypeId": {
     "type": "string",
-    "description": "To"
+    "description": "Media Type ID"
    },
-   "ticket": {
+   "name": {
     "type": "string",
-    "description": "✓ Ticket"
+    "description": "Name"
    },
-   "guest": {
-    "type": "string",
-    "description": "✓ Guest"
-   },
-   "remainingEntitlements": {
-    "type": "string",
-    "description": "✓ Remaining entitlements"
-   },
-   "entryHistory": {
-    "type": "string",
-    "description": "✓ Entry history"
-   },
-   "reEntryStatus": {
-    "type": "string",
-    "description": "✓ Re-entry status"
-   },
-   "fastPassBalance": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "✓ Fast Pass balance"
-   },
-   "reservations": {
-    "type": "string",
-    "description": "✓ Reservations"
-   },
-   "membershipAssociation": {
-    "type": "string",
-    "description": "✓ Membership association"
-   },
-   "reasonsType": {
+   "category": {
     "type": "string",
     "enum": [
-     "lost",
-     "damaged",
-     "deviceChange",
-     "upgrade",
-     "guestRequest",
-     "operationalReplacement",
-     "fraudSecurity",
-     "accessibility"
+     "digital",
+     "physical",
+     "biometric",
+     "future"
     ],
-    "description": "Vocabulary listed under Swap Reasons."
+    "description": "Media category"
+   },
+   "provider": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Provider integrations that implement this media type (media type is not the vendor)"
+   },
+   "technology": {
+    "type": "string",
+    "description": "Technology"
+   },
+   "tokenFormat": {
+    "type": "string",
+    "description": "Token format"
+   },
+   "generationMethod": {
+    "type": "string",
+    "description": "Generation method"
+   },
+   "validationMechanism": {
+    "type": "string",
+    "description": "Validation mechanism"
+   },
+   "supportsVisualDesign": {
+    "type": "boolean",
+    "description": "Supports visual design"
+   },
+   "supportsDynamicUpdate": {
+    "type": "boolean",
+    "description": "Supports dynamic update"
+   },
+   "supportsRevocation": {
+    "type": "boolean",
+    "description": "Supports revocation"
+   },
+   "supportsExpiration": {
+    "type": "boolean",
+    "description": "Supports expiration"
+   },
+   "supportsOfflineReference": {
+    "type": "boolean",
+    "description": "Supports offline reference"
+   },
+   "supportsReplacement": {
+    "type": "boolean",
+    "description": "Supports replacement"
+   },
+   "supportsEncryption": {
+    "type": "boolean",
+    "description": "Supports encryption"
+   },
+   "supportsSigning": {
+    "type": "boolean",
+    "description": "Supports signing"
+   },
+   "supportedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Supported channels"
+   },
+   "supportedDevices": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Supported devices"
+   },
+   "integrationAdapter": {
+    "type": "string",
+    "description": "Integration adapter"
+   }
+  },
+  "required": [
+   "mediaTypeId",
+   "name",
+   "category"
+  ]
+ },
+ "MediaTypeTechnologyLibraryInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; the write configures the rules the matching View reads back (decided 29 September, VM close-out)",
+  "description": "**What Media Type & Technology Library submits** (decided 29 September, VM close-out). The writable fields of its View; the figures the screen computes are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "required": [
+   "name",
+   "mediaType",
+   "technology",
+   "onlineOfflineCapability"
+  ],
+  "properties": {
+   "mediaTypeId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Absent adds a media type"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "mediaType": {
+    "type": "string",
+    "enum": [
+     "linearBarcode",
+     "twoDimensionalBarcode",
+     "qr",
+     "rfidContact",
+     "rfidProximity",
+     "rfidIso15693",
+     "rfidOtherStandard",
+     "appCredential",
+     "mobileWallet",
+     "paperTicket",
+     "wristband",
+     "plasticCard",
+     "hotelCard",
+     "facePass",
+     "faceTag",
+     "partnerQr",
+     "externalBarcode",
+     "thirdPartyCredential"
+    ]
+   },
+   "technology": {
+    "type": "string",
+    "enum": [
+     "barcode",
+     "rfid",
+     "nfc",
+     "magneticStripe",
+     "mobile",
+     "physical",
+     "biometric",
+     "external"
+    ]
+   },
+   "encodingFormat": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "supportedReaderTypes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "onlineOfflineCapability": {
+    "type": "string",
+    "enum": [
+     "onlineOnly",
+     "offlineOnly",
+     "onlineAndOffline"
+    ]
+   },
+   "writableReadOnly": {
+    "type": "string",
+    "enum": [
+     "writable",
+     "readOnly"
+    ]
+   },
+   "securityClassification": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "applicableVenues": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Empty means every venue of the tenant"
+   },
+   "applicableProducts": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Empty means every product"
+   },
+   "active": {
+    "type": "boolean",
+    "default": true,
+    "description": "False retires the media type: no new credential is issued on it; credentials already issued stay valid until they expire"
    }
   }
  },
@@ -315,88 +601,74 @@
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Media Type & Technology Library displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "qr": {
-    "type": "string",
-    "description": "QR"
+   "active": {
+    "type": "boolean",
+    "description": "False once retired through `setMediaTypeTechnology`; issued credentials stay valid (decided 29 September, VM close-out)"
    },
-   "contact": {
+   "mediaType": {
     "type": "string",
-    "description": "Contact"
-   },
-   "proximity": {
-    "type": "string",
-    "description": "Proximity"
-   },
-   "iso15693": {
-    "type": "string",
-    "description": "ISO 15693"
-   },
-   "otherSupportedStandards": {
-    "type": "string",
-    "description": "Other supported standards"
-   },
-   "appCredential": {
-    "type": "string",
-    "description": "App Credential"
-   },
-   "mobileWallet": {
-    "type": "string",
-    "description": "Mobile Wallet"
-   },
-   "paperTicket": {
-    "type": "string",
-    "description": "Paper Ticket"
-   },
-   "wristband": {
-    "type": "string",
-    "description": "Wristband"
-   },
-   "plasticCard": {
-    "type": "string",
-    "description": "Plastic Card"
-   },
-   "hotelCard": {
-    "type": "string",
-    "description": "Hotel Card"
-   },
-   "facePass": {
-    "type": "string",
-    "description": "Face Pass"
-   },
-   "faceTag": {
-    "type": "string",
-    "description": "Face Tag"
-   },
-   "partnerQr": {
-    "type": "string",
-    "description": "Partner QR"
-   },
-   "externalBarcode": {
-    "type": "string",
-    "description": "External Barcode"
-   },
-   "thirdPartyCredential": {
-    "type": "string",
-    "description": "Third-party Credential"
+    "enum": [
+     "linearBarcode",
+     "twoDimensionalBarcode",
+     "qr",
+     "rfidContact",
+     "rfidProximity",
+     "rfidIso15693",
+     "rfidOtherStandard",
+     "appCredential",
+     "mobileWallet",
+     "paperTicket",
+     "wristband",
+     "plasticCard",
+     "hotelCard",
+     "facePass",
+     "faceTag",
+     "partnerQr",
+     "externalBarcode",
+     "thirdPartyCredential"
+    ],
+    "description": "The kind of medium this profile defines"
    },
    "technology": {
     "type": "string",
-    "description": "technology"
+    "enum": [
+     "barcode",
+     "rfid",
+     "nfc",
+     "magneticStripe",
+     "mobile",
+     "physical",
+     "biometric",
+     "external"
+    ],
+    "description": "Technology family"
    },
    "encodingFormat": {
     "type": "string",
     "description": "encoding format"
    },
    "supportedReaderTypes": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "supported reader types"
    },
    "onlineOfflineCapability": {
-    "type": "integer",
+    "type": "string",
+    "enum": [
+     "onlineOnly",
+     "offlineOnly",
+     "onlineAndOffline"
+    ],
     "description": "online/offline capability"
    },
    "writableReadOnly": {
     "type": "string",
+    "enum": [
+     "writable",
+     "readOnly"
+    ],
     "description": "writable/read-only"
    },
    "securityClassification": {
@@ -404,14 +676,317 @@
     "description": "security classification"
    },
    "applicableVenues": {
-    "type": "string",
-    "description": "applicable venues"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Venue ids"
    },
    "applicableProducts": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Product ids"
+   },
+   "mediaTypeId": {
     "type": "string",
-    "description": "applicable products"
+    "description": "Media type profile identifier"
+   },
+   "name": {
+    "type": "string",
+    "description": "Profile name"
    }
   }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "RfidNfcCardWristbandMediaDesignerInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What RFID, NFC, Card & Wristband Media Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "templateId": {
+    "type": "string",
+    "description": "Media template being designed"
+   },
+   "mediaKind": {
+    "type": "string",
+    "enum": [
+     "rfidCard",
+     "rfidWristband",
+     "nfcCard",
+     "nfcWristband",
+     "membershipCard",
+     "staffGuestCard",
+     "customWearable"
+    ],
+    "description": "Physical medium"
+   },
+   "reusability": {
+    "type": "string",
+    "enum": [
+     "disposable",
+     "reusable"
+    ],
+    "description": "Disposable or reusable medium"
+   },
+   "printed": {
+    "type": "boolean",
+    "description": "Printed"
+   },
+   "encoded": {
+    "type": "boolean",
+    "description": "Encoded"
+   },
+   "colorCategory": {
+    "type": "string",
+    "description": "Color/category"
+   },
+   "sizeWhereApplicable": {
+    "type": "string",
+    "description": "Size where applicable"
+   },
+   "activationAtCollection": {
+    "type": "boolean",
+    "description": "Activation at collection"
+   },
+   "depositReferenceWhereApplicable": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Deposit/reference where applicable"
+   },
+   "mediaDimensions": {
+    "type": "string",
+    "description": "Media dimensions"
+   },
+   "front": {
+    "type": "string",
+    "description": "Front"
+   },
+   "back": {
+    "type": "string",
+    "description": "Back"
+   },
+   "printableArea": {
+    "type": "string",
+    "description": "Printable area"
+   },
+   "logo": {
+    "type": "string",
+    "description": "Logo"
+   },
+   "printedFields": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "customerName",
+      "photo",
+      "membershipTier",
+      "expiry",
+      "serialNumber",
+      "qrBarcode"
+     ]
+    },
+    "description": "Personal and reference fields printed on the medium"
+   },
+   "customArtwork": {
+    "type": "string",
+    "description": "Custom artwork"
+   },
+   "sponsorVenueBranding": {
+    "type": "string",
+    "description": "Sponsor/venue branding"
+   },
+   "rfidNfcTechnology": {
+    "type": "string",
+    "description": "RFID/NFC technology"
+   },
+   "chipProfile": {
+    "type": "string",
+    "description": "Chip/profile"
+   },
+   "uidReferenceHandling": {
+    "type": "string",
+    "description": "UID/reference handling"
+   },
+   "encodingProfile": {
+    "type": "string",
+    "description": "Encoding profile"
+   },
+   "provider": {
+    "type": "string",
+    "description": "Provider"
+   },
+   "readerCompatibility": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Reader compatibility"
+   },
+   "printerEncoderIntegration": {
+    "type": "string",
+    "description": "Printer/encoder integration"
+   }
+  },
+  "required": [
+   "templateId",
+   "mediaKind"
+  ]
+ },
+ "RfidNfcCardWristbandMediaDesignerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What RFID, NFC, Card & Wristband Media Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "templateId": {
+    "type": "string",
+    "description": "Media template being designed"
+   },
+   "mediaKind": {
+    "type": "string",
+    "enum": [
+     "rfidCard",
+     "rfidWristband",
+     "nfcCard",
+     "nfcWristband",
+     "membershipCard",
+     "staffGuestCard",
+     "customWearable"
+    ],
+    "description": "Physical medium"
+   },
+   "reusability": {
+    "type": "string",
+    "enum": [
+     "disposable",
+     "reusable"
+    ],
+    "description": "Disposable or reusable medium"
+   },
+   "printed": {
+    "type": "boolean",
+    "description": "Printed"
+   },
+   "encoded": {
+    "type": "boolean",
+    "description": "Encoded"
+   },
+   "colorCategory": {
+    "type": "string",
+    "description": "Color/category"
+   },
+   "sizeWhereApplicable": {
+    "type": "string",
+    "description": "Size where applicable"
+   },
+   "activationAtCollection": {
+    "type": "boolean",
+    "description": "Activation at collection"
+   },
+   "depositReferenceWhereApplicable": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Deposit/reference where applicable"
+   },
+   "mediaDimensions": {
+    "type": "string",
+    "description": "Media dimensions"
+   },
+   "front": {
+    "type": "string",
+    "description": "Front"
+   },
+   "back": {
+    "type": "string",
+    "description": "Back"
+   },
+   "printableArea": {
+    "type": "string",
+    "description": "Printable area"
+   },
+   "logo": {
+    "type": "string",
+    "description": "Logo"
+   },
+   "printedFields": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "customerName",
+      "photo",
+      "membershipTier",
+      "expiry",
+      "serialNumber",
+      "qrBarcode"
+     ]
+    },
+    "description": "Personal and reference fields printed on the medium"
+   },
+   "customArtwork": {
+    "type": "string",
+    "description": "Custom artwork"
+   },
+   "sponsorVenueBranding": {
+    "type": "string",
+    "description": "Sponsor/venue branding"
+   },
+   "rfidNfcTechnology": {
+    "type": "string",
+    "description": "RFID/NFC technology"
+   },
+   "chipProfile": {
+    "type": "string",
+    "description": "Chip/profile"
+   },
+   "uidReferenceHandling": {
+    "type": "string",
+    "description": "UID/reference handling"
+   },
+   "encodingProfile": {
+    "type": "string",
+    "description": "Encoding profile"
+   },
+   "provider": {
+    "type": "string",
+    "description": "Provider"
+   },
+   "readerCompatibility": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Reader compatibility"
+   },
+   "printerEncoderIntegration": {
+    "type": "string",
+    "description": "Printer/encoder integration"
+   }
+  },
+  "required": [
+   "templateId",
+   "mediaKind"
+  ]
  },
  "RfidNfcConfigurationInput": {
   "type": "object",
@@ -419,6 +994,13 @@
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What RFID & NFC Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
+   "name": {
+    "type": "string"
+   },
+   "rfidNfcProfileId": {
+    "type": "string",
+    "description": "RFID/NFC profile identifier"
+   },
    "rfidStandard": {
     "type": "string",
     "description": "RFID standard"
@@ -432,7 +1014,10 @@
     "description": "frequency/interface profile"
    },
    "readerCompatibility": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "reader compatibility"
    },
    "readWriteBehavior": {
@@ -447,51 +1032,65 @@
     "type": "string",
     "description": "security profile"
    },
-   "nfcTicket": {
-    "type": "string",
-    "description": "NFC ticket"
-   },
-   "membership": {
-    "type": "string",
-    "description": "membership"
-   },
-   "mobileDevice": {
-    "type": "string",
-    "description": "mobile device"
-   },
-   "walletCredential": {
-    "type": "string",
-    "description": "wallet credential"
+   "nfcUses": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "nfcTicket",
+      "membership",
+      "mobileDevice",
+      "walletCredential"
+     ]
+    },
+    "description": "NFC credential uses enabled by this profile"
    },
    "supportedReaders": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "supported readers"
    },
    "offlineCapability": {
-    "type": "integer",
+    "type": "boolean",
     "description": "offline capability"
    },
-   "venue": {
+   "venueId": {
     "type": "string",
     "description": "Venue"
    },
-   "zone": {
+   "zoneId": {
     "type": "string",
     "description": "Zone"
    },
-   "gate": {
+   "gateId": {
     "type": "string",
     "description": "Gate"
    },
-   "credential": {
+   "credentialType": {
     "type": "string",
     "description": "Credential"
    },
    "journey": {
     "type": "string",
     "description": "Journey"
+   },
+   "readRange": {
+    "type": "string",
+    "enum": [
+     "near",
+     "medium",
+     "far"
+    ],
+    "description": "Read range associated with the venue, zone, gate, credential or journey"
    }
-  }
+  },
+  "required": [
+   "rfidNfcProfileId",
+   "venueId",
+   "name"
+  ]
  },
  "RfidNfcConfigurationView": {
   "type": "object",
@@ -499,6 +1098,13 @@
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What RFID & NFC Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
+   "name": {
+    "type": "string"
+   },
+   "rfidNfcProfileId": {
+    "type": "string",
+    "description": "RFID/NFC profile identifier"
+   },
    "rfidStandard": {
     "type": "string",
     "description": "RFID standard"
@@ -512,7 +1118,10 @@
     "description": "frequency/interface profile"
    },
    "readerCompatibility": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "reader compatibility"
    },
    "readWriteBehavior": {
@@ -527,51 +1136,65 @@
     "type": "string",
     "description": "security profile"
    },
-   "nfcTicket": {
-    "type": "string",
-    "description": "NFC ticket"
-   },
-   "membership": {
-    "type": "string",
-    "description": "membership"
-   },
-   "mobileDevice": {
-    "type": "string",
-    "description": "mobile device"
-   },
-   "walletCredential": {
-    "type": "string",
-    "description": "wallet credential"
+   "nfcUses": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "nfcTicket",
+      "membership",
+      "mobileDevice",
+      "walletCredential"
+     ]
+    },
+    "description": "NFC credential uses enabled by this profile"
    },
    "supportedReaders": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "supported readers"
    },
    "offlineCapability": {
-    "type": "integer",
+    "type": "boolean",
     "description": "offline capability"
    },
-   "venue": {
+   "venueId": {
     "type": "string",
     "description": "Venue"
    },
-   "zone": {
+   "zoneId": {
     "type": "string",
     "description": "Zone"
    },
-   "gate": {
+   "gateId": {
     "type": "string",
     "description": "Gate"
    },
-   "credential": {
+   "credentialType": {
     "type": "string",
     "description": "Credential"
    },
    "journey": {
     "type": "string",
     "description": "Journey"
+   },
+   "readRange": {
+    "type": "string",
+    "enum": [
+     "near",
+     "medium",
+     "far"
+    ],
+    "description": "Read range associated with the venue, zone, gate, credential or journey"
    }
-  }
+  },
+  "required": [
+   "rfidNfcProfileId",
+   "venueId",
+   "name"
+  ]
  },
  "VerificationMethodSelectionLockingView": {
   "type": "object",
@@ -579,37 +1202,19 @@
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Verification Method Selection & Locking displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "dynamicQr": {
-    "type": "string",
-    "description": "☑ Dynamic QR"
-   },
-   "physicalCard": {
-    "type": "string",
-    "description": "☑ Physical Card"
-   },
-   "rfid": {
-    "type": "string",
-    "description": "☑ RFID"
-   },
-   "facePass": {
-    "type": "string",
-    "description": "☑ Face Pass"
-   },
-   "faceTag": {
-    "type": "string",
-    "description": "☑ Face Tag"
-   },
-   "guestNotAllowed": {
-    "type": "boolean",
-    "description": "Guest — Not Allowed"
-   },
-   "operationsSupervisorApproval": {
-    "type": "string",
-    "description": "Operations — Supervisor Approval"
-   },
-   "verificationMethodLocked": {
-    "type": "string",
-    "description": "🔒 VERIFICATION METHOD LOCKED"
+   "availableMethods": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "dynamicQr",
+      "physicalCard",
+      "rfid",
+      "facePass",
+      "faceTag"
+     ]
+    },
+    "description": "Verification methods the guest may choose from"
    },
    "reason": {
     "type": "string",
@@ -619,61 +1224,29 @@
      "accessibility",
      "deviceFailure",
      "guestService",
-     "everyChangeIsAudited"
+     "other"
     ],
-    "description": "Vocabulary listed under Reason."
-   }
-  }
- },
- "VirtualCredentialMediaAssociationView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Virtual Credential & Media Association displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "andThereforeToTheSame": {
-    "type": "string",
-    "description": "and therefore to the same"
+    "description": "Reason code vocabulary for a method change; every change is audited"
    },
-   "ticket": {
+   "policyId": {
     "type": "string",
-    "description": "Ticket"
+    "description": "Verification method policy identifier"
    },
-   "guest": {
+   "productId": {
     "type": "string",
-    "description": "Guest"
+    "description": "Product the policy applies to"
    },
-   "entitlements": {
-    "type": "string",
-    "description": "Entitlements"
+   "lockOnFirstSuccessfulAccess": {
+    "type": "boolean",
+    "description": "The chosen method locks at the first successful access"
    },
-   "accessHistory": {
+   "changeAfterLock": {
     "type": "string",
-    "description": "Access history"
-   },
-   "consumptionState": {
-    "type": "string",
-    "description": "Consumption state"
-   },
-   "simultaneously": {
-    "type": "string",
-    "description": "simultaneously"
-   },
-   "qr8x72": {
-    "type": "string",
-    "description": "QR 8X72"
-   },
-   "rfid298173": {
-    "type": "string",
-    "description": "RFID 298173"
-   },
-   "walletCredential827": {
-    "type": "string",
-    "description": "Wallet Credential 827"
-   },
-   "resolvesTo": {
-    "type": "string",
-    "description": "resolves to"
+    "enum": [
+     "notAllowed",
+     "supervisorApproval"
+    ],
+    "description": "Who may change the method once locked; guests may not"
    }
   }
  }

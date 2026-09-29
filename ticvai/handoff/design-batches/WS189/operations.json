@@ -1,0 +1,116 @@
+{
+ "createSharedWallet": {
+  "method": "POST",
+  "path": "/shared-wallets",
+  "contract": "wallet",
+  "summary": "Set up a family, household or corporate wallet",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SharedWallet",
+  "responds": "SharedWallet"
+ },
+ "listSharedWallets": {
+  "method": "GET",
+  "path": "/shared-wallets",
+  "contract": "wallet",
+  "summary": "Family, household and corporate structures",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SharedWallet"
+ },
+ "setApprovalMatrix": {
+  "method": "PUT",
+  "path": "/approval-matrices",
+  "contract": "approvals",
+  "summary": "Configure what requires approval",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalMatrix",
+  "responds": "ApprovalMatrix"
+ },
+ "setSharedWalletMembers": {
+  "method": "PUT",
+  "path": "/shared-wallets/{sharedWalletId}/members",
+  "contract": "wallet",
+  "summary": "Allowances, budgets and what each member may spend on",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SharedWalletMember"
+ },
+ "simulateCreditConsumption": {
+  "method": "POST",
+  "path": "/credit-consumption/simulate",
+  "contract": "wallet",
+  "summary": "Which credit this purchase would actually use",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CreditAllocation"
+ },
+ "transferWalletBalance": {
+  "method": "POST",
+  "path": "/wallets/{walletId}/transfer",
+  "contract": "wallet",
+  "summary": "Send balance to another guest",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletTransaction"
+ }
+}

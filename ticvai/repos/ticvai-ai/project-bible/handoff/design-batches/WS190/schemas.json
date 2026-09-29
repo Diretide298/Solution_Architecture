@@ -1,0 +1,324 @@
+{
+ "CreditExpiryResult": {
+  "type": "object",
+  "description": "Board 3.9. **Expiry has an accounting consequence**, so the preview carries it.",
+  "properties": {
+   "lotsAffected": {
+    "type": "integer"
+   },
+   "totalAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "breakageAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "walletsAffected": {
+    "type": "integer"
+   },
+   "applied": {
+    "type": "boolean"
+   },
+   "asOf": {
+    "type": "string",
+    "format": "date"
+   }
+  }
+ },
+ "GiftCard": {
+  "x-ticvai-persistence": "wallet.gift_card",
+  "type": "object",
+  "required": [
+   "cardCode",
+   "faceValue",
+   "balance",
+   "status",
+   "issuedAt"
+  ],
+  "properties": {
+   "cardCode": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string"
+   },
+   "faceValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "balance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "issued",
+     "active",
+     "partiallyRedeemed",
+     "redeemed",
+     "expired",
+     "blocked"
+    ]
+   },
+   "blockedReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "activatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "GiftCardProduct": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.gift_card_product",
+  "description": "Boards 5.2 and 5.3. **Activation separate from issuance is a theft control.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "denominations": {
+    "type": "array",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/Money"
+    }
+   },
+   "openAmountAllowed": {
+    "type": "boolean",
+    "default": false
+   },
+   "minimumAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "maximumAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "reloadable": {
+    "type": "boolean",
+    "default": false
+   },
+   "validityMonths": {
+    "type": "integer",
+    "nullable": true
+   },
+   "activationRequired": {
+    "type": "boolean",
+    "default": true
+   },
+   "creditTypeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "physical": {
+    "type": "boolean",
+    "default": false
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "IssueGiftCardRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "faceValue",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "physical",
+     "digital"
+    ]
+   },
+   "cardCode": {
+    "type": "string",
+    "description": "Required for physical cards, which are pre-printed. Generated for digital."
+   },
+   "faceValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "recipientEmail": {
+    "type": "string",
+    "nullable": true
+   },
+   "recipientPhone": {
+    "type": "string",
+    "nullable": true
+   },
+   "message": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "validMonths": {
+    "type": "integer",
+    "minimum": 1
+   }
+  }
+ },
+ "VoucherType": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.voucher_type",
+  "description": "Board 5.4. **An entitlement with conditions, not a balance.**",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "benefitKind": {
+    "type": "string",
+    "enum": [
+     "freeItem",
+     "percentDiscount",
+     "fixedDiscount",
+     "upgrade",
+     "accessEntitlement",
+     "companionEntry"
+    ]
+   },
+   "benefitValue": {
+    "type": "number",
+    "nullable": true
+   },
+   "conditions": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "singleUse": {
+    "type": "boolean",
+    "default": true
+   },
+   "combinable": {
+    "type": "boolean",
+    "default": false
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "issueLimit": {
+    "type": "integer",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletConfigurationVersion": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.configuration_version",
+  "description": "Boards 1.10 and 10.8. **Ten boards of configuration that interact.**",
+  "properties": {
+   "version": {
+    "type": "integer"
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "publishedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   },
+   "findings": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "severity": {
+       "type": "string",
+       "enum": [
+        "blocking",
+        "warning"
+       ]
+      },
+      "code": {
+       "type": "string"
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletLiabilityRow": {
+  "type": "object",
+  "description": "Boards 9.5 and 9.6. **The number the finance director asks for.**",
+  "properties": {
+   "key": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "outstanding": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "expiringThisPeriod": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "breakageRecognised": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "walletCount": {
+    "type": "integer"
+   },
+   "oldestLotAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   }
+  }
+ }
+}

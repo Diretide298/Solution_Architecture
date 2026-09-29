@@ -1,6 +1,6 @@
 # WS81 — Game and Ride board 4
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 7 operations · 5 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `ACCESS_VALIDATE, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-424` | Gameplay Validation Command Center | commandCentre | 0 | 0 | — |
-| `BO-425` | Gameplay Validation Rule Configuration | listDetail | 0 | 0 | — |
-| `BO-426` | Deduction Priority & Funding Source Rules | listDetail | 0 | 0 | — |
-| `BO-427` | All Games & Rides Pass Configuration | configEditor | 0 | 0 | — |
-| `BO-428` | Specific Game/Ride Unlimited Entitlement | configEditor | 0 | 0 | — |
-| `BO-429` | Specific Game/Ride Limited Entitlement | configEditor | 0 | 0 | — |
-| `BO-430` | Game Package Builder | listDetail | 0 | 0 | — |
-| `BO-431` | Entitlement Validity & Activation Rules | listDetail | 0 | 0 | — |
-| `BO-432` | Real-Time Gameplay Authorization | listDetail | 0 | 0 | — |
-| `BO-433` | Validation Simulator & Exception Analysis | listDetail | 0 | 0 | — |
+| `BO-424` | Gameplay Validation Command Center | commandCentre | 2 | 0 | — |
+| `BO-425` | Gameplay Validation Rule Configuration | listDetail | 1 | 0 | — |
+| `BO-426` | Deduction Priority & Funding Source Rules | listDetail | 1 | 0 | — |
+| `BO-427` | All Games & Rides Pass Configuration | configEditor | 1 | 0 | — |
+| `BO-428` | Specific Game/Ride Unlimited Entitlement | configEditor | 1 | 0 | — |
+| `BO-429` | Specific Game/Ride Limited Entitlement | configEditor | 1 | 0 | — |
+| `BO-430` | Game Package Builder | listDetail | 2 | 0 | — |
+| `BO-431` | Entitlement Validity & Activation Rules | listDetail | 1 | 0 | — |
+| `BO-432` | Real-Time Gameplay Authorization | listDetail | 1 | 0 | — |
+| `BO-433` | Validation Simulator & Exception Analysis | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 

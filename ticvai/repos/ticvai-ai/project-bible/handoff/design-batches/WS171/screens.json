@@ -1,0 +1,1463 @@
+[
+ {
+  "id": "BO-1013",
+  "name": "Rules Command Center",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "7",
+   "number": "01",
+   "page": 30
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/rules-command-center-bo-1013",
+   "component": "apps/venue-management-web/src/routes/access-venue/RulesCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-1014",
+    "BO-1015",
+    "BO-1016",
+    "BO-1017",
+    "BO-1018",
+    "BO-1019",
+    "BO-1020",
+    "BO-1021",
+    "BO-1022"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-1014",
+     "trigger": "Seat Kill Rules",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1015",
+     "trigger": "Buffer Seat Rules",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1016",
+     "trigger": "Companion Seat Rules",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1017",
+     "trigger": "Wheelchair Companion Rules",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1018",
+     "trigger": "Accessible Seating Master",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1019",
+     "trigger": "Accessible Route Mapping",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1020",
+     "trigger": "Accessible Filters & Eligibility",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1021",
+     "trigger": "Flexible Spacing Rules",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1022",
+     "trigger": "Compliance Validation & Audit",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Monitor seating-rule coverage, violations and compliance across venues. Show total and active rules, affected seats, open violations, capacity impact and venue compliance score. Filter by rule category, tenant, venue, event, layout, effective date, owner and severity. Surface missing accessible mappings, conflicting buffers and production changes requiring revalidation. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 30"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "filters",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Seat map",
+       "operation": "getSeatRules",
+       "notes": "Sends `?seatMapId=`.",
+       "provenance": "contract seating.yaml GET /seat-rules"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Killed seats",
+       "bindsTo": "SeatRules",
+       "columns": [
+        "SeatRules.killedSeatIds"
+       ],
+       "operation": "getSeatRules",
+       "notes": "Count of `killedSeatIds`.",
+       "provenance": "contract seating.yaml GET /seat-rules"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Buffer rule",
+       "bindsTo": "SeatRules.bufferRule",
+       "columns": [
+        "SeatRules.bufferRule.enabled"
+       ],
+       "operation": "getSeatRules",
+       "provenance": "contract seating.yaml GET /seat-rules"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Companion rule",
+       "bindsTo": "SeatRules.companionRule",
+       "columns": [
+        "SeatRules.companionRule.enabled"
+       ],
+       "operation": "getSeatRules",
+       "provenance": "contract seating.yaml GET /seat-rules"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Open violations",
+       "columns": [
+        "Open violations"
+       ],
+       "notes": "The pack asks for open violations; the contract has no field for it.",
+       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 30"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Venue compliance score",
+       "columns": [
+        "Venue compliance score"
+       ],
+       "notes": "The pack asks for venue compliance score; the contract has no field for it.",
+       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 30"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Killed seats and reasons",
+       "bindsTo": "SeatRules",
+       "columns": [
+        "SeatRules.killedSeatIds",
+        "SeatRules.killReasons"
+       ],
+       "operation": "getSeatRules",
+       "notes": "One row per killed seat with its reason from `killReasons`.",
+       "provenance": "contract seating.yaml GET /seat-rules"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Rules in force",
+       "bindsTo": "SeatRules",
+       "columns": [
+        "SeatRules.seatMapId",
+        "SeatRules.scopePath",
+        "SeatRules.bufferRule.seatsEitherSide",
+        "SeatRules.bufferRule.rowsEitherSide",
+        "SeatRules.bufferRule.avoidSingleGaps",
+        "SeatRules.companionRule.pairs",
+        "SeatRules.companionRule.releaseCompanionHoursBefore",
+        "SeatRules.flexibleSpacing.enabled",
+        "SeatRules.flexibleSpacing.densityPercent",
+        "SeatRules.flexibleSpacing.perPerformanceOverride"
+       ],
+       "operation": "getSeatRules",
+       "provenance": "contract seating.yaml GET /seat-rules"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The rules list.",
+   "error": "Could not load. Names which read failed and leaves the rules untouched.",
+   "emptyFirstRun": "No rules yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the rules are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getSeatRules",
+    "contract": "seating",
+    "purpose": "Rules in force",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1013",
+   "workshopBoard": "wireframes/WS146 Seat Management Venue Mapping Reference v1.0 Board 7.dc.html#bo-1013"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 30. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Seat_Management_Venue_Mapping_Reference v1.0.pdf p.30; contract seating.yaml GET /seat-rules. Pack labels with no schema field yet (shown as plain labels): Open violations, Venue compliance score, Total / active rules, Capacity impact, Missing accessible mappings, Conflicting buffers, Filters: rule category, venue, event, effective date, owner, severity.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1014",
+  "name": "Seat Kill Rules",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "7",
+   "number": "02",
+   "page": 30
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/seat-kill-rules-bo-1014",
+   "component": "apps/venue-management-web/src/routes/access-venue/SeatKillRules.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1013"
+   ],
+   "exitTo": [
+    "BO-1013"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1013",
+     "trigger": "Back to Rules Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Remove seats from sale based on permanent or conditional unusability. Configure sightline, stage, production, obstruction, equipment, safety, maintenance and venue-defined kill reasons. Apply by seat list, section, row, polygon, obstruction distance, event type or layout condition. Preview affected capacity, sold/reserved inventory and alternative seating before activation. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 30"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 30"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setSeatRules",
+       "label": "Save seat rules",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setSeatRules"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The seat kill rules list.",
+   "error": "Could not load. Names which read failed and leaves the seat kill rules untouched.",
+   "emptyFirstRun": "No seat kill rules yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the seat kill rules are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setSeatRules",
+    "contract": "seating",
+    "purpose": "Kill a seat, with a reason",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getSeatRules",
+     "getSeatInventory"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1014",
+   "workshopBoard": "wireframes/WS146 Seat Management Venue Mapping Reference v1.0 Board 7.dc.html#bo-1014"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 30. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1015",
+  "name": "Buffer Seat Rules",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "7",
+   "number": "03",
+   "page": 30
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/buffer-seat-rules-bo-1015",
+   "component": "apps/venue-management-web/src/routes/access-venue/BufferSeatRules.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1013"
+   ],
+   "exitTo": [
+    "BO-1013"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1013",
+     "trigger": "Back to Rules Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Create controlled unsold spacing around seats, zones or production objects. Define left/right, radial, row, perimeter, alternating or custom buffer patterns and minimum distance. Apply dynamically around selected seats, wheelchair spaces, camera positions, stages or restricted zones. Configure release behavior, priority, interaction with holds and treatment when a buffer conflicts with a sale. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 30",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 30"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 30"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setSeatRules",
+       "label": "Save seat rules",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setSeatRules"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The buffer seat rules list.",
+   "error": "Could not load. Names which read failed and leaves the buffer seat rules untouched.",
+   "emptyFirstRun": "No buffer seat rules yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the buffer seat rules are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setSeatRules",
+    "contract": "seating",
+    "purpose": "Buffer seats around a sale",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getSeatRules",
+     "getSeatInventory"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1015",
+   "workshopBoard": "wireframes/WS146 Seat Management Venue Mapping Reference v1.0 Board 7.dc.html#bo-1015"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 30. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1016",
+  "name": "Companion Seat Rules",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "7",
+   "number": "04",
+   "page": 31
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/companion-seat-rules-bo-1016",
+   "component": "apps/venue-management-web/src/routes/access-venue/CompanionSeatRules.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1013"
+   ],
+   "exitTo": [
+    "BO-1013"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1013",
+     "trigger": "Back to Rules Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Keep appropriate companion inventory linked to designated seats. Configure eligible seat types, adjacency, ratio, maximum companions and same-row or nearby rules. Control whether companions must be selected together and when unneeded companion seats may be released. Support family, premium, group and venue-defined companion policies without overriding wheelchair-specific rules. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 31"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 31"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setSeatRules",
+       "label": "Save seat rules",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setSeatRules"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The companion seat rules list.",
+   "error": "Could not load. Names which read failed and leaves the companion seat rules untouched.",
+   "emptyFirstRun": "No companion seat rules yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the companion seat rules are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setSeatRules",
+    "contract": "seating",
+    "purpose": "Companion pairing",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getSeatRules",
+     "getSeatInventory"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1016",
+   "workshopBoard": "wireframes/WS146 Seat Management Venue Mapping Reference v1.0 Board 7.dc.html#bo-1016"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 31. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1017",
+  "name": "Wheelchair Companion Rules",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "7",
+   "number": "05",
+   "page": 31
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/wheelchair-companion-rules-bo-1017",
+   "component": "apps/venue-management-web/src/routes/access-venue/WheelchairCompanionRules.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1013"
+   ],
+   "exitTo": [
+    "BO-1013"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1013",
+     "trigger": "Back to Rules Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Manage wheelchair-space and companion-seat pairing. Define one-to-one or configurable ratios, adjacency, transfer-seat eligibility and alternative companion locations. Require wheelchair space selection before companion inventory where policy permits and explain the rule clearly. Control release to general sale only through approved timing, evidence and accessible-demand safeguards. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 31"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 31"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setSeatRules",
+       "label": "Save seat rules",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setSeatRules"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The wheelchair companion rules list.",
+   "error": "Could not load. Names which read failed and leaves the wheelchair companion rules untouched.",
+   "emptyFirstRun": "No wheelchair companion rules yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the wheelchair companion rules are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setSeatRules",
+    "contract": "seating",
+    "purpose": "Wheelchair companion rules",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getSeatRules",
+     "getSeatInventory"
+    ]
+   },
+   {
+    "operationId": "getAccessibleSeating",
+    "contract": "seating",
+    "purpose": "The spaces being paired",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1017",
+   "workshopBoard": "wireframes/WS146 Seat Management Venue Mapping Reference v1.0 Board 7.dc.html#bo-1017"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 31. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1018",
+  "name": "Accessible Seating Master",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "7",
+   "number": "06",
+   "page": 31
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/accessible-seating-master-bo-1018",
+   "component": "apps/venue-management-web/src/routes/access-venue/AccessibleSeatingMaster.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1013"
+   ],
+   "exitTo": [
+    "BO-1013"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1013",
+     "trigger": "Back to Rules Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Maintain a standard catalog of accessible seat and space attributes. Configure wheelchair, companion, ambulatory, transfer, hearing, vision, service-animal and other supported types. Store dimensions, capacity treatment, route requirements, amenities, assisted access and display labels. Map each type to venue inventory, ticket products, customer-facing filters and compliance reporting. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 31"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 31"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setAccessibleSeating",
+       "label": "Save accessible seating",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setAccessibleSeating"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The accessible seating master list.",
+   "error": "Could not load. Names which read failed and leaves the accessible seating master untouched.",
+   "emptyFirstRun": "No accessible seating master yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the accessible seating master are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getAccessibleSeating",
+    "contract": "seating",
+    "purpose": "The accessible inventory",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setAccessibleSeating",
+    "contract": "seating",
+    "purpose": "Define it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getAccessibleSeating",
+     "validateSeatCompliance"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1018",
+   "workshopBoard": "wireframes/WS146 Seat Management Venue Mapping Reference v1.0 Board 7.dc.html#bo-1018"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 31. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1019",
+  "name": "Accessible Route Mapping",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "7",
+   "number": "07",
+   "page": 31
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/accessible-route-mapping-bo-1019",
+   "component": "apps/venue-management-web/src/routes/access-venue/AccessibleRouteMapping.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1013"
+   ],
+   "exitTo": [
+    "BO-1013"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1013",
+     "trigger": "Back to Rules Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Identify accessible journeys from entry to seats and facilities. Create routes through accessible entrances, lifts, ramps, concourses, restrooms and designated seating. Store distance, slope, level changes, width, surface, assistance requirement and temporary closure status. Validate route continuity and show impact when a layout, facility or access point becomes unavailable. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 31",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 31"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 31"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setAccessibleSeating",
+       "label": "Save accessible seating",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setAccessibleSeating"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The accessible route mapping list.",
+   "error": "Could not load. Names which read failed and leaves the accessible route mapping untouched.",
+   "emptyFirstRun": "No accessible route mapping yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the accessible route mapping are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setAccessibleSeating",
+    "contract": "seating",
+    "purpose": "Routes to each space",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getAccessibleSeating",
+     "validateSeatCompliance"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1019",
+   "workshopBoard": "wireframes/WS146 Seat Management Venue Mapping Reference v1.0 Board 7.dc.html#bo-1019"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 31. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1020",
+  "name": "Accessible Filters & Eligibility",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "7",
+   "number": "08",
+   "page": 32
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/accessible-filters-eligibility-bo-1020",
+   "component": "apps/venue-management-web/src/routes/access-venue/AccessibleFiltersEligibility.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1013"
+   ],
+   "exitTo": [
+    "BO-1013"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1013",
+     "trigger": "Back to Rules Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure inclusive discovery without exposing sensitive guest information. Define filters and labels for wheelchair, companion, aisle, step-free, transfer, hearing, vision and service-animal needs. Configure eligibility attestation, documentation policy where lawful, assisted-sale path and privacy restrictions. Preview the B2C, mobile, POS and call-center experience and ensure equivalent inventory visibility. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 32"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 32"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setAccessibleSeating",
+       "label": "Save accessible seating",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setAccessibleSeating"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The accessible filters eligibility list.",
+   "error": "Could not load. Names which read failed and leaves the accessible filters eligibility untouched.",
+   "emptyFirstRun": "No accessible filters eligibility yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the accessible filters eligibility are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setAccessibleSeating",
+    "contract": "seating",
+    "purpose": "Who may buy them",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getAccessibleSeating",
+     "validateSeatCompliance"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1020",
+   "workshopBoard": "wireframes/WS146 Seat Management Venue Mapping Reference v1.0 Board 7.dc.html#bo-1020"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 32. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1021",
+  "name": "Flexible Spacing Rules",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "7",
+   "number": "09",
+   "page": 32
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/flexible-spacing-rules-bo-1021",
+   "component": "apps/venue-management-web/src/routes/access-venue/FlexibleSpacingRules.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1013"
+   ],
+   "exitTo": [
+    "BO-1013"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1013",
+     "trigger": "Back to Rules Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Support temporary public-health or operational spacing requirements. Configure distance, seat count, checkerboard, blocked-row, household-group and custom patterns. Apply by event, venue, zone, seat type or time window and preview capacity and revenue impact. Coordinate with group seating, accessible inventory, holds and sold seats and prevent retroactive unsafe changes. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 32"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 32"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setSeatRules",
+       "label": "Save seat rules",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setSeatRules"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The flexible spacing rules list.",
+   "error": "Could not load. Names which read failed and leaves the flexible spacing rules untouched.",
+   "emptyFirstRun": "No flexible spacing rules yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the flexible spacing rules are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setSeatRules",
+    "contract": "seating",
+    "purpose": "Flexible spacing and density",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getSeatRules",
+     "getSeatInventory"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1021",
+   "workshopBoard": "wireframes/WS146 Seat Management Venue Mapping Reference v1.0 Board 7.dc.html#bo-1021"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 32. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1022",
+  "name": "Compliance Validation & Audit",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "7",
+   "number": "10",
+   "page": 32
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/compliance-validation-audit-bo-1022",
+   "component": "apps/venue-management-web/src/routes/access-venue/ComplianceValidationAudit.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1013"
+   ],
+   "exitTo": [
+    "BO-1013"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1013",
+     "trigger": "Back to Rules Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Demonstrate that seating rules and accessibility configuration are complete and enforced. Run validations for accessible quantities, companion ratios, route continuity, conflicts, labels and customer-channel parity. Provide issue severity, affected inventory, rule reference, owner, deadline, remediation and evidence. Retain configuration, approval, enforcement, release and override history with controlled compliance export. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 32 Board 8 - Group Reservations & Bulk Allocation Figure 8. High-definition configuration board with all 10 screens. Visual reference: information architecture and configuration coverage; detailed production behavior is defined in the following scope. Configuration Scope of Work | Version 1.0 33",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 32"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "filters",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Seat map",
+       "operation": "validateSeatCompliance",
+       "notes": "Sends `?seatMapId=` (required).",
+       "provenance": "contract seating.yaml GET /seat-compliance"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Breaches",
+       "bindsTo": "SeatComplianceFinding",
+       "columns": [
+        "SeatComplianceFinding.severity"
+       ],
+       "operation": "validateSeatCompliance",
+       "notes": "Count where `severity` is breach.",
+       "provenance": "contract seating.yaml GET /seat-compliance"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Warnings",
+       "bindsTo": "SeatComplianceFinding",
+       "columns": [
+        "SeatComplianceFinding.severity"
+       ],
+       "operation": "validateSeatCompliance",
+       "notes": "Count where `severity` is warning.",
+       "provenance": "contract seating.yaml GET /seat-compliance"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Findings",
+       "bindsTo": "SeatComplianceFinding",
+       "columns": [
+        "SeatComplianceFinding.code",
+        "SeatComplianceFinding.severity",
+        "SeatComplianceFinding.message",
+        "SeatComplianceFinding.required",
+        "SeatComplianceFinding.actual",
+        "SeatComplianceFinding.affectedSeatIds",
+        "Owner",
+        "Deadline"
+       ],
+       "operation": "validateSeatCompliance",
+       "notes": "Accessible quantities, companion ratios, route continuity, conflicts, labels and channel parity.",
+       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 32"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected finding",
+       "bindsTo": "SeatComplianceFinding",
+       "columns": [
+        "SeatComplianceFinding.code",
+        "SeatComplianceFinding.severity",
+        "SeatComplianceFinding.message",
+        "SeatComplianceFinding.required",
+        "SeatComplianceFinding.actual",
+        "SeatComplianceFinding.affectedSeatIds",
+        "Rule reference",
+        "Remediation",
+        "Evidence"
+       ],
+       "operation": "validateSeatCompliance",
+       "notes": "Rule reference, remediation and evidence are pack labels.",
+       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 32"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Run validation",
+       "operation": "validateSeatCompliance",
+       "notes": "Re-runs the checks.",
+       "provenance": "contract seating.yaml GET /seat-compliance"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Export compliance evidence",
+       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 32"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The compliance validation audit list.",
+   "error": "Could not load. Names which read failed and leaves the compliance validation audit untouched.",
+   "emptyFirstRun": "No compliance validation audit yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the compliance validation audit are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "validateSeatCompliance",
+    "contract": "seating",
+    "purpose": "Whether the map still complies",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1022",
+   "workshopBoard": "wireframes/WS146 Seat Management Venue Mapping Reference v1.0 Board 7.dc.html#bo-1022"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 32. 0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Seat_Management_Venue_Mapping_Reference v1.0.pdf p.32; contract seating.yaml GET /seat-compliance. Pack labels with no schema field yet (shown as plain labels): Rule reference, Owner, Deadline, Remediation, Evidence.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

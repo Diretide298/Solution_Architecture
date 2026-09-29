@@ -1,6 +1,6 @@
 # WS11 — Access Control board 11
 
-**10 screens · 10 operations · 12 schemas · 2 permissions**
+**10 screens · 11 operations · 10 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, SCOPE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, REPORT_VIEW_VENUE, SCOPE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -62,10 +61,10 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `BO-244` | Access Security & Fraud Command Center | listDetail | 1 | 0 | — |
-| `BO-245` | Fraud Detection Rule & Signal Library | listDetail | 1 | 0 | — |
+| `BO-245` | Fraud Detection Rule & Signal Library | listDetail | 2 | 0 | — |
 | `BO-246` | Credential Sharing & Concurrent Usage Detection | listDetail | 1 | 0 | — |
 | `BO-247` | Unified Identity & Credential Lock Manager | listDetail | 1 | 0 | — |
-| `BO-248` | Biometric & Identity Integrity Monitoring | listDetail | 1 | 0 | — |
+| `BO-248` | Biometric & Identity Integrity Monitoring | listDetail | 2 | 0 | — |
 | `BO-249` | Relationship & Companion Fraud Monitoring | configEditor | 1 | 0 | — |
 | `BO-250` | Access Risk Scoring & Decision Engine | listDetail | 1 | 0 | — |
 | `BO-251` | Real-Time Security Response & Playbook Builder | listDetail | 1 | 0 | — |
@@ -74,7 +73,7 @@ convincingly. It is never a caption.
 
 ## Thin screens in this batch
 
-**BO-244, BO-245, BO-246, BO-247, BO-248, BO-250, BO-252 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-245, BO-246, BO-247, BO-248, BO-250, BO-252 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-244 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-245",
@@ -186,13 +182,110 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Security teams can understand the overall fraud and access-security posture from one screen.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Show) and no metric row",
   "purpose": "Provide security teams with a real-time command center for access-related fraud and suspicious activity across all venues.",
-  "purposeNote": "Security teams can understand the overall fraud and access-security posture from one screen.",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active Security Alerts",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.activeSecurityAlerts",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "High-Risk Credentials",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.highRiskCredentials",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Credentials Locked Today",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.credentialsLockedToday",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Suspicious QR Activity",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.suspiciousQrActivity",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Device-Sharing Alerts",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.deviceSharingAlerts",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Biometric Alerts",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.biometricAlerts",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Blacklisted Credentials",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.blacklistedCredentials",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Active Investigations",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.activeInvestigations",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Fraud attempts prevented today",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.fraudPrevented",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Share of today's validations at low risk, percent",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.lowRisk",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Share at medium risk, percent",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.mediumRisk",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Share at high risk, percent",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.highRisk",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Share at critical risk, percent",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.critical",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -201,20 +294,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every access security fraud",
        "columns": [
-        "AccessSecurityFraudCommandCenterView.activeSecurityAlerts",
-        "AccessSecurityFraudCommandCenterView.highRiskCredentials",
-        "AccessSecurityFraudCommandCenterView.credentialsLockedToday",
-        "AccessSecurityFraudCommandCenterView.suspiciousQrActivity",
-        "AccessSecurityFraudCommandCenterView.deviceSharingAlerts",
-        "AccessSecurityFraudCommandCenterView.biometricAlerts",
-        "Duplicate Access Attempts",
-        "AccessSecurityFraudCommandCenterView.blacklistedCredentials",
-        "AccessSecurityFraudCommandCenterView.activeInvestigations",
-        "AccessSecurityFraudCommandCenterView.fraudPrevented",
-        "AccessSecurityFraudCommandCenterView.lowRisk",
-        "AccessSecurityFraudCommandCenterView.mediumRisk",
-        "AccessSecurityFraudCommandCenterView.highRisk",
-        "AccessSecurityFraudCommandCenterView.critical"
+        "Duplicate Access Attempts"
        ],
        "bindsTo": "AccessSecurityFraudCommandCenterView",
        "operation": "listAccessSecurityFraud",
@@ -231,20 +311,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected access security fraud",
        "bindsTo": "AccessSecurityFraudCommandCenterView",
        "columns": [
-        "AccessSecurityFraudCommandCenterView.activeSecurityAlerts",
-        "AccessSecurityFraudCommandCenterView.highRiskCredentials",
-        "AccessSecurityFraudCommandCenterView.credentialsLockedToday",
-        "AccessSecurityFraudCommandCenterView.suspiciousQrActivity",
-        "AccessSecurityFraudCommandCenterView.deviceSharingAlerts",
-        "AccessSecurityFraudCommandCenterView.biometricAlerts",
-        "Duplicate Access Attempts",
-        "AccessSecurityFraudCommandCenterView.blacklistedCredentials",
-        "AccessSecurityFraudCommandCenterView.activeInvestigations",
-        "AccessSecurityFraudCommandCenterView.fraudPrevented",
-        "AccessSecurityFraudCommandCenterView.lowRisk",
-        "AccessSecurityFraudCommandCenterView.mediumRisk",
-        "AccessSecurityFraudCommandCenterView.highRisk",
-        "AccessSecurityFraudCommandCenterView.critical"
+        "Duplicate Access Attempts"
        ],
        "notes": "The pack groups this record's detail under its own headings: “CRITICAL”, “HIGH”, “MEDIUM”, “Display incidents geographically across”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 151 §Display"
@@ -270,18 +337,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "AccessSecurityFraudCommandCenterView.activeSecurityAlerts",
-    "AccessSecurityFraudCommandCenterView.highRiskCredentials",
-    "AccessSecurityFraudCommandCenterView.credentialsLockedToday",
-    "AccessSecurityFraudCommandCenterView.suspiciousQrActivity",
-    "AccessSecurityFraudCommandCenterView.deviceSharingAlerts",
-    "AccessSecurityFraudCommandCenterView.biometricAlerts"
+    "AccessSecurityFraudCommandCenterViewSummary.activeSecurityAlerts",
+    "AccessSecurityFraudCommandCenterViewSummary.highRiskCredentials",
+    "AccessSecurityFraudCommandCenterViewSummary.credentialsLockedToday",
+    "AccessSecurityFraudCommandCenterViewSummary.suspiciousQrActivity",
+    "AccessSecurityFraudCommandCenterViewSummary.deviceSharingAlerts",
+    "AccessSecurityFraudCommandCenterViewSummary.biometricAlerts"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-244"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-244",
+   "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-244"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 151. 13 of 14 labels bound to a contract property; 14 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -344,10 +412,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Fraud detection logic is configurable rather than hard-coded.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure the signals TICVAI uses to identify suspicious access behavior.",
-  "purposeNote": "Fraud detection logic is configurable rather than hard-coded.",
   "gaps": [
    {
     "operation": null,
@@ -373,6 +441,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save fraud rule",
+       "operation": "setFraudDetectionRule",
+       "provenance": "contract access.yaml PUT /fraud-detection-rule (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -389,21 +469,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Fraud Detection Rule & Signal Library",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setFraudDetectionRule",
+    "contract": "access",
+    "purpose": "Save fraud rule",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "preloaded": [
-    "FraudDetectionRuleSignalLibraryView.excessiveQrActivations",
-    "FraudDetectionRuleSignalLibraryView.multipleActiveSessions",
-    "FraudDetectionRuleSignalLibraryView.credentialCopied",
-    "FraudDetectionRuleSignalLibraryView.excessiveRefreshAttempts",
-    "FraudDetectionRuleSignalLibraryView.invalidSignature"
+    "FraudDetectionRuleSignalLibraryView.signal"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-245"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-245",
+   "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-245"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 152. 0 of 0 labels bound to a contract property; 0 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -466,10 +549,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "validation.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Detect one of the most important access-control fraud scenarios: One valid ticket being shared by multiple people or devices.",
-  "purposeNote": "validation.",
   "gaps": [
    {
     "operation": null,
@@ -515,17 +598,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "CredentialSharingConcurrentUsageDetectionView.iphoneDeviceA",
     "CredentialSharingConcurrentUsageDetectionView.additionalDevices",
     "CredentialSharingConcurrentUsageDetectionView.maximumActiveDevices",
-    "CredentialSharingConcurrentUsageDetectionView.increaseRisk",
-    "CredentialSharingConcurrentUsageDetectionView.requireId"
+    "CredentialSharingConcurrentUsageDetectionView.responseActions"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-246"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-246",
+   "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-246"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 154. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -588,10 +670,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "One security action can immediately restrict all configured access representations associated with a suspicious identity.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Provide the single security lock required by the matrix so suspicious activity can immediately stop all access associated with an identity.",
-  "purposeNote": "One security action can immediately restrict all configured access representations associated with a suspicious identity.",
   "gaps": [
    {
     "operation": null,
@@ -610,11 +692,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every unified identity credential",
        "columns": [
-        "UnifiedIdentityCredentialLockManagerView.centralPlatform",
-        "UnifiedIdentityCredentialLockManagerView.venueEdge",
-        "UnifiedIdentityCredentialLockManagerView.onlineGates",
-        "UnifiedIdentityCredentialLockManagerView.offlineRevocationPackage",
-        "UnifiedIdentityCredentialLockManagerView.mobileDevices"
+        "UnifiedIdentityCredentialLockManagerView.propagatedTo"
        ],
        "bindsTo": "UnifiedIdentityCredentialLockManagerView",
        "operation": "listUnifiedIdentityCredential",
@@ -631,11 +709,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected unified identity credential",
        "bindsTo": "UnifiedIdentityCredentialLockManagerView",
        "columns": [
-        "UnifiedIdentityCredentialLockManagerView.centralPlatform",
-        "UnifiedIdentityCredentialLockManagerView.venueEdge",
-        "UnifiedIdentityCredentialLockManagerView.onlineGates",
-        "UnifiedIdentityCredentialLockManagerView.offlineRevocationPackage",
-        "UnifiedIdentityCredentialLockManagerView.mobileDevices"
+        "UnifiedIdentityCredentialLockManagerView.propagatedTo"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Identity”, “Associated Credentials”, “Lock Duration”, “Unlock”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 155 §Show"
@@ -661,17 +735,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "UnifiedIdentityCredentialLockManagerView.centralPlatform",
-    "UnifiedIdentityCredentialLockManagerView.venueEdge",
-    "UnifiedIdentityCredentialLockManagerView.onlineGates",
-    "UnifiedIdentityCredentialLockManagerView.offlineRevocationPackage",
-    "UnifiedIdentityCredentialLockManagerView.mobileDevices"
+    "UnifiedIdentityCredentialLockManagerView.propagatedTo"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-247"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-247",
+   "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-247"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 155. 5 of 5 labels bound to a contract property; 9 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -734,10 +805,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Identity changes and unusual biometric behavior automatically feed TICVAI's access-risk process.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Monitor) and no metric row",
   "purpose": "Detect suspicious biometric and identity-related changes without duplicating Board 5's biometric configuration. Board 5 configures biometrics. Board 11 monitors biometric security risk.",
-  "purposeNote": "Identity changes and unusual biometric behavior automatically feed TICVAI's access-risk process.",
   "layout": {
    "template": "split",
    "regions": [
@@ -749,12 +820,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every biometric identity integrity",
        "columns": [
-        "BiometricIdentityIntegrityMonitoringView.faceChanged",
-        "BiometricIdentityIntegrityMonitoringView.reEnrollment",
-        "BiometricIdentityIntegrityMonitoringView.repeatedFaceMismatch",
+        "BiometricIdentityIntegrityMonitoringView.anomalyType",
         "multiple faces associated with one credential",
-        "one face associated with multiple credentials",
-        "BiometricIdentityIntegrityMonitoringView.suspiciousEnrollmentFrequency"
+        "one face associated with multiple credentials"
        ],
        "bindsTo": "BiometricIdentityIntegrityMonitoringView",
        "operation": "listBiometricIdentityIntegrity",
@@ -771,12 +839,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected biometric identity integrity",
        "bindsTo": "BiometricIdentityIntegrityMonitoringView",
        "columns": [
-        "BiometricIdentityIntegrityMonitoringView.faceChanged",
-        "BiometricIdentityIntegrityMonitoringView.reEnrollment",
-        "BiometricIdentityIntegrityMonitoringView.repeatedFaceMismatch",
+        "BiometricIdentityIntegrityMonitoringView.anomalyType",
         "multiple faces associated with one credential",
-        "one face associated with multiple credentials",
-        "BiometricIdentityIntegrityMonitoringView.suspiciousEnrollmentFrequency"
+        "one face associated with multiple credentials"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Original Face Enrollment”, “Successful Visits”, “Face Changed”, “Reason”, “Enrollment 1”, “Enrollment 2”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 156 §Monitor"
@@ -798,22 +863,30 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Biometric & Identity Integrity Monitoring",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setSecurityInvestigationEvidence",
+    "contract": "access",
+    "purpose": "Open an investigation on a flagged face change or mismatch",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listBiometricIdentityIntegrity"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "BiometricIdentityIntegrityMonitoringView.faceChanged",
-    "BiometricIdentityIntegrityMonitoringView.reEnrollment",
-    "BiometricIdentityIntegrityMonitoringView.repeatedFaceMismatch",
+    "BiometricIdentityIntegrityMonitoringView.anomalyType",
     "multiple faces associated with one credential",
-    "one face associated with multiple credentials",
-    "BiometricIdentityIntegrityMonitoringView.suspiciousEnrollmentFrequency"
+    "one face associated with multiple credentials"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-248"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-248",
+   "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-248"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 156. 4 of 6 labels bound to a contract property; 6 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -876,10 +949,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Linked-person relationships are continuously monitored rather than checked only at initial credential creation.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Detect abuse involving linked guests such as: Child + Adult POD + Companion Guest + Nanny Group Leader + Group Membership dependents.",
-  "purposeNote": "Linked-person relationships are continuously monitored rather than checked only at initial credential creation.",
   "layout": {
    "template": "form",
    "regions": [
@@ -928,7 +1001,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-249"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-249",
+   "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-249"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 158. 0 of 0 labels bound to a contract property; 4 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -991,10 +1065,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Multiple fraud indicators produce a consistent, explainable security risk assessment.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Convert multiple security signals into a unified access risk score.",
-  "purposeNote": "Multiple fraud indicators produce a consistent, explainable security risk assessment.",
   "gaps": [
    {
     "operation": null,
@@ -1039,18 +1113,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    }
   ],
   "entryState": {
-   "preloaded": [
-    "AccessRiskScoringDecisionEngineView.newDevice10",
-    "AccessRiskScoringDecisionEngineView.multipleSessions20",
-    "AccessRiskScoringDecisionEngineView.impossibleTravel25",
-    "AccessRiskScoringDecisionEngineView.previousFailedAttempts12",
-    "AccessRiskScoringDecisionEngineView.faceMismatch15"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-250"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-250",
+   "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-250"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 159. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1113,16 +1182,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Security responses are standardized, automated where appropriate and consistently executed across venues.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure what TICVAI automatically does when security conditions are detected.",
-  "purposeNote": "Security responses are standardized, automated where appropriate and consistently executed across venues.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 10 actions on this screen and the screen declares 1 operation.** Unserved: Alert Only, Increase Risk Score, Require Additional Verification, Require Supervisor, Temporarily Lock, Full Identity Lock, Blacklist, Notify Security …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Access Control Module_Reference.pdf, page 161 §Available Actions"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -1201,18 +1265,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setRealTimeSecurity",
     "contract": "access",
     "purpose": "Real-Time Security Response & Playbook Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setRealTimeSecurity"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-251"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-251",
+   "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-251"
   },
-  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 161. 0 of 0 labels bound to a contract property; 10 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 161. 0 of 0 labels bound to a contract property; 10 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Alert Only, Increase Risk Score, Require Additional Verification, Require Supervisor, Temporarily Lock, Full Identity Lock, Blacklist, Notify Security … are choices sent by `setRealTimeSecurity`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1273,10 +1335,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Security teams can reconstruct and investigate suspicious access behavior using a unified evidence trail.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide security specialists with a deeper investigation environment than Board 9's operational incident workspace.",
-  "purposeNote": "Security teams can reconstruct and investigate suspicious access behavior using a unified evidence trail.",
   "gaps": [
    {
     "operation": null,
@@ -1329,16 +1391,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setSecurityInvestigationEvidence",
     "contract": "access",
     "purpose": "Security Investigation & Evidence Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setSecurityInvestigationEvidence"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-252"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-252",
+   "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-252"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 162. 0 of 0 labels bound to a contract property; 0 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1393,10 +1453,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from BO-244, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Board 11 — Final 10-Screen Structure # Backend Screen Main Responsibility 11.1 Access Security & Fraud Command Center Real-time security posture 11.2 Fraud Detection Rule & Signal Library Configure fraud indicators 11.3 Credential Sharing & Concurrent Usage Detection Detect credential/device sharing 11.4 Unified Identity & Credential Lock Manager Immediately restrict compromised identities 11.5 Biometric & Identity Integrity Monitoring Detect biometric/identity anomalies 11.6 Relationship & Companion Fraud Monitoring Protect child/POD/nanny/group relationships 11.7 Access Risk Scoring & Decisi",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show; Measure) and no metric row",
   "purpose": "Provide long-term intelligence on fraud patterns, security controls and effectiveness.",
-  "purposeNote": "Board 11 — Final 10-Screen Structure # Backend Screen Main Responsibility 11.1 Access Security & Fraud Command Center Real-time security posture 11.2 Fraud Detection Rule & Signal Library Configure fraud indicators 11.3 Credential Sharing & Concurrent Usage Detection Detect credential/device sharing 11.4 Unified Identity & Credential Lock Manager Immediately restrict compromised identities 11.5 Biometric & Identity Integrity Monitoring Detect biometric/identity anomalies 11.6 Relationship & Companion Fraud Monitoring Protect child/POD/nanny/group relationships 11.7 Access Risk Scoring & Decisi",
   "layout": {
    "template": "split",
    "regions": [
@@ -1521,7 +1581,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-253"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-253",
+   "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-253"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 164. 15 of 26 labels bound to a contract property; 26 of 93 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1578,9 +1639,40 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "park",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "zone",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "gate",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AccessSecurityFraudCommandCenterView"
+  "responds": "Page"
  },
  "listBiometricIdentityIntegrity": {
   "method": "GET",
@@ -1591,9 +1683,20 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "BiometricIdentityIntegrityMonitoringView"
+  "responds": "Page"
  },
  "listCredentialSharingConcurrent": {
   "method": "GET",
@@ -1604,9 +1707,20 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CredentialSharingConcurrentUsageDetectionView"
+  "responds": "Page"
  },
  "listFraudDetectionRule": {
   "method": "GET",
@@ -1639,7 +1753,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/security-detection-governance",
   "contract": "access",
   "summary": "Security Analytics, AI Detection & Governance",
-  "permission": "SCOPE_VIEW",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -1683,6 +1797,21 @@ Method, path, parameters, request and response for every operation these screens
     "name": "media",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "device",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "gate",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "timeDay",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -1697,9 +1826,39 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "UnifiedIdentityCredentialLockManagerView"
+  "responds": "Page"
+ },
+ "setFraudDetectionRule": {
+  "method": "PUT",
+  "path": "/fraud-detection-rule",
+  "contract": "access",
+  "summary": "Save an access fraud detection rule",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FraudDetectionRuleSignalLibraryInput",
+  "responds": "FraudDetectionRuleSignalLibraryView"
  },
  "setRealTimeSecurity": {
   "method": "PUT",
@@ -1710,7 +1869,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "RealTimeSecurityResponsePlaybookBuilderInput",
   "responds": "RealTimeSecurityResponsePlaybookBuilderView"
  },
@@ -1723,7 +1888,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "SecurityInvestigationEvidenceWorkspaceInput",
   "responds": "SecurityInvestigationEvidenceWorkspaceView"
  }
@@ -1742,235 +1913,160 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Access Risk Scoring & Decision Engine displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "newDevice10": {
+   "riskFactors": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "venue",
+      "product",
+      "ticketValue",
+      "event",
+      "accessZone",
+      "time",
+      "credentialType",
+      "historicalBehavior"
+     ]
+    },
+    "description": "Context the score may depend on"
+   },
+   "mediumThreshold": {
     "type": "integer",
-    "description": "New Device +10"
+    "description": "Score from which risk is medium (pack: 30)"
    },
-   "multipleSessions20": {
-    "type": "string",
-    "description": "Multiple Sessions +20"
-   },
-   "impossibleTravel25": {
-    "type": "string",
-    "description": "Impossible Travel +25"
-   },
-   "previousFailedAttempts12": {
+   "highThreshold": {
     "type": "integer",
-    "description": "Previous Failed Attempts +12"
+    "description": "Score from which risk is high (pack: 60)"
    },
-   "faceMismatch15": {
-    "type": "string",
-    "description": "Face Mismatch +15"
-   },
-   "criticalLockSecurityReview": {
-    "type": "string",
-    "description": "Critical Lock + Security Review"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "ticketValue": {
-    "type": "string",
-    "description": "Ticket Value"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "accessZone": {
-    "type": "string",
-    "description": "Access Zone"
-   },
-   "time": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Time"
-   },
-   "credentialType": {
-    "type": "string",
-    "description": "Credential type"
-   },
-   "historicalBehavior": {
-    "type": "string",
-    "description": "historical behavior"
+   "criticalThreshold": {
+    "type": "integer",
+    "description": "Score from which risk is critical (pack: 80)"
    }
   }
  },
- "AccessSecurityFraudCommandCenterView": {
+ "FraudDetectionRuleSignalLibraryInput": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Access Security & Fraud Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — request only; the write configures the rules the matching View reads back (decided 29 September, VM close-out)",
+  "description": "**What Fraud Detection Rule & Signal Library submits** (decided 29 September, VM close-out). The writable fields of its View; the figures the screen computes are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "required": [
+   "signal",
+   "severity",
+   "threshold",
+   "timeWindow",
+   "response"
+  ],
   "properties": {
-   "activeSecurityAlerts": {
+   "ruleId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Absent creates a rule"
+   },
+   "signal": {
+    "type": "string",
+    "enum": [
+     "excessiveQrActivations",
+     "multipleActiveSessions",
+     "credentialCopied",
+     "excessiveRefreshAttempts",
+     "invalidSignature",
+     "expiredCredential",
+     "revokedCredential",
+     "screenshotReplayAttempt",
+     "abnormalTransferFrequency",
+     "repeatedFailedValidation",
+     "newDevice",
+     "multipleDevices",
+     "deviceBindingMismatch",
+     "rootedCompromisedDevice",
+     "abnormalDeviceChanges",
+     "impossibleDeviceMovement",
+     "suspiciousScannerDeviceActivity",
+     "duplicateEntry",
+     "simultaneousUse",
+     "antiPassbackViolations",
+     "unusualReEntry",
+     "unusualCrossover",
+     "excessiveAttractionUse",
+     "repeatedWrongGateAttempts",
+     "abnormalFastPassConsumption",
+     "faceMismatch",
+     "unusualFaceChange",
+     "multipleIdentitiesLinked",
+     "suspiciousCompanionChanges",
+     "podNannyRelationshipAnomalies"
+    ]
+   },
+   "signalCategory": {
+    "type": "string",
+    "enum": [
+     "credential",
+     "device",
+     "access",
+     "identity"
+    ]
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
+   },
+   "weight": {
     "type": "integer",
-    "description": "Active Security Alerts"
+    "minimum": 0,
+    "maximum": 100,
+    "description": "Contribution to the access risk score"
    },
-   "highRiskCredentials": {
+   "threshold": {
     "type": "integer",
-    "description": "High-Risk Credentials"
+    "minimum": 1,
+    "description": "Occurrences within timeWindow that fire the rule"
    },
-   "credentialsLockedToday": {
-    "type": "string",
-    "description": "Credentials Locked Today"
-   },
-   "suspiciousQrActivity": {
-    "type": "string",
-    "description": "Suspicious QR Activity"
-   },
-   "deviceSharingAlerts": {
+   "timeWindow": {
     "type": "integer",
-    "description": "Device-Sharing Alerts"
+    "minimum": 1,
+    "description": "Minutes"
    },
-   "biometricAlerts": {
-    "type": "integer",
-    "description": "Biometric Alerts"
-   },
-   "blacklistedCredentials": {
-    "type": "integer",
-    "description": "Blacklisted Credentials"
-   },
-   "activeInvestigations": {
-    "type": "integer",
-    "description": "Active Investigations"
-   },
-   "fraudPrevented": {
+   "scope": {
     "type": "string",
-    "description": "Fraud Prevented"
+    "description": "Scope path the rule applies to; empty is the whole tenant"
    },
-   "lowRisk": {
-    "type": "string",
-    "description": "🟢 Low Risk"
+   "applicableCredentialTypes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
    },
-   "mediumRisk": {
-    "type": "string",
-    "description": "🟡 Medium Risk"
+   "applicableVenues": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
    },
-   "highRisk": {
-    "type": "string",
-    "description": "🟠 High Risk"
-   },
-   "critical": {
-    "type": "string",
-    "description": "🔴 Critical"
-   },
-   "unusuallyHighReEntryAttemptsDetected": {
-    "type": "integer",
-    "description": "Unusually high re-entry attempts detected"
-   }
-  }
- },
- "BiometricIdentityIntegrityMonitoringView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Biometric & Identity Integrity Monitoring displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "faceChanged": {
-    "type": "string",
-    "description": "Face changed"
-   },
-   "reEnrollment": {
-    "type": "string",
-    "description": "Re-enrollment"
-   },
-   "repeatedFaceMismatch": {
-    "type": "string",
-    "description": "repeated face mismatch"
-   },
-   "suspiciousEnrollmentFrequency": {
-    "type": "string",
-    "description": "suspicious enrollment frequency"
-   },
-   "unusualVerificationFailures": {
-    "type": "integer",
-    "description": "unusual verification failures"
-   },
-   "successfulVisits": {
-    "type": "integer",
-    "description": "Successful Visits (the pack shows 28)"
-   },
-   "currentVerification": {
-    "type": "string",
-    "description": "Current verification"
-   },
-   "oldBiometricReference": {
-    "type": "string",
-    "description": "Old biometric reference"
-   },
-   "newBiometricReference": {
-    "type": "integer",
-    "description": "New biometric reference"
-   },
-   "changeDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "change date"
-   },
-   "location": {
-    "type": "string",
-    "description": "location"
-   },
-   "operator": {
-    "type": "string",
-    "description": "operator"
-   },
-   "verificationProcess": {
-    "type": "string",
-    "description": "verification process"
-   },
-   "reason": {
-    "type": "string",
-    "description": "reason"
-   },
-   "approval": {
-    "type": "string",
-    "description": "approval"
-   }
-  }
- },
- "CredentialSharingConcurrentUsageDetectionView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Credential Sharing & Concurrent Usage Detection displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "iphoneDeviceA": {
-    "type": "string",
-    "description": "iPhone — Device A"
-   },
-   "additionalDevices": {
-    "type": "integer",
-    "description": "Additional Devices (the pack shows 3)"
-   },
-   "maximumActiveDevices": {
-    "type": "integer",
-    "description": "Maximum Active Devices (the pack shows 1)"
-   },
-   "increaseRisk": {
-    "type": "string",
-    "description": "Increase Risk"
-   },
-   "requireId": {
-    "type": "string",
-    "description": "Require ID"
-   },
-   "requireBiometric": {
+   "offlineAvailability": {
     "type": "boolean",
-    "description": "Require Biometric"
+    "default": false,
+    "description": "Evaluated on the gate when offline"
    },
-   "requireOperator": {
-    "type": "boolean",
-    "description": "Require Operator"
-   },
-   "securityAlert": {
+   "response": {
     "type": "string",
-    "description": "Security alert"
+    "enum": [
+     "alertOnly",
+     "increaseRiskScore",
+     "requireAdditionalVerification",
+     "requireSupervisor",
+     "temporarilyLock",
+     "fullIdentityLock",
+     "blacklist"
+    ],
+    "default": "alertOnly"
+   },
+   "enabled": {
+    "type": "boolean",
+    "default": true
    }
   }
  },
@@ -1980,137 +2076,58 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Fraud Detection Rule & Signal Library displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "excessiveQrActivations": {
+   "ruleId": {
+    "type": "string"
+   },
+   "signal": {
     "type": "string",
-    "description": "Excessive QR activations"
-   },
-   "multipleActiveSessions": {
-    "type": "string",
-    "description": "Multiple active sessions"
-   },
-   "credentialCopied": {
-    "type": "string",
-    "description": "Credential copied"
-   },
-   "excessiveRefreshAttempts": {
-    "type": "integer",
-    "description": "Excessive refresh attempts"
-   },
-   "invalidSignature": {
-    "type": "string",
-    "description": "Invalid signature"
-   },
-   "expiredCredential": {
-    "type": "integer",
-    "description": "Expired credential"
-   },
-   "revokedCredential": {
-    "type": "string",
-    "description": "Revoked credential"
-   },
-   "screenshotReplayAttempt": {
-    "type": "string",
-    "description": "Screenshot/replay attempt"
-   },
-   "abnormalTransferFrequency": {
-    "type": "string",
-    "description": "Abnormal transfer frequency"
-   },
-   "repeatedFailedValidation": {
-    "type": "string",
-    "description": "Repeated failed validation"
-   },
-   "newDevice": {
-    "type": "integer",
-    "description": "New device"
-   },
-   "multipleDevices": {
-    "type": "string",
-    "description": "Multiple devices"
-   },
-   "deviceBindingMismatch": {
-    "type": "string",
-    "description": "Device-binding mismatch"
-   },
-   "rootedCompromisedDeviceWhereDetectable": {
-    "type": "string",
-    "description": "Rooted/compromised device where detectable"
-   },
-   "abnormalDeviceChanges": {
-    "type": "string",
-    "description": "abnormal device changes"
-   },
-   "impossibleDeviceMovement": {
-    "type": "string",
-    "description": "impossible device movement"
-   },
-   "suspiciousScannerDeviceActivity": {
-    "type": "string",
-    "description": "suspicious scanner/device activity"
-   },
-   "simultaneousUse": {
-    "type": "string",
-    "description": "simultaneous use"
-   },
-   "antiPassbackViolations": {
-    "type": "string",
-    "description": "anti-passback violations"
-   },
-   "unusualReEntry": {
-    "type": "string",
-    "description": "unusual re-entry"
-   },
-   "unusualCrossover": {
-    "type": "string",
-    "description": "unusual crossover"
-   },
-   "excessiveAttractionUse": {
-    "type": "string",
-    "description": "excessive attraction use"
-   },
-   "repeatedWrongGateAttempts": {
-    "type": "integer",
-    "description": "repeated wrong-gate attempts"
-   },
-   "abnormalFastPassConsumption": {
-    "type": "string",
-    "description": "abnormal Fast Pass consumption"
-   },
-   "faceMismatch": {
-    "type": "string",
-    "description": "Face mismatch"
-   },
-   "unusualFaceChange": {
-    "type": "string",
-    "description": "unusual face change"
-   },
-   "multipleIdentitiesLinked": {
-    "type": "string",
-    "description": "multiple identities linked"
-   },
-   "suspiciousCompanionChanges": {
-    "type": "string",
-    "description": "suspicious companion changes"
-   },
-   "podNannyRelationshipAnomalies": {
-    "type": "string",
-    "description": "POD/nanny relationship anomalies"
-   },
-   "gateA1002": {
-    "type": "string",
-    "description": "Gate A — 10:02"
-   },
-   "gateB1003": {
-    "type": "string",
-    "description": "Gate B — 10:03"
+    "enum": [
+     "excessiveQrActivations",
+     "multipleActiveSessions",
+     "credentialCopied",
+     "excessiveRefreshAttempts",
+     "invalidSignature",
+     "expiredCredential",
+     "revokedCredential",
+     "screenshotReplayAttempt",
+     "abnormalTransferFrequency",
+     "repeatedFailedValidation",
+     "newDevice",
+     "multipleDevices",
+     "deviceBindingMismatch",
+     "rootedCompromisedDevice",
+     "abnormalDeviceChanges",
+     "impossibleDeviceMovement",
+     "suspiciousScannerDeviceActivity",
+     "duplicateEntry",
+     "simultaneousUse",
+     "antiPassbackViolations",
+     "unusualReEntry",
+     "unusualCrossover",
+     "excessiveAttractionUse",
+     "repeatedWrongGateAttempts",
+     "abnormalFastPassConsumption",
+     "faceMismatch",
+     "unusualFaceChange",
+     "multipleIdentitiesLinked",
+     "suspiciousCompanionChanges",
+     "podNannyRelationshipAnomalies"
+    ],
+    "description": "The fraud signal this rule configures"
    },
    "severity": {
     "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
     "description": "Severity"
    },
    "weight": {
-    "type": "string",
-    "description": "Weight"
+    "type": "integer",
+    "description": "Points the signal adds to the access risk score"
    },
    "threshold": {
     "type": "integer",
@@ -2121,25 +2138,74 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Scope"
    },
    "applicableCredentialTypes": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Applicable credential types"
    },
    "applicableVenues": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Applicable venues"
    },
    "timeWindow": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Time window"
+    "type": "integer",
+    "description": "Window the threshold is counted over, in minutes"
    },
    "offlineAvailability": {
-    "type": "integer",
-    "description": "Offline availability"
+    "type": "boolean",
+    "description": "Whether the signal is evaluated offline at the edge"
    },
    "response": {
     "type": "string",
+    "enum": [
+     "alertOnly",
+     "increaseRiskScore",
+     "requireAdditionalVerification",
+     "requireSupervisor",
+     "temporarilyLock",
+     "fullIdentityLock",
+     "blacklist"
+    ],
     "description": "Response"
+   },
+   "signalCategory": {
+    "type": "string",
+    "enum": [
+     "credential",
+     "device",
+     "access",
+     "identity"
+    ]
+   },
+   "enabled": {
+    "type": "boolean"
+   }
+  },
+  "required": [
+   "ruleId",
+   "signal"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },
@@ -2149,39 +2215,56 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Real-Time Security Response & Playbook Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "alertOnly": {
+   "triggerCondition": {
     "type": "string",
-    "description": "Alert Only"
+    "description": "e.g. Risk Score > 75 AND signal = simultaneousUse"
    },
-   "increaseRiskScore": {
-    "type": "number",
-    "description": "Increase Risk Score"
+   "name": {
+    "type": "string"
    },
-   "requireAdditionalVerification": {
-    "type": "boolean",
-    "description": "Require Additional Verification"
+   "playbookId": {
+    "type": "string"
    },
-   "requireSupervisor": {
-    "type": "boolean",
-    "description": "Require Supervisor"
+   "responseActions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "alertOnly",
+      "increaseRiskScore",
+      "requireAdditionalVerification",
+      "requireSupervisor",
+      "temporarilyLock",
+      "fullIdentityLock",
+      "blacklist",
+      "notifySecurity",
+      "createIncident",
+      "notifyGuestServices",
+      "triggerEdgeDistribution"
+     ]
+    },
+    "description": "Actions the playbook runs when triggered"
    },
-   "temporarilyLock": {
+   "acknowledgeWithinMinutes": {
+    "type": "integer"
+   },
+   "escalateToRole": {
     "type": "string",
-    "description": "Temporarily Lock"
+    "description": "e.g. Security Supervisor"
    },
-   "fullIdentityLock": {
-    "type": "string",
-    "description": "Full Identity Lock"
+   "escalateAfterMinutes": {
+    "type": "integer"
    },
-   "blacklist": {
-    "type": "string",
-    "description": "Blacklist"
-   },
-   "after": {
-    "type": "string",
-    "description": "after"
+   "enabled": {
+    "type": "boolean"
    }
-  }
+  },
+  "required": [
+   "playbookId",
+   "name",
+   "triggerCondition",
+   "responseActions"
+  ]
  },
  "RealTimeSecurityResponsePlaybookBuilderView": {
   "type": "object",
@@ -2189,39 +2272,56 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Real-Time Security Response & Playbook Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "alertOnly": {
+   "triggerCondition": {
     "type": "string",
-    "description": "Alert Only"
+    "description": "e.g. Risk Score > 75 AND signal = simultaneousUse"
    },
-   "increaseRiskScore": {
-    "type": "number",
-    "description": "Increase Risk Score"
+   "name": {
+    "type": "string"
    },
-   "requireAdditionalVerification": {
-    "type": "boolean",
-    "description": "Require Additional Verification"
+   "playbookId": {
+    "type": "string"
    },
-   "requireSupervisor": {
-    "type": "boolean",
-    "description": "Require Supervisor"
+   "responseActions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "alertOnly",
+      "increaseRiskScore",
+      "requireAdditionalVerification",
+      "requireSupervisor",
+      "temporarilyLock",
+      "fullIdentityLock",
+      "blacklist",
+      "notifySecurity",
+      "createIncident",
+      "notifyGuestServices",
+      "triggerEdgeDistribution"
+     ]
+    },
+    "description": "Actions the playbook runs when triggered"
    },
-   "temporarilyLock": {
+   "acknowledgeWithinMinutes": {
+    "type": "integer"
+   },
+   "escalateToRole": {
     "type": "string",
-    "description": "Temporarily Lock"
+    "description": "e.g. Security Supervisor"
    },
-   "fullIdentityLock": {
-    "type": "string",
-    "description": "Full Identity Lock"
+   "escalateAfterMinutes": {
+    "type": "integer"
    },
-   "blacklist": {
-    "type": "string",
-    "description": "Blacklist"
-   },
-   "after": {
-    "type": "string",
-    "description": "after"
+   "enabled": {
+    "type": "boolean"
    }
-  }
+  },
+  "required": [
+   "playbookId",
+   "name",
+   "triggerCondition",
+   "responseActions"
+  ]
  },
  "RelationshipCompanionFraudMonitoringView": {
   "type": "object",
@@ -2229,51 +2329,61 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Relationship & Companion Fraud Monitoring displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "differentCompanionBAttemptedEntry": {
-    "type": "string",
-    "description": "Different Companion B attempted entry"
+   "ruleId": {
+    "type": "string"
    },
-   "companionChangedDuringVisit": {
+   "ruleType": {
     "type": "string",
-    "description": "Companion changed during visit"
+    "enum": [
+     "companionChangedDuringVisit",
+     "nannyCredentialWithoutPrimaryGuest",
+     "childWithUnauthorizedAdult",
+     "companionLinkedToMultiplePrimaries",
+     "excessiveRelationshipChanges",
+     "groupLeaderAcrossUnrelatedGroups"
+    ]
    },
-   "childEntersExitsWithUnauthorizedAdult": {
-    "type": "string",
-    "description": "Child enters/exits with unauthorized adult"
+   "responses": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "yellowIntervention",
+      "supervisorVerification",
+      "idVerification",
+      "biometricVerification",
+      "securityEscalation",
+      "accessDenial"
+     ]
+    }
    },
-   "excessiveRelationshipChanges": {
+   "relationshipType": {
     "type": "string",
-    "description": "excessive relationship changes"
+    "enum": [
+     "childAdult",
+     "podCompanion",
+     "guestNanny",
+     "groupLeaderGroup",
+     "membershipDependent"
+    ]
    },
-   "relationshipChangeAttempt": {
+   "severity": {
     "type": "string",
-    "description": "Relationship Change Attempt"
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
    },
-   "yellowIntervention": {
-    "type": "string",
-    "description": "Yellow intervention"
-   },
-   "supervisorVerification": {
-    "type": "string",
-    "description": "Supervisor verification"
-   },
-   "idVerification": {
-    "type": "string",
-    "description": "ID verification"
-   },
-   "biometricVerification": {
-    "type": "string",
-    "description": "Biometric verification"
-   },
-   "securityEscalation": {
-    "type": "string",
-    "description": "Security escalation"
-   },
-   "accessDenial": {
-    "type": "string",
-    "description": "Access denial"
+   "enabled": {
+    "type": "boolean"
    }
-  }
+  },
+  "required": [
+   "ruleId",
+   "ruleType"
+  ]
  },
  "SecurityAnalyticsAiDetectionGovernanceView": {
   "type": "object",
@@ -2286,11 +2396,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Fraud Attempts"
    },
    "preventedFraud": {
-    "type": "string",
+    "type": "integer",
     "description": "Prevented Fraud"
    },
    "credentialSharing": {
-    "type": "string",
+    "type": "integer",
     "description": "Credential Sharing"
    },
    "biometricAlerts": {
@@ -2317,32 +2427,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "Security Overrides"
    },
-   "web8": {
-    "type": "number",
-    "description": "Web: 8%"
-   },
-   "pos3": {
-    "type": "number",
-    "description": "POS: 3%"
-   },
-   "b2b12": {
-    "type": "number",
-    "description": "B2B: 12%"
-   },
-   "resellerX41": {
-    "type": "number",
-    "description": "Reseller X: 41%"
-   },
-   "resellerY7": {
-    "type": "number",
-    "description": "Reseller Y: 7%"
-   },
    "detectionRate": {
     "type": "number",
     "description": "Detection Rate"
    },
    "falsePositiveIndicator": {
-    "type": "string",
+    "type": "number",
     "description": "False Positive Indicator"
    },
    "operatorOverrideRate": {
@@ -2350,78 +2440,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Operator Override Rate"
    },
    "averageInvestigationTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Average Investigation Time"
+    "type": "integer",
+    "description": "Minutes"
    },
    "averageResponseTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Average Response Time"
+    "type": "integer",
+    "description": "Minutes"
    },
    "recurringFraudRate": {
     "type": "number",
     "description": "Recurring Fraud Rate"
    },
    "financialExposure": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Financial Exposure"
    },
    "estimatedFraudPrevented": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Estimated Fraud Prevented"
    },
-   "fraudRules": {
-    "type": "string",
-    "description": "fraud rules"
-   },
-   "thresholds": {
-    "type": "string",
-    "description": "thresholds"
-   },
-   "riskModels": {
-    "type": "string",
-    "description": "risk models"
-   },
-   "responsePlaybooks": {
-    "type": "string",
-    "description": "response playbooks"
-   },
-   "blacklistPolicies": {
-    "type": "string",
-    "description": "blacklist policies"
-   },
-   "aiRecommendations": {
-    "type": "string",
-    "description": "AI recommendations"
-   },
-   "patternImproveControls": {
-    "type": "string",
-    "description": "Pattern → Improve Controls"
-   },
-   "board3CredentialSecurity": {
-    "type": "string",
-    "description": "Board 3 — Credential Security"
-   },
-   "board5BiometricAccess": {
-    "type": "string",
-    "description": "Board 5 — Biometric Access"
-   },
-   "board9LiveOperations": {
-    "type": "string",
-    "description": "Board 9 — Live Operations"
-   },
-   "board10DynamicPolicy": {
-    "type": "string",
-    "description": "Board 10 — Dynamic Policy"
-   },
-   "contextualConditions": {
-    "type": "string",
-    "description": "contextual conditions"
-   },
-   "abusiveCompromisedOrFraudulent": {
-    "type": "string",
-    "description": "abusive, compromised or fraudulent"
+   "duplicateUsage": {
+    "type": "integer"
    }
   }
  },
@@ -2431,71 +2470,66 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Security Investigation & Evidence Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "critical91": {
-    "type": "string",
-    "description": "CRITICAL — 91"
+   "investigationId": {
+    "type": "string"
    },
-   "operatorIntervention": {
-    "type": "string",
-    "description": "Operator Intervention"
+   "evidenceSources": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "credentialHistory",
+      "scanRecords",
+      "gate",
+      "deviceIds",
+      "qrActivations",
+      "mediaChanges",
+      "transferHistory",
+      "biometricEvents",
+      "companionRelationships",
+      "posTicketTransactionReference",
+      "overrides",
+      "blacklistEvents",
+      "securityPolicies"
+     ]
+    },
+    "description": "Sources correlated into this investigation"
    },
-   "credentialHistory": {
-    "type": "string",
-    "description": "Credential history"
+   "subjectCredentialId": {
+    "type": "string"
    },
-   "scanRecords": {
+   "status": {
     "type": "string",
-    "description": "Scan records"
+    "enum": [
+     "open",
+     "investigating",
+     "actionTaken",
+     "resolved",
+     "closed"
+    ]
    },
-   "gate": {
-    "type": "string",
-    "description": "Gate"
+   "riskScore": {
+    "type": "integer"
    },
-   "deviceIds": {
+   "riskLevel": {
     "type": "string",
-    "description": "device IDs"
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
    },
-   "qrActivations": {
-    "type": "string",
-    "description": "QR activations"
+   "notes": {
+    "type": "string"
    },
-   "mediaChanges": {
-    "type": "string",
-    "description": "media changes"
-   },
-   "biometricEvents": {
-    "type": "string",
-    "description": "biometric events"
-   },
-   "companionRelationships": {
-    "type": "string",
-    "description": "companion relationships"
-   },
-   "posTicketTransactionReference": {
-    "type": "string",
-    "description": "POS/ticket transaction reference"
-   },
-   "overrides": {
-    "type": "string",
-    "description": "overrides"
-   },
-   "blacklistEvents": {
-    "type": "string",
-    "description": "blacklist events"
-   },
-   "securityPolicies": {
-    "type": "string",
-    "description": "security policies"
-   },
-   "blacklist": {
-    "type": "string",
-    "description": "Blacklist"
-   },
-   "clearRisk": {
-    "type": "string",
-    "description": "Clear Risk"
+   "linkedIncidentId": {
+    "type": "string"
    }
-  }
+  },
+  "required": [
+   "investigationId"
+  ]
  },
  "SecurityInvestigationEvidenceWorkspaceView": {
   "type": "object",
@@ -2503,165 +2537,66 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Security Investigation & Evidence Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "critical91": {
-    "type": "string",
-    "description": "CRITICAL — 91"
+   "investigationId": {
+    "type": "string"
    },
-   "operatorIntervention": {
-    "type": "string",
-    "description": "Operator Intervention"
+   "evidenceSources": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "credentialHistory",
+      "scanRecords",
+      "gate",
+      "deviceIds",
+      "qrActivations",
+      "mediaChanges",
+      "transferHistory",
+      "biometricEvents",
+      "companionRelationships",
+      "posTicketTransactionReference",
+      "overrides",
+      "blacklistEvents",
+      "securityPolicies"
+     ]
+    },
+    "description": "Sources correlated into this investigation"
    },
-   "credentialHistory": {
-    "type": "string",
-    "description": "Credential history"
+   "subjectCredentialId": {
+    "type": "string"
    },
-   "scanRecords": {
-    "type": "string",
-    "description": "Scan records"
-   },
-   "gate": {
-    "type": "string",
-    "description": "Gate"
-   },
-   "deviceIds": {
-    "type": "string",
-    "description": "device IDs"
-   },
-   "qrActivations": {
-    "type": "string",
-    "description": "QR activations"
-   },
-   "mediaChanges": {
-    "type": "string",
-    "description": "media changes"
-   },
-   "biometricEvents": {
-    "type": "string",
-    "description": "biometric events"
-   },
-   "companionRelationships": {
-    "type": "string",
-    "description": "companion relationships"
-   },
-   "posTicketTransactionReference": {
-    "type": "string",
-    "description": "POS/ticket transaction reference"
-   },
-   "overrides": {
-    "type": "string",
-    "description": "overrides"
-   },
-   "blacklistEvents": {
-    "type": "string",
-    "description": "blacklist events"
-   },
-   "securityPolicies": {
-    "type": "string",
-    "description": "security policies"
-   },
-   "blacklist": {
-    "type": "string",
-    "description": "Blacklist"
-   },
-   "clearRisk": {
-    "type": "string",
-    "description": "Clear Risk"
-   }
-  }
- },
- "UnifiedIdentityCredentialLockManagerView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Unified Identity & Credential Lock Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "guestJohnSmith": {
-    "type": "string",
-    "description": "Guest: John Smith"
-   },
-   "ticketVc18274": {
-    "type": "string",
-    "description": "Ticket VC-18274"
-   },
-   "rfidWristbandRf8291": {
-    "type": "string",
-    "description": "RFID Wristband RF-8291"
-   },
-   "dynamicQr": {
-    "type": "string",
-    "description": "Dynamic QR"
-   },
-   "walletCredential": {
-    "type": "string",
-    "description": "Wallet Credential"
-   },
-   "facePass": {
-    "type": "string",
-    "description": "Face Pass"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "fastPass": {
-    "type": "string",
-    "description": "Fast Pass"
-   },
-   "selectType": {
+   "status": {
     "type": "string",
     "enum": [
-     "credentialOnly",
-     "mediaOnly",
-     "entitlement",
-     "venue",
-     "allVenueAccess",
-     "fullIdentity"
-    ],
-    "description": "Vocabulary listed under Select."
+     "open",
+     "investigating",
+     "actionTaken",
+     "resolved",
+     "closed"
+    ]
    },
-   "untilManuallyReleased": {
+   "riskScore": {
+    "type": "integer"
+   },
+   "riskLevel": {
     "type": "string",
-    "format": "date-time",
-    "description": "Until manually released"
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
    },
-   "endOfDay": {
-    "type": "string",
-    "description": "End of day"
+   "notes": {
+    "type": "string"
    },
-   "nHours": {
-    "type": "string",
-    "description": "N hours"
-   },
-   "untilInvestigationComplete": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Until investigation complete"
-   },
-   "permanent": {
-    "type": "string",
-    "description": "Permanent"
-   },
-   "centralPlatform": {
-    "type": "string",
-    "description": "Central Platform ✓"
-   },
-   "venueEdge": {
-    "type": "string",
-    "description": "Venue Edge ✓"
-   },
-   "onlineGates": {
-    "type": "integer",
-    "description": "Online Gates ✓"
-   },
-   "offlineRevocationPackage": {
-    "type": "integer",
-    "description": "Offline Revocation Package ✓"
-   },
-   "mobileDevices": {
-    "type": "string",
-    "description": "Mobile Devices ✓"
+   "linkedIncidentId": {
+    "type": "string"
    }
-  }
+  },
+  "required": [
+   "investigationId"
+  ]
  }
 }
 ```

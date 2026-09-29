@@ -1,0 +1,67 @@
+id: LLD-Catalogue AI finding (governance risk or channel recommendation)
+title: Catalogue AI finding (governance risk or channel recommendation) — 10 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/catalogue-ai-finding.yaml
+entity: Catalogue AI finding (governance risk or channel recommendation)
+contract: catalogue
+enum: CatalogueAiFinding.status
+enumKind: inline
+enumSchema: CatalogueAiFinding
+enumProperty: status
+owner: catalogue
+initial:
+- open
+terminal:
+- dismissed
+- resolved
+transitions:
+- from: open
+  to: acknowledged
+  operation: decideCatalogueAiFinding
+  trigger: operation
+  guard: '`decision: acknowledge`; an owner and due date may be set'
+- from: open
+  to: accepted
+  operation: decideCatalogueAiFinding
+  trigger: operation
+  guard: '`decision: accept`; acting on it is an ordinary operation under its own approval'
+- from: acknowledged
+  to: accepted
+  operation: decideCatalogueAiFinding
+  trigger: operation
+  guard: '`decision: accept`'
+- from: open
+  to: dismissed
+  operation: decideCatalogueAiFinding
+  trigger: operation
+  guard: '`decision: dismiss` with a `comment`'
+- from: acknowledged
+  to: dismissed
+  operation: decideCatalogueAiFinding
+  trigger: operation
+  guard: '`decision: dismiss` with a `comment`'
+- from: accepted
+  to: resolved
+  operation: decideCatalogueAiFinding
+  trigger: operation
+  guard: '`decision: resolve` once the action is done'
+- from: acknowledged
+  to: resolved
+  operation: decideCatalogueAiFinding
+  trigger: operation
+  guard: '`decision: resolve`'
+- from: open
+  to: resolved
+  trigger: job
+  guard: The AI monitoring job finds the condition has cleared
+- from: acknowledged
+  to: resolved
+  trigger: job
+  guard: The AI monitoring job finds the condition has cleared
+- from: accepted
+  to: resolved
+  trigger: job
+  guard: The AI monitoring job finds the condition has cleared
+notes: '**Created `open` by the AI monitoring job**, never through the API. A finding is advisory: no
+  move here changes configuration.'

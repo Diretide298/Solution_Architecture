@@ -1,0 +1,71 @@
+# Dynamic pricing strategy — state model
+# Contract: catalogue.DynamicPricingStrategy.status
+# Checked by tools/check-states.py. Added 29 September (writers pass).
+
+entity: Dynamic pricing strategy
+contract: catalogue
+enum: DynamicPricingStrategy.status
+enumKind: inline
+enumSchema: DynamicPricingStrategy
+enumProperty: status
+owner: catalogue
+initial:
+- draft
+terminal:
+- retired
+transitions:
+- from: draft
+  to: active
+  operation: transitionDynamicPricingStrategy
+  trigger: operation
+  guard: '`activate`; the strategy has a price ladder and at least one rule, and its scope is not frozen'
+- from: active
+  to: paused
+  operation: transitionDynamicPricingStrategy
+  trigger: operation
+  guard: '`pause`; prices hold at their current band'
+- from: paused
+  to: active
+  operation: transitionDynamicPricingStrategy
+  trigger: operation
+  guard: '`resume`; the scope is not frozen'
+- from: active
+  to: frozen
+  operation: setDynamicPricingGuardrailPolicy
+  trigger: cascade
+  guard: '`isFrozen` or `isKillSwitchActive` is turned on for a scope that covers the strategy'
+- from: frozen
+  to: active
+  operation: setDynamicPricingGuardrailPolicy
+  trigger: cascade
+  guard: The freeze or kill switch covering the strategy is lifted
+- from: active
+  to: expired
+  trigger: timer
+  guard: '`effectiveTo` is reached'
+- from: paused
+  to: expired
+  trigger: timer
+  guard: '`effectiveTo` is reached'
+- from: frozen
+  to: expired
+  trigger: timer
+  guard: '`effectiveTo` is reached'
+- from: draft
+  to: retired
+  operation: transitionDynamicPricingStrategy
+  trigger: operation
+  guard: '`retire`'
+- from: paused
+  to: retired
+  operation: transitionDynamicPricingStrategy
+  trigger: operation
+  guard: '`retire`'
+- from: expired
+  to: retired
+  operation: transitionDynamicPricingStrategy
+  trigger: operation
+  guard: '`retire`'
+notes: '**Created `draft` by `setDynamicPricingStrategy`.** Rules-based now; AI factors inform, never replace,
+  the rules (MoM 19 Aug 2026). An `active` strategy is paused before it is retired, so no automatic change is
+  in flight when it goes.'

@@ -39,10 +39,7 @@
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-194 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-195",
@@ -101,13 +98,117 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations can identify every access-control device and its current operational/configuration state from one screen.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Show) and no metric row",
   "purpose": "Provide the central operational/configuration view of the complete access-control hardware estate.",
-  "purposeNote": "Operations can identify every access-control device and its current operational/configuration state from one screen.",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Total Devices",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.totalDevices",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Online",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.online",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Offline",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.offline",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Degraded",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.degraded",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Turnstiles",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.turnstiles",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Handhelds",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.handhelds",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Biometric Readers",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.biometricReaders",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "RFID/NFC Readers",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.rfidNfcReaders",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Gates Open",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.gatesOpen",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Gates Closed",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.gatesClosed",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Devices Requiring Sync",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.devicesRequiringSync",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Firmware/Software Exceptions",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.firmwareSoftwareExceptions",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Hardware Alerts",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.hardwareAlerts",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Ai",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.ai",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -116,27 +217,13 @@
        "kind": "dataTable",
        "label": "Every device gate",
        "columns": [
-        "DeviceGateCommandCenterView.totalDevices",
-        "DeviceGateCommandCenterView.online",
-        "DeviceGateCommandCenterView.offline",
-        "DeviceGateCommandCenterView.degraded",
-        "DeviceGateCommandCenterView.turnstiles",
-        "DeviceGateCommandCenterView.handhelds",
-        "DeviceGateCommandCenterView.biometricReaders",
-        "DeviceGateCommandCenterView.rfidNfcReaders",
-        "DeviceGateCommandCenterView.gatesOpen",
-        "DeviceGateCommandCenterView.gatesClosed",
-        "DeviceGateCommandCenterView.devicesRequiringSync",
-        "DeviceGateCommandCenterView.firmwareSoftwareExceptions",
-        "DeviceGateCommandCenterView.hardwareAlerts",
         "DeviceGateCommandCenterView.connectivity",
         "DeviceGateCommandCenterView.lastHeartbeat",
         "DeviceGateCommandCenterView.configurationVersion",
         "DeviceGateCommandCenterView.localRuleVersion",
         "DeviceGateCommandCenterView.credentialSecurityPackageVersion",
         "DeviceGateCommandCenterView.scannerHealth",
-        "DeviceGateCommandCenterView.controllerHealth",
-        "DeviceGateCommandCenterView.ai"
+        "DeviceGateCommandCenterView.controllerHealth"
        ],
        "bindsTo": "DeviceGateCommandCenterView",
        "operation": "listDeviceGate",
@@ -153,27 +240,13 @@
        "label": "The selected device gate",
        "bindsTo": "DeviceGateCommandCenterView",
        "columns": [
-        "DeviceGateCommandCenterView.totalDevices",
-        "DeviceGateCommandCenterView.online",
-        "DeviceGateCommandCenterView.offline",
-        "DeviceGateCommandCenterView.degraded",
-        "DeviceGateCommandCenterView.turnstiles",
-        "DeviceGateCommandCenterView.handhelds",
-        "DeviceGateCommandCenterView.biometricReaders",
-        "DeviceGateCommandCenterView.rfidNfcReaders",
-        "DeviceGateCommandCenterView.gatesOpen",
-        "DeviceGateCommandCenterView.gatesClosed",
-        "DeviceGateCommandCenterView.devicesRequiringSync",
-        "DeviceGateCommandCenterView.firmwareSoftwareExceptions",
-        "DeviceGateCommandCenterView.hardwareAlerts",
         "DeviceGateCommandCenterView.connectivity",
         "DeviceGateCommandCenterView.lastHeartbeat",
         "DeviceGateCommandCenterView.configurationVersion",
         "DeviceGateCommandCenterView.localRuleVersion",
         "DeviceGateCommandCenterView.credentialSecurityPackageVersion",
         "DeviceGateCommandCenterView.scannerHealth",
-        "DeviceGateCommandCenterView.controllerHealth",
-        "DeviceGateCommandCenterView.ai"
+        "DeviceGateCommandCenterView.controllerHealth"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Device Directory”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 70 §Display"
@@ -195,22 +268,52 @@
     "contract": "access",
     "purpose": "Device & Gate Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "registerDevice",
+    "contract": "tenancy",
+    "purpose": "Register a gate device from the command centre",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "setTurnstileMode",
+    "contract": "access",
+    "purpose": "Open, close or change the mode of a gate",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listDeviceGate"
+    ]
+   },
+   {
+    "operationId": "listAccessPoints",
+    "contract": "access",
+    "purpose": "The gates and turnstiles whose mode is set",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
    "preloaded": [
-    "DeviceGateCommandCenterView.totalDevices",
-    "DeviceGateCommandCenterView.online",
-    "DeviceGateCommandCenterView.offline",
-    "DeviceGateCommandCenterView.degraded",
-    "DeviceGateCommandCenterView.turnstiles",
-    "DeviceGateCommandCenterView.handhelds"
+    "DeviceGateCommandCenterViewSummary.totalDevices",
+    "DeviceGateCommandCenterViewSummary.online",
+    "DeviceGateCommandCenterViewSummary.offline",
+    "DeviceGateCommandCenterViewSummary.degraded",
+    "DeviceGateCommandCenterViewSummary.turnstiles",
+    "DeviceGateCommandCenterViewSummary.handhelds"
+   ],
+   "params": [
+    {
+     "name": "accessPointId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-194"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-194",
+   "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-194"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 70. 21 of 21 labels bound to a contract property; 21 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -273,10 +376,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "manufacturer-specific logic into admission policies.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Create reusable hardware definitions independently from physical deployed devices.",
-  "purposeNote": "manufacturer-specific logic into admission policies.",
   "gaps": [
    {
     "operation": null,
@@ -322,17 +425,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "DeviceTypeHardwareLibraryView.standard",
-    "DeviceTypeHardwareLibraryView.fullHeight",
-    "DeviceTypeHardwareLibraryView.tripod",
-    "DeviceTypeHardwareLibraryView.speedGate",
-    "DeviceTypeHardwareLibraryView.wideLane"
+    "DeviceTypeHardwareLibraryView.hardwareType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-195"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-195",
+   "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-195"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 72. 0 of 0 labels bound to a contract property; 0 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -390,15 +490,18 @@
      "to": "BO-194",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F116 step 4→5",
-     "operation": "listPhysicalDeviceRegistration"
+     "operation": "listPhysicalDeviceRegistration",
+     "carries": [
+      "accessPointId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Every physical access-control device is uniquely registered, authenticated and assigned to its correct topology location.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Register actual deployed hardware and connect it to the Board 1 topology.",
-  "purposeNote": "Every physical access-control device is uniquely registered, authenticated and assigned to its correct topology location.",
   "layout": {
    "template": "form",
    "regions": [
@@ -487,7 +590,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-196"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-196",
+   "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-196"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 73. 0 of 0 labels bound to a contract property; 12 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -545,15 +649,18 @@
      "to": "BO-194",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F116 step 6→7",
-     "operation": "setTurnstileLaneBehavior"
+     "operation": "setTurnstileLaneBehavior",
+     "carries": [
+      "accessPointId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Each gate can execute different configured behaviors according to its mode and the validated credential.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure how each turnstile or lane behaves. The matrix specifically requires software on turnstiles to behave differently according to card/ticket type and supports different operating modes.",
-  "purposeNote": "Each gate can execute different configured behaviors according to its mode and the validated credential.",
   "layout": {
    "template": "form",
    "regions": [
@@ -657,16 +764,14 @@
     "operationId": "setTurnstileLaneBehavior",
     "contract": "access",
     "purpose": "Turnstile & Lane Behavior Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setTurnstileLaneBehavior"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-197"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-197",
+   "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-197"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 74. 0 of 0 labels bound to a contract property; 14 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -729,10 +834,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every access decision produces a configurable and understandable physical response for the guest and operator.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure what the physical access device does and displays after validation. The matrix explicitly requires valid/non-valid messages, lights, pictograms and sounds, including green/yellow/red behavior.",
-  "purposeNote": "Every access decision produces a configurable and understandable physical response for the guest and operator.",
   "layout": {
    "template": "form",
    "regions": [
@@ -821,16 +926,14 @@
     "operationId": "setValidationOutcomeGuest",
     "contract": "access",
     "purpose": "Validation Outcome & Guest Feedback Designer",
-    "trigger": "onAction",
-    "invalidates": [
-     "setValidationOutcomeGuest"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-198"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-198",
+   "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-198"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 76. 0 of 0 labels bound to a contract property; 11 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -888,15 +991,18 @@
      "to": "BO-194",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F116 step 10→11",
-     "operation": "setReaderScannerPeripheral"
+     "operation": "setReaderScannerPeripheral",
+     "carries": [
+      "accessPointId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Readers and peripherals can be independently associated with gates and checked against required admission capabilities.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure the technologies attached to a gate/device.",
-  "purposeNote": "Readers and peripherals can be independently associated with gates and checked against required admission capabilities.",
   "gaps": [
    {
     "operation": null,
@@ -955,16 +1061,14 @@
     "operationId": "setReaderScannerPeripheral",
     "contract": "access",
     "purpose": "Reader, Scanner & Peripheral Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setReaderScannerPeripheral"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-199"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-199",
+   "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-199"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 77. 0 of 0 labels bound to a contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1027,17 +1131,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Mobile access devices can be centrally configured, restricted and revoked according to their operational role.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure mobile access-control devices used by staff. The matrix explicitly requires handheld devices and Android/iOS dedicated mobile applications.",
-  "purposeNote": "Mobile access devices can be centrally configured, restricted and revoked according to their operational role.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Scan Ticket, Search Ticket, Override, View History. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Access Control Module_Reference.pdf, page 78 §Enable/disable"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1102,6 +1199,16 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 78 §Enable/disable"
       },
       {
+       "kind": "secondaryButton",
+       "label": "Entry",
+       "provenance": "pack Access Control Module_Reference.pdf, page 78 §Enable/disable"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Manual Attendance",
+       "provenance": "pack Access Control Module_Reference.pdf, page 78 §Enable/disable"
+      },
+      {
        "kind": "destructiveButton",
        "label": "Override",
        "provenance": "pack Access Control Module_Reference.pdf, page 78 §Enable/disable"
@@ -1135,18 +1242,16 @@
     "operationId": "setHandheldMobileAccess",
     "contract": "access",
     "purpose": "Handheld & Mobile Access Device Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setHandheldMobileAccess"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-200"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-200",
+   "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-200"
   },
-  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 78. 0 of 0 labels bound to a contract property; 12 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 78. 0 of 0 labels bound to a contract property; 14 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Scan Ticket, Search Ticket, Entry, Manual Attendance, Override, View History are choices sent by `setHandheldMobileAccess`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1207,10 +1312,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized operations personnel can rapidly change gate modes across individual devices or device groups while maintaining full auditability.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Manage non-standard operational modes. The source specifically requires Free Spin and Drop Arm/Emergency behavior.",
-  "purposeNote": "Authorized operations personnel can rapidly change gate modes across individual devices or device groups while maintaining full auditability.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1269,7 +1374,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-201"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-201",
+   "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-201"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 79. 0 of 0 labels bound to a contract property; 6 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1332,10 +1438,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Device configuration and supported content can be centrally deployed without manually configuring each turnstile.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Centrally control access-control device software and guest-facing configuration. The source requires the ability to configure/manage software on turnstiles, add external webpages on supported screens, and enable payment technologies where available.",
-  "purposeNote": "Device configuration and supported content can be centrally deployed without manually configuring each turnstile.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1399,16 +1505,14 @@
     "operationId": "setDeviceSoftwareContent",
     "contract": "access",
     "purpose": "Device Software, Content & Remote Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setDeviceSoftwareContent"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-202"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-202",
+   "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-202"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 81. 0 of 0 labels bound to a contract property; 6 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1460,13 +1564,20 @@
     "BO-194"
    ],
    "inferred": false,
-   "notes": "**Reached from BO-194, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+   "notes": "**Reached from BO-194, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-194",
+     "trigger": "Device & Gate Command Center",
+     "provenance": "derived — BO-194 declares entryState.params accessPointId and BO-203 holds none of them, so the edge carries nothing and BO-194 opens cold"
+    }
+   ]
   },
   "density": "compact",
+  "purposeNote": "No access device enters production until its required capabilities, connectivity, security configuration and physical responses have been successfully validated. Board 6 — Final 10-Screen Structure # Backend Screen Main Responsibility 6.1 Device & Gate Command Center Hardware estate and live health 6.2 Device Type & Hardware Library Reusable hardware/model definitions 6.3 Physical Device Registration & Provisioning Register and authenticate deployed devices 6.4 Turnstile & Lane Behavior Configuration Gate modes, direction and physical behavior # Backend Screen Main Responsibility",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide the final testing and governance layer before hardware is used in production. The matrix says venues may select their hardware, while the provider must expose hardware limitations and recommendations.",
-  "purposeNote": "No access device enters production until its required capabilities, connectivity, security configuration and physical responses have been successfully validated. Board 6 — Final 10-Screen Structure # Backend Screen Main Responsibility 6.1 Device & Gate Command Center Hardware estate and live health 6.2 Device Type & Hardware Library Reusable hardware/model definitions 6.3 Physical Device Registration & Provisioning Register and authenticate deployed devices 6.4 Turnstile & Lane Behavior Configuration Gate modes, direction and physical behavior # Backend Screen Main Responsibility",
   "gaps": [
    {
     "operation": null,
@@ -1483,15 +1594,36 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "actionBar",
+     "slot": "rowActions",
      "components": [
       {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listHardwareCompatibilityHealth",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "kind": "primaryButton",
+       "label": "Selected gates",
+       "provenance": "pack Access Control Module_Reference.pdf, page 82 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "device group",
+       "provenance": "pack Access Control Module_Reference.pdf, page 82 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "venue",
+       "provenance": "pack Access Control Module_Reference.pdf, page 82 §Support"
+      },
+      {
+       "kind": "publishGate",
+       "label": "Deploy configuration version",
+       "operation": "publishHardwareDeployment",
+       "notes": "**Names the version, the target (pilot, selected gates, device group or venue) and the devices that failed the compatibility test and will be skipped**, before it runs. Devices pick the version up at their next package refresh.",
+       "provenance": "contract access.yaml POST /hardware-deployments (decided 29 September, VM close-out)"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -1508,23 +1640,27 @@
     "contract": "access",
     "purpose": "Hardware Compatibility, Health, Testing & Deployment",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "publishHardwareDeployment",
+    "contract": "access",
+    "purpose": "Deploy configuration version",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "preloaded": [
-    "HardwareCompatibilityHealthTestingDeploymentView.rfid",
-    "HardwareCompatibilityHealthTestingDeploymentView.nfc",
-    "HardwareCompatibilityHealthTestingDeploymentView.offline",
-    "HardwareCompatibilityHealthTestingDeploymentView.pilotDeployment",
-    "HardwareCompatibilityHealthTestingDeploymentView.selectedGates"
+    "HardwareCompatibilityHealthTestingDeploymentView.capabilities",
+    "HardwareCompatibilityHealthTestingDeploymentView.rolloutScope"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-203"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-203",
+   "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-203"
   },
-  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 82. 0 of 0 labels bound to a contract property; 0 of 76 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 82. 0 of 0 labels bound to a contract property; 3 of 76 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `publishHardwareDeployment`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",

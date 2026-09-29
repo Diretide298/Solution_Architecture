@@ -3857,6 +3857,42 @@ screens:
 
           '
         provenance: carried from the previous definition
+      - kind: textField
+        label: Venue id
+        operation: listCommercialCampaigns
+        notes: Sends `?venueId=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: datePicker
+        label: Active at
+        operation: listCommercialCampaigns
+        notes: Sends `?activeAt=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: textField
+        label: Owner principal id
+        operation: listCommercialCampaigns
+        notes: Sends `?ownerPrincipalId=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: searchField
+        label: Q
+        operation: listCommercialCampaigns
+        notes: Sends `?q=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: dataTable
+        label: Every commercial campaign
+        bindsTo: CommercialCampaign
+        columns:
+        - CommercialCampaign.id
+        - CommercialCampaign.venueId
+        - CommercialCampaign.code
+        - CommercialCampaign.name
+        - CommercialCampaign.description
+        - CommercialCampaign.ownerPrincipalId
+        - CommercialCampaign.legalEntityId
+        - CommercialCampaign.validFrom
+        - CommercialCampaign.validTo
+        - CommercialCampaign.budgets
+        operation: listCommercialCampaigns
+        provenance: contract promotions.yaml GET /commercial-campaigns
     - name: contextPanel
       slot: selection
       components:
@@ -4292,6 +4328,15 @@ screens:
     - listCouponCampaigns
     - analysePromotionConflicts
     - getPromotion
+  - operationId: listCommercialCampaigns
+    contract: promotions
+    purpose: List commercial campaigns
+    trigger: onLoad
+  - operationId: recordDashboardView
+    contract: reporting
+    purpose: Record that a dashboard was opened — fired once when the dashboard renders; nothing on the
+      screen waits for it.
+    trigger: background
   entryState:
     params:
     - name: venueId
@@ -4364,8 +4409,10 @@ screens:
         holds productId, version, so an edge into it carries them
     - to: BO-009
       trigger: Pricing Rules
-      provenance: derived — BO-009 declares entryState.params priceListId, ruleId and BO-011 holds none
-        of them, so the edge carries nothing and BO-009 opens cold
+      carries:
+      - priceListId
+      provenance: derived — BO-009 declares entryState.params priceListId, ruleId and BO-011 holds priceListId,
+        so an edge into it carries them
     - to: ANL-009
       trigger: AI Assistant & Action Center
       provenance: flow F77 step 2→3
@@ -4414,6 +4461,42 @@ screens:
 
           '
         provenance: carried from the previous definition
+      - kind: textField
+        label: Venue id
+        operation: listCommercialCampaigns
+        notes: Sends `?venueId=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: datePicker
+        label: Active at
+        operation: listCommercialCampaigns
+        notes: Sends `?activeAt=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: textField
+        label: Owner principal id
+        operation: listCommercialCampaigns
+        notes: Sends `?ownerPrincipalId=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: searchField
+        label: Q
+        operation: listCommercialCampaigns
+        notes: Sends `?q=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: dataTable
+        label: Every commercial campaign
+        bindsTo: CommercialCampaign
+        columns:
+        - CommercialCampaign.id
+        - CommercialCampaign.venueId
+        - CommercialCampaign.code
+        - CommercialCampaign.name
+        - CommercialCampaign.description
+        - CommercialCampaign.ownerPrincipalId
+        - CommercialCampaign.legalEntityId
+        - CommercialCampaign.validFrom
+        - CommercialCampaign.validTo
+        - CommercialCampaign.budgets
+        operation: listCommercialCampaigns
+        provenance: contract promotions.yaml GET /commercial-campaigns
     - name: contextPanel
       slot: selection
       components:
@@ -4487,6 +4570,12 @@ screens:
         label: Save group package definition
         operation: setGroupPackageDefinition
         provenance: contract catalogue.yaml PUT /products/{productId}/group-package
+      - kind: secondaryButton
+        label: Save package pricing definition
+        operation: setPackagePricingDefinition
+        permission: PRICE_CONFIGURE
+        notes: '**The pricing model of a package, bundle or add-on** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /package-pricing
   states:
     loading: The packages bundles list.
     error: Could not load. Names which read failed and leaves the packages bundles untouched.
@@ -4546,6 +4635,18 @@ screens:
     purpose: Amend a bundle
     trigger: onAction
     provenance: decided 29 September, VM close-out (venue management and configuration)
+  - operationId: listCommercialCampaigns
+    contract: promotions
+    purpose: List commercial campaigns
+    trigger: onLoad
+  - operationId: setPackagePricingDefinition
+    contract: catalogue
+    purpose: Set how a package, bundle or add-on is priced
+    trigger: onAction
+    invalidates:
+    - listCatalogueBundles
+    - getLatestBundle
+    - listCommercialCampaigns
   entryState:
     params:
     - name: version
@@ -4659,6 +4760,33 @@ screens:
       - validFrom
       - validTo
     provenance: contract promotions.yaml POST /bundles
+  - id: formSetPackagePricingDefinition
+    component: modal
+    trigger: Save package pricing definition
+    body: '**Collects what `setPackagePricingDefinition` sends before it is called.** Required: `id`,
+      `scopePath`, `productId`, `recordKind`, `pricingModel`, `status`. Optional: `name`, `priceListId`,
+      `addOnType`, `packagePrice`, `components`, `componentPriceVisibility`. Dismissing sends nothing;
+      the screen behind is unchanged.'
+    bindsTo: PackagePricing
+    confirm:
+      label: Save package pricing definition
+      operation: setPackagePricingDefinition
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - productId
+      - recordKind
+      - pricingModel
+      - status
+      - name
+      - priceListId
+      - addOnType
+      - packagePrice
+      - components
+      - componentPriceVisibility
+    provenance: contract catalogue.yaml PUT /package-pricing
 - id: BO-012
   name: Membership Products
   module: Sell
@@ -38564,6 +38692,22 @@ screens:
         impliedBy: listAccessLocationGrouping
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save access point group
+        operation: setAccessPointGroup
+        permission: ACCESS_POINT_CONFIGURE
+        notes: '**The write behind Access Location Grouping** (BO-151): a named group of access points
+          in one venue (e.g.'
+        provenance: contract access.yaml PUT /access-point-groups
+      - kind: destructiveButton
+        label: Delete access point group
+        operation: deleteAccessPointGroup
+        permission: ACCESS_POINT_CONFIGURE
+        notes: Deletes a group.
+        provenance: contract access.yaml DELETE /access-point-groups/{groupId}
   states:
     loading: The access location grouping list.
     error: Could not load. Names which read failed and leaves the access location grouping untouched.
@@ -38578,6 +38722,18 @@ screens:
     contract: access
     purpose: Access Location Grouping
     trigger: onLoad
+  - operationId: setAccessPointGroup
+    contract: access
+    purpose: Create or replace an access-point group
+    trigger: onAction
+    invalidates:
+    - listAccessLocationGrouping
+  - operationId: deleteAccessPointGroup
+    contract: access
+    purpose: Delete an access-point group
+    trigger: onAction
+    invalidates:
+    - listAccessLocationGrouping
   wireframe:
     status: notStarted
     provenance: generated
@@ -38587,6 +38743,37 @@ screens:
     bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetAccessPointGroup
+    component: modal
+    trigger: Save access point group
+    body: '**Collects what `setAccessPointGroup` sends before it is called.** Required: `id`, `venueId`,
+      `name`, `scopePath`. Optional: `parentGroupId`, `accessPointIds`. Dismissing sends nothing; the
+      screen behind is unchanged.'
+    bindsTo: AccessAccessPointGroup
+    confirm:
+      label: Save access point group
+      operation: setAccessPointGroup
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - venueId
+      - name
+      - scopePath
+      - parentGroupId
+      - accessPointIds
+    provenance: contract access.yaml PUT /access-point-groups
+  - id: confirmDeleteAccessPointGroup
+    component: confirmDialog
+    trigger: Delete access point group
+    body: '**Names what `deleteAccessPointGroup` changes and what it leaves alone**, in the consequence
+      rather than the verb. A record this affects should be identified in the dialog, not just counted.'
+    provenance: contract access.yaml DELETE /access-point-groups/{groupId}
+  entryState:
+    params:
+    - name: groupId
+      from: navigation
 - id: BO-152
   name: Operating Calendar & Special Access Days
   module: Access & Venue
@@ -38658,6 +38845,24 @@ screens:
       - kind: selectField
         label: school/group sessions
         provenance: pack Access Control Module_Reference.pdf, page 13 §Configure
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save operating calendar entry
+        operation: setOperatingCalendarEntry
+        permission: ACCESS_POINT_CONFIGURE
+        notes: '**The write behind Operating Calendar & Special Access Days** (BO-152) and Special Event,
+          Free View & Alternative Admission (BO-222): one dated entry (a holiday, private event, free-entry
+          day, special event and so on), whether tickets must be validated, and for a free-view or special-event
+          window its admission type.'
+        provenance: contract access.yaml PUT /operating-calendar-entries
+      - kind: destructiveButton
+        label: Delete operating calendar entry
+        operation: deleteOperatingCalendarEntry
+        permission: ACCESS_POINT_CONFIGURE
+        notes: Deletes one calendar entry.
+        provenance: contract access.yaml DELETE /operating-calendar-entries/{entryId}
   states:
     loading: The operating calendar special configuration as saved.
     error: Could not load. Names which read failed and leaves the operating calendar special untouched.
@@ -38670,6 +38875,18 @@ screens:
     contract: access
     purpose: Operating Calendar & Special Access Days
     trigger: onLoad
+  - operationId: setOperatingCalendarEntry
+    contract: access
+    purpose: Create or replace an operating calendar entry
+    trigger: onAction
+    invalidates:
+    - listOperatingCalendarSpecial
+  - operationId: deleteOperatingCalendarEntry
+    contract: access
+    purpose: Delete an operating calendar entry
+    trigger: onAction
+    invalidates:
+    - listOperatingCalendarSpecial
   wireframe:
     status: notStarted
     provenance: generated
@@ -38679,6 +38896,43 @@ screens:
     bound to a contract property; 10 of 18 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetOperatingCalendarEntry
+    component: modal
+    trigger: Save operating calendar entry
+    body: '**Collects what `setOperatingCalendarEntry` sends before it is called.** Required: `id`, `venueId`,
+      `dayType`, `startsAt`, `endsAt`, `scopePath`. Optional: `name`, `ticketValidationRequired`, `admissionType`,
+      `attractionValidation`, `manualAttendanceRequired`. Dismissing sends nothing; the screen behind
+      is unchanged.'
+    bindsTo: AccessOperatingCalendarEntry
+    confirm:
+      label: Save operating calendar entry
+      operation: setOperatingCalendarEntry
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - venueId
+      - dayType
+      - startsAt
+      - endsAt
+      - scopePath
+      - name
+      - ticketValidationRequired
+      - admissionType
+      - attractionValidation
+      - manualAttendanceRequired
+    provenance: contract access.yaml PUT /operating-calendar-entries
+  - id: confirmDeleteOperatingCalendarEntry
+    component: confirmDialog
+    trigger: Delete operating calendar entry
+    body: '**Names what `deleteOperatingCalendarEntry` changes and what it leaves alone**, in the consequence
+      rather than the verb. A record this affects should be identified in the dialog, not just counted.'
+    provenance: contract access.yaml DELETE /operating-calendar-entries/{entryId}
+  entryState:
+    params:
+    - name: entryId
+      from: navigation
 - id: BO-153
   name: Topology Validation & Publication
   module: Access & Venue
@@ -38740,6 +38994,15 @@ screens:
         notes: '**Names what goes live, where, and from when.** A publish with no stated consequence is
           one somebody presses meaning to save.'
         provenance: authored — required by check-screens for publishTopologyValidation
+      - kind: secondaryButton
+        label: Rollback configuration version
+        operation: rollbackConfigurationVersion
+        permission: ACCESS_POINT_CONFIGURE
+        notes: '**Rolls back the version in force** (Topology Validation & Publication, BO-153; rule sets
+          roll back through `publishRuleConflictCheck` with step `rollBack`): the active version becomes
+          `rolledBack` and the version it replaced (`previousVersionId`) becomes `active` again and is
+          redistributed to the targets.'
+        provenance: contract access.yaml POST /configuration-versions/{versionId}/rollback
     - name: contentBody
       components: []
   states:
@@ -38756,6 +39019,10 @@ screens:
     contract: access
     purpose: Topology Validation & Publication
     trigger: onAction
+  - operationId: rollbackConfigurationVersion
+    contract: access
+    purpose: Roll back an active access configuration version
+    trigger: onAction
   wireframe:
     status: notStarted
     provenance: generated
@@ -38765,6 +39032,25 @@ screens:
     bound to a contract property; 0 of 43 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formRollbackConfigurationVersion
+    component: modal
+    trigger: Rollback configuration version
+    body: '**Collects what `rollbackConfigurationVersion` sends before it is called.** Required: `reason`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Rollback configuration version
+      operation: rollbackConfigurationVersion
+    dismiss:
+      label: Cancel
+      discards:
+      - reason
+    provenance: contract access.yaml POST /configuration-versions/{versionId}/rollback
+  entryState:
+    params:
+    - name: versionId
+      from: navigation
+      optional: true
 - id: BO-154
   name: Access Rule Command Center
   module: Access & Venue
@@ -38811,10 +39097,6 @@ screens:
       trigger: Works in Entry, Exit & Re-entry Rules
       provenance: flow F112 step 3→4
       operation: listAccessRule
-    - to: BO-157
-      trigger: Works in Anti-Passback & Journey Sequence
-      provenance: flow F112 step 5→6
-      operation: listAccessRule
     - to: BO-158
       trigger: Works in Access Validity & Time Rules
       provenance: flow F112 step 7→8
@@ -38835,6 +39117,12 @@ screens:
       trigger: Works in Rule Simulation, Conflict Check & Publication
       provenance: flow F112 step 17→18
       operation: listAccessRule
+    - to: BO-157
+      trigger: Works in Anti-Passback & Journey Sequence
+      provenance: flow F112 step 5→6
+      operation: listAccessRule
+      carries:
+      - ruleId
     - to: BO-161
       trigger: Works in Guest, Companion & Eligibility Rules
       provenance: flow F112 step 13→14
@@ -39205,6 +39493,23 @@ screens:
         label: MAIN ENTRY → ATTRACTION ENTRY
         provenance: pack Access Control Module_Reference.pdf, page 20 §Configure required sequences such
           as
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save journey sequence rule
+        operation: setJourneySequenceRule
+        permission: ACCESS_POINT_CONFIGURE
+        notes: '**The write behind Anti-Passback & Journey Sequence** (BO-157): the level a rule applies
+          at (credential, guest, gate, attraction, park, venue), the time window, the required order of
+          scans and what a violation leads to.'
+        provenance: contract access.yaml PUT /journey-sequence-rules
+      - kind: destructiveButton
+        label: Delete journey sequence rule
+        operation: deleteJourneySequenceRule
+        permission: ACCESS_POINT_CONFIGURE
+        notes: Deletes a journey sequence rule.
+        provenance: contract access.yaml DELETE /journey-sequence-rules/{ruleId}
   states:
     loading: The anti-passback journey sequence configuration as saved.
     error: Could not load. Names which read failed and leaves the anti-passback journey sequence untouched.
@@ -39217,6 +39522,18 @@ screens:
     contract: access
     purpose: Anti-Passback & Journey Sequence
     trigger: onLoad
+  - operationId: setJourneySequenceRule
+    contract: access
+    purpose: Create or replace an anti-passback / journey sequence rule
+    trigger: onAction
+    invalidates:
+    - listAntiPassbackJourney
+  - operationId: deleteJourneySequenceRule
+    contract: access
+    purpose: Delete a journey sequence rule
+    trigger: onAction
+    invalidates:
+    - listAntiPassbackJourney
   wireframe:
     status: notStarted
     provenance: generated
@@ -39226,6 +39543,39 @@ screens:
     bound to a contract property; 3 of 23 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetJourneySequenceRule
+    component: modal
+    trigger: Save journey sequence rule
+    body: '**Collects what `setJourneySequenceRule` sends before it is called.** Required: `id`, `scopePath`,
+      `scope`. Optional: `venueId`, `name`, `windowMinutes`, `requiredSequence`, `violationResponses`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: AccessJourneySequenceRule
+    confirm:
+      label: Save journey sequence rule
+      operation: setJourneySequenceRule
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - scope
+      - venueId
+      - name
+      - windowMinutes
+      - requiredSequence
+      - violationResponses
+    provenance: contract access.yaml PUT /journey-sequence-rules
+  - id: confirmDeleteJourneySequenceRule
+    component: confirmDialog
+    trigger: Delete journey sequence rule
+    body: '**Names what `deleteJourneySequenceRule` changes and what it leaves alone**, in the consequence
+      rather than the verb. A record this affects should be identified in the dialog, not just counted.'
+    provenance: contract access.yaml DELETE /journey-sequence-rules/{ruleId}
+  entryState:
+    params:
+    - name: ruleId
+      from: navigation
 - id: BO-158
   name: Access Validity & Time Rules
   module: Access & Venue
@@ -40060,6 +40410,16 @@ screens:
         - DigitalCredentialSecurityCommandCenterView.credentialType
         notes: 'The pack groups this record''s detail under its own headings: “For each credential profile”.'
         provenance: pack Access Control Module_Reference.pdf, page 29 §Show
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save device binding policy
+        operation: setDeviceBindingPolicy
+        permission: ACCESS_POINT_CONFIGURE
+        notes: '**The write behind Device Binding & Session Security** (BO-167): how many devices a mobile
+          credential may be active on, how many concurrent sessions, and what a device change needs.'
+        provenance: contract access.yaml PUT /device-binding-policy
   states:
     loading: The digital credential security list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the digital credential security untouched.
@@ -40086,6 +40446,13 @@ screens:
     invalidates:
     - listDigitalCredentialSecurity
     - listCredentialSecurity
+  - operationId: setDeviceBindingPolicy
+    contract: access
+    purpose: Set the device binding policy of a venue
+    trigger: onAction
+    invalidates:
+    - listDigitalCredentialSecurity
+    - listCredentialSecurity
   entryState:
     preloaded:
     - DigitalCredentialSecurityCommandCenterView.credentialType
@@ -40098,6 +40465,25 @@ screens:
     bound to a contract property; 16 of 30 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetDeviceBindingPolicy
+    component: modal
+    trigger: Save device binding policy
+    body: '**Collects what `setDeviceBindingPolicy` sends before it is called.** Required: `venueId`.
+      Optional: `maximumActiveDevices`, `concurrentSessions`, `deviceChangePolicy`. Dismissing sends nothing;
+      the screen behind is unchanged.'
+    bindsTo: DeviceBindingPolicyInput
+    confirm:
+      label: Save device binding policy
+      operation: setDeviceBindingPolicy
+    dismiss:
+      label: Cancel
+      discards:
+      - venueId
+      - maximumActiveDevices
+      - concurrentSessions
+      - deviceChangePolicy
+    provenance: contract access.yaml PUT /device-binding-policy
 - id: BO-165
   name: Dynamic QR Security Profile Builder
   module: Access & Venue
@@ -40376,6 +40762,24 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Maximum Active Devices”,
           “Concurrent Sessions”, “Device Change”, “Credential active on Device A”, “Response”.'
         provenance: pack Access Control Module_Reference.pdf, page 33 §Show
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save device binding policy
+        operation: setDeviceBindingPolicy
+        permission: ACCESS_POINT_CONFIGURE
+        notes: '**The write behind Device Binding & Session Security** (BO-167): how many devices a mobile
+          credential may be active on, how many concurrent sessions, and what a device change needs.'
+        provenance: contract access.yaml PUT /device-binding-policy
+      - kind: secondaryButton
+        label: Release credential device
+        operation: releaseCredentialDevice
+        permission: GUEST_MANAGE
+        notes: '**A service agent frees a credential from a device** (a lost phone, a device change that
+          needs an operator or supervisor under the policy): sets `deactivatedAt` on the binding, so the
+          guest can bind the credential on another device.'
+        provenance: contract access.yaml POST /device-bindings/{bindingId}/release
   states:
     loading: The device binding session list.
     error: Could not load. Names which read failed and leaves the device binding session untouched.
@@ -40390,6 +40794,18 @@ screens:
     contract: access
     purpose: Device Binding & Session Security
     trigger: onLoad
+  - operationId: setDeviceBindingPolicy
+    contract: access
+    purpose: Set the device binding policy of a venue
+    trigger: onAction
+    invalidates:
+    - listDeviceBindingSession
+  - operationId: releaseCredentialDevice
+    contract: access
+    purpose: Release a credential from a device
+    trigger: onAction
+    invalidates:
+    - listDeviceBindingSession
   entryState:
     preloaded:
     - DeviceBindingSessionSecurityView.user
@@ -40398,6 +40814,10 @@ screens:
     - DeviceBindingSessionSecurityView.appInstallation
     - DeviceBindingSessionSecurityView.os
     - DeviceBindingSessionSecurityView.registrationDate
+    params:
+    - name: bindingId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -40407,6 +40827,38 @@ screens:
     bound to a contract property; 8 of 22 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetDeviceBindingPolicy
+    component: modal
+    trigger: Save device binding policy
+    body: '**Collects what `setDeviceBindingPolicy` sends before it is called.** Required: `venueId`.
+      Optional: `maximumActiveDevices`, `concurrentSessions`, `deviceChangePolicy`. Dismissing sends nothing;
+      the screen behind is unchanged.'
+    bindsTo: DeviceBindingPolicyInput
+    confirm:
+      label: Save device binding policy
+      operation: setDeviceBindingPolicy
+    dismiss:
+      label: Cancel
+      discards:
+      - venueId
+      - maximumActiveDevices
+      - concurrentSessions
+      - deviceChangePolicy
+    provenance: contract access.yaml PUT /device-binding-policy
+  - id: formReleaseCredentialDevice
+    component: modal
+    trigger: Release credential device
+    body: '**Collects what `releaseCredentialDevice` sends before it is called.** Required: `reason`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Release credential device
+      operation: releaseCredentialDevice
+    dismiss:
+      label: Cancel
+      discards:
+      - reason
+    provenance: contract access.yaml POST /device-bindings/{bindingId}/release
 - id: BO-168
   name: BLE Beacon & Geofence Configuration
   module: Access & Venue
@@ -40577,6 +41029,17 @@ screens:
       - kind: selectField
         label: Return to sender
         provenance: pack Access Control Module_Reference.pdf, page 35 §Configure
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Release credential device
+        operation: releaseCredentialDevice
+        permission: GUEST_MANAGE
+        notes: '**A service agent frees a credential from a device** (a lost phone, a device change that
+          needs an operator or supervisor under the policy): sets `deactivatedAt` on the binding, so the
+          guest can bind the credential on another device.'
+        provenance: contract access.yaml POST /device-bindings/{bindingId}/release
   states:
     loading: The credential transfer rebinding configuration as saved.
     error: Could not load. Names which read failed and leaves the credential transfer rebinding untouched.
@@ -40589,6 +41052,12 @@ screens:
     contract: access
     purpose: Credential Transfer & Rebinding
     trigger: onLoad
+  - operationId: releaseCredentialDevice
+    contract: access
+    purpose: Release a credential from a device
+    trigger: onAction
+    invalidates:
+    - listCredentialTransferRebinding
   wireframe:
     status: notStarted
     provenance: generated
@@ -40598,6 +41067,25 @@ screens:
     bound to a contract property; 9 of 24 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formReleaseCredentialDevice
+    component: modal
+    trigger: Release credential device
+    body: '**Collects what `releaseCredentialDevice` sends before it is called.** Required: `reason`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Release credential device
+      operation: releaseCredentialDevice
+    dismiss:
+      label: Cancel
+      discards:
+      - reason
+    provenance: contract access.yaml POST /device-bindings/{bindingId}/release
+  entryState:
+    params:
+    - name: bindingId
+      from: navigation
+      optional: true
 - id: BO-170
   name: Credential Revocation & Lifecycle Events
   module: Access & Venue
@@ -40656,6 +41144,14 @@ screens:
         - CredentialRevocationLifecycleEventsView.propagationTargets
         notes: null
         provenance: pack Access Control Module_Reference.pdf, page 36 §Show
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save credential event propagation rule
+        operation: setCredentialEventPropagationRule
+        permission: ACCESS_POINT_CONFIGURE
+        provenance: contract access.yaml PUT /credential-event-propagation-rules
   states:
     loading: The credential revocation lifecycle list.
     error: Could not load. Names which read failed and leaves the credential revocation lifecycle untouched.
@@ -40670,6 +41166,12 @@ screens:
     contract: access
     purpose: Credential Revocation & Lifecycle Events
     trigger: onLoad
+  - operationId: setCredentialEventPropagationRule
+    contract: access
+    purpose: Set how a ticket lifecycle event propagates to the credential
+    trigger: onAction
+    invalidates:
+    - listCredentialRevocationLifecycle
   entryState:
     preloaded:
     - CredentialRevocationLifecycleEventsView.propagationTargets
@@ -40682,6 +41184,28 @@ screens:
     bound to a contract property; 14 of 20 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetCredentialEventPropagationRule
+    component: modal
+    trigger: Save credential event propagation rule
+    body: '**Collects what `setCredentialEventPropagationRule` sends before it is called.** Required:
+      `id`, `triggerEvent`, `scopePath`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`,
+      `propagation`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: AccessCredentialEventPropagationRule
+    confirm:
+      label: Save credential event propagation rule
+      operation: setCredentialEventPropagationRule
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - triggerEvent
+      - scopePath
+      - revocationAction
+      - propagationTargets
+      - monitoredConditions
+      - propagation
+    provenance: contract access.yaml PUT /credential-event-propagation-rules
 - id: BO-171
   name: Offline Cryptographic Validation Profile
   module: Access & Venue
@@ -40741,6 +41265,16 @@ screens:
         impliedBy: listOfflineCryptographicValidation
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save offline policy
+        operation: setOfflinePolicy
+        permission: TENANT_CONFIGURE
+        notes: Board 5 of the client's POS set, and **one of only two things in 36 board screens the package
+          could not do.** ADR-0013 makes the POS local-first and nothing configured the policy.
+        provenance: contract tenancy.yaml PUT /offline-policy
   states:
     loading: The offline cryptographic validation list.
     error: Could not load. Names which read failed and leaves the offline cryptographic validation untouched.
@@ -40751,10 +41285,20 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: setGateOfflinePolicy
+    purpose: Save the gate offline validation, revocation cache and degraded-mode policy (writers pass,
+      29 September)
+    contract: access
   - operationId: listOfflineCryptographicValidation
     contract: access
     purpose: Offline Cryptographic Validation Profile
     trigger: onLoad
+  - operationId: setOfflinePolicy
+    contract: tenancy
+    purpose: What a workstation may do with no network, and for how long
+    trigger: onAction
+    invalidates:
+    - listOfflineCryptographicValidation
   entryState:
     preloaded:
     - OfflineCryptographicValidationProfileView.offlineChecks
@@ -40767,6 +41311,29 @@ screens:
     bound to a contract property; 0 of 30 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetOfflinePolicy
+    component: modal
+    trigger: Save offline policy
+    body: '**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional:
+      `id`, `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`,
+      `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: OfflinePolicy
+    confirm:
+      label: Save offline policy
+      operation: setOfflinePolicy
+    dismiss:
+      label: Cancel
+      discards:
+      - scopePath
+      - id
+      - maxOfflineHours
+      - allowedOffline
+      - offlineValueCeiling
+      - offlineTransactionCeiling
+      - onCeilingBreach
+      - requiresManagerToExtend
+    provenance: contract tenancy.yaml PUT /offline-policy
 - id: BO-172
   name: Embedded Entitlement Payload Designer
   module: Access & Venue
@@ -41383,6 +41950,17 @@ screens:
         impliedBy: listVerificationMethodSelection
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save verification method policy
+        operation: setVerificationMethodPolicy
+        permission: ACCESS_POINT_CONFIGURE
+        notes: '**The write behind Verification Method Selection & Locking** (BO-177): the methods a guest
+          may choose for one product (dynamic QR, card, RFID, Face Pass, Face Tag), whether the method
+          locks on first successful access, who may change it after lock and the reasons allowed.'
+        provenance: contract access.yaml PUT /verification-method-policies
   states:
     loading: The verification method selection list.
     error: Could not load. Names which read failed and leaves the verification method selection untouched.
@@ -41397,6 +41975,12 @@ screens:
     contract: access
     purpose: Verification Method Selection & Locking
     trigger: onLoad
+  - operationId: setVerificationMethodPolicy
+    contract: access
+    purpose: Set the verification method policy of a product
+    trigger: onAction
+    invalidates:
+    - listVerificationMethodSelection
   entryState:
     preloaded:
     - VerificationMethodSelectionLockingView.availableMethods
@@ -41409,6 +41993,28 @@ screens:
     bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetVerificationMethodPolicy
+    component: modal
+    trigger: Save verification method policy
+    body: '**Collects what `setVerificationMethodPolicy` sends before it is called.** Required: `id`,
+      `productId`, `availableMethods`, `lockOnFirstSuccessfulAccess`, `changeAfterLock`, `scopePath`.
+      Optional: `reasonCodes`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: AccessVerificationMethodPolicy
+    confirm:
+      label: Save verification method policy
+      operation: setVerificationMethodPolicy
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - productId
+      - availableMethods
+      - lockOnFirstSuccessfulAccess
+      - changeAfterLock
+      - scopePath
+      - reasonCodes
+    provenance: contract access.yaml PUT /verification-method-policies
 - id: BO-178
   name: Media Issuance & Encoding Profile
   module: Access & Venue
@@ -42679,6 +43285,14 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Current Face”, “SIGNIFICANT
           IDENTITY DIFFERENCE”, “CHANGE BLOCKED”, “Change Reasons”.'
         provenance: pack Access Control Module_Reference.pdf, page 63 §Show
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Review face reenrolment
+        operation: reviewFaceReenrolment
+        permission: GUEST_MANAGE
+        provenance: contract access.yaml POST /face-reenrolment-attempts/{attemptId}/review
   states:
     loading: The face change re-enrollment list.
     error: Could not load. Names which read failed and leaves the face change re-enrollment untouched.
@@ -42693,6 +43307,12 @@ screens:
     contract: access
     purpose: Face Change, Re-enrollment & Identity Protection
     trigger: onLoad
+  - operationId: reviewFaceReenrolment
+    contract: access
+    purpose: Review a blocked Face Pass re-enrolment
+    trigger: onAction
+    invalidates:
+    - listFaceChangeEnrollment
   entryState:
     preloaded:
     - FaceChangeReEnrollmentIdentityProtectionView.existingProfileReference
@@ -42701,6 +43321,10 @@ screens:
     - FaceChangeReEnrollmentIdentityProtectionView.credentialId
     - FaceChangeReEnrollmentIdentityProtectionView.guestId
     - FaceChangeReEnrollmentIdentityProtectionView.reasonForReEnrollment
+    params:
+    - name: attemptId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -42710,6 +43334,21 @@ screens:
     bound to a contract property; 8 of 28 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formReviewFaceReenrolment
+    component: modal
+    trigger: Review face reenrolment
+    body: '**Collects what `reviewFaceReenrolment` sends before it is called.** Required: `decision`.
+      Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Review face reenrolment
+      operation: reviewFaceReenrolment
+    dismiss:
+      label: Cancel
+      discards:
+      - decision
+      - note
+    provenance: contract access.yaml POST /face-reenrolment-attempts/{attemptId}/review
 - id: BO-191
   name: Biometric Validation at Gate
   module: Access & Venue
@@ -43187,6 +43826,16 @@ screens:
         - DeviceGateCommandCenterView.controllerHealth
         notes: 'The pack groups this record''s detail under its own headings: “Device Directory”.'
         provenance: pack Access Control Module_Reference.pdf, page 70 §Display
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save access device
+        operation: updateAccessDevice
+        permission: DEVICE_CONFIGURE
+        notes: 'Changes where a registered device sits and what it is: name, hardware model, area, access
+          point, lane, group label, network references, capabilities and `isActive`.'
+        provenance: contract access.yaml PUT /access-devices/{deviceId}
   states:
     loading: The device gate list.
     error: Could not load. Names which read failed and leaves the device gate untouched.
@@ -43217,6 +43866,13 @@ screens:
     contract: access
     purpose: The gates and turnstiles whose mode is set
     trigger: onLoad
+  - operationId: updateAccessDevice
+    contract: access
+    purpose: Replace a registered device's registration
+    trigger: onAction
+    invalidates:
+    - listDeviceGate
+    - listAccessPoints
   entryState:
     preloaded:
     - DeviceGateCommandCenterViewSummary.totalDevices
@@ -43228,6 +43884,9 @@ screens:
     params:
     - name: accessPointId
       from: navigation
+    - name: deviceId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -43237,6 +43896,41 @@ screens:
     bound to a contract property; 21 of 34 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formUpdateAccessDevice
+    component: modal
+    trigger: Save access device
+    body: '**Collects what `updateAccessDevice` sends before it is called.** Required: `id`, `venueId`,
+      `hardwareType`, `provisioningStage`, `isActive`, `scopePath`. Optional: `hardwareModelId`, `name`,
+      `serialNumber`, `accessAreaId`, `accessPointId`, `gateLaneId`, `deviceGroupId`, `ipNetworkReference`,
+      `controllerReference`, `installationDate`, `lifecycleStatus`, `capabilities` and 10 more. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    bindsTo: AccessAccessDevice
+    confirm:
+      label: Save access device
+      operation: updateAccessDevice
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - venueId
+      - hardwareType
+      - provisioningStage
+      - isActive
+      - scopePath
+      - hardwareModelId
+      - name
+      - serialNumber
+      - accessAreaId
+      - accessPointId
+      - gateLaneId
+      - deviceGroupId
+      - ipNetworkReference
+      - controllerReference
+      - installationDate
+      - lifecycleStatus
+      - capabilities
+    provenance: contract access.yaml PUT /access-devices/{deviceId}
 - id: BO-195
   name: Device Type & Hardware Library
   module: Access & Venue
@@ -43293,6 +43987,17 @@ screens:
         impliedBy: listDeviceTypeHardware
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save hardware model
+        operation: setHardwareModel
+        permission: DEVICE_CONFIGURE
+        notes: '**The write behind Device Type & Hardware Library** (BO-195): one hardware model (manufacturer,
+          model, category, type, technologies, connectivity, capability flags, firmware), independent
+          of the devices deployed.'
+        provenance: contract access.yaml PUT /hardware-models
   states:
     loading: The device type hardware list.
     error: Could not load. Names which read failed and leaves the device type hardware untouched.
@@ -43307,6 +44012,12 @@ screens:
     contract: access
     purpose: Device Type & Hardware Library
     trigger: onLoad
+  - operationId: setHardwareModel
+    contract: access
+    purpose: Create or replace a hardware model in the library
+    trigger: onAction
+    invalidates:
+    - listDeviceTypeHardware
   entryState:
     preloaded:
     - DeviceTypeHardwareLibraryView.hardwareType
@@ -43319,6 +44030,38 @@ screens:
     bound to a contract property; 0 of 38 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetHardwareModel
+    component: modal
+    trigger: Save hardware model
+    body: '**Collects what `setHardwareModel` sends before it is called.** Required: `id`, `manufacturer`,
+      `model`, `deviceCategory`, `hardwareType`, `scopePath`. Optional: `supportedTechnologies`, `connectivity`,
+      `offlineCapability`, `screenCapability`, `soundCapability`, `lightCapability`, `relayControllerSupport`,
+      `paymentCapability`, `firmwareSoftwareInformation`. Dismissing sends nothing; the screen behind
+      is unchanged.'
+    bindsTo: AccessHardwareModel
+    confirm:
+      label: Save hardware model
+      operation: setHardwareModel
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - manufacturer
+      - model
+      - deviceCategory
+      - hardwareType
+      - scopePath
+      - supportedTechnologies
+      - connectivity
+      - offlineCapability
+      - screenCapability
+      - soundCapability
+      - lightCapability
+      - relayControllerSupport
+      - paymentCapability
+      - firmwareSoftwareInformation
+    provenance: contract access.yaml PUT /hardware-models
 - id: BO-196
   name: Physical Device Registration & Provisioning
   module: Access & Venue
@@ -43349,6 +44092,7 @@ screens:
       operation: listPhysicalDeviceRegistration
       carries:
       - accessPointId
+      - deviceId
   density: compact
   purposeNote: Every physical access-control device is uniquely registered, authenticated and assigned
     to its correct topology location.
@@ -43398,6 +44142,24 @@ screens:
       - kind: selectField
         label: controller reference
         provenance: pack Access Control Module_Reference.pdf, page 73 §Configure
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Register access device
+        operation: registerAccessDevice
+        permission: DEVICE_CONFIGURE
+        notes: '**The write behind Physical Device Registration & Provisioning** (BO-196): registers one
+          deployed device (a turnstile, reader, handheld, podium unit or beacon) against a hardware model
+          and places it in the topology.'
+        provenance: contract access.yaml POST /access-devices
+      - kind: secondaryButton
+        label: Save access device
+        operation: updateAccessDevice
+        permission: DEVICE_CONFIGURE
+        notes: 'Changes where a registered device sits and what it is: name, hardware model, area, access
+          point, lane, group label, network references, capabilities and `isActive`.'
+        provenance: contract access.yaml PUT /access-devices/{deviceId}
   states:
     loading: The physical device registration configuration as saved.
     error: Could not load. Names which read failed and leaves the physical device registration untouched.
@@ -43410,6 +44172,18 @@ screens:
     contract: access
     purpose: Physical Device Registration & Provisioning
     trigger: onLoad
+  - operationId: registerAccessDevice
+    contract: access
+    purpose: Register a physical access-control device
+    trigger: onAction
+    invalidates:
+    - listPhysicalDeviceRegistration
+  - operationId: updateAccessDevice
+    contract: access
+    purpose: Replace a registered device's registration
+    trigger: onAction
+    invalidates:
+    - listPhysicalDeviceRegistration
   wireframe:
     status: notStarted
     provenance: generated
@@ -43419,6 +44193,79 @@ screens:
     bound to a contract property; 12 of 30 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formRegisterAccessDevice
+    component: modal
+    trigger: Register access device
+    body: '**Collects what `registerAccessDevice` sends before it is called.** Required: `id`, `venueId`,
+      `hardwareType`, `provisioningStage`, `isActive`, `scopePath`. Optional: `hardwareModelId`, `name`,
+      `serialNumber`, `accessAreaId`, `accessPointId`, `gateLaneId`, `deviceGroupId`, `ipNetworkReference`,
+      `controllerReference`, `installationDate`, `lifecycleStatus`, `capabilities` and 10 more. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    bindsTo: AccessAccessDevice
+    confirm:
+      label: Register access device
+      operation: registerAccessDevice
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - venueId
+      - hardwareType
+      - provisioningStage
+      - isActive
+      - scopePath
+      - hardwareModelId
+      - name
+      - serialNumber
+      - accessAreaId
+      - accessPointId
+      - gateLaneId
+      - deviceGroupId
+      - ipNetworkReference
+      - controllerReference
+      - installationDate
+      - lifecycleStatus
+      - capabilities
+    provenance: contract access.yaml POST /access-devices
+  - id: formUpdateAccessDevice
+    component: modal
+    trigger: Save access device
+    body: '**Collects what `updateAccessDevice` sends before it is called.** Required: `id`, `venueId`,
+      `hardwareType`, `provisioningStage`, `isActive`, `scopePath`. Optional: `hardwareModelId`, `name`,
+      `serialNumber`, `accessAreaId`, `accessPointId`, `gateLaneId`, `deviceGroupId`, `ipNetworkReference`,
+      `controllerReference`, `installationDate`, `lifecycleStatus`, `capabilities` and 10 more. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    bindsTo: AccessAccessDevice
+    confirm:
+      label: Save access device
+      operation: updateAccessDevice
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - venueId
+      - hardwareType
+      - provisioningStage
+      - isActive
+      - scopePath
+      - hardwareModelId
+      - name
+      - serialNumber
+      - accessAreaId
+      - accessPointId
+      - gateLaneId
+      - deviceGroupId
+      - ipNetworkReference
+      - controllerReference
+      - installationDate
+      - lifecycleStatus
+      - capabilities
+    provenance: contract access.yaml PUT /access-devices/{deviceId}
+  entryState:
+    params:
+    - name: deviceId
+      from: session
 - id: BO-197
   name: Turnstile & Lane Behavior Configuration
   module: Access & Venue
@@ -43905,6 +44752,17 @@ screens:
       - kind: selectField
         label: automatic notification
         provenance: pack Access Control Module_Reference.pdf, page 79 §Configure
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save gate mode policy
+        operation: setGateModePolicy
+        permission: ACCESS_POINT_CONFIGURE
+        notes: '**The write behind Gate Modes, Free Spin & Emergency Controls** (BO-201): for `freeFlow`
+          or `dropArm` (R221 vocabulary), who may activate it, on which gate group, whether a reason is
+          required, the emergency code, notification and whether activation opens an incident.'
+        provenance: contract access.yaml PUT /gate-mode-policies
   states:
     loading: The gate modes free configuration as saved.
     error: Could not load. Names which read failed and leaves the gate modes free untouched.
@@ -43917,6 +44775,12 @@ screens:
     contract: access
     purpose: Gate Modes, Free Spin & Emergency Controls
     trigger: onLoad
+  - operationId: setGateModePolicy
+    contract: access
+    purpose: Set a policy for a non-standard gate mode
+    trigger: onAction
+    invalidates:
+    - listGateModeFree
   wireframe:
     status: notStarted
     provenance: generated
@@ -43926,6 +44790,31 @@ screens:
     bound to a contract property; 6 of 26 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetGateModePolicy
+    component: modal
+    trigger: Save gate mode policy
+    body: '**Collects what `setGateModePolicy` sends before it is called.** Required: `id`, `venueId`,
+      `mode`, `scopePath`. Optional: `whoCanActivate`, `accessPointGroupId`, `reasonRequired`, `emergencyCode`,
+      `automaticNotification`, `createsIncident`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: AccessGateModePolicy
+    confirm:
+      label: Save gate mode policy
+      operation: setGateModePolicy
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - venueId
+      - mode
+      - scopePath
+      - whoCanActivate
+      - accessPointGroupId
+      - reasonRequired
+      - emergencyCode
+      - automaticNotification
+      - createsIncident
+    provenance: contract access.yaml PUT /gate-mode-policies
 - id: BO-202
   name: Device Software, Content & Remote Configuration
   module: Access & Venue
@@ -44040,8 +44929,10 @@ screens:
     transitions:
     - to: BO-194
       trigger: Device & Gate Command Center
-      provenance: derived — BO-194 declares entryState.params accessPointId and BO-203 holds none of them,
-        so the edge carries nothing and BO-194 opens cold
+      carries:
+      - deviceId
+      provenance: derived — BO-194 declares entryState.params accessPointId, deviceId and BO-203 holds
+        deviceId, so an edge into it carries them
   density: compact
   purposeNote: 'No access device enters production until its required capabilities, connectivity, security
     configuration and physical responses have been successfully validated. Board 6 — Final 10-Screen Structure
@@ -44654,6 +45545,16 @@ screens:
         impliedBy: listOfflineCredentialRevocation
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save offline policy
+        operation: setOfflinePolicy
+        permission: TENANT_CONFIGURE
+        notes: Board 5 of the client's POS set, and **one of only two things in 36 board screens the package
+          could not do.** ADR-0013 makes the POS local-first and nothing configured the policy.
+        provenance: contract tenancy.yaml PUT /offline-policy
   states:
     loading: The offline credential revocation list.
     error: Could not load. Names which read failed and leaves the offline credential revocation untouched.
@@ -44664,10 +45565,20 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: setGateOfflinePolicy
+    purpose: Save the gate offline validation, revocation cache and degraded-mode policy (writers pass,
+      29 September)
+    contract: access
   - operationId: listOfflineCredentialRevocation
     contract: access
     purpose: Offline Credential & Revocation Cache
     trigger: onLoad
+  - operationId: setOfflinePolicy
+    contract: tenancy
+    purpose: What a workstation may do with no network, and for how long
+    trigger: onAction
+    invalidates:
+    - listOfflineCredentialRevocation
   entryState:
     preloaded:
     - OfflineCredentialRevocationCacheView.triggerEvents
@@ -44680,6 +45591,29 @@ screens:
     bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetOfflinePolicy
+    component: modal
+    trigger: Save offline policy
+    body: '**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional:
+      `id`, `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`,
+      `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: OfflinePolicy
+    confirm:
+      label: Save offline policy
+      operation: setOfflinePolicy
+    dismiss:
+      label: Cancel
+      discards:
+      - scopePath
+      - id
+      - maxOfflineHours
+      - allowedOffline
+      - offlineValueCeiling
+      - offlineTransactionCeiling
+      - onCeilingBreach
+      - requiresManagerToExtend
+    provenance: contract tenancy.yaml PUT /offline-policy
 - id: BO-209
   name: Offline Entitlement & Usage Ledger
   module: Access & Venue
@@ -44842,6 +45776,10 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: setGateOfflinePolicy
+    purpose: Save the gate offline validation, revocation cache and degraded-mode policy (writers pass,
+      29 September)
+    contract: access
   - operationId: listConnectivityFailureDegraded
     contract: access
     purpose: Connectivity Failure & Degraded Mode Policy
@@ -45125,6 +46063,16 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Draft”, “Deployment Scope”,
           “Current Production”, “Scheduled”, “Rollback”, “FORCE ONLINE-ONLY”.'
         provenance: pack Access Control Module_Reference.pdf, page 96 §Show
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save security alert
+        operation: updateSecurityAlert
+        permission: INCIDENT_MANAGE
+        notes: '**The action on the security command centres** (BO-244, BO-246, BO-248, BO-213, BO-253):
+          moves one alert raised by the detection jobs.'
+        provenance: contract access.yaml POST /security-alerts/{alertId}/status
   states:
     loading: The edge security audit list.
     error: Could not load. Names which read failed and leaves the edge security audit untouched.
@@ -45139,6 +46087,12 @@ screens:
     contract: access
     purpose: Edge Security, Audit & Deployment
     trigger: onLoad
+  - operationId: updateSecurityAlert
+    contract: access
+    purpose: Acknowledge, resolve or dismiss a security alert
+    trigger: onAction
+    invalidates:
+    - listEdgeSecurityDeployment
   entryState:
     preloaded:
     - Edge certificates/credentials
@@ -45147,6 +46101,10 @@ screens:
     - EdgeSecurityAuditDeploymentViewSummary.revokedDevices
     - EdgeSecurityAuditDeploymentViewSummary.failedPackageValidation
     - EdgeSecurityAuditDeploymentViewSummary.unauthorizedConnectionAttempts
+    params:
+    - name: alertId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -45156,6 +46114,22 @@ screens:
     bound to a contract property; 7 of 76 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formUpdateSecurityAlert
+    component: modal
+    trigger: Save security alert
+    body: '**Collects what `updateSecurityAlert` sends before it is called.** Required: `status`. Optional:
+      `note`, `securityInvestigationId`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save security alert
+      operation: updateSecurityAlert
+    dismiss:
+      label: Cancel
+      discards:
+      - status
+      - note
+      - securityInvestigationId
+    provenance: contract access.yaml POST /security-alerts/{alertId}/status
 - id: BO-214
   name: Guest Journey Command Center
   module: Access & Venue
@@ -45307,6 +46281,15 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Journey Type Venue Credential
           Status”.'
         provenance: pack Access Control Module_Reference.pdf, page 101 §Show
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save journey profile
+        operation: setJourneyProfile
+        permission: ACCESS_POINT_CONFIGURE
+        notes: '**The write behind the Guest Journey Command Center** (BO-214): a named journey (e.g.'
+        provenance: contract access.yaml PUT /journey-profiles
   states:
     loading: The guest journey list.
     error: Could not load. Names which read failed and leaves the guest journey untouched.
@@ -45328,6 +46311,12 @@ screens:
     provenance: decided 29 September, VM close-out (venue management and configuration)
     invalidates:
     - listGuestJourney
+  - operationId: setJourneyProfile
+    contract: access
+    purpose: Create or replace a guest journey profile
+    trigger: onAction
+    invalidates:
+    - listGuestJourney
   entryState:
     preloaded:
     - GuestJourneyCommandCenterViewSummary.activeJourneyProfiles
@@ -45345,6 +46334,29 @@ screens:
     bound to a contract property; 10 of 13 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetJourneyProfile
+    component: modal
+    trigger: Save journey profile
+    body: '**Collects what `setJourneyProfile` sends before it is called.** Required: `id`, `scopePath`,
+      `name`, `status`. Optional: `venueId`, `journeyType`, `credentialType`, `steps`. Dismissing sends
+      nothing; the screen behind is unchanged.'
+    bindsTo: AccessJourneyProfile
+    confirm:
+      label: Save journey profile
+      operation: setJourneyProfile
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - name
+      - status
+      - venueId
+      - journeyType
+      - credentialType
+      - steps
+    provenance: contract access.yaml PUT /journey-profiles
 - id: BO-215
   name: Group & B2B Admission Profile Builder
   module: Access & Venue
@@ -45972,6 +46984,13 @@ screens:
         label: Save Fast Pass settings
         operation: updateQueue
         provenance: contract queue.yaml PATCH /queues/{queueId} (decided 29 September, VM close-out)
+      - kind: secondaryButton
+        label: Save fast pass profile
+        operation: setFastPassProfile
+        permission: ACCESS_POINT_CONFIGURE
+        notes: '**The write behind Fast Pass & Attraction Access Journey** (BO-221): a Fast Pass profile
+          (e.g.'
+        provenance: contract access.yaml PUT /fast-pass-profiles
   states:
     loading: The fast pass attraction configuration as saved.
     error: Could not load. Names which read failed and leaves the fast pass attraction untouched.
@@ -45992,6 +47011,13 @@ screens:
     contract: queue
     purpose: Save Fast Pass settings
     trigger: onAction
+  - operationId: setFastPassProfile
+    contract: access
+    purpose: Create or replace a Fast Pass profile
+    trigger: onAction
+    invalidates:
+    - listFastPassAttraction
+    - listQueues
   wireframe:
     status: notStarted
     provenance: generated
@@ -46005,6 +47031,30 @@ screens:
     params:
     - name: queueId
       from: navigation
+  overlays:
+  - id: formSetFastPassProfile
+    component: modal
+    trigger: Save fast pass profile
+    body: '**Collects what `setFastPassProfile` sends before it is called.** Required: `id`, `scopePath`,
+      `name`, `unlimited`. Optional: `venueId`, `totalUses`, `consumptionPerValidation`, `onePerRide`,
+      `eligibleAttractionCategories`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: AccessFastPassProfile
+    confirm:
+      label: Save fast pass profile
+      operation: setFastPassProfile
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - name
+      - unlimited
+      - venueId
+      - totalUses
+      - consumptionPerValidation
+      - onePerRide
+      - eligibleAttractionCategories
+    provenance: contract access.yaml PUT /fast-pass-profiles
 - id: BO-222
   name: Special Event, Free View & Alternative Admission
   module: Access & Venue
@@ -46055,6 +47105,18 @@ screens:
       - kind: selectField
         label: 08:00–18:00
         provenance: pack Access Control Module_Reference.pdf, page 110 §Configure
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save operating calendar entry
+        operation: setOperatingCalendarEntry
+        permission: ACCESS_POINT_CONFIGURE
+        notes: '**The write behind Operating Calendar & Special Access Days** (BO-152) and Special Event,
+          Free View & Alternative Admission (BO-222): one dated entry (a holiday, private event, free-entry
+          day, special event and so on), whether tickets must be validated, and for a free-view or special-event
+          window its admission type.'
+        provenance: contract access.yaml PUT /operating-calendar-entries
   states:
     loading: The special event free configuration as saved.
     error: Could not load. Names which read failed and leaves the special event free untouched.
@@ -46081,6 +47143,12 @@ screens:
     provenance: decided 29 September, VM close-out (venue management and configuration)
     invalidates:
     - listSpecialEventFree
+  - operationId: setOperatingCalendarEntry
+    contract: access
+    purpose: Create or replace an operating calendar entry
+    trigger: onAction
+    invalidates:
+    - listSpecialEventFree
   wireframe:
     status: notStarted
     provenance: generated
@@ -46090,6 +47158,33 @@ screens:
     bound to a contract property; 2 of 15 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetOperatingCalendarEntry
+    component: modal
+    trigger: Save operating calendar entry
+    body: '**Collects what `setOperatingCalendarEntry` sends before it is called.** Required: `id`, `venueId`,
+      `dayType`, `startsAt`, `endsAt`, `scopePath`. Optional: `name`, `ticketValidationRequired`, `admissionType`,
+      `attractionValidation`, `manualAttendanceRequired`. Dismissing sends nothing; the screen behind
+      is unchanged.'
+    bindsTo: AccessOperatingCalendarEntry
+    confirm:
+      label: Save operating calendar entry
+      operation: setOperatingCalendarEntry
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - venueId
+      - dayType
+      - startsAt
+      - endsAt
+      - scopePath
+      - name
+      - ticketValidationRequired
+      - admissionType
+      - attractionValidation
+      - manualAttendanceRequired
+    provenance: contract access.yaml PUT /operating-calendar-entries
 - id: BO-223
   name: Journey Simulation, Audit & Publication
   module: Access & Venue
@@ -46261,12 +47356,6 @@ screens:
       trigger: Works in Credential Disable, Blacklist & Whitelist Operations
       provenance: flow F119 step 9→10
       operation: listLiveAccess
-    - to: BO-230
-      trigger: Works in Live Gate Mode & Lane Control
-      provenance: flow F119 step 11→12
-      operation: listLiveAccess
-      carries:
-      - accessPointId
     - to: BO-231
       trigger: Works in Queue, Throughput & Lane Optimization
       provenance: flow F119 step 13→14
@@ -46279,6 +47368,12 @@ screens:
       trigger: Works in Operations Audit, Shift Handover & Control Summary
       provenance: flow F119 step 17→18
       operation: listLiveAccess
+    - to: BO-230
+      trigger: Works in Live Gate Mode & Lane Control
+      provenance: flow F119 step 11→12
+      operation: listLiveAccess
+      carries:
+      - accessPointId
   density: compact
   purposeNote: Operations can understand the live access state of the entire venue without opening individual
     device screens.
@@ -46454,6 +47549,35 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “The podium may be”, “Controls”,
           “Operator”, “Shift”, “Authorized actions”, “Important”.'
         provenance: pack Access Control Module_Reference.pdf, page 117 §Display
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save podium
+        operation: setPodium
+        permission: DEVICE_CONFIGURE
+        notes: '**A podium is an attendant interface that controls one or more access points** (BO-225
+          Podium Operations Console): a physical panel, tablet, workstation or handheld.'
+        provenance: contract access.yaml PUT /podiums
+      - kind: destructiveButton
+        label: Delete podium
+        operation: deletePodium
+        permission: DEVICE_CONFIGURE
+        notes: Deletes a podium.
+        provenance: contract access.yaml DELETE /podiums/{podiumId}
+      - kind: secondaryButton
+        label: Start podium shift
+        operation: startPodiumShift
+        permission: TURNSTILE_MODE_SET
+        notes: '**The operator signs in to a podium** (BO-225; P07 SCN-002 where the scanner picks its
+          access point).'
+        provenance: contract access.yaml POST /podiums/{podiumId}/shifts
+      - kind: secondaryButton
+        label: End podium shift
+        operation: endPodiumShift
+        permission: TURNSTILE_MODE_SET
+        notes: '**The operator signs out of the podium**: sets `logoutAt`.'
+        provenance: contract access.yaml POST /podium-shifts/{shiftId}/end
   states:
     loading: The podium operations console list.
     error: Could not load. Names which read failed and leaves the podium operations console untouched.
@@ -46468,8 +47592,38 @@ screens:
     contract: access
     purpose: Podium Operations Console
     trigger: onLoad
+  - operationId: setPodium
+    contract: access
+    purpose: Create or replace a podium
+    trigger: onAction
+    invalidates:
+    - listPodiumConsole
+  - operationId: deletePodium
+    contract: access
+    purpose: Delete a podium
+    trigger: onAction
+    invalidates:
+    - listPodiumConsole
+  - operationId: startPodiumShift
+    contract: access
+    purpose: Start an operator shift on a podium
+    trigger: onAction
+    invalidates:
+    - listPodiumConsole
+  - operationId: endPodiumShift
+    contract: access
+    purpose: End an operator shift on a podium
+    trigger: onAction
+    invalidates:
+    - listPodiumConsole
   entryState:
     preloaded: []
+    params:
+    - name: shiftId
+      from: navigation
+      optional: true
+    - name: podiumId
+      from: navigation
   wireframe:
     status: notStarted
     provenance: generated
@@ -46479,6 +47633,60 @@ screens:
     bound to a contract property; 6 of 29 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetPodium
+    component: modal
+    trigger: Save podium
+    body: '**Collects what `setPodium` sends before it is called.** Required: `id`, `venueId`, `podiumType`,
+      `name`, `scopePath`. Optional: `accessPointIds`. Dismissing sends nothing; the screen behind is
+      unchanged.'
+    bindsTo: AccessPodium
+    confirm:
+      label: Save podium
+      operation: setPodium
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - venueId
+      - podiumType
+      - name
+      - scopePath
+      - accessPointIds
+    provenance: contract access.yaml PUT /podiums
+  - id: confirmDeletePodium
+    component: confirmDialog
+    trigger: Delete podium
+    body: '**Names what `deletePodium` changes and what it leaves alone**, in the consequence rather than
+      the verb. A record this affects should be identified in the dialog, not just counted.'
+    provenance: contract access.yaml DELETE /podiums/{podiumId}
+  - id: formStartPodiumShift
+    component: modal
+    trigger: Start podium shift
+    body: '**Collects what `startPodiumShift` sends before it is called.** Nothing in the body is required.
+      Optional: `role`, `accessDeviceId`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Start podium shift
+      operation: startPodiumShift
+    dismiss:
+      label: Cancel
+      discards:
+      - role
+      - accessDeviceId
+    provenance: contract access.yaml POST /podiums/{podiumId}/shifts
+  - id: formEndPodiumShift
+    component: modal
+    trigger: End podium shift
+    body: '**Collects what `endPodiumShift` sends before it is called.** Nothing in the body is required.
+      Optional: `handoverNote`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: End podium shift
+      operation: endPodiumShift
+    dismiss:
+      label: Cancel
+      discards:
+      - handoverNote
+    provenance: contract access.yaml POST /podium-shifts/{shiftId}/end
 - id: BO-226
   name: Ticket & Credential Investigation Console
   module: Access & Venue
@@ -46607,12 +47815,6 @@ screens:
     scanner to display a reason code when a ticket is invalid.
   gaps:
   - operation: null
-    why: '**Validation Exception & Reason Code Manager declares no operation that writes anything** —
-      its only declared call is `listValidationExceptionReason`, a read. The name promises authoring and
-      the contract offers none, so either the write operations are missing or this screen is a view of
-      something another screen builds.'
-    source: contract — the screen's declared operations
-  - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
@@ -46632,6 +47834,22 @@ screens:
         impliedBy: listValidationExceptionReason
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save reason code
+        operation: setReasonCode
+        permission: ACCESS_POINT_CONFIGURE
+        notes: '**The write behind the Validation Exception & Reason Code Manager** (BO-227): one reason
+          code (e.g.'
+        provenance: contract access.yaml PUT /reason-codes
+      - kind: destructiveButton
+        label: Delete reason code
+        operation: deleteReasonCode
+        permission: ACCESS_POINT_CONFIGURE
+        notes: Deletes a reason code no scan has used.
+        provenance: contract access.yaml DELETE /reason-codes/{reasonCodeId}
   states:
     loading: The validation exception reason list.
     error: Could not load. Names which read failed and leaves the validation exception reason untouched.
@@ -46646,9 +47864,24 @@ screens:
     contract: access
     purpose: Validation Exception & Reason Code Manager
     trigger: onLoad
+  - operationId: setReasonCode
+    contract: access
+    purpose: Create or replace a validation reason code
+    trigger: onAction
+    invalidates:
+    - listValidationExceptionReason
+  - operationId: deleteReasonCode
+    contract: access
+    purpose: Delete a validation reason code
+    trigger: onAction
+    invalidates:
+    - listValidationExceptionReason
   entryState:
     preloaded:
     - ValidationExceptionReasonCodeManagerView.operationalResponse
+    params:
+    - name: reasonCodeId
+      from: navigation
   wireframe:
     status: notStarted
     provenance: generated
@@ -46658,6 +47891,36 @@ screens:
     bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetReasonCode
+    component: modal
+    trigger: Save reason code
+    body: '**Collects what `setReasonCode` sends before it is called.** Required: `id`, `code`, `name`,
+      `operationalResponse`, `scopePath`. Optional: `venueId`, `guestMessage`, `operatorMessage`, `followUpAction`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: AccessReasonCode
+    confirm:
+      label: Save reason code
+      operation: setReasonCode
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - code
+      - name
+      - operationalResponse
+      - scopePath
+      - venueId
+      - guestMessage
+      - operatorMessage
+      - followUpAction
+    provenance: contract access.yaml PUT /reason-codes
+  - id: confirmDeleteReasonCode
+    component: confirmDialog
+    trigger: Delete reason code
+    body: '**Names what `deleteReasonCode` changes and what it leaves alone**, in the consequence rather
+      than the verb. A record this affects should be identified in the dialog, not just counted.'
+    provenance: contract access.yaml DELETE /reason-codes/{reasonCodeId}
 - id: BO-228
   name: Manual Override & Supervisor Approval
   module: Access & Venue
@@ -46903,6 +48166,15 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “ENTRY”, “Available”, “Bulk
           Command”, “Optional”, “Emergency”.'
         provenance: pack Access Control Module_Reference.pdf, page 124 §Show
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: destructiveButton
+        label: Cancel gate mode change
+        operation: cancelGateModeChange
+        permission: TURNSTILE_MODE_SET
+        notes: Cancels a `pending` gate mode change, one `setTurnstileMode` scheduled with a future `effectiveAt`.
+        provenance: contract access.yaml POST /gate-mode-changes/{changeId}/cancel
   states:
     loading: The live gate mode list.
     error: Could not load. Names which read failed and leaves the live gate mode untouched.
@@ -46928,6 +48200,13 @@ screens:
     contract: access
     purpose: The gates and lanes whose mode is set
     trigger: onLoad
+  - operationId: cancelGateModeChange
+    contract: access
+    purpose: Cancel a scheduled gate mode change
+    trigger: onAction
+    invalidates:
+    - listLiveGateMode
+    - listAccessPoints
   entryState:
     preloaded:
     - LiveGateModeLaneControlView.currentMode
@@ -46937,6 +48216,9 @@ screens:
     params:
     - name: accessPointId
       from: navigation
+    - name: changeId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -46946,6 +48228,15 @@ screens:
     bound to a contract property; 9 of 32 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: confirmCancelGateModeChange
+    component: confirmDialog
+    trigger: Cancel gate mode change
+    body: '**Names what `cancelGateModeChange` changes and what it leaves alone**, in the consequence
+      rather than the verb. A access gate mode change this affects should be identified in the dialog,
+      not just counted. **Collects what `cancelGateModeChange` sends before it is called.** Nothing in
+      the body is required. Optional: `reason`.'
+    provenance: contract access.yaml POST /gate-mode-changes/{changeId}/cancel
 - id: BO-231
   name: Queue, Throughput & Lane Optimization
   module: Access & Venue
@@ -47174,6 +48465,12 @@ screens:
       - kind: primaryButton
         label: Operations Audit, Shift Handover & Control
         provenance: pack Access Control Module_Reference.pdf, page 128 §Operations
+      - kind: secondaryButton
+        label: End podium shift
+        operation: endPodiumShift
+        permission: TURNSTILE_MODE_SET
+        notes: '**The operator signs out of the podium**: sets `logoutAt`.'
+        provenance: contract access.yaml POST /podium-shifts/{shiftId}/end
     - name: contentBody
       components:
       - kind: dataTable
@@ -47195,6 +48492,12 @@ screens:
     contract: access
     purpose: Operations Audit, Shift Handover & Control Summary
     trigger: onLoad
+  - operationId: endPodiumShift
+    contract: access
+    purpose: End an operator shift on a podium
+    trigger: onAction
+    invalidates:
+    - listShiftHandoverSummary
   entryState:
     preloaded:
     - OperationsAuditShiftHandoverControlSummaryView.operator
@@ -47202,6 +48505,10 @@ screens:
     - OperationsAuditShiftHandoverControlSummaryView.podium
     - OperationsAuditShiftHandoverControlSummaryView.device
     - OperationsAuditShiftHandoverControlSummaryView.login
+    params:
+    - name: shiftId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -47212,6 +48519,20 @@ screens:
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here. **Pack actions reconciled 29 September (VM close-out):** Operations Audit, Shift Handover &
     Control dropped (heading (screen title fragment)).
+  overlays:
+  - id: formEndPodiumShift
+    component: modal
+    trigger: End podium shift
+    body: '**Collects what `endPodiumShift` sends before it is called.** Nothing in the body is required.
+      Optional: `handoverNote`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: End podium shift
+      operation: endPodiumShift
+    dismiss:
+      label: Cancel
+      discards:
+      - handoverNote
+    provenance: contract access.yaml POST /podium-shifts/{shiftId}/end
 - id: BO-234
   name: Dynamic Access Policy Command Center
   module: Access & Venue
@@ -47998,6 +49319,18 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: setEdgeNodeLocal
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save policy evaluation setting
+        operation: setPolicyEvaluationSetting
+        permission: ACCESS_POINT_CONFIGURE
+        notes: '**The write behind Policy Evaluation Architecture & Offline Distribution** (BO-241): for
+          one policy category, the evaluation mode (central, edge, device, hybrid), the locations that
+          may evaluate it, its offline behaviour and the oldest cached data an offline evaluation may
+          use.'
+        provenance: contract access.yaml PUT /policy-evaluation-settings
   states:
     loading: The policy evaluation architecture list.
     error: Could not load. Names which read failed and leaves the policy evaluation architecture untouched.
@@ -48024,6 +49357,12 @@ screens:
     purpose: Save what the edge may decide while central services are unreachable
     trigger: onAction
     provenance: decided 29 September, VM close-out (venue management and configuration)
+  - operationId: setPolicyEvaluationSetting
+    contract: access
+    purpose: Set where and how a policy category is evaluated
+    trigger: onAction
+    invalidates:
+    - listPolicyEvaluationArchitecture
   entryState:
     preloaded: []
   wireframe:
@@ -48035,6 +49374,28 @@ screens:
     bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetPolicyEvaluationSetting
+    component: modal
+    trigger: Save policy evaluation setting
+    body: '**Collects what `setPolicyEvaluationSetting` sends before it is called.** Required: `id`, `scopePath`,
+      `policyCategory`, `evaluationMode`. Optional: `supportedLocations`, `offlineBehaviour`, `maxDataAgeMinutes`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: AccessPolicyEvaluationSetting
+    confirm:
+      label: Save policy evaluation setting
+      operation: setPolicyEvaluationSetting
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - policyCategory
+      - evaluationMode
+      - supportedLocations
+      - offlineBehaviour
+      - maxDataAgeMinutes
+    provenance: contract access.yaml PUT /policy-evaluation-settings
 - id: BO-242
   name: Policy Simulation, Conflict & Impact Analysis
   module: Access & Venue
@@ -48335,17 +49696,9 @@ screens:
       trigger: Works in Fraud Detection Rule & Signal Library
       provenance: flow F121 step 1→2
       operation: listAccessSecurityFraud
-    - to: BO-246
-      trigger: Works in Credential Sharing & Concurrent Usage Detection
-      provenance: flow F121 step 3→4
-      operation: listAccessSecurityFraud
     - to: BO-247
       trigger: Works in Unified Identity & Credential Lock Manager
       provenance: flow F121 step 5→6
-      operation: listAccessSecurityFraud
-    - to: BO-248
-      trigger: Works in Biometric & Identity Integrity Monitoring
-      provenance: flow F121 step 7→8
       operation: listAccessSecurityFraud
     - to: BO-249
       trigger: Works in Relationship & Companion Fraud Monitoring
@@ -48363,10 +49716,24 @@ screens:
       trigger: Works in Security Investigation & Evidence Workspace
       provenance: flow F121 step 15→16
       operation: listAccessSecurityFraud
+    - to: BO-246
+      trigger: Works in Credential Sharing & Concurrent Usage Detection
+      provenance: flow F121 step 3→4
+      operation: listAccessSecurityFraud
+      carries:
+      - alertId
+    - to: BO-248
+      trigger: Works in Biometric & Identity Integrity Monitoring
+      provenance: flow F121 step 7→8
+      operation: listAccessSecurityFraud
+      carries:
+      - alertId
     - to: BO-253
       trigger: Works in Security Analytics, AI Detection & Governance
       provenance: flow F121 step 17→18
       operation: listAccessSecurityFraud
+      carries:
+      - alertId
   density: compact
   purposeNote: Security teams can understand the overall fraud and access-security posture from one screen.
   pattern: listDetail
@@ -48465,6 +49832,24 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “CRITICAL”, “HIGH”, “MEDIUM”,
           “Display incidents geographically across”.'
         provenance: pack Access Control Module_Reference.pdf, page 151 §Display
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Lock identity
+        operation: lockIdentity
+        permission: INCIDENT_MANAGE
+        notes: '**The write behind the Unified Identity & Credential Lock Manager** (BO-247): locks one
+          identity at a scope (one credential, a medium, an entitlement, a venue, every venue, or the
+          full identity), for a duration, for a reason.'
+        provenance: contract access.yaml POST /identity-locks
+      - kind: secondaryButton
+        label: Save security alert
+        operation: updateSecurityAlert
+        permission: INCIDENT_MANAGE
+        notes: '**The action on the security command centres** (BO-244, BO-246, BO-248, BO-213, BO-253):
+          moves one alert raised by the detection jobs.'
+        provenance: contract access.yaml POST /security-alerts/{alertId}/status
   states:
     loading: The access security fraud list.
     error: Could not load. Names which read failed and leaves the access security fraud untouched.
@@ -48479,6 +49864,18 @@ screens:
     contract: access
     purpose: Access Security & Fraud Command Center
     trigger: onLoad
+  - operationId: lockIdentity
+    contract: access
+    purpose: Lock an identity
+    trigger: onAction
+    invalidates:
+    - listAccessSecurityFraud
+  - operationId: updateSecurityAlert
+    contract: access
+    purpose: Acknowledge, resolve or dismiss a security alert
+    trigger: onAction
+    invalidates:
+    - listAccessSecurityFraud
   entryState:
     preloaded:
     - AccessSecurityFraudCommandCenterViewSummary.activeSecurityAlerts
@@ -48487,6 +49884,10 @@ screens:
     - AccessSecurityFraudCommandCenterViewSummary.suspiciousQrActivity
     - AccessSecurityFraudCommandCenterViewSummary.deviceSharingAlerts
     - AccessSecurityFraudCommandCenterViewSummary.biometricAlerts
+    params:
+    - name: alertId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -48496,6 +49897,44 @@ screens:
     bound to a contract property; 14 of 28 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formLockIdentity
+    component: modal
+    trigger: Lock identity
+    body: '**Collects what `lockIdentity` sends before it is called.** Required: `subjectId`, `lockScope`,
+      `lockDuration`, `lockReason`. Optional: `venueId`, `lockHours`, `associatedEntitlementIds`, `securityInvestigationId`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: IdentityLockInput
+    confirm:
+      label: Lock identity
+      operation: lockIdentity
+    dismiss:
+      label: Cancel
+      discards:
+      - subjectId
+      - lockScope
+      - lockDuration
+      - lockReason
+      - venueId
+      - lockHours
+      - associatedEntitlementIds
+      - securityInvestigationId
+    provenance: contract access.yaml POST /identity-locks
+  - id: formUpdateSecurityAlert
+    component: modal
+    trigger: Save security alert
+    body: '**Collects what `updateSecurityAlert` sends before it is called.** Required: `status`. Optional:
+      `note`, `securityInvestigationId`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save security alert
+      operation: updateSecurityAlert
+    dismiss:
+      label: Cancel
+      discards:
+      - status
+      - note
+      - securityInvestigationId
+    provenance: contract access.yaml POST /security-alerts/{alertId}/status
 - id: BO-245
   name: Fraud Detection Rule & Signal Library
   module: Access & Venue
@@ -48617,6 +50056,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F121 step 4→5
       operation: listCredentialSharingConcurrent
+      carries:
+      - alertId
   density: compact
   purposeNote: validation.
   pattern: listDetail
@@ -48646,6 +50087,16 @@ screens:
         impliedBy: listCredentialSharingConcurrent
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save security alert
+        operation: updateSecurityAlert
+        permission: INCIDENT_MANAGE
+        notes: '**The action on the security command centres** (BO-244, BO-246, BO-248, BO-213, BO-253):
+          moves one alert raised by the detection jobs.'
+        provenance: contract access.yaml POST /security-alerts/{alertId}/status
   states:
     loading: The credential sharing concurrent list.
     error: Could not load. Names which read failed and leaves the credential sharing concurrent untouched.
@@ -48660,11 +50111,21 @@ screens:
     contract: access
     purpose: Credential Sharing & Concurrent Usage Detection
     trigger: onLoad
+  - operationId: updateSecurityAlert
+    contract: access
+    purpose: Acknowledge, resolve or dismiss a security alert
+    trigger: onAction
+    invalidates:
+    - listCredentialSharingConcurrent
   entryState:
     preloaded:
     - CredentialSharingConcurrentUsageDetectionView.additionalDevices
     - CredentialSharingConcurrentUsageDetectionView.maximumActiveDevices
     - CredentialSharingConcurrentUsageDetectionView.responseActions
+    params:
+    - name: alertId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -48674,6 +50135,22 @@ screens:
     bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formUpdateSecurityAlert
+    component: modal
+    trigger: Save security alert
+    body: '**Collects what `updateSecurityAlert` sends before it is called.** Required: `status`. Optional:
+      `note`, `securityInvestigationId`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save security alert
+      operation: updateSecurityAlert
+    dismiss:
+      label: Cancel
+      discards:
+      - status
+      - note
+      - securityInvestigationId
+    provenance: contract access.yaml POST /security-alerts/{alertId}/status
 - id: BO-247
   name: Unified Identity & Credential Lock Manager
   module: Access & Venue
@@ -48709,13 +50186,6 @@ screens:
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Provide the single security lock required by the matrix so suspicious activity can immediately
     stop all access associated with an identity.
-  gaps:
-  - operation: null
-    why: '**Unified Identity & Credential Lock Manager declares no operation that writes anything** —
-      its only declared call is `listUnifiedIdentityCredential`, a read. The name promises authoring and
-      the contract offers none, so either the write operations are missing or this screen is a view of
-      something another screen builds.'
-    source: contract — the screen's declared operations
   layout:
     template: split
     regions:
@@ -48740,6 +50210,23 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Identity”, “Associated
           Credentials”, “Lock Duration”, “Unlock”.'
         provenance: pack Access Control Module_Reference.pdf, page 155 §Show
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Lock identity
+        operation: lockIdentity
+        permission: INCIDENT_MANAGE
+        notes: '**The write behind the Unified Identity & Credential Lock Manager** (BO-247): locks one
+          identity at a scope (one credential, a medium, an entitlement, a venue, every venue, or the
+          full identity), for a duration, for a reason.'
+        provenance: contract access.yaml POST /identity-locks
+      - kind: secondaryButton
+        label: Release identity lock
+        operation: releaseIdentityLock
+        permission: INCIDENT_MANAGE
+        notes: 'Releases an active lock: `status: released`, with who and when.'
+        provenance: contract access.yaml POST /identity-locks/{lockId}/release
   states:
     loading: The unified identity credential list.
     error: Could not load. Names which read failed and leaves the unified identity credential untouched.
@@ -48754,9 +50241,24 @@ screens:
     contract: access
     purpose: Unified Identity & Credential Lock Manager
     trigger: onLoad
+  - operationId: lockIdentity
+    contract: access
+    purpose: Lock an identity
+    trigger: onAction
+    invalidates:
+    - listUnifiedIdentityCredential
+  - operationId: releaseIdentityLock
+    contract: access
+    purpose: Release an identity lock
+    trigger: onAction
+    invalidates:
+    - listUnifiedIdentityCredential
   entryState:
     preloaded:
     - UnifiedIdentityCredentialLockManagerView.propagatedTo
+    params:
+    - name: lockId
+      from: navigation
   wireframe:
     status: notStarted
     provenance: generated
@@ -48766,6 +50268,42 @@ screens:
     bound to a contract property; 9 of 35 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formLockIdentity
+    component: modal
+    trigger: Lock identity
+    body: '**Collects what `lockIdentity` sends before it is called.** Required: `subjectId`, `lockScope`,
+      `lockDuration`, `lockReason`. Optional: `venueId`, `lockHours`, `associatedEntitlementIds`, `securityInvestigationId`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: IdentityLockInput
+    confirm:
+      label: Lock identity
+      operation: lockIdentity
+    dismiss:
+      label: Cancel
+      discards:
+      - subjectId
+      - lockScope
+      - lockDuration
+      - lockReason
+      - venueId
+      - lockHours
+      - associatedEntitlementIds
+      - securityInvestigationId
+    provenance: contract access.yaml POST /identity-locks
+  - id: formReleaseIdentityLock
+    component: modal
+    trigger: Release identity lock
+    body: '**Collects what `releaseIdentityLock` sends before it is called.** Required: `reason`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Release identity lock
+      operation: releaseIdentityLock
+    dismiss:
+      label: Cancel
+      discards:
+      - reason
+    provenance: contract access.yaml POST /identity-locks/{lockId}/release
 - id: BO-248
   name: Biometric & Identity Integrity Monitoring
   module: Access & Venue
@@ -48794,6 +50332,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F121 step 8→9
       operation: listBiometricIdentityIntegrity
+      carries:
+      - alertId
   density: compact
   purposeNote: Identity changes and unusual biometric behavior automatically feed TICVAI's access-risk
     process.
@@ -48829,6 +50369,21 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Original Face Enrollment”,
           “Successful Visits”, “Face Changed”, “Reason”, “Enrollment 1”, “Enrollment 2”.'
         provenance: pack Access Control Module_Reference.pdf, page 156 §Monitor
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save security alert
+        operation: updateSecurityAlert
+        permission: INCIDENT_MANAGE
+        notes: '**The action on the security command centres** (BO-244, BO-246, BO-248, BO-213, BO-253):
+          moves one alert raised by the detection jobs.'
+        provenance: contract access.yaml POST /security-alerts/{alertId}/status
+      - kind: secondaryButton
+        label: Review face reenrolment
+        operation: reviewFaceReenrolment
+        permission: GUEST_MANAGE
+        provenance: contract access.yaml POST /face-reenrolment-attempts/{attemptId}/review
   states:
     loading: The biometric identity integrity list.
     error: Could not load. Names which read failed and leaves the biometric identity integrity untouched.
@@ -48850,11 +50405,30 @@ screens:
     provenance: decided 29 September, VM close-out (venue management and configuration)
     invalidates:
     - listBiometricIdentityIntegrity
+  - operationId: updateSecurityAlert
+    contract: access
+    purpose: Acknowledge, resolve or dismiss a security alert
+    trigger: onAction
+    invalidates:
+    - listBiometricIdentityIntegrity
+  - operationId: reviewFaceReenrolment
+    contract: access
+    purpose: Review a blocked Face Pass re-enrolment
+    trigger: onAction
+    invalidates:
+    - listBiometricIdentityIntegrity
   entryState:
     preloaded:
     - BiometricIdentityIntegrityMonitoringView.anomalyType
     - multiple faces associated with one credential
     - one face associated with multiple credentials
+    params:
+    - name: alertId
+      from: navigation
+      optional: true
+    - name: attemptId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -48864,6 +50438,36 @@ screens:
     bound to a contract property; 6 of 29 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formUpdateSecurityAlert
+    component: modal
+    trigger: Save security alert
+    body: '**Collects what `updateSecurityAlert` sends before it is called.** Required: `status`. Optional:
+      `note`, `securityInvestigationId`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save security alert
+      operation: updateSecurityAlert
+    dismiss:
+      label: Cancel
+      discards:
+      - status
+      - note
+      - securityInvestigationId
+    provenance: contract access.yaml POST /security-alerts/{alertId}/status
+  - id: formReviewFaceReenrolment
+    component: modal
+    trigger: Review face reenrolment
+    body: '**Collects what `reviewFaceReenrolment` sends before it is called.** Required: `decision`.
+      Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Review face reenrolment
+      operation: reviewFaceReenrolment
+    dismiss:
+      label: Cancel
+      discards:
+      - decision
+      - note
+    provenance: contract access.yaml POST /face-reenrolment-attempts/{attemptId}/review
 - id: BO-249
   name: Relationship & Companion Fraud Monitoring
   module: Access & Venue
@@ -48918,6 +50522,17 @@ screens:
       - kind: selectField
         label: excessive relationship changes
         provenance: pack Access Control Module_Reference.pdf, page 158 §Configure
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save relationship fraud rule
+        operation: setRelationshipFraudRule
+        permission: ACCESS_POINT_CONFIGURE
+        notes: '**The write behind Relationship & Companion Fraud Monitoring** (BO-249): a rule on the
+          people a credential travels with (a companion changed during the visit, a nanny credential without
+          its primary guest, a child with an unauthorised adult and so on), its severity, weight and responses.'
+        provenance: contract access.yaml PUT /relationship-fraud-rules
   states:
     loading: The relationship companion fraud configuration as saved.
     error: Could not load. Names which read failed and leaves the relationship companion fraud untouched.
@@ -48930,6 +50545,12 @@ screens:
     contract: access
     purpose: Relationship & Companion Fraud Monitoring
     trigger: onLoad
+  - operationId: setRelationshipFraudRule
+    contract: access
+    purpose: Create or replace a relationship / companion fraud rule
+    trigger: onAction
+    invalidates:
+    - listRelationshipCompanionFraud
   wireframe:
     status: notStarted
     provenance: generated
@@ -48939,6 +50560,29 @@ screens:
     bound to a contract property; 4 of 28 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetRelationshipFraudRule
+    component: modal
+    trigger: Save relationship fraud rule
+    body: '**Collects what `setRelationshipFraudRule` sends before it is called.** Required: `relationshipRuleType`,
+      `severity`, `relationshipResponses`. Optional: `ruleId`, `relationshipType`, `weight`, `applicableVenues`,
+      `enabled`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: RelationshipFraudRuleInput
+    confirm:
+      label: Save relationship fraud rule
+      operation: setRelationshipFraudRule
+    dismiss:
+      label: Cancel
+      discards:
+      - relationshipRuleType
+      - severity
+      - relationshipResponses
+      - ruleId
+      - relationshipType
+      - weight
+      - applicableVenues
+      - enabled
+    provenance: contract access.yaml PUT /relationship-fraud-rules
 - id: BO-250
   name: Access Risk Scoring & Decision Engine
   module: Access & Venue
@@ -48995,6 +50639,16 @@ screens:
         impliedBy: listAccessRiskScoring
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save risk scoring config
+        operation: setRiskScoringConfig
+        permission: ACCESS_POINT_CONFIGURE
+        notes: '**The write behind Access Risk Scoring & Decision Engine** (BO-250): the score thresholds
+          of the medium, high and critical bands and the context factors the score uses.'
+        provenance: contract access.yaml PUT /risk-scoring-config
   states:
     loading: The access risk scoring list.
     error: Could not load. Names which read failed and leaves the access risk scoring untouched.
@@ -49009,6 +50663,12 @@ screens:
     contract: access
     purpose: Access Risk Scoring & Decision Engine
     trigger: onLoad
+  - operationId: setRiskScoringConfig
+    contract: access
+    purpose: Set the access risk scoring bands
+    trigger: onAction
+    invalidates:
+    - listAccessRiskScoring
   entryState:
     preloaded: []
   wireframe:
@@ -49020,6 +50680,27 @@ screens:
     bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetRiskScoringConfig
+    component: modal
+    trigger: Save risk scoring config
+    body: '**Collects what `setRiskScoringConfig` sends before it is called.** Required: `id`, `scopePath`,
+      `mediumThreshold`, `highThreshold`, `criticalThreshold`. Optional: `riskFactors`. Dismissing sends
+      nothing; the screen behind is unchanged.'
+    bindsTo: AccessRiskScoringConfig
+    confirm:
+      label: Save risk scoring config
+      operation: setRiskScoringConfig
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - mediumThreshold
+      - highThreshold
+      - criticalThreshold
+      - riskFactors
+    provenance: contract access.yaml PUT /risk-scoring-config
 - id: BO-251
   name: Real-Time Security Response & Playbook Builder
   module: Access & Venue
@@ -49234,6 +50915,13 @@ screens:
     inferred: false
     notes: '**Reached from BO-244, the hub of its workshop board.** Stated on 4 September: the pack groups
       its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    transitions:
+    - to: BO-244
+      trigger: Access Security & Fraud Command Center
+      carries:
+      - alertId
+      provenance: derived — BO-244 declares entryState.params alertId and BO-253 holds alertId, so an
+        edge into it carries them
   density: compact
   purposeNote: 'Board 11 — Final 10-Screen Structure # Backend Screen Main Responsibility 11.1 Access
     Security & Fraud Command Center Real-time security posture 11.2 Fraud Detection Rule & Signal Library
@@ -49322,6 +51010,16 @@ screens:
           Channel”, “Emerging Pattern Detected”, “Record changes to”, “Board 11 Key Workflow”, “A key
           distinction”.'
         provenance: pack Access Control Module_Reference.pdf, page 164 §Show
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save security alert
+        operation: updateSecurityAlert
+        permission: INCIDENT_MANAGE
+        notes: '**The action on the security command centres** (BO-244, BO-246, BO-248, BO-213, BO-253):
+          moves one alert raised by the detection jobs.'
+        provenance: contract access.yaml POST /security-alerts/{alertId}/status
   states:
     loading: The security analytics detection list.
     error: Could not load. Names which read failed and leaves the security analytics detection untouched.
@@ -49336,6 +51034,12 @@ screens:
     contract: access
     purpose: Security Analytics, AI Detection & Governance
     trigger: onLoad
+  - operationId: updateSecurityAlert
+    contract: access
+    purpose: Acknowledge, resolve or dismiss a security alert
+    trigger: onAction
+    invalidates:
+    - listSecurityDetectionGovernance
   entryState:
     preloaded:
     - SecurityAnalyticsAiDetectionGovernanceView.fraudAttempts
@@ -49344,6 +51048,10 @@ screens:
     - Duplicate Usage
     - SecurityAnalyticsAiDetectionGovernanceView.biometricAlerts
     - SecurityAnalyticsAiDetectionGovernanceView.deviceBindingViolations
+    params:
+    - name: alertId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -49353,6 +51061,22 @@ screens:
     bound to a contract property; 26 of 93 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formUpdateSecurityAlert
+    component: modal
+    trigger: Save security alert
+    body: '**Collects what `updateSecurityAlert` sends before it is called.** Required: `status`. Optional:
+      `note`, `securityInvestigationId`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save security alert
+      operation: updateSecurityAlert
+    dismiss:
+      label: Cancel
+      discards:
+      - status
+      - note
+      - securityInvestigationId
+    provenance: contract access.yaml POST /security-alerts/{alertId}/status
 - id: BO-254
   name: Access Monitoring & Analytics Command Center
   module: Access & Venue
@@ -51759,10 +53483,6 @@ screens:
       trigger: Works in Group Operational Planning & Task Workspace
       provenance: flow F137 step 1→2
       operation: listGroupBooking
-    - to: BO-280
-      trigger: Works in Group Arrival, Check-In & Admission Operations
-      provenance: flow F137 step 11→12
-      operation: listGroupBooking
     - to: BO-282
       trigger: Works in Group Booking Reconciliation, Closure & Performance
       provenance: flow F137 step 15→16
@@ -51792,6 +53512,12 @@ screens:
     - to: BO-279
       trigger: Works in Group Ticket Fulfillment & Distribution
       provenance: flow F137 step 9→10
+      operation: listGroupBooking
+      carries:
+      - groupBookingId
+    - to: BO-280
+      trigger: Works in Group Arrival, Check-In & Admission Operations
+      provenance: flow F137 step 11→12
       operation: listGroupBooking
       carries:
       - groupBookingId
@@ -52633,6 +54359,15 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Single Group Check-In”,
           “Batch Check-In”, “Individual Check-In”, “Group Arrives”, “Handle”, “Integration”.'
         provenance: pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 29 §Display
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Record group check in
+        operation: recordGroupCheckIn
+        permission: ORDER_MODIFY
+        notes: '**Group check-in is a status distinct from the access scan** (MoM 31 Aug Key Decisions).'
+        provenance: contract orders.yaml POST /group-bookings/{groupBookingId}/check-in
   states:
     loading: The group arrival check-in list.
     error: Could not load. Names which read failed and leaves the group arrival check-in untouched.
@@ -52647,6 +54382,12 @@ screens:
     contract: orders
     purpose: Group Arrival, Check-In & Admission Operations
     trigger: onLoad
+  - operationId: recordGroupCheckIn
+    contract: orders
+    purpose: Record a group's arrival at the venue
+    trigger: onAction
+    invalidates:
+    - listGroupArrivalCheck
   entryState:
     preloaded:
     - GroupArrivalCheckInAdmissionOperationsView.groupsExpectedToday
@@ -52655,6 +54396,10 @@ screens:
     - GroupArrivalCheckInAdmissionOperationsView.groupSize
     - GroupArrivalCheckInAdmissionOperationsView.checkedIn
     - GroupArrivalCheckInAdmissionOperationsView.remaining
+    params:
+    - name: groupBookingId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -52664,6 +54409,27 @@ screens:
     page 29. 10 of 10 labels bound to a contract property; 16 of 39 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  overlays:
+  - id: formRecordGroupCheckIn
+    component: modal
+    trigger: Record group check in
+    body: '**Collects what `recordGroupCheckIn` sends before it is called.** Required: `arrivedCount`.
+      Optional: `additionalGuests`, `staffLeadersCount`, `arrivalGateId`, `actualArrivalAt`, `checkInIssues`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: GroupCheckInRequest
+    confirm:
+      label: Record group check in
+      operation: recordGroupCheckIn
+    dismiss:
+      label: Cancel
+      discards:
+      - arrivedCount
+      - additionalGuests
+      - staffLeadersCount
+      - arrivalGateId
+      - actualArrivalAt
+      - checkInIssues
+    provenance: contract orders.yaml POST /group-bookings/{groupBookingId}/check-in
 - id: BO-281
   name: Group Amendments, Cancellation & Refund Operations
   module: Sell
@@ -53260,6 +55026,21 @@ screens:
         label: Custom Membership
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable
           types such as
+      - kind: destructiveButton
+        label: Suspend membership product
+        operation: approveMembershipProductValidation
+        permission: PLATFORM_CELL_MANAGE
+        notes: 'Quick action: sends `action: suspend` with a `reason`. Allowed only on an `active` version;
+          selling stops on every channel at once and members already holding it keep their entitlements
+          until their own expiry (decided 29 September, writers pass; DM4).'
+        provenance: contract subscription.yaml PUT /membership-product-validation
+      - kind: secondaryButton
+        label: Reinstate membership product
+        operation: approveMembershipProductValidation
+        permission: PLATFORM_CELL_MANAGE
+        notes: 'Quick action: sends `action: reinstate`, moving a `suspended` version back to `active`;
+          refused once its `effectiveTo` has passed (decided 29 September, writers pass; DM4).'
+        provenance: contract subscription.yaml PUT /membership-product-validation
   states:
     loading: The membership annual pass list.
     error: Could not load. Names which read failed and leaves the membership annual pass untouched.
@@ -53274,6 +55055,12 @@ screens:
     contract: subscription
     purpose: Membership & Annual Pass Command Center
     trigger: onLoad
+  - operationId: approveMembershipProductValidation
+    contract: subscription
+    purpose: Membership Product Validation, Approval, Publication & Versioning
+    trigger: onAction
+    invalidates:
+    - listMembershipAnnualPass
   entryState:
     preloaded:
     - MembershipAnnualPassCommandCenterSummary.activeMembershipProducts
@@ -53293,6 +55080,16 @@ screens:
     rather than here. **Pack actions reconciled 29 September (VM close-out):** Monthly Membership, Fixed-Term
     Membership, Corporate Membership, Family Membership, Individual Membership, Student Membership, VIP
     Membership, Custom Membership … are choices sent by `listMembershipAnnualPass`.
+  overlays:
+  - id: confirmSuspendMembershipProduct
+    component: confirmDialog
+    trigger: Suspend membership product
+    body: '**Names what suspending stops and what it leaves alone**: the membership product and version,
+      every channel it stops selling on, and that members already holding it keep their entitlements until
+      their own expiry. **Collects what `approveMembershipProductValidation` sends before it is called.**
+      Required: `membershipCode`, `action` (`suspend`), `reason`.'
+    bindsTo: MembershipProductValidationApprovalPublicationVersioInput
+    provenance: contract subscription.yaml PUT /membership-product-validation
 - id: BO-285
   name: Membership Product & Tier Builder
   module: Sell
@@ -53835,6 +55632,18 @@ screens:
           “Access Integration”.'
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 11 §Maintain counters
           such as
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save membership usage policy
+        operation: setMembershipUsagePolicy
+        permission: PLATFORM_CELL_MANAGE
+        notes: 'The writer for the rules BO-289 shows through listMembershipUsageVisit: visit and admission
+          limits, re-entry, reservations, no-show treatment, cancellations and guest usage for one membership
+          product version, one row of subscription.membership_usage_policy per version (decided 29 September,
+          writers pass; DM4).'
+        provenance: contract subscription.yaml PUT /membership-usage-policy
   states:
     loading: The membership usage visit list.
     error: Could not load. Names which read failed and leaves the membership usage visit untouched.
@@ -53858,6 +55667,13 @@ screens:
     contract: catalogue
     purpose: The membership plan templates whose usage rules are set
     trigger: onLoad
+  - operationId: setMembershipUsagePolicy
+    contract: subscription
+    purpose: Save a membership product's usage, visit and consumption rules
+    trigger: onAction
+    invalidates:
+    - listMembershipUsageVisit
+    - listEntitlementTemplates
   entryState:
     preloaded: []
     params:
@@ -53872,6 +55688,41 @@ screens:
     1 of 1 labels bound to a contract property; 20 of 32 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formSetMembershipUsagePolicy
+    component: modal
+    trigger: Save membership usage policy
+    body: '**Collects what `setMembershipUsagePolicy` sends before it is called.** Required: `membershipCode`,
+      `reEntryPolicy`, `reservationRequirement`. Optional: `tier`, `maximumVisitsPerDay`, `maximumAdmissionsPerPeriod`,
+      `admissionPeriod`, `reEntryCooldownMinutes`, `walkInAllowed`, `maximumAdvanceBookingDays`, `maximumActiveFutureReservations`,
+      `concurrentReservations`, `noShowTreatment`, `noShowThreshold`, `noShowWindowDays` and 4 more. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    bindsTo: MembershipUsagePolicyInput
+    confirm:
+      label: Save membership usage policy
+      operation: setMembershipUsagePolicy
+    dismiss:
+      label: Cancel
+      discards:
+      - membershipCode
+      - reEntryPolicy
+      - reservationRequirement
+      - tier
+      - maximumVisitsPerDay
+      - maximumAdmissionsPerPeriod
+      - admissionPeriod
+      - reEntryCooldownMinutes
+      - walkInAllowed
+      - maximumAdvanceBookingDays
+      - maximumActiveFutureReservations
+      - concurrentReservations
+      - noShowTreatment
+      - noShowThreshold
+      - noShowWindowDays
+      - noShowRestrictionDays
+      - cancellationLimit
+      - guestUsage
+    provenance: contract subscription.yaml PUT /membership-usage-policy
 - id: BO-290
   name: Family, Household & Dependent Membership Configuration
   module: Sell
@@ -54103,6 +55954,15 @@ screens:
         notes: '**Names the membership products, the channels they go on or come off, and from when**,
           before it runs. A publish with no stated consequence is one somebody presses meaning to save.'
         provenance: 'contract catalogue.yaml PUT /channel-availability (authored: required by check-screens)'
+      - kind: primaryButton
+        label: Save membership commercial config
+        operation: setMembershipCommercialConfig
+        permission: PLATFORM_CELL_MANAGE
+        notes: 'The writer for the commercial columns BO-291 shows through listMembershipCommercialPricing:
+          `basePricingProfile`, `taxProfile`, `feeProfile`, `upgradePricePolicy`, `promotionalPricingEligibility`,
+          `paymentTerms` and `salesPeriod` on subscription.membership_product (decided 29 September, writers
+          pass; DM4).'
+        provenance: contract subscription.yaml PUT /membership-commercial-config
   states:
     loading: The membership commercial pricing configuration as saved.
     error: Could not load. Names which read failed and leaves the membership commercial pricing untouched.
@@ -54129,6 +55989,13 @@ screens:
     contract: catalogue
     purpose: The price lists a membership is priced on
     trigger: onLoad
+  - operationId: setMembershipCommercialConfig
+    contract: subscription
+    purpose: Save a membership product's commercial references, payment eligibility and sales period
+    trigger: onAction
+    invalidates:
+    - listMembershipCommercialPricing
+    - listPriceLists
   wireframe:
     status: notStarted
     provenance: generated
@@ -54142,6 +56009,30 @@ screens:
     params:
     - name: priceListId
       from: navigation
+  overlays:
+  - id: formSetMembershipCommercialConfig
+    component: modal
+    trigger: Save membership commercial config
+    body: '**Collects what `setMembershipCommercialConfig` sends before it is called.** Required: `membershipCode`,
+      `basePricingProfile`, `taxProfile`, `salesPeriod`. Optional: `feeProfile`, `upgradePricePolicy`,
+      `promotionalPricingEligibility`, `paymentTerms`. Dismissing sends nothing; the screen behind is
+      unchanged.'
+    bindsTo: MembershipCommercialConfigInput
+    confirm:
+      label: Save membership commercial config
+      operation: setMembershipCommercialConfig
+    dismiss:
+      label: Cancel
+      discards:
+      - membershipCode
+      - basePricingProfile
+      - taxProfile
+      - salesPeriod
+      - feeProfile
+      - upgradePricePolicy
+      - promotionalPricingEligibility
+      - paymentTerms
+    provenance: contract subscription.yaml PUT /membership-commercial-config
 - id: BO-292
   name: Renewal, Auto-Renewal & Membership Continuity Configuration
   module: Sell
@@ -58351,10 +60242,6 @@ screens:
       trigger: Works in Related Order & Transaction Relationship Explorer
       provenance: flow F142 step 9→10
       operation: listPaymentOrderFinancial
-    - to: BO-330
-      trigger: Works in External Payment, Partner & Settlement Reference Mapping
-      provenance: flow F142 step 11→12
-      operation: listPaymentOrderFinancial
     - to: BO-331
       trigger: Works in Payment Reconciliation & Exception Management
       provenance: flow F142 step 13→14
@@ -58370,6 +60257,12 @@ screens:
     - to: BO-328
       trigger: Works in Order Split, Merge & Transaction Relationship Management
       provenance: flow F142 step 7→8
+      operation: listPaymentOrderFinancial
+      carries:
+      - orderId
+    - to: BO-330
+      trigger: Works in External Payment, Partner & Settlement Reference Mapping
+      provenance: flow F142 step 11→12
       operation: listPaymentOrderFinancial
       carries:
       - orderId
@@ -58737,6 +60630,41 @@ screens:
         label: Deposit
         provenance: pack Order___Reservation_Management_Reference.pdf, page 43 §Configure whether payment
           is allocated
+      - kind: textField
+        label: Channel
+        operation: listPaymentAllocationRules
+        notes: Sends `?channel=` to `listPaymentAllocationRules`.
+        provenance: contract orders.yaml GET /payment-allocation-rules
+      - kind: textField
+        label: Terminal id
+        operation: listPaymentAllocationRules
+        notes: Sends `?terminalId=` to `listPaymentAllocationRules`.
+        provenance: contract orders.yaml GET /payment-allocation-rules
+      - kind: textField
+        label: Product id
+        operation: listPaymentAllocationRules
+        notes: Sends `?productId=` to `listPaymentAllocationRules`.
+        provenance: contract orders.yaml GET /payment-allocation-rules
+      - kind: toggle
+        label: Is active
+        operation: listPaymentAllocationRules
+        notes: Sends `?isActive=` to `listPaymentAllocationRules`.
+        provenance: contract orders.yaml GET /payment-allocation-rules
+      - kind: dataTable
+        label: Every payment allocation rule
+        bindsTo: PaymentAllocationRule
+        columns:
+        - PaymentAllocationRule.id
+        - PaymentAllocationRule.channel
+        - PaymentAllocationRule.terminalId
+        - PaymentAllocationRule.productId
+        - PaymentAllocationRule.orderType
+        - PaymentAllocationRule.customerType
+        - PaymentAllocationRule.allocationLevel
+        - PaymentAllocationRule.isActive
+        - PaymentAllocationRule.scopePath
+        operation: listPaymentAllocationRules
+        provenance: contract orders.yaml GET /payment-allocation-rules
     - name: actionBar
       slot: publish
       components:
@@ -58755,6 +60683,10 @@ screens:
     contract: orders
     purpose: Multi-Payment, Split Tender & Payment Allocation Configuration
     trigger: onAction
+  - operationId: listPaymentAllocationRules
+    contract: orders
+    purpose: The venue's split-tender allocation rules
+    trigger: onLoad
   wireframe:
     status: notStarted
     provenance: generated
@@ -59024,6 +60956,13 @@ screens:
       - kind: secondaryButton
         label: Payment Responsibility
         provenance: pack Order___Reservation_Management_Reference.pdf, page 46 §Support
+      - kind: destructiveButton
+        label: Merge orders
+        operation: mergeOrders
+        permission: ORDER_MODIFY
+        notes: '**The other half of `splitOrder`** (pack Order & Reservation Management p.46, BO-328 Order
+          Split, Merge & Transaction Relationship Management).'
+        provenance: contract orders.yaml POST /orders/{orderId}/merge
     - name: contentBody
       components: []
   states:
@@ -59048,6 +60987,12 @@ screens:
       action(s) Ticket, Product, Payment Responsibility'
     invalidates:
     - listOrderSplitMerge
+  - operationId: mergeOrders
+    contract: orders
+    purpose: Merge orders into one
+    trigger: onAction
+    invalidates:
+    - listOrderSplitMerge
   entryState:
     params:
     - name: orderId
@@ -59067,6 +61012,14 @@ screens:
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here. **Pack actions reconciled 29 September (VM close-out):** Ticket, Product, Payment
     Responsibility: `splitOrder`.'
+  overlays:
+  - id: confirmMergeOrders
+    component: confirmDialog
+    trigger: Merge orders
+    body: '**Names what `mergeOrders` changes and what it leaves alone**, in the consequence rather than
+      the verb. A order this affects should be identified in the dialog, not just counted. **Collects
+      what `mergeOrders` sends before it is called.** Required: `sourceOrderIds`. Optional: `reason`.'
+    provenance: contract orders.yaml POST /orders/{orderId}/merge
 - id: BO-329
   name: Related Order & Transaction Relationship Explorer
   module: Orders & Money
@@ -59262,6 +61215,24 @@ screens:
       - kind: selectField
         label: Amount
         provenance: pack Order___Reservation_Management_Reference.pdf, page 49 §Capture
+      - kind: dataTable
+        label: Every external reference mapping
+        bindsTo: ExternalReferenceMapping
+        columns:
+        - ExternalReferenceMapping.id
+        - ExternalReferenceMapping.orderId
+        - ExternalReferenceMapping.paymentId
+        - ExternalReferenceMapping.refundId
+        - ExternalReferenceMapping.sourceSystem
+        - ExternalReferenceMapping.provider
+        - ExternalReferenceMapping.merchantId
+        - ExternalReferenceMapping.externalTransactionId
+        - ExternalReferenceMapping.authorizationCode
+        - ExternalReferenceMapping.partnerOrderId
+        - ExternalReferenceMapping.settlementBatch
+        - ExternalReferenceMapping.settlementDate
+        operation: listExternalReferenceMappings
+        provenance: contract orders.yaml GET /orders/{orderId}/external-references
     - name: actionBar
       slot: publish
       components:
@@ -59277,6 +61248,13 @@ screens:
       - kind: secondaryButton
         label: Wallet Providers
         provenance: pack Order___Reservation_Management_Reference.pdf, page 49 §Support references from
+      - kind: secondaryButton
+        label: Record external reference
+        operation: recordExternalReference
+        permission: ORDER_MODIFY
+        notes: '**The manual mapping `orders.external_reference_mapping` had no writer for** (DM5 open
+          item).'
+        provenance: contract orders.yaml POST /orders/{orderId}/external-references
   states:
     loading: The external payment partner configuration as saved.
     error: Could not load. Names which read failed and leaves the external payment partner untouched.
@@ -59289,6 +61267,17 @@ screens:
     contract: orders
     purpose: External Payment, Partner & Settlement Reference Mapping
     trigger: onLoad
+  - operationId: listExternalReferenceMappings
+    contract: orders
+    purpose: The references other systems hold for this order
+    trigger: onLoad
+  - operationId: recordExternalReference
+    contract: orders
+    purpose: Map an order to a reference another system holds, by hand
+    trigger: onAction
+    invalidates:
+    - listExternalPaymentPartner
+    - listExternalReferenceMappings
   wireframe:
     status: notStarted
     provenance: generated
@@ -59299,6 +61288,40 @@ screens:
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here. **Pack actions reconciled 29 September (VM close-out):** POS Terminals, Finance
     Systems, Wallet Providers are choices sent by `listExternalPaymentPartner`.
+  entryState:
+    params:
+    - name: orderId
+      from: navigation
+  overlays:
+  - id: formRecordExternalReference
+    component: modal
+    trigger: Record external reference
+    body: '**Collects what `recordExternalReference` sends before it is called.** Required: `sourceSystem`,
+      `reason`. Optional: `paymentId`, `refundId`, `provider`, `merchantId`, `externalTransactionId`,
+      `authorizationCode`, `partnerOrderId`, `settlementBatch`, `settlementDate`, `erpReference`, `amount`,
+      `approvalReference`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: CreateExternalReferenceMappingRequest
+    confirm:
+      label: Record external reference
+      operation: recordExternalReference
+    dismiss:
+      label: Cancel
+      discards:
+      - sourceSystem
+      - reason
+      - paymentId
+      - refundId
+      - provider
+      - merchantId
+      - externalTransactionId
+      - authorizationCode
+      - partnerOrderId
+      - settlementBatch
+      - settlementDate
+      - erpReference
+      - amount
+      - approvalReference
+    provenance: contract orders.yaml POST /orders/{orderId}/external-references
 - id: BO-331
   name: Payment Reconciliation & Exception Management
   module: Orders & Money
@@ -59978,6 +62001,17 @@ screens:
         impliedBy: listVirtualTicketStatus
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save ticket status transition
+        operation: setTicketStatusTransition
+        permission: ACCESS_POINT_CONFIGURE
+        notes: '**The write behind Virtual Ticket Status & Lifecycle Model** (BO-336): for one move between
+          Virtual Ticket statuses, whether it is allowed, whether it needs an authorised exception and
+          where it may originate.'
+        provenance: contract access.yaml PUT /ticket-status-transitions
   states:
     loading: The virtual ticket status list.
     error: Could not load. Names which read failed and leaves the virtual ticket status untouched.
@@ -59992,6 +62026,12 @@ screens:
     contract: access
     purpose: Virtual Ticket Status & Lifecycle Model
     trigger: onLoad
+  - operationId: setTicketStatusTransition
+    contract: access
+    purpose: Set a Virtual Ticket status transition rule
+    trigger: onAction
+    invalidates:
+    - listVirtualTicketStatus
   entryState:
     preloaded:
     - VirtualTicketStatusLifecycleModelView.toStatus
@@ -60004,6 +62044,28 @@ screens:
     8. 0 of 0 labels bound to a contract property; 11 of 40 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formSetTicketStatusTransition
+    component: modal
+    trigger: Save ticket status transition
+    body: '**Collects what `setTicketStatusTransition` sends before it is called.** Required: `id`, `fromStatus`,
+      `toStatus`, `allowed`, `requiresAuthorizedException`, `scopePath`. Optional: `originatingSources`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: AccessTicketStatusTransition
+    confirm:
+      label: Save ticket status transition
+      operation: setTicketStatusTransition
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - fromStatus
+      - toStatus
+      - allowed
+      - requiresAuthorizedException
+      - scopePath
+      - originatingSources
+    provenance: contract access.yaml PUT /ticket-status-transitions
 - id: BO-337
   name: Media Type & Credential Technology Registry
   module: Access & Venue
@@ -60219,6 +62281,20 @@ screens:
       - kind: selectField
         label: Exclusive activation
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 11 §Configure
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save media binding rule
+        operation: setMediaBindingRule
+        permission: ACCESS_POINT_CONFIGURE
+        provenance: contract access.yaml PUT /media-binding-rules
+      - kind: destructiveButton
+        label: Delete media binding rule
+        operation: deleteMediaBindingRule
+        permission: ACCESS_POINT_CONFIGURE
+        notes: Deletes a binding rule.
+        provenance: contract access.yaml DELETE /media-binding-rules/{ruleId}
   states:
     loading: The multi-media binding association configuration as saved.
     error: Could not load. Names which read failed and leaves the multi-media binding association untouched.
@@ -60231,6 +62307,18 @@ screens:
     contract: access
     purpose: Multi-Media Binding & Association Rules
     trigger: onLoad
+  - operationId: setMediaBindingRule
+    contract: access
+    purpose: Create or replace a multi-media binding rule
+    trigger: onAction
+    invalidates:
+    - listMultiMediaBinding
+  - operationId: deleteMediaBindingRule
+    contract: access
+    purpose: Delete a multi-media binding rule
+    trigger: onAction
+    invalidates:
+    - listMultiMediaBinding
   wireframe:
     status: notStarted
     provenance: generated
@@ -60240,6 +62328,51 @@ screens:
     11. 0 of 0 labels bound to a contract property; 12 of 42 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formSetMediaBindingRule
+    component: modal
+    trigger: Save media binding rule
+    body: '**Collects what `setMediaBindingRule` sends before it is called.** Required: `id`, `scopePath`.
+      Optional: `allowedMediaTypeIds`, `mandatoryMediaTypeIds`, `optionalMediaTypeIds`, `primaryMediaTypeId`,
+      `secondaryMediaTypeIds`, `backupMediaTypeIds`, `temporaryMediaTypeIds`, `minimumMediaRequired`,
+      `maximumActiveMedia`, `mediaCombinations`, `simultaneousActivation`, `exclusiveActivation` and 10
+      more. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: AccessMediaBindingRule
+    confirm:
+      label: Save media binding rule
+      operation: setMediaBindingRule
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - allowedMediaTypeIds
+      - mandatoryMediaTypeIds
+      - optionalMediaTypeIds
+      - primaryMediaTypeId
+      - secondaryMediaTypeIds
+      - backupMediaTypeIds
+      - temporaryMediaTypeIds
+      - minimumMediaRequired
+      - maximumActiveMedia
+      - mediaCombinations
+      - simultaneousActivation
+      - exclusiveActivation
+      - productId
+      - ticketType
+      - eventId
+      - venueId
+    provenance: contract access.yaml PUT /media-binding-rules
+  - id: confirmDeleteMediaBindingRule
+    component: confirmDialog
+    trigger: Delete media binding rule
+    body: '**Names what `deleteMediaBindingRule` changes and what it leaves alone**, in the consequence
+      rather than the verb. A record this affects should be identified in the dialog, not just counted.'
+    provenance: contract access.yaml DELETE /media-binding-rules/{ruleId}
+  entryState:
+    params:
+    - name: ruleId
+      from: navigation
 - id: BO-339
   name: Credential Identity, Token & Reference Mapping
   module: Access & Venue
@@ -60390,6 +62523,14 @@ screens:
           example, TICVAI must prevent”, “Instead”, “Face Credential”, “Virtual Ticket resolved”, “Access
           transaction recorded”.'
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 14 §Detect
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save credential event propagation rule
+        operation: setCredentialEventPropagationRule
+        permission: ACCESS_POINT_CONFIGURE
+        provenance: contract access.yaml PUT /credential-event-propagation-rules
   states:
     loading: The entitlement cross-media synchronization list.
     error: Could not load. Names which read failed and leaves the entitlement cross-media synchronization
@@ -60405,6 +62546,12 @@ screens:
     contract: access
     purpose: Entitlement & Cross-Media Synchronization Rules
     trigger: onLoad
+  - operationId: setCredentialEventPropagationRule
+    contract: access
+    purpose: Set how a ticket lifecycle event propagates to the credential
+    trigger: onAction
+    invalidates:
+    - listEntitlementCrossMedia
   entryState:
     preloaded:
     - EntitlementCrossMediaSynchronizationRulesView.monitoredConditions
@@ -60417,6 +62564,28 @@ screens:
     14. 5 of 5 labels bound to a contract property; 17 of 40 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formSetCredentialEventPropagationRule
+    component: modal
+    trigger: Save credential event propagation rule
+    body: '**Collects what `setCredentialEventPropagationRule` sends before it is called.** Required:
+      `id`, `triggerEvent`, `scopePath`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`,
+      `propagation`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: AccessCredentialEventPropagationRule
+    confirm:
+      label: Save credential event propagation rule
+      operation: setCredentialEventPropagationRule
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - triggerEvent
+      - scopePath
+      - revocationAction
+      - propagationTargets
+      - monitoredConditions
+      - propagation
+    provenance: contract access.yaml PUT /credential-event-propagation-rules
 - id: BO-341
   name: Media Activation, Priority & Fallback Rules
   module: Access & Venue
@@ -60822,13 +62991,6 @@ screens:
     (§Each template should show) — counts over a population, then the population
   purpose: Provide administrators with the central workspace for creating and managing all ticket and
     credential media templates. This should be the entry point for the entire no-code Media Design Studio.
-  gaps:
-  - operation: null
-    why: '**Media Design Studio Command Center declares no operation that writes anything** — its only
-      declared call is `listMediaDesign`, a read. The name promises authoring and the contract offers
-      none, so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
   layout:
     template: dashboard
     regions:
@@ -60955,6 +63117,13 @@ screens:
         label: Import supported template definition
         operation: importTicketTemplate
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Allow
+      - kind: destructiveButton
+        label: Archive media template
+        operation: archiveMediaTemplate
+        permission: ACCESS_POINT_CONFIGURE
+        notes: '**Retires a media template** (Media Design Studio Command Center, BO-344, and the designers
+          BO-345 to BO-349): `status: archived`.'
+        provenance: contract access.yaml POST /media-templates/{templateId}/archive
   states:
     loading: The media design list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the media design untouched.
@@ -60981,6 +63150,13 @@ screens:
     contract: orders
     purpose: Import
     trigger: onAction
+  - operationId: archiveMediaTemplate
+    contract: access
+    purpose: Archive a media template
+    trigger: onAction
+    invalidates:
+    - listMediaDesign
+    - listTicketTemplates
   wireframe:
     status: notStarted
     provenance: generated
@@ -60995,6 +63171,15 @@ screens:
     params:
     - name: templateId
       from: navigation
+  overlays:
+  - id: confirmArchiveMediaTemplate
+    component: confirmDialog
+    trigger: Archive media template
+    body: '**Names what `archiveMediaTemplate` changes and what it leaves alone**, in the consequence
+      rather than the verb. A access media template this affects should be identified in the dialog, not
+      just counted. **Collects what `archiveMediaTemplate` sends before it is called.** Nothing in the
+      body is required. Optional: `reason`.'
+    provenance: contract access.yaml POST /media-templates/{templateId}/archive
 - id: BO-345
   name: Digital QR & Barcode Ticket Designer
   module: Access & Venue
@@ -65537,6 +67722,8 @@ screens:
     - to: BO-391
       trigger: Live Escalation Operations Center
       provenance: structural — pack board 5 wiring, 9 September 2026
+      carries:
+      - instanceId
     - to: BO-392
       trigger: SLA & Escalation Performance Analytics
       provenance: structural — pack board 5 wiring, 9 September 2026
@@ -65577,6 +67764,15 @@ screens:
       - kind: metricTile
         label: Critical Escalations
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 40 §KPI Cards
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Act on workflow instance
+        operation: actOnWorkflowInstance
+        permission: APPROVAL_ACT
+        notes: '**The monitors'' action buttons, as one operation** (decided 29 September, writers pass).'
+        provenance: contract approvals.yaml POST /workflow-instances/{instanceId}/actions
   states:
     loading: The delegation escalation list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the delegation escalation untouched.
@@ -65597,6 +67793,13 @@ screens:
     purpose: Live escalations
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: actOnWorkflowInstance
+    contract: approvals
+    purpose: An operator's intervention in a running workflow
+    trigger: onAction
+    invalidates:
+    - listApprovalDelegations
+    - listSlaEscalationBottleneck
   entryState:
     preloaded:
     - Active Delegations
@@ -65605,6 +67808,10 @@ screens:
     - SLA At Risk
     - SLA Breached
     - Escalated Today
+    params:
+    - name: instanceId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-384
@@ -65613,6 +67820,31 @@ screens:
     0 of 0 labels bound to a contract property; 8 of 13 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formActOnWorkflowInstance
+    component: modal
+    trigger: Act on workflow instance
+    body: '**Collects what `actOnWorkflowInstance` sends before it is called.** Required: `action`, `reason`.
+      Optional: `workflowStepExecutionId`, `workflowExceptionId`, `assigneePrincipalId`, `alternativeNodeId`,
+      `correctedInput`, `extendByMinutes`, `priority`. Dismissing sends nothing; the screen behind is
+      unchanged.'
+    bindsTo: WorkflowInstanceActionInput
+    confirm:
+      label: Act on workflow instance
+      operation: actOnWorkflowInstance
+    dismiss:
+      label: Cancel
+      discards:
+      - action
+      - reason
+      - workflowStepExecutionId
+      - workflowExceptionId
+      - assigneePrincipalId
+      - alternativeNodeId
+      - correctedInput
+      - extendByMinutes
+      - priority
+    provenance: contract approvals.yaml POST /workflow-instances/{instanceId}/actions
 - id: BO-385
   name: Delegation Management
   module: Venue Operations
@@ -66163,6 +68395,8 @@ screens:
       trigger: Back to Delegation & Escalation Command Center
       provenance: structural — pack board 5 wiring, 9 September 2026
       back: true
+      carries:
+      - instanceId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -66190,6 +68424,15 @@ screens:
         impliedBy: listSlaEscalationBottleneck
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Act on workflow instance
+        operation: actOnWorkflowInstance
+        permission: APPROVAL_ACT
+        notes: '**The monitors'' action buttons, as one operation** (decided 29 September, writers pass).'
+        provenance: contract approvals.yaml POST /workflow-instances/{instanceId}/actions
   states:
     loading: The live escalation operations list.
     error: Could not load. Names which read failed and leaves the live escalation operations untouched.
@@ -66205,6 +68448,12 @@ screens:
     purpose: What is escalating now
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: actOnWorkflowInstance
+    contract: approvals
+    purpose: An operator's intervention in a running workflow
+    trigger: onAction
+    invalidates:
+    - listSlaEscalationBottleneck
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-391
@@ -66213,6 +68462,36 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formActOnWorkflowInstance
+    component: modal
+    trigger: Act on workflow instance
+    body: '**Collects what `actOnWorkflowInstance` sends before it is called.** Required: `action`, `reason`.
+      Optional: `workflowStepExecutionId`, `workflowExceptionId`, `assigneePrincipalId`, `alternativeNodeId`,
+      `correctedInput`, `extendByMinutes`, `priority`. Dismissing sends nothing; the screen behind is
+      unchanged.'
+    bindsTo: WorkflowInstanceActionInput
+    confirm:
+      label: Act on workflow instance
+      operation: actOnWorkflowInstance
+    dismiss:
+      label: Cancel
+      discards:
+      - action
+      - reason
+      - workflowStepExecutionId
+      - workflowExceptionId
+      - assigneePrincipalId
+      - alternativeNodeId
+      - correctedInput
+      - extendByMinutes
+      - priority
+    provenance: contract approvals.yaml POST /workflow-instances/{instanceId}/actions
+  entryState:
+    params:
+    - name: instanceId
+      from: navigation
+      optional: true
 - id: BO-392
   name: SLA & Escalation Performance Analytics
   module: Venue Operations
@@ -80404,6 +82683,12 @@ screens:
       - kind: primaryButton
         label: Accept | Modify | Reject | Schedule
         provenance: pack Rental_Management.pdf, page 42 §Actions
+      - kind: secondaryButton
+        label: Transition dynamic pricing strategy
+        operation: transitionDynamicPricingStrategy
+        permission: PRICE_CONFIGURE
+        notes: '**The strategy''s status moves, as calls** (29 September, writers pass).'
+        provenance: contract catalogue.yaml POST /dynamic-pricing-strategies/{strategyId}/lifecycle
     - name: contentBody
       components:
       - kind: dataTable
@@ -80426,6 +82711,12 @@ screens:
     purpose: Dynamic pricing
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: transitionDynamicPricingStrategy
+    contract: catalogue
+    purpose: Activate, pause, resume or retire a dynamic pricing strategy
+    trigger: onAction
+    invalidates:
+    - listDynamicPricingStrategy
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-528
@@ -80435,6 +82726,26 @@ screens:
     examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions
     reconciled 29 September (VM close-out):** Accept | Modify | Reject | Schedule dropped (AI design pending
     review (accept/modify/reject/schedule acts on AI pricing recommendations; would bind ai decideProposedAction)).
+  overlays:
+  - id: formTransitionDynamicPricingStrategy
+    component: modal
+    trigger: Transition dynamic pricing strategy
+    body: '**Collects what `transitionDynamicPricingStrategy` sends before it is called.** Required: `action`.
+      Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Transition dynamic pricing strategy
+      operation: transitionDynamicPricingStrategy
+    dismiss:
+      label: Cancel
+      discards:
+      - action
+      - reason
+    provenance: contract catalogue.yaml POST /dynamic-pricing-strategies/{strategyId}/lifecycle
+  entryState:
+    params:
+    - name: strategyId
+      from: navigation
+      optional: true
 - id: BO-529
   name: Deposit & Security Hold Policy
   module: Rentals
@@ -90290,6 +92601,15 @@ screens:
         impliedBy: listAccreditationIdentityConflicts
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Resolve identity conflict
+        operation: resolveIdentityConflict
+        permission: ACCREDITATION_MANAGE
+        notes: '**Takes a suspected pair out of `pending`** (decided 29 September, writers pass).'
+        provenance: contract accreditation.yaml POST /accreditation-identity-conflicts/{conflictId}/resolve
   states:
     loading: The duplicate identity conflict list.
     error: Could not load. Names which read failed and leaves the duplicate identity conflict untouched.
@@ -90305,6 +92625,12 @@ screens:
     purpose: Possible duplicates
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: resolveIdentityConflict
+    contract: accreditation
+    purpose: Decide whether two accreditation records are the same person
+    trigger: onAction
+    invalidates:
+    - listAccreditationIdentityConflicts
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-631
@@ -90312,6 +92638,26 @@ screens:
   apisNote: Regenerated 9 September 2026 from ACCREDITATION.pdf page 15. 0 of 0 labels bound to a contract
     property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples
     and AI narrative, which belong to the matrix and the contracts rather than here.
+  overlays:
+  - id: formResolveIdentityConflict
+    component: modal
+    trigger: Resolve identity conflict
+    body: '**Collects what `resolveIdentityConflict` sends before it is called.** Required: `outcome`,
+      `reason`. Optional: `survivingHolderId`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Resolve identity conflict
+      operation: resolveIdentityConflict
+    dismiss:
+      label: Cancel
+      discards:
+      - outcome
+      - reason
+      - survivingHolderId
+    provenance: contract accreditation.yaml POST /accreditation-identity-conflicts/{conflictId}/resolve
+  entryState:
+    params:
+    - name: conflictId
+      from: navigation
 - id: BO-632
   name: Organization & Affiliation Management
   module: Access & Venue
@@ -106039,6 +108385,60 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: setIntelligentRoutingSkill
+      - kind: textField
+        label: Parent category id
+        operation: listCaseCategories
+        notes: Sends `?parentCategoryId=` to `listCaseCategories`.
+        provenance: contract marketing-crm.yaml GET /case-categories
+      - kind: toggle
+        label: Top level only
+        operation: listCaseCategories
+        notes: Sends `?topLevelOnly=` to `listCaseCategories`.
+        provenance: contract marketing-crm.yaml GET /case-categories
+      - kind: toggle
+        label: Is active
+        operation: listCaseCategories
+        notes: Sends `?isActive=` to `listCaseCategories`.
+        provenance: contract marketing-crm.yaml GET /case-categories
+      - kind: dataTable
+        label: Every case category
+        bindsTo: CaseCategory
+        columns:
+        - CaseCategory.id
+        - CaseCategory.code
+        - CaseCategory.name
+        - CaseCategory.parentCategoryId
+        - CaseCategory.defaultPriority
+        - CaseCategory.isActive
+        - CaseCategory.scopePath
+        operation: listCaseCategories
+        provenance: contract marketing-crm.yaml GET /case-categories
+      - kind: toggle
+        label: Is active
+        operation: listServiceQueues
+        notes: Sends `?isActive=` to `listServiceQueues`.
+        provenance: contract marketing-crm.yaml GET /service-queues
+      - kind: dataTable
+        label: Every service queue
+        bindsTo: ServiceQueue
+        columns:
+        - ServiceQueue.id
+        - ServiceQueue.code
+        - ServiceQueue.name
+        - ServiceQueue.overflowWaitSeconds
+        - ServiceQueue.isActive
+        - ServiceQueue.scopePath
+        operation: listServiceQueues
+        provenance: contract marketing-crm.yaml GET /service-queues
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save service queue definition
+        operation: setServiceQueueDefinition
+        permission: CASE_MANAGE
+        notes: '**An upsert keyed on `code`**, which is unique in the venue and never changes once created.'
+        provenance: contract marketing-crm.yaml PUT /service-queues
   states:
     loading: The routing queue list.
     error: Could not load. Names which read failed and leaves the routing queue untouched.
@@ -106059,6 +108459,22 @@ screens:
     purpose: Who is free
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listCaseCategories
+    contract: marketing-crm
+    purpose: List case categories and subcategories
+    trigger: onLoad
+  - operationId: listServiceQueues
+    contract: marketing-crm
+    purpose: List customer-service queues
+    trigger: onLoad
+  - operationId: setServiceQueueDefinition
+    contract: marketing-crm
+    purpose: Create or change a customer-service queue
+    trigger: onAction
+    invalidates:
+    - listAgentWorkloadAvailability
+    - listCaseCategories
+    - listServiceQueues
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-800
@@ -106067,6 +108483,27 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formSetServiceQueueDefinition
+    component: modal
+    trigger: Save service queue definition
+    body: '**Collects what `setServiceQueueDefinition` sends before it is called.** Required: `id`, `code`,
+      `name`, `isActive`. Optional: `overflowWaitSeconds`, `scopePath`. Dismissing sends nothing; the
+      screen behind is unchanged.'
+    bindsTo: ServiceQueue
+    confirm:
+      label: Save service queue definition
+      operation: setServiceQueueDefinition
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - code
+      - name
+      - isActive
+      - overflowWaitSeconds
+      - scopePath
+    provenance: contract marketing-crm.yaml PUT /service-queues
 - id: BO-801
   name: Sales & Service Actions
   module: Engagement & Support
@@ -106515,6 +108952,51 @@ screens:
         impliedBy: listCases
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+      - kind: textField
+        label: Parent category id
+        operation: listCaseCategories
+        notes: Sends `?parentCategoryId=` to `listCaseCategories`.
+        provenance: contract marketing-crm.yaml GET /case-categories
+      - kind: toggle
+        label: Top level only
+        operation: listCaseCategories
+        notes: Sends `?topLevelOnly=` to `listCaseCategories`.
+        provenance: contract marketing-crm.yaml GET /case-categories
+      - kind: toggle
+        label: Is active
+        operation: listCaseCategories
+        notes: Sends `?isActive=` to `listCaseCategories`.
+        provenance: contract marketing-crm.yaml GET /case-categories
+      - kind: dataTable
+        label: Every case category
+        bindsTo: CaseCategory
+        columns:
+        - CaseCategory.id
+        - CaseCategory.code
+        - CaseCategory.name
+        - CaseCategory.parentCategoryId
+        - CaseCategory.defaultPriority
+        - CaseCategory.isActive
+        - CaseCategory.scopePath
+        operation: listCaseCategories
+        provenance: contract marketing-crm.yaml GET /case-categories
+      - kind: toggle
+        label: Is active
+        operation: listServiceQueues
+        notes: Sends `?isActive=` to `listServiceQueues`.
+        provenance: contract marketing-crm.yaml GET /service-queues
+      - kind: dataTable
+        label: Every service queue
+        bindsTo: ServiceQueue
+        columns:
+        - ServiceQueue.id
+        - ServiceQueue.code
+        - ServiceQueue.name
+        - ServiceQueue.overflowWaitSeconds
+        - ServiceQueue.isActive
+        - ServiceQueue.scopePath
+        operation: listServiceQueues
+        provenance: contract marketing-crm.yaml GET /service-queues
   states:
     loading: The case queue search list.
     error: Could not load. Names which read failed and leaves the case queue search untouched.
@@ -106530,6 +109012,14 @@ screens:
     purpose: The queue
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listCaseCategories
+    contract: marketing-crm
+    purpose: List case categories and subcategories
+    trigger: onLoad
+  - operationId: listServiceQueues
+    contract: marketing-crm
+    purpose: List customer-service queues
+    trigger: onLoad
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-805
@@ -106606,6 +109096,34 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: createCase
+      - kind: textField
+        label: Parent category id
+        operation: listCaseCategories
+        notes: Sends `?parentCategoryId=` to `listCaseCategories`.
+        provenance: contract marketing-crm.yaml GET /case-categories
+      - kind: toggle
+        label: Top level only
+        operation: listCaseCategories
+        notes: Sends `?topLevelOnly=` to `listCaseCategories`.
+        provenance: contract marketing-crm.yaml GET /case-categories
+      - kind: toggle
+        label: Is active
+        operation: listCaseCategories
+        notes: Sends `?isActive=` to `listCaseCategories`.
+        provenance: contract marketing-crm.yaml GET /case-categories
+      - kind: dataTable
+        label: Every case category
+        bindsTo: CaseCategory
+        columns:
+        - CaseCategory.id
+        - CaseCategory.code
+        - CaseCategory.name
+        - CaseCategory.parentCategoryId
+        - CaseCategory.defaultPriority
+        - CaseCategory.isActive
+        - CaseCategory.scopePath
+        operation: listCaseCategories
+        provenance: contract marketing-crm.yaml GET /case-categories
   states:
     loading: The case creation list.
     error: Could not load. Names which read failed and leaves the case creation untouched.
@@ -106620,6 +109138,10 @@ screens:
     contract: marketing-crm
     purpose: Raise a service case
     trigger: onAction
+  - operationId: listCaseCategories
+    contract: marketing-crm
+    purpose: List case categories and subcategories
+    trigger: onLoad
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-806
@@ -106691,6 +109213,43 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: setCaseInvestigationResolution
+      - kind: textField
+        label: Parent category id
+        operation: listCaseCategories
+        notes: Sends `?parentCategoryId=` to `listCaseCategories`.
+        provenance: contract marketing-crm.yaml GET /case-categories
+      - kind: toggle
+        label: Top level only
+        operation: listCaseCategories
+        notes: Sends `?topLevelOnly=` to `listCaseCategories`.
+        provenance: contract marketing-crm.yaml GET /case-categories
+      - kind: toggle
+        label: Is active
+        operation: listCaseCategories
+        notes: Sends `?isActive=` to `listCaseCategories`.
+        provenance: contract marketing-crm.yaml GET /case-categories
+      - kind: dataTable
+        label: Every case category
+        bindsTo: CaseCategory
+        columns:
+        - CaseCategory.id
+        - CaseCategory.code
+        - CaseCategory.name
+        - CaseCategory.parentCategoryId
+        - CaseCategory.defaultPriority
+        - CaseCategory.isActive
+        - CaseCategory.scopePath
+        operation: listCaseCategories
+        provenance: contract marketing-crm.yaml GET /case-categories
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save case category definition
+        operation: setCaseCategoryDefinition
+        permission: CASE_MANAGE
+        notes: '**An upsert keyed on `code`**, which is unique in the venue and never changes once created.'
+        provenance: contract marketing-crm.yaml PUT /case-categories
   states:
     loading: The classification workflow list.
     error: Could not load. Names which read failed and leaves the classification workflow untouched.
@@ -106706,6 +109265,16 @@ screens:
     purpose: Classification and workflow
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: listCaseCategories
+    contract: marketing-crm
+    purpose: List case categories and subcategories
+    trigger: onLoad
+  - operationId: setCaseCategoryDefinition
+    contract: marketing-crm
+    purpose: Create or change a case category or subcategory
+    trigger: onAction
+    invalidates:
+    - listCaseCategories
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-807
@@ -106714,6 +109283,28 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formSetCaseCategoryDefinition
+    component: modal
+    trigger: Save case category definition
+    body: '**Collects what `setCaseCategoryDefinition` sends before it is called.** Required: `id`, `code`,
+      `name`, `isActive`. Optional: `parentCategoryId`, `defaultPriority`, `scopePath`. Dismissing sends
+      nothing; the screen behind is unchanged.'
+    bindsTo: CaseCategory
+    confirm:
+      label: Save case category definition
+      operation: setCaseCategoryDefinition
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - code
+      - name
+      - isActive
+      - parentCategoryId
+      - defaultPriority
+      - scopePath
+    provenance: contract marketing-crm.yaml PUT /case-categories
 - id: BO-808
   name: Assignment & Workload
   module: Engagement & Support
@@ -106772,6 +109363,23 @@ screens:
         impliedBy: listAgentWorkloadAvailability
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+      - kind: toggle
+        label: Is active
+        operation: listServiceQueues
+        notes: Sends `?isActive=` to `listServiceQueues`.
+        provenance: contract marketing-crm.yaml GET /service-queues
+      - kind: dataTable
+        label: Every service queue
+        bindsTo: ServiceQueue
+        columns:
+        - ServiceQueue.id
+        - ServiceQueue.code
+        - ServiceQueue.name
+        - ServiceQueue.overflowWaitSeconds
+        - ServiceQueue.isActive
+        - ServiceQueue.scopePath
+        operation: listServiceQueues
+        provenance: contract marketing-crm.yaml GET /service-queues
   states:
     loading: The workload list.
     error: Could not load. Names which read failed and leaves the workload untouched.
@@ -106786,6 +109394,10 @@ screens:
     purpose: Assignment and workload
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listServiceQueues
+    contract: marketing-crm
+    purpose: List customer-service queues
+    trigger: onLoad
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-808
@@ -115825,6 +118437,39 @@ screens:
         bindsTo: null
         operation: null
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 59 §Display
+      - kind: textField
+        label: Venue id
+        operation: listLabourBudgets
+        notes: Sends `?venueId=` to `listLabourBudgets`.
+        provenance: contract workforce.yaml GET /labour-budgets
+      - kind: textField
+        label: Department id
+        operation: listLabourBudgets
+        notes: Sends `?departmentId=` to `listLabourBudgets`.
+        provenance: contract workforce.yaml GET /labour-budgets
+      - kind: datePicker
+        label: From
+        operation: listLabourBudgets
+        notes: Sends `?from=` to `listLabourBudgets`.
+        provenance: contract workforce.yaml GET /labour-budgets
+      - kind: datePicker
+        label: To
+        operation: listLabourBudgets
+        notes: Sends `?to=` to `listLabourBudgets`.
+        provenance: contract workforce.yaml GET /labour-budgets
+      - kind: dataTable
+        label: Every labour budget
+        bindsTo: LabourBudget
+        columns:
+        - LabourBudget.id
+        - LabourBudget.venueId
+        - LabourBudget.departmentId
+        - LabourBudget.periodStart
+        - LabourBudget.periodEnd
+        - LabourBudget.budgetAmount
+        - LabourBudget.scopePath
+        operation: listLabourBudgets
+        provenance: contract workforce.yaml GET /labour-budgets
     - name: contextPanel
       slot: selection
       components:
@@ -115840,6 +118485,17 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Cost Calculation”, “Managers
           shall understand”.'
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 59 §Display
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save labour budget
+        operation: setLabourBudget
+        permission: WORKFORCE_MANAGE
+        notes: '**Writes `workforce.labour_budget`** (decided 29 September, writers pass), keyed by venue,
+          department and `periodStart`: a PUT for a key that exists replaces its `periodEnd` and amount,
+          any other creates a budget.'
+        provenance: contract workforce.yaml PUT /labour-budgets
   states:
     loading: The labor cost staffing list.
     error: Could not load. Names which read failed and leaves the labor cost staffing untouched.
@@ -115855,6 +118511,17 @@ screens:
     purpose: Cost against budget
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listLabourBudgets
+    contract: workforce
+    purpose: Labour budgets, per venue, department and period
+    trigger: onLoad
+  - operationId: setLabourBudget
+    contract: workforce
+    purpose: Set the labour budget for a venue, department and period
+    trigger: onAction
+    invalidates:
+    - getLabourCost
+    - listLabourBudgets
   entryState:
     preloaded:
     - Budget
@@ -115870,6 +118537,28 @@ screens:
     0 of 5 labels bound to a contract property; 5 of 35 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formSetLabourBudget
+    component: modal
+    trigger: Save labour budget
+    body: '**Collects what `setLabourBudget` sends before it is called.** Required: `id`, `venueId`, `periodStart`,
+      `periodEnd`, `budgetAmount`. Optional: `departmentId`, `scopePath`. Dismissing sends nothing; the
+      screen behind is unchanged.'
+    bindsTo: LabourBudget
+    confirm:
+      label: Save labour budget
+      operation: setLabourBudget
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - venueId
+      - periodStart
+      - periodEnd
+      - budgetAmount
+      - departmentId
+      - scopePath
+    provenance: contract workforce.yaml PUT /labour-budgets
 - id: BO-892
   name: AI Workforce Planner & Roster Optimization
   module: Rentals
@@ -117191,6 +119880,41 @@ screens:
         bindsTo: null
         operation: null
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 82 §Display
+      - kind: textField
+        label: Resource id
+        operation: listResourceCosts
+        notes: Sends `?resourceId=` to `listResourceCosts`.
+        provenance: contract resources.yaml GET /resource-costs
+      - kind: selectField
+        label: Kind
+        operation: listResourceCosts
+        notes: Sends `?kind=` to `listResourceCosts`.
+        provenance: contract resources.yaml GET /resource-costs
+      - kind: datePicker
+        label: From
+        operation: listResourceCosts
+        notes: Sends `?from=` to `listResourceCosts`.
+        provenance: contract resources.yaml GET /resource-costs
+      - kind: datePicker
+        label: To
+        operation: listResourceCosts
+        notes: Sends `?to=` to `listResourceCosts`.
+        provenance: contract resources.yaml GET /resource-costs
+      - kind: dataTable
+        label: Every resource cost entry
+        bindsTo: ResourceCostEntry
+        columns:
+        - ResourceCostEntry.id
+        - ResourceCostEntry.resourceId
+        - ResourceCostEntry.kind
+        - ResourceCostEntry.amount
+        - ResourceCostEntry.incurredOn
+        - ResourceCostEntry.fromVenueId
+        - ResourceCostEntry.toVenueId
+        - ResourceCostEntry.note
+        - ResourceCostEntry.scopePath
+        operation: listResourceCosts
+        provenance: contract resources.yaml GET /resource-costs
     - name: contextPanel
       slot: selection
       components:
@@ -117224,6 +119948,12 @@ screens:
           Each needs attaching to the control it gates, or the screen needs the control.'
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 82 §Where financial permissions
           allow
+      - kind: primaryButton
+        label: Create resource cost
+        operation: createResourceCost
+        permission: RESOURCE_MANAGE
+        notes: '**The writer of `resources.resource_cost`** (decided 29 September, writers pass).'
+        provenance: contract resources.yaml POST /resource-costs
   states:
     loading: The equipment asset list.
     error: Could not load. Names which read failed and leaves the equipment asset untouched.
@@ -117244,6 +119974,18 @@ screens:
     purpose: The asset register
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listResourceCosts
+    contract: resources
+    purpose: Cost entries booked against resources
+    trigger: onLoad
+  - operationId: createResourceCost
+    contract: resources
+    purpose: Book a transfer, operating or replacement cost against a resource
+    trigger: onAction
+    invalidates:
+    - listResources
+    - listAssets
+    - listResourceCosts
   entryState:
     preloaded:
     - Total assets
@@ -117260,6 +120002,30 @@ screens:
     0 of 13 labels bound to a contract property; 18 of 41 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formCreateResourceCost
+    component: modal
+    trigger: Create resource cost
+    body: '**Collects what `createResourceCost` sends before it is called.** Required: `id`, `resourceId`,
+      `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`, `scopePath`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    bindsTo: ResourceCostEntry
+    confirm:
+      label: Create resource cost
+      operation: createResourceCost
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - resourceId
+      - kind
+      - amount
+      - incurredOn
+      - fromVenueId
+      - toVenueId
+      - note
+      - scopePath
+    provenance: contract resources.yaml POST /resource-costs
 - id: BO-904
   name: Rental Resource Configuration
   module: Rentals
@@ -118080,6 +120846,12 @@ screens:
       - kind: primaryButton
         label: Manufacturer service
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 91 §Support
+      - kind: secondaryButton
+        label: Create resource cost
+        operation: createResourceCost
+        permission: RESOURCE_MANAGE
+        notes: '**The writer of `resources.resource_cost`** (decided 29 September, writers pass).'
+        provenance: contract resources.yaml POST /resource-costs
   states:
     loading: The maintenance resource blocking configuration as saved.
     error: Could not load. Names which read failed and leaves the maintenance resource blocking untouched.
@@ -118107,6 +120879,12 @@ screens:
     purpose: What is due
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: createResourceCost
+    contract: resources
+    purpose: Book a transfer, operating or replacement cost against a resource
+    trigger: onAction
+    invalidates:
+    - getDueMaintenance
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-910
@@ -118116,6 +120894,30 @@ screens:
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here. **Pack actions reconciled 29 September (VM close-out):** Manufacturer service are
     choices sent by `createWorkOrder` (planned work order assigned to the manufacturer (resolution referredExternal)).
+  overlays:
+  - id: formCreateResourceCost
+    component: modal
+    trigger: Create resource cost
+    body: '**Collects what `createResourceCost` sends before it is called.** Required: `id`, `resourceId`,
+      `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`, `scopePath`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    bindsTo: ResourceCostEntry
+    confirm:
+      label: Create resource cost
+      operation: createResourceCost
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - resourceId
+      - kind
+      - amount
+      - incurredOn
+      - fromVenueId
+      - toVenueId
+      - note
+      - scopePath
+    provenance: contract resources.yaml POST /resource-costs
 - id: BO-911
   name: Inspection, Condition & Compliance Management
   module: Rentals
@@ -118318,6 +121120,41 @@ screens:
         bindsTo: null
         operation: null
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 93 §Track
+      - kind: textField
+        label: Resource id
+        operation: listResourceCosts
+        notes: Sends `?resourceId=` to `listResourceCosts`.
+        provenance: contract resources.yaml GET /resource-costs
+      - kind: selectField
+        label: Kind
+        operation: listResourceCosts
+        notes: Sends `?kind=` to `listResourceCosts`.
+        provenance: contract resources.yaml GET /resource-costs
+      - kind: datePicker
+        label: From
+        operation: listResourceCosts
+        notes: Sends `?from=` to `listResourceCosts`.
+        provenance: contract resources.yaml GET /resource-costs
+      - kind: datePicker
+        label: To
+        operation: listResourceCosts
+        notes: Sends `?to=` to `listResourceCosts`.
+        provenance: contract resources.yaml GET /resource-costs
+      - kind: dataTable
+        label: Every resource cost entry
+        bindsTo: ResourceCostEntry
+        columns:
+        - ResourceCostEntry.id
+        - ResourceCostEntry.resourceId
+        - ResourceCostEntry.kind
+        - ResourceCostEntry.amount
+        - ResourceCostEntry.incurredOn
+        - ResourceCostEntry.fromVenueId
+        - ResourceCostEntry.toVenueId
+        - ResourceCostEntry.note
+        - ResourceCostEntry.scopePath
+        operation: listResourceCosts
+        provenance: contract resources.yaml GET /resource-costs
     - name: contextPanel
       slot: selection
       components:
@@ -118355,6 +121192,12 @@ screens:
       - kind: secondaryButton
         label: Asset Information
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 93 §Support
+      - kind: secondaryButton
+        label: Create resource cost
+        operation: createResourceCost
+        permission: RESOURCE_MANAGE
+        notes: '**The writer of `resources.resource_cost`** (decided 29 September, writers pass).'
+        provenance: contract resources.yaml POST /resource-costs
   states:
     loading: The asset lifecycle depreciation list.
     error: Could not load. Names which read failed and leaves the asset lifecycle depreciation untouched.
@@ -118376,6 +121219,16 @@ screens:
     purpose: Its life so far
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: listResourceCosts
+    contract: resources
+    purpose: Cost entries booked against resources
+    trigger: onLoad
+  - operationId: createResourceCost
+    contract: resources
+    purpose: Book a transfer, operating or replacement cost against a resource
+    trigger: onAction
+    invalidates:
+    - listResourceCosts
   entryState:
     preloaded:
     - Acquisition date
@@ -118399,6 +121252,30 @@ screens:
     rather than here. **Pack actions reconciled 29 September (VM close-out):** → End of Life are choices
     sent by `setResourceLifecycleState` (state retired with disposal); Asset Information dropped (section
     heading).
+  overlays:
+  - id: formCreateResourceCost
+    component: modal
+    trigger: Create resource cost
+    body: '**Collects what `createResourceCost` sends before it is called.** Required: `id`, `resourceId`,
+      `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`, `scopePath`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    bindsTo: ResourceCostEntry
+    confirm:
+      label: Create resource cost
+      operation: createResourceCost
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - resourceId
+      - kind
+      - amount
+      - incurredOn
+      - fromVenueId
+      - toVenueId
+      - note
+      - scopePath
+    provenance: contract resources.yaml POST /resource-costs
 - id: BO-913
   name: Event Resource Planning Command Center
   module: Rentals
@@ -121965,8 +124842,55 @@ screens:
       - kind: secondaryButton
         label: Resource replacement cost
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 156 §Support analysis of
+      - kind: secondaryButton
+        label: Create resource cost
+        operation: createResourceCost
+        permission: RESOURCE_MANAGE
+        notes: '**The writer of `resources.resource_cost`** (decided 29 September, writers pass).'
+        provenance: contract resources.yaml POST /resource-costs
+      - kind: destructiveButton
+        label: Delete resource cost
+        operation: deleteResourceCost
+        permission: RESOURCE_MANAGE
+        notes: Removes one `resources.resource_cost` row (decided 29 September, writers pass).
+        provenance: contract resources.yaml DELETE /resource-costs/{costId}
     - name: contentBody
-      components: []
+      components:
+      - kind: textField
+        label: Resource id
+        operation: listResourceCosts
+        notes: Sends `?resourceId=` to `listResourceCosts`.
+        provenance: contract resources.yaml GET /resource-costs
+      - kind: selectField
+        label: Kind
+        operation: listResourceCosts
+        notes: Sends `?kind=` to `listResourceCosts`.
+        provenance: contract resources.yaml GET /resource-costs
+      - kind: datePicker
+        label: From
+        operation: listResourceCosts
+        notes: Sends `?from=` to `listResourceCosts`.
+        provenance: contract resources.yaml GET /resource-costs
+      - kind: datePicker
+        label: To
+        operation: listResourceCosts
+        notes: Sends `?to=` to `listResourceCosts`.
+        provenance: contract resources.yaml GET /resource-costs
+      - kind: dataTable
+        label: Every resource cost entry
+        bindsTo: ResourceCostEntry
+        columns:
+        - ResourceCostEntry.id
+        - ResourceCostEntry.resourceId
+        - ResourceCostEntry.kind
+        - ResourceCostEntry.amount
+        - ResourceCostEntry.incurredOn
+        - ResourceCostEntry.fromVenueId
+        - ResourceCostEntry.toVenueId
+        - ResourceCostEntry.note
+        - ResourceCostEntry.scopePath
+        operation: listResourceCosts
+        provenance: contract resources.yaml GET /resource-costs
   states:
     loading: The resource cost revenue list.
     error: Could not load. Names which read failed and leaves the resource cost revenue untouched.
@@ -121986,6 +124910,26 @@ screens:
     contract: resources
     purpose: What resources cost and earn, grouped
     trigger: onLoad
+  - operationId: listResourceCosts
+    contract: resources
+    purpose: Cost entries booked against resources
+    trigger: onLoad
+  - operationId: createResourceCost
+    contract: resources
+    purpose: Book a transfer, operating or replacement cost against a resource
+    trigger: onAction
+    invalidates:
+    - getResourceUtilisation
+    - getResourceCostAnalytics
+    - listResourceCosts
+  - operationId: deleteResourceCost
+    contract: resources
+    purpose: Remove a cost entry booked in error
+    trigger: onAction
+    invalidates:
+    - getResourceUtilisation
+    - getResourceCostAnalytics
+    - listResourceCosts
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-945
@@ -121995,6 +124939,40 @@ screens:
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract
     change: `getResourceCostAnalytics`.'
+  overlays:
+  - id: formCreateResourceCost
+    component: modal
+    trigger: Create resource cost
+    body: '**Collects what `createResourceCost` sends before it is called.** Required: `id`, `resourceId`,
+      `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`, `scopePath`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    bindsTo: ResourceCostEntry
+    confirm:
+      label: Create resource cost
+      operation: createResourceCost
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - resourceId
+      - kind
+      - amount
+      - incurredOn
+      - fromVenueId
+      - toVenueId
+      - note
+      - scopePath
+    provenance: contract resources.yaml POST /resource-costs
+  - id: confirmDeleteResourceCost
+    component: confirmDialog
+    trigger: Delete resource cost
+    body: '**Names what `deleteResourceCost` changes and what it leaves alone**, in the consequence rather
+      than the verb. A record this affects should be identified in the dialog, not just counted.'
+    provenance: contract resources.yaml DELETE /resource-costs/{costId}
+  entryState:
+    params:
+    - name: costId
+      from: navigation
 - id: BO-946
   name: Demand Forecast Accuracy & Planning Performance
   module: Rentals

@@ -1,0 +1,115 @@
+id: LLD-Partner reconciliation exception
+title: Partner reconciliation exception — 15 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/partner-reconciliation-exception.yaml
+entity: Partner reconciliation exception
+contract: subscription
+enum: PartnerReconciliationException.status
+enumKind: inline
+enumSchema: PartnerReconciliationException
+enumProperty: status
+owner: subscription
+initial:
+- open
+terminal:
+- matched
+- corrected
+- differenceAccepted
+- adjusted
+transitions:
+- from: open
+  to: investigating
+  operation: actOnPartnerReconciliationException
+  trigger: operation
+  guard: '`action: assign`: an owner is assigned and starts working the mismatch (decided 29 September,
+    writers pass; DM4)'
+- from: open
+  to: matched
+  trigger: job
+  guard: The next reconciliation run finds the missing counterpart (a timing difference, a late file);
+    the two amounts now agree
+- from: investigating
+  to: matched
+  trigger: job
+  guard: The mismatch turns out to be a timing or reference difference; the records are linked and agree
+- from: investigating
+  to: corrected
+  operation: actOnPartnerReconciliationException
+  trigger: operation
+  guard: '`action: markCorrected`: TICVAI''s record was wrong and is corrected at source (a rate, a
+    tax code, a missing transaction); the next run agrees (decided 29 September, writers pass; DM4)'
+- from: investigating
+  to: differenceAccepted
+  operation: actOnPartnerReconciliationException
+  trigger: operation
+  guard: '`action: acceptDifference`: Finance accepts the difference as it stands, within tolerance
+    or on the partner''s evidence (a note is required above tolerance). Nothing is posted (decided 29
+    September, writers pass; DM4)'
+- from: investigating
+  to: adjusted
+  operation: actOnPartnerReconciliationException
+  trigger: operation
+  guard: '`action: adjust` with the `adjustmentRef` that settles it: a commission line with an `adjustmentReason`,
+    or a ledger adjustment through Finance (decided 29 September, writers pass; DM4)'
+- from: investigating
+  to: disputed
+  operation: actOnPartnerReconciliationException
+  trigger: operation
+  guard: '`action: dispute`: the partner contests TICVAI''s figure; a partner case (category `settlementDispute`
+    or `commissionDispute`) is opened to hold the argument (decided 29 September, writers pass; DM4)'
+- from: investigating
+  to: escalated
+  operation: actOnPartnerReconciliationException
+  trigger: operation
+  guard: '`action: escalate`: the owner cannot resolve it at their level (decided 29 September, writers
+    pass; DM4)'
+- from: disputed
+  to: escalated
+  operation: actOnPartnerReconciliationException
+  trigger: operation
+  guard: '`action: escalate`: the dispute is not settled at the owner''s level (decided 29 September,
+    writers pass; DM4)'
+- from: disputed
+  to: adjusted
+  operation: actOnPartnerReconciliationException
+  trigger: operation
+  guard: '`action: adjust`: the dispute is settled with an adjustment (decided 29 September, writers
+    pass; DM4)'
+- from: disputed
+  to: differenceAccepted
+  operation: actOnPartnerReconciliationException
+  trigger: operation
+  guard: '`action: acceptDifference`: the dispute is settled by accepting the difference (decided 29
+    September, writers pass; DM4)'
+- from: disputed
+  to: corrected
+  operation: actOnPartnerReconciliationException
+  trigger: operation
+  guard: '`action: markCorrected`: settled in the partner''s favour and TICVAI''s record corrected (decided
+    29 September, writers pass; DM4)'
+- from: escalated
+  to: adjusted
+  operation: actOnPartnerReconciliationException
+  trigger: operation
+  guard: '`action: adjust`, decided above the owner (decided 29 September, writers pass; DM4)'
+- from: escalated
+  to: differenceAccepted
+  operation: actOnPartnerReconciliationException
+  trigger: operation
+  guard: '`action: acceptDifference`, decided above the owner (decided 29 September, writers pass; DM4)'
+- from: escalated
+  to: corrected
+  operation: actOnPartnerReconciliationException
+  trigger: operation
+  guard: '`action: markCorrected`, decided above the owner (decided 29 September, writers pass; DM4)'
+notes: '**Four ways to close, and they are different facts** (decided 29 September, writers pass). `matched`
+  means there was never a real difference; `corrected` means TICVAI was wrong and fixed its record;
+  `differenceAccepted` means the difference stands and is written off; `adjusted` means money moved
+  to settle it. A report that lumps them together cannot say how often TICVAI was the one in error.
+
+
+
+  **The reconciliation run creates these rows** (`open`) and re-matches them (`matched`); an owner assigns,
+  corrects, accepts, adjusts, disputes or escalates with actOnPartnerReconciliationException (decided
+  29 September, writers pass; DM4). `listPartnerReconciliationException` only reads.'

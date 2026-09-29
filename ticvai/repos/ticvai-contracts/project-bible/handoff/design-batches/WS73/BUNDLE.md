@@ -1,6 +1,6 @@
 # WS73 — Waiver, Consent & Digital Form Management board 2
 
-**10 screens · 10 operations · 11 schemas · 2 permissions**
+**10 screens · 10 operations · 7 schemas · 3 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `MARKETING_MANAGE, MARKETING_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `GUEST_MANAGE, GUEST_VIEW, GUEST_VIEW_PII`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-051 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-052",
@@ -186,10 +182,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations can identify every upcoming activity affected by incomplete waiver requirements and prioritize corrective actions before customer arrival.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each record should show) — counts over a population, then the population",
   "purpose": "Provide Operations, Customer Service, Compliance and venue teams with a real-time overview of waiver completion across upcoming and active activities.",
-  "purposeNote": "Operations can identify every upcoming activity affected by incomplete waiver requirements and prioritize corrective actions before customer arrival.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -207,9 +203,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Filter by",
        "columns": [
         "Brand",
-        "WaiverOperationsCommandCenterView.venue",
-        "WaiverOperationsCommandCenterView.event",
-        "WaiverOperationsCommandCenterView.product",
         "Waiver",
         "Date",
         "Status",
@@ -307,17 +300,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every waiver operations",
        "columns": [
-        "WaiverOperationsCommandCenterView.eventActivity",
-        "WaiverOperationsCommandCenterView.venue",
-        "WaiverOperationsCommandCenterView.dateTime",
-        "WaiverOperationsCommandCenterView.participants",
-        "WaiverOperationsCommandCenterView.waiversRequired",
-        "WaiverOperationsCommandCenterView.completed",
-        "WaiverOperationsCommandCenterView.missing",
-        "WaiverOperationsCommandCenterView.completion",
-        "WaiverOperationsCommandCenterView.guardianPending",
-        "WaiverOperationsCommandCenterView.exceptions",
-        "WaiverOperationsCommandCenterView.operationalRisk"
+        "WaiverOperationsCommandCenterView.upcomingActivities[].eventActivity",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].venue",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].dateTime",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].participants",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].waiversRequired",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].completed",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].missing",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].completion",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].guardianPending",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].exceptions",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].operationalRisk"
        ],
        "bindsTo": "WaiverOperationsCommandCenterView",
        "operation": "listWaiver",
@@ -334,17 +327,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected waiver operations",
        "bindsTo": "WaiverOperationsCommandCenterView",
        "columns": [
-        "WaiverOperationsCommandCenterView.eventActivity",
-        "WaiverOperationsCommandCenterView.venue",
-        "WaiverOperationsCommandCenterView.dateTime",
-        "WaiverOperationsCommandCenterView.participants",
-        "WaiverOperationsCommandCenterView.waiversRequired",
-        "WaiverOperationsCommandCenterView.completed",
-        "WaiverOperationsCommandCenterView.missing",
-        "WaiverOperationsCommandCenterView.completion",
-        "WaiverOperationsCommandCenterView.guardianPending",
-        "WaiverOperationsCommandCenterView.exceptions",
-        "WaiverOperationsCommandCenterView.operationalRisk"
+        "WaiverOperationsCommandCenterView.upcomingActivities[].eventActivity",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].venue",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].dateTime",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].participants",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].waiversRequired",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].completed",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].missing",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].completion",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].guardianPending",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].exceptions",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].operationalRisk"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Display by”, “Activity Status”, “Youth Attentio”, “Climbing”, “Session”.",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 26 §Each record should show"
@@ -371,7 +364,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-051"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-051",
+   "workshopBoard": "wireframes/WS185 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-051"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 26. 26 of 32 labels bound to a contract property; 32 of 55 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -434,10 +428,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Staff can determine the complete waiver readiness of any participant from one screen.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide a detailed operational record of the waiver requirements for each participant.",
-  "purposeNote": "Staff can determine the complete waiver readiness of any participant from one screen.",
   "layout": {
    "template": "split",
    "regions": [
@@ -563,7 +557,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-052"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-052",
+   "workshopBoard": "wireframes/WS185 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-052"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 28. 16 of 19 labels bound to a contract property; 28 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -626,14 +621,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "channels.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Manage the actual distribution and completion of digital waivers.",
-  "purposeNote": "channels.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Email Link, SMS Link. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Email Link, SMS Link, WhatsApp where integrated, POS, Staff-Assisted Device. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 29 §Support"
    }
   ],
@@ -697,6 +692,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "SMS Link",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 29 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "WhatsApp where integrated",
+       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 29 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "POS",
+       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 29 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Staff-Assisted Device",
+       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 29 §Support"
       }
      ]
     }
@@ -730,9 +740,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-053"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-053",
+   "workshopBoard": "wireframes/WS185 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-053"
   },
-  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 29. 7 of 7 labels bound to a contract property; 15 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 29. 7 of 7 labels bound to a contract property; 18 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -793,10 +804,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "purchaser, participant and legal signatory as the same person.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Manage complex consent relationships for minors and organized groups. This screen is particularly important for camps, academies, schools, family attractions and youth activities.",
-  "purposeNote": "purchaser, participant and legal signatory as the same person.",
   "gaps": [
    {
     "operation": null,
@@ -815,12 +826,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every minor guardian group",
        "columns": [
-        "MinorGuardianGroupConsentManagementView.organization",
-        "MinorGuardianGroupConsentManagementView.groupLeader",
-        "MinorGuardianGroupConsentManagementView.contact",
-        "MinorGuardianGroupConsentManagementView.groupBooking",
-        "MinorGuardianGroupConsentManagementView.responsibility",
-        "MinorGuardianGroupConsentManagementView.permittedActions"
+        "MinorGuardianGroupConsentManagementView.group.organization",
+        "MinorGuardianGroupConsentManagementView.group.groupLeader",
+        "MinorGuardianGroupConsentManagementView.group.contact",
+        "MinorGuardianGroupConsentManagementView.group.groupBooking",
+        "MinorGuardianGroupConsentManagementView.group.responsibility",
+        "MinorGuardianGroupConsentManagementView.group.permittedActions"
        ],
        "bindsTo": "MinorGuardianGroupConsentManagementView",
        "operation": "listMinorGuardianGroup",
@@ -837,12 +848,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected minor guardian group",
        "bindsTo": "MinorGuardianGroupConsentManagementView",
        "columns": [
-        "MinorGuardianGroupConsentManagementView.organization",
-        "MinorGuardianGroupConsentManagementView.groupLeader",
-        "MinorGuardianGroupConsentManagementView.contact",
-        "MinorGuardianGroupConsentManagementView.groupBooking",
-        "MinorGuardianGroupConsentManagementView.responsibility",
-        "MinorGuardianGroupConsentManagementView.permittedActions"
+        "MinorGuardianGroupConsentManagementView.group.organization",
+        "MinorGuardianGroupConsentManagementView.group.groupLeader",
+        "MinorGuardianGroupConsentManagementView.group.contact",
+        "MinorGuardianGroupConsentManagementView.group.groupBooking",
+        "MinorGuardianGroupConsentManagementView.group.responsibility",
+        "MinorGuardianGroupConsentManagementView.group.permittedActions"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Multiple Children”.",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 31 §Display"
@@ -889,18 +900,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "MinorGuardianGroupConsentManagementView.organization",
-    "MinorGuardianGroupConsentManagementView.groupLeader",
-    "MinorGuardianGroupConsentManagementView.contact",
-    "MinorGuardianGroupConsentManagementView.groupBooking",
-    "MinorGuardianGroupConsentManagementView.responsibility",
-    "MinorGuardianGroupConsentManagementView.permittedActions"
+    "MinorGuardianGroupConsentManagementView.guardians[].contact"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-054"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-054",
+   "workshopBoard": "wireframes/WS185 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-054"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 31. 6 of 6 labels bound to a contract property; 16 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -963,10 +970,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Waivers requiring manual verification are reviewed consistently using governed validation criteria with complete reviewer accountability.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide authorized staff with a controlled process for reviewing waiver submissions that require verification.",
-  "purposeNote": "Waivers requiring manual verification are reviewed consistently using governed validation criteria with complete reviewer accountability.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1045,10 +1052,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setWaiverVerificationValidation",
     "contract": "marketing-crm",
     "purpose": "Waiver Verification & Validation Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setWaiverVerificationValidation"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1064,7 +1068,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-055"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-055",
+   "workshopBoard": "wireframes/WS185 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-055"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 33. 10 of 10 labels bound to a contract property; 20 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1127,10 +1132,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Missing, invalid and expired waiver requirements are proactively identified and managed before they cause unnecessary admission or operational failures.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide a dedicated exception workspace for waiver requirements preventing operational readiness.",
-  "purposeNote": "Missing, invalid and expired waiver requirements are proactively identified and managed before they cause unnecessary admission or operational failures.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1148,7 +1153,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "MissingExpiredInvalidWaiverManagementView.visitTime",
         "MissingExpiredInvalidWaiverManagementView.waiver",
         "MissingExpiredInvalidWaiverManagementView.problem",
-        "MissingExpiredInvalidWaiverManagementView.timeRemaining",
+        "MissingExpiredInvalidWaiverManagementView.timeRemainingSeconds",
         "MissingExpiredInvalidWaiverManagementView.accessImpact",
         "MissingExpiredInvalidWaiverManagementView.owner",
         "MissingExpiredInvalidWaiverManagementView.status"
@@ -1174,7 +1179,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "MissingExpiredInvalidWaiverManagementView.visitTime",
         "MissingExpiredInvalidWaiverManagementView.waiver",
         "MissingExpiredInvalidWaiverManagementView.problem",
-        "MissingExpiredInvalidWaiverManagementView.timeRemaining",
+        "MissingExpiredInvalidWaiverManagementView.timeRemainingSeconds",
         "MissingExpiredInvalidWaiverManagementView.accessImpact",
         "MissingExpiredInvalidWaiverManagementView.owner",
         "MissingExpiredInvalidWaiverManagementView.status"
@@ -1214,7 +1219,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-056"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-056",
+   "workshopBoard": "wireframes/WS185 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-056"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 34. 10 of 10 labels bound to a contract property; 10 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1277,10 +1283,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "On-site staff can efficiently resolve legitimate waiver issues while preventing unauthorized bypass of mandatory consent requirements.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Depending on configuration) and no display directory — it is settings, not a population",
   "purpose": "Support customers who arrive at the venue without completing required waivers.",
-  "purposeNote": "On-site staff can efficiently resolve legitimate waiver issues while preventing unauthorized bypass of mandatory consent requirements.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1344,7 +1350,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-057"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-057",
+   "workshopBoard": "wireframes/WS185 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-057"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 36. 0 of 0 labels bound to a contract property; 7 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1407,10 +1414,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "completed waiver at the relevant point in time.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Maintain the complete evidentiary record of every waiver and consent transaction.",
-  "purposeNote": "completed waiver at the relevant point in time.",
   "gaps": [
    {
     "operation": null,
@@ -1470,7 +1477,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-058"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-058",
+   "workshopBoard": "wireframes/WS185 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-058"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 38. 0 of 10 labels bound to a contract property; 10 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1533,10 +1541,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Management can understand waiver compliance and identify configuration or process improvements that reduce customer friction and on-site workload.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
   "purpose": "Analyze waiver completion, customer behavior and operational effectiveness.",
-  "purposeNote": "Management can understand waiver compliance and identify configuration or process improvements that reduce customer friction and on-site workload.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1581,7 +1589,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "WaiverAnalyticsComplianceOperationalInsightsView.completionRate",
         "WaiverAnalyticsComplianceOperationalInsightsView.preArrivalCompletion",
         "WaiverAnalyticsComplianceOperationalInsightsView.onSiteCompletion",
-        "WaiverAnalyticsComplianceOperationalInsightsView.averageCompletionTime",
+        "WaiverAnalyticsComplianceOperationalInsightsView.averageCompletionSeconds",
         "WaiverAnalyticsComplianceOperationalInsightsView.guardianCompletionRate",
         "WaiverAnalyticsComplianceOperationalInsightsView.rejectionRate",
         "WaiverAnalyticsComplianceOperationalInsightsView.exceptionRate",
@@ -1589,7 +1597,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "WaiverAnalyticsComplianceOperationalInsightsView.reminderEffectiveness",
         "WaiverAnalyticsComplianceOperationalInsightsView.checkInDelays",
         "WaiverAnalyticsComplianceOperationalInsightsView.staffInterventions",
-        "WaiverAnalyticsComplianceOperationalInsightsView.onSiteCompletions",
         "WaiverAnalyticsComplianceOperationalInsightsView.exceptions"
        ],
        "bindsTo": "WaiverAnalyticsComplianceOperationalInsightsView",
@@ -1611,7 +1618,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "WaiverAnalyticsComplianceOperationalInsightsView.completionRate",
         "WaiverAnalyticsComplianceOperationalInsightsView.preArrivalCompletion",
         "WaiverAnalyticsComplianceOperationalInsightsView.onSiteCompletion",
-        "WaiverAnalyticsComplianceOperationalInsightsView.averageCompletionTime",
+        "WaiverAnalyticsComplianceOperationalInsightsView.averageCompletionSeconds",
         "WaiverAnalyticsComplianceOperationalInsightsView.guardianCompletionRate",
         "WaiverAnalyticsComplianceOperationalInsightsView.rejectionRate",
         "WaiverAnalyticsComplianceOperationalInsightsView.exceptionRate",
@@ -1619,7 +1626,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "WaiverAnalyticsComplianceOperationalInsightsView.reminderEffectiveness",
         "WaiverAnalyticsComplianceOperationalInsightsView.checkInDelays",
         "WaiverAnalyticsComplianceOperationalInsightsView.staffInterventions",
-        "WaiverAnalyticsComplianceOperationalInsightsView.onSiteCompletions",
         "WaiverAnalyticsComplianceOperationalInsightsView.exceptions"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Visualize”, “Abandonment Analysis”, “Reminder Analysis”.",
@@ -1650,14 +1656,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "WaiverAnalyticsComplianceOperationalInsightsView.completionRate",
     "WaiverAnalyticsComplianceOperationalInsightsView.preArrivalCompletion",
     "WaiverAnalyticsComplianceOperationalInsightsView.onSiteCompletion",
-    "WaiverAnalyticsComplianceOperationalInsightsView.averageCompletionTime",
     "WaiverAnalyticsComplianceOperationalInsightsView.guardianCompletionRate"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-059"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-059",
+   "workshopBoard": "wireframes/WS185 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-059"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 39. 14 of 24 labels bound to a contract property; 24 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1712,10 +1718,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from CMS-051, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "while preserving human/legal governance over consent and exceptions. Board 2 — Final Screen Register",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide an AI intelligence layer across the complete waiver lifecycle. This should combine Board 1 configuration data + Board 2 operational data.",
-  "purposeNote": "while preserving human/legal governance over consent and exceptions. Board 2 — Final Screen Register",
   "gaps": [
    {
     "operation": null,
@@ -1783,7 +1789,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-060"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-060",
+   "workshopBoard": "wireframes/WS185 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-060"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 41. 0 of 0 labels bound to a contract property; 1 of 87 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1823,65 +1830,131 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/compliance-evidence-waiver",
   "contract": "marketing-crm",
   "summary": "Compliance Evidence, Audit & Waiver Repository",
-  "permission": "MARKETING_VIEW",
+  "permission": "GUEST_VIEW_PII",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "participant",
+    "name": "participantSubjectId",
     "in": "query",
     "required": false
    },
    {
-    "name": "customer",
+    "name": "customerSubjectId",
     "in": "query",
     "required": false
    },
    {
-    "name": "ticket",
+    "name": "signatorySubjectId",
     "in": "query",
     "required": false
    },
    {
-    "name": "booking",
+    "name": "ticketId",
     "in": "query",
     "required": false
    },
    {
-    "name": "event",
+    "name": "orderId",
     "in": "query",
     "required": false
    },
    {
-    "name": "waiver",
+    "name": "eventId",
     "in": "query",
     "required": false
    },
    {
-    "name": "version",
+    "name": "formId",
     "in": "query",
     "required": false
    },
    {
-    "name": "signatory",
+    "name": "formVersion",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "ComplianceEvidenceAuditWaiverRepositoryView"
+  "responds": "Page"
  },
  "listDigitalSigningCollection": {
   "method": "GET",
   "path": "/digital-signing-collection",
   "contract": "marketing-crm",
   "summary": "Digital Signing & Collection Operations",
-  "permission": "MARKETING_VIEW",
+  "permission": "GUEST_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "formId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "performanceId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "groupBookingId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "method",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "DigitalSigningCollectionOperationsView"
  },
@@ -1890,91 +1963,304 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/minor-guardian-group",
   "contract": "marketing-crm",
   "summary": "Minor, Guardian & Group Consent Management",
-  "permission": "MARKETING_VIEW",
+  "permission": "GUEST_VIEW_PII",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "groupBookingId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "guardianSubjectId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "performanceId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "consentStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "visitFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "visitTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "MinorGuardianGroupConsentManagementView"
+  "responds": "Page"
  },
  "listMissingExpiredInvalid": {
   "method": "GET",
   "path": "/missing-expired-invalid",
   "contract": "marketing-crm",
   "summary": "Missing, Expired & Invalid Waiver Management",
-  "permission": "MARKETING_VIEW",
+  "permission": "GUEST_VIEW_PII",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "problem",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "accessImpact",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ownerStaffId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "performanceId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "groupBookingId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "visitFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "visitTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "MissingExpiredInvalidWaiverManagementView"
+  "responds": "Page"
  },
  "listParticipantWaiverStatus": {
   "method": "GET",
   "path": "/participant-waiver-statu",
   "contract": "marketing-crm",
   "summary": "Participant Waiver Status & Tracking",
-  "permission": "MARKETING_VIEW",
+  "permission": "GUEST_VIEW_PII",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "email",
+    "name": "q",
     "in": "query",
     "required": false
    },
    {
-    "name": "mobile",
+    "name": "participantSubjectId",
     "in": "query",
     "required": false
    },
    {
-    "name": "waiverId",
+    "name": "orderId",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "ticketId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "groupBookingId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "formId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "performanceId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "visitFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "visitTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "completionStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "ParticipantWaiverStatusTrackingView"
+  "responds": "Page"
  },
  "listSiteWaiverException": {
   "method": "GET",
   "path": "/site-waiver-exception",
   "contract": "marketing-crm",
   "summary": "On-Site Waiver & Exception Handling",
-  "permission": "MARKETING_VIEW",
+  "permission": "GUEST_VIEW_PII",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "ticketId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "mediaCode",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerSubjectId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "participantSubjectId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "groupBookingId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "membershipId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "OnSiteWaiverExceptionHandlingView"
+  "responds": "Page"
  },
  "listWaiver": {
   "method": "GET",
   "path": "/waiver",
   "contract": "marketing-crm",
   "summary": "Waiver Operations Command Center",
-  "permission": "MARKETING_VIEW",
+  "permission": "GUEST_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "brand",
+    "name": "brandId",
     "in": "query",
     "required": false
    },
    {
-    "name": "waiver",
+    "name": "venueId",
     "in": "query",
     "required": false
    },
    {
-    "name": "date",
+    "name": "eventId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "formId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
     "in": "query",
     "required": false
    },
@@ -1992,6 +2278,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": "bookingChannel",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "breakdownBy",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -2002,33 +2293,33 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/waiver-compliance-operational",
   "contract": "marketing-crm",
   "summary": "Waiver Analytics, Compliance & Operational Insights",
-  "permission": "MARKETING_VIEW",
+  "permission": "GUEST_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "waiver",
+    "name": "formId",
     "in": "query",
     "required": false
    },
    {
-    "name": "version",
+    "name": "formVersion",
     "in": "query",
     "required": false
    },
    {
-    "name": "product",
+    "name": "productId",
     "in": "query",
     "required": false
    },
    {
-    "name": "event",
+    "name": "eventId",
     "in": "query",
     "required": false
    },
    {
-    "name": "venue",
+    "name": "venueId",
     "in": "query",
     "required": false
    },
@@ -2046,6 +2337,26 @@ Method, path, parameters, request and response for every operation these screens
     "name": "channel",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "groupBookingId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -2056,11 +2367,27 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/waiver-compliance-risk",
   "contract": "marketing-crm",
   "summary": "AI Waiver Compliance & Risk Intelligence Center",
-  "permission": "MARKETING_VIEW",
+  "permission": "GUEST_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "forecastDate",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "category",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "AiWaiverComplianceRiskIntelligenceCenterView"
  },
@@ -2068,12 +2395,18 @@ Method, path, parameters, request and response for every operation these screens
   "method": "PUT",
   "path": "/waiver-verification-validation",
   "contract": "marketing-crm",
-  "summary": "Waiver Verification & Validation Workspace",
-  "permission": "MARKETING_MANAGE",
+  "summary": "Record a reviewer's verification decision on a waiver submission",
+  "permission": "GUEST_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "WaiverVerificationValidationWorkspaceInput",
   "responds": "WaiverVerificationValidationWorkspaceView"
  }
@@ -2088,991 +2421,1130 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
  "AiWaiverComplianceRiskIntelligenceCenterView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What AI Waiver Compliance & Risk Intelligence Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.form_definition + marketing.form_definition_field, marketing.waiver_requirement (new), marketing.waiver_requirement_event (new), marketing.form_submission, marketing.waiver_verification (new), marketing.waiver_exception (new) and catalogue product associations; predictions computed at read time",
+  "description": "Waiver risks, recommendations and the readiness forecast. Advisory only.",
+  "required": [
+   "risks",
+   "recommendations"
+  ],
   "properties": {
    "templates": {
-    "type": "string",
-    "description": "Templates"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Waiver forms analysed (published or scheduled)."
    },
    "versions": {
-    "type": "string",
-    "description": "Versions"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Form versions in effect or scheduled."
    },
    "questions": {
-    "type": "string",
-    "description": "Questions"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Questions across those versions."
    },
    "signatoryRules": {
-    "type": "string",
-    "description": "Signatory Rules"
+    "type": "integer",
+    "minimum": 0
    },
    "productAssociations": {
-    "type": "string",
-    "description": "Product Associations"
+    "type": "integer",
+    "minimum": 0
    },
-   "participants": {
-    "type": "string",
-    "description": "Participants"
+   "risks": {
+    "type": "array",
+    "maxItems": 100,
+    "items": {
+     "type": "object",
+     "required": [
+      "category",
+      "severity",
+      "message"
+     ],
+     "properties": {
+      "category": {
+       "type": "string",
+       "enum": [
+        "operational",
+        "configuration",
+        "version",
+        "customerExperience"
+       ]
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "high",
+        "medium",
+        "low"
+       ]
+      },
+      "source": {
+       "type": "string",
+       "enum": [
+        "rule",
+        "ai"
+       ],
+       "description": "`rule` for a deterministic check, `ai` for a prediction."
+      },
+      "message": {
+       "type": "string",
+       "maxLength": 500
+      },
+      "subjectType": {
+       "type": "string",
+       "nullable": true,
+       "enum": [
+        "performance",
+        "product",
+        "form",
+        "formVersion",
+        "groupBooking"
+       ]
+      },
+      "subjectId": {
+       "type": "string",
+       "nullable": true
+      },
+      "affectedParticipants": {
+       "type": "integer",
+       "minimum": 0,
+       "nullable": true
+      }
+     }
+    }
    },
-   "completion": {
-    "type": "string",
-    "description": "Completion"
+   "recommendations": {
+    "type": "array",
+    "maxItems": 50,
+    "items": {
+     "type": "object",
+     "required": [
+      "message",
+      "action"
+     ],
+     "properties": {
+      "message": {
+       "type": "string",
+       "maxLength": 500
+      },
+      "action": {
+       "type": "string",
+       "enum": [
+        "sendTargetedReminders",
+        "reorderFormSections",
+        "reviewMobileLayout",
+        "updateVersionAssociation",
+        "addReminderTrigger",
+        "enableAccessBlocking",
+        "other"
+       ]
+      },
+      "operationId": {
+       "type": "string",
+       "nullable": true,
+       "description": "The operation that would carry it out, e.g. `actOnWaiverRequirements`, `setMessageTrigger`, `setDigitalWaiverForm`."
+      },
+      "riskIndex": {
+       "type": "integer",
+       "minimum": 0,
+       "nullable": true,
+       "description": "Index into `risks` of the risk it answers."
+      }
+     }
+    }
    },
-   "verification": {
-    "type": "string",
-    "description": "Verification"
-   },
-   "exceptions": {
-    "type": "string",
-    "description": "Exceptions"
-   },
-   "accessBlocks": {
-    "type": "string",
-    "description": "Access Blocks"
-   },
-   "customerInteractions": {
-    "type": "string",
-    "description": "Customer Interactions"
-   },
-   "operationalTrends": {
-    "type": "string",
-    "description": "Operational Trends"
-   },
-   "missing": {
-    "type": "string",
-    "description": "missing"
-   },
-   "nextWeek": {
-    "type": "string",
-    "format": "date-time",
-    "description": "next week"
-   },
-   "aWaiverIssue": {
-    "type": "string",
-    "description": "a waiver issue.”"
-   },
-   "requirements": {
-    "type": "string",
-    "description": "requirements"
-   },
-   "relationships": {
-    "type": "string",
-    "description": "relationships"
-   },
-   "area11CompleteStructure": {
-    "type": "string",
-    "description": "Area 11 — Complete Structure"
-   }
-  }
- },
- "ComplianceEvidenceAuditWaiverRepositoryView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Compliance Evidence, Audit & Waiver Repository displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "waiverId": {
-    "type": "string",
-    "description": "Waiver ID"
-   },
-   "exactVersion": {
-    "type": "string",
-    "description": "Exact Version"
-   },
-   "signatoryType": {
-    "type": "string",
-    "description": "Signatory Type"
-   },
-   "submissionDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Submission Date"
-   },
-   "submissionTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Submission Time"
-   },
-   "responses": {
-    "type": "string",
-    "description": "Responses"
-   },
-   "acknowledgements": {
-    "type": "string",
-    "description": "Acknowledgements"
-   },
-   "signatureEvidence": {
-    "type": "string",
-    "description": "Signature Evidence"
-   },
-   "verification": {
-    "type": "string",
-    "description": "Verification"
-   },
-   "relatedBooking": {
-    "type": "string",
-    "description": "Related Booking"
-   },
-   "relatedTicket": {
-    "type": "string",
-    "description": "Related Ticket"
-   },
-   "applicableProduct": {
-    "type": "string",
-    "description": "Applicable Product"
-   },
-   "applicableEvent": {
-    "type": "string",
-    "description": "Applicable Event"
-   },
-   "auditEvents": {
-    "type": "string",
-    "description": "Audit Events"
-   },
-   "legalWording": {
-    "type": "string",
-    "description": "Legal wording"
-   },
-   "questions": {
-    "type": "string",
-    "description": "Questions"
-   },
-   "waiverVersion": {
-    "type": "string",
-    "description": "Waiver version"
-   },
-   "signatoryEvidence": {
-    "type": "string",
-    "description": "Signatory evidence"
-   },
-   "role": {
-    "type": "string",
-    "description": "Role"
-   },
-   "businessUnit": {
-    "type": "string",
-    "description": "Business Unit"
-   },
-   "legalEntity": {
-    "type": "string",
-    "description": "Legal Entity"
-   },
-   "dataSensitivity": {
-    "type": "string",
-    "description": "Data sensitivity"
-   },
-   "requirements": {
-    "type": "string",
-    "description": "requirements"
+   "forecast": {
+    "type": "object",
+    "nullable": true,
+    "required": [
+     "forDate",
+     "readinessRate"
+    ],
+    "properties": {
+     "forDate": {
+      "type": "string",
+      "format": "date"
+     },
+     "readinessRate": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Predicted share of participants ready at arrival."
+     },
+     "potentialUnresolved": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "highRisk": {
+      "type": "integer",
+      "minimum": 0
+     }
+    }
    }
   }
  },
  "DigitalSigningCollectionOperationsView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Digital Signing & Collection Operations displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.waiver_requirement (new), marketing.waiver_requirement_event (new), marketing.message_dispatch and marketing.form_submission",
+  "description": "Waiver link distribution and completion for the filters given.",
+  "required": [
+   "sent",
+   "delivered",
+   "opened",
+   "started",
+   "completed",
+   "failed",
+   "expiredLinks",
+   "byMethod",
+   "journey"
+  ],
   "properties": {
-   "emailLink": {
-    "type": "string",
-    "description": "Email Link"
-   },
-   "smsLink": {
-    "type": "string",
-    "description": "SMS Link"
-   },
-   "whatsappWhereIntegrated": {
-    "type": "string",
-    "description": "WhatsApp where integrated"
-   },
-   "b2cAccount": {
-    "type": "string",
-    "description": "B2C Account"
-   },
-   "mobileApp": {
-    "type": "string",
-    "description": "Mobile App"
-   },
-   "groupPortal": {
-    "type": "string",
-    "description": "Group Portal"
-   },
-   "qrCode": {
-    "type": "string",
-    "description": "QR Code"
-   },
-   "pos": {
-    "type": "string",
-    "description": "POS"
-   },
-   "kiosk": {
-    "type": "string",
-    "description": "Kiosk"
-   },
-   "staffAssistedDevice": {
-    "type": "string",
-    "description": "Staff-Assisted Device"
-   },
    "sent": {
-    "type": "string",
-    "description": "Sent"
+    "type": "integer",
+    "minimum": 0
    },
    "delivered": {
-    "type": "string",
-    "description": "Delivered"
+    "type": "integer",
+    "minimum": 0
    },
    "opened": {
-    "type": "string",
-    "description": "Opened"
+    "type": "integer",
+    "minimum": 0
    },
    "started": {
-    "type": "string",
-    "description": "Started"
+    "type": "integer",
+    "minimum": 0
    },
    "completed": {
-    "type": "string",
-    "description": "Completed"
+    "type": "integer",
+    "minimum": 0
    },
    "failed": {
     "type": "integer",
-    "description": "Failed"
+    "minimum": 0,
+    "description": "Links whose message could not be delivered on any channel."
    },
    "expiredLinks": {
     "type": "integer",
-    "description": "Expired Links"
+    "minimum": 0,
+    "description": "Links that expired unused, or were refused because already used."
    },
-   "singleMultiUse": {
-    "type": "string",
-    "description": "Single/Multi Use"
+   "completionRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "description": "`completed` / `sent`."
    },
-   "authentication": {
-    "type": "string",
-    "description": "Authentication"
+   "byMethod": {
+    "type": "array",
+    "description": "One entry per delivery method used in the window.",
+    "items": {
+     "type": "object",
+     "required": [
+      "method",
+      "sent",
+      "completed"
+     ],
+     "properties": {
+      "method": {
+       "type": "string",
+       "enum": [
+        "email",
+        "sms",
+        "whatsapp",
+        "guestWeb",
+        "guestApp",
+        "groupPortal",
+        "qrCode",
+        "pos",
+        "kiosk",
+        "staffAssistedDevice"
+       ]
+      },
+      "sent": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "completed": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "completionRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      }
+     }
+    }
    },
-   "participant": {
-    "type": "string",
-    "description": "Participant"
+   "journey": {
+    "type": "array",
+    "description": "How many requirements reached each stage of the signing journey, in journey order.",
+    "items": {
+     "type": "object",
+     "required": [
+      "stage",
+      "count"
+     ],
+     "properties": {
+      "stage": {
+       "type": "string",
+       "enum": [
+        "linkIssued",
+        "participantIdentified",
+        "waiverLoaded",
+        "questionsCompleted",
+        "acknowledgementsAccepted",
+        "signatureCaptured",
+        "submissionValidated",
+        "evidenceStored"
+       ]
+      },
+      "count": {
+       "type": "integer",
+       "minimum": 0
+      }
+     }
+    }
    },
-   "booking": {
-    "type": "string",
-    "description": "Booking"
-   },
-   "waiverVersion": {
-    "type": "string",
-    "description": "Waiver Version"
-   },
-   "activityWaiverV32": {
-    "type": "string",
-    "description": "Activity Waiver v3.2"
-   },
-   "participantOmarAhmed": {
-    "type": "string",
-    "description": "Participant: Omar Ahmed"
+   "recentCompletions": {
+    "type": "array",
+    "maxItems": 50,
+    "items": {
+     "type": "object",
+     "required": [
+      "requirementId",
+      "participantSubjectId",
+      "formName",
+      "formVersion",
+      "completedAt"
+     ],
+     "properties": {
+      "requirementId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "participantSubjectId": {
+       "type": "string",
+       "format": "uuid",
+       "description": "The name is not returned here (GUEST_VIEW); `listParticipantWaiverStatus` resolves it under GUEST_VIEW_PII."
+      },
+      "booking": {
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "formName": {
+       "type": "string"
+      },
+      "formVersion": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "method": {
+       "type": "string",
+       "nullable": true
+      },
+      "completedAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
    }
   }
  },
- "MinorGuardianGroupConsentManagementView": {
+ "Page": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Minor, Guardian & Group Consent Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "required": [
+   "items",
+   "hasMore"
+  ],
   "properties": {
-   "minor": {
-    "type": "string",
-    "description": "Minor"
-   },
-   "guardian": {
-    "type": "string",
-    "description": "Guardian"
-   },
-   "relationship": {
-    "type": "string",
-    "description": "Relationship"
-   },
-   "contact": {
-    "type": "string",
-    "description": "Contact"
-   },
-   "verificationStatus": {
-    "type": "string",
-    "description": "Verification Status"
-   },
-   "consentStatus": {
-    "type": "string",
-    "description": "Consent Status"
-   },
-   "signatureStatus": {
-    "type": "string",
-    "description": "Signature Status"
-   },
-   "oneGuardianOneMinor": {
-    "type": "string",
-    "description": "One Guardian → One Minor"
-   },
-   "oneGuardianMultipleMinors": {
-    "type": "string",
-    "description": "One Guardian → Multiple Minors"
-   },
-   "organization": {
-    "type": "string",
-    "description": "Organization"
-   },
-   "groupLeader": {
-    "type": "string",
-    "description": "Group Leader"
-   },
-   "groupBooking": {
-    "type": "string",
-    "description": "Group Booking"
-   },
-   "responsibility": {
-    "type": "string",
-    "description": "Responsibility"
-   },
-   "permittedActions": {
-    "type": "integer",
-    "description": "Permitted Actions"
-   }
-  }
- },
- "MissingExpiredInvalidWaiverManagementView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Missing, Expired & Invalid Waiver Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "missingWaiver": {
-    "type": "string",
-    "description": "Missing Waiver"
-   },
-   "incomplete": {
-    "type": "string",
-    "description": "Incomplete"
-   },
-   "missingSignature": {
-    "type": "string",
-    "description": "Missing Signature"
-   },
-   "guardianMissing": {
-    "type": "string",
-    "description": "Guardian Missing"
-   },
-   "expired": {
-    "type": "integer",
-    "description": "Expired"
-   },
-   "wrongVersion": {
-    "type": "string",
-    "description": "Wrong Version"
-   },
-   "rejected": {
-    "type": "integer",
-    "description": "Rejected"
-   },
-   "verificationFailed": {
-    "type": "integer",
-    "description": "Verification Failed"
-   },
-   "participantMismatch": {
-    "type": "string",
-    "description": "Participant Mismatch"
-   },
-   "requiredCorrection": {
-    "type": "string",
-    "description": "Required Correction"
-   },
-   "participant": {
-    "type": "string",
-    "description": "Participant"
-   },
-   "booking": {
-    "type": "string",
-    "description": "Booking"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "visitTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Visit Time"
-   },
-   "waiver": {
-    "type": "string",
-    "description": "Waiver"
-   },
-   "problem": {
-    "type": "string",
-    "description": "Problem"
-   },
-   "timeRemaining": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Time Remaining"
-   },
-   "accessImpact": {
-    "type": "string",
-    "description": "Access Impact"
-   },
-   "owner": {
-    "type": "string",
-    "description": "Owner"
-   },
-   "status": {
-    "type": "integer",
-    "description": "Status"
-   },
-   "eventProximity": {
-    "type": "string",
-    "description": "Event proximity"
-   },
-   "mandatoryWaiver": {
-    "type": "string",
-    "description": "Mandatory waiver"
-   },
-   "accessBlocking": {
-    "type": "string",
-    "description": "Access blocking"
-   },
-   "minorGuardianIssue": {
-    "type": "string",
-    "description": "Minor/guardian issue"
-   },
-   "groupSize": {
-    "type": "string",
-    "description": "Group size"
-   },
-   "operationalImpact": {
-    "type": "string",
-    "description": "Operational impact"
-   },
-   "requestReSign": {
-    "type": "string",
-    "description": "Request Re-Sign"
-   },
-   "contactCustomer": {
-    "type": "string",
-    "description": "Contact Customer"
-   },
-   "contactGuardian": {
-    "type": "string",
-    "description": "Contact Guardian"
-   },
-   "requestVerification": {
-    "type": "string",
-    "description": "Request Verification"
-   },
-   "startExceptionWorkflow": {
-    "type": "string",
-    "description": "Start Exception Workflow"
-   }
-  }
- },
- "OnSiteWaiverExceptionHandlingView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What On-Site Waiver & Exception Handling displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "ticket": {
-    "type": "string",
-    "description": "Ticket"
-   },
-   "qr": {
-    "type": "string",
-    "description": "QR"
-   },
-   "booking": {
-    "type": "string",
-    "description": "Booking"
-   },
-   "customer": {
-    "type": "string",
-    "description": "Customer"
-   },
-   "participant": {
-    "type": "string",
-    "description": "Participant"
-   },
-   "group": {
-    "type": "string",
-    "description": "Group"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "displayQrForCustomer": {
-    "type": "string",
-    "description": "Display QR for Customer"
-   },
-   "completeOnKiosk": {
-    "type": "string",
-    "description": "Complete on Kiosk"
-   },
-   "completeOnStaffTablet": {
-    "type": "string",
-    "description": "Complete on Staff Tablet"
-   },
-   "contactGuardian": {
-    "type": "string",
-    "description": "Contact Guardian"
-   },
-   "reSignUpdatedWaiver": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Re-Sign Updated Waiver"
-   },
-   "requestSupervisorException": {
-    "type": "string",
-    "description": "Request Supervisor Exception"
-   },
-   "oneTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "One-Time"
-   },
-   "ticketSpecific": {
-    "type": "string",
-    "description": "Ticket-Specific"
-   },
-   "activitySpecific": {
-    "type": "string",
-    "description": "Activity-Specific"
-   },
-   "timeLimited": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Time-Limited"
-   },
-   "signatureEvidenceExists": {
-    "type": "string",
-    "description": "signature/evidence exists"
-   },
-   "waiverStatusVerified": {
-    "type": "string",
-    "description": "Waiver Status → Verified"
-   },
-   "accessControlReceivesUpdatedEligibility": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Access Control receives updated eligibility"
-   }
-  }
- },
- "ParticipantWaiverStatusTrackingView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Participant Waiver Status & Tracking displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "participant": {
-    "type": "string",
-    "description": "Participant"
-   },
-   "participantId": {
-    "type": "string",
-    "description": "Participant ID"
-   },
-   "customerPurchaser": {
-    "type": "string",
-    "description": "Customer/Purchaser"
-   },
-   "booking": {
-    "type": "string",
-    "description": "Booking"
-   },
-   "ticket": {
-    "type": "string",
-    "description": "Ticket"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "visitDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Visit Date"
-   },
-   "ageCategory": {
-    "type": "string",
-    "description": "Age Category"
-   },
-   "group": {
-    "type": "string",
-    "description": "Group"
-   },
-   "waiverRequirements": {
-    "type": "integer",
-    "description": "Waiver Requirements"
-   },
-   "completionStatus": {
-    "type": "integer",
-    "description": "Completion Status"
-   },
-   "requestCorrection": {
-    "type": "string",
-    "description": "Request Correction"
-   },
-   "recordException": {
-    "type": "string",
-    "description": "Record Exception"
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },
  "WaiverAnalyticsComplianceOperationalInsightsView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Waiver Analytics, Compliance & Operational Insights displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.waiver_requirement (new), marketing.waiver_requirement_event (new), marketing.form_submission, marketing.waiver_verification (new), marketing.waiver_exception (new), marketing.message_dispatch and access validation outcomes",
+  "description": "Waiver analytics for the filters given; aggregate only.",
+  "required": [
+   "waiversAssigned",
+   "completionRate",
+   "funnel"
+  ],
   "properties": {
    "waiversAssigned": {
-    "type": "string",
-    "description": "Waivers Assigned"
+    "type": "integer",
+    "minimum": 0
    },
    "completionRate": {
     "type": "number",
-    "description": "Completion Rate"
+    "minimum": 0,
+    "maximum": 1
    },
    "preArrivalCompletion": {
-    "type": "string",
-    "description": "Pre-Arrival Completion"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Requirements completed before the participant arrived."
    },
    "onSiteCompletion": {
-    "type": "string",
-    "description": "On-Site Completion"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Requirements completed on site (kiosk, POS, staff-assisted device, on-site QR)."
    },
-   "averageCompletionTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Average Completion Time"
+   "averageCompletionSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Mean time from opening the link to submitting."
    },
    "guardianCompletionRate": {
     "type": "number",
-    "description": "Guardian Completion Rate"
+    "minimum": 0,
+    "maximum": 1
    },
    "rejectionRate": {
     "type": "number",
-    "description": "Rejection Rate"
+    "minimum": 0,
+    "maximum": 1
    },
    "exceptionRate": {
     "type": "number",
-    "description": "Exception Rate"
+    "minimum": 0,
+    "maximum": 1
    },
    "accessBlocks": {
-    "type": "string",
-    "description": "Access Blocks"
-   },
-   "reminderEffectiveness": {
-    "type": "string",
-    "description": "Reminder Effectiveness"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Access attempts refused with `waiverRequired`."
    },
    "checkInDelays": {
-    "type": "string",
-    "description": "Check-in delays"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Check-ins held while a waiver was completed or resolved on site."
    },
    "staffInterventions": {
-    "type": "string",
-    "description": "Staff interventions"
-   },
-   "onSiteCompletions": {
-    "type": "string",
-    "description": "On-site completions"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Staff actions taken on requirements (sends, corrections, verifications, exceptions)."
    },
    "exceptions": {
-    "type": "string",
-    "description": "Exceptions"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Exceptions approved."
+   },
+   "reminderEffectiveness": {
+    "type": "array",
+    "description": "Completion after each reminder, by how long before the activity it was sent.",
+    "items": {
+     "type": "object",
+     "required": [
+      "hoursBeforeActivity",
+      "sent",
+      "completedAfter"
+     ],
+     "properties": {
+      "hoursBeforeActivity": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "sent": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "completedAfter": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "completionRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      }
+     }
+    }
+   },
+   "funnel": {
+    "type": "array",
+    "description": "In funnel order.",
+    "items": {
+     "type": "object",
+     "required": [
+      "stage",
+      "count"
+     ],
+     "properties": {
+      "stage": {
+       "type": "string",
+       "enum": [
+        "assigned",
+        "sent",
+        "delivered",
+        "opened",
+        "started",
+        "signed",
+        "verified"
+       ]
+      },
+      "count": {
+       "type": "integer",
+       "minimum": 0
+      }
+     }
+    }
+   },
+   "abandonment": {
+    "type": "array",
+    "maxItems": 50,
+    "description": "Where people leave the form, highest abandonment first.",
+    "items": {
+     "type": "object",
+     "required": [
+      "formId",
+      "formVersion",
+      "section",
+      "abandonmentRate"
+     ],
+     "properties": {
+      "formId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "formVersion": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "section": {
+       "type": "string",
+       "description": "The section or field key where the session ended."
+      },
+      "deviceClass": {
+       "type": "string",
+       "enum": [
+        "mobile",
+        "desktop",
+        "tablet",
+        "kiosk"
+       ]
+      },
+      "abandoned": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "abandonmentRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      }
+     }
+    }
+   },
+   "insights": {
+    "type": "array",
+    "maxItems": 20,
+    "description": "Advisory findings.",
+    "items": {
+     "type": "object",
+     "required": [
+      "message"
+     ],
+     "properties": {
+      "message": {
+       "type": "string",
+       "maxLength": 500
+      }
+     }
+    }
    }
   }
  },
  "WaiverOperationsCommandCenterView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Waiver Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.waiver_requirement (new), marketing.form_definition, marketing.form_submission, marketing.waiver_signature, marketing.waiver_verification (new), marketing.waiver_exception (new), orders.order_line, orders.group_booking and catalogue.performance",
+  "description": "Waiver readiness for the filters given. Counts are of participant waiver requirements for activities in the window unless the name says otherwise.",
+  "required": [
+   "waiversRequired",
+   "completed",
+   "pending",
+   "completionRate",
+   "byPeriod",
+   "breakdown",
+   "upcomingActivities"
+  ],
   "properties": {
    "waiversRequired": {
-    "type": "boolean",
-    "description": "Waivers Required"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Requirements assigned, excluding `superseded`."
    },
    "completed": {
-    "type": "string",
-    "description": "Completed"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Requirements `completed` or `verified`."
    },
    "pending": {
     "type": "integer",
-    "description": "Pending"
+    "minimum": 0,
+    "description": "Requirements `assigned`, `sent` or `opened`, not yet started."
    },
    "partiallyCompleted": {
-    "type": "string",
-    "description": "Partially Completed"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Requirements `inProgress`, and participants with some but not all waivers complete."
    },
    "expiring": {
-    "type": "string",
-    "description": "Expiring"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Completed requirements whose acceptance (`FormSubmission.expiresAt`) ends before the activity starts."
    },
    "invalid": {
-    "type": "string",
-    "description": "Invalid"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Requirements `expired`, or completed against a superseded version."
    },
    "rejected": {
     "type": "integer",
-    "description": "Rejected"
+    "minimum": 0
    },
    "guardianConsentPending": {
     "type": "integer",
-    "description": "Guardian Consent Pending"
+    "minimum": 0,
+    "description": "Minor participants whose guardian has not yet signed."
    },
    "upcomingParticipantsMissingWaiver": {
-    "type": "string",
-    "description": "Upcoming Participants Missing Waiver"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Participants with at least one mandatory requirement not complete."
    },
    "accessBlocked": {
-    "type": "string",
-    "description": "Access Blocked"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Participants whose ticket download, activation, check-in or access is currently blocked by a waiver."
    },
    "manualExceptions": {
     "type": "integer",
-    "description": "Manual Exceptions"
+    "minimum": 0,
+    "description": "Approved exceptions (`setWaiverException`) in force."
    },
    "completionRate": {
     "type": "number",
-    "description": "Completion Rate"
+    "minimum": 0,
+    "maximum": 1,
+    "description": "`completed` / `waiversRequired`."
    },
-   "today": {
-    "type": "string",
-    "description": "Today"
+   "byPeriod": {
+    "type": "array",
+    "description": "Today, tomorrow and this week, in that order, whatever the window.",
+    "items": {
+     "type": "object",
+     "required": [
+      "period",
+      "waiversRequired",
+      "completed",
+      "missing"
+     ],
+     "properties": {
+      "period": {
+       "type": "string",
+       "enum": [
+        "today",
+        "tomorrow",
+        "thisWeek"
+       ]
+      },
+      "waiversRequired": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "completed": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "missing": {
+       "type": "integer",
+       "minimum": 0
+      }
+     }
+    }
    },
-   "tomorrow": {
-    "type": "string",
-    "description": "Tomorrow"
+   "breakdown": {
+    "type": "array",
+    "maxItems": 100,
+    "description": "One entry per value of `breakdownBy`, lowest completion first.",
+    "items": {
+     "type": "object",
+     "required": [
+      "key",
+      "label",
+      "waiversRequired",
+      "completed",
+      "completionRate"
+     ],
+     "properties": {
+      "key": {
+       "type": "string",
+       "description": "The id of the venue, event, product, performance, group booking, booking or waiver form."
+      },
+      "label": {
+       "type": "string"
+      },
+      "waiversRequired": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "completed": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "missing": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "completionRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      }
+     }
+    }
    },
-   "thisWeek": {
-    "type": "string",
-    "description": "This Week"
+   "upcomingActivities": {
+    "type": "array",
+    "maxItems": 100,
+    "description": "Performances in the window, most at risk first, then by `dateTime`.",
+    "items": {
+     "type": "object",
+     "required": [
+      "performanceId",
+      "eventActivity",
+      "dateTime",
+      "participants",
+      "waiversRequired",
+      "completed",
+      "missing",
+      "completion",
+      "operationalRisk"
+     ],
+     "properties": {
+      "performanceId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "eventId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "eventActivity": {
+       "type": "string",
+       "description": "The event or activity name."
+      },
+      "venueId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "venue": {
+       "type": "string",
+       "description": "The venue name."
+      },
+      "dateTime": {
+       "type": "string",
+       "format": "date-time",
+       "description": "When the performance starts."
+      },
+      "participants": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "waiversRequired": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "completed": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "missing": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "completion": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1,
+       "description": "The performance's waiver readiness (the pack's Readiness Score)."
+      },
+      "guardianPending": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "exceptions": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "admissionAtRisk": {
+       "type": "boolean",
+       "description": "At least one missing requirement is configured to block check-in or access."
+      },
+      "operationalRisk": {
+       "type": "string",
+       "enum": [
+        "ready",
+        "attention",
+        "critical"
+       ],
+       "description": "`critical` when a missing requirement would block admission; `attention` when anything is missing; otherwise `ready`."
+      }
+     }
+    }
    },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "activity": {
-    "type": "string",
-    "description": "Activity"
-   },
-   "group": {
-    "type": "string",
-    "description": "Group"
-   },
-   "booking": {
-    "type": "string",
-    "description": "Booking"
-   },
-   "waiverType": {
-    "type": "string",
-    "description": "Waiver Type"
-   },
-   "eventActivity": {
-    "type": "string",
-    "description": "Event/Activity"
-   },
-   "dateTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date/Time"
-   },
-   "participants": {
-    "type": "integer",
-    "description": "Participants"
-   },
-   "missing": {
-    "type": "string",
-    "description": "Missing"
-   },
-   "completion": {
-    "type": "number",
-    "description": "Completion %"
-   },
-   "guardianPending": {
-    "type": "integer",
-    "description": "Guardian Pending"
-   },
-   "exceptions": {
-    "type": "integer",
-    "description": "Exceptions"
-   },
-   "operationalRisk": {
-    "type": "string",
-    "description": "Operational Risk"
-   },
-   "sEG": {
-    "type": "string",
-    "description": "s e g"
-   },
-   "youthAttentio": {
-    "type": "string",
-    "description": "Youth Attentio (the pack shows 180 174 6)"
+   "insights": {
+    "type": "array",
+    "maxItems": 20,
+    "description": "Advisory predictions, e.g. participants unlikely to complete before arrival without another reminder. Never change a status.",
+    "items": {
+     "type": "object",
+     "required": [
+      "message"
+     ],
+     "properties": {
+      "performanceId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "predictedIncomplete": {
+       "type": "integer",
+       "minimum": 0,
+       "nullable": true
+      },
+      "message": {
+       "type": "string",
+       "maxLength": 500
+      }
+     }
+    }
    }
   }
  },
  "WaiverVerificationValidationWorkspaceInput": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
-  "description": "**What Waiver Verification & Validation Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "x-ticvai-persistence": "marketing.waiver_verification",
+  "description": "A reviewer's decision on one waiver submission. The automatic checks are the server's and are not sent; the reviewer records the checks only a person can make.",
+  "required": [
+   "submissionId",
+   "result"
+  ],
   "properties": {
-   "requiredFieldsComplete": {
+   "id": {
     "type": "string",
-    "description": "Required Fields Complete"
+    "format": "uuid",
+    "readOnly": true
    },
-   "requiredQuestionsAnswered": {
+   "submissionId": {
     "type": "string",
-    "description": "Required Questions Answered"
+    "format": "uuid",
+    "description": "The `FormSubmission` reviewed; the natural key."
    },
-   "requiredAcknowledgementsAccepted": {
+   "result": {
     "type": "string",
-    "description": "Required Acknowledgements Accepted"
-   },
-   "signaturePresent": {
-    "type": "string",
-    "description": "Signature Present"
-   },
-   "guardianRelationshipPresent": {
-    "type": "string",
-    "description": "Guardian Relationship Present"
-   },
-   "correctWaiverVersion": {
-    "type": "string",
-    "description": "Correct Waiver Version"
+    "enum": [
+     "verified",
+     "rejected",
+     "correctionRequired",
+     "escalated"
+    ]
    },
    "participantMatch": {
-    "type": "string",
-    "description": "Participant Match"
+    "type": "boolean",
+    "nullable": true,
+    "description": "The reviewer confirmed the signed participant is the booked participant."
    },
    "bookingMatch": {
-    "type": "string",
-    "description": "Booking Match"
+    "type": "boolean",
+    "nullable": true
    },
-   "effectiveDateValid": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Effective Date Valid"
+   "guardianRelationshipPresent": {
+    "type": "boolean",
+    "nullable": true,
+    "description": "The reviewer confirmed the signatory's guardianship under the configured policy."
    },
    "requiredEvidencePresent": {
-    "type": "string",
-    "description": "Required Evidence Present"
+    "type": "boolean",
+    "nullable": true,
+    "description": "Any supporting document the form requires was seen."
    },
-   "requestCorrection": {
+   "reasonCode": {
     "type": "string",
-    "description": "Request Correction"
+    "nullable": true,
+    "enum": [
+     "signatoryNotAuthorised",
+     "participantMismatch",
+     "wrongVersion",
+     "incompleteAnswers",
+     "evidenceMissing",
+     "suspectedFraud",
+     "other"
+    ]
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 2000,
+    "nullable": true,
+    "description": "Required for `rejected`, `correctionRequired`, `escalated`, and for changing an earlier decision."
+   },
+   "escalatedTo": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The staff member the review is escalated to; required for `escalated`."
+   },
+   "reviewedBy": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "reviewedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
  "WaiverVerificationValidationWorkspaceView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Waiver Verification & Validation Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.form_submission, marketing.waiver_signature, marketing.form_definition, marketing.waiver_verification (new) and marketing.waiver_requirement (new); names from pii.subject",
+  "description": "One waiver submission in the verification queue, with its automatic checks, the reviewer's findings and any anomalies flagged.",
+  "required": [
+   "submissionId",
+   "participant",
+   "waiver",
+   "version",
+   "submitted",
+   "status",
+   "checks"
+  ],
   "properties": {
    "submissionId": {
     "type": "string",
-    "description": "Submission ID"
+    "format": "uuid"
+   },
+   "requirementId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
    },
    "participant": {
-    "type": "string",
-    "description": "Participant"
+    "type": "object",
+    "properties": {
+     "subjectId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "name": {
+      "type": "string"
+     },
+     "age": {
+      "type": "integer",
+      "minimum": 0,
+      "nullable": true
+     }
+    }
    },
    "waiver": {
-    "type": "string",
-    "description": "Waiver"
+    "type": "object",
+    "properties": {
+     "formId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "name": {
+      "type": "string"
+     }
+    }
    },
    "version": {
-    "type": "string",
-    "description": "Version"
+    "type": "integer",
+    "minimum": 1,
+    "description": "The form version signed."
    },
    "booking": {
     "type": "string",
-    "description": "Booking"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
    },
    "signatory": {
-    "type": "string",
-    "description": "Signatory"
+    "type": "object",
+    "properties": {
+     "subjectId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "name": {
+      "type": "string"
+     },
+     "signatoryType": {
+      "type": "string",
+      "enum": [
+       "participant",
+       "guardian",
+       "organisationRepresentative"
+      ]
+     }
+    }
    },
    "submitted": {
     "type": "string",
-    "description": "Submitted"
+    "format": "date-time",
+    "description": "`FormSubmission.submittedAt`, the device time of signing."
    },
    "verificationReason": {
     "type": "string",
-    "description": "Verification Reason"
+    "enum": [
+     "configuredManualReview",
+     "automaticCheckFailed",
+     "minorSignedAsAdult",
+     "guardianDiscrepancy",
+     "participantMismatch",
+     "evidenceRequired",
+     "aiAnomaly",
+     "sampleReview"
+    ]
    },
    "risk": {
     "type": "string",
-    "description": "Risk"
+    "enum": [
+     "low",
+     "medium",
+     "high"
+    ]
    },
    "status": {
-    "type": "integer",
-    "description": "Status"
-   },
-   "requiredFieldsComplete": {
     "type": "string",
-    "description": "Required Fields Complete"
+    "enum": [
+     "automaticallyValidated",
+     "pendingManualVerification",
+     "verified",
+     "correctionRequired",
+     "rejected",
+     "escalated"
+    ]
    },
-   "requiredQuestionsAnswered": {
+   "checks": {
+    "type": "object",
+    "description": "Each check the form's configuration applies; null when it does not apply. The first seven are evaluated by the server, the last three recorded by the reviewer.",
+    "properties": {
+     "requiredFieldsComplete": {
+      "type": "boolean",
+      "nullable": true
+     },
+     "requiredQuestionsAnswered": {
+      "type": "boolean",
+      "nullable": true
+     },
+     "requiredAcknowledgementsAccepted": {
+      "type": "boolean",
+      "nullable": true
+     },
+     "signaturePresent": {
+      "type": "boolean",
+      "nullable": true
+     },
+     "correctWaiverVersion": {
+      "type": "boolean",
+      "nullable": true
+     },
+     "effectiveDateValid": {
+      "type": "boolean",
+      "nullable": true,
+      "description": "The version signed was in effect at signing and the acceptance covers the visit."
+     },
+     "guardianRelationshipPresent": {
+      "type": "boolean",
+      "nullable": true,
+      "description": "Evaluated from `GuestRelationship` where recorded, otherwise the reviewer's."
+     },
+     "participantMatch": {
+      "type": "boolean",
+      "nullable": true
+     },
+     "bookingMatch": {
+      "type": "boolean",
+      "nullable": true
+     },
+     "requiredEvidencePresent": {
+      "type": "boolean",
+      "nullable": true
+     }
+    }
+   },
+   "anomalies": {
+    "type": "array",
+    "description": "Advisory flags for the reviewer; never a decision.",
+    "items": {
+     "type": "object",
+     "required": [
+      "code",
+      "message"
+     ],
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "minorSignedAsAdult",
+        "guardianSurnameDiffers",
+        "signatoryIsMinor",
+        "signedAfterActivity",
+        "duplicateSubmission",
+        "other"
+       ]
+      },
+      "message": {
+       "type": "string",
+       "maxLength": 500
+      },
+      "source": {
+       "type": "string",
+       "enum": [
+        "rule",
+        "ai"
+       ]
+      }
+     }
+    }
+   },
+   "reviewedBy": {
     "type": "string",
-    "description": "Required Questions Answered"
+    "format": "uuid",
+    "nullable": true
    },
-   "requiredAcknowledgementsAccepted": {
-    "type": "string",
-    "description": "Required Acknowledgements Accepted"
-   },
-   "signaturePresent": {
-    "type": "string",
-    "description": "Signature Present"
-   },
-   "guardianRelationshipPresent": {
-    "type": "string",
-    "description": "Guardian Relationship Present"
-   },
-   "correctWaiverVersion": {
-    "type": "string",
-    "description": "Correct Waiver Version"
-   },
-   "participantMatch": {
-    "type": "string",
-    "description": "Participant Match"
-   },
-   "bookingMatch": {
-    "type": "string",
-    "description": "Booking Match"
-   },
-   "effectiveDateValid": {
+   "reviewedAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Effective Date Valid"
+    "nullable": true
    },
-   "requiredEvidencePresent": {
+   "note": {
     "type": "string",
-    "description": "Required Evidence Present"
-   },
-   "requestCorrection": {
-    "type": "string",
-    "description": "Request Correction"
+    "nullable": true
    }
   }
  }

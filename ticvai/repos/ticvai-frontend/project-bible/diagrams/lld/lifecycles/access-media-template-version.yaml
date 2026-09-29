@@ -1,0 +1,55 @@
+id: LLD-AccessMediaTemplateVersion
+title: AccessMediaTemplateVersion — 6 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/access-media-template-version.yaml
+entity: AccessMediaTemplateVersion
+contract: access
+enum: AccessMediaTemplateVersion.status
+enumKind: inline
+enumSchema: AccessMediaTemplateVersion
+enumProperty: status
+owner: access
+description: One frozen version of a media template, with its rollout scope, publish mode, schedule
+  and the checks run (declared 29 September, writers pass). `approveMultiMediaPreview` writes it `pendingApproval`;
+  the approvals engine decides it; a scheduled version is published by a timer; a newer published version
+  supersedes it. **Publishing never rewrites credentials already issued.**
+initial:
+- pendingApproval
+terminal:
+- superseded
+- rejected
+transitions:
+- from: pendingApproval
+  to: published
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Granted, with `publishMode` `publishNow`
+  requiresApproval: true
+- from: pendingApproval
+  to: scheduled
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Granted, with `publishMode` `schedule`
+  requiresApproval: true
+- from: pendingApproval
+  to: rejected
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Rejected, with a reason
+- from: scheduled
+  to: published
+  trigger: timer
+  guard: '`scheduledAt` has come'
+- from: published
+  to: superseded
+  trigger: cascade
+  guard: A newer version of the same template was published for an overlapping rollout scope
+- from: scheduled
+  to: superseded
+  trigger: cascade
+  guard: A newer version of the same template was published before this one's `scheduledAt`
+openQuestions: null
+notes: '**Created by `approveMultiMediaPreview` only**, which names the template and its `templateVersion`.
+  A version is immutable: a correction is a new version, which is why `superseded` and `rejected` are
+  terminal and `published` is not.'

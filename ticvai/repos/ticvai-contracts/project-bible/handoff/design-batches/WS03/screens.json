@@ -39,10 +39,7 @@
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-164 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-165",
@@ -116,37 +113,37 @@
        "kind": "metricTile",
        "label": "Active Digital Credentials",
        "provenance": "pack Access Control Module_Reference.pdf, page 29 §KPI Cards",
-       "bindsTo": "DigitalCredentialSecurityCommandCenterView.activeDigitalCredentials"
+       "bindsTo": "DigitalCredentialSecurityCommandCenterViewSummary.activeDigitalCredentials"
       },
       {
        "kind": "metricTile",
        "label": "Dynamic QR Enabled",
        "provenance": "pack Access Control Module_Reference.pdf, page 29 §KPI Cards",
-       "bindsTo": "DigitalCredentialSecurityCommandCenterView.dynamicQrEnabled"
+       "bindsTo": "DigitalCredentialSecurityCommandCenterViewSummary.dynamicQrEnabled"
       },
       {
        "kind": "metricTile",
        "label": "Device-Bound Credentials",
        "provenance": "pack Access Control Module_Reference.pdf, page 29 §KPI Cards",
-       "bindsTo": "DigitalCredentialSecurityCommandCenterView.deviceBoundCredentials"
+       "bindsTo": "DigitalCredentialSecurityCommandCenterViewSummary.deviceBoundCredentials"
       },
       {
        "kind": "metricTile",
        "label": "Location-Protected Credentials",
        "provenance": "pack Access Control Module_Reference.pdf, page 29 §KPI Cards",
-       "bindsTo": "DigitalCredentialSecurityCommandCenterView.locationProtectedCredentials"
+       "bindsTo": "DigitalCredentialSecurityCommandCenterViewSummary.locationProtectedCredentials"
       },
       {
        "kind": "metricTile",
        "label": "Offline-Ready Credentials",
        "provenance": "pack Access Control Module_Reference.pdf, page 29 §KPI Cards",
-       "bindsTo": "DigitalCredentialSecurityCommandCenterView.offlineReadyCredentials"
+       "bindsTo": "DigitalCredentialSecurityCommandCenterViewSummary.offlineReadyCredentials"
       },
       {
        "kind": "metricTile",
        "label": "Credentials Revoked Today",
        "provenance": "pack Access Control Module_Reference.pdf, page 29 §KPI Cards",
-       "bindsTo": "DigitalCredentialSecurityCommandCenterView.credentialsRevokedToday"
+       "bindsTo": "DigitalCredentialSecurityCommandCenterViewSummary.credentialsRevokedToday"
       },
       {
        "kind": "metricTile",
@@ -157,13 +154,13 @@
        "kind": "metricTile",
        "label": "Security Alerts",
        "provenance": "pack Access Control Module_Reference.pdf, page 29 §KPI Cards",
-       "bindsTo": "DigitalCredentialSecurityCommandCenterView.securityAlerts"
+       "bindsTo": "DigitalCredentialSecurityCommandCenterViewSummary.securityAlerts"
       },
       {
        "kind": "metricTile",
        "label": "Suspicious Sessions",
        "provenance": "pack Access Control Module_Reference.pdf, page 29 §KPI Cards",
-       "bindsTo": "DigitalCredentialSecurityCommandCenterView.suspiciousSessions"
+       "bindsTo": "DigitalCredentialSecurityCommandCenterViewSummary.suspiciousSessions"
       }
      ]
     },
@@ -175,13 +172,7 @@
        "kind": "dataTable",
        "label": "Every digital credential security",
        "columns": [
-        "DigitalCredentialSecurityCommandCenterView.dynamicQrTickets",
-        "DigitalCredentialSecurityCommandCenterView.membershipCredentials",
-        "DigitalCredentialSecurityCommandCenterView.annualPasses",
-        "DigitalCredentialSecurityCommandCenterView.mobileWalletCredentials",
-        "DigitalCredentialSecurityCommandCenterView.loyaltyCredentials",
-        "DigitalCredentialSecurityCommandCenterView.digitalPasses",
-        "DigitalCredentialSecurityCommandCenterView.eventCredentials"
+        "DigitalCredentialSecurityCommandCenterView.credentialType"
        ],
        "bindsTo": "DigitalCredentialSecurityCommandCenterView",
        "operation": "listDigitalCredentialSecurity",
@@ -198,13 +189,7 @@
        "label": "The selected digital credential security",
        "bindsTo": "DigitalCredentialSecurityCommandCenterView",
        "columns": [
-        "DigitalCredentialSecurityCommandCenterView.dynamicQrTickets",
-        "DigitalCredentialSecurityCommandCenterView.membershipCredentials",
-        "DigitalCredentialSecurityCommandCenterView.annualPasses",
-        "DigitalCredentialSecurityCommandCenterView.mobileWalletCredentials",
-        "DigitalCredentialSecurityCommandCenterView.loyaltyCredentials",
-        "DigitalCredentialSecurityCommandCenterView.digitalPasses",
-        "DigitalCredentialSecurityCommandCenterView.eventCredentials"
+        "DigitalCredentialSecurityCommandCenterView.credentialType"
        ],
        "notes": "The pack groups this record's detail under its own headings: “For each credential profile”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 29 §Show"
@@ -226,22 +211,35 @@
     "contract": "access",
     "purpose": "Digital Credential Security Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCredentialSecurity",
+    "contract": "access",
+    "purpose": "Credential Security Simulation, Audit & Publication",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setDynamicSecurityProfile",
+    "contract": "access",
+    "purpose": "Create or change a dynamic QR security profile from the command centre",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listDigitalCredentialSecurity",
+     "listCredentialSecurity"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "DigitalCredentialSecurityCommandCenterView.dynamicQrTickets",
-    "DigitalCredentialSecurityCommandCenterView.membershipCredentials",
-    "DigitalCredentialSecurityCommandCenterView.annualPasses",
-    "DigitalCredentialSecurityCommandCenterView.mobileWalletCredentials",
-    "DigitalCredentialSecurityCommandCenterView.loyaltyCredentials",
-    "DigitalCredentialSecurityCommandCenterView.digitalPasses"
+    "DigitalCredentialSecurityCommandCenterView.credentialType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-164"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-164",
+   "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-164"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 29. 15 of 15 labels bound to a contract property; 16 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -304,10 +302,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can create reusable dynamic-QR security profiles without configuring individual tickets manually.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Options; Configuration may include) and no display directory — it is settings, not a population",
   "purpose": "Configure how a dynamic QR is generated and protected. The matrix requires a unique QR per issued ticket/pass and periodic QR refresh to reduce screenshot and duplication fraud.",
-  "purposeNote": "Administrators can create reusable dynamic-QR security profiles without configuring individual tickets manually.",
   "layout": {
    "template": "form",
    "regions": [
@@ -406,16 +404,14 @@
     "operationId": "setDynamicSecurityProfile",
     "contract": "access",
     "purpose": "Dynamic QR Security Profile Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setDynamicSecurityProfile"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-165"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-165",
+   "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-165"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 30. 0 of 0 labels bound to a contract property; 13 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -478,10 +474,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "The credential is only displayed in a usable form when its configured activation conditions are satisfied.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure when the guest is permitted to see/use the credential. The matrix specifies that after registration, a ticket may appear as a blurred QR and only become clear and usable near the park entrance.",
-  "purposeNote": "The credential is only displayed in a usable form when its configured activation conditions are satisfied.",
   "gaps": [
    {
     "operation": null,
@@ -507,6 +503,18 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save activation and display rule",
+       "operation": "setCredentialActivationDisplay",
+       "provenance": "contract access.yaml PUT /credential-activation-display (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -523,21 +531,24 @@
     "contract": "access",
     "purpose": "Credential Activation & Display Rules",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setCredentialActivationDisplay",
+    "contract": "access",
+    "purpose": "Save activation and display rule",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "preloaded": [
-    "CredentialActivationDisplayRulesView.hideQr",
-    "CredentialActivationDisplayRulesView.blurQr",
-    "CredentialActivationDisplayRulesView.showCountdown",
-    "CredentialActivationDisplayRulesView.showAvailableAtVenue",
-    "CredentialActivationDisplayRulesView.showVenueDirections"
+    "CredentialActivationDisplayRulesView.beforeActivationDisplay"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-166"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-166",
+   "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-166"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 0 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -600,10 +611,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "A credential cannot be duplicated across unauthorized devices when device binding is enabled.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Prevent one credential from being shared across unauthorized devices. The source explicitly requires tickets to be linked to a specific device/user and suspicious patterns such as device sharing and multiple simultaneous sessions to be detected.",
-  "purposeNote": "A credential cannot be duplicated across unauthorized devices when device binding is enabled.",
   "layout": {
    "template": "split",
    "regions": [
@@ -683,7 +694,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-167"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-167",
+   "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-167"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 33. 7 of 8 labels bound to a contract property; 8 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -746,10 +758,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Digital credentials can automatically activate/deactivate according to configured physical-location context.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Map-Based Configuration; Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure location-aware credential activation. This is a major requirement under 3.1.9. The matrix requires BLE beacon proximity and geofence boundaries to activate/deactivate credentials at venue, attraction, zone and gate level.",
-  "purposeNote": "Digital credentials can automatically activate/deactivate according to configured physical-location context.",
   "layout": {
    "template": "form",
    "regions": [
@@ -805,8 +817,18 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
-       "provenance": "contract operation setBleBeaconGeofence"
+       "label": "Venue",
+       "provenance": "pack Access Control Module_Reference.pdf, page 34 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Attraction",
+       "provenance": "pack Access Control Module_Reference.pdf, page 34 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Zone",
+       "provenance": "pack Access Control Module_Reference.pdf, page 34 §Support"
       }
      ]
     }
@@ -823,18 +845,16 @@
     "operationId": "setBleBeaconGeofence",
     "contract": "access",
     "purpose": "BLE Beacon & Geofence Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setBleBeaconGeofence"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-168"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-168",
+   "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-168"
   },
-  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 34. 0 of 0 labels bound to a contract property; 8 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 34. 0 of 0 labels bound to a contract property; 11 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Venue, Attraction, Zone are choices sent by `setBleBeaconGeofence`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -895,10 +915,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Transferred tickets cannot remain simultaneously usable by both sender and recipient.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Securely manage digital-ticket transfers. The matrix requires tickets to be transferable through email/app, with the recipient required to authenticate before accessing and activating the transferred QR.",
-  "purposeNote": "Transferred tickets cannot remain simultaneously usable by both sender and recipient.",
   "layout": {
    "template": "form",
    "regions": [
@@ -972,7 +992,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-169"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-169",
+   "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-169"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 35. 0 of 0 labels bound to a contract property; 9 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1035,10 +1056,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "A revoked or replaced credential cannot remain valid within the access ecosystem beyond the configured synchronization/offline security policy.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Immediately invalidate credentials when the underlying ticket changes. Requirement 3.1.4 specifically requires dynamic QR invalidation after refunds, cancellations, transfers, exchanges, upgrades or reissues.",
-  "purposeNote": "A revoked or replaced credential cannot remain valid within the access ecosystem beyond the configured synchronization/offline security policy.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1050,11 +1071,7 @@
        "kind": "dataTable",
        "label": "Every credential revocation lifecycle",
        "columns": [
-        "CredentialRevocationLifecycleEventsView.centralPlatform",
-        "CredentialRevocationLifecycleEventsView.mobileApp",
-        "CredentialRevocationLifecycleEventsView.gateNetwork",
-        "CredentialRevocationLifecycleEventsView.offlineRevocationPackage",
-        "CredentialRevocationLifecycleEventsView.walletCredentialService"
+        "CredentialRevocationLifecycleEventsView.propagationTargets"
        ],
        "bindsTo": "CredentialRevocationLifecycleEventsView",
        "operation": "listCredentialRevocationLifecycle",
@@ -1071,11 +1088,7 @@
        "label": "The selected credential revocation lifecycle",
        "bindsTo": "CredentialRevocationLifecycleEventsView",
        "columns": [
-        "CredentialRevocationLifecycleEventsView.centralPlatform",
-        "CredentialRevocationLifecycleEventsView.mobileApp",
-        "CredentialRevocationLifecycleEventsView.gateNetwork",
-        "CredentialRevocationLifecycleEventsView.offlineRevocationPackage",
-        "CredentialRevocationLifecycleEventsView.walletCredentialService"
+        "CredentialRevocationLifecycleEventsView.propagationTargets"
        ],
        "notes": null,
        "provenance": "pack Access Control Module_Reference.pdf, page 36 §Show"
@@ -1101,17 +1114,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "CredentialRevocationLifecycleEventsView.centralPlatform",
-    "CredentialRevocationLifecycleEventsView.mobileApp",
-    "CredentialRevocationLifecycleEventsView.gateNetwork",
-    "CredentialRevocationLifecycleEventsView.offlineRevocationPackage",
-    "CredentialRevocationLifecycleEventsView.walletCredentialService"
+    "CredentialRevocationLifecycleEventsView.propagationTargets"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-170"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-170",
+   "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-170"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 36. 5 of 5 labels bound to a contract property; 14 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1174,10 +1184,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Supported credentials can be securely validated offline without exposing private signing secrets to gate devices.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Allow access devices to validate secure credentials without continuous backend connectivity. The matrix explicitly requires offline cryptographic validation and embedded entitlement validation without real-time backend connectivity.",
-  "purposeNote": "Supported credentials can be securely validated offline without exposing private signing secrets to gate devices.",
   "gaps": [
    {
     "operation": null,
@@ -1223,17 +1233,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "OfflineCryptographicValidationProfileView.credentialAuthenticity",
-    "OfflineCryptographicValidationProfileView.digitalSignature",
-    "OfflineCryptographicValidationProfileView.ticketId",
-    "OfflineCryptographicValidationProfileView.venue",
-    "OfflineCryptographicValidationProfileView.park"
+    "OfflineCryptographicValidationProfileView.offlineChecks"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-171"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-171",
+   "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-171"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 37. 0 of 0 labels bound to a contract property; 0 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1296,10 +1303,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can determine the minimum secure information required for reliable offline admission.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Determine what operational information can be securely carried by the credential for offline decisions. The matrix permits embedded information including ticket type, seat assignment, event ID, venue access rights, timeslot, reservations, locker assignments, membership entitlements, guest category and validity.",
-  "purposeNote": "Administrators can determine the minimum secure information required for reliable offline admission.",
   "gaps": [
    {
     "operation": null,
@@ -1352,16 +1359,14 @@
     "operationId": "setEmbeddedEntitlementPayload",
     "contract": "access",
     "purpose": "Embedded Entitlement Payload Designer",
-    "trigger": "onAction",
-    "invalidates": [
-     "setEmbeddedEntitlementPayload"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-172"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-172",
+   "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-172"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 38. 0 of 0 labels bound to a contract property; 0 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1416,10 +1421,10 @@
    "notes": "**Reached from BO-164, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Credential-security configurations can be tested, approved, deployed, audited and rolled back before affecting live access. Board 3 — Final 10-Screen Structure # Backend Screen Responsibility Digital Credential Security Command Overall credential-security configuration and 3.1",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Test the complete secure credential lifecycle before production deployment.",
-  "purposeNote": "Credential-security configurations can be tested, approved, deployed, audited and rolled back before affecting live access. Board 3 — Final 10-Screen Structure # Backend Screen Responsibility Digital Credential Security Command Overall credential-security configuration and 3.1",
   "layout": {
    "template": "split",
    "regions": [
@@ -1430,13 +1435,6 @@
       {
        "kind": "dataTable",
        "label": "Every credential security simulation",
-       "columns": [
-        "CredentialSecuritySimulationAuditPublicationView.signatureValid",
-        "CredentialSecuritySimulationAuditPublicationView.deviceValid",
-        "CredentialSecuritySimulationAuditPublicationView.venueValid",
-        "CredentialSecuritySimulationAuditPublicationView.entitlementValid",
-        "CredentialSecuritySimulationAuditPublicationView.qrFreshnessFailed"
-       ],
        "bindsTo": "CredentialSecuritySimulationAuditPublicationView",
        "operation": "listCredentialSecurity",
        "provenance": "pack Access Control Module_Reference.pdf, page 39 §Show"
@@ -1451,13 +1449,6 @@
        "kind": "detailPanel",
        "label": "The selected credential security simulation",
        "bindsTo": "CredentialSecuritySimulationAuditPublicationView",
-       "columns": [
-        "CredentialSecuritySimulationAuditPublicationView.signatureValid",
-        "CredentialSecuritySimulationAuditPublicationView.deviceValid",
-        "CredentialSecuritySimulationAuditPublicationView.venueValid",
-        "CredentialSecuritySimulationAuditPublicationView.entitlementValid",
-        "CredentialSecuritySimulationAuditPublicationView.qrFreshnessFailed"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “QR age”, “Every important event records”, “Center health”, “Board 3 workflow”, “There is a deliberate distinction”, “Media, Credential & Verification Methods”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 39 §Show"
       }
@@ -1478,21 +1469,22 @@
     "contract": "access",
     "purpose": "Credential Security Simulation, Audit & Publication",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCredentialSecurityOperational",
+    "contract": "access",
+    "purpose": "Credential Security, Audit & Operational Evidence",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
-   "preloaded": [
-    "CredentialSecuritySimulationAuditPublicationView.signatureValid",
-    "CredentialSecuritySimulationAuditPublicationView.deviceValid",
-    "CredentialSecuritySimulationAuditPublicationView.venueValid",
-    "CredentialSecuritySimulationAuditPublicationView.entitlementValid",
-    "CredentialSecuritySimulationAuditPublicationView.qrFreshnessFailed"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-173"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-173",
+   "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-173"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 39. 5 of 5 labels bound to a contract property; 6 of 72 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

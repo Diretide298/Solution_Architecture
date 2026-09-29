@@ -1,6 +1,6 @@
 # P08-orders-money-03 — P08 · Orders & Money (3 of 3)
 
-**9 screens · 55 operations · 51 schemas · 16 permissions**
+**7 screens · 41 operations · 32 schemas · 8 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 16 permissions apply here:
-  `ACCOUNT_CONFIGURE, LEDGER_APPROVE, LEDGER_POST, LEDGER_VIEW, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REPRINT, ORDER_RESCHEDULE, ORDER_VIEW, ORDER_VOID`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 8 permissions apply here:
+  `ACCOUNT_CONFIGURE, LEDGER_APPROVE, LEDGER_POST, LEDGER_VIEW, ORDER_VIEW, SETTLEMENT_VIEW, TAX_CONFIGURE, TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **13 of these operations work offline**: applyManualDiscount, createOrder, getOrder, getRefundPolicy, getVenueSettings, holdOrder, listFxRates, listOrderRefunds
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,14 +60,12 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-065` | Venue Configuration | listDetail | 5 | 0 | — |
-| `BO-070` | Work Orders | listDetail | 13 | 1 | — |
-| `BO-074` | Chart of Accounts | listDetail | 8 | 0 | — |
-| `BO-075` | Account Mapping | commandCentre | 7 | 0 | — |
-| `BO-076` | Revenue Recognition | listDetail | 4 | 0 | — |
-| `BO-077` | FX Rates & Variances | approvalInbox | 4 | 0 | — |
-| `BO-089` | Journal Entries | approvalInbox | 6 | 2 | — |
-| `BO-090` | Period Close | listDetail | 6 | 2 | — |
+| `BO-074` | Chart of Accounts | listDetail | 8 | 4 | — |
+| `BO-075` | Account Mapping | commandCentre | 8 | 4 | — |
+| `BO-076` | Revenue Recognition | listDetail | 5 | 2 | — |
+| `BO-077` | FX Rates & Variances | approvalInbox | 5 | 3 | — |
+| `BO-089` | Journal Entries | approvalInbox | 6 | 4 | — |
+| `BO-090` | Period Close | listDetail | 6 | 3 | — |
 | `BO-101` | Orders & Money | listDetail | 3 | 0 | — |
 
 ---
@@ -79,679 +76,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
 
 ```json
 [
- {
-  "id": "BO-065",
-  "name": "Venue Configuration",
-  "module": "Orders & Money",
-  "requiresModule": "ticketing",
-  "wave": 1,
-  "capability": "C00",
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/venue-operations/venue-configuration",
-   "component": "apps/venue-management-web/src/routes/venue-operations/VenueConfigurationDetail.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
-   ],
-   "inferred": true,
-   "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listDiningOutlets` reads the population and `getRefundPolicy` reads one of them — list, select, act",
-  "purpose": "Set the venue-level values everything inherits from.",
-  "gaps": [
-   {
-    "operation": "listDeliveryLocations",
-    "why": "**1 declared operation reach no component on this screen**: listDeliveryLocations. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every venue",
-       "bindsTo": "DiningOutlet",
-       "columns": [
-        "DiningOutlet.outletId",
-        "DiningOutlet.name",
-        "DiningOutlet.kind",
-        "DiningOutlet.zone",
-        "DiningOutlet.cuisine",
-        "DiningOutlet.isOpenNow",
-        "DiningOutlet.opensAt",
-        "DiningOutlet.closesAt",
-        "DiningOutlet.orderingMethod",
-        "DiningOutlet.estimatedWaitMinutes",
-        "DiningOutlet.imageAssetRef",
-        "DiningOutlet.menuId"
-       ],
-       "operation": "listDiningOutlets",
-       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected venue",
-       "bindsTo": "RefundPolicy",
-       "columns": [
-        "RefundPolicy.id",
-        "RefundPolicy.venueId",
-        "RefundPolicy.selfAuthoriseLimit",
-        "RefundPolicy.requiresSecondUserAbove",
-        "RefundPolicy.requiresApprovalAbove",
-        "RefundPolicy.timeBands",
-        "RefundPolicy.allowPartial",
-        "RefundPolicy.refundWindowDays",
-        "RefundPolicy.varianceThreshold"
-       ],
-       "operation": "getRefundPolicy",
-       "provenance": "contract orders.yaml GET /venues/{venueId}/refund-policy"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save changes",
-       "operation": "setRefundPolicy",
-       "provenance": "contract orders.yaml PUT /venues/{venueId}/refund-policy"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setVenueSettings",
-       "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listDiningOutlets",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setRefundPolicy",
-       "label": "Save refund policy",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setRefundPolicy",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The venue list.",
-   "error": "Could not load. Names which read failed and leaves the venue untouched.",
-   "emptyFirstRun": "No venue yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the venue are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getRefundPolicy",
-    "contract": "orders",
-    "purpose": "Read a venue's refund policy",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listDiningOutlets",
-    "contract": "fnb",
-    "purpose": "Where a guest can eat, right now",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setRefundPolicy",
-    "contract": "orders",
-    "purpose": "Set a venue's refund policy",
-    "trigger": "onAction",
-    "invalidates": [
-     "listDiningOutlets"
-    ]
-   },
-   {
-    "operationId": "listDeliveryLocations",
-    "contract": "fnb",
-    "purpose": "Where an order can be delivered",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setVenueSettings",
-    "contract": "tenancy",
-    "purpose": "Save the venue's configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "listDiningOutlets"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "venueId",
-     "from": "session"
-    }
-   ],
-   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
-   "preloaded": [
-    "RefundPolicy.id",
-    "RefundPolicy.venueId",
-    "RefundPolicy.selfAuthoriseLimit",
-    "RefundPolicy.requiresSecondUserAbove",
-    "RefundPolicy.requiresApprovalAbove"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-065"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-070",
-  "name": "Work Orders",
-  "module": "Orders & Money",
-  "requiresModule": "ticketing",
-  "wave": 2,
-  "capability": "C00",
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/venue-operations/work-orders",
-   "component": "apps/venue-management-web/src/routes/venue-operations/WorkOrdersDetail.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
-   ],
-   "inferred": true,
-   "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **createRefund removed 18 August** — attached by module resemblance, not by what this screen does. A screen that does not handle money should not be able to move it (CF-87's class).",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listOrders` reads the population and `getOrder` reads one of them — list, select, act",
-  "purpose": "Get something fixed, and know it was.",
-  "gaps": [
-   {
-    "operation": "getOrderStatement",
-    "why": "**2 declared operations reach no component on this screen**: getOrderStatement, listOrderRefunds. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every work orders",
-       "bindsTo": "OrderSummary",
-       "columns": [
-        "OrderSummary.id",
-        "OrderSummary.orderNumber",
-        "OrderSummary.status",
-        "OrderSummary.grossAmount",
-        "OrderSummary.refundedAmount",
-        "OrderSummary.channel",
-        "OrderSummary.lineCount"
-       ],
-       "operation": "listOrders",
-       "provenance": "contract orders.yaml GET /orders"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected work orders",
-       "bindsTo": "Order",
-       "columns": [
-        "Order.id",
-        "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
-        "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
-        "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount",
-        "Order.totalPriceVariance",
-        "Order.lines",
-        "Order.payments",
-        "Order.principalId"
-       ],
-       "operation": "getOrder",
-       "provenance": "contract orders.yaml GET /orders/{orderId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createOrder",
-       "provenance": "contract orders.yaml POST /orders"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Apply",
-       "operation": "applyManualDiscount",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Exchange",
-       "operation": "exchangeOrderLines",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Hold",
-       "operation": "holdOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Modify",
-       "operation": "modifyOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reprint",
-       "operation": "reprintOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reschedule",
-       "operation": "rescheduleOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Resume",
-       "operation": "resumeOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Void",
-       "operation": "voidOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listOrders",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createOrder",
-       "label": "Create order",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "voidOrder",
-       "label": "Void order",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createOrder",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmVoidOrder",
-    "component": "confirmDialog",
-    "trigger": "Void",
-    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A work orders this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
-   }
-  ],
-  "states": {
-   "loading": "The work orders list.",
-   "error": "Could not load. Names which read failed and leaves the work orders untouched.",
-   "emptyFirstRun": "No work orders yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the work orders are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listOrders",
-    "contract": "orders",
-    "purpose": "List orders",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getOrder",
-    "contract": "orders",
-    "purpose": "Read an order",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createOrder",
-    "contract": "orders",
-    "purpose": "Create an order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "applyManualDiscount",
-    "contract": "orders",
-    "purpose": "Apply a discount a cashier chose",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "exchangeOrderLines",
-    "contract": "orders",
-    "purpose": "Exchange lines for different products or dates",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "getOrderStatement",
-    "contract": "orders",
-    "purpose": "Full financial history of an order",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "holdOrder",
-    "contract": "orders",
-    "purpose": "Park a sale and free the till",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "listOrderRefunds",
-    "contract": "orders",
-    "purpose": "List refunds against an order",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "modifyOrder",
-    "contract": "orders",
-    "purpose": "Add or remove lines on an existing order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "reprintOrder",
-    "contract": "orders",
-    "purpose": "Reprint or resend tickets",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "rescheduleOrder",
-    "contract": "orders",
-    "purpose": "Move an order to another performance",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "resumeOrder",
-    "contract": "orders",
-    "purpose": "Bring a parked sale back to a till",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "voidOrder",
-    "contract": "orders",
-    "purpose": "Void an order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "orderId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
-   "preloaded": [
-    "Order.id",
-    "Order.orderNumber",
-    "Order.channel",
-    "Order.venueId",
-    "Order.scopePath"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-070"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
  {
   "id": "BO-074",
   "name": "Chart of Accounts",
@@ -767,7 +91,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-075",
     "BO-076",
     "BO-077"
@@ -781,22 +104,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "provenance": "flow F16 step 5→6, F98 step 2→3"
     },
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-077",
      "trigger": "FX Rates & Variances",
-     "carries": [
-      "varianceId"
-     ],
-     "provenance": "derived — BO-077 declares entryState.params varianceId, so an edge into it must carry them"
+     "provenance": "derived — BO-077 declares entryState.params varianceId and BO-074 holds none of them, so the edge carries nothing and BO-077 opens cold"
     }
    ],
    "entryFrom": [
@@ -808,13 +118,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listAccounts` reads the population and `getAccount` reads one of them — list, select, act",
   "purpose": "Accounts, cost centres and legal entities.",
-  "gaps": [
-   {
-    "operation": "listCostCenters",
-    "why": "**2 declared operations reach no component on this screen**: listCostCenters, listLegalEntities. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -823,8 +126,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Legal entity id",
+       "operation": "listAccounts",
+       "notes": "Sends `?legalEntityId=` to `listAccounts`.",
+       "provenance": "contract finance.yaml GET /accounts"
+      },
+      {
+       "kind": "textField",
+       "label": "Type",
+       "operation": "listAccounts",
+       "notes": "Sends `?type=` to `listAccounts`.",
+       "provenance": "contract finance.yaml GET /accounts"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is postable",
+       "operation": "listAccounts",
+       "notes": "Sends `?isPostable=` to `listAccounts`.",
+       "provenance": "contract finance.yaml GET /accounts"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every chart accounts",
+       "label": "Every account",
        "bindsTo": "Account",
        "columns": [
         "Account.id",
@@ -842,6 +166,41 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listAccounts",
        "provenance": "contract finance.yaml GET /accounts"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every cost center",
+       "bindsTo": "CostCenter",
+       "columns": [
+        "CostCenter.id",
+        "CostCenter.code",
+        "CostCenter.name",
+        "CostCenter.parentId",
+        "CostCenter.venueId",
+        "CostCenter.isActive"
+       ],
+       "operation": "listCostCenters",
+       "provenance": "contract finance.yaml GET /cost-centers"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every legal entity",
+       "bindsTo": "LegalEntity",
+       "columns": [
+        "LegalEntity.id",
+        "LegalEntity.code",
+        "LegalEntity.name",
+        "LegalEntity.countryCode",
+        "LegalEntity.currency",
+        "LegalEntity.currencyScale",
+        "LegalEntity.taxRegistrationNumber",
+        "LegalEntity.fiscalYearStartMonth",
+        "LegalEntity.regionIds",
+        "LegalEntity.isActive",
+        "LegalEntity.scopePath"
+       ],
+       "operation": "listLegalEntities",
+       "provenance": "contract finance.yaml GET /legal-entities"
       }
      ]
     },
@@ -851,7 +210,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected chart accounts",
+       "label": "The selected account",
        "bindsTo": "Account",
        "columns": [
         "Account.id",
@@ -881,25 +240,25 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create account",
        "operation": "createAccount",
        "provenance": "contract finance.yaml POST /accounts"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save account",
        "operation": "updateAccount",
        "provenance": "contract finance.yaml PATCH /accounts/{accountId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create cost center",
        "operation": "createCostCenter",
        "provenance": "contract finance.yaml POST /cost-centers"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create legal entity",
        "operation": "createLegalEntity",
        "provenance": "contract finance.yaml POST /legal-entities"
       }
@@ -910,9 +269,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The chart accounts list.",
    "error": "Could not load. Names which read failed and leaves the chart accounts untouched.",
-   "emptyFirstRun": "No chart accounts yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the chart accounts are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No chart accounts yet. Offers Create account (`createAccount`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on legalEntityId, type, isPostable and the chart accounts are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listAccounts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -925,7 +284,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getAccount",
     "contract": "finance",
     "purpose": "Read an account",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createAccount",
@@ -998,6 +357,108 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P08 Venue Management.dc.html#bo-074"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateAccount",
+    "component": "modal",
+    "trigger": "Create account",
+    "body": "**Collects what `createAccount` sends before it is called.** Required: `code`, `name`, `type`, `legalEntityId`. Optional: `externalCode`, `parentId`, `isPostable`, `isSuspense`, `subType`, `tags`, `notes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateAccountRequest",
+    "confirm": {
+     "label": "Create account",
+     "operation": "createAccount"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "type",
+      "legalEntityId",
+      "externalCode",
+      "parentId",
+      "isPostable",
+      "isSuspense",
+      "subType",
+      "tags",
+      "notes"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /accounts"
+   },
+   {
+    "id": "formUpdateAccount",
+    "component": "modal",
+    "trigger": "Save account",
+    "body": "**Collects what `updateAccount` sends before it is called.** Nothing in the body is required. Optional: `code`, `name`, `externalCode`, `isActive`, `isSuspense`, `subType`, `tags`, `notes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save account",
+     "operation": "updateAccount"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "externalCode",
+      "isActive",
+      "isSuspense",
+      "subType",
+      "tags",
+      "notes"
+     ]
+    },
+    "provenance": "contract finance.yaml PATCH /accounts/{accountId}"
+   },
+   {
+    "id": "formCreateCostCenter",
+    "component": "modal",
+    "trigger": "Create cost center",
+    "body": "**Collects what `createCostCenter` sends before it is called.** Required: `code`, `name`. Optional: `parentId`, `venueId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create cost center",
+     "operation": "createCostCenter"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "parentId",
+      "venueId"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /cost-centers"
+   },
+   {
+    "id": "formCreateLegalEntity",
+    "component": "modal",
+    "trigger": "Create legal entity",
+    "body": "**Collects what `createLegalEntity` sends before it is called.** Required: `id`, `code`, `name`, `countryCode`, `currency`, `currencyScale`, `fiscalYearStartMonth`. Optional: `taxRegistrationNumber`, `regionIds`, `isActive`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "LegalEntity",
+    "confirm": {
+     "label": "Create legal entity",
+     "operation": "createLegalEntity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "countryCode",
+      "currency",
+      "currencyScale",
+      "fiscalYearStartMonth",
+      "taxRegistrationNumber",
+      "regionIds",
+      "isActive",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /legal-entities"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1036,7 +497,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-074",
     "BO-076",
     "BO-077"
@@ -1050,30 +510,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "provenance": "flow F98 step 3→4"
     },
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-074",
      "trigger": "Chart of Accounts",
      "carries": [
       "accountId"
      ],
-     "provenance": "derived — BO-074 declares entryState.params accountId, so an edge into it must carry them"
+     "provenance": "derived — BO-074 declares entryState.params accountId and BO-075 holds accountId, so an edge into it carries them"
     },
     {
      "to": "BO-077",
      "trigger": "FX Rates & Variances",
-     "carries": [
-      "varianceId"
-     ],
-     "provenance": "derived — BO-077 declares entryState.params varianceId, so an edge into it must carry them"
+     "provenance": "derived — BO-077 declares entryState.params varianceId and BO-075 holds none of them, so the edge carries nothing and BO-077 opens cold"
     },
     {
      "to": "ADM-020",
@@ -1116,13 +563,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "TaxExemption",
        "operation": "listTaxExemptions",
        "provenance": "contract finance.yaml GET /tax-exemptions"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
+      },
       {
        "kind": "dataTable",
        "label": "Every account mapping",
@@ -1144,38 +585,44 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save account mappings",
        "operation": "setAccountMappings",
        "provenance": "contract finance.yaml PUT /account-mappings"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create tax code",
        "operation": "createTaxCode",
        "provenance": "contract finance.yaml POST /tax-codes"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save tax code",
        "operation": "updateTaxCode",
        "provenance": "contract finance.yaml PATCH /tax-codes/{taxCodeId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create tax exemption",
        "operation": "createTaxExemption",
        "provenance": "contract finance.yaml POST /tax-exemptions"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Verify tax exemption",
+       "operation": "verifyTaxExemption",
+       "provenance": "contract finance.yaml POST /tax-exemptions/{exemptionId}/verify (decided 29 September, VM close-out)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The account mapping list.",
+   "loading": "The account mapping figures; each tile loads on its own.",
    "error": "Could not load. Names which read failed and leaves the account mapping untouched.",
-   "emptyFirstRun": "No account mapping yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the account mapping are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No account mapping yet. Offers Create tax code (`createTaxCode`).",
+   "emptyNoResults": "Never shown: `listAccountMappings` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listAccountMappings` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1231,6 +678,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listAccountMappings"
     ]
+   },
+   {
+    "operationId": "verifyTaxExemption",
+    "contract": "finance",
+    "purpose": "Verify tax exemption",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1238,6 +691,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "taxCodeId",
      "from": "deepLink"
+    },
+    {
+     "name": "exemptionId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `taxCodeId`."
@@ -1248,6 +705,95 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P08 Venue Management.dc.html#bo-075"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetAccountMappings",
+    "component": "modal",
+    "trigger": "Save account mappings",
+    "body": "**Collects what `setAccountMappings` sends before it is called.** Required: `mappings`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save account mappings",
+     "operation": "setAccountMappings"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "mappings"
+     ]
+    },
+    "provenance": "contract finance.yaml PUT /account-mappings"
+   },
+   {
+    "id": "formCreateTaxCode",
+    "component": "modal",
+    "trigger": "Create tax code",
+    "body": "**Collects what `createTaxCode` sends before it is called.** Required: `code`, `name`, `countryCode`, `rate`, `accountId`, `effectiveFrom`. Optional: `compoundOnTaxCodeId`, `isInclusive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateTaxCodeRequest",
+    "confirm": {
+     "label": "Create tax code",
+     "operation": "createTaxCode"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "countryCode",
+      "rate",
+      "accountId",
+      "effectiveFrom",
+      "compoundOnTaxCodeId",
+      "isInclusive"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /tax-codes"
+   },
+   {
+    "id": "formUpdateTaxCode",
+    "component": "modal",
+    "trigger": "Save tax code",
+    "body": "**Collects what `updateTaxCode` sends before it is called.** Nothing in the body is required. Optional: `name`, `rate`, `effectiveFrom`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save tax code",
+     "operation": "updateTaxCode"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "rate",
+      "effectiveFrom",
+      "isActive"
+     ]
+    },
+    "provenance": "contract finance.yaml PATCH /tax-codes/{taxCodeId}"
+   },
+   {
+    "id": "formCreateTaxExemption",
+    "component": "modal",
+    "trigger": "Create tax exemption",
+    "body": "**Collects what `createTaxExemption` sends before it is called.** Required: `id`, `scope`, `taxCodeId`, `reason`. Optional: `scopeRef`, `certificateReference`, `validFrom`, `validTo`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "TaxExemption",
+    "confirm": {
+     "label": "Create tax exemption",
+     "operation": "createTaxExemption"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scope",
+      "taxCodeId",
+      "reason",
+      "scopeRef",
+      "certificateReference",
+      "validFrom",
+      "validTo"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /tax-exemptions"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1286,7 +832,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-074",
     "BO-075",
     "BO-077"
@@ -1294,38 +839,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-074",
      "trigger": "Chart of Accounts",
-     "carries": [
-      "accountId"
-     ],
-     "provenance": "derived — BO-074 declares entryState.params accountId, so an edge into it must carry them"
+     "provenance": "derived — BO-074 declares entryState.params accountId and BO-076 holds none of them, so the edge carries nothing and BO-074 opens cold"
     },
     {
      "to": "BO-075",
      "trigger": "Account Mapping",
-     "carries": [
-      "taxCodeId"
-     ],
-     "provenance": "derived — BO-075 declares entryState.params taxCodeId, so an edge into it must carry them"
+     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-076 holds none of them, so the edge carries nothing and BO-075 opens cold"
     },
     {
      "to": "BO-077",
      "trigger": "FX Rates & Variances",
-     "carries": [
-      "varianceId"
-     ],
-     "provenance": "derived — BO-077 declares entryState.params varianceId, so an edge into it must carry them"
+     "provenance": "derived — BO-077 declares entryState.params varianceId and BO-076 holds none of them, so the edge carries nothing and BO-077 opens cold"
     }
    ]
   },
@@ -1343,7 +869,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every revenue recognition",
+       "label": "Every recognition schedule",
        "bindsTo": "RecognitionSchedule",
        "columns": [
         "RecognitionSchedule.id",
@@ -1370,10 +896,35 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected revenue recognition",
+       "label": "The selected recognition schedule",
+       "bindsTo": "RecognitionSchedule",
+       "columns": [
+        "RecognitionSchedule.id",
+        "RecognitionSchedule.name",
+        "RecognitionSchedule.method",
+        "RecognitionSchedule.priority",
+        "RecognitionSchedule.recognitionSite",
+        "RecognitionSchedule.frequency",
+        "RecognitionSchedule.revalidateOnValidityChange",
+        "RecognitionSchedule.productKinds",
+        "RecognitionSchedule.deferredAccountId",
+        "RecognitionSchedule.recognisedAccountId",
+        "RecognitionSchedule.breakageAccountId",
+        "RecognitionSchedule.noShowTrigger",
+        "RecognitionSchedule.noShowAccountId",
+        "RecognitionSchedule.breakageAfterDays",
+        "RecognitionSchedule.isActive"
+       ],
+       "operation": "listRecognitionSchedules",
+       "provenance": "contract finance.yaml GET /recognition-schedules"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The deferred revenue report",
        "bindsTo": "DeferredRevenueReport",
        "columns": [
         "DeferredRevenueReport.asAt",
+        "DeferredRevenueReport.totals",
         "DeferredRevenueReport.total",
         "DeferredRevenueReport.buckets"
        ],
@@ -1388,15 +939,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Run",
+       "label": "Run recognition",
        "operation": "runRecognition",
        "provenance": "contract finance.yaml POST /recognition/run"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create recognition schedule",
        "operation": "createRecognitionSchedule",
        "provenance": "contract finance.yaml POST /recognition-schedules"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Validate recognition schedules",
+       "operation": "validateRecognitionSchedules",
+       "provenance": "contract finance.yaml POST /recognition-schedules/validate"
       }
      ]
     }
@@ -1405,9 +962,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The revenue recognition list.",
    "error": "Could not load. Names which read failed and leaves the revenue recognition untouched.",
-   "emptyFirstRun": "No revenue recognition yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the revenue recognition are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No revenue recognition yet. Offers Create recognition schedule (`createRecognitionSchedule`).",
+   "emptyNoResults": "Never shown: `listRecognitionSchedules` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `getDeferredRevenue` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1439,6 +996,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listRecognitionSchedules"
     ]
+   },
+   {
+    "operationId": "validateRecognitionSchedules",
+    "contract": "finance",
+    "purpose": "Find product kinds claimed by more than one schedule",
+    "trigger": "onAction",
+    "provenance": "wiring gap, 19 September 2026 — the screen showed the noun and could not act on it"
    }
   ],
   "entryState": {
@@ -1454,6 +1018,58 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P08 Venue Management.dc.html#bo-076"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRunRecognition",
+    "component": "modal",
+    "trigger": "Run recognition",
+    "body": "**Collects what `runRecognition` sends before it is called.** Required: `fiscalPeriodId`. Optional: `dryRun`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Run recognition",
+     "operation": "runRecognition"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "fiscalPeriodId",
+      "dryRun"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /recognition/run"
+   },
+   {
+    "id": "formCreateRecognitionSchedule",
+    "component": "modal",
+    "trigger": "Create recognition schedule",
+    "body": "**Collects what `createRecognitionSchedule` sends before it is called.** Required: `id`, `name`, `method`, `productKinds`. Optional: `priority`, `recognitionSite`, `frequency`, `revalidateOnValidityChange`, `deferredAccountId`, `recognisedAccountId`, `breakageAccountId`, `noShowTrigger`, `noShowAccountId`, `breakageAfterDays`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RecognitionSchedule",
+    "confirm": {
+     "label": "Create recognition schedule",
+     "operation": "createRecognitionSchedule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "name",
+      "method",
+      "productKinds",
+      "priority",
+      "recognitionSite",
+      "frequency",
+      "revalidateOnValidityChange",
+      "deferredAccountId",
+      "recognisedAccountId",
+      "breakageAccountId",
+      "noShowTrigger",
+      "noShowAccountId",
+      "breakageAfterDays",
+      "isActive"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /recognition-schedules"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1492,7 +1108,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-074",
     "BO-075",
     "BO-076"
@@ -1500,30 +1115,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-074",
      "trigger": "Chart of Accounts",
-     "carries": [
-      "accountId"
-     ],
-     "provenance": "derived — BO-074 declares entryState.params accountId, so an edge into it must carry them"
+     "provenance": "derived — BO-074 declares entryState.params accountId and BO-077 holds none of them, so the edge carries nothing and BO-074 opens cold"
     },
     {
      "to": "BO-075",
      "trigger": "Account Mapping",
-     "carries": [
-      "taxCodeId"
-     ],
-     "provenance": "derived — BO-075 declares entryState.params taxCodeId, so an edge into it must carry them"
+     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-077 holds none of them, so the edge carries nothing and BO-075 opens cold"
     }
    ]
   },
@@ -1532,13 +1131,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "approvalInbox",
   "patternReason": "`reviewPriceVariance` decides items that `listFxRates` queues — every row is waiting for a person, so the empty state is success",
   "purpose": "Rates, and the price variances waiting for review.",
-  "gaps": [
-   {
-    "operation": "listPriceVariances",
-    "why": "**1 declared operation reach no component on this screen**: listPriceVariances. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1546,6 +1138,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "name": "contentBody",
      "slot": "queue",
      "components": [
+      {
+       "kind": "datePicker",
+       "label": "As at",
+       "operation": "listFxRates",
+       "notes": "Sends `?asAt=` to `listFxRates`.",
+       "provenance": "contract finance.yaml GET /fx-rates"
+      },
+      {
+       "kind": "textField",
+       "label": "Purpose",
+       "operation": "listFxRates",
+       "notes": "Sends `?purpose=` to `listFxRates`.",
+       "provenance": "contract finance.yaml GET /fx-rates"
+      },
       {
        "kind": "dataTable",
        "label": "Waiting for a decision",
@@ -1565,6 +1171,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listFxRates",
        "provenance": "contract finance.yaml GET /fx-rates"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every price variance",
+       "bindsTo": "PriceVariance",
+       "columns": [
+        "PriceVariance.id",
+        "PriceVariance.orderId",
+        "PriceVariance.orderLineId",
+        "PriceVariance.venueId",
+        "PriceVariance.variantId",
+        "PriceVariance.quotedPrice",
+        "PriceVariance.serverPrice",
+        "PriceVariance.variance",
+        "PriceVariance.catalogueBundleVersion",
+        "PriceVariance.isException",
+        "PriceVariance.reviewStatus",
+        "PriceVariance.reviewOutcome"
+       ],
+       "operation": "listPriceVariances",
+       "provenance": "contract finance.yaml GET /price-variances"
       }
      ]
     },
@@ -1574,7 +1201,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected rates variances",
+       "label": "The selected FX rate",
        "bindsTo": "FxRate",
        "columns": [
         "FxRate.id",
@@ -1600,15 +1227,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save FX rate",
        "operation": "setFxRate",
        "provenance": "contract finance.yaml PUT /fx-rates"
       },
       {
        "kind": "secondaryButton",
-       "label": "Review",
+       "label": "Review price variance",
        "operation": "reviewPriceVariance",
        "provenance": "contract finance.yaml POST /price-variances/{varianceId}/review"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Ingest FX rates",
+       "operation": "ingestFxRates",
+       "provenance": "contract finance.yaml POST /fx-rates/ingest"
       }
      ]
     }
@@ -1618,8 +1251,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "loading": "The rates variances list.",
    "error": "Could not load. Names which read failed and leaves the rates variances untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
-   "emptyNoResults": "The filter narrowed it and the rates variances are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoResults": "Nothing matches the filter on asAt, purpose and the rates variances are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listFxRates` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1651,6 +1284,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listFxRates"
     ]
+   },
+   {
+    "operationId": "ingestFxRates",
+    "contract": "finance",
+    "purpose": "Pull today's rates from the configured provider",
+    "trigger": "onAction",
+    "provenance": "wiring gap, 19 September 2026 — the screen showed the noun and could not act on it",
+    "invalidates": [
+     "listFxRates"
+    ]
    }
   ],
   "entryState": {
@@ -1675,6 +1318,74 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P08 Venue Management.dc.html#bo-077"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formIngestFxRates",
+    "component": "modal",
+    "trigger": "Ingest FX rates",
+    "body": "**Collects what `ingestFxRates` sends before it is called.** Required: `purpose`. Optional: `pairs`, `effectiveFrom`, `dryRun`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Ingest FX rates",
+     "operation": "ingestFxRates"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "purpose",
+      "pairs",
+      "effectiveFrom",
+      "dryRun"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /fx-rates/ingest"
+   },
+   {
+    "id": "formSetFxRate",
+    "component": "modal",
+    "trigger": "Save FX rate",
+    "body": "**Collects what `setFxRate` sends before it is called.** Required: `fromCurrency`, `toCurrency`, `rate`, `purpose`, `effectiveFrom`. Optional: `id`, `source`, `effectiveTo`, `setByPrincipalId`, `providerReference`, `fetchedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "FxRate",
+    "confirm": {
+     "label": "Save FX rate",
+     "operation": "setFxRate"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "fromCurrency",
+      "toCurrency",
+      "rate",
+      "purpose",
+      "effectiveFrom",
+      "id",
+      "source",
+      "effectiveTo",
+      "setByPrincipalId",
+      "providerReference",
+      "fetchedAt"
+     ]
+    },
+    "provenance": "contract finance.yaml PUT /fx-rates"
+   },
+   {
+    "id": "formReviewPriceVariance",
+    "component": "modal",
+    "trigger": "Review price variance",
+    "body": "**Collects what `reviewPriceVariance` sends before it is called.** Required: `outcome`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Review price variance",
+     "operation": "reviewPriceVariance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "outcome",
+      "note"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /price-variances/{varianceId}/review"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1713,7 +1424,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-074",
     "BO-075",
     "BO-076",
@@ -1728,30 +1438,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "provenance": "flow F13 step 3→4"
     },
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-074",
      "trigger": "Chart of Accounts",
      "carries": [
       "accountId"
      ],
-     "provenance": "derived — BO-074 declares entryState.params accountId, so an edge into it must carry them"
+     "provenance": "derived — BO-074 declares entryState.params accountId and BO-089 holds accountId, so an edge into it carries them"
     },
     {
      "to": "BO-075",
      "trigger": "Account Mapping",
-     "carries": [
-      "taxCodeId"
-     ],
-     "provenance": "derived — BO-075 declares entryState.params taxCodeId, so an edge into it must carry them"
+     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-089 holds none of them, so the edge carries nothing and BO-075 opens cold"
     }
    ]
   },
@@ -1767,6 +1464,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "name": "contentBody",
      "slot": "queue",
      "components": [
+      {
+       "kind": "textField",
+       "label": "Fiscal period id",
+       "operation": "listJournalEntries",
+       "notes": "Sends `?fiscalPeriodId=` to `listJournalEntries`.",
+       "provenance": "contract finance.yaml GET /journal-entries"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listJournalEntries",
+       "notes": "Sends `?status=` to `listJournalEntries`.",
+       "provenance": "contract finance.yaml GET /journal-entries"
+      },
+      {
+       "kind": "textField",
+       "label": "Source",
+       "operation": "listJournalEntries",
+       "notes": "Sends `?source=` to `listJournalEntries`.",
+       "provenance": "contract finance.yaml GET /journal-entries"
+      },
       {
        "kind": "dataTable",
        "label": "Waiting for a decision",
@@ -1796,7 +1514,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected journal entries",
+       "label": "The selected journal entry",
        "bindsTo": "JournalEntry",
        "columns": [
         "JournalEntry.id",
@@ -1827,25 +1545,25 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create journal entry",
        "operation": "createJournalEntry",
        "provenance": "contract finance.yaml POST /journal-entries"
       },
       {
        "kind": "secondaryButton",
-       "label": "Approve",
+       "label": "Approve journal entry",
        "operation": "approveJournalEntry",
        "provenance": "contract finance.yaml POST /journal-entries/{entryId}/approve"
       },
       {
        "kind": "destructiveButton",
-       "label": "Reject",
+       "label": "Reject journal",
        "operation": "rejectJournal",
        "provenance": "contract finance.yaml POST /journal-entries/{entryId}/reject"
       },
       {
        "kind": "destructiveButton",
-       "label": "Reverse",
+       "label": "Reverse journal entry",
        "operation": "reverseJournalEntry",
        "provenance": "contract finance.yaml POST /journal-entries/{entryId}/reverse"
       }
@@ -1857,24 +1575,64 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmRejectJournal",
     "component": "confirmDialog",
-    "trigger": "Reject",
-    "body": "**Names what `rejectJournal` changes and what it leaves alone**, in the consequence rather than the verb. A journal entries this affects should be identified in the dialog, not just counted.",
+    "trigger": "Reject journal",
+    "body": "**Names what `rejectJournal` changes and what it leaves alone**, in the consequence rather than the verb. A journal entries this affects should be identified in the dialog, not just counted. **Collects what `rejectJournal` sends before it is called.** Required: `reason`.",
     "provenance": "contract finance.yaml POST /journal-entries/{entryId}/reject"
    },
    {
     "id": "confirmReverseJournalEntry",
     "component": "confirmDialog",
-    "trigger": "Reverse",
-    "body": "**Names what `reverseJournalEntry` changes and what it leaves alone**, in the consequence rather than the verb. A journal entries this affects should be identified in the dialog, not just counted.",
+    "trigger": "Reverse journal entry",
+    "body": "**Names what `reverseJournalEntry` changes and what it leaves alone**, in the consequence rather than the verb. A journal entries this affects should be identified in the dialog, not just counted. **Collects what `reverseJournalEntry` sends before it is called.** Required: `reason`. Optional: `fiscalPeriodId`.",
     "provenance": "contract finance.yaml POST /journal-entries/{entryId}/reverse"
+   },
+   {
+    "id": "formCreateJournalEntry",
+    "component": "modal",
+    "trigger": "Create journal entry",
+    "body": "**Collects what `createJournalEntry` sends before it is called.** Required: `id`, `fiscalPeriodId`, `description`, `lines`. Optional: `postingDate`, `reference`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateJournalEntryRequest",
+    "confirm": {
+     "label": "Create journal entry",
+     "operation": "createJournalEntry"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "fiscalPeriodId",
+      "description",
+      "lines",
+      "postingDate",
+      "reference"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /journal-entries"
+   },
+   {
+    "id": "formApproveJournalEntry",
+    "component": "modal",
+    "trigger": "Approve journal entry",
+    "body": "**Collects what `approveJournalEntry` sends before it is called.** Nothing in the body is required. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Approve journal entry",
+     "operation": "approveJournalEntry"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "note"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /journal-entries/{entryId}/approve"
    }
   ],
   "states": {
    "loading": "The journal entries list.",
    "error": "Could not load. Names which read failed and leaves the journal entries untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
-   "emptyNoResults": "The filter narrowed it and the journal entries are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoResults": "Nothing matches the filter on fiscalPeriodId, status, source and the journal entries are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listJournalEntries` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1887,7 +1645,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getJournalEntry",
     "contract": "finance",
     "purpose": "Read a journal entry",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createJournalEntry",
@@ -1986,7 +1744,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-040",
     "BO-074",
     "BO-075",
@@ -2001,30 +1758,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "provenance": "flow F13 step 1→2"
     },
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-074",
      "trigger": "Chart of Accounts",
      "carries": [
       "accountId"
      ],
-     "provenance": "derived — BO-074 declares entryState.params accountId, so an edge into it must carry them"
+     "provenance": "derived — BO-074 declares entryState.params accountId and BO-090 holds accountId, so an edge into it carries them"
     },
     {
      "to": "BO-075",
      "trigger": "Account Mapping",
-     "carries": [
-      "taxCodeId"
-     ],
-     "provenance": "derived — BO-075 declares entryState.params taxCodeId, so an edge into it must carry them"
+     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-090 holds none of them, so the edge carries nothing and BO-075 opens cold"
     }
    ]
   },
@@ -2041,8 +1785,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Legal entity id",
+       "operation": "listFiscalPeriods",
+       "notes": "Sends `?legalEntityId=` to `listFiscalPeriods`.",
+       "provenance": "contract finance.yaml GET /fiscal-periods"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listFiscalPeriods",
+       "notes": "Sends `?status=` to `listFiscalPeriods`.",
+       "provenance": "contract finance.yaml GET /fiscal-periods"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every period close",
+       "label": "Every fiscal period",
        "bindsTo": "FiscalPeriod",
        "columns": [
         "FiscalPeriod.id",
@@ -2065,7 +1823,25 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected period close",
+       "label": "The selected fiscal period",
+       "bindsTo": "FiscalPeriod",
+       "columns": [
+        "FiscalPeriod.id",
+        "FiscalPeriod.legalEntityId",
+        "FiscalPeriod.name",
+        "FiscalPeriod.startDate",
+        "FiscalPeriod.endDate",
+        "FiscalPeriod.status",
+        "FiscalPeriod.closedByPrincipalId",
+        "FiscalPeriod.closedAt",
+        "FiscalPeriod.events"
+       ],
+       "operation": "listFiscalPeriods",
+       "provenance": "contract finance.yaml GET /fiscal-periods"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The trial balance",
        "bindsTo": "TrialBalance",
        "columns": [
         "TrialBalance.fiscalPeriodId",
@@ -2085,25 +1861,25 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Begin",
+       "label": "Begin period close",
        "operation": "beginPeriodClose",
        "provenance": "contract finance.yaml POST /fiscal-periods/{periodId}/begin-close"
       },
       {
        "kind": "destructiveButton",
-       "label": "Close",
+       "label": "Close fiscal period",
        "operation": "closeFiscalPeriod",
        "provenance": "contract finance.yaml POST /fiscal-periods/{periodId}/close"
       },
       {
        "kind": "destructiveButton",
-       "label": "Abandon",
+       "label": "Abandon period close",
        "operation": "abandonPeriodClose",
        "provenance": "contract finance.yaml POST /fiscal-periods/{periodId}/abandon-close"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reopen",
+       "label": "Reopen period",
        "operation": "reopenPeriod",
        "provenance": "contract finance.yaml POST /fiscal-periods/{periodId}/reopen"
       }
@@ -2115,24 +1891,41 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmCloseFiscalPeriod",
     "component": "confirmDialog",
-    "trigger": "Close",
-    "body": "**Names what `closeFiscalPeriod` changes and what it leaves alone**, in the consequence rather than the verb. A period close this affects should be identified in the dialog, not just counted.",
+    "trigger": "Close fiscal period",
+    "body": "**Names what `closeFiscalPeriod` changes and what it leaves alone**, in the consequence rather than the verb. A period close this affects should be identified in the dialog, not just counted. **Collects what `closeFiscalPeriod` sends before it is called.** Nothing in the body is required. Optional: `dryRun`. **A real close answers 202 pending a finance approver** (decided 28 September, audit R144): the period shows *close pending approval* with its `approvalRequestId` until the approver acts; a dry run answers at once.",
     "provenance": "contract finance.yaml POST /fiscal-periods/{periodId}/close"
    },
    {
     "id": "confirmAbandonPeriodClose",
     "component": "confirmDialog",
-    "trigger": "Abandon",
-    "body": "**Names what `abandonPeriodClose` changes and what it leaves alone**, in the consequence rather than the verb. A period close this affects should be identified in the dialog, not just counted.",
+    "trigger": "Abandon period close",
+    "body": "**Names what `abandonPeriodClose` changes and what it leaves alone**, in the consequence rather than the verb. A period close this affects should be identified in the dialog, not just counted. **Collects what `abandonPeriodClose` sends before it is called.** Required: `reason`.",
     "provenance": "contract finance.yaml POST /fiscal-periods/{periodId}/abandon-close"
+   },
+   {
+    "id": "formReopenPeriod",
+    "component": "modal",
+    "trigger": "Reopen period",
+    "body": "**Collects what `reopenPeriod` sends before it is called.** Required: `reason` only — the approver is not named here. **The request answers 202 with an `approvalRequestId`** and the period shows *reopen pending finance approval* until a finance approver acts (decided 28 September, audit R144). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reopen period",
+     "operation": "reopenPeriod"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /fiscal-periods/{periodId}/reopen"
    }
   ],
   "states": {
    "loading": "The period close list.",
    "error": "Could not load. Names which read failed and leaves the period close untouched.",
-   "emptyFirstRun": "No period close yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the period close are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No period close yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on legalEntityId, status and the period close are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listFiscalPeriods` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2153,7 +1946,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "operationId": "closeFiscalPeriod",
     "contract": "finance",
-    "purpose": "Close a period and lock postings",
+    "purpose": "Close a period and lock postings — 202 pending finance approval (audit R144)",
     "trigger": "onAction",
     "invalidates": [
      "listFiscalPeriods"
@@ -2171,7 +1964,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "operationId": "reopenPeriod",
     "contract": "finance",
-    "purpose": "Reopen a closed period",
+    "purpose": "Request to reopen a closed period — 202 pending finance approval (audit R144)",
     "trigger": "onAction",
     "invalidates": [
      "listFiscalPeriods"
@@ -2193,11 +1986,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `periodId`.",
    "preloaded": [
-    "TrialBalance.fiscalPeriodId",
-    "TrialBalance.isBalanced",
-    "TrialBalance.totalDebit",
-    "TrialBalance.totalCredit",
-    "TrialBalance.accounts"
+    "FiscalPeriod.id",
+    "FiscalPeriod.legalEntityId",
+    "FiscalPeriod.name",
+    "FiscalPeriod.startDate",
+    "FiscalPeriod.endDate"
    ]
   },
   "wireframe": {
@@ -2262,12 +2055,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "BO-043",
     "BO-047",
     "BO-048",
-    "BO-051",
     "BO-059",
     "BO-061",
     "BO-062",
     "BO-065",
-    "BO-070",
     "BO-074",
     "BO-075",
     "BO-076",
@@ -2279,37 +2070,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-101 holds none of them, so the edge carries nothing and BO-008 opens cold"
     },
     {
      "to": "BO-022",
      "trigger": "Order Detail",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — BO-022 declares entryState.params orderId, so an edge into it must carry them"
+     "provenance": "derived — BO-022 declares entryState.params orderId and BO-101 holds none of them, so the edge carries nothing and BO-022 opens cold"
     },
     {
      "to": "BO-023",
      "trigger": "Refunds & Exchanges",
-     "carries": [
-      "orderId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-023 declares entryState.params orderId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-023 declares entryState.params orderId and BO-101 holds none of them, so the edge carries nothing and BO-023 opens cold"
     },
     {
      "to": "BO-024",
      "trigger": "Payment Exceptions",
-     "carries": [
-      "depositId",
-      "paymentId"
-     ],
-     "provenance": "derived — BO-024 declares entryState.params depositId, paymentId, so an edge into it must carry them"
+     "provenance": "derived — BO-024 declares entryState.params depositId, paymentId and BO-101 holds none of them, so the edge carries nothing and BO-024 opens cold"
     },
     {
      "to": "BO-025",
@@ -2317,65 +2093,42 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "settlementId"
      ],
-     "provenance": "derived — BO-025 declares entryState.params settlementId, so an edge into it must carry them"
+     "provenance": "derived — BO-025 declares entryState.params settlementId and BO-101 holds settlementId, so an edge into it carries them"
     },
     {
      "to": "BO-026",
      "trigger": "Group Bookings",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — BO-026 declares entryState.params orderId, so an edge into it must carry them"
+     "provenance": "derived — BO-026 declares entryState.params groupBookingId, orderId and BO-101 holds none of them, so the edge carries nothing and BO-026 opens cold"
     },
     {
      "to": "BO-027",
      "trigger": "Reissue & Media Replacement",
-     "carries": [
-      "mediaCode",
-      "mediaId"
-     ],
-     "provenance": "derived — BO-027 declares entryState.params mediaCode, mediaId, so an edge into it must carry them"
+     "provenance": "derived — BO-027 declares entryState.params mediaCode, mediaId and BO-101 holds none of them, so the edge carries nothing and BO-027 opens cold"
     },
     {
      "to": "BO-029",
      "trigger": "Report Builder",
-     "carries": [
-      "conversationId",
-      "reportId"
-     ],
-     "provenance": "derived — BO-029 declares entryState.params conversationId, reportId, so an edge into it must carry them"
+     "provenance": "derived — BO-029 declares entryState.params conversationId, reportId and BO-101 holds none of them, so the edge carries nothing and BO-029 opens cold"
     },
     {
      "to": "BO-039",
      "trigger": "Shift Directory",
-     "carries": [
-      "shiftId"
-     ],
-     "provenance": "derived — BO-039 declares entryState.params shiftId, so an edge into it must carry them"
+     "provenance": "derived — BO-039 declares entryState.params  and BO-101 holds none of them, so the edge carries nothing and BO-039 opens cold"
     },
     {
      "to": "BO-040",
      "trigger": "Variance Approval",
-     "carries": [
-      "shiftId"
-     ],
-     "provenance": "derived — BO-040 declares entryState.params shiftId, so an edge into it must carry them"
+     "provenance": "derived — BO-040 declares entryState.params  and BO-101 holds none of them, so the edge carries nothing and BO-040 opens cold"
     },
     {
      "to": "BO-041",
      "trigger": "Cash Movements",
-     "carries": [
-      "shiftId"
-     ],
-     "provenance": "derived — BO-041 declares entryState.params shiftId, so an edge into it must carry them"
+     "provenance": "derived — BO-041 declares entryState.params  and BO-101 holds none of them, so the edge carries nothing and BO-041 opens cold"
     },
     {
      "to": "BO-042",
      "trigger": "Banking & Safe",
-     "carries": [
-      "shiftId"
-     ],
-     "provenance": "derived — BO-042 declares entryState.params shiftId, so an edge into it must carry them"
+     "provenance": "derived — BO-042 declares entryState.params boxId and BO-101 holds none of them, so the edge carries nothing and BO-042 opens cold"
     },
     {
      "to": "BO-043",
@@ -2383,113 +2136,62 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "settlementId"
      ],
-     "provenance": "derived — BO-043 declares entryState.params settlementId, so an edge into it must carry them"
+     "provenance": "derived — BO-043 declares entryState.params settlementId and BO-101 holds settlementId, so an edge into it carries them"
     },
     {
      "to": "BO-047",
      "trigger": "Order Corrections & Exceptions",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — BO-047 declares entryState.params orderId, so an edge into it must carry them"
+     "provenance": "derived — BO-047 declares entryState.params orderId and BO-101 holds none of them, so the edge carries nothing and BO-047 opens cold"
     },
     {
      "to": "BO-048",
      "trigger": "Retail Products",
-     "carries": [
-      "merchandiseId"
-     ],
-     "provenance": "derived — BO-048 declares entryState.params merchandiseId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-051",
-     "trigger": "Purchase Orders",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — BO-051 declares entryState.params orderId, so an edge into it must carry them"
+     "provenance": "derived — BO-048 declares entryState.params merchandiseId and BO-101 holds none of them, so the edge carries nothing and BO-048 opens cold"
     },
     {
      "to": "BO-059",
      "trigger": "Sales Reports",
-     "carries": [
-      "conversationId",
-      "reportId"
-     ],
-     "provenance": "derived — BO-059 declares entryState.params conversationId, reportId, so an edge into it must carry them"
+     "provenance": "derived — BO-059 declares entryState.params conversationId, reportId and BO-101 holds none of them, so the edge carries nothing and BO-059 opens cold"
     },
     {
      "to": "BO-061",
      "trigger": "Scheduled Reports",
-     "carries": [
-      "conversationId",
-      "reportId"
-     ],
-     "provenance": "derived — BO-061 declares entryState.params conversationId, reportId, so an edge into it must carry them"
+     "provenance": "derived — BO-061 declares entryState.params reportId, scheduleId and BO-101 holds none of them, so the edge carries nothing and BO-061 opens cold"
     },
     {
      "to": "BO-062",
      "trigger": "Venue Profile",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-062 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-062 declares entryState.params  and BO-101 holds none of them, so the edge carries nothing and BO-062 opens cold"
     },
     {
      "to": "BO-065",
      "trigger": "Venue Configuration",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-065 declares entryState.params venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-070",
-     "trigger": "Work Orders",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — BO-070 declares entryState.params orderId, so an edge into it must carry them"
+     "provenance": "derived — BO-065 declares entryState.params  and BO-101 holds none of them, so the edge carries nothing and BO-065 opens cold"
     },
     {
      "to": "BO-074",
      "trigger": "Chart of Accounts",
-     "carries": [
-      "accountId"
-     ],
-     "provenance": "derived — BO-074 declares entryState.params accountId, so an edge into it must carry them"
+     "provenance": "derived — BO-074 declares entryState.params accountId and BO-101 holds none of them, so the edge carries nothing and BO-074 opens cold"
     },
     {
      "to": "BO-075",
      "trigger": "Account Mapping",
-     "carries": [
-      "taxCodeId"
-     ],
-     "provenance": "derived — BO-075 declares entryState.params taxCodeId, so an edge into it must carry them"
+     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-101 holds none of them, so the edge carries nothing and BO-075 opens cold"
     },
     {
      "to": "BO-077",
      "trigger": "FX Rates & Variances",
-     "carries": [
-      "varianceId"
-     ],
-     "provenance": "derived — BO-077 declares entryState.params varianceId, so an edge into it must carry them"
+     "provenance": "derived — BO-077 declares entryState.params varianceId and BO-101 holds none of them, so the edge carries nothing and BO-077 opens cold"
     },
     {
      "to": "BO-089",
      "trigger": "Journal Entries",
-     "carries": [
-      "entryId"
-     ],
-     "provenance": "derived — BO-089 declares entryState.params entryId, so an edge into it must carry them"
+     "provenance": "derived — BO-089 declares entryState.params entryId and BO-101 holds none of them, so the edge carries nothing and BO-089 opens cold"
     },
     {
      "to": "BO-090",
      "trigger": "Period Close",
-     "carries": [
-      "periodId"
-     ],
-     "provenance": "derived — BO-090 declares entryState.params periodId, so an edge into it must carry them"
+     "provenance": "derived — BO-090 declares entryState.params periodId and BO-101 holds none of them, so the edge carries nothing and BO-090 opens cold"
     }
    ]
   },
@@ -2498,13 +2200,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listOrders` reads the population and `getVenueSettings` reads one of them — list, select, act",
   "purpose": "Everything in orders & money, and what in it needs attention.",
-  "gaps": [
-   {
-    "operation": "listSettlements",
-    "why": "**1 declared operation reach no component on this screen**: listSettlements. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -2513,8 +2208,50 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listOrders",
+       "notes": "Sends `?venueId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Principal id",
+       "operation": "listOrders",
+       "notes": "Sends `?principalId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Shift id",
+       "operation": "listOrders",
+       "notes": "Sends `?shiftId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listOrders",
+       "notes": "Sends `?status=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created from",
+       "operation": "listOrders",
+       "notes": "Sends `?createdFrom=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created to",
+       "operation": "listOrders",
+       "notes": "Sends `?createdTo=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every orders money",
+       "label": "Every order",
        "bindsTo": "OrderSummary",
        "columns": [
         "OrderSummary.id",
@@ -2527,34 +2264,28 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listOrders",
        "provenance": "contract orders.yaml GET /orders"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
+      },
       {
-       "kind": "detailPanel",
-       "label": "The selected orders money",
-       "bindsTo": "VenueSettings",
+       "kind": "dataTable",
+       "label": "Every settlement",
+       "bindsTo": "Settlement",
        "columns": [
-        "VenueSettings.id",
-        "VenueSettings.venueId",
-        "VenueSettings.supportHours",
-        "VenueSettings.quietHours",
-        "VenueSettings.segregatedAccess",
-        "VenueSettings.alerting"
+        "Settlement.id",
+        "Settlement.currencyCode",
+        "Settlement.providerName",
+        "Settlement.periodStart",
+        "Settlement.periodEnd",
+        "Settlement.fileReference",
+        "Settlement.format",
+        "Settlement.status",
+        "Settlement.lineCount",
+        "Settlement.matchedCount",
+        "Settlement.exceptionCount",
+        "Settlement.providerGross"
        ],
-       "operation": "getVenueSettings",
-       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+       "operation": "listSettlements",
+       "provenance": "contract finance.yaml GET /settlements"
+      },
       {
        "kind": "cardList",
        "bindsTo": "screens",
@@ -2565,6 +2296,49 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "searchField",
        "label": "Search orders & money",
        "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected order",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount",
+        "OrderSummary.principalId",
+        "OrderSummary.holdLabel",
+        "OrderSummary.heldUntil"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The venue settings",
+       "bindsTo": "VenueSettings",
+       "columns": [
+        "VenueSettings.id",
+        "VenueSettings.venueId",
+        "VenueSettings.currencyCode",
+        "VenueSettings.currencyScale",
+        "VenueSettings.supportHours",
+        "VenueSettings.quietHours",
+        "VenueSettings.biometrics",
+        "VenueSettings.segregatedAccess",
+        "VenueSettings.alerting"
+       ],
+       "operation": "getVenueSettings",
+       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
       }
      ]
     }
@@ -2668,26 +2442,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
- },
- "applyManualDiscount": {
-  "method": "POST",
-  "path": "/orders/{orderId}/discounts",
-  "contract": "orders",
-  "summary": "Apply a discount a cashier chose",
-  "permission": "ORDER_DISCOUNT",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ManualDiscountRequest",
-  "responds": "Order"
+  "responds": "FiscalPeriod"
  },
  "approveJournalEntry": {
   "method": "POST",
@@ -2725,7 +2480,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "FiscalPeriod"
  },
  "closeFiscalPeriod": {
   "method": "POST",
@@ -2822,25 +2577,6 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "LegalEntity",
   "responds": "LegalEntity"
  },
- "createOrder": {
-  "method": "POST",
-  "path": "/orders",
-  "contract": "orders",
-  "summary": "Create an order",
-  "permission": "ORDER_CREATE",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateOrderRequest",
-  "responds": "Order"
- },
  "createRecognitionSchedule": {
   "method": "POST",
   "path": "/recognition-schedules",
@@ -2883,7 +2619,7 @@ Method, path, parameters, request and response for every operation these screens
   "method": "POST",
   "path": "/tax-exemptions",
   "contract": "finance",
-  "summary": "DelegatedAccess a tax exemption",
+  "summary": "Grant a tax exemption",
   "permission": "TAX_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -2897,25 +2633,6 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "TaxExemption",
   "responds": "TaxExemption"
- },
- "exchangeOrderLines": {
-  "method": "POST",
-  "path": "/orders/{orderId}/exchanges",
-  "contract": "orders",
-  "summary": "Exchange lines for different products or dates",
-  "permission": "ORDER_EXCHANGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ExchangeOrderRequest",
-  "responds": "OrderExchangeResult"
  },
  "getAccount": {
   "method": "GET",
@@ -2967,45 +2684,6 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "JournalEntry"
  },
- "getOrder": {
-  "method": "GET",
-  "path": "/orders/{orderId}",
-  "contract": "orders",
-  "summary": "Read an order",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "Order"
- },
- "getOrderStatement": {
-  "method": "GET",
-  "path": "/orders/{orderId}/statement",
-  "contract": "orders",
-  "summary": "Full financial history of an order",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "OrderStatement"
- },
- "getRefundPolicy": {
-  "method": "GET",
-  "path": "/venues/{venueId}/refund-policy",
-  "contract": "orders",
-  "summary": "Read a venue's refund policy",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "RefundPolicy"
- },
  "getTrialBalance": {
   "method": "GET",
   "path": "/ledger/trial-balance",
@@ -3035,7 +2713,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/venues/{venueId}/settings",
   "contract": "tenancy",
   "summary": "Operational settings for this venue",
-  "permission": "TENANT_CONFIGURE",
+  "permission": "TENANT_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -3043,15 +2721,15 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "VenueSettings"
  },
- "holdOrder": {
+ "ingestFxRates": {
   "method": "POST",
-  "path": "/orders/{orderId}/hold",
-  "contract": "orders",
-  "summary": "Park a sale and free the till",
-  "permission": "ORDER_MODIFY",
-  "offlineCapable": true,
-  "conflictPolicy": "lastWriterWins",
-  "scopeLevel": "workstation",
+  "path": "/fx-rates/ingest",
+  "contract": "finance",
+  "summary": "Pull rates from the configured provider",
+  "permission": "LEDGER_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "region",
   "parameters": [
    {
     "name": null,
@@ -3060,7 +2738,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Order"
+  "responds": null
  },
  "listAccountMappings": {
   "method": "GET",
@@ -3084,7 +2762,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "AccountMapping"
+  "responds": "Page"
  },
  "listAccounts": {
   "method": "GET",
@@ -3149,74 +2827,6 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
- "listDeliveryLocations": {
-  "method": "GET",
-  "path": "/venues/{venueId}/delivery-locations",
-  "contract": "fnb",
-  "summary": "Where an order can be delivered",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "kind",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "servingOutletId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "DeliveryLocation"
- },
- "listDiningOutlets": {
-  "method": "GET",
-  "path": "/venues/{venueId}/dining",
-  "contract": "fnb",
-  "summary": "Where a guest can eat, right now",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "openNow",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "orderingMethod",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "DiningOutlet"
- },
  "listFiscalPeriods": {
   "method": "GET",
   "path": "/fiscal-periods",
@@ -3249,7 +2859,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "FiscalPeriod"
+  "responds": "Page"
  },
  "listFxRates": {
   "method": "GET",
@@ -3272,6 +2882,11 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    },
    {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -3283,7 +2898,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "FxRate"
+  "responds": "Page"
  },
  "listJournalEntries": {
   "method": "GET",
@@ -3346,31 +2961,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "LegalEntity"
- },
- "listOrderRefunds": {
-  "method": "GET",
-  "path": "/orders/{orderId}/refunds",
-  "contract": "orders",
-  "summary": "List refunds against an order",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Refund"
+  "responds": "Page"
  },
  "listOrders": {
   "method": "GET",
@@ -3515,6 +3106,11 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    },
    {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": "status",
     "in": "query",
     "required": null
@@ -3584,26 +3180,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "TaxExemption"
- },
- "modifyOrder": {
-  "method": "POST",
-  "path": "/orders/{orderId}/modify",
-  "contract": "orders",
-  "summary": "Add or remove lines on an existing order",
-  "permission": "ORDER_MODIFY",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ModifyOrderRequest",
-  "responds": "OrderModificationResult"
+  "responds": "Page"
  },
  "rejectJournal": {
   "method": "POST",
@@ -3622,7 +3199,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "JournalEntry"
  },
  "reopenPeriod": {
   "method": "POST",
@@ -3642,63 +3219,6 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": null
- },
- "reprintOrder": {
-  "method": "POST",
-  "path": "/orders/{orderId}/reprints",
-  "contract": "orders",
-  "summary": "Reprint or resend tickets",
-  "permission": "ORDER_REPRINT",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "rescheduleOrder": {
-  "method": "POST",
-  "path": "/orders/{orderId}/reschedule",
-  "contract": "orders",
-  "summary": "Move an order to another performance",
-  "permission": "ORDER_RESCHEDULE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "OrderExchangeResult"
- },
- "resumeOrder": {
-  "method": "POST",
-  "path": "/orders/{orderId}/resume",
-  "contract": "orders",
-  "summary": "Bring a parked sale back to a till",
-  "permission": "ORDER_MODIFY",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "OrderResumeResult"
  },
  "reverseJournalEntry": {
   "method": "POST",
@@ -3795,44 +3315,6 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "FxRate",
   "responds": "FxRate"
  },
- "setRefundPolicy": {
-  "method": "PUT",
-  "path": "/venues/{venueId}/refund-policy",
-  "contract": "orders",
-  "summary": "Set a venue's refund policy",
-  "permission": "REGION_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RefundPolicy",
-  "responds": "RefundPolicy"
- },
- "setVenueSettings": {
-  "method": "PUT",
-  "path": "/venues/{venueId}/settings",
-  "contract": "tenancy",
-  "summary": "Set support hours, quiet hours, segregated access and alerting",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "VenueSettings",
-  "responds": "VenueSettings"
- },
  "updateAccount": {
   "method": "PATCH",
   "path": "/accounts/{accountId}",
@@ -3871,15 +3353,15 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "TaxCode"
  },
- "voidOrder": {
+ "validateRecognitionSchedules": {
   "method": "POST",
-  "path": "/orders/{orderId}/voids",
-  "contract": "orders",
-  "summary": "Void an order",
-  "permission": "ORDER_VOID",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
+  "path": "/recognition-schedules/validate",
+  "contract": "finance",
+  "summary": "Find product kinds claimed by more than one schedule",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -3888,7 +3370,26 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Order"
+  "responds": null
+ },
+ "verifyTaxExemption": {
+  "method": "POST",
+  "path": "/tax-exemptions/{exemptionId}/verify",
+  "contract": "finance",
+  "summary": "Record that a tax exemption's evidence was checked",
+  "permission": "TAX_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TaxExemption"
  }
 }
 ```
@@ -4017,18 +3518,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "expense"
   ]
  },
- "Channel": {
-  "type": "string",
-  "enum": [
-   "pos",
-   "kiosk",
-   "web",
-   "mobile",
-   "b2b",
-   "ota",
-   "callCentre"
-  ]
- },
  "CostCenter": {
   "x-ticvai-persistence": "ledger.cost_center",
   "type": "object",
@@ -4099,6 +3588,28 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "isPostable": {
     "type": "boolean",
     "default": true
+   },
+   "isSuspense": {
+    "type": "boolean",
+    "default": false,
+    "description": "See `Account.isSuspense`."
+   },
+   "subType": {
+    "type": "string",
+    "nullable": true,
+    "description": "See `Account.subType`."
+   },
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "See `Account.tags`."
+   },
+   "notes": {
+    "type": "string",
+    "nullable": true,
+    "description": "See `Account.notes`."
    }
   }
  },
@@ -4121,7 +3632,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "postingDate": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "A day in the region's time zone, local midnight to local midnight."
    },
    "description": {
     "type": "string",
@@ -4138,115 +3650,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "items": {
      "$ref": "#/components/schemas/JournalLine"
     }
-   }
-  }
- },
- "CreateOrderLine": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "id",
-   "variantId",
-   "quantity",
-   "quotedUnitPrice"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
-   },
-   "variantId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "performanceId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "inventoryHoldId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Lease the units were drawn from. Absent for uncontended products."
-   },
-   "seatIds": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Seated products only. Not available offline."
-   },
-   "quantity": {
-    "type": "integer",
-    "minimum": 1
-   },
-   "quotedUnitPrice": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "What the client charged, from its local bundle."
-   },
-   "holderName": {
-    "type": "string",
-    "nullable": true
-   },
-   "dataMaskValues": {
-    "type": "object",
-    "additionalProperties": true
-   }
-  }
- },
- "CreateOrderRequest": {
-  "type": "object",
-  "required": [
-   "id",
-   "venueId",
-   "channel",
-   "lines",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID. Also the idempotency key."
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "channel": {
-    "$ref": "#/components/schemas/Channel"
-   },
-   "shiftId": {
-    "type": "string"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Null for an anonymous sale. Identity and entitlement are separate."
-   },
-   "guestLinkId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Present where the guest is linked across cells."
-   },
-   "catalogueBundleVersion": {
-    "type": "string",
-    "description": "The bundle the client priced from. Lets the server explain a variance rather than merely report one.\n"
-   },
-   "lines": {
-    "type": "array",
-    "minItems": 1,
-    "items": {
-     "$ref": "#/components/schemas/CreateOrderLine"
-    }
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
    }
   }
  },
@@ -4292,7 +3695,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "effectiveFrom": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "A day in the region's time zone, local midnight to local midnight."
    }
   }
  },
@@ -4301,19 +3705,34 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "type": "object",
   "required": [
    "asAt",
-   "total",
+   "totals",
    "buckets"
   ],
   "properties": {
    "asAt": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "A day in the region's time zone, local midnight to local midnight."
+   },
+   "totals": {
+    "type": "array",
+    "description": "**One `Money` per currency in scope**, never a sum across currencies. One entry when every venue in scope trades in the same currency.\n",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/Money"
+    }
    },
    "total": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "The single total when everything in scope is in one currency; null otherwise. Read `totals`."
    },
    "buckets": {
     "type": "array",
+    "description": "One ageing band in one currency per entry. A band spanning two currencies is two entries.",
     "items": {
      "type": "object",
      "required": [
@@ -4340,193 +3759,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
- "DeliveryLocation": {
-  "type": "object",
-  "x-ticvai-persistence": "fnb.delivery_location",
-  "required": [
-   "id",
-   "venueId",
-   "kind",
-   "label",
-   "isServiceable"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/DeliveryLocationKind"
-   },
-   "label": {
-    "type": "string",
-    "description": "What a runner is told. \"Cabana 12\", \"Row H Seat 4\", \"Lawn — north gate\"."
-   },
-   "zone": {
-    "type": "string",
-    "nullable": true
-   },
-   "tableId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Set where the location is a restaurant table, so it shares table state."
-   },
-   "seatId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Set where the seat is the address. References the seat map."
-   },
-   "servingOutletIds": {
-    "type": "array",
-    "description": "Which outlets deliver here. A cabana served by the pool bar and not the restaurant is normal, and a location nothing serves is not an address.\n",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "isServiceable": {
-    "type": "boolean",
-    "description": "False where the location exists but is not currently taking delivery — closed section, weather, no runner on shift.\n"
-   },
-   "unserviceableReason": {
-    "type": "string",
-    "nullable": true
-   },
-   "walkTimeMinutes": {
-    "type": "integer",
-    "nullable": true,
-    "description": "From the serving outlet. Feeds the guest's estimate — a cabana eight minutes away is not the same promise as a table by the kitchen.\n"
-   }
-  }
- },
- "DeliveryLocationKind": {
-  "type": "string",
-  "description": "4.6.26. One concept, because a runner needs one instruction.",
-  "enum": [
-   "table",
-   "seat",
-   "cabana",
-   "sunbed",
-   "poolside",
-   "box",
-   "suite",
-   "lawn",
-   "collectionPoint",
-   "namedLocation"
-  ]
- },
- "DiningOutlet": {
-  "type": "object",
-  "x-ticvai-persistence": "none — projection over outlet, menu and table state",
-  "required": [
-   "outletId",
-   "name",
-   "kind",
-   "isOpenNow",
-   "orderingMethod"
-  ],
-  "properties": {
-   "outletId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "name": {
-    "type": "string"
-   },
-   "kind": {
-    "type": "string"
-   },
-   "zone": {
-    "type": "string",
-    "nullable": true
-   },
-   "cuisine": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "isOpenNow": {
-    "type": "boolean"
-   },
-   "opensAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "closesAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "orderingMethod": {
-    "$ref": "#/components/schemas/GuestOrderingMethod"
-   },
-   "estimatedWaitMinutes": {
-    "type": "integer",
-    "nullable": true,
-    "description": "From current kitchen ticket volume, not a fixed figure. Null where the outlet has no KDS reporting — an invented wait time is worse than none.\n"
-   },
-   "imageAssetRef": {
-    "type": "string",
-    "nullable": true
-   },
-   "menuId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   }
-  }
- },
- "ExchangeOrderRequest": {
-  "type": "object",
-  "required": [
-   "id",
-   "outgoingLineIds",
-   "incomingLines",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
-   },
-   "outgoingLineIds": {
-    "type": "array",
-    "minItems": 1,
-    "items": {
-     "type": "string"
-    }
-   },
-   "incomingLines": {
-    "type": "array",
-    "minItems": 1,
-    "items": {
-     "$ref": "#/components/schemas/CreateOrderLine"
-    }
-   },
-   "waiveFee": {
-    "type": "boolean",
-    "default": false
-   },
-   "reason": {
-    "type": "string",
-    "maxLength": 500
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
  "FiscalPeriod": {
-  "x-ticvai-persistence": "ledger.fiscal_period",
+  "x-ticvai-persistence": "ledger.fiscal_period + ledger.fiscal_period_event",
   "type": "object",
+  "description": "`startDate` and `endDate` are days in the region's time zone: a posting belongs to the period when its `postedAt`, in that zone, falls on or between them.\n",
   "required": [
    "id",
    "legalEntityId",
@@ -4549,11 +3785,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "startDate": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "A day in the region's time zone, local midnight to local midnight."
    },
    "endDate": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "A day in the region's time zone, local midnight to local midnight."
    },
    "status": {
     "$ref": "#/components/schemas/PeriodStatus"
@@ -4567,12 +3805,67 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The approval request a close or reopen is waiting on (`approvals`), routed to a finance approver (decided 28 September, audit R144). Null when nothing is waiting."
+   },
+   "events": {
+    "type": "array",
+    "description": "**Every step of the period's close, oldest first**: begin, abandon, close and reopen, each with who, when and (for abandon and reopen) why. A reopened period restates figures somebody has already reported, so the reason is kept, not just the latest status.\n",
+    "items": {
+     "$ref": "#/components/schemas/FiscalPeriodEvent"
+    }
+   }
+  }
+ },
+ "FiscalPeriodEvent": {
+  "type": "object",
+  "description": "One step in a fiscal period's close. Written by the operation that took the step; never edited.",
+  "required": [
+   "action",
+   "principalId",
+   "occurredAt"
+  ],
+  "properties": {
+   "action": {
+    "type": "string",
+    "enum": [
+     "beginClose",
+     "abandonClose",
+     "close",
+     "reopen"
+    ]
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Required by `abandonPeriodClose` and `reopenPeriod`; null for the other steps."
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Who took the step."
+   },
+   "approverPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The approver of a `reopen`. Null for the other steps."
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time"
    }
   }
  },
  "FxRate": {
   "type": "object",
   "x-ticvai-persistence": "ledger.fx_rate",
+  "description": "Also the `setFxRate` body. **Server-owned fields are `readOnly`** and ignored if sent: `id`, `setByPrincipalId`, and the provenance `ingestFxRates` writes (`source`, `providerReference`, `fetchedAt`). A rate set through `setFxRate` has `source` `manual`.\n",
   "required": [
    "fromCurrency",
    "toCurrency",
@@ -4595,14 +3888,23 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "pattern": "^[A-Z]{3}$"
    },
    "rate": {
-    "type": "number",
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/FxRateValue"
+     }
+    ],
     "description": "Units of `toCurrency` per one `fromCurrency`. Six decimal places — a two-place rate on a three-place currency loses money on every transaction, quietly.\n"
    },
    "purpose": {
     "$ref": "#/components/schemas/FxRatePurpose"
    },
    "source": {
-    "$ref": "#/components/schemas/FxRateSource"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/FxRateSource"
+     }
+    ],
+    "readOnly": true
    },
    "effectiveFrom": {
     "type": "string",
@@ -4619,15 +3921,23 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid",
     "readOnly": true
    },
+   "note": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "Why this rate, and from where. **Required when `source` is `manual`** (decided 28 September, audit R127 (4)); null on a rate `ingestFxRates` fetched."
+   },
    "providerReference": {
     "type": "string",
     "nullable": true,
+    "readOnly": true,
     "description": "The provider's own identifier for this quote. **What makes a rate reproducible** — an auditor asking why a payment converted at 3.6725 gets an answer that is checkable against the source rather than a number somebody typed."
    },
    "fetchedAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true,
+    "readOnly": true,
     "description": "When the rate was pulled. **Distinct from `effectiveFrom`**, which is when it applies — a rate fetched at 06:00 for a business day starting at 00:00 has two different times and conflating them makes a late feed look like a backdated rate."
    }
   }
@@ -4654,17 +3964,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "provider"
   ]
  },
- "GuestOrderingMethod": {
-  "x-ticvai-persistence": "none — enum",
+ "FxRateValue": {
+  "x-ticvai-persistence-column": "numeric(18,6)",
   "type": "string",
-  "description": "How a guest may order at this outlet. Varies within one venue, so it is per outlet rather than a venue setting.\n",
-  "enum": [
-   "tableService",
-   "appToTable",
-   "appToCollect",
-   "counterOnly",
-   "notAvailable"
-  ]
+  "pattern": "^\\d+(\\.\\d{1,6})?$",
+  "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one (naming-and-style 5.1). Up to six decimal places — a two-place rate on a three-place currency loses money on every transaction, quietly — and stored as `numeric(18,6)` so the six places the wire carries survive the database.\n"
  },
  "JournalEntry": {
   "x-ticvai-persistence": "ledger.journal_entry + ledger.journal_line",
@@ -4683,10 +3987,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "entryNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "Server-assigned, **in sequence per legal entity per fiscal year** (decided 28 September, audit R191), for example `JE-2026-000123`. Gapless within the legal entity and year: a number is taken when the entry reaches the ledger, not when a draft is saved.\n"
    },
    "fiscalPeriodId": {
     "type": "string",
@@ -4734,10 +4041,32 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "reversalOfEntryId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "reversedByEntryId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "reversalReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "On a reversal, the `reason` given to `reverseJournalEntry`. Null on every other entry."
+   },
+   "rejectionReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "The comment from the latest `rejectJournal`, which the preparer reads before resubmitting. Null until an entry is rejected.\n"
+   },
+   "rejectedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "rejectedAt": {
+    "type": "string",
+    "format": "date-time",
     "nullable": true
    },
    "createdAt": {
@@ -4796,7 +4125,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "recognition",
    "settlement",
    "variance",
-   "reversal"
+   "reversal",
+   "writeOff"
   ]
  },
  "JournalStatus": {
@@ -4811,6 +4141,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "LegalEntity": {
   "x-ticvai-persistence": "ledger.legal_entity",
   "type": "object",
+  "description": "Also the `createLegalEntity` body. **`id` and `scopePath` are server-owned** (`readOnly`) and ignored if sent.\n",
   "required": [
    "id",
    "code",
@@ -4823,7 +4154,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "code": {
     "type": "string",
@@ -4867,533 +4199,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "scopePath": {
     "type": "string",
+    "readOnly": true,
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
    }
   }
- },
- "ManualDiscountRequest": {
-  "type": "object",
-  "x-ticvai-persistence": "none — request only",
-  "required": [
-   "id",
-   "reason",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
-   },
-   "lineId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Omit to discount the order rather than a line."
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "percentage": {
-    "type": "number",
-    "minimum": 0,
-    "maximum": 100
-   },
-   "reason": {
-    "type": "string",
-    "minLength": 3,
-    "maxLength": 300,
-    "description": "Required, and free text rather than a code list. A cashier forced to pick the nearest reason picks the first one, and the register stops meaning anything.\n"
-   },
-   "reasonCode": {
-    "type": "string",
-    "nullable": true,
-    "description": "Optional alongside the free text, where the venue maintains a list."
-   },
-   "approverPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Required above the venue threshold. May not be the requester."
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "ModifyOrderRequest": {
-  "type": "object",
-  "required": [
-   "id",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
-   },
-   "addLines": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/CreateOrderLine"
-    }
-   },
-   "removeLineIds": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "reason": {
-    "type": "string",
-    "maxLength": 500
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "Order": {
-  "x-ticvai-persistence": "orders.sales_order + orders.order_line",
-  "type": "object",
-  "required": [
-   "id",
-   "venueId",
-   "scopePath",
-   "channel",
-   "status",
-   "currency",
-   "currencyScale",
-   "grossAmount",
-   "taxAmount",
-   "netAmount",
-   "lines",
-   "createdAt",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string"
-   },
-   "orderNumber": {
-    "type": "string"
-   },
-   "channel": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/OrderChannel"
-     }
-    ],
-    "description": "Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "scopePath": {
-    "type": "string"
-   },
-   "status": {
-    "$ref": "#/components/schemas/OrderStatus"
-   },
-   "currency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
-   },
-   "currencyScale": {
-    "type": "integer",
-    "minimum": 0,
-    "maximum": 4,
-    "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
-   },
-   "grossAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "taxAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "netAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "refundedAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "totalPriceVariance": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Sum across lines. Zero on a normal order."
-   },
-   "lines": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/OrderLine"
-    }
-   },
-   "payments": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/Payment"
-    }
-   },
-   "principalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "workstationId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "shiftId": {
-    "type": "string",
-    "nullable": true
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "syncedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "OrderChannel": {
-  "type": "string",
-  "description": "Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n",
-  "enum": [
-   "pos",
-   "kiosk",
-   "guestApp",
-   "guestWeb",
-   "callCentre",
-   "partner",
-   "api",
-   "backOffice"
-  ]
- },
- "OrderExchangeResult": {
-  "x-ticvai-persistence": "none — computed",
-  "type": "object",
-  "required": [
-   "orderId",
-   "outgoingValue",
-   "incomingValue",
-   "difference"
-  ],
-  "properties": {
-   "orderId": {
-    "type": "string"
-   },
-   "outgoingValue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "incomingValue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "exchangeFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "difference": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Only the difference settles. The replacement is held before the original is released, never the other way round.\n"
-   },
-   "newLineIds": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "revokedEntitlementIds": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "issuedEntitlementIds": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   }
-  }
- },
- "OrderLine": {
-  "x-ticvai-persistence": "orders.order_line",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/CreateOrderLine"
-   },
-   {
-    "type": "object",
-    "required": [
-     "serverUnitPrice",
-     "taxAmount",
-     "netAmount",
-     "grossAmount"
-    ],
-    "properties": {
-     "serverUnitPrice": {
-      "allOf": [
-       {
-        "$ref": "../shared/common.yaml#/components/schemas/Money"
-       }
-      ],
-      "description": "What the server computed on ingest."
-     },
-     "priceVariance": {
-      "allOf": [
-       {
-        "$ref": "../shared/common.yaml#/components/schemas/Money"
-       }
-      ],
-      "description": "Server minus quoted. Non-zero means the quoted price was honoured and the difference posted to the variance account.\n"
-     },
-     "taxAmount": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     },
-     "netAmount": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     },
-     "grossAmount": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     },
-     "entitlementIds": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      }
-     },
-     "crossRegionRightIds": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      },
-      "description": "Redemption rights propagated to other cells for this line."
-     }
-    }
-   }
-  ]
- },
- "OrderModificationResult": {
-  "x-ticvai-persistence": "none — computed",
-  "type": "object",
-  "required": [
-   "order",
-   "balanceDue"
-  ],
-  "properties": {
-   "order": {
-    "$ref": "#/components/schemas/Order"
-   },
-   "addedValue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "removedValue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "balanceDue": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Positive means the guest pays; negative means a refund is due."
-   },
-   "refundId": {
-    "type": "string",
-    "nullable": true
-   },
-   "revokedEntitlementIds": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "issuedEntitlementIds": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   }
-  }
- },
- "OrderResumeResult": {
-  "type": "object",
-  "x-ticvai-persistence": "none — computed",
-  "required": [
-   "order",
-   "hasChanged"
-  ],
-  "properties": {
-   "order": {
-    "$ref": "#/components/schemas/Order"
-   },
-   "hasChanged": {
-    "type": "boolean",
-    "description": "True where anything moved while the sale was parked. The cashier decides — silently charging the old price loses money, silently charging the new one loses the guest.\n"
-   },
-   "changes": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "kind": {
-       "type": "string",
-       "enum": [
-        "priceChanged",
-        "promotionExpired",
-        "promotionNowApplies",
-        "soldOut",
-        "seatHoldExpired",
-        "productWithdrawn"
-       ]
-      },
-      "lineId": {
-       "type": "string"
-      },
-      "detail": {
-       "type": "string"
-      },
-      "wasAmount": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "nowAmount": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      }
-     }
-    }
-   }
-  }
- },
- "OrderStatement": {
-  "x-ticvai-persistence": "none — computed from order, payment, refund and ledger",
-  "type": "object",
-  "required": [
-   "orderId",
-   "orderNumber",
-   "currency",
-   "entries",
-   "currentBalance"
-  ],
-  "properties": {
-   "orderId": {
-    "type": "string"
-   },
-   "orderNumber": {
-    "type": "string"
-   },
-   "currency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
-   },
-   "currencyScale": {
-    "type": "integer",
-    "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
-   },
-   "entries": {
-    "type": "array",
-    "description": "Sequential. What an agent reads to a guest asking about a charge.",
-    "items": {
-     "type": "object",
-     "required": [
-      "kind",
-      "amount",
-      "runningBalance",
-      "occurredAt"
-     ],
-     "properties": {
-      "kind": {
-       "type": "string",
-       "enum": [
-        "sale",
-        "payment",
-        "refund",
-        "void",
-        "modification",
-        "exchange",
-        "fee",
-        "variance",
-        "chargeback"
-       ]
-      },
-      "description": {
-       "type": "string"
-      },
-      "amount": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "runningBalance": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "referenceId": {
-       "type": "string",
-       "nullable": true
-      },
-      "principalId": {
-       "type": "string",
-       "format": "uuid",
-       "nullable": true
-      },
-      "occurredAt": {
-       "type": "string",
-       "format": "date-time"
-      }
-     }
-    }
-   },
-   "totalPaid": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "totalRefunded": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "currentBalance": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Positive means the guest owes; negative means a refund is outstanding."
-   }
-  }
- },
- "OrderStatus": {
-  "type": "string",
-  "enum": [
-   "pending",
-   "held",
-   "paid",
-   "partiallyPaid",
-   "completed",
-   "voided",
-   "refunded",
-   "partiallyRefunded",
-   "failed"
-  ],
-  "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
  },
  "Page": {
   "type": "object",
@@ -5411,103 +4220,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "hasMore": {
     "type": "boolean"
-   }
-  }
- },
- "Payment": {
-  "x-ticvai-persistence": "orders.payment",
-  "type": "object",
-  "required": [
-   "id",
-   "orderId",
-   "tender",
-   "amount",
-   "status",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string"
-   },
-   "orderId": {
-    "type": "string"
-   },
-   "tender": {
-    "$ref": "#/components/schemas/TenderKind"
-   },
-   "tenderCurrency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "description": "4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"
-   },
-   "tenderAmount": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "The amount in `tenderCurrency`, at that currency's own scale."
-   },
-   "fxRate": {
-    "type": "number",
-    "nullable": true,
-    "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
-   },
-   "fxRateSource": {
-    "type": "string",
-    "nullable": true,
-    "enum": [
-     "manual",
-     "feed",
-     "cardScheme"
-    ],
-    "description": "4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"
-   },
-   "changeCurrency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "nullable": true,
-    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "changeAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "authorised",
-     "captured",
-     "pendingConfirmation",
-     "declined",
-     "failed",
-     "voided",
-     "refunded"
-    ]
-   },
-   "providerName": {
-    "type": "string",
-    "nullable": true
-   },
-   "providerReference": {
-    "type": "string",
-    "nullable": true
-   },
-   "lastInquiryAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "syncedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
    }
   }
  },
@@ -5576,7 +4288,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "PostingEventType": {
   "type": "string",
-  "description": "Every event that generates a ledger posting.",
+  "description": "Every event that generates a ledger posting.\n**How each money event posts** (decided 28 September, audit R191). Card payment `cardReceived`, cash payment `cashReceived`, refund `refundIssued`, a POS offline sync the same events as the payments it replays, dated by when the till recorded them. **Two added on that date**: `gameCreditLoaded`, the liability `wallet.loadGameCredits` creates, and `pointsAccrued`, the liability for loyalty points earned. Every posting goes to the fiscal period open for the event date, through the mapping for its event type, or to suspense where none is mapped.\n**Required before a venue trades**: `cardReceived`, `cashReceived`, `refundIssued` and `priceVariance` (audit R127 (1)).\n",
   "enum": [
    "ticketRevenue",
    "fnbRevenue",
@@ -5594,7 +4306,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "priceVariance",
    "cashOverShort",
    "settlementFee",
-   "settlementClearing"
+   "settlementClearing",
+   "gameCreditLoaded",
+   "pointsAccrued"
   ]
  },
  "PriceVariance": {
@@ -5613,10 +4327,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "orderLineId": {
     "type": "string"
@@ -5652,7 +4368,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "reviewOutcome": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "The `outcome` given to `reviewPriceVariance`. Null until reviewed.",
+    "enum": [
+     "accepted",
+     "investigated",
+     "catalogueCorrected"
+    ]
    },
    "reviewedByPrincipalId": {
     "type": "string",
@@ -5661,6 +4383,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "journalEntryId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "occurredAt": {
@@ -5726,7 +4449,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "journalEntryIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    }
   }
@@ -5734,6 +4458,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "RecognitionSchedule": {
   "x-ticvai-persistence": "ledger.recognition_schedule",
   "type": "object",
+  "description": "Also the `createRecognitionSchedule` body. **`id` is server-owned** (`readOnly`): a client does not send it, and one sent is ignored.\n",
   "required": [
    "id",
    "name",
@@ -5743,7 +4468,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "name": {
     "type": "string",
@@ -5786,8 +4512,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "productKinds": {
     "type": "array",
+    "minItems": 1,
+    "description": "The product kinds this schedule claims, from the catalogue's `ProductKind`.",
     "items": {
-     "type": "string"
+     "type": "string",
+     "allOf": [
+      {
+       "$ref": "../spine/catalogue.yaml#/components/schemas/ProductKind"
+      }
+     ]
     }
    },
    "deferredAccountId": {
@@ -5826,193 +4559,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "isActive": {
     "type": "boolean"
-   }
-  }
- },
- "Refund": {
-  "x-ticvai-persistence": "orders.refund",
-  "type": "object",
-  "required": [
-   "id",
-   "orderId",
-   "amount",
-   "status",
-   "createdAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string"
-   },
-   "orderId": {
-    "type": "string"
-   },
-   "fxRate": {
-    "type": "number",
-    "nullable": true,
-    "readOnly": true,
-    "description": "**The rate on the original payment, not today's** (BL-087, CF-118).\n`Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the moment of sale, so the sale rate is always retrievable. **Refunding at today's rate repays a different amount of money than was taken** — a guest who paid 100 USD at 3.67 and is refunded at 3.72 gets back more AED than they gave, and the venue carries the difference on every refund.\nThe exposure runs both ways and neither direction is defensible: a guest short-changed by a moving rate has a complaint the venue cannot answer, because **the guest did nothing but wait.**\n"
-   },
-   "taxReversalEntryId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "description": "**A refund reverses the tax entry it created, and this is where that is stated rather than implied.** `reverseJournalEntry` and `calculateTax` both exist, so both halves were present and the obligation was assumed — **an implied obligation is one a developer can miss without failing anything.**\nNull only where the original sale carried no tax.\n"
-   },
-   "settleTo": {
-    "type": "string",
-    "enum": [
-     "originalTender",
-     "advanceBalance",
-     "wireTransfer",
-     "storeCredit"
-    ],
-    "default": "originalTender",
-    "description": "BL-086. **A refund could only go back the way it came.** A guest whose card has expired, a partner settling by wire, a guest who would rather have the credit — three real cases with one answer.\n**`originalTender` stays the default** because refunding elsewhere is how money laundering works, and anything else needs a reason.\n"
-   },
-   "fxVariance": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Where the sale rate and the current rate differ, **the difference is booked as an FX variance rather than hidden in the refund**. `runFxRevaluation` already handles this class of movement and this is the same act at a smaller scale.\n"
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "appliedPercentage": {
-    "type": "number",
-    "description": "From the venue's time bands, or an approver override."
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "pendingApproval",
-     "pendingGateway",
-     "completed",
-     "declined",
-     "failed"
-    ]
-   },
-   "reason": {
-    "type": "string"
-   },
-   "requestedByPrincipalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "secondaryPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "approvedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "ledgerEntryId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Written before the gateway is called."
-   },
-   "gatewayReference": {
-    "type": "string",
-    "nullable": true
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "completedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "RefundPolicy": {
-  "x-ticvai-persistence": "orders.refund_policy",
-  "type": "object",
-  "description": "Venue-configured. Thresholds are policy, not permission scope — venues run different policies and the permission model should not encode commercial rules.\n",
-  "required": [
-   "venueId",
-   "selfAuthoriseLimit",
-   "requiresApprovalAbove"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "selfAuthoriseLimit": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Up to this, a holder of ORDER_REFUND refunds alone. Zero means every refund needs a second authoriser.\n"
-   },
-   "requiresSecondUserAbove": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Above this, a second user — cashier OR supervisor — names themselves as audit control. Dual-authorisation, not escalation (2.12.3).\n"
-   },
-   "requiresApprovalAbove": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Above this, an ORDER_REFUND_APPROVE holder must approve."
-   },
-   "timeBands": {
-    "type": "array",
-    "description": "Refundable percentage by time before the performance. Evaluated most-specific first.\n",
-    "items": {
-     "type": "object",
-     "required": [
-      "hoursBefore",
-      "percentage"
-     ],
-     "properties": {
-      "hoursBefore": {
-       "type": "integer",
-       "minimum": 0
-      },
-      "percentage": {
-       "type": "number",
-       "minimum": 0,
-       "maximum": 100
-      }
-     }
-    }
-   },
-   "allowPartial": {
-    "type": "boolean",
-    "default": true
-   },
-   "refundWindowDays": {
-    "type": "integer",
-    "nullable": true
-   },
-   "varianceThreshold": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Price variance above this is an exception requiring review rather than a routine posting (CF-38). Venue-configured.\n"
    }
   }
  },
@@ -6083,11 +4629,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "effectiveFrom": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "A day in the region's time zone, local midnight to local midnight."
    },
    "effectiveTo": {
     "type": "string",
     "format": "date",
+    "description": "A day in the region's time zone, local midnight to local midnight.",
     "nullable": true
    },
    "isActive": {
@@ -6098,6 +4646,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "TaxExemption": {
   "x-ticvai-persistence": "ledger.tax_exemption",
   "type": "object",
+  "description": "Also the `createTaxExemption` body. **`id` is server-owned** (`readOnly`): a client does not send it, and one sent is ignored. OpenAPI 3.1: a `readOnly` property in `required` is required in responses only.\n",
   "required": [
    "id",
    "scope",
@@ -6107,7 +4656,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "scope": {
     "type": "string",
@@ -6130,17 +4680,72 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "maxLength": 500
    },
+   "exemptionType": {
+    "type": "string",
+    "enum": [
+     "diplomatic",
+     "export",
+     "businessToBusiness",
+     "charity",
+     "governmentEntity",
+     "freeZone",
+     "zeroRated",
+     "other"
+    ],
+    "description": "Tax Exemption Evidence: exemption type (pack 'Pricing___Revenue_Management_Reference.pdf' p.47). Moved here from catalogue `listFeeWaiverTax`, whose rule now only says `evidenceRequired` (decided 29 September, readiness close-out). Which types a jurisdiction recognises is the client's tax configuration; the list names the kinds, it does not grant any. **Proposed values: tax configuration per jurisdiction, client to correct.**"
+   },
    "certificateReference": {
     "type": "string",
-    "nullable": true
+    "maxLength": 100,
+    "nullable": true,
+    "description": "Tax Exemption Evidence: reference, e.g. the exemption certificate, diplomatic card or export declaration number."
+   },
+   "evidenceDocumentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Tax Exemption Evidence: the uploaded document (certificate scan, declaration). Kept for the retention period of the postings it exempted, not of the exemption."
+   },
+   "verificationStatus": {
+    "type": "string",
+    "enum": [
+     "notRequired",
+     "pending",
+     "verified",
+     "rejected",
+     "expired"
+    ],
+    "default": "pending",
+    "description": "Tax Exemption Evidence: verification status. **Only `verified` and `notRequired` exempt a line**; `calculateTax` treats `pending`, `rejected` and `expired` as no exemption and records the exemption id on the line so the refusal is explainable. `expired` is set by the server once `validTo` has passed; evidence checked after the grant is recorded with `verifyTaxExemption`. The granter sends `verified` on `createTaxExemption` when the evidence was checked at the grant; `verifiedBy` and `verifiedAt` are then set from the caller."
+   },
+   "verifiedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "verifiedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "verificationNote": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `note` given to `verifyTaxExemption`; required when evidence was rejected."
    },
    "validFrom": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "Tax Exemption Evidence: validity, first day. A day in the region's time zone, local midnight to local midnight."
    },
    "validTo": {
     "type": "string",
     "format": "date",
+    "description": "Tax Exemption Evidence: validity, last day. A day in the region's time zone, local midnight to local midnight.",
     "nullable": true
    }
   }
@@ -6221,7 +4826,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "VenueSettings": {
   "type": "object",
   "x-ticvai-persistence": "platform.venue_settings",
-  "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n",
+  "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n**And the configured limits** (decided 28 September, audit R094): every limit the contracts call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`, `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a null field here inherits it. Each field's `default` is the proposed tenant default, marked proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the sheet the client corrects, and where the two differ this contract is what runs.\n",
   "properties": {
    "id": {
     "type": "string",
@@ -6231,7 +4836,24 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "venueId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true,
+    "description": "From the path of `setVenueSettings`."
+   },
+   "currencyCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**`readOnly` is the freeze.** `setVenueSettings` takes this whole schema as its request body, so without it any settings save could rewrite the currency of a venue that had already traded — which is the one thing ADR-0018's amendment forbids. It is set when the venue is provisioned, defaulted from the region, and changed only by an operation whose precondition is that the venue has not yet traded.\n**The venue's trading currency, defaulted from its region and frozen once the venue has traded** (ADR-0018, amended 20 September). Currency was a region-only fact, grouped with tax rates on the reasoning that *\"a venue cannot choose its VAT\"* -- true of tax and over-applied to currency, because a free-zone unit, a duty-free shop and a cruise terminal genuinely trade in a currency their region does not.\n**This column exists because the freeze needs somewhere to live.** A venue that resolved purely from its region would silently follow a region currency change after it had already traded, and every dated artefact beneath it -- a price list is a `validFrom`/`validTo` range -- would render retrospectively wrong. Null means \"resolve from the region\", which is the answer for every venue that has not overridden.\n"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4,
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Scale travels with currency** (ADR-0008), and so does the freeze. OMR is three decimal places because Oman says so; overriding the currency without the scale gets rounding wrong. Set together or not at all.\n"
    },
    "supportHours": {
     "type": "object",
@@ -6247,7 +4869,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       ]
      },
      "timezone": {
-      "type": "string"
+      "type": "string",
+      "description": "IANA zone the `windows` are read in. Absent, they are read in the region's `timeZone`, like every other wall-clock time in this contract.\n"
      },
      "windows": {
       "type": "array",
@@ -6267,10 +4890,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
          ]
         },
         "from": {
-         "type": "string"
+         "type": "string",
+         "description": "Wall-clock time the desk opens."
         },
         "to": {
-         "type": "string"
+         "type": "string",
+         "description": "Wall-clock time the desk closes."
         }
        }
       }
@@ -6287,10 +4912,51 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "**When the platform does not send.** A wallet low-balance alert at 3am is a complaint, and journeys and message triggers both respect this.\n**Operational messages ignore it** — a queue-turn alert is why a guest is holding the phone.\n",
     "properties": {
      "from": {
-      "type": "string"
+      "type": "string",
+      "description": "Wall-clock time sending stops",
+      "in the region's time zone.": null
      },
      "to": {
-      "type": "string"
+      "type": "string",
+      "description": "Wall-clock time sending resumes",
+      "in the region's time zone.": null
+     }
+    }
+   },
+   "biometrics": {
+    "type": "object",
+    "nullable": true,
+    "description": "CF-35, BL-096, BL-105, BL-106. **The venue-level master switch, and the one place a person is asked whether the paperwork exists.** Biometric data is sensitive under PDPL (Federal Decree-Law 45/2021) — heightened protection, explicit consent, and an Article 21 assessment before the processing rather than after it.\n**Nothing below this switch operates while it is off.** `AdmissionRules` may carry a `biometricPolicy` per ticket type and those rules are inert until a venue enables biometrics here, which means a profile copied between venues cannot start capturing faces at the destination.\n**Venue level because that is where the assessment is filed.** Region owns tax and currency; the DPIA, the consent notice and the hardware are a venue's.\n",
+    "properties": {
+     "isEnabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "**Off by default, and turning it on is refused without the two fields below.** `setVenueSettings` answers 422 rather than accepting an enable it cannot evidence — **a DPIA nobody can name is a DPIA nobody did**, and the point of the refusal is that the person switching this on is asked at the moment they switch it on rather than by an auditor a year later.\n"
+     },
+     "dpiaReference": {
+      "type": "string",
+      "nullable": true,
+      "maxLength": 200,
+      "description": "**The venue's own reference for its Article 21 assessment.** The platform does not hold the document and does not judge it; it records that one was named, by whom, and when — which is what an audit asks for and what the venue can produce.\n"
+     },
+     "consentNoticeAcknowledgedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "description": "**When somebody confirmed the consent forms are in place at the point of capture.** A guest consenting in an app is a record; a guest consenting at a ticket counter is a notice somebody has to have printed and a question somebody has to have asked.\n"
+     },
+     "acknowledgedByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "readOnly": true,
+      "description": "**Who confirmed it.** An acknowledgement with no name behind it cannot be followed up, and this is the field that makes the switch an act rather than a setting. Recorded by the server as the caller whose save carried the acknowledgement, so it cannot name somebody else.\n"
+     },
+     "faceTagPurgeMinutesAfterClose": {
+      "type": "integer",
+      "nullable": true,
+      "default": 0,
+      "description": "BL-106. **How long a same-visit Face Tag survives past the close of the operating day**, and zero is the default because that is what 3.2.44 describes. A non-zero value is an operational allowance for a late reconciliation, not a retention period — **`facePass` ignores this entirely** and is bounded by its entitlement.\n"
      }
     }
    },
@@ -6316,13 +4982,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        "type": "object",
        "properties": {
         "day": {
-         "type": "string"
+         "type": "string",
+         "enum": [
+          "mon",
+          "tue",
+          "wed",
+          "thu",
+          "fri",
+          "sat",
+          "sun"
+         ]
         },
         "from": {
-         "type": "string"
+         "type": "string",
+         "description": "Wall-clock time",
+         "in the region's time zone.": null
         },
         "to": {
-         "type": "string"
+         "type": "string",
+         "description": "Wall-clock time",
+         "in the region's time zone.": null
         },
         "admits": {
          "type": "string",
@@ -6346,11 +5025,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "genderVerification": {
       "type": "string",
       "enum": [
-       false,
+       "off",
        "staffAssisted",
        "deviceAssisted"
       ],
-      "default": false,
+      "default": "off",
       "description": "`off` — the entitlement decides and a steward handles exceptions. **The default, and what is contracted.**\n`staffAssisted` — the steward's screen shows the ticket type so they can ask. No inference anywhere.\n`deviceAssisted` — **the venue's access hardware performs the check, not the platform.** Available only where the driver reports the capability, and the result is **advisory to the steward rather than decisive at the turnstile** (3.2.45 asks for rejection; this deviates deliberately).\n"
      },
      "overrideRateAlertThreshold": {
@@ -6380,6 +5059,326 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "escalateAfterMinutes": {
       "type": "integer",
       "nullable": true
+     }
+    }
+   },
+   "displayCurrencies": {
+    "type": "array",
+    "nullable": true,
+    "description": "**Which currencies this venue shows guests** (decided 28 September, audit R120 (a)). ISO 4217 codes, each one its region holds an `FxRate` for; the rate itself stays per region and is never set here. `finance.listFxRates` with `venueId` narrows the region's rates to these. Null or empty shows the trading currency only. A code the region has no rate for is refused `400`.\n",
+    "items": {
+     "type": "string",
+     "pattern": "^[A-Z]{3}$"
+    }
+   },
+   "cartLeaseSeconds": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 30,
+    "maximum": 3600,
+    "default": 900,
+    "description": "**How long a cart holds capacity** (decided 28 September, audit R169): 15 minutes, the default `catalogue.acquireInventoryHold` takes for `ttlSeconds`. Proposed, client to correct (audit R094).\n"
+   },
+   "cartHoldExtensionMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 1,
+    "maximum": 30,
+    "default": 5,
+    "description": "How long one `orders.extendCart` extension adds. Proposed, client to correct (audit R094)."
+   },
+   "cartMaxExtensions": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 5,
+    "default": 1,
+    "description": "How many extensions a cart may take before `extensionCapReached` (`Cart.maxExtensions`). Proposed, client to correct (audit R094)."
+   },
+   "resaleCutoffHours": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 168,
+    "default": 24,
+    "description": "Hours before the performance after which a ticket can no longer be listed for resale (`orders.createResaleListing`). Proposed, client to correct (audit R094)."
+   },
+   "exchangeCutoffHours": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 720,
+    "default": 24,
+    "description": "Hours before the original performance after which lines can no longer be exchanged (`orders.exchangeOrderLines`, `outsideExchangeWindow`). Proposed, client to correct (audit R094)."
+   },
+   "rescheduleCutoffHours": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 720,
+    "default": 24,
+    "description": "Hours before the original performance after which an order can no longer be rescheduled (`orders.rescheduleOrder`, `outsideRescheduleWindow`). Proposed, client to correct (audit R094)."
+   },
+   "reservationMaxExtensions": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 5,
+    "default": 1,
+    "description": "How many times `orders.extendReservation` may extend one reservation. Proposed, client to correct (audit R094)."
+   },
+   "shiftVarianceThreshold": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in the venue currency; client finance to correct (audit R094).**\n"
+   },
+   "catalogue": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "maxVariantsPerProduct": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "maximum": 2000,
+      "default": 200,
+      "description": "Variants one product may generate from its attributes (`setProductAttributes` refuses above it). Proposed, client to correct (audit R094)."
+     },
+     "waitlistOfferHoldMinutes": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "maximum": 1440,
+      "default": 30,
+      "description": "How long a waitlist offer holds the released capacity for the guest it was offered to. Proposed, client to correct (audit R094)."
+     },
+     "bulkPriceChangeEscalationPercent": {
+      "type": "number",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 100,
+      "default": 10,
+      "description": "A `bulkChangePrices` run changing any price by more than this percentage needs `PRICE_CONFIGURE` (audit R197). Proposed, client to correct (audit R094)."
+     },
+     "bulkPriceChangeEscalationCount": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "default": 50,
+      "description": "A `bulkChangePrices` run touching more prices than this needs `PRICE_CONFIGURE` (audit R197). Proposed, client to correct (audit R094)."
+     }
+    }
+   },
+   "inventory": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "overReceiptTolerancePercent": {
+      "type": "number",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 25,
+      "default": 5,
+      "description": "Percent above the outstanding ordered quantity a goods receipt line may record (`createGoodsReceipt`). Proposed, client to correct (audit R094)."
+     },
+     "countVarianceTolerancePercent": {
+      "type": "number",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 25,
+      "default": 2,
+      "description": "Percent difference between counted and expected quantity before a count line is an exception (`getCountVariance`). Proposed, client to correct (audit R094)."
+     },
+     "countVarianceApprovalAmount": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "nullable": true,
+      "description": "Total variance value of a count above which posting it needs approval (`postStockCount`). **Proposed tenant default 1,000.00 in the venue currency, client finance to correct (audit R094).**\n"
+     }
+    }
+   },
+   "seating": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "seatHoldExtensionSeconds": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 60,
+      "maximum": 1800,
+      "default": 300,
+      "description": "What one `extendSeatHold` adds. No hold outlives 30 minutes in all (audit R169). Proposed, client to correct (audit R094)."
+     },
+     "seatHoldMaxExtensions": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 5,
+      "default": 2,
+      "description": "How many times a seat hold may be extended. Proposed, client to correct (audit R094). A resource hold on a venue map (`resources.extendResourceHold`) uses the same two bounds (decided 29 September, rev 3 REV3-15)."
+     },
+     "maxSeatsPerGuestOrder": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "maximum": 50,
+      "default": 10,
+      "description": "**Seats one guest may take in one booking on a guest channel** (Guest Web, Guest App), decided 29 September, rev 3 REV3-7. `seating.createSeatHold` counts the seats in the request plus the seats the same guest already holds on the same performance, and refuses above this with `422` `seat-limit-exceeded`, naming the limit. Default 10, bounds 1 to 50; a venue sets its own in Venue Management. Staff and POS sales keep 10 per sale (audit R080 (c)) and do not read this field.\n"
+     }
+    }
+   },
+   "promotions": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "maxDiscountPercent": {
+      "type": "number",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 100,
+      "default": 30,
+      "description": "The largest discount one promotion may give (`createPromotion` refuses above it). Proposed, client to correct (audit R094)."
+     },
+     "nearZeroLinePrice": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "nullable": true,
+      "description": "Net line price below which a stacked combination is flagged near-zero in `analysePromotionConflicts` (audit R096 (5)); a warning, not a refusal. **Proposed tenant default AED 1.00, client to correct (audit R094).**\n"
+     }
+    }
+   },
+   "fnb": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "recallWindowMinutes": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 60,
+      "default": 10,
+      "description": "Minutes after a bump during which `recallKitchenTicket` still recalls; after it the act is a refire. Proposed, client to correct (audit R094)."
+     },
+     "compEscalationAmount": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "nullable": true,
+      "description": "Line value above which `compItem` needs `ORDER_DISCOUNT` (audit R197). **Proposed tenant default AED 100.00, client to correct (audit R094).**\n"
+     },
+     "foodSafetyLeadPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "**The venue's food-safety lead**, to whom `escalateCorrectiveAction` sends every escalation (decided 28 September, audit R096 (9)). A venue fact, so it has no tenant default; while it is null an escalation is refused `409 no-food-safety-lead`.\n"
+     }
+    }
+   },
+   "queue": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "crossQueueLimit": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "maximum": 10,
+      "default": 2,
+      "description": "Virtual queues one guest party may wait in at once (`joinQueue`, `crossQueueLimitReached`). Proposed, client to correct (audit R094)."
+     }
+    }
+   },
+   "reporting": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "inlineRunRowLimit": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1000,
+      "maximum": 100000,
+      "default": 5000,
+      "description": "Estimated rows above which `runReport` answers `202` and runs in the background. Proposed, client to correct (audit R094)."
+     },
+     "dashboardRefreshBudgetPerMinute": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "default": 24,
+      "description": "Tile refreshes per minute, summed over a dashboard's tiles, that `createDashboard` allows. Proposed, client to correct (audit R094)."
+     }
+    }
+   },
+   "marketing": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "attributionWindowDays": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "maximum": 30,
+      "default": 7,
+      "description": "Days after a campaign touch within which a booking is attributed to it (`getCampaignPerformance`). Proposed, client to correct (audit R094)."
+     }
+    }
+   },
+   "identity": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "guestOtpMaxAttempts": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 3,
+      "maximum": 10,
+      "default": 5,
+      "description": "Wrong entries allowed per guest one-time code before `verifyGuestOtp` invalidates it. A guest code is tenant-scoped, so the tenant default is the value used. Proposed, client to correct (audit R094).\n"
+     },
+     "guestTwoStep": {
+      "type": "object",
+      "nullable": true,
+      "description": "**Guest two-step verification: a venue option, off unless the venue enables it in Venue Management** (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of audit R167, \"no guest MFA\"; an earlier draft of the same day put it on the tenant's `PasswordPolicy`, which no longer carries it). **The guest's enrolment stays tenant-wide**: one guest account across the tenant's venues, so a method enrolled once is used in every venue that has this on, and is never asked in a venue that has it off. Identity learns the venue from `venueId` on the guest sign-in (`verifyGuestOtp`, `guestPasswordLogin`, `guestSocialLogin`, `guestUaePassLogin`) and on `createMfaChallenge`: the venue the guest app or booking is in; with no venue given, an enrolled guest is asked when any venue of the tenant has it on. Guests may enrol `totp` with `emailOtp` as the fallback, as staff do (audit R126 (5)); it is never forced. Guests still never use enterprise SSO (R167, first part). A null inherits the tenant default set with `setVenueSettingsDefaults`.\n",
+      "properties": {
+       "enabled": {
+        "type": "boolean",
+        "default": false,
+        "description": "Off unless the venue enables it. While no venue of the tenant has it on, guests cannot enrol (`enrolMfaMethod` answers 403 `guest-two-step-disabled`)."
+       },
+       "stepUpActions": {
+        "type": "array",
+        "uniqueItems": true,
+        "description": "The guest actions in this venue that ask an enrolled guest for the factor again, whatever the age of the session. The service performing the action passes this venue to `createMfaChallenge`. Proposed, client to correct (rev 3 GAP-B1).\n",
+        "items": {
+         "type": "string",
+         "enum": [
+          "changeContactDetails",
+          "changePassword",
+          "managePaymentMethods",
+          "transferTickets",
+          "deleteAccount"
+         ]
+        },
+        "default": [
+         "changeContactDetails",
+         "changePassword",
+         "managePaymentMethods",
+         "deleteAccount"
+        ]
+       }
+      }
      }
     }
    }

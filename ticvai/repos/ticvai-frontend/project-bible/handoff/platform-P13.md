@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 100 |
-| Operations | 141 |
+| Operations | 142 |
 | Contracts | 9 |
 | Modules | 3 |
 | Undrawn | 0 |
@@ -100,9 +100,9 @@
 | `CMS-025` | Cookie, Tracking & Digital Technology Registry | Policy | 3 | 1 | yes |
 | `CMS-026` | Cookie Banner & Preference Center Designer | Policy | 3 | 1 | yes |
 | `CMS-027` | Consent Capture Point & Customer Journey Configuration | Policy | 3 | 1 | yes |
-| `CMS-028` | Privacy Notice, Policy & Terms Version Management | Policy | 3 | 1 | yes |
+| `CMS-028` | Privacy Notice, Policy & Terms Version Management | Policy | 3 | 2 | yes |
 | `CMS-029` | Minor, Guardian & Age-Based Privacy Configuration | Policy | 3 | 1 | yes |
-| `CMS-030` | Privacy Configuration Testing, Approval & Publication | Policy | 3 | 1 | yes |
+| `CMS-030` | Privacy Configuration Testing, Approval & Publication | Policy | 3 | 2 | yes |
 | `CMS-031` | Privacy Operations Command Center | Policy | 3 | 1 | yes |
 | `CMS-032` | Customer Privacy, Consent & Preference 360° | Policy | 3 | 1 | yes |
 | `CMS-033` | Consent Evidence, History & Withdrawal Management | Policy | 3 | 1 | yes |

@@ -417,6 +417,45 @@
   "requestBody": null,
   "responds": "Event"
  },
+ "getKpiValues": {
+  "method": "GET",
+  "path": "/kpi-values",
+  "contract": "reporting",
+  "summary": "Current values, against target, with movement",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kpiIds",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kpiCodes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "compareTo",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KpiValue"
+ },
  "getPerformance": {
   "method": "GET",
   "path": "/performances/{performanceId}",
@@ -725,11 +764,16 @@
   "path": "/parking-facilities",
   "contract": "access",
   "summary": "Car parks at a venue, and how each integrates",
-  "permission": "ACCESS_POINT_CONFIGURE",
+  "permission": "PARKING_CONFIGURE",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
    {
     "name": null,
     "in": null,
@@ -742,7 +786,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "ParkingFacility"
+  "responds": "Page"
  },
  "listPerformances": {
   "method": "GET",
@@ -761,6 +805,11 @@
    },
    {
     "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "language",
     "in": "query",
     "required": null
    },
@@ -944,7 +993,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Campaign"
  },
  "recommendSeats": {
   "method": "POST",
@@ -955,7 +1004,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "SeatRecommendationRequest",
   "responds": null
  },
@@ -996,6 +1051,30 @@
   ],
   "requestBody": "SetAssetStatusRequest",
   "responds": "AssetStatusResult"
+ },
+ "setEntryRulePoints": {
+  "method": "PUT",
+  "path": "/admission-rules/{ruleId}/points",
+  "contract": "access",
+  "summary": "Set the access points an admission rule covers",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "ruleId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessEntryRulePoint",
+  "responds": "AccessEntryRulePoint"
  },
  "setParkingFacility": {
   "method": "PUT",
@@ -1128,7 +1207,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Campaign"
  },
  "updateAccessPoint": {
   "method": "PATCH",

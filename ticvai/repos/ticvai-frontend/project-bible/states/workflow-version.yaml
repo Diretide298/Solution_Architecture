@@ -1,0 +1,108 @@
+# Workflow version — state model
+# Contract: approvals.WorkflowVersionStatus
+# Checked by tools/check-states.py.
+
+entity: Workflow version
+contract: approvals
+enum: WorkflowVersionStatus
+enumKind: named
+enumSchema: WorkflowVersionStatus
+owner: approvals
+description: '**How a workflow version moves safely from configuration into production** (pack 13.1.10;
+  decided 29 September, readiness close-out; data model for the agreed operations, 29 September). Only a
+  tested and approved version goes active, through the approvals engine; in-flight instances keep the version
+  they started on (audit R129).'
+initial:
+- draft
+terminal:
+- retired
+transitions:
+- from: draft
+  to: tested
+  operation: simulateWorkflowTestingImpact
+  trigger: operation
+  guard: A test or simulation of this version passed; the result and the tester are recorded on the version.
+    Simulation never executes actions
+- from: tested
+  to: draft
+  operation: setVisualWorkflow
+  trigger: operation
+  guard: The graph was edited after testing, so the test no longer describes it
+- from: tested
+  to: businessReview
+  operation: approveVersioningGovernance
+  trigger: operation
+  guard: Submitted for business review by the business owner
+- from: businessReview
+  to: technicalValidation
+  operation: approveVersioningGovernance
+  trigger: operation
+  guard: The business owner accepted the change
+- from: businessReview
+  to: draft
+  operation: approveVersioningGovernance
+  trigger: operation
+  guard: Returned for rework, with a reason
+- from: technicalValidation
+  to: approval
+  operation: approveVersioningGovernance
+  trigger: operation
+  guard: The technical owner validated it; publication raises an `approvals.request` (`approvalRequestId`)
+    of kind `configurationChange`
+- from: technicalValidation
+  to: draft
+  operation: approveVersioningGovernance
+  trigger: operation
+  guard: Returned for rework, with a reason
+- from: approval
+  to: active
+  trigger: externalEvent
+  guard: The publication request was approved and no `effectiveFrom` is set; the workflow's `activeWorkflowVersionId`
+    moves to this version
+  requiresApproval: true
+- from: approval
+  to: scheduled
+  trigger: externalEvent
+  guard: The publication request was approved with a future `effectiveFrom`
+  requiresApproval: true
+- from: approval
+  to: draft
+  trigger: externalEvent
+  guard: The publication request was rejected or returned
+- from: scheduled
+  to: active
+  trigger: timer
+  guard: '`effectiveFrom` arrived'
+- from: scheduled
+  to: suspended
+  operation: approveVersioningGovernance
+  trigger: operation
+  guard: Held before activation, with a reason
+- from: active
+  to: suspended
+  operation: approveVersioningGovernance
+  trigger: operation
+  guard: Suspended (the kill switch), with a reason. New instances stop starting on it; running instances
+    finish on it
+- from: suspended
+  to: active
+  operation: approveVersioningGovernance
+  trigger: operation
+  guard: Reinstated. It was already tested and approved; nothing it contains changed
+- from: active
+  to: retired
+  trigger: cascade
+  guard: A newer version of the same workflow went active, or `effectiveTo` passed
+- from: suspended
+  to: retired
+  operation: approveVersioningGovernance
+  trigger: operation
+  guard: Withdrawn for good (rollback goes to a new version made from an earlier one)
+- from: draft
+  to: retired
+  operation: approveVersioningGovernance
+  trigger: operation
+  guard: An abandoned draft
+notes: '**A version past `draft` is never edited.** A change is a new version, so what was approved is exactly
+  what runs. Nothing leaves `retired`: rolling back means publishing a new version made from an earlier one,
+  through the same tests and approval.'

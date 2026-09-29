@@ -1,4 +1,4 @@
--- wallet — 28 tables
+-- wallet — 29 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 3 columns. No description has been written for this table — the name is the only thing
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS wallet.adjustment (
 );
 
 -- Holds 2 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.authentication_policy (
     scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
@@ -69,6 +69,17 @@ CREATE TABLE IF NOT EXISTS wallet.configuration_version (
     note                              text,
     scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS wallet.configuration_version_snapshot (
+    id                                uuid PRIMARY KEY,
+    configuration_version_id          uuid NOT NULL,
+    area                              text NOT NULL CONSTRAINT configuration_version_snapshot_area_chk CHECK (area IN ('walletTypes', 'creditTypes', 'consumptionPolicy', 'fundingRules', 'channelRules', 'authenticationPolicy', 'transferRules', 'refundPolicy', 'riskRules', 'accountingMapping', 'reconciliationSources', 'integrationMappings')),
+    values                            jsonb NOT NULL,
+    captured_at                       timestamptz NOT NULL,
+    scope_path                        ltree NOT NULL
 );
 
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
@@ -237,7 +248,7 @@ CREATE TABLE IF NOT EXISTS wallet.hold (
 );
 
 -- Holds 5 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.integration_mapping (
     api_client_id                     uuid NOT NULL,
     date_time_format                  text DEFAULT 'ISO-8601',
@@ -247,7 +258,7 @@ CREATE TABLE IF NOT EXISTS wallet.integration_mapping (
 );
 
 -- Holds 2 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.reconciliation_source (
     scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL

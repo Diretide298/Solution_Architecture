@@ -39,10 +39,7 @@
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-051 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-052",
@@ -101,10 +98,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations can identify every upcoming activity affected by incomplete waiver requirements and prioritize corrective actions before customer arrival.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each record should show) — counts over a population, then the population",
   "purpose": "Provide Operations, Customer Service, Compliance and venue teams with a real-time overview of waiver completion across upcoming and active activities.",
-  "purposeNote": "Operations can identify every upcoming activity affected by incomplete waiver requirements and prioritize corrective actions before customer arrival.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -122,9 +119,6 @@
        "label": "Filter by",
        "columns": [
         "Brand",
-        "WaiverOperationsCommandCenterView.venue",
-        "WaiverOperationsCommandCenterView.event",
-        "WaiverOperationsCommandCenterView.product",
         "Waiver",
         "Date",
         "Status",
@@ -222,17 +216,17 @@
        "kind": "dataTable",
        "label": "Every waiver operations",
        "columns": [
-        "WaiverOperationsCommandCenterView.eventActivity",
-        "WaiverOperationsCommandCenterView.venue",
-        "WaiverOperationsCommandCenterView.dateTime",
-        "WaiverOperationsCommandCenterView.participants",
-        "WaiverOperationsCommandCenterView.waiversRequired",
-        "WaiverOperationsCommandCenterView.completed",
-        "WaiverOperationsCommandCenterView.missing",
-        "WaiverOperationsCommandCenterView.completion",
-        "WaiverOperationsCommandCenterView.guardianPending",
-        "WaiverOperationsCommandCenterView.exceptions",
-        "WaiverOperationsCommandCenterView.operationalRisk"
+        "WaiverOperationsCommandCenterView.upcomingActivities[].eventActivity",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].venue",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].dateTime",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].participants",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].waiversRequired",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].completed",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].missing",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].completion",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].guardianPending",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].exceptions",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].operationalRisk"
        ],
        "bindsTo": "WaiverOperationsCommandCenterView",
        "operation": "listWaiver",
@@ -249,17 +243,17 @@
        "label": "The selected waiver operations",
        "bindsTo": "WaiverOperationsCommandCenterView",
        "columns": [
-        "WaiverOperationsCommandCenterView.eventActivity",
-        "WaiverOperationsCommandCenterView.venue",
-        "WaiverOperationsCommandCenterView.dateTime",
-        "WaiverOperationsCommandCenterView.participants",
-        "WaiverOperationsCommandCenterView.waiversRequired",
-        "WaiverOperationsCommandCenterView.completed",
-        "WaiverOperationsCommandCenterView.missing",
-        "WaiverOperationsCommandCenterView.completion",
-        "WaiverOperationsCommandCenterView.guardianPending",
-        "WaiverOperationsCommandCenterView.exceptions",
-        "WaiverOperationsCommandCenterView.operationalRisk"
+        "WaiverOperationsCommandCenterView.upcomingActivities[].eventActivity",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].venue",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].dateTime",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].participants",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].waiversRequired",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].completed",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].missing",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].completion",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].guardianPending",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].exceptions",
+        "WaiverOperationsCommandCenterView.upcomingActivities[].operationalRisk"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Display by”, “Activity Status”, “Youth Attentio”, “Climbing”, “Session”.",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 26 §Each record should show"
@@ -286,7 +280,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-051"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-051",
+   "workshopBoard": "wireframes/WS185 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-051"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 26. 26 of 32 labels bound to a contract property; 32 of 55 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -349,10 +344,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Staff can determine the complete waiver readiness of any participant from one screen.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide a detailed operational record of the waiver requirements for each participant.",
-  "purposeNote": "Staff can determine the complete waiver readiness of any participant from one screen.",
   "layout": {
    "template": "split",
    "regions": [
@@ -478,7 +473,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-052"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-052",
+   "workshopBoard": "wireframes/WS185 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-052"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 28. 16 of 19 labels bound to a contract property; 28 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -541,14 +537,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "channels.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Manage the actual distribution and completion of digital waivers.",
-  "purposeNote": "channels.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Email Link, SMS Link. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Email Link, SMS Link, WhatsApp where integrated, POS, Staff-Assisted Device. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 29 §Support"
    }
   ],
@@ -612,6 +608,21 @@
        "kind": "secondaryButton",
        "label": "SMS Link",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 29 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "WhatsApp where integrated",
+       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 29 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "POS",
+       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 29 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Staff-Assisted Device",
+       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 29 §Support"
       }
      ]
     }
@@ -645,9 +656,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-053"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-053",
+   "workshopBoard": "wireframes/WS185 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-053"
   },
-  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 29. 7 of 7 labels bound to a contract property; 15 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 29. 7 of 7 labels bound to a contract property; 18 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -708,10 +720,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "purchaser, participant and legal signatory as the same person.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Manage complex consent relationships for minors and organized groups. This screen is particularly important for camps, academies, schools, family attractions and youth activities.",
-  "purposeNote": "purchaser, participant and legal signatory as the same person.",
   "gaps": [
    {
     "operation": null,
@@ -730,12 +742,12 @@
        "kind": "dataTable",
        "label": "Every minor guardian group",
        "columns": [
-        "MinorGuardianGroupConsentManagementView.organization",
-        "MinorGuardianGroupConsentManagementView.groupLeader",
-        "MinorGuardianGroupConsentManagementView.contact",
-        "MinorGuardianGroupConsentManagementView.groupBooking",
-        "MinorGuardianGroupConsentManagementView.responsibility",
-        "MinorGuardianGroupConsentManagementView.permittedActions"
+        "MinorGuardianGroupConsentManagementView.group.organization",
+        "MinorGuardianGroupConsentManagementView.group.groupLeader",
+        "MinorGuardianGroupConsentManagementView.group.contact",
+        "MinorGuardianGroupConsentManagementView.group.groupBooking",
+        "MinorGuardianGroupConsentManagementView.group.responsibility",
+        "MinorGuardianGroupConsentManagementView.group.permittedActions"
        ],
        "bindsTo": "MinorGuardianGroupConsentManagementView",
        "operation": "listMinorGuardianGroup",
@@ -752,12 +764,12 @@
        "label": "The selected minor guardian group",
        "bindsTo": "MinorGuardianGroupConsentManagementView",
        "columns": [
-        "MinorGuardianGroupConsentManagementView.organization",
-        "MinorGuardianGroupConsentManagementView.groupLeader",
-        "MinorGuardianGroupConsentManagementView.contact",
-        "MinorGuardianGroupConsentManagementView.groupBooking",
-        "MinorGuardianGroupConsentManagementView.responsibility",
-        "MinorGuardianGroupConsentManagementView.permittedActions"
+        "MinorGuardianGroupConsentManagementView.group.organization",
+        "MinorGuardianGroupConsentManagementView.group.groupLeader",
+        "MinorGuardianGroupConsentManagementView.group.contact",
+        "MinorGuardianGroupConsentManagementView.group.groupBooking",
+        "MinorGuardianGroupConsentManagementView.group.responsibility",
+        "MinorGuardianGroupConsentManagementView.group.permittedActions"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Multiple Children”.",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 31 §Display"
@@ -804,18 +816,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "MinorGuardianGroupConsentManagementView.organization",
-    "MinorGuardianGroupConsentManagementView.groupLeader",
-    "MinorGuardianGroupConsentManagementView.contact",
-    "MinorGuardianGroupConsentManagementView.groupBooking",
-    "MinorGuardianGroupConsentManagementView.responsibility",
-    "MinorGuardianGroupConsentManagementView.permittedActions"
+    "MinorGuardianGroupConsentManagementView.guardians[].contact"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-054"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-054",
+   "workshopBoard": "wireframes/WS185 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-054"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 31. 6 of 6 labels bound to a contract property; 16 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -878,10 +886,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Waivers requiring manual verification are reviewed consistently using governed validation criteria with complete reviewer accountability.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide authorized staff with a controlled process for reviewing waiver submissions that require verification.",
-  "purposeNote": "Waivers requiring manual verification are reviewed consistently using governed validation criteria with complete reviewer accountability.",
   "layout": {
    "template": "split",
    "regions": [
@@ -960,10 +968,7 @@
     "operationId": "setWaiverVerificationValidation",
     "contract": "marketing-crm",
     "purpose": "Waiver Verification & Validation Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setWaiverVerificationValidation"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -979,7 +984,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-055"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-055",
+   "workshopBoard": "wireframes/WS185 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-055"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 33. 10 of 10 labels bound to a contract property; 20 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1042,10 +1048,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Missing, invalid and expired waiver requirements are proactively identified and managed before they cause unnecessary admission or operational failures.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide a dedicated exception workspace for waiver requirements preventing operational readiness.",
-  "purposeNote": "Missing, invalid and expired waiver requirements are proactively identified and managed before they cause unnecessary admission or operational failures.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1063,7 +1069,7 @@
         "MissingExpiredInvalidWaiverManagementView.visitTime",
         "MissingExpiredInvalidWaiverManagementView.waiver",
         "MissingExpiredInvalidWaiverManagementView.problem",
-        "MissingExpiredInvalidWaiverManagementView.timeRemaining",
+        "MissingExpiredInvalidWaiverManagementView.timeRemainingSeconds",
         "MissingExpiredInvalidWaiverManagementView.accessImpact",
         "MissingExpiredInvalidWaiverManagementView.owner",
         "MissingExpiredInvalidWaiverManagementView.status"
@@ -1089,7 +1095,7 @@
         "MissingExpiredInvalidWaiverManagementView.visitTime",
         "MissingExpiredInvalidWaiverManagementView.waiver",
         "MissingExpiredInvalidWaiverManagementView.problem",
-        "MissingExpiredInvalidWaiverManagementView.timeRemaining",
+        "MissingExpiredInvalidWaiverManagementView.timeRemainingSeconds",
         "MissingExpiredInvalidWaiverManagementView.accessImpact",
         "MissingExpiredInvalidWaiverManagementView.owner",
         "MissingExpiredInvalidWaiverManagementView.status"
@@ -1129,7 +1135,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-056"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-056",
+   "workshopBoard": "wireframes/WS185 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-056"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 34. 10 of 10 labels bound to a contract property; 10 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1192,10 +1199,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "On-site staff can efficiently resolve legitimate waiver issues while preventing unauthorized bypass of mandatory consent requirements.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Depending on configuration) and no display directory — it is settings, not a population",
   "purpose": "Support customers who arrive at the venue without completing required waivers.",
-  "purposeNote": "On-site staff can efficiently resolve legitimate waiver issues while preventing unauthorized bypass of mandatory consent requirements.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1259,7 +1266,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-057"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-057",
+   "workshopBoard": "wireframes/WS185 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-057"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 36. 0 of 0 labels bound to a contract property; 7 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1322,10 +1330,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "completed waiver at the relevant point in time.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Maintain the complete evidentiary record of every waiver and consent transaction.",
-  "purposeNote": "completed waiver at the relevant point in time.",
   "gaps": [
    {
     "operation": null,
@@ -1385,7 +1393,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-058"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-058",
+   "workshopBoard": "wireframes/WS185 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-058"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 38. 0 of 10 labels bound to a contract property; 10 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1448,10 +1457,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Management can understand waiver compliance and identify configuration or process improvements that reduce customer friction and on-site workload.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
   "purpose": "Analyze waiver completion, customer behavior and operational effectiveness.",
-  "purposeNote": "Management can understand waiver compliance and identify configuration or process improvements that reduce customer friction and on-site workload.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1496,7 +1505,7 @@
         "WaiverAnalyticsComplianceOperationalInsightsView.completionRate",
         "WaiverAnalyticsComplianceOperationalInsightsView.preArrivalCompletion",
         "WaiverAnalyticsComplianceOperationalInsightsView.onSiteCompletion",
-        "WaiverAnalyticsComplianceOperationalInsightsView.averageCompletionTime",
+        "WaiverAnalyticsComplianceOperationalInsightsView.averageCompletionSeconds",
         "WaiverAnalyticsComplianceOperationalInsightsView.guardianCompletionRate",
         "WaiverAnalyticsComplianceOperationalInsightsView.rejectionRate",
         "WaiverAnalyticsComplianceOperationalInsightsView.exceptionRate",
@@ -1504,7 +1513,6 @@
         "WaiverAnalyticsComplianceOperationalInsightsView.reminderEffectiveness",
         "WaiverAnalyticsComplianceOperationalInsightsView.checkInDelays",
         "WaiverAnalyticsComplianceOperationalInsightsView.staffInterventions",
-        "WaiverAnalyticsComplianceOperationalInsightsView.onSiteCompletions",
         "WaiverAnalyticsComplianceOperationalInsightsView.exceptions"
        ],
        "bindsTo": "WaiverAnalyticsComplianceOperationalInsightsView",
@@ -1526,7 +1534,7 @@
         "WaiverAnalyticsComplianceOperationalInsightsView.completionRate",
         "WaiverAnalyticsComplianceOperationalInsightsView.preArrivalCompletion",
         "WaiverAnalyticsComplianceOperationalInsightsView.onSiteCompletion",
-        "WaiverAnalyticsComplianceOperationalInsightsView.averageCompletionTime",
+        "WaiverAnalyticsComplianceOperationalInsightsView.averageCompletionSeconds",
         "WaiverAnalyticsComplianceOperationalInsightsView.guardianCompletionRate",
         "WaiverAnalyticsComplianceOperationalInsightsView.rejectionRate",
         "WaiverAnalyticsComplianceOperationalInsightsView.exceptionRate",
@@ -1534,7 +1542,6 @@
         "WaiverAnalyticsComplianceOperationalInsightsView.reminderEffectiveness",
         "WaiverAnalyticsComplianceOperationalInsightsView.checkInDelays",
         "WaiverAnalyticsComplianceOperationalInsightsView.staffInterventions",
-        "WaiverAnalyticsComplianceOperationalInsightsView.onSiteCompletions",
         "WaiverAnalyticsComplianceOperationalInsightsView.exceptions"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Visualize”, “Abandonment Analysis”, “Reminder Analysis”.",
@@ -1565,14 +1572,14 @@
     "WaiverAnalyticsComplianceOperationalInsightsView.completionRate",
     "WaiverAnalyticsComplianceOperationalInsightsView.preArrivalCompletion",
     "WaiverAnalyticsComplianceOperationalInsightsView.onSiteCompletion",
-    "WaiverAnalyticsComplianceOperationalInsightsView.averageCompletionTime",
     "WaiverAnalyticsComplianceOperationalInsightsView.guardianCompletionRate"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-059"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-059",
+   "workshopBoard": "wireframes/WS185 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-059"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 39. 14 of 24 labels bound to a contract property; 24 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1627,10 +1634,10 @@
    "notes": "**Reached from CMS-051, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "while preserving human/legal governance over consent and exceptions. Board 2 — Final Screen Register",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide an AI intelligence layer across the complete waiver lifecycle. This should combine Board 1 configuration data + Board 2 operational data.",
-  "purposeNote": "while preserving human/legal governance over consent and exceptions. Board 2 — Final Screen Register",
   "gaps": [
    {
     "operation": null,
@@ -1698,7 +1705,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-060"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-060",
+   "workshopBoard": "wireframes/WS185 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-060"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 41. 0 of 0 labels bound to a contract property; 1 of 87 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

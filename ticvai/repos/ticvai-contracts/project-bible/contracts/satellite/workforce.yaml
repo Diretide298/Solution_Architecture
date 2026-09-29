@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Workforce
   version: 1.0.0
-  x-ticvai-screen-count: 41
+  x-ticvai-screen-count: 43
   x-ticvai-module: "18 — Employee Mobile App & AI Assistant (workforce)"
   x-ticvai-platforms:
     - P06 Venue Staff App
@@ -803,6 +803,10 @@ paths:
         **Working-hour limits are law in most markets**, and a system that lets a manager roster
         somebody for fourteen hours has made the venue liable rather than the manager.
 
+        **Writes `workforce.staffing_rules` and the rows of `workforce.position_requirement`** (decided 29 September,
+        writers pass): each `minimumCover` entry is one position requirement, and the set sent replaces the
+        venue''s set, so a position left out no longer has a minimum.
+
         '
       tags:
       - workforce
@@ -956,7 +960,8 @@ paths:
         explain its payroll.
 
         Compared against budget per venue, department and period, because that is the granularity a
-        general manager is held to.
+        general manager is held to. The budgets are set with `setLabourBudget` (decided 29 September, writers
+        pass).
 
         '
       tags:
@@ -1820,6 +1825,118 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+  /labour-budgets:
+    get:
+      operationId: listLabourBudgets
+      x-ticvai-consumed-by:
+        - "P08 BO-891 Labor Cost & Staffing Budget Control"
+      x-ticvai-agreed: '29 September: writers pass; resource board 4.9 (BO-891 Labor Cost & Staffing Budget
+        Control, "budget per venue, department and period"); shape follows listJobTitles with the Page envelope'
+      summary: Labour budgets, per venue, department and period
+      description: 'The budgets `getLabourCost` compares rostered and actual cost against (decided 29 September,
+        writers pass). Filtered by venue and department, and by a date range that returns every budget whose
+        period overlaps it.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: venueId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: departmentId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: from
+        in: query
+        description: First calendar day, in the Region's time zone, not UTC.
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        description: Last calendar day, in the Region's time zone, not UTC.
+        schema:
+          type: string
+          format: date
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Budgets
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/LabourBudget'
+    put:
+      operationId: setLabourBudget
+      x-ticvai-consumed-by:
+        - "P08 BO-891 Labor Cost & Staffing Budget Control"
+      x-ticvai-agreed: '29 September: writers pass; resource board 4.9 (BO-891 Labor Cost & Staffing Budget
+        Control); closes DM2 open item (workforce.labour_budget had no writer); shape follows setJobTitle'
+      summary: Set the labour budget for a venue, department and period
+      description: '**Writes `workforce.labour_budget`** (decided 29 September, writers pass), keyed by venue,
+        department and `periodStart`: a PUT for a key that exists replaces its `periodEnd` and amount, any
+        other creates a budget. A null `departmentId` is the whole venue''s budget.
+        **Periods for one venue and department never overlap** (`409`), so `getLabourCost` has exactly one
+        budget to compare each day against; `periodEnd` before `periodStart` is `422`. Changing a budget does
+        not rewrite past cost, only the comparison.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LabourBudget'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabourBudget'
+        '409':
+          description: The period overlaps another budget for the same venue and department
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: periodEnd is before periodStart
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1827,6 +1944,7 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+
     WorkforceEmployeeProfile:
       type: object
       x-ticvai-persistence: none — composed from employee and four related tables
@@ -2146,6 +2264,14 @@ components:
         dateOfJoining:
           type: string
           format: date
+        dateOfBirth:
+          type: string
+          format: date
+          nullable: true
+          description: '**What the under-age check needs** (data model for the agreed operations, 29 September): `validateWorkforceCompliance` reports
+            `underAgeNightShift` against `StaffingRules.minimumAgeForNightShift`, and that rule has nothing to
+            compare with unless the employee''s age is on file. **An employee with no date of birth is reported
+            as a warning**, not assumed to be of age.'
         employmentType:
           type: string
           maxLength: 30
@@ -2459,14 +2585,24 @@ components:
           type: string
     StaffingRules:
       type: object
-      x-ticvai-persistence: workforce.staffing_rules
+      x-ticvai-persistence: workforce.staffing_rules + workforce.position_requirement
       description: 'Resource board 4.3. **A safety rule before it is a cost rule.**'
       properties:
         minimumCover:
           type: array
+          description: '**Minimum staffing per position, venue and time window, with the qualifications it
+            requires**: the rows of `workforce.position_requirement` (data model for the agreed operations, 29 September). `getStaffingCoverage` measures the
+            rota against them; before this they were an array with no table, so no minimum was stored.'
           items:
             type: object
+            required:
+            - id
+            - positionCode
+            - minimumHeadcount
             properties:
+              id:
+                type: string
+                format: uuid
               positionCode:
                 type: string
               label:
@@ -2481,6 +2617,29 @@ components:
                 nullable: true
               minimumHeadcount:
                 type: integer
+                minimum: 0
+              daysOfWeek:
+                type: array
+                nullable: true
+                description: Days the minimum applies; absent means every day the venue is open
+                items:
+                  type: string
+                  enum:
+                  - monday
+                  - tuesday
+                  - wednesday
+                  - thursday
+                  - friday
+                  - saturday
+                  - sunday
+              startsAt:
+                type: string
+                nullable: true
+                description: Start of the time window, local time (HH:MM) as `ShiftTemplate.startsAt`; absent means opening
+              endsAt:
+                type: string
+                nullable: true
+                description: End of the time window, local time (HH:MM); absent means closing
               requiredQualifications:
                 type: array
                 items:
@@ -2680,6 +2839,52 @@ components:
           type: number
         headcount:
           type: integer
+    LabourBudget:
+      type: object
+      x-ticvai-persistence: workforce.labour_budget
+      description: '**The labour budget a general manager is held to, per venue, department and period**
+        (resource board 4.9; data model for the agreed operations, 29 September). `getLabourCost` compares rostered and actual cost against it
+        (`LabourCostRow.budget`). A null `departmentId` is the whole venue''s budget. Periods for one venue
+        and department do not overlap. Written by `setLabourBudget`, listed by `listLabourBudgets` (decided
+        29 September, writers pass).'
+      required:
+      - id
+      - venueId
+      - periodStart
+      - periodEnd
+      - budgetAmount
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        venueId:
+          type: string
+          format: uuid
+        departmentId:
+          type: string
+          format: uuid
+          nullable: true
+        periodStart:
+          type: string
+          format: date
+          description: First day of the period, in the Region's time zone
+        periodEnd:
+          type: string
+          format: date
+          description: Last day of the period, in the Region's time zone
+        budgetAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        scopePath:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
     WorkforceComplianceFinding:
       type: object
       description: 'Resource board 4.8. **Checked before the rota is published, not in an inspection.**'

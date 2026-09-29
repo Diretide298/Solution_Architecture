@@ -13,52 +13,9 @@
    "status": "notStarted"
   },
   "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
-   ],
-   "inferred": true,
-   "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
-    }
-   ]
+   "inferred": true
   },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Carried `listAiInteractions` alone** — an audit log showing only AI prompts. The platform audit record is `identity.audit_event`. **Rewired 20 August.** **`listAuditRecords` wired 24 August.** This screen declared zero operations — an audit log with nothing behind it — and `platform.audit_record` was written by nothing and read by nothing. **Found by mapping the POS pack**, where four separate frames wanted an audit view. **Retail board operations wired 24 August.**",
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Carried `listAiInteractions` alone** — an audit log showing only AI prompts. The platform audit record is `identity.audit_event`. **Rewired 20 August.** **`listAuditRecords` wired 24 August.** This screen declared zero operations — an audit log with nothing behind it — and `platform.audit_record` was written by nothing and read by nothing. **Found by mapping the POS pack**, where four separate frames wanted an audit view. **Retail board operations wired 24 August.** **Platform-staff access shown 28 September (audit R098)** — `listPlatformStaffGrants` lists every grant a TICVAI operator opened into this tenant, and the `platformStaffGrantId` filter of `listAuditRecords` shows what was done under each.",
   "density": "compact",
   "boardFrames": [
    "Retail Board 6.dc.html#ret-6j"
@@ -66,13 +23,6 @@
   "pattern": "listDetail",
   "patternReason": "`listAuditRecords` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "See who changed what at this venue.",
-  "gaps": [
-   {
-    "operation": "listAuditRecords",
-    "why": "**1 declared operation reach no component on this screen**: listAuditRecords. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -82,7 +32,7 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Resolve",
+       "label": "Resolve permissions",
        "operation": "resolvePermissions",
        "provenance": "contract identity.yaml POST /permissions/resolve"
       }
@@ -93,24 +43,101 @@
      "slot": "carried",
      "components": [
       {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
+       "kind": "textField",
+       "label": "Org unit id",
+       "operation": "listAuditRecords",
+       "notes": "Sends `?orgUnitId=` to `listAuditRecords`.",
+       "provenance": "contract tenancy.yaml GET /audit-records"
+      },
+      {
+       "kind": "textField",
+       "label": "Principal id",
+       "operation": "listAuditRecords",
+       "notes": "Sends `?principalId=` to `listAuditRecords`.",
+       "provenance": "contract tenancy.yaml GET /audit-records"
+      },
+      {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listAuditRecords",
+       "notes": "Sends `?workstationId=` to `listAuditRecords`.",
+       "provenance": "contract tenancy.yaml GET /audit-records"
+      },
+      {
+       "kind": "textField",
+       "label": "Action",
+       "operation": "listAuditRecords",
+       "notes": "Sends `?action=` to `listAuditRecords`.",
+       "provenance": "contract tenancy.yaml GET /audit-records"
+      },
+      {
+       "kind": "textField",
+       "label": "Subject ref",
+       "operation": "listAuditRecords",
+       "notes": "Sends `?subjectRef=` to `listAuditRecords`.",
+       "provenance": "contract tenancy.yaml GET /audit-records"
+      },
+      {
+       "kind": "datePicker",
+       "label": "From",
+       "operation": "listAuditRecords",
+       "notes": "Sends `?from=` to `listAuditRecords`.",
+       "provenance": "contract tenancy.yaml GET /audit-records"
+      },
+      {
+       "kind": "datePicker",
+       "label": "To",
+       "operation": "listAuditRecords",
+       "notes": "Sends `?to=` to `listAuditRecords`.",
+       "provenance": "contract tenancy.yaml GET /audit-records"
       },
       {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAuditRecords",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
+       "label": "Every audit",
+       "bindsTo": "AuditRecord",
+       "columns": [
+        "AuditRecord.id",
+        "AuditRecord.principalId",
+        "AuditRecord.orgUnitId",
+        "AuditRecord.workstationId",
+        "AuditRecord.action",
+        "AuditRecord.subjectRef",
+        "AuditRecord.occurredAt",
+        "AuditRecord.platformStaffGrantId"
+       ],
+       "operation": "listAuditRecords",
+       "provenance": "contract tenancy.yaml GET /audit-records"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "resolvePermissions",
-       "provenance": "carried from the previous definition"
+       "kind": "textField",
+       "label": "Platform-staff grant id",
+       "operation": "listAuditRecords",
+       "notes": "Sends `?platformStaffGrantId=` to `listAuditRecords`, so the log shows only what a platform operator did under that grant. Choosing a row in **Platform-staff grants** fills it (decided 28 September, audit R098).",
+       "provenance": "contract tenancy.yaml GET /audit-records"
+      },
+      {
+       "kind": "toggle",
+       "label": "Open grants only",
+       "operation": "listPlatformStaffGrants",
+       "notes": "Sends `?activeOnly=true` to `listPlatformStaffGrants`.",
+       "provenance": "contract identity.yaml GET /platform-staff-grants"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Platform-staff grants",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.operatorPrincipalId",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "listPlatformStaffGrants",
+       "notes": "**Every platform-staff grant into this tenant is visible here** — open, expired and ended, most recent first. Choosing a grant filters the audit log on `platformStaffGrantId` to show what was done under it (decided 28 September, audit R098).",
+       "provenance": "contract identity.yaml GET /platform-staff-grants"
       }
      ]
     }
@@ -119,15 +146,21 @@
   "states": {
    "loading": "The audit log list.",
    "error": "Could not load. Names which read failed and leaves the audit log untouched.",
-   "emptyFirstRun": "No audit log yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the audit log are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No audit log yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on orgUnitId, principalId, workstationId, action, subjectRef, from and platformStaffGrantId; the audit log is still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `AUDIT_VIEW`, which `listAuditRecords` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "listAuditRecords",
     "contract": "tenancy",
     "purpose": "Who did what, where, and when",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Every platform-staff grant into this tenant, so the tenant sees when TICVAI staff acted and under what reason (decided 28 September, audit R098)",
     "trigger": "onLoad"
    },
    {
@@ -144,10 +177,32 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-068",
+   "derivedFrom": "wireframes/reference/Retail Board 6.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 6.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formResolvePermissions",
+    "component": "modal",
+    "trigger": "Resolve permissions",
+    "body": "**Collects what `resolvePermissions` sends before it is called.** Required: `principalId`, `roleId`. Optional: `atScopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Resolve permissions",
+     "operation": "resolvePermissions"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "principalId",
+      "roleId",
+      "atScopePath"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /permissions/resolve"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -185,50 +240,7 @@
    "status": "notStarted"
   },
   "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
-   ],
-   "inferred": true,
-   "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
-    }
-   ]
+   "inferred": true
   },
   "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Carried `listCases` and `createCase`.** `LostItem` exists — CL-07 built it as one entity in two directions, lost and found — and a service case is a different thing. **Rewired 20 August.**",
   "density": "compact",
@@ -244,7 +256,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every lost found register",
+       "label": "Every lost",
        "bindsTo": "LostItem",
        "columns": [
         "LostItem.id",
@@ -271,7 +283,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected lost found register",
+       "label": "The selected lost",
        "bindsTo": "LostItem",
        "columns": [
         "LostItem.id",
@@ -300,35 +312,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Find matches",
+       "label": "Find matches for lost item",
        "operation": "matchLostItem",
        "provenance": "contract marketing-crm.yaml POST /lost-items/{itemId}/match"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listLostItems",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "matchLostItem",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -337,9 +323,9 @@
   "states": {
    "loading": "The lost found register list.",
    "error": "Could not load. Names which read failed and leaves the lost found register untouched.",
-   "emptyFirstRun": "No lost found register yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the lost found register are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No lost found register yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listLostItems` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `CASE_VIEW`, which `listLostItems` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -353,6 +339,16 @@
     "contract": "marketing-crm",
     "purpose": "Tie a report to a found item, or hand it back",
     "trigger": "onAction",
+    "invalidates": [
+     "listLostItems"
+    ]
+   },
+   {
+    "operationId": "recordLostItem",
+    "contract": "marketing-crm",
+    "purpose": "Report something lost, or log something handed in",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
     "invalidates": [
      "listLostItems"
     ]
@@ -384,6 +380,28 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-073"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formMatchLostItem",
+    "component": "modal",
+    "trigger": "Find matches for lost item",
+    "body": "**Collects what `matchLostItem` sends before it is called.** Required: `action`. Optional: `otherItemId`, `claimantSubjectId`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Find matches for lost item",
+     "operation": "matchLostItem"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "action",
+      "otherItemId",
+      "claimantSubjectId",
+      "note"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /lost-items/{itemId}/match"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -421,21 +439,8 @@
    "status": "notStarted"
   },
   "navigation": {
-   "exitTo": [
-    "BO-001"
-   ],
    "inferred": true,
    "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
     {
      "to": "ADM-004",
      "trigger": "Platform Audit Log",
@@ -450,13 +455,6 @@
   "pattern": "listDetail",
   "patternReason": "`listIndexFailures` reads the population and `getAiPolicy` reads one of them — list, select, act",
   "purpose": "What the assistant may do here, what it has cost, and what happens at the ceiling.",
-  "gaps": [
-   {
-    "operation": "getAiUsage",
-    "why": "**1 declared operation reach no component on this screen**: getAiUsage. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -465,8 +463,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Job id",
+       "operation": "listIndexFailures",
+       "notes": "Sends `?jobId=` to `listIndexFailures`.",
+       "provenance": "contract ai.yaml GET /index-failures"
+      },
+      {
+       "kind": "selectField",
+       "label": "Stage",
+       "operation": "listIndexFailures",
+       "notes": "Sends `?stage=` to `listIndexFailures`.",
+       "provenance": "contract ai.yaml GET /index-failures"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every policy spend",
+       "label": "Every index failure",
        "bindsTo": "IndexFailure",
        "columns": [
         "IndexFailure.id",
@@ -488,11 +500,41 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected policy spend",
+       "label": "The selected index failure",
+       "bindsTo": "IndexFailure",
+       "columns": [
+        "IndexFailure.id",
+        "IndexFailure.jobId",
+        "IndexFailure.sourceId",
+        "IndexFailure.documentRef",
+        "IndexFailure.stage",
+        "IndexFailure.error",
+        "IndexFailure.attempts"
+       ],
+       "operation": "listIndexFailures",
+       "provenance": "contract ai.yaml GET /index-failures"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The AI usage report",
+       "bindsTo": "AiUsageReport",
+       "columns": [
+        "AiUsageReport.from",
+        "AiUsageReport.to",
+        "AiUsageReport.groupBy",
+        "AiUsageReport.rows"
+       ],
+       "operation": "getAiUsage",
+       "provenance": "contract ai.yaml GET /usage"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The AI policy",
        "bindsTo": "AiPolicy",
        "columns": [
         "AiPolicy.id",
         "AiPolicy.scopeLevel",
+        "AiPolicy.scopePath",
         "AiPolicy.enabledCapabilities",
         "AiPolicy.allowedRoleIds",
         "AiPolicy.maskedFields",
@@ -505,8 +547,7 @@
         "AiPolicy.rerankTopK",
         "AiPolicy.cacheAnswers",
         "AiPolicy.cacheTtlMinutes",
-        "AiPolicy.retainInteractionsDays",
-        "AiPolicy.semanticCacheThreshold"
+        "AiPolicy.retainInteractionsDays"
        ],
        "operation": "getAiPolicy",
        "provenance": "contract ai.yaml GET /policy"
@@ -519,30 +560,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save AI policy",
        "operation": "setAiPolicy",
        "provenance": "contract ai.yaml PUT /policy"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setAiPolicy",
-       "label": "Save ai policy",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setAiPolicy",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -551,9 +571,9 @@
   "states": {
    "loading": "The policy spend list.",
    "error": "Could not load. Names which read failed and leaves the policy spend untouched.",
-   "emptyFirstRun": "No policy spend yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the policy spend are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No policy spend yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on jobId, stage and the policy spend are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `AI_CONFIGURE`, which `getAiPolicy` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -599,6 +619,43 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-091"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetAiPolicy",
+    "component": "modal",
+    "trigger": "Save AI policy",
+    "body": "**Collects what `setAiPolicy` sends before it is called.** Required: `scopeLevel`, `scopePath`, `enabledCapabilities`. Optional: `id`, `allowedRoleIds`, `maskedFields`, `requiresApprovalFor`, `monthlyTokenCeiling`, `ceilingBehaviour`, `ceilingWarningPercent`, `guestCapabilityScope`, `retrieveTopK`, `rerankTopK`, `cacheAnswers`, `cacheTtlMinutes` and 12 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AiPolicy",
+    "confirm": {
+     "label": "Save AI policy",
+     "operation": "setAiPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "scopeLevel",
+      "scopePath",
+      "enabledCapabilities",
+      "id",
+      "allowedRoleIds",
+      "maskedFields",
+      "requiresApprovalFor",
+      "monthlyTokenCeiling",
+      "ceilingBehaviour",
+      "ceilingWarningPercent",
+      "guestCapabilityScope",
+      "retrieveTopK",
+      "rerankTopK",
+      "cacheAnswers",
+      "cacheTtlMinutes",
+      "retainInteractionsDays",
+      "semanticCacheThreshold",
+      "negativeCacheTtlSeconds"
+     ]
+    },
+    "provenance": "contract ai.yaml PUT /policy"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -647,11 +704,7 @@
     {
      "to": "BO-073",
      "trigger": "Lost & Found Register",
-     "carries": [
-      "itemId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-073 declares entryState.params itemId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-073 declares entryState.params itemId and BO-107 holds none of them, so the edge carries nothing and BO-073 opens cold"
     }
    ]
   },
@@ -659,7 +712,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listCampaigns` reads the population and `getVenueSettings` reads one of them — list, select, act",
-  "purpose": "Everything in guests & marketing, and what in it needs attention.",
+  "purpose": "Everything in guests & marketing.",
   "layout": {
    "template": "split",
    "regions": [
@@ -668,8 +721,15 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listCampaigns",
+       "notes": "Sends `?status=` to `listCampaigns`.",
+       "provenance": "contract marketing-crm.yaml GET /campaigns"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every guests marketing",
+       "label": "Every campaign",
        "bindsTo": "Campaign",
        "columns": [
         "Campaign.name",
@@ -687,6 +747,33 @@
        ],
        "operation": "listCampaigns",
        "provenance": "contract marketing-crm.yaml GET /campaigns"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Takings and admissions today",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.code",
+        "KpiValue.name",
+        "KpiValue.value",
+        "KpiValue.period",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ],
+       "operation": "getKpiValues",
+       "notes": "**Takings and admissions**, from `getKpiValues?kpiCodes=takings,admissions`; with no `period` the period is today in the venue's time zone (decided 28 September, audit R283).",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      },
+      {
+       "kind": "cardList",
+       "bindsTo": "screens",
+       "notes": "3 screens. **No attention counts** until a summary operation exists to supply them (decided 28 September, audit R283).",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search guests & marketing",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -696,13 +783,41 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected guests marketing",
+       "label": "The selected campaign",
+       "bindsTo": "Campaign",
+       "columns": [
+        "Campaign.name",
+        "Campaign.kind",
+        "Campaign.channel",
+        "Campaign.venueId",
+        "Campaign.segmentId",
+        "Campaign.content",
+        "Campaign.trigger",
+        "Campaign.scheduledFor",
+        "Campaign.consentPurpose",
+        "Campaign.sendWindow",
+        "Campaign.id",
+        "Campaign.budgetCap",
+        "Campaign.budgetSpent",
+        "Campaign.status",
+        "Campaign.isPaused",
+        "Campaign.createdByPrincipalId"
+       ],
+       "operation": "listCampaigns",
+       "provenance": "contract marketing-crm.yaml GET /campaigns"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The venue settings",
        "bindsTo": "VenueSettings",
        "columns": [
         "VenueSettings.id",
         "VenueSettings.venueId",
+        "VenueSettings.currencyCode",
+        "VenueSettings.currencyScale",
         "VenueSettings.supportHours",
         "VenueSettings.quietHours",
+        "VenueSettings.biometrics",
         "VenueSettings.segregatedAccess",
         "VenueSettings.alerting"
        ],
@@ -717,26 +832,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create campaign",
        "operation": "createCampaign",
        "provenance": "contract marketing-crm.yaml POST /campaigns"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "cardList",
-       "bindsTo": "screens",
-       "notes": "3 screens, each with what needs attention.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "searchField",
-       "label": "Search guests & marketing",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -750,6 +848,12 @@
    "emptyNoAccess": "You do not have permission for guests & marketing. **Said plainly** — an empty section reads as broken."
   },
   "apis": [
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Today's takings and admissions tiles — `kpiCodes=takings,admissions`, period defaulting to today (decided 28 September, audit R283)",
+    "trigger": "onLoad"
+   },
    {
     "operationId": "getVenueSettings",
     "contract": "tenancy",
@@ -794,6 +898,35 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-107"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateCampaign",
+    "component": "modal",
+    "trigger": "Create campaign",
+    "body": "**Collects what `createCampaign` sends before it is called.** Required: `name`, `kind`, `channel`, `segmentId`, `content`. Optional: `venueId`, `trigger`, `scheduledFor`, `consentPurpose`, `sendWindow`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateCampaignRequest",
+    "confirm": {
+     "label": "Create campaign",
+     "operation": "createCampaign"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "kind",
+      "channel",
+      "segmentId",
+      "content",
+      "venueId",
+      "trigger",
+      "scheduledFor",
+      "consentPurpose",
+      "sendWindow"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /campaigns"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

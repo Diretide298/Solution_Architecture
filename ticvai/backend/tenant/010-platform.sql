@@ -193,8 +193,8 @@ CREATE TABLE IF NOT EXISTS platform.offline_policy (
 );
 
 -- Written in the same transaction as the state change, by the platform, not by an operation. That
--- is what makes it exactly-once Hangs off: reaches platform.scope through its keys. Reached by: 2
--- operations read it and 22 write it; 1 tables reference it; written by 13 contracts — access,
+-- is what makes it exactly-once Hangs off: reaches platform.scope through its keys. Reached by: 3
+-- operations read it and 36 write it; 1 tables reference it; written by 13 contracts — access,
 -- approvals, catalogue, finance.
 CREATE TABLE IF NOT EXISTS platform.outbox (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -300,7 +300,7 @@ CREATE TABLE IF NOT EXISTS platform.scope (
 );
 
 -- read-only projection of control.tenant, outside every cell Hangs off: reaches platform.scope
--- through its keys; references platform.scope. Reached by: 2 operations read it and 0 write it; 17
+-- through its keys; references platform.scope. Reached by: 2 operations read it and 0 write it; 16
 -- tables reference it.
 CREATE TABLE IF NOT EXISTS platform.tenant (
     id                                uuid PRIMARY KEY NOT NULL,

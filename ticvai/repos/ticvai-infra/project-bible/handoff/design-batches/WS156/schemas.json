@@ -1,0 +1,429 @@
+{
+ "Resource": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.resource",
+  "description": "**A specific object, not a quantity of interchangeable ones.** A venue with forty identical strollers has forty resources, because guest number twelve returned stroller number twelve.\n",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "kind",
+   "venueId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ResourceKind"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "parentResourceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**A pool cabana belongs to the pool area; a seat belongs to an auditorium.** Booking a parent takes its children with it, which is the behaviour a venue expects and would otherwise have to enforce by hand.\n"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a resource of kind `instructor` or `staff`. **`workforce` still owns their rota** — this says whether they are qualified and whether they are already committed.\n"
+   },
+   "attributes": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Configurable per kind — capacity, size, shade, power, poolside."
+   },
+   "setupMinutes": {
+    "type": "integer",
+    "default": 0,
+    "description": "**Before the booking, not inside it.** An auditorium booked 14:00–16:00 is unavailable from 13:30 with a 30-minute setup, and a calendar that cannot express that double-books every time.\n"
+   },
+   "teardownMinutes": {
+    "type": "integer",
+    "default": 0
+   },
+   "requiresQualification": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Qualification codes a person must hold to be assigned to this."
+   },
+   "depositAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "available",
+     "booked",
+     "checkedOut",
+     "maintenance",
+     "retired"
+    ]
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "ResourceBlock": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.resource_block",
+  "description": "Board 2.07. **A block is not a booking**, and the reason travels with it so an operator knows whether to wait or to look elsewhere.\n",
+  "required": [
+   "resourceId",
+   "from",
+   "to",
+   "reason"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "resourceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "from": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "to": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "reason": {
+    "type": "string",
+    "enum": [
+     "setup",
+     "teardown",
+     "maintenance",
+     "blackout",
+     "closed",
+     "operational",
+     "training"
+    ]
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   },
+   "createdBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "ResourceBooking": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.booking",
+  "required": [
+   "id",
+   "resourceId",
+   "from",
+   "to",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "resourceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "from": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "to": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "$ref": "#/components/schemas/ResourceBookingStatus"
+   },
+   "holdId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The `ResourceHold` this booking was converted from, where a guest picked the resource on a venue map (rev 3 REV3-15). Null for a staff booking or an allocation.\n"
+   },
+   "recurrenceGroupId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Ties the occurrences of a recurring booking. **Cancelling one week does not cancel the series**, and cancelling the series is a separate act with a separate confirmation.\n"
+   },
+   "depositAuthorisationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The hold, through `orders.authoriseStoredValue` (CF-126). **A deposit taken and refunded is two transactions and a fee; held and released is neither.**\n"
+   },
+   "checkedOutAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "dueBackAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "returnedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "conditionOut": {
+    "type": "string",
+    "nullable": true
+   },
+   "conditionIn": {
+    "type": "string",
+    "nullable": true
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the latest offline check-out or check-in write reached the server. **The device times are `checkedOutAt` and `returnedAt`**, taken from each write's `recordedAt`; this is the server's half of the pair naming-and-style 5.2 requires. Null while pending.\n"
+   }
+  }
+ },
+ "ResourceBookingStatus": {
+  "type": "string",
+  "enum": [
+   "reserved",
+   "checkedOut",
+   "returned",
+   "overdue",
+   "cancelled",
+   "noShow"
+  ]
+ },
+ "ResourceCalendarRow": {
+  "type": "object",
+  "description": "Board 2.01. **One resource across the window, with its states already computed** — including conflict, which a client cannot derive from a booking list.\n",
+  "properties": {
+   "resourceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "resourceName": {
+    "type": "string"
+   },
+   "resourceTypeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "utilisationPercent": {
+    "type": "number"
+   },
+   "segments": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "from": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "to": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "state": {
+       "type": "string",
+       "enum": [
+        "available",
+        "reserved",
+        "assigned",
+        "partiallyUtilised",
+        "fullyUtilised",
+        "unavailable",
+        "onBreak",
+        "onLeave",
+        "underMaintenance",
+        "operationallyBlocked",
+        "pendingApproval",
+        "conflict"
+       ]
+      },
+      "bookingId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "conflictsWith": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "ResourceKind": {
+  "type": "string",
+  "description": "BL-135. **`locker` was an entitlement kind in `orders` and nothing issued, assigned or released one.** A locker is a specific object checked out to a named guest and returned — which is this context exactly, and modelling it as an entitlement would have needed a second check-out mechanism.\nA seed for `ResourceType` rather than the law (board 1.02): a customer adding a class does it with `createResourceType`, not by waiting for this list to grow.\n**`table` is a non-dining spot** (decided 29 September, rev 3 GAP-C2, confirmed by Chinmay): a beach or event table placed on a venue map, picked and sold like a cabana (`createResourceHold`, then the order). **A dining table is not this**: restaurant tables stay `fnb` tables, booked with `fnb.createTableReservation` and the waitlist (audit R073 (d)).\n",
+  "enum": [
+   "cabana",
+   "lounger",
+   "locker",
+   "wheelchair",
+   "stroller",
+   "equipment",
+   "room",
+   "auditorium",
+   "vehicle",
+   "instructor",
+   "staff",
+   "table",
+   "pitch",
+   "studio",
+   "other"
+  ],
+  "x-ticvai-refuses": {
+   "mealPlan": "**Listed by 5.5.8b and deliberately not a kind.** 5.5.8b groups meal plans with lockers and parking, but a meal plan is a balance rather than an object. It resolves to `retail.Wallet` with a `mealPlan` credit kind (CF-126), not to a resource — so it is not offered here, and a form built from this enum cannot offer it either."
+  }
+ },
+ "ResourceSchedule": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.resource_schedule",
+  "description": "Boards 2.03 and 2.04. **A recurring pattern with exceptions, not a list of dates.** A schedule written as concrete dates silently expires.\n",
+  "properties": {
+   "resourceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "availabilityMode": {
+    "type": "string",
+    "enum": [
+     "alwaysAvailable",
+     "scheduled",
+     "onRequest"
+    ]
+   },
+   "windows": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "daysOfWeek": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "from": {
+       "type": "string",
+       "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+       "description": "Local time of day, HH:MM."
+      },
+      "to": {
+       "type": "string",
+       "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+       "description": "Local time of day, HH:MM."
+      },
+      "effectiveFrom": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      },
+      "effectiveTo": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "slotMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**How finely this resource's time can be cut**, which is a property of the resource and not of the product sold against it.\n"
+   },
+   "minimumBookingMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "maximumBookingMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "advanceBookingDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "exceptions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "date": {
+       "type": "string",
+       "format": "date"
+      },
+      "closed": {
+       "type": "boolean"
+      },
+      "from": {
+       "type": "string",
+       "nullable": true,
+       "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+       "description": "Local time of day, HH:MM."
+      },
+      "to": {
+       "type": "string",
+       "nullable": true,
+       "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+       "description": "Local time of day, HH:MM."
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ }
+}

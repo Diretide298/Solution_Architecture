@@ -1,6 +1,6 @@
 # WS83 — Game and Ride board 6
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 9 operations · 7 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `ORDER_CREATE, PRICE_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, WALLET_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-444` | Redemption Operations Dashboard | commandCentre | 0 | 0 | — |
-| `BO-445` | Redemption Credit Rule Configuration | configEditor | 0 | 0 | — |
-| `BO-446` | Ticket-Based Redemption / Ticket-Eater Integration | listDetail | 0 | 0 | — |
-| `BO-447` | Ticketless Redemption Game Integration | listDetail | 0 | 0 | — |
-| `BO-448` | Redemption Wallet & Balance View | listDetail | 0 | 0 | — |
-| `BO-449` | Redemption Counter / Prize Checkout | listDetail | 0 | 2 | — |
-| `BO-450` | Prize Catalogue & Credit Cost Configuration | listDetail | 0 | 0 | — |
-| `BO-451` | Prize Inventory Integration | listDetail | 0 | 0 | — |
-| `BO-452` | Direct-Pay / Crane & Prize Machine Configuration | listDetail | 0 | 0 | — |
-| `BO-453` | Redemption Transaction Ledger, Reconciliation & Audit | listDetail | 0 | 0 | — |
+| `BO-444` | Redemption Operations Dashboard | commandCentre | 1 | 0 | — |
+| `BO-445` | Redemption Credit Rule Configuration | configEditor | 2 | 0 | — |
+| `BO-446` | Ticket-Based Redemption / Ticket-Eater Integration | listDetail | 1 | 0 | — |
+| `BO-447` | Ticketless Redemption Game Integration | listDetail | 1 | 0 | — |
+| `BO-448` | Redemption Wallet & Balance View | listDetail | 1 | 0 | — |
+| `BO-449` | Redemption Counter / Prize Checkout | listDetail | 4 | 2 | — |
+| `BO-450` | Prize Catalogue & Credit Cost Configuration | listDetail | 2 | 0 | — |
+| `BO-451` | Prize Inventory Integration | listDetail | 2 | 0 | — |
+| `BO-452` | Direct-Pay / Crane & Prize Machine Configuration | listDetail | 1 | 0 | — |
+| `BO-453` | Redemption Transaction Ledger, Reconciliation & Audit | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-446, BO-447, BO-448, BO-450, BO-451, BO-452, BO-453 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-446, BO-447, BO-448, BO-450, BO-451, BO-453 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

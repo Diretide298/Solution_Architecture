@@ -205,8 +205,8 @@ CREATE TABLE IF NOT EXISTS inventory.quotation (
     scope_path                        ltree NOT NULL
 );
 
--- One item quoted. Hangs off: a child of inventory.quotation; reaches inventory.item through its
--- keys; references inventory.item, inventory.quotation. Reached by: 2 operations read it and 1
+-- One item quoted. Hangs off: a child of inventory.quotation; reaches inventory.location through
+-- its keys; references inventory.item, inventory.quotation. Reached by: 2 operations read it and 1
 -- write it.
 CREATE TABLE IF NOT EXISTS inventory.quotation_line (
     quotation_id                      uuid NOT NULL,
@@ -242,9 +242,9 @@ CREATE TABLE IF NOT EXISTS inventory.requisition (
     cancelled_at                      timestamptz
 );
 
--- One item asked for. Hangs off: a child of inventory.requisition; reaches inventory.item through
--- its keys; references inventory.item, inventory.requisition. Reached by: 7 operations read it and
--- 2 write it.
+-- One item asked for. Hangs off: a child of inventory.requisition; reaches inventory.location
+-- through its keys; references inventory.item, inventory.requisition. Reached by: 7 operations
+-- read it and 2 write it.
 CREATE TABLE IF NOT EXISTS inventory.requisition_line (
     requisition_id                    text NOT NULL,
     line_id                           text,

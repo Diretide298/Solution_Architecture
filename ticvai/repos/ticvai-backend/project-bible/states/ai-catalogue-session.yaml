@@ -1,0 +1,30 @@
+# AI catalogue builder session — state model
+# Contract: catalogue.AiCatalogueSession.status
+# Checked by tools/check-states.py. Added 29 September (writers pass).
+
+entity: AI catalogue builder session
+contract: catalogue
+enum: AiCatalogueSession.status
+enumKind: inline
+enumSchema: AiCatalogueSession
+enumProperty: status
+owner: catalogue
+initial:
+- open
+terminal:
+- draftCreated
+- abandoned
+transitions:
+- from: open
+  to: draftCreated
+  operation: setCatalogueReview
+  trigger: operation
+  guard: '`createDraft: true` and at least one proposal accepted; the draft is an ordinary `draft` product
+    (`draftProductId`) under the usual approval'
+- from: open
+  to: abandoned
+  trigger: timer
+  guard: No activity on the session for 30 days (proposed, our build plan); nothing was created
+notes: '**Created `open` by `setCatalogueReview`**; decisions on proposals saved without `createDraft` leave it
+  `open`. The AI proposes; nothing is created until `createDraft`. A draft product made from a session is
+  governed like any other product from then on; the session keeps the proposals and decisions for audit.'

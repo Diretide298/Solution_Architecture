@@ -1,0 +1,1158 @@
+[
+ {
+  "id": "BO-644",
+  "name": "Credential Issuance Command Center",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "4",
+   "number": "1",
+   "page": 28
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/credential-issuance-command-center-bo-644",
+   "component": "apps/venue-management-web/src/routes/access-venue/CredentialIssuanceCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-645",
+    "BO-646",
+    "BO-647",
+    "BO-648",
+    "BO-649",
+    "BO-650",
+    "BO-651",
+    "BO-027",
+    "BO-653"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-645",
+     "trigger": "Credential Generation Workspace",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-646",
+     "trigger": "Credential Media Configuration",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-647",
+     "trigger": "Badge Template Designer",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-648",
+     "trigger": "Badge Printing & Print Queue",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-649",
+     "trigger": "Digital & Mobile Credential Management",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-650",
+     "trigger": "NFC & RFID Credential Encoding",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-651",
+     "trigger": "Credential Activation & Delivery",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-027",
+     "trigger": "Credential Replacement & Reissue (BO-027, absorbed BO-652, audit R276)",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-653",
+     "trigger": "Credential Registry & Credential History",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Central operational dashboard for accreditation credential issuance.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 28"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 28"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listCredentialGenerationIssuance",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The credential issuance list.",
+   "error": "Could not load. Names which read failed and leaves the credential issuance untouched.",
+   "emptyFirstRun": "No credential issuance yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the credential issuance are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCredentialGenerationIssuance",
+    "contract": "access",
+    "purpose": "Credential Generation & Issuance Monitor",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-644",
+   "workshopBoard": "wireframes/WS04 ACCREDITATION Board 4.dc.html#bo-644"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 28. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-645",
+  "name": "Credential Generation Workspace",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "4",
+   "number": "2",
+   "page": 29
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/credential-generation-workspace-bo-645",
+   "component": "apps/venue-management-web/src/routes/access-venue/CredentialGenerationWorkspace.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-644"
+   ],
+   "exitTo": [
+    "BO-644"
+   ],
+   "transitions": [
+    {
+     "to": "BO-644",
+     "trigger": "Back to Credential Issuance Command Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Convert an approved accreditation into an operational credential.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 29"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 29"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Key requirement: 12.1.4",
+       "provenance": "pack ACCREDITATION.pdf, page 29 §Actions"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAccreditationCredentials",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The credential generation list.",
+   "error": "Could not load. Names which read failed and leaves the credential generation untouched.",
+   "emptyFirstRun": "No credential generation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the credential generation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAccreditationCredentials",
+    "contract": "accreditation",
+    "purpose": "Credentials issued",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-645",
+   "workshopBoard": "wireframes/WS04 ACCREDITATION Board 4.dc.html#bo-645"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 29. 0 of 0 labels bound to a contract property; 1 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Key requirement: 12.1.4 are choices sent by `listAccreditationCredentials` (requirement reference shown on the workspace).",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-646",
+  "name": "Credential Media Configuration",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "4",
+   "number": "3",
+   "page": 30
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/credential-media-configuration-bo-646",
+   "component": "apps/venue-management-web/src/routes/access-venue/CredentialMediaConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-644"
+   ],
+   "exitTo": [
+    "BO-644"
+   ],
+   "transitions": [
+    {
+     "to": "BO-644",
+     "trigger": "Back to Credential Issuance Command Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure the credential technologies available for each accreditation program.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 30"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 30"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "issueAccreditationCredential",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "issueAccreditationCredential"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The credential media list.",
+   "error": "Could not load. Names which read failed and leaves the credential media untouched.",
+   "emptyFirstRun": "No credential media yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the credential media are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "issueAccreditationCredential",
+    "contract": "accreditation",
+    "purpose": "Generate a credential",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listAccreditationCredentials"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-646",
+   "workshopBoard": "wireframes/WS04 ACCREDITATION Board 4.dc.html#bo-646"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 30. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-647",
+  "name": "Badge Template Designer",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "4",
+   "number": "4",
+   "page": 30
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/badge-template-designer-bo-647",
+   "component": "apps/venue-management-web/src/routes/access-venue/BadgeTemplateDesigner.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-644"
+   ],
+   "exitTo": [
+    "BO-644"
+   ],
+   "transitions": [
+    {
+     "to": "BO-644",
+     "trigger": "Back to Credential Issuance Command Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Design physical accreditation badges.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Badge Template Designer declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 30"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 30"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setBadgeTemplate",
+       "label": "Save badge template",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setBadgeTemplate"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The badge template designer list.",
+   "error": "Could not load. Names which read failed and leaves the badge template designer untouched.",
+   "emptyFirstRun": "No badge template designer yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the badge template designer are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setBadgeTemplate",
+    "contract": "accreditation",
+    "purpose": "Credential media",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listBadgeTemplates"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-647",
+   "workshopBoard": "wireframes/WS04 ACCREDITATION Board 4.dc.html#bo-647"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 30. 0 of 0 labels bound to a contract property; 0 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-648",
+  "name": "Badge Printing & Print Queue",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "4",
+   "number": "5",
+   "page": 31
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/badge-printing-print-queue-bo-648",
+   "component": "apps/venue-management-web/src/routes/access-venue/BadgePrintingPrintQueue.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-644"
+   ],
+   "exitTo": [
+    "BO-644"
+   ],
+   "transitions": [
+    {
+     "to": "BO-644",
+     "trigger": "Back to Credential Issuance Command Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Manage physical accreditation badge production.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 31"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 31"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listBadgeTemplates",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setBadgeTemplate",
+       "label": "Save badge template",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setBadgeTemplate"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The badge printing print list.",
+   "error": "Could not load. Names which read failed and leaves the badge printing print untouched.",
+   "emptyFirstRun": "No badge printing print yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the badge printing print are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listBadgeTemplates",
+    "contract": "accreditation",
+    "purpose": "Badge designs",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setBadgeTemplate",
+    "contract": "accreditation",
+    "purpose": "Design one",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listBadgeTemplates"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-648",
+   "workshopBoard": "wireframes/WS04 ACCREDITATION Board 4.dc.html#bo-648"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 31. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-649",
+  "name": "Digital & Mobile Credential Management",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "4",
+   "number": "6",
+   "page": 32
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/digital-mobile-credential-management-bo-649",
+   "component": "apps/venue-management-web/src/routes/access-venue/DigitalMobileCredentialManagement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-644"
+   ],
+   "exitTo": [
+    "BO-644"
+   ],
+   "transitions": [
+    {
+     "to": "BO-644",
+     "trigger": "Back to Credential Issuance Command Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Manage credentials delivered electronically to accreditation holders.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 32"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 32"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createBadgePrintJob",
+       "label": "Create badge print job",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listBadgePrintJobs",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createBadgePrintJob"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The digital mobile credential list.",
+   "error": "Could not load. Names which read failed and leaves the digital mobile credential untouched.",
+   "emptyFirstRun": "No digital mobile credential yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the digital mobile credential are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "createBadgePrintJob",
+    "contract": "accreditation",
+    "purpose": "Queue for printing",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listBadgePrintJobs"
+    ]
+   },
+   {
+    "operationId": "listBadgePrintJobs",
+    "contract": "accreditation",
+    "purpose": "The print queue",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-649",
+   "workshopBoard": "wireframes/WS04 ACCREDITATION Board 4.dc.html#bo-649"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 32. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-650",
+  "name": "NFC & RFID Credential Encoding",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "4",
+   "number": "7",
+   "page": 33
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/nfc-rfid-credential-encoding-bo-650",
+   "component": "apps/venue-management-web/src/routes/access-venue/NfcRfidCredentialEncoding.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-644"
+   ],
+   "exitTo": [
+    "BO-644"
+   ],
+   "transitions": [
+    {
+     "to": "BO-644",
+     "trigger": "Back to Credential Issuance Command Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Associate physical NFC/RFID media with an accreditation.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 33"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 33"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "issueAccreditationCredential",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "issueAccreditationCredential"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The nfc rfid credential list.",
+   "error": "Could not load. Names which read failed and leaves the nfc rfid credential untouched.",
+   "emptyFirstRun": "No nfc rfid credential yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the nfc rfid credential are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "issueAccreditationCredential",
+    "contract": "accreditation",
+    "purpose": "Digital and mobile credentials",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listAccreditationCredentials"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-650",
+   "workshopBoard": "wireframes/WS04 ACCREDITATION Board 4.dc.html#bo-650"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 33. 0 of 0 labels bound to a contract property; 0 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-651",
+  "name": "Credential Activation & Delivery",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "4",
+   "number": "8",
+   "page": 33
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/credential-activation-delivery-bo-651",
+   "component": "apps/venue-management-web/src/routes/access-venue/CredentialActivationDelivery.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-644"
+   ],
+   "exitTo": [
+    "BO-644"
+   ],
+   "transitions": [
+    {
+     "to": "BO-644",
+     "trigger": "Back to Credential Issuance Command Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Control when an issued credential becomes operational.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 33"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 33"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "issueAccreditationCredential",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "issueAccreditationCredential"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The credential activation delivery list.",
+   "error": "Could not load. Names which read failed and leaves the credential activation delivery untouched.",
+   "emptyFirstRun": "No credential activation delivery yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the credential activation delivery are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "issueAccreditationCredential",
+    "contract": "accreditation",
+    "purpose": "NFC and RFID encoding",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listAccreditationCredentials"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-651",
+   "workshopBoard": "wireframes/WS04 ACCREDITATION Board 4.dc.html#bo-651"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 33. 0 of 0 labels bound to a contract property; 0 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-653",
+  "name": "Credential Registry & Credential History",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "4",
+   "number": "10",
+   "page": 34
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/credential-registry-credential-history-bo-653",
+   "component": "apps/venue-management-web/src/routes/access-venue/CredentialRegistryCredentialHistory.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-644"
+   ],
+   "exitTo": [
+    "BO-644"
+   ],
+   "transitions": [
+    {
+     "to": "BO-644",
+     "trigger": "Back to Credential Issuance Command Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Maintain the authoritative record of every credential issued by TICVAI.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 34"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 34"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listCredential",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The credential registry credential list.",
+   "error": "Could not load. Names which read failed and leaves the credential registry credential untouched.",
+   "emptyFirstRun": "No credential registry credential yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the credential registry credential are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCredential",
+    "contract": "access",
+    "purpose": "Credential Operations Command Center",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-653",
+   "workshopBoard": "wireframes/WS04 ACCREDITATION Board 4.dc.html#bo-653"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 34. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

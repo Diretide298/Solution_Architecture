@@ -1,1 +1,294 @@
-{}
+{
+ "analyseMediaAsset": {
+  "method": "POST",
+  "path": "/media-assets/{assetId}/analyse",
+  "contract": "assets",
+  "summary": "Auto-tag, describe and classify an asset",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "bulkUpdateMediaAssets": {
+  "method": "POST",
+  "path": "/media-assets/bulk",
+  "contract": "assets",
+  "summary": "Retag, reclassify, move or archive many assets at once",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "completeUpload": {
+  "method": "POST",
+  "path": "/media/uploads/{uploadId}/complete",
+  "contract": "assets",
+  "summary": "Confirm an upload and create the asset",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaAsset"
+ },
+ "createCollection": {
+  "method": "POST",
+  "path": "/media/collections",
+  "contract": "assets",
+  "summary": "Create a collection",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Collection"
+ },
+ "createUpload": {
+  "method": "POST",
+  "path": "/media/uploads",
+  "contract": "assets",
+  "summary": "Request a signed upload URL",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "UploadTicket"
+ },
+ "getMediaAsset": {
+  "method": "GET",
+  "path": "/media/{mediaId}",
+  "contract": "assets",
+  "summary": "Read an asset with derivatives and usage",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MediaAssetDetail"
+ },
+ "getMediaDistribution": {
+  "method": "GET",
+  "path": "/media-distribution",
+  "contract": "assets",
+  "summary": "Where an asset is used and how it is delivered",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "assetId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaDistribution"
+ },
+ "getMediaTaxonomy": {
+  "method": "GET",
+  "path": "/media-taxonomy",
+  "contract": "assets",
+  "summary": "The categories, metadata fields and controlled vocabularies",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MediaTaxonomy"
+ },
+ "getMediaUsageAnalytics": {
+  "method": "GET",
+  "path": "/media-usage",
+  "contract": "assets",
+  "summary": "Downloads, views, shares and library health",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaUsageRow"
+ },
+ "listCollections": {
+  "method": "GET",
+  "path": "/media/collections",
+  "contract": "assets",
+  "summary": "List collections",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Collection"
+ },
+ "listMediaAssetVersions": {
+  "method": "GET",
+  "path": "/media-assets/{assetId}/versions",
+  "contract": "assets",
+  "summary": "Every revision, and what replacing it would affect",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MediaAssetVersion"
+ },
+ "searchMedia": {
+  "method": "GET",
+  "path": "/media",
+  "contract": "assets",
+  "summary": "Search the asset library",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "tag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "collectionId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "unusedOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "rightsExpiringWithinDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "setMediaAssetTags": {
+  "method": "PUT",
+  "path": "/media-assets/{assetId}/tags",
+  "contract": "assets",
+  "summary": "Tags and keywords, whoever or whatever supplied them",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaTag"
+ },
+ "setMediaTaxonomy": {
+  "method": "PUT",
+  "path": "/media-taxonomy",
+  "contract": "assets",
+  "summary": "Define categories, fields and keyword vocabularies",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MediaTaxonomy",
+  "responds": "MediaTaxonomy"
+ }
+}

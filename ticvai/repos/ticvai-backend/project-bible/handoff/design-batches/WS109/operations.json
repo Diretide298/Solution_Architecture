@@ -1,0 +1,162 @@
+{
+ "getAccreditationHolder": {
+  "method": "GET",
+  "path": "/accreditation-holders/{holderId}",
+  "contract": "accreditation",
+  "summary": "One holder — identity, documents, access and history",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccreditationHolder"
+ },
+ "listAccreditationAudit": {
+  "method": "GET",
+  "path": "/accreditation-audit",
+  "contract": "accreditation",
+  "summary": "The immutable record of who granted what to whom",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "holderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationAuditRecord"
+ },
+ "listAccreditationHolders": {
+  "method": "GET",
+  "path": "/accreditation-holders",
+  "contract": "accreditation",
+  "summary": "Everybody accredited, and what state they are in",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "programmeId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "organisationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "expiringWithinDays",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationHolder"
+ },
+ "listAccreditationIdentityConflicts": {
+  "method": "GET",
+  "path": "/accreditation-identity-conflicts",
+  "contract": "accreditation",
+  "summary": "People who may already be accredited under another record",
+  "permission": "ACCREDITATION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccreditationIdentityConflict"
+ },
+ "resolveIdentityConflict": {
+  "method": "POST",
+  "path": "/accreditation-identity-conflicts/{conflictId}/resolve",
+  "contract": "accreditation",
+  "summary": "Decide whether two accreditation records are the same person",
+  "permission": "ACCREDITATION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationIdentityConflict"
+ },
+ "submitAccreditationDocument": {
+  "method": "POST",
+  "path": "/accreditation-documents",
+  "contract": "accreditation",
+  "summary": "Supply a document against a requirement",
+  "permission": "ACCREDITATION_APPLY",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccreditationDocument",
+  "responds": "AccreditationDocument"
+ },
+ "updateAccreditationHolder": {
+  "method": "PUT",
+  "path": "/accreditation-holders/{holderId}",
+  "contract": "accreditation",
+  "summary": "Amend identity, affiliation or contact details",
+  "permission": "ACCREDITATION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccreditationHolder",
+  "responds": "AccreditationHolder"
+ },
+ "verifyAccreditationDocument": {
+  "method": "POST",
+  "path": "/accreditation-documents/{documentId}/verify",
+  "contract": "accreditation",
+  "summary": "Accept or refuse a submitted document",
+  "permission": "ACCREDITATION_APPROVE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationDocument"
+ }
+}

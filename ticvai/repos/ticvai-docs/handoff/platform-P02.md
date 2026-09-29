@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 77 |
-| Operations | 188 |
+| Operations | 189 |
 | Contracts | 19 |
 | Modules | 17 |
 | Undrawn | 0 |
@@ -88,7 +88,7 @@
 | `GST-010` | Booking Confirmation | Cart & Checkout | 1 | 3 | yes |
 | `GST-011` | Wallet Overview | Membership, Loyalty & Value | 2 | 2 | yes |
 | `GST-012` | My Tickets | Account & Self-Service | 1 | 6 | yes |
-| `GST-013` | Ticket Details | Account & Self-Service | 1 | 4 | yes |
+| `GST-013` | Ticket Details | Account & Self-Service | 1 | 5 | yes |
 | `GST-014` | Ticket Transfer | Ticketing | 2 | 3 | yes |
 | `GST-015` | Memberships | Membership, Loyalty & Value | 2 | 9 | yes |
 | `GST-016` | My Reservations | Ticketing | 2 | 3 | yes |
@@ -130,7 +130,7 @@
 | `GST-052` | Suggested Itineraries | Engagement & Support | 4 | 2 | yes |
 | `GST-053` | Build Your Own Itinerary | Engagement & Support | 4 | 4 | yes |
 | `GST-054` | AI Optimized Itinerary | Engagement & Support | 4 | 3 | yes |
-| `GST-055` | Dynamic QR Ticket | Account & Self-Service | 1 | 4 | yes |
+| `GST-055` | Dynamic QR Ticket | Account & Self-Service | 1 | 5 | yes |
 | `GST-056` | Bundle Package | Booking & Selection | 2 | 3 | yes |
 | `GST-057` | Accessibility Information | Discovery & Browse | 2 | 1 | yes |
 | `GST-058` | Resource Availability (Cabana) | Booking & Selection | 3 | 2 | yes |

@@ -4,7 +4,7 @@
   "path": "/purchase-orders/{purchaseOrderId}/acknowledge",
   "contract": "inventory",
   "summary": "Record the supplier acknowledgement",
-  "permission": "PRODUCT_CONFIGURE",
+  "permission": "PROCUREMENT_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -16,7 +16,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "PurchaseOrder"
  },
  "approveRequisition": {
   "method": "POST",
@@ -42,7 +42,7 @@
   "path": "/purchase-orders/{purchaseOrderId}/cancel",
   "contract": "inventory",
   "summary": "Cancel a purchase order",
-  "permission": "ORDER_CANCEL",
+  "permission": "PROCUREMENT_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -61,7 +61,7 @@
   "path": "/requisitions/{requisitionId}/cancel",
   "contract": "inventory",
   "summary": "Cancel a requisition",
-  "permission": "PRODUCT_CONFIGURE",
+  "permission": "PROCUREMENT_REQUEST",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -73,7 +73,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Requisition"
  },
  "cancelStockCount": {
   "method": "POST",
@@ -92,14 +92,14 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "StockCount"
  },
  "closePurchaseOrderShort": {
   "method": "POST",
   "path": "/purchase-orders/{purchaseOrderId}/close-short",
   "contract": "inventory",
   "summary": "Close an order accepting the balance will not arrive",
-  "permission": "LEDGER_APPROVE",
+  "permission": "PROCUREMENT_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -111,7 +111,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "PurchaseOrder"
  },
  "closeTransferShort": {
   "method": "POST",
@@ -130,14 +130,14 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "StockTransfer"
  },
  "compareQuotations": {
   "method": "GET",
   "path": "/requisitions/{requisitionId}/quotations",
   "contract": "inventory",
   "summary": "Compare quotations for a requisition",
-  "permission": "PRODUCT_VIEW",
+  "permission": "PROCUREMENT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -150,7 +150,7 @@
   "path": "/goods-receipts",
   "contract": "inventory",
   "summary": "Receive goods against a purchase order",
-  "permission": "PRODUCT_CONFIGURE",
+  "permission": "PROCUREMENT_RECEIVE",
   "offlineCapable": true,
   "conflictPolicy": "append",
   "scopeLevel": "venue",
@@ -188,7 +188,7 @@
   "path": "/purchase-orders",
   "contract": "inventory",
   "summary": "Raise a purchase order",
-  "permission": "ORDER_CREATE",
+  "permission": "PROCUREMENT_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -207,7 +207,7 @@
   "path": "/requisitions",
   "contract": "inventory",
   "summary": "Raise a requisition",
-  "permission": "ORDER_CREATE",
+  "permission": "PROCUREMENT_REQUEST",
   "offlineCapable": true,
   "conflictPolicy": "append",
   "scopeLevel": "venue",
@@ -283,10 +283,10 @@
   "path": "/suppliers",
   "contract": "inventory",
   "summary": "Create a supplier",
-  "permission": "PRODUCT_CONFIGURE",
+  "permission": "PROCUREMENT_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -299,7 +299,7 @@
  },
  "enterCountLine": {
   "method": "POST",
-  "path": "/stock-counts/{countId}/lines",
+  "path": "/fnb-stock-counts/{countId}/lines",
   "contract": "fnb",
   "summary": "What was actually on the shelf",
   "permission": "PRODUCT_CONFIGURE",
@@ -347,7 +347,7 @@
   "path": "/purchase-orders/{purchaseOrderId}",
   "contract": "inventory",
   "summary": "Read a purchase order with receipt progress",
-  "permission": "PRODUCT_VIEW",
+  "permission": "PROCUREMENT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -405,7 +405,7 @@
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": null
+  "responds": "StockTransfer"
  },
  "getStockValuation": {
   "method": "GET",
@@ -436,7 +436,7 @@
   "path": "/requisitions/suggested",
   "contract": "inventory",
   "summary": "Draft requisitions from reorder points",
-  "permission": "PRODUCT_VIEW",
+  "permission": "PROCUREMENT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -474,25 +474,12 @@
   "requestBody": null,
   "responds": null
  },
- "getVenueSettings": {
-  "method": "GET",
-  "path": "/venues/{venueId}/settings",
-  "contract": "tenancy",
-  "summary": "Operational settings for this venue",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "VenueSettings"
- },
  "listGoodsReceipts": {
   "method": "GET",
   "path": "/goods-receipts",
   "contract": "inventory",
   "summary": "List goods receipts",
-  "permission": "PRODUCT_VIEW",
+  "permission": "PROCUREMENT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -619,7 +606,7 @@
   "path": "/purchase-orders",
   "contract": "inventory",
   "summary": "List purchase orders",
-  "permission": "PRODUCT_VIEW",
+  "permission": "PROCUREMENT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -653,7 +640,7 @@
   "path": "/requisitions",
   "contract": "inventory",
   "summary": "List requisitions",
-  "permission": "PRODUCT_VIEW",
+  "permission": "PROCUREMENT_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -738,7 +725,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "StockLocation"
+  "responds": "Page"
  },
  "listStockMovements": {
   "method": "GET",
@@ -823,10 +810,10 @@
   "path": "/suppliers",
   "contract": "inventory",
   "summary": "List suppliers",
-  "permission": "PRODUCT_VIEW",
+  "permission": "PROCUREMENT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
+  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
@@ -909,7 +896,7 @@
   "path": "/suppliers/{supplierId}/quotations",
   "contract": "inventory",
   "summary": "Record a supplier quotation",
-  "permission": "PRODUCT_CONFIGURE",
+  "permission": "PROCUREMENT_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -940,14 +927,14 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "StockCount"
  },
  "rejectReceivedGoods": {
   "method": "POST",
   "path": "/goods-receipts/{receiptId}/reject",
   "contract": "inventory",
   "summary": "Reject received goods",
-  "permission": "PRODUCT_CONFIGURE",
+  "permission": "PROCUREMENT_RECEIVE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -966,7 +953,7 @@
   "path": "/requisitions/{requisitionId}/reject",
   "contract": "inventory",
   "summary": "Reject a requisition",
-  "permission": "LEDGER_APPROVE",
+  "permission": "APPROVAL_ACT",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -978,11 +965,11 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Requisition"
  },
  "requestRecount": {
   "method": "POST",
-  "path": "/stock-counts/{countId}/recount",
+  "path": "/fnb-stock-counts/{countId}/recount",
   "contract": "fnb",
   "summary": "Send a line back to be counted again",
   "permission": "PRODUCT_CONFIGURE",
@@ -997,14 +984,14 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "RecountResult"
  },
  "returnRequisition": {
   "method": "POST",
   "path": "/requisitions/{requisitionId}/return",
   "contract": "inventory",
   "summary": "Return a requisition for more information",
-  "permission": "LEDGER_APPROVE",
+  "permission": "APPROVAL_ACT",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -1016,14 +1003,14 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Requisition"
  },
  "sendPurchaseOrder": {
   "method": "POST",
   "path": "/purchase-orders/{purchaseOrderId}/send",
   "contract": "inventory",
   "summary": "Issue the order to the supplier",
-  "permission": "PRODUCT_CONFIGURE",
+  "permission": "PROCUREMENT_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -1035,7 +1022,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "PurchaseOrder"
  },
  "setItemAvailability": {
   "method": "PUT",
@@ -1075,6 +1062,25 @@
   "requestBody": "StartStockCountRequest",
   "responds": "StockCount"
  },
+ "submitCountLines": {
+  "method": "POST",
+  "path": "/stock-counts/{countId}/lines",
+  "contract": "inventory",
+  "summary": "Submit counted quantities",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "updateInventoryItem": {
   "method": "PATCH",
   "path": "/inventory-items/{itemId}",
@@ -1099,7 +1105,7 @@
   "path": "/requisitions/{requisitionId}/lines",
   "contract": "inventory",
   "summary": "Change what an outlet is asking for, before it is approved",
-  "permission": "PRODUCT_CONFIGURE",
+  "permission": "PROCUREMENT_REQUEST",
   "offlineCapable": true,
   "conflictPolicy": "lastWriterWins",
   "scopeLevel": "venue",
@@ -1111,14 +1117,14 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Requisition"
  },
  "updateSupplier": {
   "method": "PUT",
   "path": "/suppliers/{supplierId}",
   "contract": "inventory",
   "summary": "Change terms, or stop buying from them",
-  "permission": "PRODUCT_CONFIGURE",
+  "permission": "PROCUREMENT_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
@@ -1130,6 +1136,6 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Supplier"
  }
 }

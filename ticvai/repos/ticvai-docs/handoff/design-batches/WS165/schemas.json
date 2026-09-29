@@ -1,0 +1,768 @@
+{
+ "BulkUpdateSeatsRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "selection"
+  ],
+  "properties": {
+   "selection": {
+    "type": "object",
+    "description": "Seats to amend. Combine filters; an empty selection is rejected.",
+    "properties": {
+     "seatIds": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "sectionCodes": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "rowLabels": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "attribute": {
+    "$ref": "#/components/schemas/SeatAttribute"
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "CreateSeatMapRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "name",
+   "venueId"
+  ],
+  "properties": {
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "templateId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Create from a template rather than empty."
+   }
+  }
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "MapZone": {
+  "type": "object",
+  "x-ticvai-persistence": "seating.zone",
+  "description": "BL-166. **`seating` is strong on everything that is a seat and the map itself was only seats.**\n**A standing area is a capacity without individual seats**, and modelling it as seats means inventing seat numbers nobody prints and a guest cannot find. A suite is the opposite — one sellable unit containing many seats, sold whole.\nNon-sellable zones matter too: **a stage, an entry and a sightline obstruction are not inventory and they change what the seats beside them are worth.**\n",
+  "required": [
+   "id",
+   "seatMapId",
+   "kind",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "seatMapId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "standing",
+     "suite",
+     "box",
+     "lounge",
+     "accessiblePlatform",
+     "stage",
+     "entry",
+     "exit",
+     "concourse",
+     "obstruction",
+     "camera",
+     "aisle"
+    ]
+   },
+   "name": {
+    "type": "string"
+   },
+   "capacity": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**For a standing zone this is the inventory** — sold as a count rather than as seats. Null for a stage or an obstruction, which sell nothing.\n"
+   },
+   "seatCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "containsSeatIds": {
+    "type": "array",
+    "description": "For a suite or box. **Sold whole, so the seats inside are held together** — selling one seat of a suite is not a thing a venue does.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "obstructsZoneIds": {
+    "type": "array",
+    "description": "What this blocks the view of. **A pillar is not inventory and it decides what the seats behind it are worth**, which is the only reason to draw it.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "geometry": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "MediaAsset": {
+  "x-ticvai-persistence": "assets.media_asset",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "status",
+   "filename",
+   "contentType",
+   "sizeBytes",
+   "referenceCount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MediaKind"
+   },
+   "status": {
+    "$ref": "#/components/schemas/MediaStatus"
+   },
+   "filename": {
+    "type": "string"
+   },
+   "contentType": {
+    "type": "string"
+   },
+   "sizeBytes": {
+    "type": "integer"
+   },
+   "title": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "description": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"
+   },
+   "altText": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "Required before use in a guest-facing surface. WCAG 2.2 AA."
+   },
+   "width": {
+    "type": "integer",
+    "nullable": true
+   },
+   "height": {
+    "type": "integer",
+    "nullable": true
+   },
+   "durationSeconds": {
+    "type": "number",
+    "nullable": true
+   },
+   "customMetadata": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": true,
+    "description": "BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"
+   },
+   "sharedWithTenantIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"
+   },
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "url": {
+    "type": "string",
+    "description": "Signed and expiring for private assets; stable CDN URL for public ones."
+   },
+   "thumbnailUrl": {
+    "type": "string",
+    "nullable": true
+   },
+   "referenceCount": {
+    "type": "integer",
+    "description": "How many surfaces reference this asset. Non-zero refuses deletion.\n"
+   },
+   "rights": {
+    "$ref": "#/components/schemas/MediaRights"
+   },
+   "isRightsExpired": {
+    "type": "boolean"
+   },
+   "version": {
+    "type": "integer"
+   },
+   "uploadedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "MediaKind": {
+  "type": "string",
+  "enum": [
+   "image",
+   "video",
+   "audio",
+   "document",
+   "vector",
+   "font",
+   "archive"
+  ]
+ },
+ "MediaRights": {
+  "x-ticvai-persistence": "none — embedded in asset",
+  "type": "object",
+  "description": "Licensing terms. Tracked because an expired licence on a live surface is a legal exposure, not a housekeeping item.\n",
+  "properties": {
+   "licenceKind": {
+    "type": "string",
+    "enum": [
+     "owned",
+     "royaltyFree",
+     "rightsManaged",
+     "creativeCommons",
+     "editorialOnly",
+     "unknown"
+    ]
+   },
+   "licensor": {
+    "type": "string",
+    "nullable": true
+   },
+   "licenceReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "permittedUses": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "web",
+      "print",
+      "socialMedia",
+      "inVenue",
+      "advertising",
+      "internal"
+     ]
+    }
+   },
+   "attributionRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "attributionText": {
+    "type": "string",
+    "nullable": true
+   },
+   "permittedTerritories": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "ISO country or region codes. **Empty means unrestricted, which is a claim rather than an absence** — an unknown territory and a worldwide licence are not the same thing, and `licenceKind: unknown` is how the second is said.\n"
+   },
+   "permittedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Distribution channel codes, checked by `setMediaDistributionChannels`. Narrower than `permittedUses`, which describes the medium rather than the route.\n"
+   },
+   "modelReleaseHeld": {
+    "type": "boolean",
+    "default": false
+   },
+   "renewalOwner": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
+ "MediaStatus": {
+  "type": "string",
+  "enum": [
+   "processing",
+   "ready",
+   "quarantined",
+   "failed",
+   "archived"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Point": {
+  "type": "object",
+  "required": [
+   "x",
+   "y"
+  ],
+  "properties": {
+   "x": {
+    "type": "number"
+   },
+   "y": {
+    "type": "number"
+   }
+  }
+ },
+ "SeatAttribute": {
+  "type": "string",
+  "description": "BL-168. **Extended from eight values on 18 August.** Amenity and view filters needed attributes the original set did not carry, and a guest filtering for *aisle seat with power* was filtering on something the model could not express.\n",
+  "enum": [
+   "standard",
+   "accessible",
+   "companion",
+   "obstructedView",
+   "restrictedLegroom",
+   "premium",
+   "houseSeat",
+   "buffer",
+   "aisle",
+   "endOfRow",
+   "extraLegroom",
+   "powerOutlet",
+   "tableService",
+   "shaded",
+   "covered",
+   "nearExit",
+   "nearAccessibleWc",
+   "wheelchairTransfer",
+   "limitedRecline",
+   "sofa",
+   "beanbag"
+  ]
+ },
+ "SeatMap": {
+  "x-ticvai-persistence": "seating.seat_map",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/SeatMapSummary"
+   },
+   {
+    "type": "object",
+    "required": [
+     "sections"
+    ],
+    "properties": {
+     "description": {
+      "type": "string",
+      "nullable": true
+     },
+     "viewBox": {
+      "type": "object",
+      "description": "Coordinate space for rendering. Absent when there is no geometry.",
+      "nullable": true,
+      "properties": {
+       "width": {
+        "type": "number"
+       },
+       "height": {
+        "type": "number"
+       }
+      }
+     },
+     "stagePosition": {
+      "$ref": "#/components/schemas/Point"
+     },
+     "sections": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/Section"
+      }
+     },
+     "isActive": {
+      "type": "boolean"
+     }
+    }
+   }
+  ]
+ },
+ "SeatMapSummary": {
+  "x-ticvai-persistence": "seating.seat_map",
+  "type": "object",
+  "required": [
+   "id",
+   "name",
+   "venueId",
+   "status",
+   "seatCount"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "status": {
+    "$ref": "#/components/schemas/SeatMapStatus"
+   },
+   "seatCount": {
+    "type": "integer"
+   },
+   "sectionCount": {
+    "type": "integer"
+   },
+   "hasGeometry": {
+    "type": "boolean",
+    "description": "False when only a manifest has been imported. Such a map can be sold from a list but not rendered.\n"
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "SeatMapTemplate": {
+  "x-ticvai-persistence": "seating.seat_map_template",
+  "type": "object",
+  "required": [
+   "id",
+   "name",
+   "seatCount",
+   "sectionCount"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "seatCount": {
+    "type": "integer"
+   },
+   "sectionCount": {
+    "type": "integer"
+   },
+   "hasGeometry": {
+    "type": "boolean"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "Section": {
+  "x-ticvai-persistence": "seating.section",
+  "type": "object",
+  "required": [
+   "code",
+   "name",
+   "rowCount",
+   "seatCount"
+  ],
+  "properties": {
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "rowCount": {
+    "type": "integer"
+   },
+   "seatCount": {
+    "type": "integer"
+   },
+   "boundary": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Point"
+    },
+    "description": "Polygon for rendering. Absent without geometry."
+   },
+   "viewAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "assets.MediaAsset",
+    "description": "**The view of the stage from this section, as a photo**, uploaded through `assets` like any other media (decided 29 September, rev 3 23SEP-14). Optional: where it is null the client renders the view from the imported geometry (the section `boundary`, the map's `stagePosition` and the seat positions), so a closer section shows a larger stage and fewer rows ahead. Set with `updateSeatMap` `sectionViews`, which is allowed on a published map because a photo does not change the map's shape.\n"
+   },
+   "rows": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "label",
+      "seatCount"
+     ],
+     "properties": {
+      "label": {
+       "type": "string"
+      },
+      "seatCount": {
+       "type": "integer"
+      },
+      "numberingDirection": {
+       "type": "string",
+       "enum": [
+        "leftToRight",
+        "rightToLeft"
+       ],
+       "description": "Which end row numbering starts from. Not recoverable from a manifest and must be stated — it determines whether a guest finds their seat.\n"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "UploadTicket": {
+  "x-ticvai-persistence": "assets.media_upload",
+  "type": "object",
+  "required": [
+   "uploadId",
+   "uploadUrl",
+   "method",
+   "expiresAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "uploadId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "uploadUrl": {
+    "type": "string",
+    "description": "Signed. PUT the file here, then confirm with `/complete`."
+   },
+   "method": {
+    "type": "string",
+    "enum": [
+     "PUT",
+     "POST"
+    ]
+   },
+   "headers": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "maxSizeBytes": {
+    "type": "integer"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "filename": {
+    "type": "string"
+   },
+   "contentType": {
+    "type": "string"
+   },
+   "sizeBytes": {
+    "type": "integer"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The asset this upload became — created by `completeUpload`, or the asset whose file `replaceMediaAsset` swapped. Null while the transfer is outstanding.\n"
+   }
+  }
+ },
+ "ValidationFinding": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "kind",
+   "severity",
+   "message"
+  ],
+  "properties": {
+   "kind": {
+    "$ref": "#/components/schemas/ValidationFindingKind"
+   },
+   "severity": {
+    "$ref": "#/components/schemas/ValidationSeverity"
+   },
+   "message": {
+    "type": "string"
+   },
+   "sectionCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "rowLabel": {
+    "type": "string",
+    "nullable": true
+   },
+   "seatNumbers": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "affectedCount": {
+    "type": "integer"
+   }
+  }
+ },
+ "ValidationReport": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "seatMapId",
+   "passed",
+   "errorCount",
+   "warningCount",
+   "findings"
+  ],
+  "properties": {
+   "seatMapId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "passed": {
+    "type": "boolean",
+    "description": "False when any finding has severity `error`."
+   },
+   "errorCount": {
+    "type": "integer"
+   },
+   "warningCount": {
+    "type": "integer"
+   },
+   "findings": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ValidationFinding"
+    }
+   }
+  }
+ }
+}

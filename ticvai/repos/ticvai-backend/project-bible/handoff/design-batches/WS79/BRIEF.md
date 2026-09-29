@@ -1,6 +1,6 @@
 # WS79 — Game and Ride board 2
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 7 operations · 7 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `DEVICE_CONFIGURE, DEVICE_MANAGE, DEVICE_VIEW, PRODUCT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-404` | Reader Management Dashboard | commandCentre | 0 | 0 | — |
-| `BO-405` | Reader Directory | listDetail | 0 | 1 | — |
-| `BO-406` | Reader Profile & Device Setup | configEditor | 0 | 0 | — |
-| `BO-407` | Reader Credit & Payment Configuration | configEditor | 0 | 0 | — |
-| `BO-408` | Reader / Attraction Assignment | listDetail | 0 | 0 | — |
-| `BO-409` | Retap Delay & Transaction Protection | configEditor | 0 | 0 | — |
-| `BO-410` | Free Game Glow & Reader Display Rules | configEditor | 0 | 0 | — |
-| `BO-411` | Reader Theme & Experience Configuration | configEditor | 0 | 0 | — |
-| `BO-412` | Real-Time Tap Validation & Reader Response | listDetail | 0 | 0 | — |
-| `BO-413` | Balance Check Reader & Device Test Console | listDetail | 0 | 0 | — |
+| `BO-404` | Reader Management Dashboard | commandCentre | 1 | 0 | — |
+| `BO-405` | Reader Directory | listDetail | 4 | 1 | — |
+| `BO-406` | Reader Profile & Device Setup | configEditor | 1 | 0 | — |
+| `BO-407` | Reader Credit & Payment Configuration | configEditor | 2 | 0 | — |
+| `BO-408` | Reader / Attraction Assignment | listDetail | 1 | 0 | — |
+| `BO-409` | Retap Delay & Transaction Protection | configEditor | 1 | 0 | — |
+| `BO-410` | Free Game Glow & Reader Display Rules | configEditor | 1 | 0 | — |
+| `BO-411` | Reader Theme & Experience Configuration | configEditor | 1 | 0 | — |
+| `BO-412` | Real-Time Tap Validation & Reader Response | listDetail | 1 | 0 | — |
+| `BO-413` | Balance Check Reader & Device Test Console | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 

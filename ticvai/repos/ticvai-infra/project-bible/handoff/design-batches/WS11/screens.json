@@ -39,10 +39,7 @@
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-244 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-245",
@@ -101,13 +98,110 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Security teams can understand the overall fraud and access-security posture from one screen.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Show) and no metric row",
   "purpose": "Provide security teams with a real-time command center for access-related fraud and suspicious activity across all venues.",
-  "purposeNote": "Security teams can understand the overall fraud and access-security posture from one screen.",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active Security Alerts",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.activeSecurityAlerts",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "High-Risk Credentials",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.highRiskCredentials",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Credentials Locked Today",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.credentialsLockedToday",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Suspicious QR Activity",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.suspiciousQrActivity",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Device-Sharing Alerts",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.deviceSharingAlerts",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Biometric Alerts",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.biometricAlerts",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Blacklisted Credentials",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.blacklistedCredentials",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Active Investigations",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.activeInvestigations",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Fraud attempts prevented today",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.fraudPrevented",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Share of today's validations at low risk, percent",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.lowRisk",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Share at medium risk, percent",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.mediumRisk",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Share at high risk, percent",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.highRisk",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Share at critical risk, percent",
+       "bindsTo": "AccessSecurityFraudCommandCenterViewSummary.critical",
+       "operation": "listAccessSecurityFraud",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -116,20 +210,7 @@
        "kind": "dataTable",
        "label": "Every access security fraud",
        "columns": [
-        "AccessSecurityFraudCommandCenterView.activeSecurityAlerts",
-        "AccessSecurityFraudCommandCenterView.highRiskCredentials",
-        "AccessSecurityFraudCommandCenterView.credentialsLockedToday",
-        "AccessSecurityFraudCommandCenterView.suspiciousQrActivity",
-        "AccessSecurityFraudCommandCenterView.deviceSharingAlerts",
-        "AccessSecurityFraudCommandCenterView.biometricAlerts",
-        "Duplicate Access Attempts",
-        "AccessSecurityFraudCommandCenterView.blacklistedCredentials",
-        "AccessSecurityFraudCommandCenterView.activeInvestigations",
-        "AccessSecurityFraudCommandCenterView.fraudPrevented",
-        "AccessSecurityFraudCommandCenterView.lowRisk",
-        "AccessSecurityFraudCommandCenterView.mediumRisk",
-        "AccessSecurityFraudCommandCenterView.highRisk",
-        "AccessSecurityFraudCommandCenterView.critical"
+        "Duplicate Access Attempts"
        ],
        "bindsTo": "AccessSecurityFraudCommandCenterView",
        "operation": "listAccessSecurityFraud",
@@ -146,20 +227,7 @@
        "label": "The selected access security fraud",
        "bindsTo": "AccessSecurityFraudCommandCenterView",
        "columns": [
-        "AccessSecurityFraudCommandCenterView.activeSecurityAlerts",
-        "AccessSecurityFraudCommandCenterView.highRiskCredentials",
-        "AccessSecurityFraudCommandCenterView.credentialsLockedToday",
-        "AccessSecurityFraudCommandCenterView.suspiciousQrActivity",
-        "AccessSecurityFraudCommandCenterView.deviceSharingAlerts",
-        "AccessSecurityFraudCommandCenterView.biometricAlerts",
-        "Duplicate Access Attempts",
-        "AccessSecurityFraudCommandCenterView.blacklistedCredentials",
-        "AccessSecurityFraudCommandCenterView.activeInvestigations",
-        "AccessSecurityFraudCommandCenterView.fraudPrevented",
-        "AccessSecurityFraudCommandCenterView.lowRisk",
-        "AccessSecurityFraudCommandCenterView.mediumRisk",
-        "AccessSecurityFraudCommandCenterView.highRisk",
-        "AccessSecurityFraudCommandCenterView.critical"
+        "Duplicate Access Attempts"
        ],
        "notes": "The pack groups this record's detail under its own headings: “CRITICAL”, “HIGH”, “MEDIUM”, “Display incidents geographically across”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 151 §Display"
@@ -185,18 +253,19 @@
   ],
   "entryState": {
    "preloaded": [
-    "AccessSecurityFraudCommandCenterView.activeSecurityAlerts",
-    "AccessSecurityFraudCommandCenterView.highRiskCredentials",
-    "AccessSecurityFraudCommandCenterView.credentialsLockedToday",
-    "AccessSecurityFraudCommandCenterView.suspiciousQrActivity",
-    "AccessSecurityFraudCommandCenterView.deviceSharingAlerts",
-    "AccessSecurityFraudCommandCenterView.biometricAlerts"
+    "AccessSecurityFraudCommandCenterViewSummary.activeSecurityAlerts",
+    "AccessSecurityFraudCommandCenterViewSummary.highRiskCredentials",
+    "AccessSecurityFraudCommandCenterViewSummary.credentialsLockedToday",
+    "AccessSecurityFraudCommandCenterViewSummary.suspiciousQrActivity",
+    "AccessSecurityFraudCommandCenterViewSummary.deviceSharingAlerts",
+    "AccessSecurityFraudCommandCenterViewSummary.biometricAlerts"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-244"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-244",
+   "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-244"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 151. 13 of 14 labels bound to a contract property; 14 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -259,10 +328,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Fraud detection logic is configurable rather than hard-coded.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure the signals TICVAI uses to identify suspicious access behavior.",
-  "purposeNote": "Fraud detection logic is configurable rather than hard-coded.",
   "gaps": [
    {
     "operation": null,
@@ -288,6 +357,18 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save fraud rule",
+       "operation": "setFraudDetectionRule",
+       "provenance": "contract access.yaml PUT /fraud-detection-rule (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -304,21 +385,24 @@
     "contract": "access",
     "purpose": "Fraud Detection Rule & Signal Library",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setFraudDetectionRule",
+    "contract": "access",
+    "purpose": "Save fraud rule",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "preloaded": [
-    "FraudDetectionRuleSignalLibraryView.excessiveQrActivations",
-    "FraudDetectionRuleSignalLibraryView.multipleActiveSessions",
-    "FraudDetectionRuleSignalLibraryView.credentialCopied",
-    "FraudDetectionRuleSignalLibraryView.excessiveRefreshAttempts",
-    "FraudDetectionRuleSignalLibraryView.invalidSignature"
+    "FraudDetectionRuleSignalLibraryView.signal"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-245"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-245",
+   "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-245"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 152. 0 of 0 labels bound to a contract property; 0 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -381,10 +465,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "validation.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Detect one of the most important access-control fraud scenarios: One valid ticket being shared by multiple people or devices.",
-  "purposeNote": "validation.",
   "gaps": [
    {
     "operation": null,
@@ -430,17 +514,16 @@
   ],
   "entryState": {
    "preloaded": [
-    "CredentialSharingConcurrentUsageDetectionView.iphoneDeviceA",
     "CredentialSharingConcurrentUsageDetectionView.additionalDevices",
     "CredentialSharingConcurrentUsageDetectionView.maximumActiveDevices",
-    "CredentialSharingConcurrentUsageDetectionView.increaseRisk",
-    "CredentialSharingConcurrentUsageDetectionView.requireId"
+    "CredentialSharingConcurrentUsageDetectionView.responseActions"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-246"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-246",
+   "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-246"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 154. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -503,10 +586,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "One security action can immediately restrict all configured access representations associated with a suspicious identity.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Provide the single security lock required by the matrix so suspicious activity can immediately stop all access associated with an identity.",
-  "purposeNote": "One security action can immediately restrict all configured access representations associated with a suspicious identity.",
   "gaps": [
    {
     "operation": null,
@@ -525,11 +608,7 @@
        "kind": "dataTable",
        "label": "Every unified identity credential",
        "columns": [
-        "UnifiedIdentityCredentialLockManagerView.centralPlatform",
-        "UnifiedIdentityCredentialLockManagerView.venueEdge",
-        "UnifiedIdentityCredentialLockManagerView.onlineGates",
-        "UnifiedIdentityCredentialLockManagerView.offlineRevocationPackage",
-        "UnifiedIdentityCredentialLockManagerView.mobileDevices"
+        "UnifiedIdentityCredentialLockManagerView.propagatedTo"
        ],
        "bindsTo": "UnifiedIdentityCredentialLockManagerView",
        "operation": "listUnifiedIdentityCredential",
@@ -546,11 +625,7 @@
        "label": "The selected unified identity credential",
        "bindsTo": "UnifiedIdentityCredentialLockManagerView",
        "columns": [
-        "UnifiedIdentityCredentialLockManagerView.centralPlatform",
-        "UnifiedIdentityCredentialLockManagerView.venueEdge",
-        "UnifiedIdentityCredentialLockManagerView.onlineGates",
-        "UnifiedIdentityCredentialLockManagerView.offlineRevocationPackage",
-        "UnifiedIdentityCredentialLockManagerView.mobileDevices"
+        "UnifiedIdentityCredentialLockManagerView.propagatedTo"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Identity”, “Associated Credentials”, “Lock Duration”, “Unlock”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 155 §Show"
@@ -576,17 +651,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "UnifiedIdentityCredentialLockManagerView.centralPlatform",
-    "UnifiedIdentityCredentialLockManagerView.venueEdge",
-    "UnifiedIdentityCredentialLockManagerView.onlineGates",
-    "UnifiedIdentityCredentialLockManagerView.offlineRevocationPackage",
-    "UnifiedIdentityCredentialLockManagerView.mobileDevices"
+    "UnifiedIdentityCredentialLockManagerView.propagatedTo"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-247"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-247",
+   "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-247"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 155. 5 of 5 labels bound to a contract property; 9 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -649,10 +721,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Identity changes and unusual biometric behavior automatically feed TICVAI's access-risk process.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Monitor) and no metric row",
   "purpose": "Detect suspicious biometric and identity-related changes without duplicating Board 5's biometric configuration. Board 5 configures biometrics. Board 11 monitors biometric security risk.",
-  "purposeNote": "Identity changes and unusual biometric behavior automatically feed TICVAI's access-risk process.",
   "layout": {
    "template": "split",
    "regions": [
@@ -664,12 +736,9 @@
        "kind": "dataTable",
        "label": "Every biometric identity integrity",
        "columns": [
-        "BiometricIdentityIntegrityMonitoringView.faceChanged",
-        "BiometricIdentityIntegrityMonitoringView.reEnrollment",
-        "BiometricIdentityIntegrityMonitoringView.repeatedFaceMismatch",
+        "BiometricIdentityIntegrityMonitoringView.anomalyType",
         "multiple faces associated with one credential",
-        "one face associated with multiple credentials",
-        "BiometricIdentityIntegrityMonitoringView.suspiciousEnrollmentFrequency"
+        "one face associated with multiple credentials"
        ],
        "bindsTo": "BiometricIdentityIntegrityMonitoringView",
        "operation": "listBiometricIdentityIntegrity",
@@ -686,12 +755,9 @@
        "label": "The selected biometric identity integrity",
        "bindsTo": "BiometricIdentityIntegrityMonitoringView",
        "columns": [
-        "BiometricIdentityIntegrityMonitoringView.faceChanged",
-        "BiometricIdentityIntegrityMonitoringView.reEnrollment",
-        "BiometricIdentityIntegrityMonitoringView.repeatedFaceMismatch",
+        "BiometricIdentityIntegrityMonitoringView.anomalyType",
         "multiple faces associated with one credential",
-        "one face associated with multiple credentials",
-        "BiometricIdentityIntegrityMonitoringView.suspiciousEnrollmentFrequency"
+        "one face associated with multiple credentials"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Original Face Enrollment”, “Successful Visits”, “Face Changed”, “Reason”, “Enrollment 1”, “Enrollment 2”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 156 §Monitor"
@@ -713,22 +779,30 @@
     "contract": "access",
     "purpose": "Biometric & Identity Integrity Monitoring",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setSecurityInvestigationEvidence",
+    "contract": "access",
+    "purpose": "Open an investigation on a flagged face change or mismatch",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listBiometricIdentityIntegrity"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "BiometricIdentityIntegrityMonitoringView.faceChanged",
-    "BiometricIdentityIntegrityMonitoringView.reEnrollment",
-    "BiometricIdentityIntegrityMonitoringView.repeatedFaceMismatch",
+    "BiometricIdentityIntegrityMonitoringView.anomalyType",
     "multiple faces associated with one credential",
-    "one face associated with multiple credentials",
-    "BiometricIdentityIntegrityMonitoringView.suspiciousEnrollmentFrequency"
+    "one face associated with multiple credentials"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-248"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-248",
+   "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-248"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 156. 4 of 6 labels bound to a contract property; 6 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -791,10 +865,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Linked-person relationships are continuously monitored rather than checked only at initial credential creation.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Detect abuse involving linked guests such as: Child + Adult POD + Companion Guest + Nanny Group Leader + Group Membership dependents.",
-  "purposeNote": "Linked-person relationships are continuously monitored rather than checked only at initial credential creation.",
   "layout": {
    "template": "form",
    "regions": [
@@ -843,7 +917,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-249"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-249",
+   "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-249"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 158. 0 of 0 labels bound to a contract property; 4 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -906,10 +981,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Multiple fraud indicators produce a consistent, explainable security risk assessment.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Convert multiple security signals into a unified access risk score.",
-  "purposeNote": "Multiple fraud indicators produce a consistent, explainable security risk assessment.",
   "gaps": [
    {
     "operation": null,
@@ -954,18 +1029,13 @@
    }
   ],
   "entryState": {
-   "preloaded": [
-    "AccessRiskScoringDecisionEngineView.newDevice10",
-    "AccessRiskScoringDecisionEngineView.multipleSessions20",
-    "AccessRiskScoringDecisionEngineView.impossibleTravel25",
-    "AccessRiskScoringDecisionEngineView.previousFailedAttempts12",
-    "AccessRiskScoringDecisionEngineView.faceMismatch15"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-250"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-250",
+   "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-250"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 159. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1028,16 +1098,11 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Security responses are standardized, automated where appropriate and consistently executed across venues.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure what TICVAI automatically does when security conditions are detected.",
-  "purposeNote": "Security responses are standardized, automated where appropriate and consistently executed across venues.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 10 actions on this screen and the screen declares 1 operation.** Unserved: Alert Only, Increase Risk Score, Require Additional Verification, Require Supervisor, Temporarily Lock, Full Identity Lock, Blacklist, Notify Security …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Access Control Module_Reference.pdf, page 161 §Available Actions"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -1116,18 +1181,16 @@
     "operationId": "setRealTimeSecurity",
     "contract": "access",
     "purpose": "Real-Time Security Response & Playbook Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setRealTimeSecurity"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-251"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-251",
+   "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-251"
   },
-  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 161. 0 of 0 labels bound to a contract property; 10 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 161. 0 of 0 labels bound to a contract property; 10 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Alert Only, Increase Risk Score, Require Additional Verification, Require Supervisor, Temporarily Lock, Full Identity Lock, Blacklist, Notify Security … are choices sent by `setRealTimeSecurity`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1188,10 +1251,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Security teams can reconstruct and investigate suspicious access behavior using a unified evidence trail.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide security specialists with a deeper investigation environment than Board 9's operational incident workspace.",
-  "purposeNote": "Security teams can reconstruct and investigate suspicious access behavior using a unified evidence trail.",
   "gaps": [
    {
     "operation": null,
@@ -1244,16 +1307,14 @@
     "operationId": "setSecurityInvestigationEvidence",
     "contract": "access",
     "purpose": "Security Investigation & Evidence Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setSecurityInvestigationEvidence"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-252"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-252",
+   "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-252"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 162. 0 of 0 labels bound to a contract property; 0 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1308,10 +1369,10 @@
    "notes": "**Reached from BO-244, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Board 11 — Final 10-Screen Structure # Backend Screen Main Responsibility 11.1 Access Security & Fraud Command Center Real-time security posture 11.2 Fraud Detection Rule & Signal Library Configure fraud indicators 11.3 Credential Sharing & Concurrent Usage Detection Detect credential/device sharing 11.4 Unified Identity & Credential Lock Manager Immediately restrict compromised identities 11.5 Biometric & Identity Integrity Monitoring Detect biometric/identity anomalies 11.6 Relationship & Companion Fraud Monitoring Protect child/POD/nanny/group relationships 11.7 Access Risk Scoring & Decisi",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show; Measure) and no metric row",
   "purpose": "Provide long-term intelligence on fraud patterns, security controls and effectiveness.",
-  "purposeNote": "Board 11 — Final 10-Screen Structure # Backend Screen Main Responsibility 11.1 Access Security & Fraud Command Center Real-time security posture 11.2 Fraud Detection Rule & Signal Library Configure fraud indicators 11.3 Credential Sharing & Concurrent Usage Detection Detect credential/device sharing 11.4 Unified Identity & Credential Lock Manager Immediately restrict compromised identities 11.5 Biometric & Identity Integrity Monitoring Detect biometric/identity anomalies 11.6 Relationship & Companion Fraud Monitoring Protect child/POD/nanny/group relationships 11.7 Access Risk Scoring & Decisi",
   "layout": {
    "template": "split",
    "regions": [
@@ -1436,7 +1497,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-253"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-253",
+   "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-253"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 164. 15 of 26 labels bound to a contract property; 26 of 93 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

@@ -7,6 +7,10 @@
    },
    {
     "type": "object",
+    "x-ticvai-retired-columns": [
+     "is_maintenance_overdue",
+     "document_refs"
+    ],
     "required": [
      "id",
      "status"
@@ -21,6 +25,12 @@
       "format": "uuid",
       "nullable": true,
       "description": "1.2.x. **Where this asset is also bookable.** An AV rig is an asset to maintain and a resource to allocate, and they are the same object seen from two sides.\n**`resources` owns the calendar and this owns the condition.** An asset out of service makes its resource unbookable, which is one link rather than two models of availability.\n"
+     },
+     "deviceId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "BL-160. **Where this asset is also a registered device.** A turnstile is an asset to maintain and a device to operate, and — exactly as with `resourceId` above — they are the same object seen from two sides.\n**Nothing joined them before this.** A turnstile controller reporting `needsAttention` could not raise a work order against itself, and an engineer closing one had no way back to the device whose firmware caused it.\n**Null for most assets and for most devices.** A chiller is not a device and a signature pad is not on the asset register; the link is sparse, and it lives here rather than on `platform.device` because `platform` is the foundation tier and a foreign key pointing from it into `maintenance` would invert the tiers — every cell running a spine would carry a column for a satellite it may not deploy.\n"
      },
      "acquisitionCost": {
       "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -72,20 +82,33 @@
       "nullable": true
      },
      "openWorkOrderCount": {
-      "type": "integer"
+      "type": "integer",
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "Work orders on this asset whose status is `open`, `assigned`, `inProgress`, `paused` or `awaitingParts` — the same set `AssetDetail.openWorkOrders` returns. **Maintained on write**: `createWorkOrder` and every transition into or out of that set (complete, cancel, close, reject back to open) adjust it in the same transaction as the work-order row.\n"
      },
      "nextMaintenanceDueAt": {
       "type": "string",
       "format": "date-time",
-      "nullable": true
+      "nullable": true,
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "The earliest `nextDueAt` among this asset's active maintenance plans; null when none has one. **Maintained on write**: recomputed whenever one of those plans is created, amended, suspended or has its `nextDueAt` moved by a completed work order. `listAssets?maintenanceDue` filters on this column against the clock.\n"
      },
      "isMaintenanceOverdue": {
-      "type": "boolean"
+      "type": "boolean",
+      "readOnly": true,
+      "x-ticvai-persisted": false,
+      "x-ticvai-derived": "onRead",
+      "description": "`nextMaintenanceDueAt` is in the past at the moment of the read. **Computed on read and not stored** — it depends on the clock, so a stored copy is stale the minute after it is written.\n"
      },
      "lastInspectionAt": {
       "type": "string",
       "format": "date-time",
-      "nullable": true
+      "nullable": true,
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "`performedAt` of the latest inspection submitted against this asset. **Maintained on write** by `submitInspection`, in the same transaction as the inspection row; an inspection synced late with an earlier `performedAt` does not move it back.\n"
      },
      "usageCounter": {
       "type": "number",
@@ -128,33 +151,73 @@
      },
      "documents": {
       "type": "array",
-      "description": "Manuals, procedures, certificates. What a technician needs on site.",
+      "description": "Manuals, procedures, certificates. What a technician needs on site. Read from `maintenance.asset_document`.\n",
       "items": {
-       "type": "object",
-       "properties": {
-        "ref": {
-         "type": "string"
-        },
-        "name": {
-         "type": "string"
-        },
-        "kind": {
-         "type": "string",
-         "enum": [
-          "manual",
-          "sop",
-          "certificate",
-          "warranty",
-          "drawing",
-          "riskAssessment"
-         ]
-        }
-       }
+       "$ref": "#/components/schemas/AssetDocument"
       }
      }
     }
    }
   ]
+ },
+ "AssetDocument": {
+  "x-ticvai-persistence": "maintenance.asset_document",
+  "type": "object",
+  "description": "A document attached to an asset — manual, procedure, certificate — with the name and kind a technician needs on site. **One row per document**, because `AssetDetail.documents` returns a name and a kind for each and a `text[]` of refs has nowhere to hold either.\n",
+  "required": [
+   "id",
+   "assetId",
+   "ref"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "ref": {
+    "type": "string",
+    "description": "The document in the media store."
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "kind": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AssetDocumentKind"
+     }
+    ],
+    "nullable": true,
+    "description": "Null where the document arrived as a bare ref in `documentRefs`."
+   }
+  }
+ },
+ "AssetDocumentInput": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "ref",
+   "kind"
+  ],
+  "properties": {
+   "ref": {
+    "type": "string",
+    "description": "The document in the media store."
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "kind": {
+    "$ref": "#/components/schemas/AssetDocumentKind"
+   }
+  }
  },
  "AssetStatus": {
   "type": "string",
@@ -197,6 +260,7 @@
      },
      "workOrderId": {
       "type": "string",
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
       "nullable": true
      }
     }
@@ -215,7 +279,9 @@
   "properties": {
    "assetTag": {
     "type": "string",
-    "maxLength": 64
+    "maxLength": 64,
+    "x-ticvai-unique": "venue",
+    "description": "**Unique per venue** (decided 28 September, audit R108). Two assets in one venue never share a tag; `createAsset` refuses a duplicate with `409` `duplicate-code`. Two venues may each have an `A-001`.\n"
    },
    "name": {
     "type": "string",
@@ -279,8 +345,17 @@
     "default": false,
     "description": "True means a completed inspection is required before return to service. A technician cannot simply declare a ride safe.\n"
    },
+   "documents": {
+    "type": "array",
+    "description": "Manuals, procedures, certificates, each with its name and kind. Stored one row per document in `maintenance.asset_document`, which is where `AssetDetail.documents` reads them from.\n",
+    "items": {
+     "$ref": "#/components/schemas/AssetDocumentInput"
+    }
+   },
    "documentRefs": {
     "type": "array",
+    "x-ticvai-persisted": false,
+    "description": "**The refs alone, kept for callers that predate `documents`.** Each ref sent here is stored as an `asset_document` row with no name and no kind. Returned as the refs of `documents`, computed on read — there is no second copy to fall out of step.\n",
     "items": {
      "type": "string"
     }
@@ -340,9 +415,14 @@
    },
    "operatingWindows": {
     "type": "array",
-    "description": "**When the queue runs, which is not when the venue is open.** A ride closing an hour early for maintenance leaves a queue accepting guests for a cycle that will not happen.\n",
+    "description": "**When the queue runs, which is not when the venue is open.** A ride closing an hour early for maintenance leaves a queue accepting guests for a cycle that will not happen.\nStored one row per window in `queue.queue_operating_window` (see `Queue`), not as a column on the queue.\n",
     "items": {
      "type": "object",
+     "required": [
+      "day",
+      "from",
+      "to"
+     ],
      "properties": {
       "day": {
        "type": "string",
@@ -357,10 +437,14 @@
        ]
       },
       "from": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+       "description": "Venue local time, 24-hour `HH:MM`, when the queue starts running."
       },
       "to": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+       "description": "Venue local time, 24-hour `HH:MM`, when the queue stops running."
       },
       "lastEntryMinutesBefore": {
        "type": "integer",
@@ -425,6 +509,15 @@
    "zone": {
     "type": "string",
     "nullable": true
+   },
+   "fastPass": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/QueueFastPass"
+     }
+    ],
+    "nullable": true,
+    "description": "The lane's Fast Pass block (decided 29 September, VM close-out). Null on a queue that takes no Fast Pass.\n"
    }
   }
  },
@@ -449,7 +542,8 @@
    "mediaDeactivated",
    "unpaid",
    "delegatedRightExhausted",
-   "delegatedRightRevoked"
+   "delegatedRightRevoked",
+   "journeyNotCovered"
   ]
  },
  "Direction": {
@@ -509,6 +603,7 @@
    },
    "workOrderId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    }
   }
@@ -667,6 +762,35 @@
       }
      }
     }
+   },
+   "resourceFindings": {
+    "type": "array",
+    "description": "**Placed resources a guest could not buy** (rev 3 REV3-15), named by label. Any entry here makes `isValid` false, and `publishVenueMap` refuses with the matching blocker.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "placedResourceId",
+      "label",
+      "reason"
+     ],
+     "properties": {
+      "placedResourceId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "label": {
+       "type": "string"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "resourceUnlinked",
+        "resourcePriceBandMissing",
+        "duplicateResourceLabel"
+       ]
+      }
+     }
+    }
    }
   }
  },
@@ -685,10 +809,13 @@
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "incidentNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.\n"
    },
    "kind": {
     "$ref": "#/components/schemas/IncidentKind"
@@ -724,7 +851,10 @@
    "notifiedAt": {
     "type": "string",
     "format": "date-time",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "The earliest `notifiedAt` among this incident's authority notifications. **Maintained on write** by `recordAuthorityNotification`; each notification itself is a row of `maintenance.incident_authority_notification`.\n"
    },
    "assignedToPrincipalId": {
     "type": "string",
@@ -737,6 +867,7 @@
    },
    "correctiveWorkOrderId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "occurredAt": {
@@ -759,6 +890,54 @@
    }
   }
  },
+ "IncidentAuthorityNotification": {
+  "x-ticvai-persistence": "maintenance.incident_authority_notification",
+  "type": "object",
+  "description": "**One notification to an external authority, appended by `recordAuthorityNotification`.** An incident may be reported to more than one authority, or to the same one twice, and each is the evidence that an obligation was met — so each is a row, not an overwrite of `maintenance.incident.notified_at`.\n",
+  "required": [
+   "id",
+   "incidentId",
+   "authority",
+   "notifiedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "incidentId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "authority": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "reference": {
+    "type": "string",
+    "maxLength": 128,
+    "nullable": true
+   },
+   "notifiedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "notifiedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "attachmentRefs": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "IncidentDetail": {
   "x-ticvai-persistence": "maintenance.incident",
   "allOf": [
@@ -774,7 +953,17 @@
      },
      "investigationNote": {
       "type": "string",
-      "nullable": true
+      "nullable": true,
+      "readOnly": true,
+      "description": "The latest entry of `investigationNotes`, kept for readers that show one line."
+     },
+     "investigationNotes": {
+      "type": "array",
+      "readOnly": true,
+      "description": "**Every investigation note, oldest first** (decided 28 September, audit R106 (5)). Read from `maintenance.incident_investigation_note`; appended by `updateIncident`.\n",
+      "items": {
+       "$ref": "#/components/schemas/IncidentInvestigationNote"
+      }
      },
      "rootCause": {
       "type": "string",
@@ -799,32 +988,95 @@
        "type": "string"
       }
      },
+     "involvedParties": {
+      "type": "array",
+      "description": "Who was involved, as given in `ReportIncidentRequest.involvedSubjectIds` and `involvedStaffPrincipalIds`. Read from `maintenance.incident_involved_party`.\n",
+      "items": {
+       "$ref": "#/components/schemas/IncidentInvolvedParty"
+      }
+     },
      "authorityNotifications": {
       "type": "array",
+      "description": "Read from `maintenance.incident_authority_notification`, oldest first.",
       "items": {
-       "type": "object",
-       "properties": {
-        "authority": {
-         "type": "string"
-        },
-        "reference": {
-         "type": "string",
-         "nullable": true
-        },
-        "notifiedAt": {
-         "type": "string",
-         "format": "date-time"
-        },
-        "notifiedByPrincipalId": {
-         "type": "string",
-         "format": "uuid"
-        }
-       }
+       "$ref": "#/components/schemas/IncidentAuthorityNotification"
       }
      }
     }
    }
   ]
+ },
+ "IncidentInvestigationNote": {
+  "x-ticvai-persistence": "maintenance.incident_investigation_note",
+  "type": "object",
+  "description": "**One investigation note, appended by `updateIncident`** (decided 28 September, audit R106 (5)). A history rather than a field, so what an investigator thought on Tuesday survives what they found on Thursday.\n",
+  "required": [
+   "id",
+   "incidentId",
+   "note",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "incidentId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 10000
+   },
+   "writtenByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "IncidentInvolvedParty": {
+  "x-ticvai-persistence": "maintenance.incident_involved_party",
+  "type": "object",
+  "description": "**One person involved in an incident, by opaque reference.** A guest or member of the public is a `pii.subject` id — personal details live there, the erasable store of ADR-0023, so the incident record survives an erasure request intact. A member of staff is a principal id. Exactly one of the two is set, as `kind` says.\n",
+  "required": [
+   "id",
+   "incidentId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "incidentId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "subject",
+     "staff"
+    ]
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A `pii.subject` id where `kind` is `subject`."
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The staff principal where `kind` is `staff`."
+   }
+  }
  },
  "IncidentKind": {
   "type": "string",
@@ -868,7 +1120,7 @@
   }
  },
  "MaintenancePlan": {
-  "x-ticvai-persistence": "maintenance.maintenance_plan",
+  "x-ticvai-persistence": "maintenance.preventive_plan",
   "type": "object",
   "required": [
    "id",
@@ -1014,7 +1266,9 @@
      ],
      "properties": {
       "ticketId": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "description": "The `Entitlement.id`."
       },
       "mediaCodes": {
        "type": "array",
@@ -1072,7 +1326,9 @@
        "type": "string"
       },
       "ticketId": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "description": "The `Entitlement.id` in the issuing cell."
       },
       "issuingCellId": {
        "type": "string"
@@ -1167,6 +1423,140 @@
    }
   }
  },
+ "PathClosureResult": {
+  "description": "What `setPathClosure` returns: the path, and **what a forced closure cut off**, named.\n",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/VenuePath"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "strandedPoints": {
+      "type": "array",
+      "readOnly": true,
+      "description": "Points no longer reachable because of this closure. Empty unless `force` was used.\n",
+      "items": {
+       "$ref": "#/components/schemas/StrandedPoint"
+      }
+     }
+    }
+   }
+  ]
+ },
+ "PlacedResource": {
+  "type": "object",
+  "x-ticvai-persistence": "venuemap.placed_resource",
+  "description": "**A bookable resource where it stands on the map** (decided 29 September, rev 3 REV3-15 and GAP-C2): cabana B09 on the Beach, 15 guests, Large. The resource itself, its bookings and its holds live in `resources`; this row says where it is drawn and what the guest sees. Written into the working draft by `importVenueGeometry` or `setPlacedResource`, copied into the `VenueMapVersion` snapshot at publish. A guest picks one on the published map, holds it with `resources.createResourceHold` and buys it. **Supersedes audit R073 (c) and the 26 August minute for resources on an ingested map.**\n",
+  "required": [
+   "id",
+   "mapId",
+   "resourceId",
+   "label",
+   "kind",
+   "zone",
+   "capacity",
+   "priceBandCode",
+   "position"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "mapId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "From the path of the operation that writes it."
+   },
+   "resourceId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "resources.Resource",
+    "description": "The `resources.Resource` this is. **Availability, holds and bookings are keyed by this**, so a republished map with the cabana moved keeps its bookings.\n"
+   },
+   "label": {
+    "type": "string",
+    "maxLength": 40,
+    "x-ticvai-unique": "map",
+    "description": "What the guest sees and taps, e.g. `B09`. **Unique on the map**, compared without case after digit normalisation; normally the resource's `code`.\n"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "cabana",
+     "lounger",
+     "table",
+     "pitch",
+     "other"
+    ],
+    "description": "A subset of `resources.ResourceKind`, the kinds a guest books from a map. A `table` here is a non-dining spot (a beach or event table) sold like a cabana; restaurant tables stay `fnb` table reservations (decided 29 September, rev 3 GAP-C2)."
+   },
+   "zone": {
+    "type": "string",
+    "maxLength": 80,
+    "description": "The area the guest reads it by, e.g. `Beach`, `River`, `Terrace`."
+   },
+   "capacity": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 500,
+    "description": "Guests it takes, e.g. 15. Shown on the map and checked against the party at hold."
+   },
+   "priceBandCode": {
+    "type": "string",
+    "maxLength": 40,
+    "description": "The band it sells in, e.g. `Large`, one of the `priceBands` given at import. The band's `variantId` prices it; the map holds no price.\n"
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "catalogue.ProductVariant",
+    "description": "Resolved from the price band. What a cart line for this resource names."
+   },
+   "position": {
+    "type": "object",
+    "required": [
+     "x",
+     "y"
+    ],
+    "description": "Drawing coordinates of its label anchor, as on `VenuePoint`.",
+    "properties": {
+     "x": {
+      "type": "number"
+     },
+     "y": {
+      "type": "number"
+     }
+    }
+   },
+   "boundary": {
+    "type": "array",
+    "nullable": true,
+    "description": "The shape drawn, as a polygon in drawing coordinates. Null for a pin.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "x": {
+       "type": "number"
+      },
+      "y": {
+       "type": "number"
+      }
+     }
+    }
+   },
+   "isBookable": {
+    "type": "boolean",
+    "default": true,
+    "description": "False keeps it on the map and off sale, e.g. a cabana kept for staff use. Shown greyed.\n"
+   }
+  }
+ },
  "PlayResult": {
   "x-ticvai-persistence": "games.play",
   "type": "object",
@@ -1212,7 +1602,7 @@
   }
  },
  "Queue": {
-  "x-ticvai-persistence": "queue.queue",
+  "x-ticvai-persistence": "queue.queue + queue.queue_operating_window",
   "allOf": [
    {
     "$ref": "#/components/schemas/CreateQueueRequest"
@@ -1248,6 +1638,27 @@
      },
      "waitTimeSource": {
       "$ref": "#/components/schemas/WaitTimeSource"
+     },
+     "waitTimeAsOf": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "description": "When `currentWaitMinutes` was last set, by whichever source set it. `WaitTime.asOf` reads this.\n"
+     },
+     "manualWaitExpiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "description": "Set by `setWaitTime` as now plus `expiresInMinutes`. Past it, the manual figure is dropped and the queue reverts to its sensor or throughput estimate. Null when the current figure is not manual.\n"
+     },
+     "manualWaitNote": {
+      "type": "string",
+      "maxLength": 200,
+      "nullable": true,
+      "readOnly": true,
+      "description": "The `note` given with the current manual figure. Cleared when it expires."
      },
      "expectedReopenAt": {
       "type": "string",
@@ -1289,6 +1700,46 @@
    }
   ]
  },
+ "QueueFastPass": {
+  "x-ticvai-persistence": "queue.queue",
+  "type": "object",
+  "description": "**Which Fast Pass entitlements this lane accepts, and how** (decided 29 September, VM close-out; pack 'Access Control Module' p.109, BO-221 Fast Pass & Attraction Access Journey). Fast Pass stays an entitlement owned by Product & Entitlement; this block is the lane's side of it: which products it honours, the return window, a per-guest daily cap and the access points that redeem it. Stored on the queue row. Only meaningful where `kind` is `fastPass` or `fastPassAllocationPercent` is above 0.\n",
+  "required": [
+   "entitlementProductIds"
+  ],
+  "properties": {
+   "entitlementProductIds": {
+    "type": "array",
+    "minItems": 1,
+    "description": "Catalogue products whose entitlement admits to this lane.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "returnWindowMinutes": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 240,
+    "default": 60,
+    "description": "How long after the booked return time a Fast Pass holder may still enter. Proposed, our build plan.\n"
+   },
+   "maxPerGuestPerDay": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Fast Pass redemptions one guest may make on this lane per day; null is no cap."
+   },
+   "allowedAccessPointIds": {
+    "type": "array",
+    "description": "Access points that redeem Fast Pass for this lane; empty is the queue's own.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   }
+  }
+ },
  "QueueFeedHealth": {
   "x-ticvai-persistence": "none — computed",
   "type": "object",
@@ -1306,7 +1757,8 @@
     "$ref": "#/components/schemas/QueueFeedAdaptor"
    },
    "isHealthy": {
-    "type": "boolean"
+    "type": "boolean",
+    "description": "**Healthy means the last reading arrived within the feed's expected interval** (decided 28 September, audit R106 (1)): `lastReadingAt` is no older than `expectedIntervalSeconds`. It is the opposite of `isQuiet`, and nothing else (latency, discards) makes a reporting feed unhealthy.\n"
    },
    "isQuiet": {
     "type": "boolean",
@@ -1317,12 +1769,16 @@
     "format": "date-time",
     "nullable": true
    },
+   "expectedIntervalSeconds": {
+    "type": "integer",
+    "description": "The feed's `expectedIntervalSeconds` — the interval `isQuiet` is judged against, returned here so a health panel does not need the feed row as well.\n"
+   },
    "readingsLastHour": {
     "type": "integer"
    },
    "discardedLastHour": {
     "type": "integer",
-    "description": "Out-of-order or duplicate readings rejected."
+    "description": "Out-of-order readings rejected in the last hour — rows of `queue.reading` for this feed with `disposition: discardedOutOfOrder`. Duplicates are not counted here: a duplicate has no row, and `submitQueueReading` reports it in its own `duplicates`.\n"
    }
   }
  },
@@ -1375,7 +1831,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The play ID, generated on the reader, and returned as `PlayResult.playId`. Also the idempotency key: on `recordGamePlay` it must equal the `Idempotency-Key` header (a mismatch is the shared 409 `Conflict`); in a `syncGamePlays` batch it is the key on its own.\n"
    },
    "cardCode": {
     "type": "string"
@@ -1395,6 +1852,11 @@
    "sequence": {
     "type": "integer",
     "description": "Monotonic per reader. Preserves order across an offline batch."
+   },
+   "playedOffline": {
+    "type": "boolean",
+    "default": false,
+    "description": "**True where the reader recorded the play while offline** and is replaying it. Such a play is accepted even against too few credits and reported for reconciliation; a live play (false) is refused instead (decided 28 September, audit R106 (3)). Every play in a `syncGamePlays` batch is treated as offline.\n"
    },
    "recordedAt": {
     "type": "string",
@@ -1507,25 +1969,7 @@
     "type": "string"
    },
    "kind": {
-    "type": "string",
-    "enum": [
-     "cabana",
-     "locker",
-     "wheelchair",
-     "stroller",
-     "equipment",
-     "room",
-     "auditorium",
-     "vehicle",
-     "instructor",
-     "staff",
-     "table",
-     "pitch",
-     "studio",
-     "mealPlan",
-     "other"
-    ],
-    "description": "BL-135. **`locker` was an entitlement kind in `orders` and nothing issued, assigned or released one.** A locker is a specific object checked out to a named guest and returned — which is this context exactly, and modelling it as an entitlement would have needed a second check-out mechanism.\n**`mealPlan` is the exception and is listed here to be refused**: 5.5.8b groups it with lockers and parking, and a meal plan is a balance rather than an object. It resolves to `retail.Wallet` with a `mealPlan` credit kind (CF-126), not to a resource.\n"
+    "$ref": "#/components/schemas/ResourceKind"
    },
    "venueId": {
     "type": "string",
@@ -1544,7 +1988,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "For a person resource. **`workforce` still owns their rota** — this says whether they are qualified and whether they are already committed.\n"
+    "description": "For a resource of kind `instructor` or `staff`. **`workforce` still owns their rota** — this says whether they are qualified and whether they are already committed.\n"
    },
    "attributes": {
     "type": "object",
@@ -1584,6 +2028,30 @@
     "type": "boolean",
     "default": true
    }
+  }
+ },
+ "ResourceKind": {
+  "type": "string",
+  "description": "BL-135. **`locker` was an entitlement kind in `orders` and nothing issued, assigned or released one.** A locker is a specific object checked out to a named guest and returned — which is this context exactly, and modelling it as an entitlement would have needed a second check-out mechanism.\nA seed for `ResourceType` rather than the law (board 1.02): a customer adding a class does it with `createResourceType`, not by waiting for this list to grow.\n**`table` is a non-dining spot** (decided 29 September, rev 3 GAP-C2, confirmed by Chinmay): a beach or event table placed on a venue map, picked and sold like a cabana (`createResourceHold`, then the order). **A dining table is not this**: restaurant tables stay `fnb` tables, booked with `fnb.createTableReservation` and the waitlist (audit R073 (d)).\n",
+  "enum": [
+   "cabana",
+   "lounger",
+   "locker",
+   "wheelchair",
+   "stroller",
+   "equipment",
+   "room",
+   "auditorium",
+   "vehicle",
+   "instructor",
+   "staff",
+   "table",
+   "pitch",
+   "studio",
+   "other"
+  ],
+  "x-ticvai-refuses": {
+   "mealPlan": "**Listed by 5.5.8b and deliberately not a kind.** 5.5.8b groups meal plans with lockers and parking, but a meal plan is a balance rather than an object. It resolves to `retail.Wallet` with a `mealPlan` credit kind (CF-126), not to a resource — so it is not offered here, and a form built from this enum cannot offer it either."
   }
  },
  "ScanOutcome": {
@@ -1671,6 +2139,7 @@
    },
    "inspectionId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true,
     "description": "Required for return to service where the asset demands it."
    },
@@ -1681,6 +2150,70 @@
    "recordedAt": {
     "type": "string",
     "format": "date-time"
+   }
+  }
+ },
+ "SetPlacedResourceRequest": {
+  "description": "What `setPlacedResource` takes: a `PlacedResource` without its server-owned fields. **`placedResourceId` absent places a new one; present amends that one**, as `setVenuePoint`.\n",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/PlacedResource"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "placedResourceId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "The placed resource to amend. Absent or null places a new one."
+     }
+    }
+   }
+  ]
+ },
+ "SetVenuePointRequest": {
+  "description": "What `setVenuePoint` takes: a `VenuePoint` without its server-owned fields, plus the point to amend. **`pointId` absent places a new point; present amends that one**, and it must be a point on the map in the path.\n",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/VenuePoint"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "pointId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "The point to amend. Absent or null places a new point."
+     }
+    }
+   }
+  ]
+ },
+ "StrandedPoint": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed from the graph",
+  "required": [
+   "pointId",
+   "name",
+   "kind",
+   "isCritical"
+  ],
+  "properties": {
+   "pointId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string"
+   },
+   "isCritical": {
+    "type": "boolean",
+    "description": "First aid, an emergency exit or an assembly point, the same set as `GraphValidation.criticalUnreachable`. **The one the operator must read first.**\n"
    }
   }
  },
@@ -1846,6 +2379,33 @@
    "serverEvaluatedAt": {
     "type": "string",
     "format": "date-time"
+   },
+   "advisory": {
+    "type": "object",
+    "nullable": true,
+    "description": "BL-179, CF-130. **What a device observed, for the steward, never for the gate.** Present only where an access point's device reports the matching `DeviceCapability` and the venue has turned the corresponding setting on.\n**Never persisted.** This schema is computed and stored as `access.scan_event`, and the advisory is deliberately not part of what is stored: an inferred classification kept against a guest is sensitive personal data with no consent behind it. **A guest agreed to be admitted, not to be classified** — Face Pass and Face Tag carry `consent_purpose_id` and `consent_given_at` because somebody enrolled, and nobody enrols in being looked at by a turnstile. `scan_event` records that an override happened and never what the device thought, which keeps `overrideRateAlertThreshold` working without building a register nobody agreed to.\n**It cannot reach `outcome` or `denyReason`.** Those are decisive and `entitlementGated` is `true` and read-only: the gate admits on the entitlement, and everything here sits on top of that without replacing any of it.\n",
+    "properties": {
+     "genderClassification": {
+      "type": "string",
+      "enum": [
+       "women",
+       "men",
+       "undetermined"
+      ],
+      "description": "**`undetermined` is a real answer and the most common one to design for.** A classifier that never returns it is one that has been tuned to look confident.\n"
+     },
+     "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "**Required reading for the steward, not decoration.** An advisory with no confidence is read as a fact, and `overrideRateAlertThreshold` exists to catch exactly the failure that produces — *an override rate near zero means the steward has stopped deciding.* That number only means anything if the steward could see how sure the device was.\n"
+     },
+     "reportedByDeviceId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "**Which device said it.** A classifier that degrades is one camera, not a venue, and an advisory nobody can trace to hardware cannot be investigated or switched off alone.\n"
+     }
+    }
    }
   }
  },
@@ -1862,7 +2422,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "name": {
     "type": "string"
@@ -1872,7 +2433,9 @@
     "format": "uuid"
    },
    "scopePath": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "Derived from `venueId`. Not sent by a client."
    },
    "kind": {
     "type": "string",
@@ -1893,11 +2456,20 @@
      "draft",
      "published",
      "archived"
-    ]
+    ],
+    "readOnly": true,
+    "description": "`draft` on create. Moves through `publishVenueMap` (`states/venue-map.yaml`), never by sending a value.\n"
    },
    "publishedVersion": {
     "type": "integer",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `VenueMapVersion.version` guests are served. Null until the first publish.\n"
+   },
+   "graphVersion": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "**Bumped by a publish or a closure**, and returned as `VenueMapGraph.version`. Separate from `publishedVersion` because a closure changes the routes without creating a map version, and a closure that looked like a publish would lie about what changed.\n"
    },
    "isGeoreferenced": {
     "type": "boolean",
@@ -1949,6 +2521,7 @@
    "tileSetRef": {
     "type": "string",
     "nullable": true,
+    "readOnly": true,
     "description": "Where a base image is large enough to need zoom levels. **A 12,000-pixel park map is not something a phone downloads on arrival**, and a guest opening the map on venue wifi at the gate is the worst moment to send twenty megabytes.\nGenerated from the base asset. Null means the image is small enough to serve whole.\n"
    },
    "boundsGeoJson": {
@@ -1972,6 +2545,12 @@
   "type": "object",
   "description": "19.2.55. **The whole map in one call**, so a client caches it and filters locally.",
   "properties": {
+   "version": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The published version these points and paths belong to**, which is the number a client caches and sends back as `version`. It can differ from `map.publishedVersion` when an older version was asked for. Null when the draft was read.\n"
+   },
    "map": {
     "$ref": "#/components/schemas/VenueMap"
    },
@@ -1985,6 +2564,13 @@
     "type": "array",
     "items": {
      "$ref": "#/components/schemas/VenuePath"
+    }
+   },
+   "resources": {
+    "type": "array",
+    "description": "The bookable resources placed on this version of the map (rev 3 REV3-15). Empty on a map that carries none.\n",
+    "items": {
+     "$ref": "#/components/schemas/PlacedResource"
     }
    }
   }
@@ -2005,7 +2591,7 @@
    },
    "version": {
     "type": "integer",
-    "description": "**Bumped by a publish or a closure.** A client holding an older version knows its route may cross something that closed, and asking for the graph is cheaper than asking whether the graph changed.\n"
+    "description": "**Bumped by a publish or a closure**, and stored as `VenueMap.graphVersion`. A client holding an older version knows its route may cross something that closed, and asking for the graph is cheaper than asking whether the graph changed.\n"
    },
    "generatedAt": {
     "type": "string",
@@ -2029,7 +2615,7 @@
       "kind": {
        "type": "string"
       },
-      "isAccessible": {
+      "isStepFree": {
        "type": "boolean"
       }
      }
@@ -2071,6 +2657,144 @@
    }
   }
  },
+ "VenueMapImportJob": {
+  "type": "object",
+  "x-ticvai-persistence": "venuemap.import_job",
+  "description": "**Two-phase, following `seating.ImportJob`**, and carrying its lesson: a job that finds nothing is not a successful job.\n",
+  "required": [
+   "id",
+   "status",
+   "outcome"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "mapId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "parsing",
+     "previewReady",
+     "committed",
+     "failed"
+    ]
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "parsed",
+     "parsedWithFindings",
+     "nothingFound",
+     "noLayersMatched",
+     "unreadable"
+    ]
+   },
+   "shapesFound": {
+    "type": "integer"
+   },
+   "layersFound": {
+    "type": "array",
+    "description": "**Every layer name in the source, decoded.** Shown whether or not extraction worked, so an operator maps a role by reading rather than guessing.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "unmappedLayers": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "manifestRowsRead": {
+    "type": "integer",
+    "nullable": true
+   },
+   "resourcesFound": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Bookable resource shapes found on the resource layer (rev 3 REV3-15). Null where the map has none.\n"
+   },
+   "resourceRowsJoined": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Resource manifest rows that joined a shape and a `resources.Resource`. **The number to check against your own count**, as `manifestRowsJoined` is for seats: 34 cabanas on the plan and 30 joined is four labels that differ.\n"
+   },
+   "manifestRowsJoined": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**The number to check against your own count.** A manifest of 396 seats that joins 220 is the digit problem in §4, or a section code that differs by a space — and both look like success without this figure.\n"
+   },
+   "findings": {
+    "type": "array",
+    "description": "**Named against the spec**, so a finding maps to a section of `handoff/venue-map-input-spec.md` rather than to a stack trace.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "code",
+      "severity",
+      "message"
+     ],
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "duplicateLayerName",
+        "geometryOnLayerZero",
+        "unmappedLayer",
+        "mixedLayerContent",
+        "sectionCodeMismatch",
+        "digitScriptMismatch",
+        "mergedCells",
+        "totalRowDetected",
+        "manifestSectionMissingFromPlan",
+        "planSectionMissingFromManifest",
+        "exitLayerNotSplit",
+        "noGeoreference",
+        "layerNameUndecodable",
+        "rasterOnly",
+        "resourceLabelMissing",
+        "resourceLabelDuplicate",
+        "resourceManifestMissingFromPlan",
+        "resourcePlanMissingFromManifest",
+        "resourceCodeUnmatched",
+        "resourcePriceBandUnknown"
+       ],
+       "description": "**A closed set, and each one names a rule in the spec.** Free-text findings are findings a drawing office cannot act on. The six `resource*` codes check placed resources (rev 3 REV3-15): a shape with no label, two with one label, a manifest row with no shape or the reverse, a label with no `resources.Resource`, and a price band not in `priceBands`.\n"
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "error",
+        "warning",
+        "info"
+       ],
+       "description": "**`warning` is the important level here.** `rasterOnly` and `noGeoreference` are warnings — the map still works, with less — and treating them as errors would refuse a venue that sent everything it had.\n"
+      },
+      "message": {
+       "type": "string"
+      },
+      "specSection": {
+       "type": "string",
+       "nullable": true,
+       "description": "Which part of the spec covers it — `§2 Layers`, `§4 Digits`."
+      },
+      "affected": {
+       "type": "array",
+       "description": "The layers, sections or rows involved. **Named, not counted.**",
+       "items": {
+        "type": "string"
+       }
+      }
+     }
+    }
+   }
+  }
+ },
  "VenuePath": {
   "type": "object",
   "x-ticvai-persistence": "venuemap.path",
@@ -2084,11 +2808,14 @@
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "mapId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true,
+    "description": "From the path of the operation that writes the path."
    },
    "fromPointId": {
     "type": "string",
@@ -2106,7 +2833,8 @@
    "distanceMetres": {
     "type": "number",
     "nullable": true,
-    "description": "**Along the centreline, not point to point.** A path that curves round a lake is longer than the distance between its ends, and a guest told 80 metres who walks 200 stops trusting the map.\nRequires a georeference for real units; without one, distances are in drawing units and routing still works because **only the ratios matter to a shortest path.**\n"
+    "readOnly": true,
+    "description": "Computed by the server from `geometry` and the georeference. **Along the centreline, not point to point.** A path that curves round a lake is longer than the distance between its ends, and a guest told 80 metres who walks 200 stops trusting the map.\nRequires a georeference for real units; without one, distances are in drawing units and routing still works because **only the ratios matter to a shortest path.**\n"
    },
    "isStepFree": {
     "type": "boolean",
@@ -2126,7 +2854,8 @@
    "closedReason": {
     "type": "string",
     "nullable": true,
-    "description": "Set during works or an incident. **A closed path removes routes rather than hiding the path**, so a guest sees why rather than wondering where it went.\n"
+    "readOnly": true,
+    "description": "Set by `setPathClosure` during works or an incident, never by sending it here. **A closed path removes routes rather than hiding the path**, so a guest sees why rather than wondering where it went.\n"
    }
   }
  },
@@ -2144,11 +2873,14 @@
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "mapId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true,
+    "description": "From the path of the operation that writes the point."
    },
    "kind": {
     "type": "string",
@@ -2182,7 +2914,9 @@
     "description": "**A closed set, and `emergencyExit` is separate from `exit` on purpose.** An exit is where a guest leaves; an emergency exit is where they are sent, and a map that cannot tell them apart is a map that routes a normal departure through a fire door.\n**`junction` is the one that is not a point of interest.** A path connects two points, so a fork in a walkway with nothing at it still needs a node — otherwise every bend has to be named as a destination, and a guest browsing the map sees forty entries called *Path junction 12*.\n**Junctions are hidden from guests and present in the graph.** Generated by extraction where paths meet; a venue never places one by hand.\n"
    },
    "name": {
-    "type": "string"
+    "type": "string",
+    "x-ticvai-unique": "venue",
+    "description": "**Unique per venue** (decided 28 September, audit R108). Two points on a venue's maps never share a name, compared without case, so *Toilets North* names one place; `setVenuePoint` refuses a duplicate with `409` `duplicate-code`. Junctions are named by extraction and are exempt.\n"
    },
    "nameLocalised": {
     "type": "object",
@@ -2225,10 +2959,10 @@
     "nullable": true,
     "description": "For an entrance or exit. **This is what makes 3.2.64 work** — live admission statistics drawn on the point they came from.\n"
    },
-   "isAccessible": {
+   "isStepFree": {
     "type": "boolean",
     "default": true,
-    "description": "Step-free. **Placed on the point rather than inferred from the path**, because a step-free route to a building with steps at the door is not a step-free route.\n"
+    "description": "Whether the point itself can be reached without steps. **The same name as `VenuePath.isStepFree`, because it is the same concept** (it was `isAccessible` until the 26 September audit). **Placed on the point rather than inferred from the path**, because a step-free route to a building with steps at the door is not a step-free route.\n"
    },
    "openingHours": {
     "type": "string",
@@ -2277,6 +3011,12 @@
     "format": "uuid",
     "nullable": true
    },
+   "attractionCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The catalogue `ProductCategory` the attraction product is filed under — the value the `category` filter on `getWaitTimes` matches. Read from catalogue, not stored here.\n"
+   },
    "status": {
     "$ref": "#/components/schemas/QueueStatus"
    },
@@ -2290,7 +3030,7 @@
    },
    "isStale": {
     "type": "boolean",
-    "description": "The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as current.\n"
+    "description": "The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as current, and it is not hidden (decided 28 September, audit R080 (b)): the screen shows `waitMinutes` with its `asOf` and a stale marker.\n"
    },
    "heightRequirementCm": {
     "type": "integer",
@@ -2302,7 +3042,8 @@
    },
    "asOf": {
     "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "description": "When the figure was produced — the queue's `waitTimeAsOf`."
    }
   }
  },
@@ -2318,6 +3059,9 @@
  },
  "WorkOrder": {
   "x-ticvai-persistence": "maintenance.work_order",
+  "x-ticvai-retired-columns": [
+   "is_overdue"
+  ],
   "type": "object",
   "required": [
    "id",
@@ -2334,7 +3078,8 @@
     "type": "integer",
     "nullable": true,
     "readOnly": true,
-    "description": "**Measured from out-of-service to back-in-service, not from work start to work end.** A ride down for six hours of which two were spent working is down six hours, and the gap between the two numbers is the thing worth managing.\n"
+    "x-ticvai-derived": "onWrite",
+    "description": "**Measured from out-of-service to back-in-service, not from work start to work end.** A ride down for six hours of which two were spent working is down six hours, and the gap between the two numbers is the thing worth managing.\n**Maintained on write**: set when the asset returns to service, as the minutes from the `maintenance.asset_status_change` row that took it out carrying this work order's id to the asset's next change back to `inService`. Null while the asset is still out, and for a work order that never took it out.\n"
    },
    "rootCause": {
     "type": "string",
@@ -2367,10 +3112,13 @@
     "description": "**Escalation is a clock, not a decision.** A work order on a ride nobody has accepted after twenty minutes escalates itself, because the alternative is somebody noticing.\n"
    },
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "workOrderNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.\n"
    },
    "title": {
     "type": "string"
@@ -2386,7 +3134,10 @@
    },
    "assetName": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "The asset's name, copied when the work order is raised or its asset changes, and not updated when the asset is later renamed — the record reads as it was raised.\n"
    },
    "status": {
     "$ref": "#/components/schemas/WorkOrderStatus"
@@ -2406,11 +3157,29 @@
     "type": "string",
     "format": "uuid"
    },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "As raised in `CreateWorkOrderRequest.categoryId`, amendable by `updateWorkOrder`. The category is what `completeWorkOrder` reads to decide whether completion photographs are required.\n"
+   },
+   "locationDescription": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "Where the fault is, as raised. Needed where there is no asset — a broken tile, a leak in a corridor.\n"
+   },
    "elapsedMinutes": {
-    "type": "integer"
+    "type": "integer",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Labour minutes accumulated up to the last pause or stop. **Maintained on write** by `recordWorkOrderTime`, `pauseWorkOrder` and `completeWorkOrder`; while `isTimerRunning` is true the interval since the last start is not yet included.\n"
    },
    "isTimerRunning": {
-    "type": "boolean"
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Maintained on write by `startWorkOrder`, `resumeWorkOrder`, `recordWorkOrderTime`, `pauseWorkOrder` and `completeWorkOrder`.\n"
    },
    "dueAt": {
     "type": "string",
@@ -2418,7 +3187,11 @@
     "nullable": true
    },
    "isOverdue": {
-    "type": "boolean"
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "`dueAt` is in the past and the status is still `open`, `assigned`, `inProgress`, `paused` or `awaitingParts`. **Computed on read and not stored** — it depends on the clock. `listWorkOrders?overdueOnly` applies the same test to `due_at`.\n"
    },
    "requiresVerification": {
     "type": "boolean"
@@ -2430,10 +3203,12 @@
    },
    "sourceInspectionId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "sourceIncidentId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "createdAt": {

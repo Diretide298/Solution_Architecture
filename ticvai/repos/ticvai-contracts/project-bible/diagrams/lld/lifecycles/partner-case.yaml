@@ -1,0 +1,95 @@
+id: LLD-Partner case
+title: Partner case — 12 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/partner-case.yaml
+entity: Partner case
+contract: subscription
+enum: PartnerCase.status
+enumKind: inline
+enumSchema: PartnerCase
+enumProperty: status
+owner: subscription
+initial:
+- open
+terminal:
+- closed
+transitions:
+- from: open
+  to: assigned
+  operation: actOnPartnerCase
+  trigger: operation
+  guard: '`action: assign` sets the owner; the SLA clock is already running from creation (decided 29
+    September, writers pass; DM4)'
+- from: assigned
+  to: investigating
+  operation: actOnPartnerCase
+  trigger: operation
+  guard: '`action: startInvestigation` (decided 29 September, writers pass; DM4)'
+- from: investigating
+  to: waitingPartner
+  operation: actOnPartnerCase
+  trigger: operation
+  guard: '`action: waitForPartner`: evidence or an answer is needed from the partner. **Time waiting
+    on the partner is not counted against the SLA** (decided 29 September, writers pass; DM4)'
+- from: waitingPartner
+  to: investigating
+  operation: actOnPartnerCase
+  trigger: operation
+  guard: '`action: partnerResponded` (decided 29 September, writers pass; DM4)'
+- from: investigating
+  to: waitingInternal
+  operation: actOnPartnerCase
+  trigger: operation
+  guard: '`action: waitForInternal`: another team (Finance, Operations, Technical) must answer (decided
+    29 September, writers pass; DM4)'
+- from: waitingInternal
+  to: investigating
+  operation: actOnPartnerCase
+  trigger: operation
+  guard: '`action: internalResponded` (decided 29 September, writers pass; DM4)'
+- from: investigating
+  to: resolutionProposed
+  operation: actOnPartnerCase
+  trigger: operation
+  guard: '`action: proposeResolution` with the `resolution`: an adjustment, a credit, a correction,
+    or no change with the reason (decided 29 September, writers pass; DM4)'
+- from: resolutionProposed
+  to: resolved
+  operation: actOnPartnerCase
+  trigger: operation
+  guard: '`action: acceptResolution` by the partner, or by the case job when the response window passes
+    without an answer (decided 29 September, writers pass; DM4)'
+- from: resolutionProposed
+  to: investigating
+  operation: actOnPartnerCase
+  trigger: operation
+  guard: '`action: rejectResolution` by the partner (decided 29 September, writers pass; DM4)'
+  isReversal: true
+- from: resolved
+  to: investigating
+  operation: actOnPartnerCase
+  trigger: operation
+  guard: '`action: reopen` within the reopening window: the resolution was not carried out (decided
+    29 September, writers pass; DM4)'
+  isReversal: true
+- from: resolved
+  to: closed
+  trigger: timer
+  guard: The reopening window passes
+- from: open
+  to: closed
+  operation: actOnPartnerCase
+  trigger: operation
+  guard: '`action: closeWithoutInvestigation` with a reason: a duplicate, raised in error, or withdrawn
+    by the partner (decided 29 September, writers pass; DM4)'
+notes: '**A partner case is not a guest case** (decided 29 September, writers pass). `marketing.case`
+  has a guest lifecycle; this one runs between TICVAI and a company it trades with, and a case about
+  money (`commissionDispute`, `settlementDispute`, `invoiceDispute`) holds the commission line, batch
+  or reconciliation exception it concerns `disputed` until it is resolved.
+
+
+
+  **`resolved` is not `closed`.** A resolution can still be found not to have happened; `closed` is
+  final and a case that comes back after it is a new case. createPartnerCase opens a case and actOnPartnerCase
+  works it (decided 29 September, writers pass; DM4); `listPartnerDisputeCase` only reads.'

@@ -1,1 +1,298 @@
-{}
+{
+ "analyseMediaAsset": {
+  "method": "POST",
+  "path": "/media-assets/{assetId}/analyse",
+  "contract": "assets",
+  "summary": "Auto-tag, describe and classify an asset",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "deleteMediaAsset": {
+  "method": "DELETE",
+  "path": "/media/{mediaId}",
+  "contract": "assets",
+  "summary": "Delete an asset",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "findSimilarMediaAssets": {
+  "method": "GET",
+  "path": "/media-assets/similar",
+  "contract": "assets",
+  "summary": "Visually similar, near-duplicate and related assets",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "assetId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "minSimilarity",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaSimilarity"
+ },
+ "getMediaUsageAnalytics": {
+  "method": "GET",
+  "path": "/media-usage",
+  "contract": "assets",
+  "summary": "Downloads, views, shares and library health",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaUsageRow"
+ },
+ "listAssets": {
+  "method": "GET",
+  "path": "/assets",
+  "contract": "maintenance",
+  "summary": "List assets",
+  "permission": "ASSET_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "maintenanceDue",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMediaAssetVersions": {
+  "method": "GET",
+  "path": "/media-assets/{assetId}/versions",
+  "contract": "assets",
+  "summary": "Every revision, and what replacing it would affect",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MediaAssetVersion"
+ },
+ "listMediaRenditions": {
+  "method": "GET",
+  "path": "/media-assets/{assetId}/renditions",
+  "contract": "assets",
+  "summary": "The derived sizes and formats, and whether they are ready",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MediaRendition"
+ },
+ "replaceMediaAsset": {
+  "method": "POST",
+  "path": "/media/{mediaId}/replace",
+  "contract": "assets",
+  "summary": "Replace the file behind an asset",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaReplaceResult"
+ },
+ "requestMediaRendition": {
+  "method": "POST",
+  "path": "/media-assets/{assetId}/renditions",
+  "contract": "assets",
+  "summary": "Generate a size or format",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MediaRendition",
+  "responds": null
+ },
+ "searchMedia": {
+  "method": "GET",
+  "path": "/media",
+  "contract": "assets",
+  "summary": "Search the asset library",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "tag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "collectionId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "unusedOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "rightsExpiringWithinDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "setMediaAssetTags": {
+  "method": "PUT",
+  "path": "/media-assets/{assetId}/tags",
+  "contract": "assets",
+  "summary": "Tags and keywords, whoever or whatever supplied them",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaTag"
+ },
+ "updateMediaAsset": {
+  "method": "PATCH",
+  "path": "/media/{mediaId}",
+  "contract": "assets",
+  "summary": "Amend metadata, tags or rights",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaAsset"
+ }
+}

@@ -548,7 +548,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - identity.module
+  - identity.permission
   writes: []
 - operation: listModules
   verb: GET
@@ -636,7 +638,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - identity.delegated_access
+  - identity.principal
+  - identity.role_permission
+  - identity.segregation_rule
   writes: []
 - operation: listSsoProviders
   verb: GET

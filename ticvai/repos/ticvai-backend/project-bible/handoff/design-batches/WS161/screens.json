@@ -1,0 +1,1754 @@
+[
+ {
+  "id": "BO-913",
+  "name": "Event Resource Planning Command Center",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "7",
+   "number": "01",
+   "page": 99
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/event-resource-planning-command-center-bo-913",
+   "component": "apps/venue-management-web/src/routes/rentals/EventResourcePlanningCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-914",
+    "BO-915",
+    "BO-916",
+    "BO-917",
+    "BO-918",
+    "BO-919",
+    "BO-920",
+    "BO-921",
+    "BO-922"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-914",
+     "trigger": "Event Resource Requirement Builder",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "carries": [
+      "eventId"
+     ]
+    },
+    {
+     "to": "BO-915",
+     "trigger": "Venue & Space Allocation",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-916",
+     "trigger": "Equipment & Asset Allocation",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-917",
+     "trigger": "Event Staff & Personnel Allocation",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-918",
+     "trigger": "Event Resource Template Library",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-919",
+     "trigger": "AI Event Resource Forecasting",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-920",
+     "trigger": "Event Resource Cost Estimator",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "carries": [
+      "eventId"
+     ]
+    },
+    {
+     "to": "BO-921",
+     "trigger": "Multi-Event Allocation & Conflict Optimizer",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-922",
+     "trigger": "Event Resource Approval & Readiness Gate",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "carries": [
+      "eventId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Provide event and operations managers with a single workspace for understanding the resource readiness of upcoming events.",
+  "purposeNote": "Managers can immediately understand resource readiness across upcoming events and identify events requiring operational attention.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 99 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search event resource planning",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 99 §Users shall filter by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Event",
+        "Date",
+        "Venue",
+        "Event type",
+        "Resource status",
+        "Readiness",
+        "Event manager",
+        "Approval status",
+        "Risk level",
+        "AI Event Summary"
+       ],
+       "notes": "The pack filters this screen by event, date, venue, event type, resource status, readiness and 4 more — which are present is a decision the pack already made.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 99 §Users shall filter by"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every event resource planning",
+       "columns": [
+        "Upcoming events",
+        "Events fully resourced",
+        "Events partially resourced",
+        "Events with critical gaps",
+        "Pending resource requests",
+        "Pending approvals",
+        "Resource conflicts",
+        "Staff shortages",
+        "Equipment shortages",
+        "Venue/space conflicts",
+        "Forecast resource cost",
+        "Event Readiness"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 99 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected event resource planning",
+       "bindsTo": null,
+       "columns": [
+        "Upcoming events",
+        "Events fully resourced",
+        "Events partially resourced",
+        "Events with critical gaps",
+        "Pending resource requests",
+        "Pending approvals",
+        "Resource conflicts",
+        "Staff shortages",
+        "Equipment shortages",
+        "Venue/space conflicts",
+        "Forecast resource cost",
+        "Event Readiness"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Corporate Gala”, “Concert A”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 99 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The event resource planning list.",
+   "error": "Could not load. Names which read failed and leaves the event resource planning untouched.",
+   "emptyFirstRun": "No event resource planning yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the event resource planning are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getEventResourcePlan",
+    "contract": "catalogue",
+    "purpose": "Event resource plans",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Upcoming events",
+    "Events fully resourced",
+    "Events partially resourced",
+    "Events with critical gaps",
+    "Pending resource requests",
+    "Pending approvals"
+   ],
+   "params": [
+    {
+     "name": "eventId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-913",
+   "workshopBoard": "wireframes/WS132 Resource Management Configuration Board 7.dc.html#bo-913"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 99. 0 of 22 labels bound to a contract property; 22 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-914",
+  "name": "Event Resource Requirement Builder",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "7",
+   "number": "02",
+   "page": 100
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/event-resource-requirement-builder-bo-914",
+   "component": "apps/venue-management-web/src/routes/rentals/EventResourceRequirementBuilder.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-913"
+   ],
+   "exitTo": [
+    "BO-913"
+   ],
+   "transitions": [
+    {
+     "to": "BO-913",
+     "trigger": "Back to Event Resource Planning Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "eventId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Define every resource required to deliver a specific event.",
+  "purposeNote": "Event managers can define a complete structured resource requirement plan for each event.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 100 §Display"
+   },
+   {
+    "operation": null,
+    "why": "**Event Resource Requirement Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every event resource requirement",
+       "columns": [
+        "Event",
+        "Event type",
+        "Venue",
+        "Event date",
+        "Start/end",
+        "Expected attendance",
+        "Capacity",
+        "Event manager",
+        "Resource Requirement Sections",
+        "Spaces"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 100 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected event resource requirement",
+       "bindsTo": null,
+       "columns": [
+        "Event",
+        "Event type",
+        "Venue",
+        "Event date",
+        "Start/end",
+        "Expected attendance",
+        "Capacity",
+        "Event manager",
+        "Resource Requirement Sections",
+        "Spaces"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Event Selection”, “For each requirement”, “Requirements may change according to”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 100 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The event resource requirement list.",
+   "error": "Could not load. Names which read failed and leaves the event resource requirement untouched.",
+   "emptyFirstRun": "No event resource requirement yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the event resource requirement are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setEventResourcePlan",
+    "contract": "catalogue",
+    "purpose": "What an event needs",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getEventResourcePlan"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Event",
+    "Event type",
+    "Venue",
+    "Event date",
+    "Start/end",
+    "Expected attendance"
+   ],
+   "params": [
+    {
+     "name": "eventId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-914",
+   "workshopBoard": "wireframes/WS132 Resource Management Configuration Board 7.dc.html#bo-914"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 100. 0 of 10 labels bound to a contract property; 35 of 59 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-915",
+  "name": "Venue & Space Allocation",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "7",
+   "number": "03",
+   "page": 102
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/venue-space-allocation-bo-915",
+   "component": "apps/venue-management-web/src/routes/rentals/VenueSpaceAllocation.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-913"
+   ],
+   "exitTo": [
+    "BO-913"
+   ],
+   "transitions": [
+    {
+     "to": "BO-913",
+     "trigger": "Back to Event Resource Planning Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Assign suitable physical spaces to an event and its operational components.",
+  "purposeNote": "Users can assign suitable venues and spaces while TICVAI validates the entire operational occupancy period rather than only the event start/end time.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 102 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every venue space allocation",
+       "columns": [
+        "Capacity",
+        "Layout",
+        "Location",
+        "Availability",
+        "Existing bookings",
+        "Setup time",
+        "Teardown time",
+        "Accessibility",
+        "Associated resources",
+        "Operational restrictions"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 102 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected venue space allocation",
+       "bindsTo": null,
+       "columns": [
+        "Capacity",
+        "Layout",
+        "Location",
+        "Availability",
+        "Existing bookings",
+        "Setup time",
+        "Teardown time",
+        "Accessibility",
+        "Associated resources",
+        "Operational restrictions"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “The interface shall display available”, “Users shall see”, “Event”, “Teardown”, “Conflict Detection”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 102 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The venue space allocation list.",
+   "error": "Could not load. Names which read failed and leaves the venue space allocation untouched.",
+   "emptyFirstRun": "No venue space allocation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the venue space allocation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listSpaces",
+    "contract": "catalogue",
+    "purpose": "Venue and space allocation",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "bookResource",
+    "contract": "resources",
+    "purpose": "Book the space",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Capacity",
+    "Layout",
+    "Location",
+    "Availability",
+    "Existing bookings",
+    "Setup time"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-915",
+   "workshopBoard": "wireframes/WS132 Resource Management Configuration Board 7.dc.html#bo-915"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 102. 0 of 10 labels bound to a contract property; 11 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-916",
+  "name": "Equipment & Asset Allocation",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "7",
+   "number": "04",
+   "page": 103
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/equipment-asset-allocation-bo-916",
+   "component": "apps/venue-management-web/src/routes/rentals/EquipmentAssetAllocation.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-913"
+   ],
+   "exitTo": [
+    "BO-913"
+   ],
+   "transitions": [
+    {
+     "to": "BO-913",
+     "trigger": "Back to Event Resource Planning Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allocate physical equipment and operational assets required for events.",
+  "purposeNote": "Event equipment requirements can be translated into actual physical-asset allocations without creating resource conflicts.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 103"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 103"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "allocateResources",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "allocateResources"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The equipment asset allocation list.",
+   "error": "Could not load. Names which read failed and leaves the equipment asset allocation untouched.",
+   "emptyFirstRun": "No equipment asset allocation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the equipment asset allocation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "allocateResources",
+    "contract": "resources",
+    "purpose": "Equipment allocation",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-916",
+   "workshopBoard": "wireframes/WS132 Resource Management Configuration Board 7.dc.html#bo-916"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 103. 0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-917",
+  "name": "Event Staff & Personnel Allocation",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "7",
+   "number": "05",
+   "page": 105
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/event-staff-personnel-allocation-bo-917",
+   "component": "apps/venue-management-web/src/routes/rentals/EventStaffPersonnelAllocation.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-913"
+   ],
+   "exitTo": [
+    "BO-913"
+   ],
+   "transitions": [
+    {
+     "to": "BO-913",
+     "trigger": "Back to Event Resource Planning Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Each candidate may display) and no metric row",
+  "purpose": "Assign qualified staff resources to event roles.",
+  "purposeNote": "Event managers can assign qualified staff while TICVAI automatically validates workforce eligibility and availability.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 105 §Each candidate may display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every event staff personnel",
+       "columns": [
+        "Name",
+        "Role",
+        "Skill",
+        "Certification",
+        "Availability",
+        "Existing workload",
+        "Venue",
+        "Overtime impact",
+        "AI match"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 105 §Each candidate may display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected event staff personnel",
+       "bindsTo": null,
+       "columns": [
+        "Name",
+        "Role",
+        "Skill",
+        "Certification",
+        "Availability",
+        "Existing workload",
+        "Venue",
+        "Overtime impact",
+        "AI match"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “For each role”, “AV Technician Required”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 105 §Each candidate may display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Event manager",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 105 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Supervisor",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 105 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Security",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 105 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Customer service",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 105 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The event staff personnel list.",
+   "error": "Could not load. Names which read failed and leaves the event staff personnel untouched.",
+   "emptyFirstRun": "No event staff personnel yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the event staff personnel are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "createRotaAssignment",
+    "contract": "workforce",
+    "purpose": "Staff allocation",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listRotaAssignments",
+     "getStaffingCoverage"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Name",
+    "Role",
+    "Skill",
+    "Certification",
+    "Availability",
+    "Existing workload"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-917",
+   "workshopBoard": "wireframes/WS132 Resource Management Configuration Board 7.dc.html#bo-917"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 105. 0 of 9 labels bound to a contract property; 13 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Event manager, Supervisor, Security, Customer service are choices sent by `createRotaAssignment` (position / requiredRoleId).",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-918",
+  "name": "Event Resource Template Library",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "7",
+   "number": "06",
+   "page": 106
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/event-resource-template-library-bo-918",
+   "component": "apps/venue-management-web/src/routes/rentals/EventResourceTemplateLibrary.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-913"
+   ],
+   "exitTo": [
+    "BO-913"
+   ],
+   "transitions": [
+    {
+     "to": "BO-913",
+     "trigger": "Back to Event Resource Planning Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Administrators shall configure) and no display directory — it is settings, not a population",
+  "purpose": "Allow frequently used event-resource configurations to be saved as reusable templates.",
+  "purposeNote": "Reusable event-resource templates significantly reduce manual event setup while maintaining controlled versioning.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Template code",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 106 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Template name",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 106 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Event type",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 106 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Attendance range",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 106 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Applicable venues",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 106 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Required resources",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 106 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Quantities",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 106 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Staff roles",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 106 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Setup duration",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 106 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Teardown duration",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 106 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Dependencies",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 106 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Effective dates",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 106 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Template Application",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 106 §Administrators shall configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The event resource template configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the event resource template untouched.",
+   "emptyFirstRun": "No event resource template configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "listResourcePackages",
+    "contract": "resources",
+    "purpose": "Template library",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createResourcePackage",
+    "contract": "resources",
+    "purpose": "Save a template",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-918",
+   "workshopBoard": "wireframes/WS132 Resource Management Configuration Board 7.dc.html#bo-918"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 106. 0 of 0 labels bound to a contract property; 13 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-919",
+  "name": "AI Event Resource Forecasting",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "7",
+   "number": "07",
+   "page": 107
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/ai-event-resource-forecasting-bo-919",
+   "component": "apps/venue-management-web/src/routes/rentals/AiEventResourceForecasting.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-913"
+   ],
+   "exitTo": [
+    "BO-913"
+   ],
+   "transitions": [
+    {
+     "to": "BO-913",
+     "trigger": "Back to Event Resource Planning Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Predict the resources required for an event before final allocation.",
+  "purposeNote": "and predicted requirements.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 107 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every event resource forecasting",
+       "columns": [
+        "Configured",
+        "AI Recommended"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 107 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected event resource forecasting",
+       "bindsTo": null,
+       "columns": [
+        "Configured",
+        "AI Recommended"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Security”, “Reason”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 107 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The event resource forecasting list.",
+   "error": "Could not load. Names which read failed and leaves the event resource forecasting untouched.",
+   "emptyFirstRun": "No event resource forecasting yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the event resource forecasting are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "entryState": {
+   "preloaded": [
+    "Configured",
+    "AI Recommended"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-919",
+   "workshopBoard": "wireframes/WS132 Resource Management Configuration Board 7.dc.html#bo-919"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 107. 0 of 2 labels bound to a contract property; 2 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-920",
+  "name": "Event Resource Cost Estimator",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "7",
+   "number": "08",
+   "page": 108
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/event-resource-cost-estimator-bo-920",
+   "component": "apps/venue-management-web/src/routes/rentals/EventResourceCostEstimator.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-913"
+   ],
+   "exitTo": [
+    "BO-913"
+   ],
+   "transitions": [
+    {
+     "to": "BO-913",
+     "trigger": "Back to Event Resource Planning Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "eventId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Calculate the expected resource cost of delivering an event.",
+  "purposeNote": "Event managers can understand expected resource cost before approving the operational event plan.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 108 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search event resource cost",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 108 §Users shall analyze by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Resource type",
+        "Department",
+        "Venue",
+        "Event phase",
+        "Internal/external",
+        "Staff/equipment",
+        "AI Optimization"
+       ],
+       "notes": "The pack filters this screen by resource type, department, venue, event phase, internal/external, staff/equipment and 1 more — which are present is a decision the pack already made.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 108 §Users shall analyze by"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every event resource cost",
+       "columns": [
+        "Budget",
+        "Estimated",
+        "Committed",
+        "Actual",
+        "Variance"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 108 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected event resource cost",
+       "bindsTo": null,
+       "columns": [
+        "Budget",
+        "Estimated",
+        "Committed",
+        "Actual",
+        "Variance"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Budget Variance”, “Estimated saving”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 108 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Venue cost",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 108 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Equipment cost",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 108 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "External resource cost",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 108 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The event resource cost list.",
+   "error": "Could not load. Names which read failed and leaves the event resource cost untouched.",
+   "emptyFirstRun": "No event resource cost yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the event resource cost are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getEventResourcePlan",
+    "contract": "catalogue",
+    "purpose": "Cost estimate",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "estimateEventResourceCost",
+    "contract": "catalogue",
+    "purpose": "What the event's resource plan costs, by kind",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Budget",
+    "Estimated",
+    "Committed",
+    "Actual",
+    "Variance"
+   ],
+   "params": [
+    {
+     "name": "eventId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-920",
+   "workshopBoard": "wireframes/WS132 Resource Management Configuration Board 7.dc.html#bo-920"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 108. 0 of 12 labels bound to a contract property; 15 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `estimateEventResourceCost`.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-921",
+  "name": "Multi-Event Allocation & Conflict Optimizer",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "7",
+   "number": "09",
+   "page": 109
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/multi-event-allocation-conflict-optimizer-bo-921",
+   "component": "apps/venue-management-web/src/routes/rentals/MultiEventAllocationConflictOptimizer.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-913"
+   ],
+   "exitTo": [
+    "BO-913"
+   ],
+   "transitions": [
+    {
+     "to": "BO-913",
+     "trigger": "Back to Event Resource Planning Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Manage scarce resources across simultaneous or overlapping events.",
+  "purposeNote": "Managers can resolve shared-resource conflicts across multiple simultaneous events using visual planning and AI-supported optimization.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 109"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "filters",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "datePicker",
+       "label": "From",
+       "operation": "getResourceCalendar",
+       "notes": "Sends `?from=` (required).",
+       "provenance": "contract resources.yaml GET /resource-calendar"
+      },
+      {
+       "kind": "datePicker",
+       "label": "To",
+       "operation": "getResourceCalendar",
+       "notes": "Sends `?to=` (required).",
+       "provenance": "contract resources.yaml GET /resource-calendar"
+      },
+      {
+       "kind": "selectField",
+       "label": "Resource type",
+       "operation": "getResourceCalendar",
+       "notes": "Sends `?resourceTypeId=` (e.g. Security Level 2+, LED screens).",
+       "provenance": "contract resources.yaml GET /resource-calendar"
+      },
+      {
+       "kind": "selectField",
+       "label": "View",
+       "operation": "getResourceCalendar",
+       "notes": "Sends `?granularity=`.",
+       "provenance": "contract resources.yaml GET /resource-calendar"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Total required",
+       "columns": [
+        "Total required"
+       ],
+       "notes": "The pack asks for total required; the contract has no field for it.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 110"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Available",
+       "bindsTo": "ResourceCalendarRow",
+       "columns": [
+        "ResourceCalendarRow.resourceId"
+       ],
+       "operation": "getResourceCalendar",
+       "notes": "Count of resources of the chosen type.",
+       "provenance": "contract resources.yaml GET /resource-calendar"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Gap",
+       "columns": [
+        "Gap"
+       ],
+       "notes": "The pack asks for gap; the contract has no field for it.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 110"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Shared timeline",
+       "bindsTo": "ResourceCalendarRow",
+       "columns": [
+        "ResourceCalendarRow.resourceName",
+        "ResourceCalendarRow.resourceTypeId",
+        "ResourceCalendarRow.utilisationPercent",
+        "ResourceCalendarRow.segments"
+       ],
+       "operation": "getResourceCalendar",
+       "notes": "Segments in conflict are highlighted; the pack draws events, not resources, across the timeline.",
+       "provenance": "contract resources.yaml GET /resource-calendar"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected conflict",
+       "bindsTo": "ResourceCalendarRow.segments",
+       "columns": [
+        "ResourceCalendarRow.segments[].from",
+        "ResourceCalendarRow.segments[].to",
+        "ResourceCalendarRow.segments[].state",
+        "ResourceCalendarRow.segments[].bookingId",
+        "ResourceCalendarRow.segments[].conflictsWith",
+        "Event",
+        "Event priority",
+        "Proposed resolution"
+       ],
+       "operation": "getResourceCalendar",
+       "notes": "Event, priority and the proposed resolution are pack labels.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 110"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The multi-event allocation conflict list.",
+   "error": "Could not load. Names which read failed and leaves the multi-event allocation conflict untouched.",
+   "emptyFirstRun": "No multi-event allocation conflict yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the multi-event allocation conflict are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getResourceCalendar",
+    "contract": "resources",
+    "purpose": "Conflicts across events",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-921",
+   "workshopBoard": "wireframes/WS132 Resource Management Configuration Board 7.dc.html#bo-921"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 109. 0 of 0 labels bound to a contract property; 0 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Resource_Management_Configuration_Reference.pdf p.110; contract resources.yaml GET /resource-calendar. Pack labels with no schema field yet (shown as plain labels): Total required, Gap, Required per event, Event priority / SLA / customer tier, AI redistribution proposal.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-922",
+  "name": "Event Resource Approval & Readiness Gate",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "7",
+   "number": "10",
+   "page": 111
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/event-resource-approval-readiness-gate-bo-922",
+   "component": "apps/venue-management-web/src/routes/rentals/EventResourceApprovalReadinessGate.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-913"
+   ],
+   "exitTo": [
+    "BO-913"
+   ],
+   "transitions": [
+    {
+     "to": "BO-913",
+     "trigger": "Back to Event Resource Planning Command Center",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "eventId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide the final governance checkpoint before an event resource plan becomes operational. Provide TICVAI with a centralized AI Resource Intelligence Engine capable of forecasting demand, identifying resource shortages, recommending optimal staff and physical resources, resolving conflicts, optimizing schedules, simulating operational scenarios, and allowing managers to interact with Resource Management through natural language. Board 8 shall consume information from the previous Resource Management boards rather than recreate their configuration.",
+  "purposeNote": "An event cannot be marked operationally ready until mandatory resource requirements, conflicts, qualifications, costs, and approvals have passed configured readiness controls. Board 7 Shared Event Readiness Engine",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 111"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 111"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getEventResourcePlan",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createApprovalRequest",
+       "label": "Create approval request",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createApprovalRequest"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The event resource approval list.",
+   "error": "Could not load. Names which read failed and leaves the event resource approval untouched.",
+   "emptyFirstRun": "No event resource approval yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the event resource approval are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getEventResourcePlan",
+    "contract": "catalogue",
+    "purpose": "Readiness gate",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createApprovalRequest",
+    "contract": "approvals",
+    "purpose": "Send for approval",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-922",
+   "workshopBoard": "wireframes/WS132 Resource Management Configuration Board 7.dc.html#bo-922"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 111. 0 of 0 labels bound to a contract property; 0 of 150 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "eventId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

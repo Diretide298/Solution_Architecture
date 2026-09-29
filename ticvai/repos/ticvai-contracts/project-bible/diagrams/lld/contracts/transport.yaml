@@ -73,8 +73,12 @@ operations:
   audience:
   - guest
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - transport.favourite_route
+  writes:
+  - cache:idempotency
+  - transport.favourite_route
 - operation: getNextTransportDeparture
   verb: GET
   path: /transport/departures/next
@@ -84,7 +88,15 @@ operations:
   - guest
   - public
   offline: false
-  reads: []
+  reads:
+  - transport.departure
+  - transport.fare_matrix_cell
+  - transport.fare_passenger_type
+  - transport.fare_table
+  - transport.route
+  - transport.route_stop
+  - transport.station
+  - transport.timetable
   writes: []
 - operation: getTransportFareTable
   verb: GET
@@ -136,7 +148,10 @@ operations:
   - guest
   - public
   offline: true
-  reads: []
+  reads:
+  - transport.route
+  - transport.route_stop
+  - transport.station
   writes: []
 - operation: importTransportNetwork
   verb: POST
@@ -169,7 +184,12 @@ operations:
   - guest
   - public
   offline: false
-  reads: []
+  reads:
+  - transport.fare_matrix_cell
+  - transport.fare_table
+  - transport.pass_type
+  - transport.route
+  - transport.route_stop
   writes: []
 - operation: listTransportPassTypes
   verb: GET
@@ -255,7 +275,12 @@ operations:
   - public
   - service
   offline: false
-  reads: []
+  reads:
+  - transport.fare_matrix_cell
+  - transport.fare_passenger_type
+  - transport.fare_table
+  - transport.pass_type
+  - transport.route_stop
   writes: []
 - operation: saveFavouriteRoute
   verb: POST
@@ -277,7 +302,15 @@ operations:
   - guest
   - public
   offline: false
-  reads: []
+  reads:
+  - transport.departure
+  - transport.fare_matrix_cell
+  - transport.fare_passenger_type
+  - transport.fare_table
+  - transport.route
+  - transport.route_stop
+  - transport.station
+  - transport.timetable
   writes: []
 - operation: setTransportFareTable
   verb: PUT

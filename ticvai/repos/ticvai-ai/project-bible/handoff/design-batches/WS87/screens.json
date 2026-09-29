@@ -159,7 +159,15 @@
    "emptyNoResults": "The filter narrowed it and the self-service experience are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getGameEligibility",
+    "contract": "games",
+    "purpose": "Self-service overview",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Total Self-Service Devices",
@@ -171,7 +179,8 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-484"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-484",
+   "workshopBoard": "wireframes/WS67 Game and Ride Board 10.dc.html#bo-484"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 96. 0 of 5 labels bound to a contract property; 10 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -250,7 +259,27 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setGameKioskConfiguration",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setGameKioskConfiguration"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The self-service kiosk profile list.",
@@ -259,10 +288,19 @@
    "emptyNoResults": "The filter narrowed it and the self-service kiosk profile are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setGameKioskConfiguration",
+    "contract": "games",
+    "purpose": "Kiosk profile and channel",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-485"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-485",
+   "workshopBoard": "wireframes/WS67 Game and Ride Board 10.dc.html#bo-485"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 97. 0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -380,16 +418,31 @@
    "emptyNoResults": "The filter narrowed it and the customer card wallet are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getGameCard",
+    "contract": "games",
+    "purpose": "Identify the customer",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "↓",
     "4321"
+   ],
+   "params": [
+    {
+     "name": "cardCode",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-486"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-486",
+   "workshopBoard": "wireframes/WS67 Game and Ride Board 10.dc.html#bo-486"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 98. 0 of 2 labels bound to a contract property; 3 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -509,17 +562,32 @@
    "emptyNoResults": "The filter narrowed it and the customer wallet balance are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getWallet",
+    "contract": "wallet",
+    "purpose": "Balance summary",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Card Status",
     "Card Expiry",
     "Last Recharge"
+   ],
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-487"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-487",
+   "workshopBoard": "wireframes/WS67 Game and Ride Board 10.dc.html#bo-487"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 99. 0 of 3 labels bound to a contract property; 3 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -598,7 +666,26 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "topUpWallet",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "topUpWallet"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The self-service wallet top-up list.",
@@ -607,12 +694,29 @@
    "emptyNoResults": "The filter narrowed it and the self-service wallet top-up are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "topUpWallet",
+    "contract": "wallet",
+    "purpose": "Self-service top-up",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-488"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-488",
+   "workshopBoard": "wireframes/WS67 Game and Ride Board 10.dc.html#bo-488"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 99. 0 of 0 labels bound to a contract property; 0 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -678,18 +782,119 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Game_and_Ride_Module.pdf, page 100"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 100"
    }
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "filters",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Card number",
+       "operation": "getGameEligibility",
+       "notes": "Sends `?cardId=`.",
+       "provenance": "contract games.yaml GET /game-eligibility"
+      },
+      {
+       "kind": "searchField",
+       "label": "Guest",
+       "operation": "getGameEligibility",
+       "notes": "Sends `?subjectId=`.",
+       "provenance": "contract games.yaml GET /game-eligibility"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "operation": "getGameEligibility",
+       "notes": "Sends `?venueId=`.",
+       "provenance": "contract games.yaml GET /game-eligibility"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Bonus credit",
+       "columns": [
+        "Bonus credit"
+       ],
+       "notes": "The pack's Bonus Section (AED 25, valid until 30 Sep 2026); the eligibility read carries no wallet balance.",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 100"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Free plays remaining",
+       "bindsTo": "GameEligibility",
+       "columns": [
+        "GameEligibility.remainingPlays"
+       ],
+       "operation": "getGameEligibility",
+       "notes": "Summed where `costKind` is freeWithEntitlement.",
+       "provenance": "contract games.yaml GET /game-eligibility"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "What this card can play",
+       "bindsTo": "GameEligibility",
+       "columns": [
+        "GameEligibility.name",
+        "GameEligibility.costKind",
+        "GameEligibility.price",
+        "GameEligibility.playable",
+        "GameEligibility.remainingPlays",
+        "GameEligibility.entitlementId",
+        "GameEligibility.blockedReason"
+       ],
+       "operation": "getGameEligibility",
+       "notes": "`costKind` maps to the pack's Included / Free / Pay to Play / Not Eligible.",
+       "provenance": "contract games.yaml GET /game-eligibility"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected game or benefit",
+       "bindsTo": "GameEligibility",
+       "columns": [
+        "GameEligibility.gameId",
+        "GameEligibility.name",
+        "GameEligibility.playable",
+        "GameEligibility.costKind",
+        "GameEligibility.price",
+        "GameEligibility.entitlementId",
+        "GameEligibility.remainingPlays",
+        "GameEligibility.blockedReason",
+        "GameEligibility.ticketsTypicallyEarned",
+        "Benefit name",
+        "Valid until",
+        "Can be used at",
+        "Cannot be used at"
+       ],
+       "operation": "getGameEligibility",
+       "notes": "The benefit name (e.g. Birthday Free Play), its validity and where bonus value is accepted are pack labels.",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 101"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The bonus free game list.",
@@ -698,12 +903,21 @@
    "emptyNoResults": "The filter narrowed it and the bonus free game are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getGameEligibility",
+    "contract": "games",
+    "purpose": "Bonus, free game and benefits",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-489"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-489",
+   "workshopBoard": "wireframes/WS67 Game and Ride Board 10.dc.html#bo-489"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 100. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 100. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Game_and_Ride_Module.pdf p.100; pack Game_and_Ride_Module.pdf p.101; contract games.yaml GET /game-eligibility. Pack labels with no schema field yet (shown as plain labels): Bonus credit, Bonus valid until, Where bonus can / cannot be used (games, rides, F&B, retail), Benefit name (e.g. Birthday Free Play), Entitlement validity (e.g. Valid Today).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -809,10 +1023,19 @@
    "emptyNoResults": "The filter narrowed it and the game ride eligibility are still there. The pack's own statuses are Included — the state names which is selected.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getGameEligibility",
+    "contract": "games",
+    "purpose": "What can I play",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-490"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-490",
+   "workshopBoard": "wireframes/WS67 Game and Ride Board 10.dc.html#bo-490"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 101. 0 of 5 labels bound to a contract property; 9 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -919,10 +1142,19 @@
    "emptyNoResults": "The filter narrowed it and the redemption balance prize are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listPrizes",
+    "contract": "games",
+    "purpose": "Prize discovery",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-491"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-491",
+   "workshopBoard": "wireframes/WS67 Game and Ride Board 10.dc.html#bo-491"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 102. 0 of 4 labels bound to a contract property; 4 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1030,10 +1262,19 @@
    "emptyNoResults": "The filter narrowed it and the customer game wallet are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listGameplayTransactions",
+    "contract": "games",
+    "purpose": "Transaction history",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-492"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-492",
+   "workshopBoard": "wireframes/WS67 Game and Ride Board 10.dc.html#bo-492"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 102. 0 of 5 labels bound to a contract property; 5 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1136,10 +1377,19 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setGameKioskConfiguration",
+    "contract": "games",
+    "purpose": "Theme, language and journey",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-493"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-493",
+   "workshopBoard": "wireframes/WS67 Game and Ride Board 10.dc.html#bo-493"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 103. 0 of 0 labels bound to a contract property; 4 of 59 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

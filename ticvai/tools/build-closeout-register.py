@@ -132,9 +132,32 @@ def main():
         out += [f"### {contract} ({len(rows)})", "", "| Operation | Evidence | What changed |", "| --- | --- | --- |"]
         out += [f"| `{c['op']}` | {cell(c['evidence'])} | {cell(c['changed']) or 'agreed as drafted'} |" for c in rows]
         out.append("")
+    dm = d.get("dataModel") or {}
+    if dm:
+        tabs = dm.get("tables") or []
+        by_schema = collections.Counter(str(t.get("table", "")).split(".")[0] for t in tabs)
+        out += [
+            "## The data model under them (29 September)",
+            "",
+            f"**{cell(dm.get('why'))}** So the same day {len(tabs)} tables were designed and declared in their contracts "
+            "(groups DM1 to DM6), each from the agreed operation shapes and the packs, near-duplicates merged. Then a "
+            f"writers pass (WA to WE) gave every new table a writer or a documented job: {len(dm.get('writersAdded') or [])} "
+            "operations, bound to their screens. The lineage of the agreed operations was then merged: agreed "
+            "operations touching no real table went from 647 to 4.",
+            "",
+            "| Schema | New tables |",
+            "| --- | ---: |",
+        ]
+        out += [f"| {k} | {n} |" for k, n in by_schema.most_common()]
+        out += ["", "| Table | Group | Merged from |", "| --- | --- | --- |"]
+        out += [f"| `{t.get('table')}` | {t.get('group')} | {cell(t.get('merged'))} |"
+                for t in sorted(tabs, key=lambda t: str(t.get("table")))]
+        out.append("")
     out += ["## Operations added", "", "| Operation | Contract | Added by | Screens |", "| --- | --- | --- | --- |"]
     out += [f"| `{a['op']}` | {a['contract']} | {a['group']} | {cell(', '.join(a.get('screens') or []))} |"
             for a in sorted(added, key=lambda a: (a["contract"], a["op"]))]
+    out += [f"| `{a['op']}` | | {a['group']} (writers pass) | {cell(', '.join(a.get('screens') or []))} |"
+            for a in sorted((dm.get("writersAdded") or []), key=lambda a: (a["group"], str(a["op"])))]
     io.open(OUT, "w", encoding="utf-8", newline="\n").write("\n".join(out) + "\n")
     print(f"{len(closed)} agreed, {len(kept)} kept, {len(added)} added -> {os.path.relpath(OUT, ROOT)}")
 

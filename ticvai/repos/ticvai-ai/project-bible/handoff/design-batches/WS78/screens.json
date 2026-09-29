@@ -43,12 +43,18 @@
     {
      "to": "BO-395",
      "trigger": "Game & Ride Directory",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026"
+     "provenance": "structural — pack board 1 wiring, 11 September 2026",
+     "carries": [
+      "gameId"
+     ]
     },
     {
      "to": "BO-396",
      "trigger": "Attraction Profile",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026"
+     "provenance": "structural — pack board 1 wiring, 11 September 2026",
+     "carries": [
+      "gameId"
+     ]
     },
     {
      "to": "BO-397",
@@ -58,7 +64,10 @@
     {
      "to": "BO-398",
      "trigger": "Game & Ride Operational Configuration",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026"
+     "provenance": "structural — pack board 1 wiring, 11 September 2026",
+     "carries": [
+      "gameId"
+     ]
     },
     {
      "to": "BO-399",
@@ -68,7 +77,10 @@
     {
      "to": "BO-400",
      "trigger": "Attraction / Reader Mapping",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026"
+     "provenance": "structural — pack board 1 wiring, 11 September 2026",
+     "carries": [
+      "readerId"
+     ]
     },
     {
      "to": "BO-401",
@@ -92,13 +104,6 @@
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Header KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Provide management with one central view of the operational and configuration status of all games, rides, skill games, video games and redemption games.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 7 actions on this screen and the screen declares 0 operations.** Unserved: Add Attraction, Open Attraction, Disable Attraction, View Configuration, View Reader, View Transactions, Filter by venue/zone/type/status. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Game_and_Ride_Module.pdf, page 3 §Actions"
-   }
-  ],
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -207,12 +212,58 @@
    "emptyNoResults": "The filter narrowed it and the game ride operations are still there. The pack's own statuses are Active — the state names which is selected.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listGames",
+    "contract": "games",
+    "purpose": "Games and rides today",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listGameplayTransactions",
+    "contract": "games",
+    "purpose": "Live taps",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createGame",
+    "contract": "games",
+    "purpose": "Add a game or ride",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Add Attraction; Disable Attraction",
+    "invalidates": [
+     "listGames",
+     "listGameplayTransactions"
+    ]
+   },
+   {
+    "operationId": "updateGame",
+    "contract": "games",
+    "purpose": "Take the attraction out of service (status)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Add Attraction; Disable Attraction",
+    "invalidates": [
+     "listGames",
+     "listGameplayTransactions"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-394"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-394",
+   "workshopBoard": "wireframes/WS58 Game and Ride Board 1.dc.html#bo-394"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 3. 0 of 0 labels bound to a contract property; 20 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 3. 0 of 0 labels bound to a contract property; 20 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Filter by venue/zone/type/status are choices sent by `listGames`; Add Attraction: `createGame`; Disable Attraction: `updateGame`; Open Attraction, View Configuration, View Reader, View Transactions dropped (navigation).",
+  "entryState": {
+   "params": [
+    {
+     "name": "gameId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -266,7 +317,10 @@
      "to": "BO-394",
      "trigger": "Back to Game & Ride Operations Dashboard",
      "provenance": "structural — pack board 1 wiring, 11 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "gameId"
+     ]
     }
    ]
   },
@@ -275,13 +329,6 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Field Description) and no display directory — it is settings, not a population",
   "purpose": "Maintain the master catalogue of all attractions participating in the payment/redemption ecosystem.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Create, Edit, Clone, View, Export. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Game_and_Ride_Module.pdf, page 4 §Actions"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -339,6 +386,7 @@
       {
        "kind": "secondaryButton",
        "label": "Clone",
+       "operation": "cloneGame",
        "provenance": "pack Game_and_Ride_Module.pdf, page 4 §Actions"
       },
       {
@@ -362,12 +410,55 @@
    "emptyNoResults": "The filter narrowed it and the game ride are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listGames",
+    "contract": "games",
+    "purpose": "The directory",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createGame",
+    "contract": "games",
+    "purpose": "Create a game or ride",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Create; Edit",
+    "invalidates": [
+     "listGames"
+    ]
+   },
+   {
+    "operationId": "updateGame",
+    "contract": "games",
+    "purpose": "Edit a game or ride",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Create; Edit",
+    "invalidates": [
+     "listGames"
+    ]
+   },
+   {
+    "operationId": "cloneGame",
+    "contract": "games",
+    "purpose": "Clone",
+    "trigger": "onAction"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-395"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-395",
+   "workshopBoard": "wireframes/WS58 Game and Ride Board 1.dc.html#bo-395"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 4. 0 of 7 labels bound to a contract property; 13 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 4. 0 of 7 labels bound to a contract property; 13 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Create: `createGame`; Edit: `updateGame`; View dropped (navigation); Export dropped (export is served by reporting exportReportResult); still owed by a contract change: `cloneGame`.",
+  "entryState": {
+   "params": [
+    {
+     "name": "gameId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -421,7 +512,10 @@
      "to": "BO-394",
      "trigger": "Back to Game & Ride Operations Dashboard",
      "provenance": "structural — pack board 1 wiring, 11 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "gameId"
+     ]
     }
    ]
   },
@@ -441,6 +535,26 @@
        "kind": "selectField",
        "label": "Wallet Payment Enabled",
        "provenance": "pack Game_and_Ride_Module.pdf, page 5 §Transaction Configuration"
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getGameCard",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateGame",
+       "label": "Save game",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateGame"
       }
      ]
     }
@@ -453,12 +567,50 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getGameCard",
+    "contract": "games",
+    "purpose": "The attraction profile",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "updateGame",
+    "contract": "games",
+    "purpose": "Change it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createGame",
+    "contract": "games",
+    "purpose": "Register a game on this attraction",
+    "trigger": "onAction",
+    "provenance": "wiring gap, 19 September 2026 — the screen showed the noun and could not act on it",
+    "invalidates": [
+     "listGames"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-396"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-396",
+   "workshopBoard": "wireframes/WS58 Game and Ride Board 1.dc.html#bo-396"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 5. 0 of 0 labels bound to a contract property; 1 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "cardCode",
+     "from": "navigation"
+    },
+    {
+     "name": "gameId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -564,10 +716,29 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listAttractionTypes",
+    "contract": "games",
+    "purpose": "Types defined",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setAttractionType",
+    "contract": "games",
+    "purpose": "Define one",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listAttractionTypes"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-397"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-397",
+   "workshopBoard": "wireframes/WS58 Game and Ride Board 1.dc.html#bo-397"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 6. 0 of 0 labels bound to a contract property; 5 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -623,7 +794,10 @@
      "to": "BO-394",
      "trigger": "Back to Game & Ride Operations Dashboard",
      "provenance": "structural — pack board 1 wiring, 11 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "gameId"
+     ]
     }
    ]
   },
@@ -646,7 +820,27 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setGameOperationalConfiguration",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setGameOperationalConfiguration"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The game ride operational list.",
@@ -655,12 +849,32 @@
    "emptyNoResults": "The filter narrowed it and the game ride operational are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setGameOperationalConfiguration",
+    "contract": "games",
+    "purpose": "Cycle, capacity and restrictions",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listGames"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-398"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-398",
+   "workshopBoard": "wireframes/WS58 Game and Ride Board 1.dc.html#bo-398"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 7. 0 of 0 labels bound to a contract property; 0 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "gameId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -718,6 +932,7 @@
     }
    ]
   },
+  "notes": "**Superseded by `BO-1106` Credit Usage & Eligibility Rules** from `Wallet_Configuration_Backend_Structure_v1.0.pdf`, 19 September 2026. This screen came from `Game_and_Ride_Module.pdf`, which describes the wallet incidentally; the wallet pack is the workshop dedicated to it and is backed by the 27 August MoM and matrix 4.3.28-4.3.35. It has zero components, so nothing rendered is lost. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "density": "compact",
   "purposeNote": "The attraction can identify which wallet/credit mechanisms it accepts before a gameplay transaction is authorized.",
   "pattern": "listDetail",
@@ -737,7 +952,27 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setCreditEligibilityRules",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setCreditEligibilityRules"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The wallet credit acceptance list.",
@@ -746,12 +981,29 @@
    "emptyNoResults": "The filter narrowed it and the wallet credit acceptance are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setCreditEligibilityRules",
+    "contract": "wallet",
+    "purpose": "Where credit may be spent",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-399"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-399",
+   "workshopBoard": "wireframes/WS58 Game and Ride Board 1.dc.html#bo-399"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 8. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "creditTypeId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -805,7 +1057,10 @@
      "to": "BO-394",
      "trigger": "Back to Game & Ride Operations Dashboard",
      "provenance": "structural — pack board 1 wiring, 11 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "gameId"
+     ]
     }
    ]
   },
@@ -815,11 +1070,6 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide a high-level association between games/rides and their reader configurations. Important: This screen only performs the mapping. Detailed reader properties belong to Board 2 – Game Reader & Device Configuration.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 8 actions on this screen and the screen declares 0 operations.** Unserved: Video Game Reader, Skill Game Reader, Ride Reader, Assign Reader, Replace Reader, Remove Assignment, View Reader Configuration, Test Mapping. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Game_and_Ride_Module.pdf, page 8 §Support at least"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -879,6 +1129,10 @@
        "provenance": "pack Game_and_Ride_Module.pdf, page 8 §Actions"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -898,12 +1152,49 @@
    "emptyNoResults": "The filter narrowed it and the attraction reader mapping are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listReaders",
+    "contract": "games",
+    "purpose": "Readers on this attraction",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setReaderConfiguration",
+    "contract": "games",
+    "purpose": "Assign one",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listReaders"
+    ]
+   },
+   {
+    "operationId": "testReader",
+    "contract": "games",
+    "purpose": "Test the attraction/reader mapping on the reader",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Test Mapping",
+    "invalidates": [
+     "listReaders"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-400"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-400",
+   "workshopBoard": "wireframes/WS58 Game and Ride Board 1.dc.html#bo-400"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 8. 0 of 0 labels bound to a contract property; 8 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 8. 0 of 0 labels bound to a contract property; 8 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Video Game Reader, Skill Game Reader, Ride Reader are choices sent by `listReaders`; Assign Reader, Replace Reader, Remove Assignment are choices sent by `setReaderConfiguration`; Test Mapping: `testReader`; View Reader Configuration dropped (navigation).",
+  "entryState": {
+   "params": [
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -969,11 +1260,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: View Package. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Game_and_Ride_Module.pdf, page 9 §Actions"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 9"
    },
@@ -996,6 +1282,24 @@
        "provenance": "pack Game_and_Ride_Module.pdf, page 9 §Actions"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listGameEntitlements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createGameEntitlement"
+      }
+     ]
     }
    ]
   },
@@ -1006,12 +1310,31 @@
    "emptyNoResults": "The filter narrowed it and the game package entitlement are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listGameEntitlements",
+    "contract": "games",
+    "purpose": "Packages and entitlements",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createGameEntitlement",
+    "contract": "games",
+    "purpose": "Associate one",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listGameEntitlements"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-401"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-401",
+   "workshopBoard": "wireframes/WS58 Game and Ride Board 1.dc.html#bo-401"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 9. 0 of 0 labels bound to a contract property; 1 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 9. 0 of 0 labels bound to a contract property; 1 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** View Package dropped (navigation).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1065,7 +1388,10 @@
      "to": "BO-394",
      "trigger": "Back to Game & Ride Operations Dashboard",
      "provenance": "structural — pack board 1 wiring, 11 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "gameId"
+     ]
     }
    ]
   },
@@ -1075,11 +1401,6 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Prevent incomplete or conflicting game/ride configurations from becoming operational.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: Fix Issue, Open Configuration, Validate Again, View Dependencies. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Game_and_Ride_Module.pdf, page 10 §Actions"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -1111,6 +1432,7 @@
       {
        "kind": "secondaryButton",
        "label": "Validate Again",
+       "operation": "validateGameConfiguration",
        "provenance": "pack Game_and_Ride_Module.pdf, page 10 §Actions"
       },
       {
@@ -1119,6 +1441,10 @@
        "provenance": "pack Game_and_Ride_Module.pdf, page 10 §Actions"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -1129,12 +1455,27 @@
    "emptyNoResults": "The filter narrowed it and the health validation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "simulateGameplayAuthorisation",
+    "contract": "games",
+    "purpose": "Would a tap work here",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "validateGameConfiguration",
+    "contract": "games",
+    "purpose": "Validate again",
+    "trigger": "onAction"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-402"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-402",
+   "workshopBoard": "wireframes/WS58 Game and Ride Board 1.dc.html#bo-402"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 10. 0 of 0 labels bound to a contract property; 4 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 10. 0 of 0 labels bound to a contract property; 4 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Fix Issue, Open Configuration, View Dependencies dropped (navigation); still owed by a contract change: `validateGameConfiguration`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1188,7 +1529,10 @@
      "to": "BO-394",
      "trigger": "Back to Game & Ride Operations Dashboard",
      "provenance": "structural — pack board 1 wiring, 11 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "gameId"
+     ]
     }
    ]
   },
@@ -1270,10 +1614,19 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listGameplayTransactions",
+    "contract": "games",
+    "purpose": "Audit and governed actions",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-403"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-403",
+   "workshopBoard": "wireframes/WS58 Game and Ride Board 1.dc.html#bo-403"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 11. 0 of 0 labels bound to a contract property; 11 of 56 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

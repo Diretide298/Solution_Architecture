@@ -1,1 +1,282 @@
-{}
+{
+ "createRentalPricingProfile": {
+  "method": "POST",
+  "path": "/rental-pricing-profiles",
+  "contract": "rental",
+  "summary": "Define how a rental is priced",
+  "permission": "RENTAL_PRICE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalPricingProfile",
+  "responds": "RentalPricingProfile"
+ },
+ "explainRentalPrice": {
+  "method": "POST",
+  "path": "/rental-price/explain",
+  "contract": "rental",
+  "summary": "Why the price is what it is, rule by rule",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalQuoteRequest",
+  "responds": "RentalPriceExplanation"
+ },
+ "listCommercialPricing": {
+  "method": "GET",
+  "path": "/commercial-pricing",
+  "contract": "catalogue",
+  "summary": "Commercial Pricing Command Center",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priceListType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "market",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "currency",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "owner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listDynamicPricingStrategy": {
+  "method": "GET",
+  "path": "/dynamic-pricing-strategy",
+  "contract": "catalogue",
+  "summary": "Dynamic Pricing Strategy Command Center",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "strategyType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "automationMode",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listRentalPricingProfiles": {
+  "method": "GET",
+  "path": "/rental-pricing-profiles",
+  "contract": "rental",
+  "summary": "Pricing profiles, and the products with none",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "unpricedOnly",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RentalPricingProfile"
+ },
+ "requestRentalCommercialOverride": {
+  "method": "POST",
+  "path": "/rental-overrides",
+  "contract": "rental",
+  "summary": "Deviate from policy, with a reason and an approver",
+  "permission": "RENTAL_OVERRIDE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalOverride",
+  "responds": "RentalOverride"
+ },
+ "setRentalDepositPolicy": {
+  "method": "PUT",
+  "path": "/rental-deposit-policies",
+  "contract": "rental",
+  "summary": "How much is held, how, and what happens to it",
+  "permission": "RENTAL_PRICE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalDepositPolicy",
+  "responds": "RentalDepositPolicy"
+ },
+ "setRentalFeePolicy": {
+  "method": "PUT",
+  "path": "/rental-fee-policies",
+  "contract": "rental",
+  "summary": "Grace period, late fees and extension pricing",
+  "permission": "RENTAL_PRICE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalFeePolicy",
+  "responds": "RentalFeePolicy"
+ },
+ "simulateRentalPricing": {
+  "method": "POST",
+  "path": "/rental-price/simulate",
+  "contract": "rental",
+  "summary": "Test a commercial configuration before publishing it",
+  "permission": "RENTAL_PRICE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalQuoteRequest",
+  "responds": null
+ },
+ "updateRentalPricingProfile": {
+  "method": "PUT",
+  "path": "/rental-pricing-profiles/{profileId}",
+  "contract": "rental",
+  "summary": "Change a pricing profile",
+  "permission": "RENTAL_PRICE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalPricingProfile",
+  "responds": "RentalPricingProfile"
+ }
+}

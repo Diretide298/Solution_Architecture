@@ -1,6 +1,6 @@
 # P08-sell-03 — P08 · Sell (3 of 4)
 
-**10 screens · 23 operations · 26 schemas · 10 permissions**
+**10 screens · 28 operations · 31 schemas · 10 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 10 permissions apply here:
   `AI_USE, MARKETING_MANAGE, MARKETING_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE, ROLE_MANAGE, SCOPE_VIEW, TENANT_CONFIGURE, WORKSTATION_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **5 of these operations work offline**: getUpsellSuggestions, listMerchandise, listProductCategories, listSaleBoards, listSerialisedItems
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -62,16 +61,12 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `BO-114` | Variants, Attributes, Barcode & RFID Management | listDetail | 2 | 0 | — |
-| `BO-115` | Category, Brand & Merchandise Hierarchy | listDetail | 5 | 0 | — |
-| `BO-116` | Merchandising & Product Presentation | commandCentre | 7 | 0 | — |
-| `BO-117` | Product Import, Governance & AI Configuration Assistant | listDetail | 5 | 0 | — |
-| `BO-118` | Campaign & Audience Management | commandCentre | 6 | 0 | — |
-| `BO-119` | Cross-Sell, Upsell & Recommendation Rules | statusTracker | 2 | 0 | — |
-| `BO-120` | Omnichannel Commerce & Journey Configuration | listDetail | 2 | 0 | — |
-| `BO-121` | Personalized Offers & Guest Engagement | listDetail | 2 | 0 | — |
+| `BO-115` | Category, Brand & Merchandise Hierarchy | listDetail | 5 | 3 | — |
+| `BO-116` | Merchandising & Product Presentation | commandCentre | 7 | 4 | — |
+| `BO-117` | Product Import, Governance & AI Configuration Assistant | listDetail | 6 | 4 | — |
+| `BO-118` | Campaign & Audience Management | commandCentre | 6 | 3 | — |
+| `BO-119` | Cross-Sell, Upsell & Recommendation Rules | statusTracker | 4 | 0 | — |
+| `BO-120` | Omnichannel Commerce & Journey Configuration | listDetail | 2 | 1 | — |
+| `BO-121` | Personalized Offers & Guest Engagement | listDetail | 2 | 1 | — |
 | `BO-122` | POS Experience Dashboard | listDetail | 1 | 0 | — |
-| `BO-123` | POS Profile Management | listDetail | 2 | 0 | — |
-
-## Thin screens in this batch
-
-**BO-119, BO-122 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+| `BO-1190` | Donation Campaigns | listDetail | 3 | 1 | — |

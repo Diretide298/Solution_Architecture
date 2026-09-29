@@ -1,4 +1,4 @@
--- payments — 25 tables
+-- payments — 27 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -246,6 +246,27 @@ CREATE TABLE IF NOT EXISTS payments.mixed_tender_rules (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
+-- Holds 16 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS payments.payment_attempt (
+    id                                uuid PRIMARY KEY,
+    payment_id                        text,
+    order_id                          text,
+    provider_connection_id            uuid NOT NULL,
+    payment_method_id                 uuid,
+    card_type                         text,
+    channel                           text,
+    outcome                           text NOT NULL CONSTRAINT payment_attempt_outcome_chk CHECK (outcome IN ('authorised', 'declined', 'errored', 'abandoned')),
+    decline_class                     text,
+    decline_code                      text,
+    decline_reason                    text,
+    latency_ms                        integer,
+    authentication_outcome            text CONSTRAINT payment_attempt_authentication_outcome_chk CHECK (authentication_outcome IN ('notAttempted', 'exempted', 'frictionless', 'challengePassed', 'challengeFailed')),
+    amount                            numeric(18,4),
+    attempted_at                      timestamptz NOT NULL,
+    scope_path                        ltree NOT NULL
+);
+
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS payments.payment_terms (
@@ -295,6 +316,19 @@ CREATE TABLE IF NOT EXISTS payments.provider_connection (
     merchant_account_id               uuid,
     status                            text CONSTRAINT provider_connection_status_chk CHECK (status IN ('draft', 'testing', 'active', 'degraded', 'disabled')),
     last_tested_at                    timestamptz,
+    scope_path                        ltree NOT NULL
+);
+
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS payments.provider_cost (
+    id                                uuid PRIMARY KEY,
+    payment_id                        text,
+    provider_connection_id            uuid NOT NULL,
+    cost_kind                         text NOT NULL CONSTRAINT provider_cost_cost_kind_chk CHECK (cost_kind IN ('schemeFee', 'interchange', 'acquirerMargin', 'fxSpread')),
+    amount                            numeric(18,4) NOT NULL,
+    settlement_id                     uuid,
+    incurred_at                       timestamptz NOT NULL,
     scope_path                        ltree NOT NULL
 );
 

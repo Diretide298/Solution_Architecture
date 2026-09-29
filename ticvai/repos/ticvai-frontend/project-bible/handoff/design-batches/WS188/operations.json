@@ -1,0 +1,209 @@
+{
+ "createCreditType": {
+  "method": "POST",
+  "path": "/credit-types",
+  "contract": "wallet",
+  "summary": "Define a kind of credit, without a release",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreditType",
+  "responds": "CreditType"
+ },
+ "expireCreditLots": {
+  "method": "POST",
+  "path": "/credit-lots/expire",
+  "contract": "wallet",
+  "summary": "Expire, extend or forfeit credit that has run out of time",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CreditExpiryResult"
+ },
+ "getCreditConsumptionPolicy": {
+  "method": "GET",
+  "path": "/credit-consumption-policy",
+  "contract": "wallet",
+  "summary": "Which credit is spent first",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CreditConsumptionPolicy"
+ },
+ "getWalletLiability": {
+  "method": "GET",
+  "path": "/wallet-liability",
+  "contract": "wallet",
+  "summary": "What is outstanding, and what is breakage",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "asOf",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletLiabilityRow"
+ },
+ "listCreditLots": {
+  "method": "GET",
+  "path": "/credit-lots",
+  "contract": "wallet",
+  "summary": "The tranches behind a balance, with their expiry",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "walletId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "includeExhausted",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CreditLot"
+ },
+ "listCreditTypes": {
+  "method": "GET",
+  "path": "/credit-types",
+  "contract": "wallet",
+  "summary": "The kinds of value that may sit in a wallet",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CreditType"
+ },
+ "publishWalletConfiguration": {
+  "method": "POST",
+  "path": "/wallet-configuration/publish",
+  "contract": "wallet",
+  "summary": "Validate and publish the wallet configuration as a version",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletConfigurationVersion"
+ },
+ "setCreditConsumptionPolicy": {
+  "method": "PUT",
+  "path": "/credit-consumption-policy",
+  "contract": "wallet",
+  "summary": "The order credit is drawn down in",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreditConsumptionPolicy",
+  "responds": "CreditConsumptionPolicy"
+ },
+ "setCreditEligibilityRules": {
+  "method": "PUT",
+  "path": "/credit-types/{creditTypeId}/eligibility",
+  "contract": "wallet",
+  "summary": "Where this credit may be spent, and on what",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreditEligibility",
+  "responds": "CreditEligibility"
+ },
+ "simulateCreditConsumption": {
+  "method": "POST",
+  "path": "/credit-consumption/simulate",
+  "contract": "wallet",
+  "summary": "Which credit this purchase would actually use",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CreditAllocation"
+ },
+ "updateCreditType": {
+  "method": "PUT",
+  "path": "/credit-types/{creditTypeId}",
+  "contract": "wallet",
+  "summary": "Change a kind of credit",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreditType",
+  "responds": "CreditType"
+ }
+}

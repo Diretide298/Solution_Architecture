@@ -367,6 +367,11 @@ screens:
     trigger: onAction
     invalidates:
     - listAlerts
+  - operationId: recordDashboardView
+    contract: reporting
+    purpose: Record that a dashboard was opened — fired once when the dashboard renders; nothing on the
+      screen waits for it.
+    trigger: background
   entryState:
     params:
     - name: venueId
@@ -536,6 +541,11 @@ screens:
     contract: reporting
     purpose: Run a report
     trigger: onAction
+  - operationId: recordDashboardView
+    contract: reporting
+    purpose: Record that a dashboard was opened — fired once when the dashboard renders; nothing on the
+      screen waits for it.
+    trigger: background
   entryState:
     params:
     - name: venueId
@@ -795,6 +805,11 @@ screens:
     contract: identity
     purpose: List principals
     trigger: onLoad
+  - operationId: recordDashboardView
+    contract: reporting
+    purpose: Record that a dashboard was opened — fired once when the dashboard renders; nothing on the
+      screen waits for it.
+    trigger: background
   entryState:
     params:
     - name: venueId
@@ -1011,6 +1026,11 @@ screens:
     contract: catalogue
     purpose: List products
     trigger: onLoad
+  - operationId: recordDashboardView
+    contract: reporting
+    purpose: Record that a dashboard was opened — fired once when the dashboard renders; nothing on the
+      screen waits for it.
+    trigger: background
   entryState:
     params:
     - name: venueId
@@ -1174,6 +1194,11 @@ screens:
     contract: inventory
     purpose: Stock value by location and category
     trigger: onLoad
+  - operationId: recordDashboardView
+    contract: reporting
+    purpose: Record that a dashboard was opened — fired once when the dashboard renders; nothing on the
+      screen waits for it.
+    trigger: background
   entryState:
     params:
     - name: venueId
@@ -1383,6 +1408,11 @@ screens:
     contract: inventory
     purpose: What is about to go out of date
     trigger: onLoad
+  - operationId: recordDashboardView
+    contract: reporting
+    purpose: Record that a dashboard was opened — fired once when the dashboard renders; nothing on the
+      screen waits for it.
+    trigger: background
   entryState:
     params:
     - name: venueId
@@ -1601,6 +1631,11 @@ screens:
     trigger: onAction
     invalidates:
     - listSegments
+  - operationId: recordDashboardView
+    contract: reporting
+    purpose: Record that a dashboard was opened — fired once when the dashboard renders; nothing on the
+      screen waits for it.
+    trigger: background
   entryState:
     params:
     - name: venueId
@@ -1765,6 +1800,11 @@ screens:
     contract: reporting
     purpose: Read a dashboard with tile data
     trigger: onLoad
+  - operationId: recordDashboardView
+    contract: reporting
+    purpose: Record that a dashboard was opened — fired once when the dashboard renders; nothing on the
+      screen waits for it.
+    trigger: background
   entryState:
     params:
     - name: venueId
@@ -3394,6 +3434,35 @@ screens:
         label: Operational Exceptions
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
+      - kind: textField
+        label: Scope path
+        operation: listSiteNormalisationBases
+        notes: Sends `?scopePath=` to `listSiteNormalisationBases`.
+        provenance: contract reporting.yaml GET /site-normalisation-bases
+      - kind: datePicker
+        label: Period from
+        operation: listSiteNormalisationBases
+        notes: Sends `?periodFrom=` to `listSiteNormalisationBases`.
+        provenance: contract reporting.yaml GET /site-normalisation-bases
+      - kind: datePicker
+        label: Period to
+        operation: listSiteNormalisationBases
+        notes: Sends `?periodTo=` to `listSiteNormalisationBases`.
+        provenance: contract reporting.yaml GET /site-normalisation-bases
+      - kind: dataTable
+        label: Every site normalisation basis
+        bindsTo: SiteNormalisationBasis
+        columns:
+        - SiteNormalisationBasis.id
+        - SiteNormalisationBasis.scopePath
+        - SiteNormalisationBasis.periodStart
+        - SiteNormalisationBasis.periodEnd
+        - SiteNormalisationBasis.visitors
+        - SiteNormalisationBasis.operatingHours
+        - SiteNormalisationBasis.staffedPositions
+        - SiteNormalisationBasis.areaSquareMetres
+        operation: listSiteNormalisationBases
+        provenance: contract reporting.yaml GET /site-normalisation-bases
   states:
     loading: The multi-site performance comparison list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the multi-site performance comparison untouched.
@@ -3409,6 +3478,10 @@ screens:
     purpose: Site against site, normalised
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listSiteNormalisationBases
+    contract: reporting
+    purpose: The denominators each site is benchmarked by
+    trigger: onLoad
   entryState:
     preloaded:
     - Revenue
@@ -3625,6 +3698,11 @@ screens:
     provenance: board reading, 19 September 2026
     invalidates:
     - listDashboards
+  - operationId: recordDashboardView
+    contract: reporting
+    purpose: Record that a dashboard was opened — fired once when the dashboard renders; nothing on the
+      screen waits for it.
+    trigger: background
   entryState:
     preloaded:
     - Dashboard Name
@@ -3860,6 +3938,11 @@ screens:
     purpose: Archive this dashboard
     trigger: onAction
     provenance: decided 29 September, VM close-out (venue management and configuration)
+  - operationId: recordDashboardView
+    contract: reporting
+    purpose: Record that a dashboard was opened — fired once when the dashboard renders; nothing on the
+      screen waits for it.
+    trigger: background
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-023
@@ -4705,6 +4788,11 @@ screens:
     purpose: Whether its data is fresh
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: recordDashboardView
+    contract: reporting
+    purpose: Record that a dashboard was opened — fired once when the dashboard renders; nothing on the
+      screen waits for it.
+    trigger: background
   entryState:
     preloaded:
     - Data Last Refreshed
@@ -8592,6 +8680,45 @@ screens:
         label: Utilization %
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support
           metrics such as
+      - kind: textField
+        label: Scope path
+        operation: listSiteNormalisationBases
+        notes: Sends `?scopePath=` to `listSiteNormalisationBases`.
+        provenance: contract reporting.yaml GET /site-normalisation-bases
+      - kind: datePicker
+        label: Period from
+        operation: listSiteNormalisationBases
+        notes: Sends `?periodFrom=` to `listSiteNormalisationBases`.
+        provenance: contract reporting.yaml GET /site-normalisation-bases
+      - kind: datePicker
+        label: Period to
+        operation: listSiteNormalisationBases
+        notes: Sends `?periodTo=` to `listSiteNormalisationBases`.
+        provenance: contract reporting.yaml GET /site-normalisation-bases
+      - kind: dataTable
+        label: Every site normalisation basis
+        bindsTo: SiteNormalisationBasis
+        columns:
+        - SiteNormalisationBasis.id
+        - SiteNormalisationBasis.scopePath
+        - SiteNormalisationBasis.periodStart
+        - SiteNormalisationBasis.periodEnd
+        - SiteNormalisationBasis.visitors
+        - SiteNormalisationBasis.operatingHours
+        - SiteNormalisationBasis.staffedPositions
+        - SiteNormalisationBasis.areaSquareMetres
+        operation: listSiteNormalisationBases
+        provenance: contract reporting.yaml GET /site-normalisation-bases
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save site normalisation basis
+        operation: setSiteNormalisationBasis
+        permission: REPORT_MANAGE
+        notes: '**The writer of `reporting.site_normalisation_basis`** (decided 29 September, writers
+          pass).'
+        provenance: contract reporting.yaml PUT /site-normalisation-bases
   states:
     loading: The benchmark comparative analytics list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the benchmark comparative analytics untouched.
@@ -8607,6 +8734,17 @@ screens:
     purpose: Configure the comparison basis
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listSiteNormalisationBases
+    contract: reporting
+    purpose: The denominators each site is benchmarked by
+    trigger: onLoad
+  - operationId: setSiteNormalisationBasis
+    contract: reporting
+    purpose: Set the denominators a site is benchmarked by
+    trigger: onAction
+    invalidates:
+    - getAnalyticsBenchmark
+    - listSiteNormalisationBases
   entryState:
     preloaded:
     - Revenue per Visitor
@@ -8623,6 +8761,20 @@ screens:
     page 127. 0 of 0 labels bound to a contract property; 7 of 16 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  overlays:
+  - id: formSetSiteNormalisationBasis
+    component: modal
+    trigger: Save site normalisation basis
+    body: '**Collects what `setSiteNormalisationBasis` sends before it is called.** Required: `bases`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save site normalisation basis
+      operation: setSiteNormalisationBasis
+    dismiss:
+      label: Cancel
+      discards:
+      - bases
+    provenance: contract reporting.yaml PUT /site-normalisation-bases
 - id: ANL-065
   name: Data Source & Integration Registry
   module: Analytics

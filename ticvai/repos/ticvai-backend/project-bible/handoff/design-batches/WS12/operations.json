@@ -1,10 +1,48 @@
 {
+ "createReportSchedule": {
+  "method": "POST",
+  "path": "/report-schedules",
+  "contract": "reporting",
+  "summary": "Schedule a report",
+  "permission": "REPORT_SCHEDULE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateReportScheduleRequest",
+  "responds": "ReportSchedule"
+ },
+ "deleteReportSchedule": {
+  "method": "DELETE",
+  "path": "/report-schedules/{scheduleId}",
+  "contract": "reporting",
+  "summary": "Delete a schedule",
+  "permission": "REPORT_SCHEDULE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "listAccessExecutiveInsight": {
   "method": "GET",
   "path": "/access-executive-insight",
   "contract": "access",
   "summary": "AI Access Intelligence, Forecasting & Executive Insights",
-  "permission": "SCOPE_VIEW",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -17,24 +55,91 @@
   "path": "/access-monitoring",
   "contract": "access",
   "summary": "Access Monitoring & Analytics Command Center",
-  "permission": "SCOPE_VIEW",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AccessMonitoringAnalyticsCommandCenterView"
+  "responds": "Page"
  },
  "listAccessReportScheduled": {
   "method": "GET",
   "path": "/access-report-scheduled",
   "contract": "access",
   "summary": "Access Reports, Scheduled Reporting & Data Export",
-  "permission": "SCOPE_VIEW",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "park",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "zone",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ticketType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "gate",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "device",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partner",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "AccessReportsScheduledReportingDataExportView"
  },
@@ -43,7 +148,7 @@
   "path": "/attendance-admission",
   "contract": "access",
   "summary": "Attendance & Admission Analytics",
-  "permission": "SCOPE_VIEW",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -82,6 +187,31 @@
     "name": "venue",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "ticketType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerSegment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -92,7 +222,7 @@
   "path": "/entry-exit-crossover",
   "contract": "access",
   "summary": "Entry, Exit, Re-entry & Crossover Analytics",
-  "permission": "SCOPE_VIEW",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -109,7 +239,23 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "park",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "zone",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "GraphicalAccessMapLiveGatePerformanceView"
  },
@@ -118,7 +264,7 @@
   "path": "/guest-dwell-time",
   "contract": "access",
   "summary": "Guest Dwell Time, Length of Stay & Attraction Flow",
-  "permission": "SCOPE_VIEW",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -139,12 +285,70 @@
   "requestBody": null,
   "responds": "LiveVenueOccupancyPeopleCountingView"
  },
+ "listReportSchedules": {
+  "method": "GET",
+  "path": "/report-schedules",
+  "contract": "reporting",
+  "summary": "List scheduled reports",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listReports": {
+  "method": "GET",
+  "path": "/reports",
+  "contract": "reporting",
+  "summary": "List available report definitions",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "category",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listThroughputQueueValidation": {
   "method": "GET",
   "path": "/throughput-queue-validation",
   "contract": "access",
   "summary": "Throughput, Queue & Validation Performance Analytics",
-  "permission": "SCOPE_VIEW",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -157,7 +361,7 @@
   "path": "/validation-outcome-rejection",
   "contract": "access",
   "summary": "Validation Outcome & Rejection Analytics",
-  "permission": "SCOPE_VIEW",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -201,9 +405,57 @@
     "name": "device",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "credentialType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "time",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
   "responds": "ValidationOutcomeRejectionAnalyticsView"
+ },
+ "runReport": {
+  "method": "POST",
+  "path": "/reports/{reportId}/run",
+  "contract": "reporting",
+  "summary": "Run a report",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RunReportRequest",
+  "responds": "ReportResult"
+ },
+ "updateReportSchedule": {
+  "method": "PATCH",
+  "path": "/report-schedules/{scheduleId}",
+  "contract": "reporting",
+  "summary": "Amend, pause or resume a schedule",
+  "permission": "REPORT_SCHEDULE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ReportSchedule"
  }
 }

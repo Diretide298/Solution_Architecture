@@ -39,10 +39,7 @@
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-041 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-042",
@@ -101,14 +98,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized administrators can locate, manage and understand the lifecycle and usage of every waiver or consent form from one central workspace.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each record should display) — counts over a population, then the population",
   "purpose": "Provide administrators with a centralized workspace for managing every waiver, consent form and digital declaration configured across TICVAI.",
-  "purposeNote": "Authorized administrators can locate, manage and understand the lifecycle and usage of every waiver or consent form from one central workspace.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 14 actions on this screen and the screen declares 1 operation.** Unserved: Liability Waiver, Parent/Guardian Consent, Participation Consent, Media Consent, Membership Declaration, Create Waiver, Duplicate, Create New Version …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 16 actions on this screen and the screen declares 1 operation.** Unserved: Liability Waiver, Parent/Guardian Consent, Participation Consent, Media Consent, Rental Agreement, Terms Acceptance, Membership Declaration, Create Waiver …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Support configurable classifications"
    }
   ],
@@ -151,61 +148,71 @@
        "kind": "metricTile",
        "label": "Total Templates",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Display",
-       "bindsTo": "WaiverConsentCommandCenterView.totalTemplates"
+       "bindsTo": "WaiverConsentCommandCenterView.waiverId",
+       "notes": "Shows `kpis.totalTemplates` of the `listWaiverConsent` response. That KPI object is inline in the response, not a named schema, so the binding names the row field the count is taken over."
       },
       {
        "kind": "metricTile",
        "label": "Published",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Display",
-       "bindsTo": "WaiverConsentCommandCenterView.published"
+       "bindsTo": "WaiverConsentCommandCenterView.status",
+       "notes": "Shows `kpis.published` of the `listWaiverConsent` response. That KPI object is inline in the response, not a named schema, so the binding names the row field the count is taken over."
       },
       {
        "kind": "metricTile",
        "label": "Draft",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Display",
-       "bindsTo": "WaiverConsentCommandCenterView.draft"
+       "bindsTo": "WaiverConsentCommandCenterView.status",
+       "notes": "Shows `kpis.draft` of the `listWaiverConsent` response. That KPI object is inline in the response, not a named schema, so the binding names the row field the count is taken over."
       },
       {
        "kind": "metricTile",
        "label": "Pending Approval",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Display",
-       "bindsTo": "WaiverConsentCommandCenterView.pendingApproval"
+       "bindsTo": "WaiverConsentCommandCenterView.status",
+       "notes": "Shows `kpis.pendingApproval` of the `listWaiverConsent` response. That KPI object is inline in the response, not a named schema, so the binding names the row field the count is taken over."
       },
       {
        "kind": "metricTile",
        "label": "Scheduled",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Display",
-       "bindsTo": "WaiverConsentCommandCenterView.scheduled"
+       "bindsTo": "WaiverConsentCommandCenterView.status",
+       "notes": "Shows `kpis.scheduled` of the `listWaiverConsent` response. That KPI object is inline in the response, not a named schema, so the binding names the row field the count is taken over."
       },
       {
        "kind": "metricTile",
        "label": "Expiring",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Display",
-       "bindsTo": "WaiverConsentCommandCenterView.expiring"
+       "bindsTo": "WaiverConsentCommandCenterView.effectiveTo",
+       "notes": "Shows `kpis.expiring` of the `listWaiverConsent` response. That KPI object is inline in the response, not a named schema, so the binding names the row field the count is taken over."
       },
       {
        "kind": "metricTile",
        "label": "Archived",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Display",
-       "bindsTo": "WaiverConsentCommandCenterView.archived"
+       "bindsTo": "WaiverConsentCommandCenterView.status",
+       "notes": "Shows `kpis.archived` of the `listWaiverConsent` response. That KPI object is inline in the response, not a named schema, so the binding names the row field the count is taken over."
       },
       {
        "kind": "metricTile",
        "label": "Products Requiring Waiver",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Display",
-       "bindsTo": "WaiverConsentCommandCenterView.productsRequiringWaiver"
+       "bindsTo": "WaiverConsentCommandCenterView.associatedProducts",
+       "notes": "Shows `kpis.productsRequiringWaiver` of the `listWaiverConsent` response. That KPI object is inline in the response, not a named schema, so the binding names the row field the count is taken over."
       },
       {
        "kind": "metricTile",
        "label": "Active Waiver Versions",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Display",
-       "bindsTo": "WaiverConsentCommandCenterView.activeWaiverVersions"
+       "bindsTo": "WaiverConsentCommandCenterView.publishedVersion",
+       "notes": "Shows `kpis.activeWaiverVersions` of the `listWaiverConsent` response. That KPI object is inline in the response, not a named schema, so the binding names the row field the count is taken over."
       },
       {
        "kind": "metricTile",
        "label": "Waivers Requiring Review",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Display",
-       "bindsTo": "WaiverConsentCommandCenterView.waiversRequiringReview"
+       "bindsTo": "WaiverConsentCommandCenterView.status",
+       "notes": "Shows `kpis.waiversRequiringReview` of the `listWaiverConsent` response. That KPI object is inline in the response, not a named schema, so the binding names the row field the count is taken over."
       }
      ]
     },
@@ -289,22 +296,22 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Rental Agreement",
+       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Support configurable classifications"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Terms Acceptance",
+       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Support configurable classifications"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Membership Declaration",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Support configurable classifications"
       },
       {
        "kind": "secondaryButton",
        "label": "Create Waiver",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Quick Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Duplicate",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Quick Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create New Version",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Quick Actions"
       }
      ]
@@ -329,9 +336,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-041"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-041",
+   "workshopBoard": "wireframes/WS184 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-041"
   },
-  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 6. 26 of 31 labels bound to a contract property; 45 of 59 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 6. 26 of 31 labels bound to a contract property; 47 of 59 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -392,10 +400,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every waiver has a governed master record, owner, classification and intended business scope before publication.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Create the master definition of a waiver or consent form before individual content and questions are configured.",
-  "purposeNote": "Every waiver has a governed master record, owner, classification and intended business scope before publication.",
   "gaps": [
    {
     "operation": null,
@@ -512,7 +520,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-042"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-042",
+   "workshopBoard": "wireframes/WS184 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-042"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 14 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -575,14 +584,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized administrators can build responsive digital waivers without software development while retaining complete control over mandatory content.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide a no-code visual builder for creating the actual customer-facing waiver or digital form.",
-  "purposeNote": "Authorized administrators can build responsive digital waivers without software development while retaining complete control over mandatory content.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Information Box, Customer Details. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Information Box, Customer Details, Guardian Details. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 9 §Support configurable blocks"
    },
    {
@@ -612,6 +621,11 @@
        "kind": "secondaryButton",
        "label": "Customer Details",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 9 §Support configurable blocks"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guardian Details",
+       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 9 §Support configurable blocks"
       }
      ]
     },
@@ -633,18 +647,16 @@
     "operationId": "setDigitalWaiverForm",
     "contract": "marketing-crm",
     "purpose": "Digital Waiver & Form Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setDigitalWaiverForm"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-043"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-043",
+   "workshopBoard": "wireframes/WS184 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-043"
   },
-  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 2 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 3 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -705,14 +717,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can create dynamic forms that collect only the information required for the specific participant, product and scenario.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Reusable fields can include; Each field can be; Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure the information that must be collected from the participant or signatory.",
-  "purposeNote": "Administrators can create dynamic forms that collect only the information required for the specific participant, product and scenario.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Customer Lookup. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Single Select, Customer Lookup. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 11 §Support"
    }
   ],
@@ -821,6 +833,11 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Single Select",
+       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 11 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Customer Lookup",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 11 §Support"
       }
@@ -845,9 +862,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-044"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-044",
+   "workshopBoard": "wireframes/WS184 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-044"
   },
-  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 19 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 20 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -908,14 +926,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "before the waiver is considered complete.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; For group bookings, configure whether) and no display directory — it is settings, not a population",
   "purpose": "Define who is legally or operationally required to complete and sign the waiver.",
-  "purposeNote": "before the waiver is considered complete.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Ticket Holder, Rental Customer, Customer + Authorized Representative. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Ticket Holder, Rental Customer, Other Authorized Signatory, Customer + Authorized Representative. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Support"
    }
   ],
@@ -1004,6 +1022,11 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Other Authorized Signatory",
+       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Customer + Authorized Representative",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Support scenarios requiring"
       }
@@ -1022,18 +1045,16 @@
     "operationId": "setSignatorySignatureGuardian",
     "contract": "marketing-crm",
     "purpose": "Signatory, Signature & Guardian Rule Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setSignatorySignatureGuardian"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-045"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-045",
+   "workshopBoard": "wireframes/WS184 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-045"
   },
-  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 13. 0 of 0 labels bound to a contract property; 15 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 13. 0 of 0 labels bound to a contract property; 16 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1094,14 +1115,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every applicable TICVAI product, event or activity can automatically determine which waiver or consent requirements apply.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Determine which TICVAI products or activities require each waiver.",
-  "purposeNote": "Every applicable TICVAI product, event or activity can automatically determine which waiver or consent requirements apply.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Ticket Type, Membership. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 9 actions on this screen and the screen declares 1 operation.** Unserved: Ticket Type, Attraction, Activity, Membership, Resource, Package, Venue. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 14 §Allow association with"
    },
    {
@@ -1124,12 +1145,42 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Product",
+       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 14 §Allow association with"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Ticket Type",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 14 §Allow association with"
       },
       {
        "kind": "secondaryButton",
+       "label": "Event",
+       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 14 §Allow association with"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Attraction",
+       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 14 §Allow association with"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Activity",
+       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 14 §Allow association with"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Membership",
+       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 14 §Allow association with"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resource",
+       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 14 §Allow association with"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Package",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 14 §Allow association with"
       }
      ]
@@ -1157,19 +1208,16 @@
   ],
   "entryState": {
    "preloaded": [
-    "ProductEventExperienceAssociationView.product",
-    "ProductEventExperienceAssociationView.ticketType",
-    "ProductEventExperienceAssociationView.event",
-    "ProductEventExperienceAssociationView.performance",
-    "ProductEventExperienceAssociationView.attraction"
+    "ProductEventExperienceAssociationView.targetType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-046"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-046",
+   "workshopBoard": "wireframes/WS184 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-046"
   },
-  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 2 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 9 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1230,10 +1278,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Waiver requirements are automatically triggered and enforced according to configurable business rules and participant context.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Configure whether incomplete status; Configure reminders such as) and no display directory — it is settings, not a population",
   "purpose": "Define when a waiver is required, when it must be completed and what happens if it is not completed.",
-  "purposeNote": "Waiver requirements are automatically triggered and enforced according to configurable business rules and participant context.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1337,7 +1385,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-047"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-047",
+   "workshopBoard": "wireframes/WS184 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-047"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 15 of 46 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1400,10 +1449,17 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "approved version accepted by the signatory.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Ensure TICVAI maintains a complete historical record of exactly which waiver wording each participant accepted.",
-  "purposeNote": "approved version accepted by the signatory.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Previous Version ↔ New Version. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 18 §Allow side-by-side comparison"
+   }
+  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1452,6 +1508,17 @@
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 18 §Capture"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Previous Version ↔ New Version",
+       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 18 §Allow side-by-side comparison"
+      }
+     ]
     }
    ]
   },
@@ -1472,9 +1539,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-048"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-048",
+   "workshopBoard": "wireframes/WS184 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-048"
   },
-  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 18. 0 of 0 labels bound to a contract property; 8 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 18. 0 of 0 labels bound to a contract property; 9 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1535,10 +1603,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Waivers can be delivered as localized, branded and accessible customer experiences without creating separate business logic for each channel.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Each version should show) and no metric row",
   "purpose": "Configure how the waiver appears across different brands, languages and customer channels.",
-  "purposeNote": "Waivers can be delivered as localized, branded and accessible customer experiences without creating separate business logic for each channel.",
   "gaps": [
    {
     "operation": null,
@@ -1558,10 +1626,11 @@
        "label": "Every localization branding customer",
        "columns": [
         "LocalizationBrandingCustomerExperienceConfigurationView.sourceLanguage",
-        "LocalizationBrandingCustomerExperienceConfigurationView.translationStatus",
-        "LocalizationBrandingCustomerExperienceConfigurationView.translatorReviewer",
-        "LocalizationBrandingCustomerExperienceConfigurationView.approvalStatus",
-        "LocalizationBrandingCustomerExperienceConfigurationView.lastUpdated"
+        "LocalizationBrandingCustomerExperienceConfigurationView.languages[].translationStatus",
+        "LocalizationBrandingCustomerExperienceConfigurationView.languages[].translatorUserId",
+        "LocalizationBrandingCustomerExperienceConfigurationView.languages[].reviewerUserId",
+        "LocalizationBrandingCustomerExperienceConfigurationView.languages[].approvalStatus",
+        "LocalizationBrandingCustomerExperienceConfigurationView.languages[].lastUpdated"
        ],
        "bindsTo": "LocalizationBrandingCustomerExperienceConfigurationView",
        "operation": "setLocalizationBrandingCustomer",
@@ -1579,10 +1648,11 @@
        "bindsTo": "LocalizationBrandingCustomerExperienceConfigurationView",
        "columns": [
         "LocalizationBrandingCustomerExperienceConfigurationView.sourceLanguage",
-        "LocalizationBrandingCustomerExperienceConfigurationView.translationStatus",
-        "LocalizationBrandingCustomerExperienceConfigurationView.translatorReviewer",
-        "LocalizationBrandingCustomerExperienceConfigurationView.approvalStatus",
-        "LocalizationBrandingCustomerExperienceConfigurationView.lastUpdated"
+        "LocalizationBrandingCustomerExperienceConfigurationView.languages[].translationStatus",
+        "LocalizationBrandingCustomerExperienceConfigurationView.languages[].translatorUserId",
+        "LocalizationBrandingCustomerExperienceConfigurationView.languages[].reviewerUserId",
+        "LocalizationBrandingCustomerExperienceConfigurationView.languages[].approvalStatus",
+        "LocalizationBrandingCustomerExperienceConfigurationView.languages[].lastUpdated"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Preview for”, “Accessibility”.",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 19 §Each version should show"
@@ -1614,25 +1684,22 @@
     "operationId": "setLocalizationBrandingCustomer",
     "contract": "marketing-crm",
     "purpose": "Localization, Branding & Customer Experience Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setLocalizationBrandingCustomer"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "preloaded": [
     "LocalizationBrandingCustomerExperienceConfigurationView.sourceLanguage",
-    "LocalizationBrandingCustomerExperienceConfigurationView.translationStatus",
-    "LocalizationBrandingCustomerExperienceConfigurationView.translatorReviewer",
-    "LocalizationBrandingCustomerExperienceConfigurationView.approvalStatus",
-    "LocalizationBrandingCustomerExperienceConfigurationView.lastUpdated"
+    "LocalizationBrandingCustomerExperienceConfigurationView.languages[].translationStatus",
+    "LocalizationBrandingCustomerExperienceConfigurationView.languages[].approvalStatus",
+    "LocalizationBrandingCustomerExperienceConfigurationView.languages[].lastUpdated"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-049"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-049",
+   "workshopBoard": "wireframes/WS184 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-049"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 19. 5 of 5 labels bound to a contract property; 14 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1687,10 +1754,10 @@
    "notes": "**Reached from CMS-041, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "No governed waiver can enter production until its content, rules, associations, signatory requirements and customer journey have been successfully validated and approved. Board 1 — Final Screen Register",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Fields; Configuration experience; Board 1 Configuration Flow) and no display directory — it is settings, not a population",
   "purpose": "Provide the final governance gate before a waiver becomes operational. Board 1 configured what the waiver is, who must sign it, when it applies, and how it is published. Board 2 manages what happens operationally after a waiver requirement is assigned to a booking, ticket, participant, member, rental, group, or activity.",
-  "purposeNote": "No governed waiver can enter production until its content, rules, associations, signatory requirements and customer journey have been successfully validated and approved. Board 1 — Final Screen Register",
   "gaps": [
    {
     "operation": null,
@@ -1766,16 +1833,14 @@
     "operationId": "approveWaiverTesting",
     "contract": "marketing-crm",
     "purpose": "Waiver Approval, Testing & Publication Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "approveWaiverTesting"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-050"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-050",
+   "workshopBoard": "wireframes/WS184 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-050"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 21. 0 of 0 labels bound to a contract property; 8 of 83 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

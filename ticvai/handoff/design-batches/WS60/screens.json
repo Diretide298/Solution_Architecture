@@ -39,21 +39,12 @@
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-344 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-345",
      "trigger": "Works in Digital QR & Barcode Ticket Designer",
      "provenance": "flow F169 step 1→2",
-     "operation": "listMediaDesign"
-    },
-    {
-     "to": "BO-346",
-     "trigger": "Works in PDF, Printable & POS Ticket Designer",
-     "provenance": "flow F169 step 3→4",
      "operation": "listMediaDesign"
     },
     {
@@ -97,20 +88,24 @@
      "trigger": "Works in Multi-Media Preview, Testing, Approval & Publication",
      "provenance": "flow F169 step 17→18",
      "operation": "listMediaDesign"
+    },
+    {
+     "to": "BO-346",
+     "trigger": "Works in PDF, Printable & POS Ticket Designer",
+     "provenance": "flow F169 step 3→4",
+     "operation": "listMediaDesign",
+     "carries": [
+      "templateId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can locate, create and manage every ticket-media template from one centralized Media Design Studio.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each template should show) — counts over a population, then the population",
   "purpose": "Provide administrators with the central workspace for creating and managing all ticket and credential media templates. This should be the entry point for the entire no-code Media Design Studio.",
-  "purposeNote": "Administrators can locate, create and manage every ticket-media template from one centralized Media Design Studio.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Duplicate Existing, Import supported template definition. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Allow"
-   },
    {
     "operation": null,
     "why": "**Media Design Studio Command Center declares no operation that writes anything** — its only declared call is `listMediaDesign`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
@@ -128,85 +123,85 @@
        "kind": "metricTile",
        "label": "Total Media Templates",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.totalMediaTemplates"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.totalMediaTemplates"
       },
       {
        "kind": "metricTile",
        "label": "Published",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.published"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.published"
       },
       {
        "kind": "metricTile",
        "label": "Draft",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.draft"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.draft"
       },
       {
        "kind": "metricTile",
        "label": "Pending Approval",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.pendingApproval"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.pendingApproval"
       },
       {
        "kind": "metricTile",
        "label": "Scheduled",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.scheduled"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.scheduled"
       },
       {
        "kind": "metricTile",
        "label": "Archived",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.archived"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.archived"
       },
       {
        "kind": "metricTile",
        "label": "QR / Digital Templates",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.qrDigitalTemplates"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.qrDigitalTemplates"
       },
       {
        "kind": "metricTile",
        "label": "PDF / Print Templates",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.pdfPrintTemplates"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.pdfPrintTemplates"
       },
       {
        "kind": "metricTile",
        "label": "Apple Wallet Templates",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.appleWalletTemplates"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.appleWalletTemplates"
       },
       {
        "kind": "metricTile",
        "label": "Google Wallet Templates",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.googleWalletTemplates"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.googleWalletTemplates"
       },
       {
        "kind": "metricTile",
        "label": "RFID / NFC Templates",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.rfidNfcTemplates"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.rfidNfcTemplates"
       },
       {
        "kind": "metricTile",
        "label": "Card / Wristband Templates",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.cardWristbandTemplates"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.cardWristbandTemplates"
       },
       {
        "kind": "metricTile",
        "label": "Templates Requiring Review",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.templatesRequiringReview"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.templatesRequiringReview"
       },
       {
        "kind": "metricTile",
        "label": "Templates with Validation Errors",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.templatesWithValidationErrors"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.templatesWithValidationErrors"
       }
      ]
     },
@@ -273,11 +268,23 @@
       {
        "kind": "primaryButton",
        "label": "Duplicate Existing",
+       "operation": "cloneTicketTemplate",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Use Venue Template",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Use Product Template",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Allow"
       },
       {
        "kind": "secondaryButton",
        "label": "Import supported template definition",
+       "operation": "importTicketTemplate",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Allow"
       }
      ]
@@ -297,14 +304,41 @@
     "contract": "access",
     "purpose": "Media Design Studio Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTicketTemplates",
+    "contract": "orders",
+    "purpose": "The ticket templates to duplicate or start from",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "cloneTicketTemplate",
+    "contract": "orders",
+    "purpose": "Duplicate",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "importTicketTemplate",
+    "contract": "orders",
+    "purpose": "Import",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-344"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-344",
+   "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-344"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 23. 27 of 27 labels bound to a contract property; 29 of 59 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 23. 27 of 27 labels bound to a contract property; 31 of 59 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `importTicketTemplate`, `cloneTicketTemplate`.",
+  "entryState": {
+   "params": [
+    {
+     "name": "templateId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -360,15 +394,18 @@
      "to": "BO-344",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F169 step 2→3",
-     "operation": "setDigitalBarcodeTicket"
+     "operation": "setDigitalBarcodeTicket",
+     "carries": [
+      "templateId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized administrators can visually design and configure customer-facing QR/barcode tickets without development.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Barcode Configuration) and no display directory — it is settings, not a population",
   "purpose": "Provide a visual no-code designer specifically for digital QR and barcode tickets.",
-  "purposeNote": "Authorized administrators can visually design and configure customer-facing QR/barcode tickets without development.",
   "layout": {
    "template": "form",
    "regions": [
@@ -477,16 +514,14 @@
     "operationId": "setDigitalBarcodeTicket",
     "contract": "access",
     "purpose": "Digital QR & Barcode Ticket Designer",
-    "trigger": "onAction",
-    "invalidates": [
-     "setDigitalBarcodeTicket"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-345"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-345",
+   "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-345"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 24. 0 of 0 labels bound to a contract property; 15 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -544,22 +579,18 @@
      "to": "BO-344",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F169 step 4→5",
-     "operation": "setPdfPrintablePos"
+     "operation": "setPdfPrintablePos",
+     "carries": [
+      "templateId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "and operational environments.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Configure/reference) and no display directory — it is settings, not a population",
   "purpose": "Design tickets intended for printing, PDF generation, POS, box office and other physical/document outputs.",
-  "purposeNote": "and operational environments.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Thermal ticket. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Support"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -675,6 +706,11 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "POS receipt",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Thermal ticket",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Support"
       }
@@ -690,21 +726,57 @@
   },
   "apis": [
    {
+    "operationId": "listTicketTemplates",
+    "contract": "orders",
+    "purpose": "The templates this venue issues from",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createTicketTemplate",
+    "contract": "orders",
+    "purpose": "Create a template",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTicketTemplates"
+    ]
+   },
+   {
+    "operationId": "updateTicketTemplate",
+    "contract": "orders",
+    "purpose": "Change or retire a template",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTicketTemplates"
+    ]
+   },
+   {
+    "operationId": "printTicketProof",
+    "contract": "orders",
+    "purpose": "Print a sample without selling anything",
+    "trigger": "onAction"
+   },
+   {
     "operationId": "setPdfPrintablePos",
     "contract": "access",
     "purpose": "PDF, Printable & POS Ticket Designer",
-    "trigger": "onAction",
-    "invalidates": [
-     "setPdfPrintablePos"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-346"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-346",
+   "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-346"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 26. 0 of 0 labels bound to a contract property; 21 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 26. 0 of 0 labels bound to a contract property; 22 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Thermal ticket are choices sent by `setPdfPrintablePos`.",
+  "entryState": {
+   "params": [
+    {
+     "name": "templateId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -760,15 +832,18 @@
      "to": "BO-344",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F169 step 6→7",
-     "operation": "setAppleWalletPass"
+     "operation": "setAppleWalletPass",
+     "carries": [
+      "templateId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can configure, preview, test and publish Apple Wallet presentations of TICVAI Virtual Tickets using supported wallet capabilities.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Pass Configuration; Configure the appropriate; Configure/reference) and no display directory — it is settings, not a population",
   "purpose": "Provide an Apple Wallet-specific configuration experience for eligible TICVAI credentials. This should not simply be a PDF ticket rendered inside a wallet.",
-  "purposeNote": "Administrators can configure, preview, test and publish Apple Wallet presentations of TICVAI Virtual Tickets using supported wallet capabilities.",
   "layout": {
    "template": "form",
    "regions": [
@@ -922,16 +997,14 @@
     "operationId": "setAppleWalletPass",
     "contract": "access",
     "purpose": "Apple Wallet Pass Designer",
-    "trigger": "onAction",
-    "invalidates": [
-     "setAppleWalletPass"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-347"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-347",
+   "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-347"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 27. 0 of 0 labels bound to a contract property; 24 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -989,22 +1062,18 @@
      "to": "BO-344",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F169 step 8→9",
-     "operation": "setGoogleWalletPass"
+     "operation": "setGoogleWalletPass",
+     "carries": [
+      "templateId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can independently configure and govern Google Wallet ticket presentations while retaining the same underlying Virtual Ticket architecture.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure supported; Configure) and no display directory — it is settings, not a population",
   "purpose": "Provide a dedicated Google Wallet configuration environment.",
-  "purposeNote": "Administrators can independently configure and govern Google Wallet ticket presentations while retaining the same underlying Virtual Ticket architecture.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Venue change, Ticket status change, Relevant ticket information changes. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Support/reference updates such as"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1110,6 +1179,11 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Event time change",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Support/reference updates such as"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Venue change",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Support/reference updates such as"
       },
@@ -1138,18 +1212,16 @@
     "operationId": "setGoogleWalletPass",
     "contract": "access",
     "purpose": "Google Wallet Pass Designer",
-    "trigger": "onAction",
-    "invalidates": [
-     "setGoogleWalletPass"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-348"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-348",
+   "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-348"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 21 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 22 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Event time change, Venue change, Ticket status change, Relevant ticket information changes are choices sent by `setGoogleWalletPass`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1205,22 +1277,18 @@
      "to": "BO-344",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F169 step 10→11",
-     "operation": "setRfidNfcCard"
+     "operation": "setRfidNfcCard",
+     "carries": [
+      "templateId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "cards, wristbands and supported wearable media.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Configure/reference) and no display directory — it is settings, not a population",
   "purpose": "Configure both the visual and technical profile of physical electronic credentials. This is important because RFID/NFC media are not merely artwork.",
-  "purposeNote": "cards, wristbands and supported wearable media.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Membership Card. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Support"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1336,7 +1404,32 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "RFID Card",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "NFC Card",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Membership Card",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Staff/guest card where applicable",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Size where applicable",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Deposit/reference where applicable",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Support"
       }
      ]
@@ -1354,18 +1447,16 @@
     "operationId": "setRfidNfcCard",
     "contract": "access",
     "purpose": "RFID, NFC, Card & Wristband Media Designer",
-    "trigger": "onAction",
-    "invalidates": [
-     "setRfidNfcCard"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-349"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-349",
+   "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-349"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 30. 0 of 0 labels bound to a contract property; 21 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 30. 0 of 0 labels bound to a contract property; 26 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Membership Card, Staff/guest card where applicable, Size where applicable, Deposit/reference where applicable are choices sent by `setRfidNfcCard`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1421,15 +1512,18 @@
      "to": "BO-344",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F169 step 12→13",
-     "operation": "setDigitalCardMembership"
+     "operation": "setDigitalCardMembership",
+     "carries": [
+      "templateId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "templates linked to persistent Virtual Tickets or applicable entitlement identities.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Provide specialized configuration for persistent credentials that may represent longer-lived relationships rather than a single event ticket.",
-  "purposeNote": "templates linked to persistent Virtual Tickets or applicable entitlement identities.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1500,6 +1594,11 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Tier designs",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 31 §Support different"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Membership types",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 31 §Support different"
       }
@@ -1518,18 +1617,16 @@
     "operationId": "setDigitalCardMembership",
     "contract": "access",
     "purpose": "Digital Card, Membership & Wearable Designer",
-    "trigger": "onAction",
-    "invalidates": [
-     "setDigitalCardMembership"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-350"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-350",
+   "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-350"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 31. 0 of 0 labels bound to a contract property; 12 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 31. 0 of 0 labels bound to a contract property; 13 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Tier designs are choices sent by `setDigitalCardMembership`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1590,10 +1687,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "All media designers consume a governed reusable field/data-mapping framework rather than independently hard-coding ticket information.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Custom Fields; Configure) and no display directory — it is settings, not a population",
   "purpose": "Create a centralized reusable field library so development team does not hard-code ticket fields separately into every media designer. This is another important architecture screen.",
-  "purposeNote": "All media designers consume a governed reusable field/data-mapping framework rather than independently hard-coding ticket information.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1662,16 +1759,14 @@
     "operationId": "setDynamicFieldData",
     "contract": "access",
     "purpose": "Dynamic Fields, Data Mapping & Content Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setDynamicFieldData"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-351"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-351",
+   "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-351"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 7 of 64 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1734,17 +1829,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "controlled inheritance and media-specific overrides.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Track) and no metric row",
   "purpose": "Allow TICVAI's multi-tenant clients to control branding and localization without rebuilding every ticket template.",
-  "purposeNote": "controlled inheritance and media-specific overrides.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Additional configured languages. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 34 §Support"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1798,6 +1886,12 @@
        "kind": "primaryButton",
        "label": "Additional configured languages",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 34 §Support"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save branding and languages",
+       "operation": "setBrandingLocalizationTemplate",
+       "provenance": "contract access.yaml PUT /branding-localization-template (decided 29 September, VM close-out)"
       }
      ]
     }
@@ -1816,6 +1910,12 @@
     "contract": "access",
     "purpose": "Branding, Localization & Template Inheritance",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setBrandingLocalizationTemplate",
+    "contract": "access",
+    "purpose": "Save branding and languages",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1831,9 +1931,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-352"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-352",
+   "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-352"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 34. 6 of 6 labels bound to a contract property; 16 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 34. 6 of 6 labels bound to a contract property; 16 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `setBrandingLocalizationTemplate`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1883,19 +1984,24 @@
     "BO-344"
    ],
    "inferred": false,
-   "notes": "**Reached from BO-344, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+   "notes": "**Reached from BO-344, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-344",
+     "trigger": "Media Design Studio Command Center",
+     "carries": [
+      "templateId"
+     ],
+     "provenance": "derived — BO-344 declares entryState.params templateId and BO-353 holds templateId, so an edge into it carries them"
+    }
+   ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can preview, test, approve, version and publish every supported ticket-media configuration before it becomes available for production issuance. Board 2 — Final Screen Register",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide the final quality and governance gate before any media template becomes operational. This should be a particularly visual screen. Board 1 established the Virtual Ticket as the authoritative ticket identity and the one- Virtual-Ticket-to-many-media architecture. Board 2 established how administrators design and configure each media type. Board 3 manages what happens to the actual credential instances in production after a Virtual Ticket has been created.",
-  "purposeNote": "Administrators can preview, test, approve, version and publish every supported ticket-media configuration before it becomes available for production issuance. Board 2 — Final Screen Register",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Publish Now, Schedule. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 36 §Support"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -1923,6 +2029,26 @@
        "kind": "secondaryButton",
        "label": "Schedule",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 36 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected Brands",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 36 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected Venues",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 36 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected Products",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 36 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected Channels",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 36 §Support"
       }
      ]
     },
@@ -1944,18 +2070,16 @@
     "operationId": "approveMultiMediaPreview",
     "contract": "access",
     "purpose": "Multi-Media Preview, Testing, Approval & Publication",
-    "trigger": "onAction",
-    "invalidates": [
-     "approveMultiMediaPreview"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-353"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-353",
+   "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-353"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 36. 0 of 0 labels bound to a contract property; 3 of 126 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 36. 0 of 0 labels bound to a contract property; 7 of 126 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Publish Now, Schedule, Selected Brands, Selected Venues, Selected Products, Selected Channels are choices sent by `approveMultiMediaPreview`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",

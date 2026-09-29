@@ -1,6 +1,6 @@
 # WS89 — Rental Management board 2
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 16 operations · 18 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `ASSET_MANAGE, ASSET_VIEW, PROCUREMENT_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-504` | Rental Inventory Command Center | commandCentre | 0 | 0 | — |
-| `BO-505` | Serialized Equipment Registry | configEditor | 0 | 0 | — |
-| `BO-506` | Equipment / Asset Profile | listDetail | 0 | 0 | — |
-| `BO-507` | Pooled Inventory Management | listDetail | 0 | 0 | — |
-| `BO-508` | Equipment Status & Condition Management | listDetail | 0 | 0 | — |
-| `BO-509` | QR / Barcode Equipment Identification | listDetail | 0 | 0 | — |
-| `BO-510` | Inventory Location Allocation | listDetail | 0 | 0 | — |
-| `BO-511` | Inventory Transfer Management | listDetail | 0 | 0 | — |
-| `BO-512` | Inventory Adjustment & Exception Management | listDetail | 0 | 0 | — |
-| `BO-513` | Inventory Intelligence & Rebalancing | listDetail | 0 | 0 | — |
+| `BO-504` | Rental Inventory Command Center | commandCentre | 2 | 0 | — |
+| `BO-505` | Serialized Equipment Registry | configEditor | 2 | 0 | — |
+| `BO-506` | Equipment / Asset Profile | listDetail | 2 | 0 | — |
+| `BO-507` | Pooled Inventory Management | listDetail | 3 | 0 | — |
+| `BO-508` | Equipment Status & Condition Management | listDetail | 2 | 0 | — |
+| `BO-509` | QR / Barcode Equipment Identification | listDetail | 1 | 0 | — |
+| `BO-510` | Inventory Location Allocation | listDetail | 2 | 0 | — |
+| `BO-511` | Inventory Transfer Management | listDetail | 3 | 0 | — |
+| `BO-512` | Inventory Adjustment & Exception Management | listDetail | 2 | 0 | — |
+| `BO-513` | Inventory Intelligence & Rebalancing | listDetail | 3 | 0 | — |
 
 ## Thin screens in this batch
 

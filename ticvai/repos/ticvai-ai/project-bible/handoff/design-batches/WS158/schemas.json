@@ -1,0 +1,656 @@
+{
+ "AttendanceAmendment": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.attendance_amendment",
+  "description": "One correction to an attendance record, appended by `amendAttendance` and never updated (decided 28 September, audit R129 (7)).\n",
+  "required": [
+   "id",
+   "attendanceRecordId",
+   "amendedByPrincipalId",
+   "amendedAt",
+   "occurredAtBefore",
+   "occurredAtAfter",
+   "reason"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "attendanceRecordId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "amendedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "amendedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "occurredAtBefore": {
+    "type": "string",
+    "format": "date-time",
+    "description": "The record's time before this correction."
+   },
+   "occurredAtAfter": {
+    "type": "string",
+    "format": "date-time",
+    "description": "The time this correction set (`correctedAt` on the request)."
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 300
+   }
+  }
+ },
+ "AttendanceRecord": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.attendance",
+  "required": [
+   "id",
+   "principalId",
+   "kind",
+   "occurredAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "assignmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "clockIn",
+     "clockOut",
+     "breakStart",
+     "breakEnd"
+    ]
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time — when it happened."
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "When the server received it. **Both are kept**: a steward clocking in offline at a gate is not late because the sync was.\n"
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "latitude": {
+    "type": "number",
+    "nullable": true
+   },
+   "longitude": {
+    "type": "number",
+    "nullable": true
+   },
+   "isAmended": {
+    "type": "boolean",
+    "readOnly": true
+   },
+   "amendedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Who made the latest amendment. The full history is `amendments` (audit R129 (7))."
+   },
+   "amendmentReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The latest amendment's reason. The full history is `amendments` (audit R129 (7))."
+   },
+   "originalOccurredAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**The original is never overwritten.** Attendance feeds pay, and a record that can be quietly rewritten is not evidence.\n"
+   },
+   "amendments": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**Every correction, oldest first, one row each** (decided 28 September, audit R129 (7)). A single set of amendment columns holds only the last one, and the second correction to a record would erase the evidence of the first.\n",
+    "items": {
+     "$ref": "#/components/schemas/AttendanceAmendment"
+    }
+   },
+   "exception": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "late",
+     "earlyLeave",
+     "missingClockOut",
+     "noShow",
+     "outOfGeofence",
+     "unscheduled"
+    ],
+    "description": "Computed against the rota. Null where the record matches what was expected."
+   }
+  }
+ },
+ "LabourCostRow": {
+  "type": "object",
+  "description": "Resource board 4.9. **Rostered and actual diverge every day.**",
+  "properties": {
+   "key": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "rosteredHours": {
+    "type": "number"
+   },
+   "actualHours": {
+    "type": "number"
+   },
+   "overtimeHours": {
+    "type": "number"
+   },
+   "rosteredCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "actualCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "budget": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "variance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "variancePercent": {
+    "type": "number"
+   },
+   "headcount": {
+    "type": "integer"
+   }
+  }
+ },
+ "OpenShift": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.open_shift",
+  "description": "Resource board 4.6. **How a gap gets filled at nine on a Friday without a manager ringing round.**\n",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "rotaAssignmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "shiftTemplateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "positionCode": {
+    "type": "string"
+   },
+   "from": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "to": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "releasedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "requiredQualifications": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "eligiblePrincipalCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "incentiveRateMultiplier": {
+    "type": "number",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "claimed",
+     "pendingApproval",
+     "filled",
+     "expired",
+     "withdrawn"
+    ]
+   },
+   "claimedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "claimedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "RotaAssignment": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.rota_assignment",
+  "required": [
+   "principalId",
+   "venueId",
+   "startsAt",
+   "endsAt",
+   "position"
+  ],
+  "properties": {
+   "overtimeMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "description": "BL-044, 1.2.83. **UAE labour law limits working hours and mandates rest periods**, and nothing in the package counted either. Derived from attendance against the shift.\n"
+   },
+   "restPeriodBefore": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Minutes since the previous shift ended. **The check that stops a closing shift followed by an opening one**, which is legal in most places and unsafe in all of them.\n"
+   },
+   "breachesWorkingHourLimit": {
+    "type": "boolean",
+    "default": false,
+    "readOnly": true,
+    "description": "**Flagged at assignment, not discovered at payroll.** A rota that breaches a statutory limit is a rota somebody has to redo, and finding out a month later means it was worked.\n"
+   },
+   "labourCost": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "**Cost at the point of scheduling.** A manager building a rota without seeing its cost is a manager who finds out from finance.\n"
+   },
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "departmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "position": {
+    "type": "string",
+    "description": "What they are rostered to do — gate steward, cashier, lifeguard, technician. **Most positions never touch a till**, which is why a rota assignment is not a shift.\n**A position code, not a label.** It is the same value as `StaffingRules.minimumCover[].positionCode`, `OpenShift.positionCode` and `StaffingCoverage.positionCode`: coverage counts rostered people per position, so an assignment spelled differently from the rule it fills is counted against nothing and the gap stays open. Tenant-defined, which is why it is not an enum here.\n"
+   },
+   "requiredRoleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Checked on assignment. A rota naming someone unqualified is a rota that gets overridden."
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where the position needs a till. **The link between a rota and a cash session**, without merging the two.\n"
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "endsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "$ref": "#/components/schemas/RotaStatus"
+   },
+   "breakMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "RotaStatus": {
+  "type": "string",
+  "enum": [
+   "planned",
+   "published",
+   "confirmed",
+   "swapPending",
+   "cancelled",
+   "completed",
+   "noShow"
+  ]
+ },
+ "StaffingCoverage": {
+  "type": "object",
+  "description": "Resource board 4.4. **The gap is the product.**",
+  "properties": {
+   "date": {
+    "type": "string",
+    "format": "date"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "positionCode": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "from": {
+    "type": "string"
+   },
+   "to": {
+    "type": "string"
+   },
+   "required": {
+    "type": "integer"
+   },
+   "rostered": {
+    "type": "integer"
+   },
+   "qualified": {
+    "type": "integer",
+    "description": "**A position filled by somebody not qualified for it is still a gap.**"
+   },
+   "gap": {
+    "type": "integer"
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "covered",
+     "tight",
+     "short",
+     "blocking"
+    ]
+   },
+   "openShiftIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   }
+  }
+ },
+ "StaffingRules": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.staffing_rules + workforce.position_requirement",
+  "description": "Resource board 4.3. **A safety rule before it is a cost rule.**",
+  "properties": {
+   "minimumCover": {
+    "type": "array",
+    "description": "**Minimum staffing per position, venue and time window, with the qualifications it requires**: the rows of `workforce.position_requirement` (data model for the agreed operations, 29 September). `getStaffingCoverage` measures the rota against them; before this they were an array with no table, so no minimum was stored.",
+    "items": {
+     "type": "object",
+     "required": [
+      "id",
+      "positionCode",
+      "minimumHeadcount"
+     ],
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "positionCode": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string"
+      },
+      "venueId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "attractionId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "minimumHeadcount": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "daysOfWeek": {
+       "type": "array",
+       "nullable": true,
+       "description": "Days the minimum applies; absent means every day the venue is open",
+       "items": {
+        "type": "string",
+        "enum": [
+         "monday",
+         "tuesday",
+         "wednesday",
+         "thursday",
+         "friday",
+         "saturday",
+         "sunday"
+        ]
+       }
+      },
+      "startsAt": {
+       "type": "string",
+       "nullable": true,
+       "description": "Start of the time window, local time (HH:MM) as `ShiftTemplate.startsAt`; absent means opening"
+      },
+      "endsAt": {
+       "type": "string",
+       "nullable": true,
+       "description": "End of the time window, local time (HH:MM); absent means closing"
+      },
+      "requiredQualifications": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "appliesWhenOpen": {
+       "type": "boolean",
+       "default": true
+      },
+      "blocksOperation": {
+       "type": "boolean",
+       "default": true,
+       "description": "**A ride requiring two operators cannot run with one.** Where this is true the attraction closes rather than running short.\n"
+      }
+     }
+    }
+   },
+   "maximumHoursPerDay": {
+    "type": "integer",
+    "nullable": true
+   },
+   "maximumHoursPerWeek": {
+    "type": "integer",
+    "nullable": true
+   },
+   "minimumRestHours": {
+    "type": "integer",
+    "nullable": true
+   },
+   "maximumConsecutiveDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "overtime": {
+    "type": "object",
+    "properties": {
+     "allowed": {
+      "type": "boolean",
+      "default": true
+     },
+     "afterHoursPerWeek": {
+      "type": "integer",
+      "nullable": true
+     },
+     "rateMultiplier": {
+      "type": "number",
+      "nullable": true
+     },
+     "requiresApproval": {
+      "type": "boolean",
+      "default": true
+     }
+    }
+   },
+   "minimumAgeForNightShift": {
+    "type": "integer",
+    "nullable": true
+   },
+   "defaultIncentiveRateMultiplier": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 1,
+    "description": "**What an open shift pays above base when it is released.** Added 22 September: `workforce.open_shift.incentive_rate_multiplier` was set per shift with nothing behind it, so two identical shifts could price differently and record no reason. The shift still carries its own value — **as the snapshot**, the rule-and-record split `payments.fee_rule` and `orders.order_fee` use — and this is where it comes from.\n**Top-level rather than beside `overtime`** so the value is its own column. Nested in an object it would be a key inside a JSON blob, which nothing can index, constrain or pair to the shift that uses it.\n"
+   },
+   "maximumIncentiveRateMultiplier": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 1,
+    "description": "**The ceiling on an incentive.** A shift nobody claims is the moment somebody raises the multiplier in a hurry — the same reason `maximumDailyCharge` bounds a late fee."
+   },
+   "incentiveApprovalAbove": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 1,
+    "description": "**Above this multiplier a second person approves the release.** Routed as an approval, not a boolean — `overtime.requiresApproval` beside it is one of 26 approval flags across the contracts that no approval kind, matrix row or SLA reaches."
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WorkforceComplianceFinding": {
+  "type": "object",
+  "description": "Resource board 4.8. **Checked before the rota is published, not in an inspection.**",
+  "properties": {
+   "code": {
+    "type": "string",
+    "enum": [
+     "expiredQualification",
+     "missingQualification",
+     "exceededDailyHours",
+     "exceededWeeklyHours",
+     "insufficientRest",
+     "missedBreak",
+     "consecutiveDaysExceeded",
+     "underAgeNightShift",
+     "belowMinimumCover"
+    ]
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "breach",
+     "warning"
+    ]
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "principalName": {
+    "type": "string",
+    "nullable": true
+   },
+   "date": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "detail": {
+    "type": "string"
+   },
+   "rotaAssignmentIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   }
+  }
+ }
+}

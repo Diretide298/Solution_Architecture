@@ -1,5 +1,5 @@
 id: LLD-orders
-title: orders — 206 operations
+title: orders — 215 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -132,8 +132,16 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - orders.after_sale_policy
+  - orders.after_sale_request
+  - orders.refund
+  - orders.refund_policy
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - orders.after_sale_request
 - operation: approveGroupDiscountException
   verb: PUT
   path: /group-discount-exception
@@ -142,8 +150,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - catalogue.price
+  - orders.group_enquiry
+  - orders.group_quote
+  - orders.group_quote_line
+  writes:
+  - cache:idempotency
+  - orders.group_quote
 - operation: approveListingModeration
   verb: PUT
   path: /listing-moderation
@@ -152,8 +167,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - orders.order_line
+  - orders.resale_listing
+  - orders.resale_marketplace_config
+  writes:
+  - cache:idempotency
+  - orders.resale_listing
 - operation: approveRefund
   verb: POST
   path: /refunds/{refundId}/approve
@@ -167,6 +188,7 @@ operations:
   - orders.refund
   writes:
   - cache:idempotency
+  - orders.order_event
   - orders.refund
 - operation: authoriseStoredValue
   verb: POST
@@ -199,6 +221,7 @@ operations:
   - orders.reservation
   writes:
   - cache:idempotency
+  - orders.order_event
   - orders.reservation
 - operation: capturePayment
   verb: POST
@@ -213,9 +236,12 @@ operations:
   - cache:idempotency
   - ledger.fx_rate
   - orders.payment
+  - payments.provider_connection
   writes:
   - cache:idempotency
+  - orders.order_event
   - orders.payment
+  - payments.payment_attempt
   - platform.outbox
 - operation: captureStoredValue
   verb: POST
@@ -335,9 +361,11 @@ operations:
   - orders.sales_order
   writes:
   - cache:idempotency
+  - orders.order_event
   - orders.order_line
   - orders.payment
   - orders.sales_order
+  - promotions.promotion_evaluation_trace
 - operation: convertToTermProduct
   verb: POST
   path: /orders/{orderId}/convert-to-term
@@ -372,6 +400,7 @@ operations:
   - orders.refund_batch
   writes:
   - cache:idempotency
+  - orders.order_event
   - orders.refund
 - operation: createCart
   verb: POST
@@ -405,11 +434,13 @@ operations:
   reads:
   - cache:idempotency
   - orders.group_booking
+  - orders.group_quote
   - orders.sales_order
   - pii.subject
   writes:
   - cache:idempotency
   - orders.group_booking
+  - orders.group_quote
 - operation: createGroupEnquiry
   verb: POST
   path: /group-enquiry-opportunity
@@ -429,8 +460,19 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.entitlement
+  - access.scan_event
+  - cache:idempotency
+  - catalogue.entitlement_template
+  - orders.resale_eligibility_rule
+  - orders.resale_fee_policy
+  - orders.resale_listing
+  - orders.resale_marketplace_config
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - orders.resale_listing
 - operation: createMemberException
   verb: POST
   path: /memberships/{membershipId}/exceptions
@@ -464,9 +506,11 @@ operations:
   - cache:idempotency
   - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
   - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
+  - orders.order_event
   - orders.order_line
   - orders.payment
   - orders.sales_order
+  - promotions.promotion_evaluation_trace
 - operation: createOrderSourceChannel
   verb: POST
   path: /order-source-channel
@@ -475,8 +519,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - orders.order_source_channel
+  writes:
+  - cache:idempotency
+  - orders.order_source_channel
 - operation: createPayment
   verb: POST
   path: /payments
@@ -492,11 +540,14 @@ operations:
   - ledger.fx_rate
   - orders.payment
   - orders.sales_order
+  - payments.provider_connection
   writes:
   - cache:idempotency
   - ledger.journal_entry
   - ledger.posting
+  - orders.order_event
   - orders.payment
+  - payments.payment_attempt
   - platform.outbox
 - operation: createPaymentLink
   verb: POST
@@ -533,6 +584,7 @@ operations:
   - cache:idempotency
   - ledger.journal_entry
   - ledger.posting
+  - orders.order_event
   - orders.refund
   - platform.outbox
 - operation: createRefundRequest
@@ -586,6 +638,7 @@ operations:
   - cache:idempotency
   - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
   - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
+  - orders.order_event
   - orders.reservation
   - orders.reservation_line
 - operation: createTicketTemplate
@@ -611,8 +664,19 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.entitlement
+  - cache:idempotency
+  - orders.order_line
+  - orders.upgrade
+  - orders.upgrade_rule
+  - orders.wallet_pass
+  writes:
+  - access.entitlement
+  - cache:idempotency
+  - orders.order_event
+  - orders.upgrade
+  - orders.wallet_pass
 - operation: exchangeOrderLines
   verb: POST
   path: /orders/{orderId}/exchanges
@@ -629,6 +693,7 @@ operations:
   - cache:idempotency
   - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
   - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
+  - orders.order_event
   - orders.sales_order
 - operation: extendCart
   verb: POST
@@ -667,6 +732,7 @@ operations:
   - orders.reservation_line
   writes:
   - cache:idempotency
+  - orders.order_event
   - orders.reservation
 - operation: getB2bCredit
   verb: GET
@@ -847,6 +913,17 @@ operations:
   reads:
   - orders.resale_fee_policy
   writes: []
+- operation: getResaleMarketplaceConfig
+  verb: GET
+  path: /resale-marketplace-config
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.resale_marketplace_config
+  writes: []
 - operation: getReservation
   verb: GET
   path: /reservations/{reservationId}
@@ -892,9 +969,23 @@ operations:
   - orders.sales_order
   writes:
   - cache:idempotency
+  - orders.order_event
   - orders.order_line
   - orders.payment
   - orders.sales_order
+- operation: holdResaleSettlement
+  verb: POST
+  path: /resale-settlements/{resaleSettlementId}/hold
+  scope: venue
+  permission: SETTLEMENT_RECONCILE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.resale_settlement
+  writes:
+  - orders.resale_settlement
+  - platform.outbox
 - operation: importTicketTemplate
   verb: POST
   path: /ticket-templates/imports
@@ -981,7 +1072,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.after_sale_request
+  - orders.order_line
+  - orders.refund
+  - orders.sales_order
+  - orders.ticket_transfer
+  - orders.upgrade
   writes: []
 - operation: listAmendmentAfterSale2
   verb: GET
@@ -991,7 +1088,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.after_sale_request
+  - orders.order_line
+  - orders.refund
+  - orders.sales_order
+  - orders.upgrade
   writes: []
 - operation: listBillingStatements
   verb: GET
@@ -1015,7 +1117,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - catalogue.price
+  - orders.group_booking
+  - orders.order_line
+  - orders.sales_order
+  - orders.upgrade
+  - orders.upgrade_rule
   writes: []
 - operation: listBuyerCheckoutInventory
   verb: GET
@@ -1025,7 +1134,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.inventory_hold
+  - orders.cart
+  - orders.cart_line
+  - orders.resale_listing
+  - pii.subject
   writes: []
 - operation: listBuyerPurchaseResale
   verb: GET
@@ -1035,7 +1149,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.cart
+  - orders.payment
+  - orders.resale_fee_policy
+  - orders.resale_listing
+  - orders.resale_marketplace_config
+  - pii.subject
   writes: []
 - operation: listCapacityInventoryReconciliation
   verb: GET
@@ -1045,7 +1165,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - catalogue.channel_capacity
+  - orders.order_line
+  - orders.refund
+  - orders.resale_listing
   writes: []
 - operation: listCapacityReservationInventory
   verb: GET
@@ -1055,7 +1180,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.channel_capacity
+  - catalogue.inventory_hold
+  - orders.order_line
+  - orders.reservation
+  - orders.reservation_line
   writes: []
 - operation: listChargebacks
   verb: GET
@@ -1077,7 +1207,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.order_line
+  - orders.resale_fee_policy
+  - orders.resale_marketplace_config
   writes: []
 - operation: listCredentialRevocationRegeneration
   verb: GET
@@ -1087,7 +1220,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - orders.resale_listing
+  - orders.wallet_pass
   writes: []
 - operation: listDepositPartialPayment
   verb: GET
@@ -1097,7 +1233,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.deposit
+  - orders.deposit_policy
+  - orders.group_payment_milestone
+  - orders.payment
+  - orders.sales_order
+  - payments.dunning_case
   writes: []
 - operation: listDeposits
   verb: GET
@@ -1118,7 +1260,23 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - ledger.settlement
+  - orders.external_reference_mapping
+  - orders.payment
+  - orders.refund
+  - orders.sales_order
+  writes: []
+- operation: listExternalReferenceMappings
+  verb: GET
+  path: /orders/{orderId}/external-references
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.external_reference_mapping
   writes: []
 - operation: listFeeSellerProceed
   verb: GET
@@ -1128,7 +1286,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.resale_fee_policy
+  - orders.resale_listing
+  - orders.resale_marketplace_config
   writes: []
 - operation: listFinancialTraceability
   verb: GET
@@ -1138,7 +1299,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - ledger.posting
+  - orders.discount
+  - orders.order_fee
+  - orders.order_line
+  - orders.payment
+  - orders.refund
+  - orders.sales_order
   writes: []
 - operation: listFraudRules
   verb: GET
@@ -1159,7 +1327,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.after_sale_request
+  - orders.deposit
+  - orders.group_booking
+  - orders.group_ticket_allocation_line
+  - orders.order_line
+  - orders.refund
+  - orders.refund_policy
+  - orders.sales_order
   writes: []
 - operation: listGroupArrivalCheck
   verb: GET
@@ -1169,7 +1345,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - access.scan_event
+  - orders.group_booking
+  - orders.group_participant
+  - orders.group_visit_plan
   writes: []
 - operation: listGroupBooking
   verb: GET
@@ -1179,7 +1360,17 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - orders.group_booking
+  - orders.group_participant_list
+  - orders.group_payment_milestone
+  - orders.group_payment_schedule
+  - orders.group_task
+  - orders.group_ticket_allocation
+  - orders.group_ticket_fulfillment
+  - orders.group_visit_plan
+  - orders.sales_order
   writes: []
 - operation: listGroupBookingReconciliation
   verb: GET
@@ -1189,7 +1380,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - access.scan_event
+  - orders.group_booking
+  - orders.group_payment_milestone
+  - orders.order_line
+  - orders.payment
+  - orders.refund
+  - orders.sales_order
   writes: []
 - operation: listGroupCustomerOrganization
   verb: GET
@@ -1199,7 +1398,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.group_booking
+  - orders.group_customer_organization
+  - orders.group_customer_organization_contact
+  - orders.group_enquiry
+  - orders.group_payment_milestone
+  - orders.sales_order
   writes: []
 - operation: listGroupEnquiryOpportunity
   verb: GET
@@ -1209,7 +1414,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.group_customer_organization
+  - orders.group_enquiry
   writes: []
 - operation: listGroupPaymentDeposit
   verb: GET
@@ -1219,7 +1426,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.deposit
+  - orders.deposit_policy
+  - orders.group_booking
+  - orders.group_payment_milestone
+  - orders.group_payment_schedule
+  - orders.payment
+  - orders.payment_link
+  - orders.sales_order
   writes: []
 - operation: listGroupRequirementAvailability
   verb: GET
@@ -1229,7 +1444,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.channel_capacity
+  - catalogue.inventory_hold
+  - catalogue.performance
+  - orders.group_booking
+  - orders.group_enquiry
   writes: []
 - operation: listGroupSale
   verb: GET
@@ -1239,7 +1459,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.group_booking
+  - orders.group_customer_organization
+  - orders.group_enquiry
+  - orders.group_payment_milestone
+  - orders.group_payment_schedule
+  - orders.group_quote
+  - orders.sales_order
   writes: []
 - operation: listGroupSale2
   verb: GET
@@ -1249,7 +1476,16 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.scan_event
+  - orders.discount
+  - orders.group_booking
+  - orders.group_customer_organization
+  - orders.group_enquiry
+  - orders.group_quote
+  - orders.order_line
+  - orders.refund
+  - orders.sales_order
   writes: []
 - operation: listGroupTicketFulfillment
   verb: GET
@@ -1259,7 +1495,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - marketing.message_dispatch
+  - orders.group_participant
+  - orders.group_ticket_fulfillment
+  - orders.wallet_pass
   writes: []
 - operation: listGroupTicketSeat
   verb: GET
@@ -1269,7 +1510,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - orders.group_booking
+  - orders.group_participant
+  - orders.group_ticket_allocation
+  - orders.group_ticket_allocation_line
+  - orders.order_line
   writes: []
 - operation: listInvitationAllowances
   verb: GET
@@ -1291,7 +1538,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.resale_listing
+  - orders.resale_marketplace_config
   writes: []
 - operation: listMembershipRenewals
   verb: GET
@@ -1329,7 +1578,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - catalogue.performance
+  - catalogue.product
+  - orders.order_line
+  - orders.resale_listing
   writes: []
 - operation: listOrderDiscounts
   verb: GET
@@ -1361,7 +1615,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - ledger.settlement
+  - ledger.settlement_exception
+  - orders.deposit
+  - orders.payment
+  - orders.refund
+  - orders.sales_order
+  - payments.dunning_case
   writes: []
 - operation: listOrderLifecycleTimeline
   verb: GET
@@ -1371,7 +1632,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.order_event
+  - orders.payment
+  - orders.refund
+  - orders.reservation
+  - orders.sales_order
+  - orders.upgrade
+  - sync.rejection
   writes: []
 - operation: listOrderLineProduct
   verb: GET
@@ -1381,7 +1649,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - catalogue.performance
+  - catalogue.product
+  - orders.discount
+  - orders.order_fee
+  - orders.order_line
+  - orders.order_line_eligibility
   writes: []
 - operation: listOrderPaymentDetail
   verb: GET
@@ -1391,7 +1666,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - ledger.settlement_exception
+  - orders.payment
+  - orders.payment_tip
+  - orders.refund
+  - orders.sales_order
+  - orders.stored_value_authorisation
   writes: []
 - operation: listOrderRefunds
   verb: GET
@@ -1413,7 +1694,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.inventory_hold
+  - orders.order_line
+  - orders.payment
+  - orders.payment_link
+  - orders.reservation
+  - orders.reservation_line
+  - orders.sales_order
   writes: []
 - operation: listOrderSplitMerge
   verb: GET
@@ -1423,7 +1711,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.discount
+  - orders.order_fee
+  - orders.order_line
+  - orders.order_relationship
+  - orders.payment
+  - orders.refund
+  - orders.sales_order
   writes: []
 - operation: listOrders
   verb: GET
@@ -1447,7 +1742,23 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - orders.group_booking
+  - orders.group_participant
+  - orders.group_participant_list
+  - orders.group_ticket_allocation_line
+  writes: []
+- operation: listPaymentAllocationRules
+  verb: GET
+  path: /payment-allocation-rules
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.payment_allocation_rule
   writes: []
 - operation: listPaymentOrderFinancial
   verb: GET
@@ -1457,7 +1768,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - ledger.settlement
+  - ledger.settlement_exception
+  - orders.payment
+  - orders.payment_link
+  - orders.refund
+  - orders.sales_order
   writes: []
 - operation: listPaymentProviders
   verb: GET
@@ -1479,7 +1796,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - ledger.settlement
+  - ledger.settlement_exception
+  - orders.payment
+  - orders.sales_order
   writes: []
 - operation: listPaymentTokens
   verb: GET
@@ -1501,7 +1822,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.product
+  - orders.upgrade_rule
   writes: []
 - operation: listQuoteBookingConversion
   verb: GET
@@ -1511,7 +1834,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.group_booking
+  - orders.group_payment_milestone
+  - orders.group_payment_schedule
+  - orders.group_quote
+  - orders.group_quote_line
+  - orders.order_line
+  - orders.payment_link
+  - orders.sales_order
   writes: []
 - operation: listQuoteRevisionNegotiation
   verb: GET
@@ -1521,7 +1852,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.group_enquiry
+  - orders.group_quote
   writes: []
 - operation: listRefundDisputeResale
   verb: GET
@@ -1541,7 +1874,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.order_relationship
+  - orders.payment
+  - orders.refund
+  - orders.reservation
+  - orders.sales_order
+  - orders.ticket_transfer
+  - orders.upgrade
   writes: []
 - operation: listResale
   verb: GET
@@ -1551,7 +1891,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - orders.payment
+  - orders.refund
+  - orders.resale_listing
+  - orders.resale_settlement
+  - orders.sales_order
+  - orders.ticket_transfer
   writes: []
 - operation: listResale2
   verb: GET
@@ -1561,7 +1908,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.channel_capacity
+  - orders.order_line
+  - orders.refund
+  - orders.resale_listing
+  - orders.sales_order
   writes: []
 - operation: listResaleConfirmationOwnership
   verb: GET
@@ -1571,7 +1923,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - orders.resale_listing
+  - orders.resale_settlement
+  - orders.ticket_transfer
+  - orders.wallet_pass
   writes: []
 - operation: listResaleEligibilityTicket
   verb: GET
@@ -1581,7 +1938,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - access.scan_event
+  - catalogue.performance
+  - orders.order_line
+  - orders.resale_eligibility_rule
+  - orders.resale_listing
+  - orders.sales_order
   writes: []
 - operation: listResaleFeeCommission
   verb: GET
@@ -1591,7 +1955,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.resale_fee_policy
   writes: []
 - operation: listResaleFraudDuplicate
   verb: GET
@@ -1601,7 +1966,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - access.scan_event
+  - orders.fraud_rule
+  - orders.payment
+  - orders.resale_listing
   writes: []
 - operation: listResaleInventoryAvailability
   verb: GET
@@ -1611,7 +1981,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - catalogue.performance
+  - orders.order_line
+  - orders.resale_listing
   writes: []
 - operation: listResaleListingSeller
   verb: GET
@@ -1621,7 +1995,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - catalogue.performance
+  - orders.resale_listing
+  - orders.resale_settlement
   writes: []
 - operation: listResaleMarketplace
   verb: GET
@@ -1631,7 +2009,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - catalogue.performance
+  - orders.order_line
+  - orders.resale_fee_policy
+  - orders.resale_listing
+  - orders.resale_settlement
+  - orders.sales_order
   writes: []
 - operation: listResaleOwnership
   verb: GET
@@ -1641,7 +2026,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - orders.payment
+  - orders.resale_listing
+  - orders.resale_settlement
+  - orders.sales_order
+  - orders.ticket_transfer
   writes: []
 - operation: listResalePolicyMarketplace
   verb: GET
@@ -1651,7 +2042,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.resale_fee_policy
+  - orders.resale_marketplace_config
   writes: []
 - operation: listResalePricingPrice
   verb: GET
@@ -1661,7 +2054,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.price
+  - orders.order_line
+  - orders.resale_fee_policy
+  - orders.resale_listing
+  - orders.resale_marketplace_config
   writes: []
 - operation: listResaleTicketDetail
   verb: GET
@@ -1671,7 +2069,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - catalogue.performance
+  - catalogue.product
+  - orders.order_line
+  - orders.resale_fee_policy
+  - orders.resale_listing
   writes: []
 - operation: listReservationConfirmationExpiry
   verb: GET
@@ -1681,7 +2085,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.inventory_hold
+  - orders.payment_link
+  - orders.reservation
+  - orders.reservation_line
+  - orders.sales_order
   writes: []
 - operation: listReservations
   verb: GET
@@ -1706,7 +2115,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.resale_fee_policy
+  - orders.resale_listing
+  - orders.resale_marketplace_config
+  - orders.resale_settlement
   writes: []
 - operation: listSyncRejections
   verb: GET
@@ -1727,7 +2140,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - orders.order_line
+  - orders.resale_listing
+  - orders.sales_order
+  - orders.ticket_transfer
   writes: []
 - operation: listTicketReissueFulfillment
   verb: GET
@@ -1737,7 +2155,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - orders.after_sale_policy
+  - orders.after_sale_request
+  - orders.order_line
+  - orders.wallet_pass
   writes: []
 - operation: listTicketResaleMarketplace
   verb: GET
@@ -1747,7 +2170,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - catalogue.performance
+  - orders.order_line
+  - orders.resale_listing
+  - orders.resale_marketplace_config
   writes: []
 - operation: listTicketTemplates
   verb: GET
@@ -1780,7 +2208,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.product
+  - orders.order_line
+  - orders.sales_order
+  - orders.upgrade
+  - orders.upgrade_rule
   writes: []
 - operation: listUpgradeEligibilityQualification
   verb: GET
@@ -1790,7 +2223,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - catalogue.product
+  - orders.order_line
+  - orders.sales_order
+  - orders.upgrade
+  - orders.upgrade_rule
   writes: []
 - operation: listUpgradeException
   verb: GET
@@ -1800,7 +2239,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - identity.principal
+  - orders.order_line
+  - orders.payment
+  - orders.refund
+  - orders.sales_order
+  - orders.upgrade
+  - orders.upgrade_rule
   writes: []
 - operation: listUpgradeFinancialTreatment
   verb: GET
@@ -1810,7 +2256,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.price
+  - orders.order_line
+  - orders.upgrade
+  - orders.upgrade_rule
   writes: []
 - operation: listUpgradeTimingUsage
   verb: GET
@@ -1820,7 +2270,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - orders.upgrade
+  - orders.upgrade_rule
   writes: []
 - operation: listUpgrades
   verb: GET
@@ -1841,7 +2294,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.after_sale_policy
   writes: []
 - operation: listWhiteLabelMarketplace
   verb: GET
@@ -1851,8 +2305,31 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.resale_marketplace_config
   writes: []
+- operation: mergeOrders
+  verb: POST
+  path: /orders/{orderId}/merge
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.order_line
+  - orders.order_line_eligibility
+  - orders.payment
+  - orders.sales_order
+  writes:
+  - ledger.journal_entry
+  - ledger.posting
+  - orders.order_event
+  - orders.order_line
+  - orders.order_relationship
+  - orders.payment
+  - orders.sales_order
+  - platform.outbox
 - operation: migrateMembership
   verb: POST
   path: /memberships/{membershipId}/migrations
@@ -1885,6 +2362,7 @@ operations:
   - cache:idempotency
   - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
   - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
+  - orders.order_event
   - orders.order_line
   - orders.payment
   - orders.sales_order
@@ -1984,6 +2462,35 @@ operations:
   - catalogue.product
   - orders.sales_order
   writes: []
+- operation: recordExternalReference
+  verb: POST
+  path: /orders/{orderId}/external-references
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.external_reference_mapping
+  - orders.payment
+  - orders.refund
+  - orders.sales_order
+  writes:
+  - orders.external_reference_mapping
+- operation: recordGroupCheckIn
+  verb: POST
+  path: /group-bookings/{groupBookingId}/check-in
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.group_booking
+  - orders.group_visit_plan
+  writes:
+  - orders.group_visit_plan
+  - orders.order_event
 - operation: reissueEntitlement
   verb: POST
   path: /entitlements/{entitlementId}/reissue
@@ -1999,6 +2506,20 @@ operations:
   writes:
   - access.entitlement
   - cache:idempotency
+- operation: releaseResaleSettlementHold
+  verb: POST
+  path: /resale-settlements/{resaleSettlementId}/release
+  scope: venue
+  permission: SETTLEMENT_RECONCILE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.resale_marketplace_config
+  - orders.resale_settlement
+  writes:
+  - orders.resale_settlement
+  - platform.outbox
 - operation: relinquishStoredValue
   verb: POST
   path: /stored-value/authorisations/{authorisationId}/release
@@ -2092,6 +2613,7 @@ operations:
   - orders.sales_order
   writes:
   - cache:idempotency
+  - orders.order_event
   - orders.sales_order
 - operation: resendPaymentLink
   verb: POST
@@ -2168,6 +2690,7 @@ operations:
   - orders.sales_order
   writes:
   - cache:idempotency
+  - orders.order_event
   - orders.order_line
   - orders.payment
   - orders.sales_order
@@ -2180,8 +2703,14 @@ operations:
   - staff
   - guest
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.entitlement
+  - cache:idempotency
+  - identity.delegated_access
+  writes:
+  - access.entitlement
+  - cache:idempotency
+  - identity.delegated_access
 - operation: setAfterSaleFinancial
   verb: PUT
   path: /after-sale-financial
@@ -2190,8 +2719,17 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - orders.after_sale_request
+  - orders.discount
+  - orders.order_fee
+  - orders.order_line
+  - orders.payment
+  - orders.refund
+  - orders.sales_order
+  writes:
+  - cache:idempotency
 - operation: setAmendmentEligibilityPolicy
   verb: PUT
   path: /amendment-eligibility-policy
@@ -2200,8 +2738,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - orders.after_sale_policy
+  writes:
+  - cache:idempotency
+  - orders.after_sale_policy
 - operation: setB2bCreditLimit
   verb: PUT
   path: /b2b-accounts/{accountId}/credit
@@ -2226,8 +2768,16 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - orders.after_sale_policy
+  - orders.after_sale_policy_window
+  - orders.refund_policy
+  - orders.refund_policy_time_band
+  writes:
+  - cache:idempotency
+  - orders.after_sale_policy
+  - orders.after_sale_policy_window
 - operation: setCustomerGuestAccount
   verb: PUT
   path: /customer-guest-account
@@ -2236,8 +2786,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - orders.reservation
+  - orders.sales_order
+  - pii.subject
+  writes:
+  - cache:idempotency
+  - orders.reservation
+  - orders.sales_order
 - operation: setDepositPolicy
   verb: PUT
   path: /deposit-policy
@@ -2275,8 +2832,19 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - orders.group_booking
+  - orders.group_customer_organization_contact
+  - orders.group_enquiry
+  - orders.group_payment_milestone
+  - orders.group_payment_schedule
+  - orders.group_visit_plan
+  - orders.order_line
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - orders.group_visit_plan
 - operation: setGroupCustomerOrganization
   verb: PUT
   path: /group-customer-organization
@@ -2298,8 +2866,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - orders.group_booking
+  - orders.group_task
+  - orders.group_visit_plan
+  writes:
+  - cache:idempotency
+  - orders.group_task
+  - orders.group_visit_plan
 - operation: setGroupPackageExperience
   verb: PUT
   path: /group-package-experience
@@ -2308,8 +2883,16 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - catalogue.group_package
+  - catalogue.price
+  - catalogue.product
+  - orders.group_quote
+  writes:
+  - cache:idempotency
+  - orders.group_quote
+  - orders.group_quote_line
 - operation: setGroupPaymentSchedule
   verb: PUT
   path: /group-bookings/{groupBookingId}/payment-schedule
@@ -2331,8 +2914,17 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - catalogue.price
+  - orders.group_customer_organization
+  - orders.group_enquiry
+  - orders.group_quote
+  - orders.group_quote_line
+  writes:
+  - cache:idempotency
+  - orders.group_quote
+  - orders.group_quote_line
 - operation: setGroupTicketAllocation
   verb: PUT
   path: /group-bookings/{groupBookingId}/allocation
@@ -2365,8 +2957,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - orders.payment_allocation_rule
+  - payments.mixed_tender_rules
+  writes:
+  - cache:idempotency
+  - orders.payment_allocation_rule
 - operation: setOrderAmendment
   verb: PUT
   path: /order-amendment
@@ -2375,8 +2972,23 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.entitlement
+  - cache:idempotency
+  - catalogue.channel_capacity
+  - catalogue.inventory_hold
+  - orders.after_sale_policy
+  - orders.after_sale_request
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - orders.after_sale_request
+  - orders.order_event
+  - orders.order_line
+  - orders.order_relationship
+  - orders.sales_order
 - operation: setOrderDetailTransaction
   verb: PUT
   path: /order-detail-transaction
@@ -2385,8 +2997,20 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.entitlement
+  - cache:idempotency
+  - orders.discount
+  - orders.order_fee
+  - orders.order_line
+  - orders.payment
+  - orders.refund
+  - orders.reservation
+  - orders.reservation_line
+  - orders.sales_order
+  - pii.subject
+  writes:
+  - cache:idempotency
 - operation: setOrderReservationStatus
   verb: PUT
   path: /order-reservation-statu
@@ -2395,8 +3019,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - orders.status_transition_rule
+  writes:
+  - cache:idempotency
+  - orders.status_transition_rule
 - operation: setParticipantGuestList
   verb: PUT
   path: /group-bookings/{groupBookingId}/participants
@@ -2433,8 +3061,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - orders.upgrade_rule
+  writes:
+  - cache:idempotency
+  - orders.upgrade_rule
 - operation: setRefundCalculationPolicy
   verb: PUT
   path: /refund-calculation-policy
@@ -2471,8 +3103,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - orders.resale_eligibility_rule
+  writes:
+  - cache:idempotency
+  - orders.resale_eligibility_rule
 - operation: setResaleFeePolicy
   verb: PUT
   path: /resale-fee-policy
@@ -2485,6 +3121,18 @@ operations:
   - orders.resale_fee_policy
   writes:
   - orders.resale_fee_policy
+- operation: setResaleMarketplaceConfig
+  verb: PUT
+  path: /resale-marketplace-config
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.resale_marketplace_config
+  writes:
+  - orders.resale_marketplace_config
 - operation: setResaleMarketplaceRecommendation
   verb: PUT
   path: /resale-marketplace-recommendation
@@ -2493,8 +3141,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - orders.resale_fee_policy
+  - orders.resale_listing
+  - orders.resale_recommendation
+  writes:
+  - cache:idempotency
+  - orders.resale_recommendation
 - operation: setReservationHoldPolicy
   verb: PUT
   path: /reservation-hold-policy
@@ -2503,8 +3157,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - orders.reservation_hold_policy
+  writes:
+  - cache:idempotency
+  - orders.reservation_hold_policy
 - operation: setUpgradeConversionPath
   verb: PUT
   path: /upgrade-conversion-path
@@ -2513,8 +3171,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - catalogue.product
+  - orders.upgrade_rule
+  writes:
+  - cache:idempotency
+  - orders.upgrade_rule
 - operation: setVisitReminder
   verb: PUT
   path: /orders/{orderId}/reminder
@@ -2560,7 +3223,9 @@ operations:
   - orders.sales_order
   writes:
   - cache:idempotency
+  - orders.order_event
   - orders.order_line
+  - orders.order_relationship
   - orders.sales_order
 - operation: storePaymentToken
   verb: POST
@@ -2692,6 +3357,7 @@ operations:
   - orders.sales_order
   writes:
   - cache:idempotency
+  - orders.order_event
   - orders.order_line
   - orders.payment
   - orders.sales_order
@@ -2708,4 +3374,5 @@ operations:
   - orders.payment
   writes:
   - cache:idempotency
+  - orders.order_event
   - orders.payment

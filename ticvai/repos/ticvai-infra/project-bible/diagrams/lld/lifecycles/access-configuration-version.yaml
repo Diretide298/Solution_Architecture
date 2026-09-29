@@ -1,0 +1,118 @@
+id: LLD-AccessConfigurationVersion
+title: AccessConfigurationVersion — 17 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/access-configuration-version.yaml
+entity: AccessConfigurationVersion
+contract: access
+enum: AccessConfigurationVersion.status
+enumKind: inline
+enumSchema: AccessConfigurationVersion
+enumProperty: status
+owner: access
+description: One version of access configuration, a topology or a rule set, moving through simulate,
+  validate, schedule, publish and roll back (declared 29 September, writers pass). `publishTopologyValidation`
+  drives topology versions and `publishRuleConflictCheck` rule-set versions (its `step` names the lifecycle
+  step). **Approval goes through the approvals engine**, and **every publication keeps the previous
+  version for rollback** (`previousVersionId`, `snapshot`).
+initial:
+- draft
+terminal:
+- rolledBack
+transitions:
+- from: draft
+  to: validated
+  operation: publishTopologyValidation
+  trigger: operation
+  guard: A topology version passed pre-publication validation with no blocking `validationIssues`
+- from: draft
+  to: validated
+  operation: publishRuleConflictCheck
+  trigger: operation
+  guard: '`step` `validate` on a rule-set version; conflicts are advisory and do not block'
+- from: validated
+  to: pendingApproval
+  operation: publishTopologyValidation
+  trigger: operation
+  guard: Publish now or scheduled, and `evaluateApprovalRequirement` requires approval; the request
+    is raised (`approvalRequestId`)
+- from: validated
+  to: pendingApproval
+  operation: publishRuleConflictCheck
+  trigger: operation
+  guard: '`step` `publish` or `schedule`, and approval is required'
+- from: validated
+  to: active
+  operation: publishTopologyValidation
+  trigger: operation
+  guard: '`publishMode` `now` and no approval is required'
+- from: validated
+  to: active
+  operation: publishRuleConflictCheck
+  trigger: operation
+  guard: '`step` `publish` and no approval is required'
+- from: validated
+  to: scheduled
+  operation: publishTopologyValidation
+  trigger: operation
+  guard: '`publishMode` `scheduled` and no approval is required'
+- from: validated
+  to: scheduled
+  operation: publishRuleConflictCheck
+  trigger: operation
+  guard: '`step` `schedule` and no approval is required'
+- from: pendingApproval
+  to: active
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Granted, for a publish-now version
+  requiresApproval: true
+- from: pendingApproval
+  to: scheduled
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Granted, for a scheduled version
+  requiresApproval: true
+- from: pendingApproval
+  to: draft
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Rejected, with a reason; the version must be validated again after it is changed
+- from: scheduled
+  to: active
+  trigger: timer
+  guard: The scheduled time has come
+- from: active
+  to: inactive
+  trigger: cascade
+  guard: A newer version of the same configuration kind and target became active
+- from: inactive
+  to: active
+  trigger: cascade
+  guard: The version that replaced this one was rolled back (`rollbackConfigurationVersion`, or `publishRuleConflictCheck`
+    step `rollBack`) and this one is its `previousVersionId`; its `snapshot` is restored
+  isReversal: true
+- from: active
+  to: rolledBack
+  operation: publishRuleConflictCheck
+  trigger: operation
+  guard: '`step` `rollBack` on the active rule-set version; its `previousVersionId` becomes active again'
+  isReversal: true
+- from: scheduled
+  to: rolledBack
+  operation: publishRuleConflictCheck
+  trigger: operation
+  guard: '`step` `rollBack` on a scheduled rule-set version before it took effect'
+  isReversal: true
+- from: active
+  to: rolledBack
+  operation: rollbackConfigurationVersion
+  trigger: operation
+  guard: Only an `active` version (`409 not-active`) with a previous version (`409 no-previous-version`);
+    its `previousVersionId` becomes active again and is redistributed to the targets. No approval, since
+    the restored configuration was already approved; logged in `access.configuration_change`
+  isReversal: true
+openQuestions: null
+notes: '**A rolled-back version is never published again**: a correction is a new version. **Only `rolledBack`
+  is terminal.** An `inactive` version can come back through the rollback of the version that replaced
+  it, so it is not finished. Simulation (`step` `simulate`) changes no state and is not a transition.'

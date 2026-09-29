@@ -1,6 +1,6 @@
 # WS08 — Access Control board 8
 
-**10 screens · 10 operations · 12 schemas · 3 permissions**
+**10 screens · 19 operations · 20 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, MARKETING_VIEW, SCOPE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, MARKETING_VIEW, QUEUE_MANAGE, QUEUE_VIEW, SCOPE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,20 +60,20 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-214` | Guest Journey Command Center | listDetail | 1 | 0 | — |
+| `BO-214` | Guest Journey Command Center | listDetail | 2 | 0 | — |
 | `BO-215` | Group & B2B Admission Profile Builder | configEditor | 1 | 0 | — |
 | `BO-216` | Group Leader & Fast B2B Validation | listDetail | 1 | 0 | — |
 | `BO-217` | Group Attendance & Partial Entry Manager | listDetail | 1 | 0 | — |
-| `BO-218` | Family, Child, POD & Companion Journey | configEditor | 1 | 0 | — |
-| `BO-219` | Re-entry & Temporary Exit Journey | configEditor | 1 | 0 | — |
-| `BO-220` | Multi-Park & Crossover Journey Orchestrator | listDetail | 1 | 0 | — |
-| `BO-221` | Fast Pass & Attraction Access Journey | configEditor | 1 | 0 | — |
-| `BO-222` | Special Event, Free View & Alternative Admission | configEditor | 1 | 0 | — |
-| `BO-223` | Journey Simulation, Audit & Publication | listDetail | 1 | 0 | — |
+| `BO-218` | Family, Child, POD & Companion Journey | configEditor | 2 | 0 | — |
+| `BO-219` | Re-entry & Temporary Exit Journey | configEditor | 3 | 0 | — |
+| `BO-220` | Multi-Park & Crossover Journey Orchestrator | listDetail | 4 | 0 | — |
+| `BO-221` | Fast Pass & Attraction Access Journey | configEditor | 3 | 0 | — |
+| `BO-222` | Special Event, Free View & Alternative Admission | configEditor | 3 | 0 | — |
+| `BO-223` | Journey Simulation, Audit & Publication | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-214, BO-216, BO-217, BO-220, BO-221, BO-222, BO-223 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-216, BO-217, BO-220, BO-222 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-214 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-215",
@@ -194,23 +190,87 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "regions": [
     {
      "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active Journey Profiles",
+       "bindsTo": "GuestJourneyCommandCenterViewSummary.activeJourneyProfiles",
+       "operation": "listGuestJourney",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Group Arrivals Today",
+       "bindsTo": "GuestJourneyCommandCenterViewSummary.groupArrivalsToday",
+       "operation": "listGuestJourney",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Guests via Group Admission",
+       "bindsTo": "GuestJourneyCommandCenterViewSummary.guestsViaGroupAdmission",
+       "operation": "listGuestJourney",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Family Journeys",
+       "bindsTo": "GuestJourneyCommandCenterViewSummary.familyJourneys",
+       "operation": "listGuestJourney",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Re-entry Guests",
+       "bindsTo": "GuestJourneyCommandCenterViewSummary.reEntryGuests",
+       "operation": "listGuestJourney",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Crossovers Today",
+       "bindsTo": "GuestJourneyCommandCenterViewSummary.crossoversToday",
+       "operation": "listGuestJourney",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Fast Pass Validations",
+       "bindsTo": "GuestJourneyCommandCenterViewSummary.fastPassValidations",
+       "operation": "listGuestJourney",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Special Event Admissions",
+       "bindsTo": "GuestJourneyCommandCenterViewSummary.specialEventAdmissions",
+       "operation": "listGuestJourney",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "VIP Admissions",
+       "bindsTo": "GuestJourneyCommandCenterViewSummary.vipAdmissions",
+       "operation": "listGuestJourney",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Journey Exceptions",
+       "bindsTo": "GuestJourneyCommandCenterViewSummary.journeyExceptions",
+       "operation": "listGuestJourney",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
      "slot": "collection",
      "components": [
       {
        "kind": "dataTable",
        "label": "Every guest journey",
-       "columns": [
-        "GuestJourneyCommandCenterView.activeJourneyProfiles",
-        "GuestJourneyCommandCenterView.groupArrivalsToday",
-        "GuestJourneyCommandCenterView.guestsViaGroupAdmission",
-        "GuestJourneyCommandCenterView.familyJourneys",
-        "GuestJourneyCommandCenterView.reEntryGuests",
-        "GuestJourneyCommandCenterView.crossoversToday",
-        "GuestJourneyCommandCenterView.fastPassValidations",
-        "GuestJourneyCommandCenterView.specialEventAdmissions",
-        "GuestJourneyCommandCenterView.vipAdmissions",
-        "GuestJourneyCommandCenterView.journeyExceptions"
-       ],
        "bindsTo": "GuestJourneyCommandCenterView",
        "operation": "listGuestJourney",
        "provenance": "pack Access Control Module_Reference.pdf, page 101 §Show"
@@ -225,18 +285,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "detailPanel",
        "label": "The selected guest journey",
        "bindsTo": "GuestJourneyCommandCenterView",
-       "columns": [
-        "GuestJourneyCommandCenterView.activeJourneyProfiles",
-        "GuestJourneyCommandCenterView.groupArrivalsToday",
-        "GuestJourneyCommandCenterView.guestsViaGroupAdmission",
-        "GuestJourneyCommandCenterView.familyJourneys",
-        "GuestJourneyCommandCenterView.reEntryGuests",
-        "GuestJourneyCommandCenterView.crossoversToday",
-        "GuestJourneyCommandCenterView.fastPassValidations",
-        "GuestJourneyCommandCenterView.specialEventAdmissions",
-        "GuestJourneyCommandCenterView.vipAdmissions",
-        "GuestJourneyCommandCenterView.journeyExceptions"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “Journey Type Venue Credential Status”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 101 §Show"
       }
@@ -257,22 +305,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Guest Journey Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "createAdmissionRules",
+    "contract": "access",
+    "purpose": "Start a new guest journey from an admission profile",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listGuestJourney"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "GuestJourneyCommandCenterView.activeJourneyProfiles",
-    "GuestJourneyCommandCenterView.groupArrivalsToday",
-    "GuestJourneyCommandCenterView.guestsViaGroupAdmission",
-    "GuestJourneyCommandCenterView.familyJourneys",
-    "GuestJourneyCommandCenterView.reEntryGuests",
-    "GuestJourneyCommandCenterView.crossoversToday"
+    "GuestJourneyCommandCenterViewSummary.activeJourneyProfiles",
+    "GuestJourneyCommandCenterViewSummary.groupArrivalsToday",
+    "GuestJourneyCommandCenterViewSummary.guestsViaGroupAdmission",
+    "GuestJourneyCommandCenterViewSummary.familyJourneys",
+    "GuestJourneyCommandCenterViewSummary.reEntryGuests",
+    "GuestJourneyCommandCenterViewSummary.crossoversToday"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-214"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-214",
+   "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-214"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 101. 10 of 10 labels bound to a contract property; 10 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -335,10 +394,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Group admission behavior can be configured independently from standard individual-ticket admission.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure admission for) and no display directory — it is settings, not a population",
   "purpose": "Group & B2B Admission Profile Builder",
-  "purposeNote": "Group admission behavior can be configured independently from standard individual-ticket admission.",
   "layout": {
    "template": "form",
    "regions": [
@@ -407,16 +466,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setGroupAdmissionProfile",
     "contract": "access",
     "purpose": "Group & B2B Admission Profile Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setGroupAdmissionProfile"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-215"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-215",
+   "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-215"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 102. 0 of 0 labels bound to a contract property; 7 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -479,10 +536,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Large B2B groups can be admitted using a streamlined workflow without individually processing every credential when the configured group product allows it.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Solve the specific matrix requirement for faster entrance flow when large B2B groups have multiple tickets stored on one device.",
-  "purposeNote": "Large B2B groups can be admitted using a streamlined workflow without individually processing every credential when the configured group product allows it.",
   "layout": {
    "template": "split",
    "regions": [
@@ -496,7 +553,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "columns": [
         "GroupLeaderFastB2bValidationView.payment",
         "GroupLeaderFastB2bValidationView.booking",
-        "GroupLeaderFastB2bValidationView.visitDate",
         "GroupLeaderFastB2bValidationView.groupProduct",
         "GroupLeaderFastB2bValidationView.accessRules",
         "GroupLeaderFastB2bValidationView.manifest"
@@ -518,7 +574,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "columns": [
         "GroupLeaderFastB2bValidationView.payment",
         "GroupLeaderFastB2bValidationView.booking",
-        "GroupLeaderFastB2bValidationView.visitDate",
         "GroupLeaderFastB2bValidationView.groupProduct",
         "GroupLeaderFastB2bValidationView.accessRules",
         "GroupLeaderFastB2bValidationView.manifest"
@@ -549,7 +604,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "preloaded": [
     "GroupLeaderFastB2bValidationView.payment",
     "GroupLeaderFastB2bValidationView.booking",
-    "GroupLeaderFastB2bValidationView.visitDate",
     "GroupLeaderFastB2bValidationView.groupProduct",
     "GroupLeaderFastB2bValidationView.accessRules",
     "GroupLeaderFastB2bValidationView.manifest"
@@ -558,7 +612,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-216"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-216",
+   "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-216"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 103. 6 of 6 labels bound to a contract property; 6 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -621,10 +676,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Attendance reflects the number of guests actually admitted rather than simply the quantity on the group ticket.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Manage actual attendance when fewer guests arrive than the quantity purchased. The matrix explicitly requires the scanner to show the exact group size and allow the operator to enter actual attendants so daily attendance is updated correctly.",
-  "purposeNote": "Attendance reflects the number of guests actually admitted rather than simply the quantity on the group ticket.",
   "gaps": [
    {
     "operation": null,
@@ -675,17 +730,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "GroupAttendancePartialEntryManagerView.purchased50",
-    "GroupAttendancePartialEntryManagerView.previouslyEntered0",
-    "GroupAttendancePartialEntryManagerView.entered43",
-    "GroupAttendancePartialEntryManagerView.remaining7",
     "GroupAttendancePartialEntryManagerView.remaining"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-217"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-217",
+   "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-217"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 104. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -748,10 +800,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Dependent and companion credentials cannot bypass their configured relationship requirements.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure linked-person access journeys. The matrix requires child protection through adult-ticket pairing or biometric validation of the assigned adult. It also requires POD accompanying persons and nannies to be bound to a primary guest and only enter when accompanied by that guest.",
-  "purposeNote": "Dependent and companion credentials cannot bypass their configured relationship requirements.",
   "layout": {
    "template": "form",
    "regions": [
@@ -785,6 +837,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 105 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save companion rule",
+       "operation": "setGuestCompanionEligibility",
+       "provenance": "contract access.yaml PUT /guest-companion-eligibility (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -800,12 +864,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Family, Child, POD & Companion Journey",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setGuestCompanionEligibility",
+    "contract": "access",
+    "purpose": "Save companion rule",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-218"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-218",
+   "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-218"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 105. 0 of 0 labels bound to a contract property; 5 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -868,10 +939,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Temporary exit and re-entry are tracked as distinct journey events rather than being counted as new normal admissions.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Manage guests temporarily leaving and returning to the venue. The source matrix requires configurable re-entry and also describes a journey using a designated re-entry gate with both ticket verification and a UV stamp.",
-  "purposeNote": "Temporary exit and re-entry are tracked as distinct journey events rather than being counted as new normal admissions.",
   "layout": {
    "template": "form",
    "regions": [
@@ -915,14 +986,41 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Re-entry & Temporary Exit Journey",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listAdmissionRules",
+    "contract": "access",
+    "purpose": "The admission profiles that allow a temporary exit",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "updateAdmissionRules",
+    "contract": "access",
+    "purpose": "Save re-entry quantity and the exit-before-re-entry rule",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listEntryTemporaryExit",
+     "listAdmissionRules"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-219"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-219",
+   "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-219"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 106. 0 of 0 labels bound to a contract property; 4 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "profileId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1011,6 +1109,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save admission rules",
+       "operation": "updateAdmissionRules",
+       "provenance": "contract access.yaml PUT /admission-rules/{profileId} (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -1027,21 +1137,49 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Multi-Park & Crossover Journey Orchestrator",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listMultiParkCrossover",
+    "contract": "access",
+    "purpose": "Multi-Park & Crossover Rules",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listAdmissionRules",
+    "contract": "access",
+    "purpose": "The admission profiles that carry crossover rules",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "updateAdmissionRules",
+    "contract": "access",
+    "purpose": "Save the parks a crossover journey admits to",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listMultiParkCrossover2",
+     "listMultiParkCrossover",
+     "listAdmissionRules"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "MultiParkCrossoverJourneyOrchestratorView.maximum",
-    "MultiParkCrossoverJourneyOrchestratorView.adventureParkInside",
-    "MultiParkCrossoverJourneyOrchestratorView.waterParkCrossoverAvailable",
-    "MultiParkCrossoverJourneyOrchestratorView.normalEntry",
-    "MultiParkCrossoverJourneyOrchestratorView.reEntry"
+    "MultiParkCrossoverJourneyOrchestratorView.eventType"
+   ],
+   "params": [
+    {
+     "name": "profileId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-220"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-220",
+   "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-220"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 108. 0 of 0 labels bound to a contract property; 0 of 6 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1104,10 +1242,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Priority-access journeys correctly consume and display limited/unlimited entitlement usage.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Select eligible) and no display directory — it is settings, not a population",
   "purpose": "Configure the operational experience for limited and unlimited priority-access entitlements. The matrix requires Silver Fast Pass to support three accesses and Gold to support unlimited access with an optional one-access-per-ride restriction.",
-  "purposeNote": "Priority-access journeys correctly consume and display limited/unlimited entitlement usage.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1131,6 +1269,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 109 §Select eligible"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save Fast Pass settings",
+       "operation": "updateQueue",
+       "provenance": "contract queue.yaml PATCH /queues/{queueId} (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -1146,14 +1296,35 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Fast Pass & Attraction Access Journey",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listQueues",
+    "contract": "queue",
+    "purpose": "The attraction lanes a Fast Pass is configured on",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateQueue",
+    "contract": "queue",
+    "purpose": "Save Fast Pass settings",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-221"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-221",
+   "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-221"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 109. 0 of 0 labels bound to a contract property; 3 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "queueId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1214,10 +1385,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Special admission processes can temporarily replace normal access behavior without permanent gate reconfiguration.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure temporary/special admission processes that differ from normal venue access. The matrix requires special-event products capable of capturing attendance without physical admission, N- person attendance entered through a turnstile/tablet/handheld, and Free View days where main gates are open while attraction gates continue validating tickets.",
-  "purposeNote": "Special admission processes can temporarily replace normal access behavior without permanent gate reconfiguration.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1251,12 +1422,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Special Event, Free View & Alternative Admission",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "createAdmissionRules",
+    "contract": "access",
+    "purpose": "Create a special-event or free-view admission profile",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listSpecialEventFree"
+    ]
+   },
+   {
+    "operationId": "setContextTimeEvent",
+    "contract": "access",
+    "purpose": "Tie the alternative admission to a date, event or calendar day",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listSpecialEventFree"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-222"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-222",
+   "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-222"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 110. 0 of 0 labels bound to a contract property; 2 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1311,17 +1503,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from BO-214, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Complex guest journeys can be simulated end-to-end, approved, deployed, audited and rolled back. Board 8 — Final 10-Screen Structure # Backend Screen Main Responsibility 8.1 Guest Journey Command Center Special journey management and monitoring 8.2 Group & B2B Admission Profile Builder Configure group-access models 8.3 Group Leader & Fast B2B Validation Accelerate large-group entry 8.4 Group Attendance & Partial Entry Manager Actual attendance and multiple arrival waves 8.5 Family, Child, POD & Companion Journey Linked-person and child-protection journeys 8.6 Re-entry & Temporary Exit Journey",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Detect) and no metric row",
   "purpose": "Test an entire guest journey—not merely an individual scan—before deploying it.",
-  "purposeNote": "Complex guest journeys can be simulated end-to-end, approved, deployed, audited and rolled back. Board 8 — Final 10-Screen Structure # Backend Screen Main Responsibility 8.1 Guest Journey Command Center Special journey management and monitoring 8.2 Group & B2B Admission Profile Builder Configure group-access models 8.3 Group Leader & Fast B2B Validation Accelerate large-group entry 8.4 Group Attendance & Partial Entry Manager Actual attendance and multiple arrival waves 8.5 Family, Child, POD & Companion Journey Linked-person and child-protection journeys 8.6 Re-entry & Temporary Exit Journey",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Free View Day. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Access Control Module_Reference.pdf, page 111 §Support"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1375,6 +1560,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "primaryButton",
        "label": "Free View Day",
        "provenance": "pack Access Control Module_Reference.pdf, page 111 §Support"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Run journey simulation",
+       "operation": "simulateGuestJourney",
+       "provenance": "contract access.yaml POST /guest-journey/simulate (decided 29 September, VM close-out)"
       }
      ]
     }
@@ -1393,6 +1584,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "marketing-crm",
     "purpose": "Automated journeys",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "simulateGuestJourney",
+    "contract": "access",
+    "purpose": "Run journey simulation",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1408,9 +1605,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-223"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-223",
+   "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-223"
   },
-  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 111. 0 of 6 labels bound to a contract property; 7 of 94 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 111. 0 of 6 labels bound to a contract property; 7 of 94 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `simulateGuestJourney`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1443,6 +1641,49 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "createAdmissionRules": {
+  "method": "POST",
+  "path": "/admission-rules",
+  "contract": "access",
+  "summary": "Create an admission profile",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AdmissionRules",
+  "responds": "AdmissionRules"
+ },
+ "listAdmissionRules": {
+  "method": "GET",
+  "path": "/admission-rules",
+  "contract": "access",
+  "summary": "List admission profiles",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listEntryTemporaryExit": {
   "method": "GET",
   "path": "/entry-temporary-exit",
@@ -1491,9 +1732,20 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "GroupAttendancePartialEntryManagerView"
+  "responds": "Page"
  },
  "listGroupLeaderFast": {
   "method": "GET",
@@ -1504,9 +1756,20 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "GroupLeaderFastB2bValidationView"
+  "responds": "Page"
  },
  "listGuestJourney": {
   "method": "GET",
@@ -1517,9 +1780,20 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "GuestJourneyCommandCenterView"
+  "responds": "Page"
  },
  "listJourneys": {
   "method": "GET",
@@ -1543,7 +1817,20 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Journey"
+  "responds": "Page"
+ },
+ "listMultiParkCrossover": {
+  "method": "GET",
+  "path": "/multi-park-crossover",
+  "contract": "access",
+  "summary": "Multi-Park & Crossover Rules",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MultiParkCrossoverRulesView"
  },
  "listMultiParkCrossover2": {
   "method": "GET",
@@ -1554,9 +1841,54 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "MultiParkCrossoverJourneyOrchestratorView"
+  "responds": "Page"
+ },
+ "listQueues": {
+  "method": "GET",
+  "path": "/queues",
+  "contract": "queue",
+  "summary": "List queues",
+  "permission": "QUEUE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "openOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listSpecialEventFree": {
   "method": "GET",
@@ -1571,6 +1903,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "SpecialEventFreeViewAlternativeAdmissionView"
  },
+ "setContextTimeEvent": {
+  "method": "PUT",
+  "path": "/context-time-event",
+  "contract": "access",
+  "summary": "Context, Time, Event & Capacity Policy Builder",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ContextTimeEventCapacityPolicyBuilderInput",
+  "responds": "ContextTimeEventCapacityPolicyBuilderView"
+ },
  "setGroupAdmissionProfile": {
   "method": "PUT",
   "path": "/group-admission-profile",
@@ -1580,9 +1931,91 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "GroupB2bAdmissionProfileBuilderInput",
   "responds": "GroupB2bAdmissionProfileBuilderView"
+ },
+ "setGuestCompanionEligibility": {
+  "method": "PUT",
+  "path": "/guest-companion-eligibility",
+  "contract": "access",
+  "summary": "Save a companion eligibility rule",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GuestCompanionEligibilityRulesInput",
+  "responds": "GuestCompanionEligibilityRulesView"
+ },
+ "simulateGuestJourney": {
+  "method": "POST",
+  "path": "/guest-journey/simulate",
+  "contract": "access",
+  "summary": "Simulate an access journey",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GuestJourneySimulationInput",
+  "responds": "GuestJourneySimulationView"
+ },
+ "updateAdmissionRules": {
+  "method": "PUT",
+  "path": "/admission-rules/{profileId}",
+  "contract": "access",
+  "summary": "Update an admission profile",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AdmissionRules",
+  "responds": "AdmissionRules"
+ },
+ "updateQueue": {
+  "method": "PATCH",
+  "path": "/queues/{queueId}",
+  "contract": "queue",
+  "summary": "Amend queue configuration",
+  "permission": "QUEUE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Queue"
  }
 }
 ```
@@ -1593,507 +2026,299 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
- "FamilyChildPodCompanionJourneyView": {
+ "AdmissionRules": {
+  "x-ticvai-persistence": "access.admission_rules",
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Family, Child, POD & Companion Journey displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "parentChild": {
-    "type": "string",
-    "description": "Parent → Child"
-   },
-   "guardianMinor": {
-    "type": "string",
-    "description": "Guardian → Minor"
-   },
-   "podCompanion": {
-    "type": "string",
-    "description": "POD → Companion"
-   },
-   "primaryGuestNanny": {
-    "type": "string",
-    "description": "Primary Guest → Nanny"
-   },
-   "groupLeaderGroupMember": {
-    "type": "string",
-    "description": "Group Leader → Group Member"
-   },
-   "otherAuthorizedRelationships": {
-    "type": "string",
-    "description": "other authorized relationships"
-   }
-  }
- },
- "FastPassAttractionAccessJourneyView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Fast Pass & Attraction Access Journey displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "totalUses": {
-    "type": "integer",
-    "description": "Total Uses (the pack shows 3)"
-   },
-   "rideCoaster": {
-    "type": "string",
-    "description": "Ride: Coaster"
-   },
-   "previousUse1032": {
-    "type": "string",
-    "description": "Previous Use: 10:32"
-   },
-   "eligibleYes": {
-    "type": "string",
-    "description": "Eligible: YES"
-   },
-   "eligibleType": {
-    "type": "string",
-    "enum": [
-     "rollerCoaster",
-     "dropTower",
-     "waterRide",
-     "adventureRide"
-    ],
-    "description": "Vocabulary listed under Select eligible."
-   }
-  }
- },
- "GroupAttendancePartialEntryManagerView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Group Attendance & Partial Entry Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "purchased50": {
-    "type": "string",
-    "description": "Purchased: 50"
-   },
-   "previouslyEntered0": {
-    "type": "string",
-    "description": "Previously Entered: 0"
-   },
-   "entered43": {
-    "type": "string",
-    "description": "Entered: 43"
-   },
-   "remaining7": {
-    "type": "string",
-    "description": "Remaining: 7"
-   },
-   "remaining": {
-    "type": "string",
-    "description": "Remaining (the pack shows 7, 2)"
-   },
-   "guestsArriving": {
-    "type": "string",
-    "description": "Guests arriving (the pack shows 104 | Pa ge, 5)"
-   },
-   "totalEntered": {
-    "type": "integer",
-    "description": "Total Entered (the pack shows 48)"
-   },
-   "group": {
-    "type": "string",
-    "description": "Group"
-   },
-   "leader": {
-    "type": "string",
-    "description": "Leader"
-   },
-   "gate": {
-    "type": "string",
-    "description": "Gate"
-   },
-   "operator": {
-    "type": "string",
-    "description": "Operator"
-   },
-   "quantity": {
-    "type": "integer",
-    "description": "Quantity"
-   },
-   "time": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Time"
-   },
-   "device": {
-    "type": "string",
-    "description": "Device"
-   }
-  }
- },
- "GroupB2bAdmissionProfileBuilderInput": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
-  "description": "**What Group & B2B Admission Profile Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
-  "properties": {
-   "schools": {
-    "type": "string",
-    "description": "Schools"
-   },
-   "tourOperators": {
-    "type": "string",
-    "description": "Tour Operators"
-   },
-   "corporateGroups": {
-    "type": "string",
-    "description": "Corporate Groups"
-   },
-   "resellers": {
-    "type": "string",
-    "description": "Resellers"
-   },
-   "travelGroups": {
-    "type": "string",
-    "description": "Travel Groups"
-   },
-   "camps": {
-    "type": "string",
-    "description": "Camps"
-   },
-   "families": {
-    "type": "string",
-    "description": "Families"
-   },
-   "events": {
-    "type": "string",
-    "description": "Events"
-   },
-   "singleGroupQr": {
-    "type": "string",
-    "description": "Single Group QR"
-   },
-   "groupBarcode": {
-    "type": "string",
-    "description": "Group Barcode"
-   },
-   "groupRfid": {
-    "type": "string",
-    "description": "Group RFID"
-   },
-   "groupLeaderCredential": {
-    "type": "string",
-    "description": "Group Leader Credential"
-   },
-   "individualCredentials": {
-    "type": "string",
-    "description": "Individual Credentials"
-   },
-   "hybrid": {
-    "type": "string",
-    "description": "Hybrid"
-   },
-   "entireGroup": {
-    "type": "string",
-    "description": "Entire Group"
-   },
-   "partialGroup": {
-    "type": "string",
-    "description": "Partial Group"
-   },
-   "multipleWaves": {
-    "type": "string",
-    "description": "Multiple Waves"
-   },
-   "individualScan": {
-    "type": "string",
-    "description": "Individual Scan"
-   },
-   "leaderQuantity": {
-    "type": "integer",
-    "description": "Leader + Quantity"
-   },
-   "manifestBased": {
-    "type": "string",
-    "description": "Manifest-Based"
-   }
-  }
- },
- "GroupB2bAdmissionProfileBuilderView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Group & B2B Admission Profile Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "schools": {
-    "type": "string",
-    "description": "Schools"
-   },
-   "tourOperators": {
-    "type": "string",
-    "description": "Tour Operators"
-   },
-   "corporateGroups": {
-    "type": "string",
-    "description": "Corporate Groups"
-   },
-   "resellers": {
-    "type": "string",
-    "description": "Resellers"
-   },
-   "travelGroups": {
-    "type": "string",
-    "description": "Travel Groups"
-   },
-   "camps": {
-    "type": "string",
-    "description": "Camps"
-   },
-   "families": {
-    "type": "string",
-    "description": "Families"
-   },
-   "events": {
-    "type": "string",
-    "description": "Events"
-   },
-   "singleGroupQr": {
-    "type": "string",
-    "description": "Single Group QR"
-   },
-   "groupBarcode": {
-    "type": "string",
-    "description": "Group Barcode"
-   },
-   "groupRfid": {
-    "type": "string",
-    "description": "Group RFID"
-   },
-   "groupLeaderCredential": {
-    "type": "string",
-    "description": "Group Leader Credential"
-   },
-   "individualCredentials": {
-    "type": "string",
-    "description": "Individual Credentials"
-   },
-   "hybrid": {
-    "type": "string",
-    "description": "Hybrid"
-   },
-   "purchasedGuests": {
-    "type": "integer",
-    "description": "Purchased Guests (the pack shows 50)"
-   },
-   "entireGroup": {
-    "type": "string",
-    "description": "Entire Group"
-   },
-   "partialGroup": {
-    "type": "string",
-    "description": "Partial Group"
-   },
-   "multipleWaves": {
-    "type": "string",
-    "description": "Multiple Waves"
-   },
-   "individualScan": {
-    "type": "string",
-    "description": "Individual Scan"
-   },
-   "leaderQuantity": {
-    "type": "integer",
-    "description": "Leader + Quantity"
-   },
-   "manifestBased": {
-    "type": "string",
-    "description": "Manifest-Based"
-   }
-  }
- },
- "GroupLeaderFastB2bValidationView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Group Leader & Fast B2B Validation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "group120Guests": {
-    "type": "string",
-    "description": "GROUP: 120 GUESTS"
-   },
-   "attendance": {
-    "type": "integer",
-    "description": "Attendance (the pack shows +112)"
-   },
-   "remaining": {
-    "type": "string",
-    "description": "Remaining (the pack shows 8)"
-   },
-   "payment": {
-    "type": "string",
-    "description": "Payment ✓"
-   },
-   "booking": {
-    "type": "string",
-    "description": "Booking ✓"
-   },
-   "visitDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Visit Date ✓"
-   },
-   "groupProduct": {
-    "type": "string",
-    "description": "Group Product ✓"
-   },
-   "accessRules": {
-    "type": "string",
-    "description": "Access Rules ✓"
-   },
-   "manifest": {
-    "type": "string",
-    "description": "Manifest ✓"
-   }
-  }
- },
- "GuestJourneyCommandCenterView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Guest Journey Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "activeJourneyProfiles": {
-    "type": "integer",
-    "description": "Active Journey Profiles"
-   },
-   "groupArrivalsToday": {
-    "type": "string",
-    "description": "Group Arrivals Today"
-   },
-   "guestsViaGroupAdmission": {
-    "type": "string",
-    "description": "Guests via Group Admission"
-   },
-   "familyJourneys": {
-    "type": "integer",
-    "description": "Family Journeys"
-   },
-   "reEntryGuests": {
-    "type": "integer",
-    "description": "Re-entry Guests"
-   },
-   "crossoversToday": {
-    "type": "string",
-    "description": "Crossovers Today"
-   },
-   "fastPassValidations": {
-    "type": "integer",
-    "description": "Fast Pass Validations"
-   },
-   "specialEventAdmissions": {
-    "type": "integer",
-    "description": "Special Event Admissions"
-   },
-   "vipAdmissions": {
-    "type": "integer",
-    "description": "VIP Admissions"
-   },
-   "journeyExceptions": {
-    "type": "integer",
-    "description": "Journey Exceptions"
-   },
-   "delayedGroups": {
-    "type": "string",
-    "description": "delayed groups"
-   },
-   "unusuallyHighManualIntervention": {
-    "type": "string",
-    "description": "unusually high manual intervention"
-   },
-   "incompleteGroupEntry": {
-    "type": "string",
-    "description": "incomplete group entry"
-   },
-   "companionViolations": {
-    "type": "string",
-    "description": "companion violations"
-   },
-   "crossoverExceptions": {
-    "type": "string",
-    "description": "crossover exceptions"
-   },
-   "fastPassAnomalies": {
-    "type": "string",
-    "description": "Fast Pass anomalies"
-   }
-  }
- },
- "Journey": {
-  "type": "object",
-  "x-ticvai-persistence": "marketing.journey",
-  "description": "22.3.1b to 22.3.10b, CF-137. **A journey is a sequence with branches; a `MessageTrigger` is one step of it.** The trigger already handles *\"send this when that happens\"* — a journey is what you need when the next message depends on what the guest did about the last one.\nFive of the ten requirements are named lifecycles — abandoned cart, membership, loyalty, wallet, birthday. **They are not five features.** Each is a journey with a different entry event and a different set of steps, which is why this is one entity and a template library rather than five contracts.\n**Consent is checked at every send, not at entry.** A guest who opts out mid-journey stops receiving, and the journey does not need to know — the same rule `MessageTrigger` follows and the one PDPL Article 17(1) makes unconditional.\n",
   "required": [
    "id",
+   "code",
    "name",
-   "entryEvent",
-   "status",
-   "steps"
+   "openMinutesBefore",
+   "closeMinutesAfter"
   ],
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Server-assigned.** Ignored in a `createAdmissionRules` or `updateAdmissionRules` body; on update the profile is the one the path names.\n"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "perProductRules": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/PerProductRuleList"
+     }
+    ],
+    "description": "BL-059. **Transaction rules were per profile and a ticket type could not state its own.** An annual pass allowing one entry per day and a single ticket allowing one entry ever are different rules, and forcing a profile per product multiplies profiles instead.\n"
    },
    "name": {
-    "type": "string"
-   },
-   "templateKind": {
     "type": "string",
-    "nullable": true,
-    "enum": [
-     "abandonedCart",
-     "membershipLifecycle",
-     "loyaltyLifecycle",
-     "walletLifecycle",
-     "birthday",
-     "onboarding",
-     "winBack",
-     "custom"
-    ],
-    "description": "Which named lifecycle this implements. **Set for reporting and for the library**, not for behaviour — the steps decide what happens.\n"
+    "maxLength": 200
    },
-   "entryEvent": {
-    "type": "string",
-    "description": "22.3.2b. From the event catalogue, so a journey cannot enter on something nothing publishes.\n"
+   "openMinutesBefore": {
+    "type": "integer",
+    "description": "How long before a performance validation opens."
    },
-   "entryConditions": {
+   "closeMinutesAfter": {
+    "type": "integer"
+   },
+   "maxDurationMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "requiresExitBeforeReentry": {
+    "type": "boolean",
+    "default": false
+   },
+   "maxReentries": {
+    "type": "integer",
+    "nullable": true
+   },
+   "entryLimit": {
     "type": "object",
-    "nullable": true,
-    "description": "Narrows entry — a segment, a tier, a venue. **Evaluated once at entry**, unlike step conditions.\n"
-   },
-   "steps": {
-    "type": "array",
-    "description": "22.3.1b. What the builder produces. **The visual builder is a frontend over this** — the contract holds the graph and the canvas is a rendering of it.\n",
-    "items": {
-     "$ref": "#/components/schemas/JourneyStep"
+    "description": "**How many times the credential may enter** (decided 29 September, VM close-out). Pack 'Access Control Module' p.19 (BO-156, Entry, Exit & Re-entry Rules). Absent means `unlimited`.",
+    "required": [
+     "mode"
+    ],
+    "properties": {
+     "mode": {
+      "type": "string",
+      "enum": [
+       "unlimited",
+       "once",
+       "nTimes",
+       "nPerDay",
+       "nPerPeriod"
+      ],
+      "default": "unlimited"
+     },
+     "count": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "N for nTimes, nPerDay and nPerPeriod; required for those modes (`422` without it)"
+     },
+     "periodDays": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The period for nPerPeriod"
+     }
     }
    },
-   "status": {
+   "exitScan": {
     "type": "string",
     "enum": [
-     "draft",
-     "active",
-     "paused",
-     "archived"
-    ]
-   },
-   "maxDurationDays": {
-    "type": "integer",
-    "default": 30,
-    "description": "**A journey with no end is a guest who never leaves it.** After this, entrants exit wherever they are.\n"
-   },
-   "reentryPolicy": {
-    "type": "string",
-    "enum": [
-     "never",
-     "afterCompletion",
-     "always"
+     "required",
+     "optional",
+     "none"
     ],
-    "default": "afterCompletion",
-    "description": "22.3.6b. **Abandoned cart is the case that needs this.** A guest who abandons three carts in an hour should not get three recovery sequences, and `never` is wrong too — they may genuinely abandon one next month.\n"
+    "default": "optional",
+    "description": "(decided 29 September, VM close-out) `required`: re-entry needs a recorded exit. `optional`: exits run in free rotation and headcount is inferred. `none`: the exit has no reader."
+   },
+   "maxExits": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Null is unlimited (decided 29 September, VM close-out)"
+   },
+   "reEntryWindowMinutes": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Minutes after an exit within which re-entry is allowed; null is any time the credential is valid (decided 29 September, VM close-out)"
+   },
+   "sameDayOnly": {
+    "type": "boolean",
+    "default": true,
+    "description": "Re-entry only on the day of the exit (decided 29 September, VM close-out)"
+   },
+   "designatedAccessPointIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Re-entry only through these access points; empty is any allowed access point (decided 29 September, VM close-out)"
+   },
+   "validity": {
+    "type": "object",
+    "description": "**When the credential is valid** (decided 29 September, VM close-out). Pack 'Access Control Module' p.21 (BO-158, Access Validity & Time Rules). The admission window above still applies inside it.",
+    "required": [
+     "anchor"
+    ],
+    "properties": {
+     "anchor": {
+      "type": "string",
+      "enum": [
+       "fixedRange",
+       "afterSale",
+       "afterActivation",
+       "afterFirstUse"
+      ],
+      "description": "fixedRange uses from and to; the others count days from the event"
+     },
+     "days": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "N days after the anchor; required unless the anchor is fixedRange"
+     },
+     "from": {
+      "type": "string",
+      "format": "date"
+     },
+     "to": {
+      "type": "string",
+      "format": "date",
+      "description": "Inclusive. Must not be before from (`422`)"
+     },
+     "endOf": {
+      "type": "string",
+      "enum": [
+       "day",
+       "week",
+       "month",
+       "year"
+      ],
+      "nullable": true,
+      "description": "Validity runs to the end of the day, week, month or year the relative period ends in"
+     },
+     "daysOfWeek": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+       ]
+      },
+      "description": "Empty is every day"
+     },
+     "dayTypes": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "peakDates",
+        "offPeakDates",
+        "holidays",
+        "seasons",
+        "eventDates"
+       ]
+      },
+      "description": "Calendar day types on which access is allowed; empty is every day type"
+     },
+     "blackoutDates": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "date"
+      },
+      "description": "Dates on which access is refused whatever else allows it"
+     }
+    }
+   },
+   "crossover": {
+    "type": "object",
+    "nullable": true,
+    "description": "**Crossover between parks** (decided 29 September, VM close-out). Pack 'Access Control Module' p.23 (BO-160, Multi-Park & Crossover Rules); BO-220 uses the same block. Null means the profile admits to one park only.",
+    "required": [
+     "allowedParkOrgUnitIds"
+    ],
+    "properties": {
+     "allowedParkOrgUnitIds": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "parkOrder": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "description": "Required order of parks, if any; empty is any order"
+     },
+     "sameDayOnly": {
+      "type": "boolean",
+      "default": true
+     },
+     "differentDayAccess": {
+      "type": "boolean",
+      "default": false
+     },
+     "dayPattern": {
+      "type": "string",
+      "enum": [
+       "consecutiveFromFirstScan",
+       "flexibleWithinValidity"
+      ],
+      "default": "flexibleWithinValidity"
+     },
+     "maxParkEntries": {
+      "type": "integer",
+      "minimum": 1,
+      "nullable": true,
+      "description": "Null is unlimited"
+     },
+     "crossoverQuantity": {
+      "type": "integer",
+      "minimum": 1,
+      "nullable": true,
+      "description": "How many crossovers; null is unlimited"
+     },
+     "crossoverAfterTime": {
+      "type": "string",
+      "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+      "nullable": true,
+      "description": "Earliest venue-local time HH:MM a crossover is allowed"
+     },
+     "prerequisiteParkOrgUnitId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "The park that must be entered first"
+     },
+     "reEntryAfterCrossover": {
+      "type": "boolean",
+      "default": false
+     }
+    }
+   },
+   "allowedAccessPointIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Empty means any access point in the venue."
+   },
+   "reEntryVerification": {
+    "type": "string",
+    "enum": [
+     "credentialOnly",
+     "credentialUvStamp",
+     "credentialFace",
+     "credentialOperator",
+     "custom"
+    ],
+    "default": "credentialOnly",
+    "description": "What a re-entering guest must show besides the credential, as `listEntryTemporaryExit` returns it (added 29 September, data-model close-out DM1)."
+   },
+   "ruleConditions": {
+    "type": "object",
+    "nullable": true,
+    "description": "The visual rule builder body `setVisualAccessRule` writes: `appliesTo` (products or credential types), `conditions`, `logic` (AND / OR / NOT over the conditions), `decision` (allow, deny, referToOperator, overrideEligible) and `consequences`. **One `jsonb` column on the rule row**, read with the rule and never queried on its own; the locations stay in `access.entry_rule_point` (added 29 September, data-model close-out DM1)."
    },
    "scopePath": {
     "type": "string",
@@ -2101,152 +2326,980 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
- "JourneyStep": {
+ "ContextTimeEventCapacityPolicyBuilderInput": {
   "type": "object",
-  "description": "One node. **A step either sends, waits, or branches** — three kinds rather than a general graph, because a marketing user drawing an arbitrary graph draws a loop.\n",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Context, Time, Event & Capacity Policy Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "result": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "deny",
+     "review",
+     "requireId",
+     "requireBiometric",
+     "requireCompanion",
+     "requireSupervisor"
+    ]
+   },
+   "conditionExpression": {
+    "type": "string",
+    "description": "e.g. Zone Occupancy >= 90% AND Day = Friday AND Time BETWEEN 18:00 AND 23:59"
+   },
+   "name": {
+    "type": "string"
+   },
+   "policyId": {
+    "type": "string"
+   },
+   "contextType": {
+    "type": "string",
+    "enum": [
+     "date",
+     "day",
+     "time",
+     "season",
+     "event",
+     "performance",
+     "specialEvent",
+     "holiday",
+     "operatingCalendar",
+     "occupancy",
+     "attractionStatus"
+    ],
+    "description": "Kind of venue condition the policy reacts to"
+   },
+   "monitorThresholdPercent": {
+    "type": "integer",
+    "description": "Occupancy percent at which the band becomes Monitor"
+   },
+   "restrictThresholdPercent": {
+    "type": "integer",
+    "description": "Occupancy percent at which the band becomes Restrict"
+   }
+  },
   "required": [
-   "id",
-   "kind"
+   "policyId",
+   "name",
+   "contextType",
+   "conditionExpression",
+   "result"
+  ]
+ },
+ "ContextTimeEventCapacityPolicyBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Context, Time, Event & Capacity Policy Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "result": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "deny",
+     "review",
+     "requireId",
+     "requireBiometric",
+     "requireCompanion",
+     "requireSupervisor"
+    ]
+   },
+   "conditionExpression": {
+    "type": "string",
+    "description": "e.g. Zone Occupancy >= 90% AND Day = Friday AND Time BETWEEN 18:00 AND 23:59"
+   },
+   "name": {
+    "type": "string"
+   },
+   "policyId": {
+    "type": "string"
+   },
+   "contextType": {
+    "type": "string",
+    "enum": [
+     "date",
+     "day",
+     "time",
+     "season",
+     "event",
+     "performance",
+     "specialEvent",
+     "holiday",
+     "operatingCalendar",
+     "occupancy",
+     "attractionStatus"
+    ],
+    "description": "Kind of venue condition the policy reacts to"
+   },
+   "monitorThresholdPercent": {
+    "type": "integer",
+    "description": "Occupancy percent at which the band becomes Monitor"
+   },
+   "restrictThresholdPercent": {
+    "type": "integer",
+    "description": "Occupancy percent at which the band becomes Restrict"
+   }
+  },
+  "required": [
+   "policyId",
+   "name",
+   "contextType",
+   "conditionExpression",
+   "result"
+  ]
+ },
+ "CreateQueueRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "code",
+   "name",
+   "venueId",
+   "capacityPerCycle",
+   "cycleMinutes"
   ],
   "properties": {
-   "id": {
-    "type": "string"
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "attractionProductId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The ride. Taking it out of service closes this queue rather than leaving guests holding positions for something that is not running.\n"
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
    },
    "kind": {
     "type": "string",
     "enum": [
-     "send",
-     "wait",
-     "branch",
-     "exit",
-     "goal"
-    ]
+     "standby",
+     "singleRider",
+     "fastPass",
+     "virtual",
+     "accessible",
+     "groupOnly",
+     "staffOnly"
+    ],
+    "default": "standby",
+    "description": "5.6.x. **A ride has several queues and the model had one.** A single-rider line and a standby line at the same attraction draw from one capacity and fill at different rates, and modelling them as one queue makes both wait estimates wrong.\n**`accessible` is not a courtesy lane.** It has its own capacity because a guest who cannot stand in a switchback needs a place to wait, not priority.\n"
    },
-   "templateId": {
+   "operatingWindows": {
+    "type": "array",
+    "description": "**When the queue runs, which is not when the venue is open.** A ride closing an hour early for maintenance leaves a queue accepting guests for a cycle that will not happen.\nStored one row per window in `queue.queue_operating_window` (see `Queue`), not as a column on the queue.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "day",
+      "from",
+      "to"
+     ],
+     "properties": {
+      "day": {
+       "type": "string",
+       "enum": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+       ]
+      },
+      "from": {
+       "type": "string",
+       "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+       "description": "Venue local time, 24-hour `HH:MM`, when the queue starts running."
+      },
+      "to": {
+       "type": "string",
+       "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+       "description": "Venue local time, 24-hour `HH:MM`, when the queue stops running."
+      },
+      "lastEntryMinutesBefore": {
+       "type": "integer",
+       "default": 0,
+       "description": "**When the queue stops accepting, which is before it stops running.** A guest joining two minutes before close waits twenty and is turned away at the front.\n"
+      }
+     }
+    }
+   },
+   "parentQueueId": {
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "For `send`. Channel is resolved from the guest's preference at the moment of sending."
+    "description": "Where several queues share one capacity. **The standby and single-rider lines at one ride draw from the same cycles**, and a parent is how that is expressed without either queue owning the other.\n"
    },
-   "channelPreference": {
+   "loadBalanceWithQueueIds": {
     "type": "array",
-    "nullable": true,
-    "description": "22.3.3b. Ordered fallback — email, then SMS, then push. **A guest with no email address does not get an email step**, and the step does not fail, it moves down the list.\n",
+    "description": "BL-137. **Two rides with the same theme and different waits**, and nothing directed a guest to the shorter one. Load balancing is an offer, not an assignment — **a guest sent to a ride they did not choose is a guest who feels managed.**\n",
     "items": {
      "type": "string",
-     "enum": [
-      "email",
-      "sms",
-      "whatsapp",
-      "push",
-      "inApp"
-     ]
+     "format": "uuid"
     }
    },
-   "waitMinutes": {
+   "inQueueOfferEnabled": {
+    "type": "boolean",
+    "default": false,
+    "description": "**A guest with twenty minutes to wait is a guest with twenty minutes to buy something.** Offers surface in the wait screen and are the only reason a virtual queue earns its infrastructure.\n"
+   },
+   "notifyBeforeCallMinutes": {
+    "type": "integer",
+    "default": 5,
+    "description": "BL-017, 19.2.61. **A guest was not told their turn was approaching**, which makes a virtual queue worse than a physical one — at least a line is visible.\n"
+   },
+   "capacityPerCycle": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "cycleMinutes": {
+    "type": "number",
+    "minimum": 0
+   },
+   "maxPartySize": {
+    "type": "integer",
+    "default": 6
+   },
+   "returnWindowMinutes": {
+    "type": "integer",
+    "default": 15,
+    "description": "How long a called party has to arrive before the entry expires."
+   },
+   "heightRequirementCm": {
     "type": "integer",
     "nullable": true
    },
-   "waitUntil": {
-    "type": "object",
-    "nullable": true,
-    "description": "22.3.5b. **Business hours, time zone and blackout windows** — a wallet low-balance alert at 3am is a complaint, and the venue's quiet hours are venue configuration rather than a property of this step.\n",
-    "properties": {
-     "businessHoursOnly": {
-      "type": "boolean",
-      "default": false
-     },
-     "timezone": {
-      "type": "string",
-      "nullable": true
-     },
-     "respectQuietHours": {
-      "type": "boolean",
-      "default": true
-     },
-     "notBefore": {
-      "type": "string",
-      "nullable": true
-     }
-    }
+   "fastPassAllocationPercent": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100,
+    "default": 0,
+    "description": "Share of each cycle reserved for Fast Pass holders."
    },
-   "condition": {
-    "type": "object",
-    "nullable": true,
-    "description": "22.3.4b. IF/THEN over guest profile, behaviour and prior steps. **The most common condition is whether the previous message worked** — a recovery sequence must stop when the guest buys.\n",
-    "properties": {
-     "field": {
-      "type": "string"
-     },
-     "operator": {
-      "type": "string",
-      "enum": [
-       "eq",
-       "neq",
-       "gt",
-       "lt",
-       "contains",
-       "exists",
-       "notExists"
-      ]
-     },
-     "value": {
-      "type": "string",
-      "nullable": true
-     }
-    }
-   },
-   "onTrue": {
-    "type": "string",
-    "nullable": true,
-    "description": "Next step id."
-   },
-   "onFalse": {
+   "zone": {
     "type": "string",
     "nullable": true
    },
-   "next": {
-    "type": "string",
-    "nullable": true
-   },
-   "goalEvent": {
-    "type": "string",
+   "fastPass": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/QueueFastPass"
+     }
+    ],
     "nullable": true,
-    "description": "For `goal`. **The event that means this journey worked and the guest should leave it** — a purchase for abandoned cart, a renewal for membership. **Reaching a goal exits immediately**, which is what stops a recovered cart from being chased.\n"
+    "description": "The lane's Fast Pass block (decided 29 September, VM close-out). Null on a queue that takes no Fast Pass.\n"
    }
   }
  },
- "MultiParkCrossoverJourneyOrchestratorView": {
+ "FamilyChildPodCompanionJourneyView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Multi-Park & Crossover Journey Orchestrator displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "description": "**What Family, Child, POD & Companion Journey displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "maximum": {
+   "ruleId": {
     "type": "string",
-    "description": "Maximum (the pack shows 1)"
+    "description": "Companion rule identifier"
    },
-   "adventureParkInside": {
+   "relationshipType": {
     "type": "string",
-    "description": "Adventure Park — INSIDE"
+    "enum": [
+     "parentChild",
+     "guardianMinor",
+     "podCompanion",
+     "primaryGuestNanny",
+     "groupLeaderGroupMember",
+     "other"
+    ],
+    "description": "Linked-person relationship this rule governs"
    },
-   "waterParkCrossoverAvailable": {
+   "verificationMethod": {
     "type": "string",
-    "description": "Water Park — CROSSOVER AVAILABLE"
+    "enum": [
+     "pairedAdultCredential",
+     "assignedAdultBiometric"
+    ],
+    "description": "How the accompanying adult is verified"
    },
-   "normalEntry": {
+   "assignedAdultRequiredForExit": {
+    "type": "boolean",
+    "description": "The assigned adult must be present for the dependent to exit"
+   }
+  },
+  "required": [
+   "ruleId"
+  ]
+ },
+ "FastPassAttractionAccessJourneyView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Fast Pass & Attraction Access Journey displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "profileId": {
     "type": "string",
-    "description": "Normal Entry"
+    "description": "Fast Pass profile identifier"
    },
-   "reEntry": {
-    "type": "string",
-    "description": "Re-entry"
+   "totalUses": {
+    "type": "integer",
+    "description": "Total Uses (the pack shows 3)"
    },
-   "crossover": {
+   "eligibleType": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Eligible attraction categories: rollerCoaster, dropTower, waterRide, adventureRide"
+   },
+   "name": {
     "type": "string",
-    "description": "Crossover"
+    "description": "Profile name, e.g. Silver, Gold"
+   },
+   "unlimited": {
+    "type": "boolean",
+    "description": "Unlimited uses"
+   },
+   "consumptionPerValidation": {
+    "type": "integer",
+    "description": "Uses consumed per validation"
+   },
+   "onePerRide": {
+    "type": "boolean",
+    "description": "Restrict to one access per ride"
+   }
+  },
+  "required": [
+   "profileId"
+  ]
+ },
+ "GroupB2bAdmissionProfileBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Group & B2B Admission Profile Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "name": {
+    "type": "string",
+    "description": "Profile name"
+   },
+   "venueId": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "profileId": {
+    "type": "string",
+    "description": "Group admission profile identifier"
+   },
+   "groupSegments": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "schools",
+      "tourOperators",
+      "corporateGroups",
+      "resellers",
+      "travelGroups",
+      "camps",
+      "families",
+      "events"
+     ]
+    },
+    "description": "Group segments this profile applies to"
+   },
+   "credentialMode": {
+    "type": "string",
+    "enum": [
+     "singleGroupQr",
+     "groupBarcode",
+     "groupRfid",
+     "groupLeaderCredential",
+     "individualCredentials",
+     "hybrid"
+    ],
+    "description": "How the group presents its credentials"
+   },
+   "admissionMethod": {
+    "type": "string",
+    "enum": [
+     "entireGroup",
+     "partialGroup",
+     "multipleWaves",
+     "individualScan",
+     "leaderQuantity",
+     "manifestBased"
+    ],
+    "description": "How the group is admitted at the gate"
+   }
+  },
+  "required": [
+   "profileId",
+   "venueId",
+   "name"
+  ]
+ },
+ "GroupB2bAdmissionProfileBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Group & B2B Admission Profile Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "name": {
+    "type": "string",
+    "description": "Profile name"
+   },
+   "venueId": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "profileId": {
+    "type": "string",
+    "description": "Group admission profile identifier"
+   },
+   "groupSegments": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "schools",
+      "tourOperators",
+      "corporateGroups",
+      "resellers",
+      "travelGroups",
+      "camps",
+      "families",
+      "events"
+     ]
+    },
+    "description": "Group segments this profile applies to"
+   },
+   "credentialMode": {
+    "type": "string",
+    "enum": [
+     "singleGroupQr",
+     "groupBarcode",
+     "groupRfid",
+     "groupLeaderCredential",
+     "individualCredentials",
+     "hybrid"
+    ],
+    "description": "How the group presents its credentials"
+   },
+   "admissionMethod": {
+    "type": "string",
+    "enum": [
+     "entireGroup",
+     "partialGroup",
+     "multipleWaves",
+     "individualScan",
+     "leaderQuantity",
+     "manifestBased"
+    ],
+    "description": "How the group is admitted at the gate"
+   }
+  },
+  "required": [
+   "profileId",
+   "venueId",
+   "name"
+  ]
+ },
+ "GuestCompanionEligibilityRulesInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; the write configures the rules the matching View reads back (decided 29 September, VM close-out)",
+  "description": "**What Guest, Companion & Eligibility Rules submits** (decided 29 September, VM close-out). The writable fields of its View; the figures the screen computes are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "required": [
+   "venueId",
+   "name",
+   "guestCategory",
+   "requiredCompanionCategory",
+   "verifyAt"
+  ],
+  "properties": {
+   "ruleId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Absent creates a rule"
+   },
+   "venueId": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "guestCategory": {
+    "type": "string",
+    "enum": [
+     "adult",
+     "child",
+     "junior",
+     "senior",
+     "pod",
+     "podCompanion",
+     "nanny",
+     "vip",
+     "member",
+     "staff",
+     "accreditation",
+     "customerSegment"
+    ]
+   },
+   "requiredCompanionCategory": {
+    "type": "string",
+    "enum": [
+     "adult",
+     "podCompanion",
+     "nanny",
+     "guardian"
+    ],
+    "description": "Category of the companion who must be present"
+   },
+   "companionVerification": {
+    "type": "string",
+    "enum": [
+     "linkedTicket",
+     "companionBiometric"
+    ],
+    "default": "linkedTicket"
+   },
+   "verifyAt": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "admission",
+      "exit",
+      "attraction"
+     ]
+    },
+    "minItems": 1,
+    "description": "Where the companion is checked"
+   },
+   "attractionIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Where verifyAt includes attraction"
    }
   }
+ },
+ "GuestCompanionEligibilityRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Guest, Companion & Eligibility Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ruleId": {
+    "type": "string"
+   },
+   "guestCategory": {
+    "type": "string",
+    "enum": [
+     "adult",
+     "child",
+     "junior",
+     "senior",
+     "pod",
+     "podCompanion",
+     "nanny",
+     "vip",
+     "member",
+     "staff",
+     "accreditation",
+     "customerSegment"
+    ]
+   },
+   "name": {
+    "type": "string"
+   },
+   "requiredCompanionCategory": {
+    "type": "string",
+    "description": "Category of the qualifying companion, e.g. adult"
+   },
+   "companionVerification": {
+    "type": "string",
+    "enum": [
+     "linkedTicket",
+     "companionBiometric"
+    ]
+   },
+   "verifyAt": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "admission",
+      "exit",
+      "attraction"
+     ]
+    },
+    "description": "Where the companion is checked (decided 29 September, VM close-out)"
+   },
+   "attractionIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   }
+  },
+  "required": [
+   "ruleId",
+   "guestCategory"
+  ]
+ },
+ "GuestJourneySimulationInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only (decided 29 September, VM close-out)",
+  "description": "A journey to simulate against the access rules, before it is published (decided 29 September, VM close-out).",
+  "required": [
+   "journeyProfileId",
+   "scenario"
+  ],
+  "properties": {
+   "journeyProfileId": {
+    "type": "string",
+    "description": "The access journey (`GuestJourneyCommandCenterView.journeyProfileId`)"
+   },
+   "scenario": {
+    "type": "string",
+    "enum": [
+     "standardDay",
+     "freeViewDay",
+     "specialEvent",
+     "peakDay"
+    ]
+   },
+   "simulatedDate": {
+    "type": "string",
+    "format": "date",
+    "description": "Date the calendar rules are evaluated for; empty is today"
+   },
+   "entitlementIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Entitlements the simulated guest holds"
+   },
+   "steps": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "accessPointId"
+     ],
+     "properties": {
+      "accessPointId": {
+       "type": "string"
+      },
+      "direction": {
+       "type": "string",
+       "enum": [
+        "entry",
+        "exit"
+       ],
+       "default": "entry"
+      },
+      "at": {
+       "type": "string",
+       "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+       "description": "Local time HH:MM"
+      }
+     }
+    },
+    "minItems": 1,
+    "maxItems": 50,
+    "description": "The scans, in order"
+   }
+  }
+ },
+ "GuestJourneySimulationView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed; nothing is admitted or consumed (decided 29 September, VM close-out)",
+  "description": "What each step of a simulated journey would decide (decided 29 September, VM close-out).",
+  "required": [
+   "journeyProfileId",
+   "scenario",
+   "steps"
+  ],
+  "properties": {
+   "journeyProfileId": {
+    "type": "string"
+   },
+   "scenario": {
+    "type": "string",
+    "enum": [
+     "standardDay",
+     "freeViewDay",
+     "specialEvent",
+     "peakDay"
+    ]
+   },
+   "passed": {
+    "type": "boolean",
+    "description": "Every step produced the expected decision"
+   },
+   "steps": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "accessPointId": {
+       "type": "string"
+      },
+      "decision": {
+       "type": "string",
+       "enum": [
+        "allowed",
+        "denied",
+        "review"
+       ]
+      },
+      "reasonCode": {
+       "type": "string"
+      },
+      "entitlementConsumed": {
+       "type": "string",
+       "nullable": true
+      },
+      "decisionTrace": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "MultiParkCrossoverRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Multi-Park & Crossover Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ruleId": {
+    "type": "string"
+   },
+   "allowedParks": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "allowed parks"
+   },
+   "parkOrder": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Required park order, if any"
+   },
+   "sameDayCrossover": {
+    "type": "boolean",
+    "description": "same-day crossover"
+   },
+   "differentDayAccess": {
+    "type": "boolean",
+    "description": "different-day access"
+   },
+   "numberOfParkEntries": {
+    "type": "integer",
+    "description": "number of park entries"
+   },
+   "crossoverQuantity": {
+    "type": "integer",
+    "description": "crossover quantity"
+   },
+   "crossoverTime": {
+    "type": "string",
+    "description": "Earliest local time HH:MM a crossover is allowed"
+   },
+   "prerequisitePark": {
+    "type": "string",
+    "description": "prerequisite park"
+   },
+   "reEntryAfterCrossover": {
+    "type": "boolean",
+    "description": "re-entry after crossover"
+   },
+   "name": {
+    "type": "string"
+   },
+   "dayPattern": {
+    "type": "string",
+    "enum": [
+     "consecutiveFromFirstScan",
+     "flexibleWithinValidity"
+    ]
+   }
+  },
+  "required": [
+   "ruleId",
+   "allowedParks"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PerProductRuleList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "**One `jsonb` column on the profile row** (`access.admission_rules.per_product_rules`). The rules are read with the profile and a rule is never queried on its own, so a child table would add a join for nothing.\n",
+  "items": {
+   "type": "object",
+   "properties": {
+    "productId": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "entriesPerDay": {
+     "type": "integer",
+     "nullable": true
+    },
+    "minimumGapMinutes": {
+     "type": "integer",
+     "nullable": true,
+     "description": "**Anti-passback in minutes rather than a boolean.** A guest leaving for lunch and returning in forty minutes is normal; the same scan twice in ten seconds is a card being passed back over a fence.\n"
+    },
+    "allowedAccessPointIds": {
+     "type": "array",
+     "items": {
+      "type": "string",
+      "format": "uuid"
+     }
+    },
+    "biometricPolicy": {
+     "allOf": [
+      {
+       "$ref": "#/components/schemas/BiometricPolicy"
+      }
+     ],
+     "description": "BL-105, 3.2.9. **The biometric check is a property of the product, not of the venue** — memberships checked, day tickets not. It sits here rather than on the profile because `perProductRules` is already where a ticket type states its own terms, and a profile per product would multiply profiles to carry one flag.\n**Absent means `disabled`**, and `disabled` is the answer for every product until somebody chooses otherwise. **Inert while `VenueSettings.biometrics.isEnabled` is false**, so a rules profile copied to another venue cannot begin capturing faces there.\n"
+    },
+    "maxPassesPerBiometricIdentity": {
+     "type": "integer",
+     "nullable": true,
+     "minimum": 1,
+     "description": "BL-096, 2.14.7. **The annual-pass quota, keyed to biometric identity.** `enrolFacePass` already answers 409 where a face is on another annual pass; the constant behind that refusal was one and was invisible. **Null means unlimited** and is the answer for every product that is not an annual pass — a quota applied where nobody asked for one turns a family sharing a day ticket into a fraud alert.\n"
+    }
+   }
+  }
+ },
+ "Queue": {
+  "x-ticvai-persistence": "queue.queue + queue.queue_operating_window",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateQueueRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "status",
+     "waitingPartyCount"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "status": {
+      "$ref": "#/components/schemas/QueueStatus"
+     },
+     "statusReason": {
+      "type": "string",
+      "nullable": true
+     },
+     "waitingPartyCount": {
+      "type": "integer"
+     },
+     "waitingGuestCount": {
+      "type": "integer"
+     },
+     "currentWaitMinutes": {
+      "type": "integer",
+      "nullable": true
+     },
+     "waitTimeSource": {
+      "$ref": "#/components/schemas/WaitTimeSource"
+     },
+     "waitTimeAsOf": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "description": "When `currentWaitMinutes` was last set, by whichever source set it. `WaitTime.asOf` reads this.\n"
+     },
+     "manualWaitExpiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "description": "Set by `setWaitTime` as now plus `expiresInMinutes`. Past it, the manual figure is dropped and the queue reverts to its sensor or throughput estimate. Null when the current figure is not manual.\n"
+     },
+     "manualWaitNote": {
+      "type": "string",
+      "maxLength": 200,
+      "nullable": true,
+      "readOnly": true,
+      "description": "The `note` given with the current manual figure. Cleared when it expires."
+     },
+     "expectedReopenAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
+   }
+  ]
+ },
+ "QueueStatus": {
+  "type": "string",
+  "enum": [
+   "open",
+   "paused",
+   "closed",
+   "atCapacity"
+  ]
  },
  "ReEntryTemporaryExitJourneyView": {
   "type": "object",
@@ -2254,59 +3307,33 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Re-entry & Temporary Exit Journey displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "credentialOnly": {
+   "ruleId": {
     "type": "string",
-    "description": "Credential only"
+    "description": "Re-entry rule identifier"
    },
-   "credentialUvStamp": {
+   "reEntryVerification": {
     "type": "string",
-    "description": "Credential + UV stamp"
-   },
-   "credentialFace": {
-    "type": "string",
-    "description": "Credential + Face"
-   },
-   "credentialOperator": {
-    "type": "string",
-    "description": "Credential + operator"
-   },
-   "customSupportedMethod": {
-    "type": "string",
-    "description": "custom supported method"
+    "enum": [
+     "credentialOnly",
+     "credentialUvStamp",
+     "credentialFace",
+     "credentialOperator",
+     "custom"
+    ],
+    "description": "Verification required at re-entry"
    },
    "maximum": {
-    "type": "string",
-    "description": "Maximum (the pack shows 1)"
-   },
-   "previousEntry": {
-    "type": "string",
-    "description": "✓ Previous entry"
-   },
-   "validExit": {
-    "type": "string",
-    "description": "✓ Valid exit"
-   },
-   "reEntryEntitlement": {
-    "type": "string",
-    "description": "✓ Re-entry entitlement"
-   },
-   "reEntryQuantity": {
     "type": "integer",
-    "description": "✓ Re-entry quantity"
+    "description": "Maximum re-entries allowed"
    },
-   "correctGate": {
+   "name": {
     "type": "string",
-    "description": "✓ Correct gate"
-   },
-   "antiPassback": {
-    "type": "string",
-    "description": "✓ Anti-passback"
-   },
-   "additionalVerification": {
-    "type": "string",
-    "description": "✓ Additional verification"
+    "description": "Rule name"
    }
-  }
+  },
+  "required": [
+   "ruleId"
+  ]
  },
  "SpecialEventFreeViewAlternativeAdmissionView": {
   "type": "object",
@@ -2314,23 +3341,54 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Special Event, Free View & Alternative Admission displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "exampleFreeViewDay": {
+   "configId": {
     "type": "string",
-    "description": "Example — Free View Day"
-   },
-   "on": {
-    "type": "string",
-    "description": "ON"
+    "description": "Special admission configuration identifier"
    },
    "attendance": {
     "type": "integer",
     "description": "Attendance (the pack shows +85)"
    },
-   "exampleSpecialEvent": {
+   "admissionType": {
     "type": "string",
-    "description": "Example — Special Event"
+    "enum": [
+     "freeViewDay",
+     "specialEvent"
+    ],
+    "description": "Kind of special admission"
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Start"
+   },
+   "endsAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "End"
+   },
+   "attractionValidation": {
+    "type": "boolean",
+    "description": "Attraction gates keep validating tickets"
+   },
+   "manualAttendanceRequired": {
+    "type": "boolean",
+    "description": "Operator enters attendance count"
    }
-  }
+  },
+  "required": [
+   "configId"
+  ]
+ },
+ "WaitTimeSource": {
+  "type": "string",
+  "description": "Where the estimate came from. Surfaced so an operator knows whether a figure is measured or guessed.\n",
+  "enum": [
+   "sensor",
+   "throughput",
+   "manual",
+   "unavailable"
+  ]
  }
 }
 ```

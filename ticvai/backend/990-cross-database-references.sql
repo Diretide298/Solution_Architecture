@@ -34,9 +34,9 @@
 -- control.partner_agreement.approval_request_id -> approvals.request
 -- control database -> tenant database. Enforced by the caller, not by Postgres.
 -- ALTER TABLE control.partner_agreement ADD CONSTRAINT partner_agreement_approval_request_id_fkey FOREIGN KEY (approval_request_id) REFERENCES approvals.request(id);
--- control.partner_agreement.partner_id -> platform.tenant
+-- control.partner_case.sla_policy_id -> approvals.sla_policy
 -- control database -> tenant database. Enforced by the caller, not by Postgres.
--- ALTER TABLE control.partner_agreement ADD CONSTRAINT partner_agreement_partner_id_fkey FOREIGN KEY (partner_id) REFERENCES platform.tenant(id);
+-- ALTER TABLE control.partner_case ADD CONSTRAINT partner_case_sla_policy_id_fkey FOREIGN KEY (sla_policy_id) REFERENCES approvals.sla_policy(id);
 -- control.partner_user.principal_id -> identity.principal
 -- control database -> tenant database. Enforced by the caller, not by Postgres.
 -- ALTER TABLE control.partner_user ADD CONSTRAINT partner_user_principal_id_fkey FOREIGN KEY (principal_id) REFERENCES identity.principal(id);

@@ -1,0 +1,734 @@
+{
+ "ApprovalKind": {
+  "type": "string",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n",
+  "enum": [
+   "refund",
+   "priceOverride",
+   "discountOverride",
+   "complimentaryTicket",
+   "membershipCancellation",
+   "accessPermissionChange",
+   "configurationChange",
+   "aiRecommendation",
+   "releasePromotion",
+   "requisition",
+   "stockWriteOff",
+   "journalEntry",
+   "periodClose",
+   "periodReopen",
+   "purchaseOrderCancel",
+   "purchaseOrderShortClose",
+   "tenantMigration"
+  ]
+ },
+ "ApprovalMatrix": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.matrix",
+  "required": [
+   "kind",
+   "scopeLevel",
+   "rules"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ApprovalKind"
+   },
+   "scopeLevel": {
+    "type": "string",
+    "enum": [
+     "tenant",
+     "region",
+     "venue"
+    ]
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true
+   },
+   "version": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "11.1.80. **A request is decided by the rules it was raised under.** Changing the matrix mid-flight would mean an approver answering a question that changed while they read it.\n**(`kind`, `scopePath`, `version`) is unique**, and a stored version is never edited: a request's `matrixVersion` names exactly one rule set (decided 28 September, audit R129 (2)).\n"
+   },
+   "rules": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ApprovalRule"
+    }
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ApprovalRule": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.rule",
+  "required": [
+   "order",
+   "approverRoleIds",
+   "mode"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "order": {
+    "type": "integer",
+    "description": "**First match wins.** Explicit ordering is what makes a matrix reviewable — an unordered set of overlapping rules is one nobody can reason about.\n"
+   },
+   "minAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "maxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "riskScoreAbove": {
+    "type": "number",
+    "nullable": true,
+    "description": "11.1.12. **Nothing supplies this yet** — risk scoring is parked with the model-dependent AI. The field exists so adding the engine later is configuration rather than a schema change.\n"
+   },
+   "condition": {
+    "type": "string",
+    "nullable": true,
+    "description": "11.1.13. Evaluated against the attributes the caller supplied.\n\n**No condition language is defined yet** (pull audit R104, 26 September): the grammar, the attributes it may name and how two conditions are compared for `unreachableRule` are an open decision, not something to infer from this field.\n"
+   },
+   "approverRoleIds": {
+    "type": "array",
+    "minItems": 1,
+    "description": "Role ids from `identity.listRoles` (`Role.id`), which is where an editor gets the names to show and pick from. This contract stores the ids only.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "approverScopeLevel": {
+    "type": "string",
+    "enum": [
+     "venue",
+     "department",
+     "region",
+     "tenant"
+    ],
+    "description": "11.1.39. Which organisational level the approver must sit at."
+   },
+   "mode": {
+    "$ref": "#/components/schemas/ApprovalMode"
+   },
+   "levels": {
+    "type": "integer",
+    "default": 1,
+    "description": "11.1.3. Multi-level chains ask each level in turn."
+   },
+   "requiresMfa": {
+    "type": "boolean",
+    "default": false
+   },
+   "requiresSignature": {
+    "type": "boolean",
+    "default": false
+   },
+   "slaMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "11.1.14. Null means no SLA, which is different from a long one."
+   },
+   "escalateAfterMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "escalateToRoleIds": {
+    "type": "array",
+    "description": "Role ids from `identity.listRoles`, as `approverRoleIds`.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "expiresAfterMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "11.1.53. An unanswered request eventually stops waiting."
+   }
+  }
+ },
+ "CreateRefundRequest": {
+  "type": "object",
+  "required": [
+   "id",
+   "amount",
+   "reason",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID of the refund, and its idempotency key — it must equal the `Idempotency-Key` header."
+   },
+   "lineIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "description": "Omit to refund the whole order."
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "reason": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 500
+   },
+   "secondaryAuthorisation": {
+    "type": "object",
+    "description": "Required above the venue's `requiresSecondUserAbove`. A second user — cashier or supervisor — names themselves. This is dual-authorisation, not escalation.\n",
+    "required": [
+     "principalId",
+     "credential"
+    ],
+    "properties": {
+     "principalId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "credential": {
+      "type": "string",
+      "maxLength": 512,
+      "description": "The second person's staff PIN, as they sign in at a till with it. **A PIN, never a password** (decided 28 September, audit R123 (7))."
+     }
+    }
+   },
+   "refundToOriginalTender": {
+    "type": "boolean",
+    "default": true
+   },
+   "alternateTender": {
+    "$ref": "#/components/schemas/TenderKind"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "RefundPolicy": {
+  "x-ticvai-persistence": "orders.refund_policy + orders.refund_policy_time_band",
+  "type": "object",
+  "description": "Venue-configured. Thresholds are policy, not permission scope — venues run different policies and the permission model should not encode commercial rules.\n**The three thresholds must ascend** (decided 28 September, audit R123 (6)): `selfAuthoriseLimit` <= `requiresSecondUserAbove` <= `requiresApprovalAbove`, where the second is set. `setRefundPolicy` refuses a policy that does not with 422 `refund-thresholds-not-ascending`.\n",
+  "required": [
+   "venueId",
+   "selfAuthoriseLimit",
+   "requiresApprovalAbove"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The venue in the path. Not taken from a `setRefundPolicy` body."
+   },
+   "selfAuthoriseLimit": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Up to this, a holder of ORDER_REFUND refunds alone. Zero means every refund needs a second authoriser.\n"
+   },
+   "requiresSecondUserAbove": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Above this, a second user — cashier OR supervisor — names themselves as audit control. Dual-authorisation, not escalation (2.12.3).\n"
+   },
+   "requiresApprovalAbove": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Above this, an ORDER_REFUND_APPROVE holder must approve."
+   },
+   "timeBands": {
+    "type": "array",
+    "description": "Refundable percentage by time before the performance. Evaluated most-specific first.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "hoursBefore",
+      "percentage"
+     ],
+     "properties": {
+      "hoursBefore": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "percentage": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 100
+      }
+     }
+    }
+   },
+   "allowPartial": {
+    "type": "boolean",
+    "default": true
+   },
+   "refundWindowDays": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "description": "Days after purchase within which a refund may be made. 0 is allowed and means the day of purchase only; null means no window (decided 28 September, audit R123 (6))."
+   },
+   "varianceThreshold": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Price variance above this is an exception requiring review rather than a routine posting (CF-38). Venue-configured.\n**A venue setting with a tenant default** (decided 28 September, audit R094). **Proposed default, client to correct (audit R094): AED 5.00 per order line.**\n"
+   }
+  }
+ },
+ "TenderKind": {
+  "type": "string",
+  "description": "`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n",
+  "enum": [
+   "cash",
+   "card",
+   "wallet",
+   "voucher",
+   "bankTransfer",
+   "hotelCharge",
+   "installment",
+   "giftCard",
+   "complimentary"
+  ]
+ },
+ "Wallet": {
+  "x-ticvai-persistence": "wallet.wallet + wallet.credit_lot",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "balance",
+   "currency",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "balance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "credits": {
+    "type": "array",
+    "description": "4.3.5 and 4.3.19. **One balance and one bonus balance with one expiry could not express what the requirement asks for** — cash, bonus and redemption credit, each with its own expiry.\n**The expiries are the reason this is a list.** Cash a guest paid for should outlive a promotional credit they were given, and a single `expiresAt` either expires the money they paid or never expires the promotion.\n**Consumed first-expiry-first-out across all three** (4.3.19), which is also the order that is fairest to the guest — spend what is about to die before what is not.\n**One entry per `active` lot in `wallet.credit_lot`** for this wallet: `amount` is the lot's `remaining_amount`, `expiresAt` its `expires_at`, `sourceRef` its `source_reference`. `kind` and `isRefundable` are not stored on the lot; they come from the lot's credit type (`listCreditLots` returns the lots themselves).\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "amount"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "cash",
+        "bonus",
+        "redemption",
+        "refund",
+        "goodwill"
+       ],
+       "description": "**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability.\n",
+       "x-ticvai-persisted": false
+      },
+      "amount": {
+       "x-ticvai-column": "remaining_amount",
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "expiresAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "sourceRef": {
+       "type": "string",
+       "nullable": true,
+       "x-ticvai-column": "source_reference"
+      },
+      "isRefundable": {
+       "type": "boolean",
+       "default": false,
+       "x-ticvai-persisted": false,
+       "description": "**True only for `cash`.** A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice.\n"
+      }
+     }
+    }
+   },
+   "bonusBalance": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Promotional value. Typically non-refundable and spent first."
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "suspended",
+     "closed"
+    ]
+   },
+   "homeCellName": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where the authoritative balance lives. Present when the guest is linked across cells.\n"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastActivityAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "WalletAdjustment": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.adjustment",
+  "description": "Board 7.7. **A correction, distinguishable from a spend.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "walletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "reversal",
+     "chargeback",
+     "goodwill",
+     "correction",
+     "writeOff"
+    ]
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "affectedLotIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "reason": {
+    "type": "string"
+   },
+   "performedBy": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "approvedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletDispute": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.dispute",
+  "description": "Board 7.9. **Internal, and the venue decides it** — unlike a card chargeback.",
+  "required": [
+   "walletId",
+   "description"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "walletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "transactionIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "description": {
+    "type": "string"
+   },
+   "raisedBy": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "raisedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "investigating",
+     "escalated",
+     "upheld",
+     "rejected",
+     "withdrawn"
+    ],
+    "description": "`escalated` added with `resolveWalletDispute` (VM close-out, 29 September). `upheld`, `rejected` and `withdrawn` are closed."
+   },
+   "resolution": {
+    "type": "string",
+    "nullable": true
+   },
+   "escalatedToRoleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "reprocessedTransactionIds": {
+    "type": "array",
+    "readOnly": true,
+    "description": "Transactions created by a `reprocess` action.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "resolvedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "adjustmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletRefundPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.refund_policy",
+  "description": "Boards 7.4 and 7.5. **Restoration is to the lot, not to the balance.**",
+  "properties": {
+   "defaultDestination": {
+    "type": "string",
+    "enum": [
+     "originalTender",
+     "wallet",
+     "guestChoice"
+    ]
+   },
+   "walletRefundCreditTypeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "restoreToOriginalLots": {
+    "type": "boolean",
+    "default": true
+   },
+   "restoreOriginalExpiry": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Refunding into a new lot with a fresh expiry is a gift.** Sometimes intended, never by accident.\n"
+   },
+   "walletRefundBonusPercent": {
+    "type": "number",
+    "nullable": true,
+    "description": "An incentive to take the refund as credit rather than to a card."
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletRestriction": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.restriction",
+  "description": "Board 7.8. **Freeze, block and restrict are three different things.**",
+  "required": [
+   "walletId",
+   "kind",
+   "reason"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "walletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "freeze",
+     "block",
+     "restrict",
+     "none"
+    ],
+    "description": "**`freeze` stops spending and allows funding** — what you do while investigating. **`block` stops both** — a confirmed fraud. **`restrict` limits channels or categories** — what a parent asked for.\n"
+   },
+   "blockedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "blockedCategoryIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "reason": {
+    "type": "string"
+   },
+   "appliedBy": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "appliedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletTransferRules": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.transfer_rules",
+  "description": "Boards 7.2 and 7.3. **A money-transmission question before it is a feature.**",
+  "properties": {
+   "peerToPeerAllowed": {
+    "type": "boolean",
+    "default": false
+   },
+   "transferableCreditTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "maximumPerTransfer": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "maximumPerDay": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "approvalAboveAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "bothPartiesIdentified": {
+    "type": "boolean",
+    "default": true
+   },
+   "withinSharedWalletOnly": {
+    "type": "boolean",
+    "default": false
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ }
+}

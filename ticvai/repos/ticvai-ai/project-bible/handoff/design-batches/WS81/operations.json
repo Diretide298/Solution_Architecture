@@ -1,1 +1,133 @@
-{}
+{
+ "authoriseGameplay": {
+  "method": "POST",
+  "path": "/gameplay-authorisations",
+  "contract": "games",
+  "summary": "Decide a tap, now",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GameplayAuthorisationRequest",
+  "responds": "GameplayAuthorisation"
+ },
+ "createGameEntitlement": {
+  "method": "POST",
+  "path": "/game-entitlements",
+  "contract": "games",
+  "summary": "Define a pass, package or per-game entitlement",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GameEntitlement",
+  "responds": "GameEntitlement"
+ },
+ "getGameplayValidationRules": {
+  "method": "GET",
+  "path": "/gameplay-validation-rules",
+  "contract": "games",
+  "summary": "What a tap is checked against, and in what order",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GameplayValidationRules"
+ },
+ "listGameEntitlements": {
+  "method": "GET",
+  "path": "/game-entitlements",
+  "contract": "games",
+  "summary": "Passes, packages and per-game entitlements",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GameEntitlement"
+ },
+ "listGameplayTransactions": {
+  "method": "GET",
+  "path": "/gameplay-transactions",
+  "contract": "games",
+  "summary": "Taps, decisions and what they cost",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "readerId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outcome",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GameplayTransaction"
+ },
+ "setGameplayValidationRules": {
+  "method": "PUT",
+  "path": "/gameplay-validation-rules",
+  "contract": "games",
+  "summary": "Deduction priority and the order of checks",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GameplayValidationRules",
+  "responds": "GameplayValidationRules"
+ },
+ "simulateGameplayAuthorisation": {
+  "method": "POST",
+  "path": "/gameplay-authorisations/simulate",
+  "contract": "games",
+  "summary": "What would happen if this card tapped this reader",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GameplayAuthorisationRequest",
+  "responds": "GameplayAuthorisation"
+ }
+}

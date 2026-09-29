@@ -332,6 +332,10 @@ paths:
         brand refresh happens without editing thirty screens.
 
         Derivatives regenerate. The previous version is retained for rollback.
+
+        **The fingerprint is recomputed with them**: the asset's one `assets.media_fingerprint` row
+        is replaced by the processing job for the new file (decided 29 September, writers pass;
+        DM4), so similarity and duplicate checks compare what is actually served.
       tags: [asset]
       x-ticvai-permission: ASSET_LIBRARY_MANAGE
       x-ticvai-scope-level: venue
@@ -448,6 +452,11 @@ paths:
         carries the asset in `processing`; the job moves it to `ready`, `quarantined` or
         `failed`. A failed scan is therefore an asset in `quarantined`, not a refusal here —
         a client reads `status` rather than assuming the file is servable.
+
+        **The same job writes the asset's `assets.media_fingerprint` row** (perceptual hash and
+        embedding, stamped with the model version) once the file passes scanning, so
+        `findSimilarMediaAssets` sees a new asset without anyone asking for it (decided 29
+        September, writers pass; DM4). A quarantined file gets no fingerprint.
       tags: [upload]
       x-ticvai-permission: ASSET_LIBRARY_MANAGE
       x-ticvai-scope-level: venue
@@ -729,6 +738,12 @@ paths:
         confidence scores and a person or a threshold promotes them — a library that silently accepts
         machine labels becomes a library nobody trusts the moment one is wrong in public.
 
+        **It also refreshes the asset''s `assets.media_fingerprint`** (decided 29 September, writers pass;
+        DM4): the analysis job recomputes the perceptual hash and embedding under the current model
+        version and replaces the row. This is how fingerprints computed under an older model are brought
+        forward, since only fingerprints of the same `modelVersion` are compared. The fingerprint is not
+        a proposal: it describes the file and nobody promotes it.
+
         '
       tags:
       - assets
@@ -740,6 +755,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Queued; results arrive as proposed tags
           content:
             application/json:
@@ -929,6 +947,9 @@ paths:
               $ref: '#/components/schemas/MediaRights'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1163,6 +1184,9 @@ paths:
                   default: false
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: What would change, or what did
           content:
             application/json:
@@ -1393,6 +1417,47 @@ components:
           type: array
           items:
             type: string
+    MediaFingerprint:
+      type: object
+      x-ticvai-persistence: assets.media_fingerprint
+      description: '**What `findSimilarMediaAssets` compares**: one visual fingerprint per asset, a
+        perceptual hash for near-duplicates and an embedding for related assets, recomputed when the
+        file is replaced. Exact duplicates are found by `MediaAssetVersion.checksum` (decided 29
+        September, data model DM4).
+
+        '
+      required:
+      - id
+      - mediaAssetId
+      - modelVersion
+      - computedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        mediaAssetId:
+          type: string
+          format: uuid
+          description: One fingerprint per asset.
+        perceptualHash:
+          type: string
+          nullable: true
+        embedding:
+          type: array
+          nullable: true
+          items:
+            type: number
+        modelVersion:
+          type: string
+          description: Only fingerprints of the same model version are compared.
+        computedAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005), written at `venue` scope.
     MediaAssetVersion:
       type: object
       x-ticvai-persistence: assets.asset_version
@@ -1835,6 +1900,13 @@ components:
         tags:
           type: array
           items: { type: string }
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified.
+            Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).
         venueId: { type: string, format: uuid, nullable: true }
         url:
           type: string

@@ -11,7 +11,7 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 100,
-  "operations": 141,
+  "operations": 142,
   "contracts": 9,
   "modules": 3,
   "undrawn": 0,
@@ -51,7 +51,7 @@
   },
   {
    "contract": "marketing-crm",
-   "operations": 46
+   "operations": 47
   },
   {
    "contract": "assets",
@@ -74,11 +74,11 @@
    "operations": 2
   },
   {
-   "contract": "tenancy",
+   "contract": "maintenance",
    "operations": 1
   },
   {
-   "contract": "maintenance",
+   "contract": "tenancy",
    "operations": 1
   }
  ],
@@ -323,7 +323,7 @@
    "module": "Policy",
    "wave": 3,
    "route": "/policy/privacy-notice-policy-terms-version-management-cms-028",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -341,7 +341,7 @@
    "module": "Policy",
    "wave": 3,
    "route": "/policy/privacy-configuration-testing-approval-publication-cms-030",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {

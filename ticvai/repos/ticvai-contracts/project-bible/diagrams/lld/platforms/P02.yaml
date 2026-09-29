@@ -57,7 +57,7 @@ servicesCalled:
 - service: FnbService
   operationCalls: 25
 - service: AccessService
-  operationCalls: 18
+  operationCalls: 20
 - service: WhiteLabelService
   operationCalls: 10
 - service: AiService
@@ -502,6 +502,7 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - bindCredentialDevice
   - getEntitlement
   - getEntitlementCredential
   - getEntitlementHistory
@@ -516,6 +517,7 @@ screens:
   entryParams:
   - entitlementId<-deepLink
   - orderId<-deepLink
+  - credentialId<-navigation
   goesTo:
   - GST-001
   - GST-002
@@ -1686,6 +1688,7 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - bindCredentialDevice
   - getEntitlement
   - getEntitlementCredential
   - listMyEntitlements
@@ -1700,6 +1703,7 @@ screens:
   entryParams:
   - orderId<-deepLink
   - entitlementId<-navigation
+  - credentialId<-navigation
   goesTo:
   - GST-001
   - GST-002

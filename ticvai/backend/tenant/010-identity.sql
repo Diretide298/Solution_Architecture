@@ -154,7 +154,20 @@ CREATE TABLE IF NOT EXISTS identity.membership_history (
     to_status                         text NOT NULL CONSTRAINT membership_history_to_status_chk CHECK (char_length(to_status) <= 30),
     reason                            text CONSTRAINT membership_history_reason_chk CHECK (char_length(reason) <= 500),
     changed_by_principal_id           uuid,
-    changed_at                        timestamptz NOT NULL
+    changed_at                        timestamptz NOT NULL,
+    interruption_type                 text CONSTRAINT membership_history_interruption_type_chk CHECK (interruption_type IN ('freeze', 'suspension', 'administrativeHold')),
+    suspension_reason                 text CONSTRAINT membership_history_suspension_reason_chk CHECK (suspension_reason IN ('paymentIssue', 'membershipMisuse', 'credentialMisuse', 'eligibilityIssue', 'chargeback', 'administrativeReview', 'other')),
+    episode_start_date                date,
+    episode_end_date                  date,
+    validity_treatment                text CONSTRAINT membership_history_validity_treatment_chk CHECK (validity_treatment IN ('extendExpiry', 'doNotExtend')),
+    new_expiry_date                   date,
+    is_admission_blocked              boolean,
+    is_reservations_restricted        boolean,
+    is_benefits_restricted            boolean,
+    is_renewal_allowed                boolean,
+    is_credential_disabled            boolean,
+    approval_request_id               text,
+    ends_episode_history_id           uuid
 );
 
 -- an issued MFA challenge and its outcome Hangs off: reaches identity.principal through its keys;
@@ -320,7 +333,7 @@ CREATE TABLE IF NOT EXISTS identity.role (
 );
 
 -- child of role, returned nested Hangs off: a child of identity.role; reaches identity.principal
--- through its keys; references identity.principal, identity.role. Reached by: 2 operations read it
+-- through its keys; references identity.principal, identity.role. Reached by: 3 operations read it
 -- and 1 write it.
 CREATE TABLE IF NOT EXISTS identity.role_permission (
     role_id                           uuid NOT NULL,

@@ -1524,6 +1524,9 @@ paths:
                   maxLength: 500
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Released
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
@@ -2417,6 +2420,9 @@ paths:
                     format: uuid
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Allocated
           content:
             application/json:
@@ -2468,20 +2474,14 @@ paths:
               properties:
                 participants:
                   type: array
+                  description: The whole roster; it replaces the previous one.
                   items:
-                    type: object
-                    properties:
-                      name:
-                        type: string
-                      seatId:
-                        type: string
-                        format: uuid
-                        nullable: true
-                      notes:
-                        type: string
-                        nullable: true
+                    $ref: '#/components/schemas/GroupSeatParticipant'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
   /seat-recommendation-rules:
     get:
@@ -3068,6 +3068,43 @@ components:
           nullable: true
         scopePath:
           type: string
+    GroupSeatParticipant:
+      type: object
+      x-ticvai-persistence: seating.group_request_participant
+      description: '**One named member of a group booking, and the seat they sit in.** Written by
+        `setGroupSeatRoster`, which replaces the request''s roster as a whole (decided 29 September,
+        data model DM4).
+
+        '
+      required:
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        groupRequestId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The request in the path.
+        name:
+          type: string
+        seatId:
+          type: string
+          format: uuid
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005), written at `venue` scope.
     GroupSeatAllocation:
       type: object
       description: 'Board 8.6. **Best-fit for a group is not best-seat for one guest.**'

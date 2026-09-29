@@ -6,15 +6,18 @@ Asked for on 28 September. The readiness report says *what* stands between each 
 this is the list somebody takes into the room. Nothing here is authored. It is read from the
 contracts, the screens, the design-pack index and the audit decisions, so it shrinks as answers land.
 
+**29 September: the client gets only make-or-break questions.** Chinmay decided that day that the
+readiness questions are ours to answer from the minutes, the RFP, the design packs and our build plan
+(docs/registers/readiness-closeout.md). 574 of 577 operations were agreed and the 40 design packs were
+scoped (handoff/design-pack-coverage.json). So the sessions, flagged, sign-off and scope sheets are gone;
+what is left for the client is one sheet, and the rest is our own work, kept here so it is visible.
+
 Sheets:
-    Summary       each platform: ready now, and which questions close the gap
-    Sessions      the five client sessions and the scoping decision, with their size
-    Flagged       operations whose drafted shape needs a real answer, not a yes (one question each)
-    Sign-off      the rest of the unagreed operations: agree as drafted, correct, or not needed
-    Scope         design packs nothing has been drafted from: in this delivery or not?
-    Specify       screens that name no operation: what does each show and call?
-    Wireframes    each platform's frames: who verifies, which revision
-    Open values   values the audit decisions left for the client to name
+    Summary        each platform: ready now, and what closes the gap
+    Make or break  the only questions for the client: law, a name only they have, their customers' money
+    Decided by us  where every other answer is recorded
+    Our work       build gaps from the design packs, and screens that still name no operation
+    Wireframes     each platform's frames: prototype, drawn, or generated
 
     python3 tools/build-readiness-questions.py
 Writes handoff/TICVAI_Readiness_Questions.xlsx.
@@ -88,6 +91,7 @@ def provisional_rows():
                         "fields": ", ".join(props[:30]) + (" ..." if len(props) > 30 else ""),
                         "screens": "; ".join(bpr.clean(s) for s in (op.get("x-ticvai-consumed-by") or [])),
                         "flag": re.sub(r"\*\*", "", bpr.caution(props)),
+                        "mob": str(op.get("x-ticvai-make-or-break") or ""),
                     })
     return rows
 
@@ -124,7 +128,7 @@ def main():
     scr = screens()
     report = json.load(open(os.path.join(ROOT, "handoff", "package-report.json"), encoding="utf-8"))
     decisions = json.load(open(os.path.join(ROOT, "handoff", "audit-decisions.json"), encoding="utf-8"))
-    packs = json.load(open(os.path.join(ROOT, "sources", "packs-index.json"), encoding="utf-8"))
+    packs_cov = json.load(open(os.path.join(ROOT, "handoff", "design-pack-coverage.json"), encoding="utf-8"))["packs"]
 
     by_session = collections.defaultdict(list)
     for r in prov:
@@ -150,7 +154,7 @@ def main():
         pr = next((x for x in report.get("platforms", []) if x["code"] == code), {})
         closes = []
         if unagreed:
-            closes.append("sessions " + ", ".join(f"{k} ({v})" for k, v in sorted(unagreed.items())))
+            closes.append(f"{sum(unagreed.values())} make-or-break question(s) for the client")
         if p["noop"]:
             closes.append(f"{len(p['noop'])} screens to specify")
         closes.append("wireframes verified" if p["wf"].get("approved") == sum(p["wf"].values())
@@ -160,49 +164,53 @@ def main():
     sheet(wb, "Summary", ["Platform", "Name", "Screens", "Operations called", "Unagreed", "Screens with no operation",
                           "What gets it to 100%"], [9, 30, 9, 12, 11, 12, 70], summary, first=True)
 
-    sess = []
-    for sid, title, who in SESSIONS:
-        rs = by_session.get(sid, [])
-        packs_in = collections.Counter(r["pack"] for r in rs)
-        plats = sorted({s.split()[0] for r in rs for s in r["screens"].split("; ") if s})
-        sess.append((sid, title, who, len(rs), sum(1 for r in rs if r["flag"]),
-                     sum(1 for r in rs if not r["flag"]), ", ".join(plats),
-                     "; ".join(f"{k} ({v})" for k, v in packs_in.most_common())))
-    ai = [s for c, s in scr if c == "P09" and not ({a.get("operationId") for a in s.get("apis") or []
-                                                    if isinstance(a, dict)} - {None})]
-    sess.append(("D1", "Scoping decision: are the AI configuration assistant, forecasting and AI governance "
-                 "in this delivery? If yes, they need contracts written from scratch.", "Client product",
-                 0, "", "", "P09", f"{len(ai)} P09 screens name no operation"))
-    sheet(wb, "Sessions", ["Id", "Session", "Who answers", "Unagreed operations", "Need a real answer",
-                           "Agree-as-drafted", "Platforms", "Design packs (operations)"],
-          [6, 50, 26, 11, 11, 11, 22, 70], sess)
+    kept_ops = [r for r in prov]
+    mob = []
+    for r in kept_ops:
+        mob.append((r["op"], r["contract"], r["summary"], "(" + ", ".join(sorted(set(re.findall(r"\(([abc])\)", r.get("mob", "")))) or ["?"]) + ")",
+                    r.get("mob", "") or "Kept provisional", r["screens"], ""))
+    # An agreed operation can still carry one make-or-break value (K1's Face Tag retention threshold).
+    for sub in ("spine", "satellite"):
+        for fn in sorted(glob.glob(os.path.join(ROOT, "contracts", sub, "*.yaml"))):
+            for path_, ops_ in ((yaml.safe_load(open(fn, encoding="utf-8")) or {}).get("paths") or {}).items():
+                for verb_, op_ in (ops_ or {}).items():
+                    if (isinstance(op_, dict) and op_.get("x-ticvai-make-or-break")
+                            and op_["operationId"] not in {r["op"] for r in kept_ops}):
+                        q = str(op_["x-ticvai-make-or-break"])
+                        mob.append((op_["operationId"], os.path.basename(fn)[:-5], op_.get("summary", ""),
+                                    "(" + ", ".join(sorted(set(re.findall(r"\(([abc])\)", q))) or ["a"]) + ")", q, "", ""))
+    for d in decisions:
+        for m in re.finditer(r"\[client to (?:name|set)[^\]]*\]", json.dumps(d, ensure_ascii=False)):
+            mob.append((d["id"], d["theme"], m.group(0), "(b)", "A value only the client can name", "", ""))
+    for rid, what, why in (("R126 / R205", "The age below which a guest is a minor", "(a) law"),
+                           ("R149 (3)", "How long each kind of guest document is kept", "(a) law"),
+                           ("R077 (b)", "The facial-reader vendor, which sets the SDK and template format", "(b) vendor"),
+                           ("R252", "One design reviewer who signs off each wireframe batch within 3 working days", "(b) a person only the client can name"),
+                           ("Consumer law", "A/B price tests on live customers: allowed, and with what notice?", "(a) law, not blocking"),
+                           ("Consumer law", "Cooling-off rights after an auto-renewal charge", "(a) law, not blocking")):
+        mob.append((rid, what, "", why, "", "", ""))
+    sheet(wb, "Make or break", ["Id", "Topic", "Detail", "Why only the client", "Question", "Screens", "Answer"],
+          [16, 34, 34, 18, 70, 30, 30], mob)
 
-    flagged = [(r["session"], r["pack"], r["page"] or "", r["op"], r["call"], r["summary"],
-                f"Page {r['page']} of '{r['pack']}' was drafted into `{r['op']}`. {r['flag']} "
-                "Which fields does this screen really record or show, and which are its filters or its behaviour?",
-                r["fields"], r["screens"], "")
-               for r in sorted(prov, key=lambda r: (r["session"], r["pack"], r["page"])) if r["flag"]]
-    sheet(wb, "Flagged", ["Session", "Design pack", "Page", "Operation", "Call", "Screen title", "Question",
-                          "Drafted fields", "Used by", "Answer"], [8, 28, 6, 26, 30, 28, 60, 50, 30, 30], flagged)
-
-    signoff = [(r["session"], r["pack"], r["page"] or "", r["op"], r["call"], r["summary"], r["fields"],
-                r["screens"], "")
-               for r in sorted(prov, key=lambda r: (r["session"], r["pack"], r["page"])) if not r["flag"]]
-    sheet(wb, "Sign-off", ["Session", "Design pack", "Page", "Operation", "Call", "Screen title", "Drafted fields",
-                           "Used by", "Agreed / corrected (how) / not needed"],
-          [8, 28, 6, 26, 30, 28, 50, 30, 34], signoff)
-
-    und = [d for d in packs.get("undraftedDocuments") or [] if str(d).lower().endswith(".pdf")]
-    sheet(wb, "Scope", ["Design pack (nothing drafted from it yet)", "Question", "Answer"], [50, 70, 30],
-          [(d, "Is this pack in this delivery? If yes, we read it and draft its operations for a session; "
-               "if no, it is recorded as out of scope.", "") for d in sorted(und)])
-
+    sheet(wb, "Decided by us", ["What", "Where it is recorded", "Count"], [44, 60, 10], [
+        ("Audit questions, our recommendation (28 September)", "docs/registers/audit-decisions.md", len(decisions)),
+        ("Rev 3 prototype feedback (29 September)", "docs/registers/rev3-decisions.md", ""),
+        ("Operations agreed from minutes, packs and build plan (29 September)", "docs/registers/readiness-closeout.md", ""),
+        ("Design pack scope (29 September)", "docs/active/design-pack-coverage.md", len(packs_cov)),
+    ])
+    work = [(p["pack"], p.get("verdict", ""), p.get("gap", ""), p.get("estimatedNewOperations", ""), p.get("action", ""))
+            for p in packs_cov if "gap" in str(p.get("verdict", "")) or "residual" in str(p.get("verdict", ""))]
     spec = [(c, s["id"], s.get("name", ""), s.get("module", ""),
              "What does this screen show, and what does it read and change? Name its records and actions; "
              "we write the operations.", "")
             for c, s in scr if not ({a.get("operationId") for a in s.get("apis") or [] if isinstance(a, dict)} - {None})
             and not (s.get("deferred") or str(s.get("wave")) == "4")]
-    sheet(wb, "Specify", ["Platform", "Screen", "Name", "Module", "Question", "Answer"], [9, 10, 36, 24, 60, 30], spec)
+    sheet(wb, "Our work", ["Design pack or platform", "Verdict", "Gap", "New operations (estimate)", "Action"],
+          [40, 22, 60, 14, 60],
+          work + [(c, "screen names no operation", f"{s['id']} {s.get('name', '')}",
+                   "", "Waits on the AI design review" if c == "P09" else "Specify from its pack")
+                  for c, s in scr if not ({a.get("operationId") for a in s.get("apis") or [] if isinstance(a, dict)} - {None})
+                  and not (s.get("deferred") or str(s.get("wave")) == "4")])
 
     wf = [(code, names.get(code, ""), sum(plat[code]["wf"].values()),
            ", ".join(f"{k} {v}" for k, v in plat[code]["wf"].most_common()),
@@ -211,19 +219,9 @@ def main():
     sheet(wb, "Wireframes", ["Platform", "Name", "Screens", "Frame status now", "Question", "Answer"],
           [9, 30, 9, 40, 60, 30], wf)
 
-    ov = []
-    for d in decisions:
-        for m in re.finditer(r"\[client to (?:name|set)[^\]]*\]", json.dumps(d, ensure_ascii=False)):
-            ov.append((d["id"], d["theme"], m.group(0), d["who"], ""))
-    for rid, what, who in (("R126 / R205", "The age below which a guest is a minor", "Client counsel"),
-                           ("R149 (3)", "How long each kind of guest document is kept", "Client counsel"),
-                           ("R077 (b)", "The facial-reader vendor, which sets the SDK and template format", "Client IT")):
-        ov.append((rid, what, "open", who, ""))
-    sheet(wb, "Open values", ["Decision", "Topic", "Missing value", "Who names it", "Answer"], [14, 40, 50, 30, 30], ov)
-
     wb.save(OUT)
-    print(f"{len(prov)} unagreed operations ({len(flagged)} flagged, {len(signoff)} sign-off), {len(und)} undrafted "
-          f"packs, {len(spec)} screens to specify, {len(ov)} open values -> {os.path.relpath(OUT, ROOT)}")
+    print(f"{len(mob)} make-or-break questions for the client, {len(work)} build gaps, "
+          f"{len(spec)} screens naming no operation -> {os.path.relpath(OUT, ROOT)}")
 
 
 if __name__ == "__main__":

@@ -7,7 +7,7 @@
 | Tier | platform: Provisioning, publishing, reporting, and the one cross-region path. |
 | Contracts | `reporting` |
 | Schemas owned | `reporting` |
-| Operations in the slice | 11 of 44 |
+| Operations in the slice | 13 of 47 |
 | Scale | Analytical. Runs against the replica and the analytical store. |
 | If it is down | Down stops dashboards. Nothing operational depends on it. |
 
@@ -31,10 +31,12 @@
 | catalogue | [`listReports`](#listreports) | GET | `/reports` | core | 2 | ANL-031, BO-029, BO-058, BO-059, BO-060, BO-262 … |
 | dashboard | [`createDashboard`](#createdashboard) | POST | `/dashboards` | setup | 2 | ADM-031, ANL-021, ANL-022, ANL-053 |
 | dashboard | [`getDashboard`](#getdashboard) | GET | `/dashboards/{dashboardId}` | core | 2 | ADM-031, ANL-001, ANL-002, ANL-003, ANL-004, ANL-005 … |
+| dashboard | [`recordDashboardView`](#recorddashboardview) | POST | `/dashboards/{dashboardId}/views` | core | 2 | ADM-031, ANL-001, ANL-002, ANL-003, ANL-004, ANL-005 … |
 | dashboard | [`updateDashboard`](#updatedashboard) | PUT | `/dashboards/{dashboardId}` | setup | 2 | ADM-031, ANL-023, ANL-027, ANL-028, ANL-029 |
 | execution | [`runReport`](#runreport) | POST | `/reports/{reportId}/run` | core | 1 | ANL-001, ANL-002, ANL-003, ANL-004, ANL-005, ANL-006 … |
 | naturalLanguage | [`askReportingQuestion`](#askreportingquestion) | POST | `/reports/ask` | core | 2 | ANL-008, ANL-009, ANL-019, ANL-052, ANL-056, BO-029 … |
 | naturalLanguage | [`saveNaturalLanguageQuery`](#savenaturallanguagequery) | POST | `/reports/ask/{conversationId}/save` | core | 2 | ANL-052, BO-029, BO-058, BO-059, BO-060, POS-008 … |
+| reporting | [`deleteDashboard`](#deletedashboard) | DELETE | `/dashboards/{dashboardId}` | setup | 2 | ANL-023 |
 | reporting | [`listAlerts`](#listalerts) | GET | `/alerts` | core | 1 | ANL-001, ANL-003, ANL-009, ANL-012, BO-036, BO-125 … |
 | reporting | [`setAlertRule`](#setalertrule) | PUT | `/alert-rules` | setup | 1 | ANL-009, BO-133 |
 
@@ -382,6 +384,45 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 | 200 |  | Dashboard with data |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
+### recordDashboardView
+
+**`POST /dashboards/{dashboardId}/views`**: Record that a dashboard was opened
+
+**The writer of `reporting.dashboard_view`** (decided 29 September, writers pass). `getDashboard` stays a pure read on the analytical replica: a write inside a GET would break replica routing, so the dashboard client posts this once when a dashboard is rendered for the caller, not on every tile refresh. One row per call, stamped with the caller as `viewedByPrincipalId` and the server time as `openedAt`; `getAnalyticsUsage` reads it for `opens`, `distinctUsers` and `lastOpenedAt`.
+**Best effort for the client.** A failure here must never stop the dashboard rendering, and a retry with the same `Idempotency-Key` records nothing twice. An archived dashboard or one the caller cannot read is `404`, exactly as `getDashboard` answers.
+
+|  |  |
+|---|---|
+| Permission | `REPORT_VIEW_VENUE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | append |
+| Reads | `cache:idempotency`, `reporting.dashboard` |
+| Writes | `cache:idempotency`, `reporting.dashboard_view` |
+| Called by | ADM-031, ANL-001, ANL-002, ANL-003, ANL-004, ANL-005, ANL-006, ANL-007, ANL-008, ANL-021, ANL-023, ANL-030, BO-010, KIT-010 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| dashboardId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| venueId | string (uuid) |  | The venue the dashboard was narrowed to when opened, as Dashboard.venueId. (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 204 |  | Recorded |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
 ### updateDashboard
 
 **`PUT /dashboards/{dashboardId}`**: Update a dashboard
@@ -704,6 +745,39 @@ Turns a one-off question into something schedulable. The generated query becomes
 
 ## Group: reporting
 
+### deleteDashboard
+
+**`DELETE /dashboards/{dashboardId}`**: Archive a dashboard
+
+CF-169. **Archives rather than removes, and refuses while `isShared` is true.**
+A shared dashboard is on other people's screens. Deleting one makes their saved view vanish with no way to say what it was, and a confirmation dialog cannot help because nothing in it reaches the people who are using it — **un-sharing first is one extra call and it puts the owner in front of that fact.**
+The tiles go with it and come back with it. `reporting.dashboard_tile` carries `visualisation`, `parameters` and `refresh_seconds` per tile, which is the configuration work rather than the dashboard.
+
+|  |  |
+|---|---|
+| Permission | `REPORT_MANAGE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `reporting.dashboard` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Reads | `cache:idempotency`, `reporting.dashboard`, `reporting.dashboard_tile` |
+| Writes | `cache:idempotency`, `reporting.dashboard` |
+| Called by | ANL-023 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| dashboardId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 204 |  | Archived |
+| 409 |  | The dashboard is shared. |
+
 ### listAlerts
 
 **`GET /alerts`**: What is currently wrong
@@ -884,6 +958,16 @@ Every table this service owns that the slice reads or writes, with its columns a
 | refresh_seconds | integer | no | Minimum thirty seconds. |
 | position | jsonb | yes |  |
 
+### `reporting.dashboard_view`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| dashboard_id | uuid | yes |  |
+| viewed_by_principal_id | uuid | yes |  |
+| venue_id | uuid | no | The venue the dashboard was narrowed to when opened, as Dashboard.venueId. |
+| opened_at | timestamptz | yes |  |
+
 ### `reporting.execution`
 
 | Column | Type | Required | Notes |
@@ -964,7 +1048,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-33 operations, added to this service in later releases without changing any of the above.
+34 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -972,5 +1056,5 @@ Every table this service owns that the slice reads or writes, with its columns a
 | dashboard | `getCommandCentre`, `listDashboards` |
 | execution | `cancelReportExecution`, `getReportExecution`, `getReportResult`, `listReportExecutions` |
 | export | `exportReportResult`, `getReportExport` |
-| reporting | `acknowledgeAlert`, `createKpi`, `createReportSubscription`, `deleteDashboard`, `getAnalyticsBenchmark`, `getAnalyticsUsage`, `getKpiValues`, `getSemanticModel`, `getSupplierPerformance`, `listAlertRules`, `listAnalyticsAnomalies`, `listAnalyticsPipelines`, `listKpis`, `listReportDeliveries`, `listReportSubscriptions`, `listSeededReports`, `setKpiTargets`, `setSemanticModel` |
+| reporting | `acknowledgeAlert`, `createKpi`, `createReportSubscription`, `getAnalyticsBenchmark`, `getAnalyticsUsage`, `getKpiValues`, `getSemanticModel`, `getSupplierPerformance`, `listAlertRules`, `listAnalyticsAnomalies`, `listAnalyticsPipelines`, `listKpis`, `listReportDeliveries`, `listReportSubscriptions`, `listSeededReports`, `listSiteNormalisationBases`, `setKpiTargets`, `setSemanticModel`, `setSiteNormalisationBasis` |
 | schedule | `createReportSchedule`, `deleteReportSchedule`, `listReportSchedules`, `updateReportSchedule` |

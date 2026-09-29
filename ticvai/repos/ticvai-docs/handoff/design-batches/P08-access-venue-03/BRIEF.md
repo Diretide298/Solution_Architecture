@@ -1,6 +1,6 @@
 # P08-access-venue-03 — P08 · Access & Venue (3 of 3)
 
-**5 screens · 12 operations · 9 schemas · 7 permissions**
+**5 screens · 14 operations · 12 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,10 +48,9 @@ convincingly. It is never a caption.
 ## Rules that are not style preferences
 
 - **Every control that can be refused must be gated.** 7 permissions apply here:
-  `ORDER_CREATE, REPORT_VIEW_VENUE, RESOURCE_BOOK, RESOURCE_MANAGE, RESOURCE_VIEW, SCOPE_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
+  `ORDER_CREATE, REPORT_VIEW_VENUE, RESOURCE_BOOK, RESOURCE_MANAGE, RESOURCE_VIEW, SCOPE_VIEW, TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **6 of these operations work offline**: checkInResource, checkOutResource, getSessionManifest, getVenueSettings, listAccessPoints, reorderSessionManifest
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,8 +60,8 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-096` | Resource Calendar | statusTracker | 2 | 0 | — |
-| `BO-097` | Check Out & Check In | configEditor | 4 | 0 | — |
+| `BO-096` | Resource Calendar | statusTracker | 2 | 1 | — |
+| `BO-097` | Check Out & Check In | configEditor | 5 | 3 | — |
 | `BO-098` | Qualifications | configEditor | 1 | 0 | — |
-| `BO-099` | Session Manifest | statusTracker | 2 | 0 | — |
-| `BO-103` | Access & Venue | listDetail | 3 | 0 | — |
+| `BO-099` | Performance Manifest | statusTracker | 2 | 1 | — |
+| `BO-103` | Access & Venue | listDetail | 4 | 0 | — |

@@ -1,6 +1,6 @@
 # WS06 — Access Control board 6
 
-**10 screens · 10 operations · 15 schemas · 2 permissions**
+**10 screens · 14 operations · 25 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, SCOPE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, DEVICE_CONFIGURE, DEVICE_VIEW, SCOPE_VIEW, TURNSTILE_MODE_SET`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,7 +60,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-194` | Device & Gate Command Center | listDetail | 1 | 0 | — |
+| `BO-194` | Device & Gate Command Center | listDetail | 4 | 0 | — |
 | `BO-195` | Device Type & Hardware Library | listDetail | 1 | 0 | — |
 | `BO-196` | Physical Device Registration & Provisioning | configEditor | 1 | 0 | — |
 | `BO-197` | Turnstile & Lane Behavior Configuration | configEditor | 1 | 0 | — |
@@ -70,8 +69,8 @@ convincingly. It is never a caption.
 | `BO-200` | Handheld & Mobile Access Device Configuration | configEditor | 1 | 1 | — |
 | `BO-201` | Gate Modes, Free Spin & Emergency Controls | configEditor | 1 | 0 | — |
 | `BO-202` | Device Software, Content & Remote Configuration | configEditor | 1 | 0 | — |
-| `BO-203` | Hardware Compatibility, Health, Testing & Deployment | listDetail | 1 | 0 | — |
+| `BO-203` | Hardware Compatibility, Health, Testing & Deployment | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-194, BO-195, BO-199, BO-203 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-195, BO-199 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

@@ -1,6 +1,6 @@
 # WS05 — Access Control board 5
 
-**10 screens · 10 operations · 12 schemas · 2 permissions**
+**10 screens · 14 operations · 14 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, SCOPE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, AUDIT_VIEW, SCOPE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,20 +60,20 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-184` | Biometric Access Command Center | listDetail | 1 | 0 | — |
+| `BO-184` | Biometric Access Command Center | listDetail | 3 | 0 | — |
 | `BO-185` | Biometric Verification Profile Builder | configEditor | 1 | 0 | — |
 | `BO-186` | Face Pass Enrollment Configuration | configEditor | 1 | 0 | — |
 | `BO-187` | Biometric Consent & Guardian Management | configEditor | 1 | 0 | — |
-| `BO-188` | Face Tag Temporary Enrollment | configEditor | 1 | 0 | — |
-| `BO-189` | Face Matching & Verification Thresholds | configEditor | 1 | 0 | — |
+| `BO-188` | Face Tag Temporary Enrollment | configEditor | 2 | 0 | — |
+| `BO-189` | Face Matching & Verification Thresholds | configEditor | 2 | 0 | — |
 | `BO-190` | Face Change, Re-enrollment & Identity Protection | listDetail | 1 | 0 | — |
-| `BO-191` | Biometric Validation at Gate | listDetail | 1 | 0 | — |
-| `BO-192` | Biometric Lifecycle, Retention & Deletion | configEditor | 1 | 0 | — |
-| `BO-193` | Biometric Simulation, Audit & Publication | listDetail | 1 | 0 | — |
+| `BO-191` | Biometric Validation at Gate | listDetail | 2 | 0 | — |
+| `BO-192` | Biometric Lifecycle, Retention & Deletion | configEditor | 2 | 0 | — |
+| `BO-193` | Biometric Simulation, Audit & Publication | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-184, BO-188, BO-190, BO-191 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-188, BO-190, BO-191 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-184 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-185",
@@ -186,13 +182,96 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized administrators can monitor and manage the biometric-access environment from one location.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Central dashboard for biometric access configuration and operational health.",
-  "purposeNote": "Authorized administrators can monitor and manage the biometric-access environment from one location.",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active Face Pass Profiles",
+       "bindsTo": "BiometricAccessCommandCenterViewSummary.activeFacePassProfiles",
+       "operation": "listBiometricAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Active Face Tags",
+       "bindsTo": "BiometricAccessCommandCenterViewSummary.activeFaceTags",
+       "operation": "listBiometricAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Enrollments Today",
+       "bindsTo": "BiometricAccessCommandCenterViewSummary.enrollmentsToday",
+       "operation": "listBiometricAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Successful Face Verifications",
+       "bindsTo": "BiometricAccessCommandCenterViewSummary.successfulFaceVerifications",
+       "operation": "listBiometricAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Failed Verifications",
+       "bindsTo": "BiometricAccessCommandCenterViewSummary.failedVerifications",
+       "operation": "listBiometricAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Manual Reviews",
+       "bindsTo": "BiometricAccessCommandCenterViewSummary.manualReviews",
+       "operation": "listBiometricAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Re-enrollment Requests",
+       "bindsTo": "BiometricAccessCommandCenterViewSummary.reEnrollmentRequests",
+       "operation": "listBiometricAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Blocked Face Changes",
+       "bindsTo": "BiometricAccessCommandCenterViewSummary.blockedFaceChanges",
+       "operation": "listBiometricAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Profiles Pending Deletion",
+       "bindsTo": "BiometricAccessCommandCenterViewSummary.profilesPendingDeletion",
+       "operation": "listBiometricAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Camera/Reader Health",
+       "bindsTo": "BiometricAccessCommandCenterViewSummary.cameraReaderHealth",
+       "operation": "listBiometricAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Biometric Security Alerts",
+       "bindsTo": "BiometricAccessCommandCenterViewSummary.biometricSecurityAlerts",
+       "operation": "listBiometricAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -200,19 +279,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "dataTable",
        "label": "Every biometric access",
-       "columns": [
-        "BiometricAccessCommandCenterView.activeFacePassProfiles",
-        "BiometricAccessCommandCenterView.activeFaceTags",
-        "BiometricAccessCommandCenterView.enrollmentsToday",
-        "BiometricAccessCommandCenterView.successfulFaceVerifications",
-        "BiometricAccessCommandCenterView.failedVerifications",
-        "BiometricAccessCommandCenterView.manualReviews",
-        "BiometricAccessCommandCenterView.reEnrollmentRequests",
-        "BiometricAccessCommandCenterView.blockedFaceChanges",
-        "BiometricAccessCommandCenterView.profilesPendingDeletion",
-        "BiometricAccessCommandCenterView.cameraReaderHealth",
-        "BiometricAccessCommandCenterView.biometricSecurityAlerts"
-       ],
        "bindsTo": "BiometricAccessCommandCenterView",
        "operation": "listBiometricAccess",
        "provenance": "pack Access Control Module_Reference.pdf, page 56 §Display"
@@ -227,19 +293,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "detailPanel",
        "label": "The selected biometric access",
        "bindsTo": "BiometricAccessCommandCenterView",
-       "columns": [
-        "BiometricAccessCommandCenterView.activeFacePassProfiles",
-        "BiometricAccessCommandCenterView.activeFaceTags",
-        "BiometricAccessCommandCenterView.enrollmentsToday",
-        "BiometricAccessCommandCenterView.successfulFaceVerifications",
-        "BiometricAccessCommandCenterView.failedVerifications",
-        "BiometricAccessCommandCenterView.manualReviews",
-        "BiometricAccessCommandCenterView.reEnrollmentRequests",
-        "BiometricAccessCommandCenterView.blockedFaceChanges",
-        "BiometricAccessCommandCenterView.profilesPendingDeletion",
-        "BiometricAccessCommandCenterView.cameraReaderHealth",
-        "BiometricAccessCommandCenterView.biometricSecurityAlerts"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “Profile Type Credential Venue Status”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 56 §Display"
       }
@@ -260,22 +313,43 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Biometric Access Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setBiometricVerificationProfile",
+    "contract": "access",
+    "purpose": "Create or change a biometric verification profile",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listBiometricAccess"
+    ]
+   },
+   {
+    "operationId": "setFacePassEnrollment",
+    "contract": "access",
+    "purpose": "Change Face Pass enrolment settings",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listBiometricAccess"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "BiometricAccessCommandCenterView.activeFacePassProfiles",
-    "BiometricAccessCommandCenterView.activeFaceTags",
-    "BiometricAccessCommandCenterView.enrollmentsToday",
-    "BiometricAccessCommandCenterView.successfulFaceVerifications",
-    "BiometricAccessCommandCenterView.failedVerifications",
-    "BiometricAccessCommandCenterView.manualReviews"
+    "BiometricAccessCommandCenterViewSummary.activeFacePassProfiles",
+    "BiometricAccessCommandCenterViewSummary.activeFaceTags",
+    "BiometricAccessCommandCenterViewSummary.enrollmentsToday",
+    "BiometricAccessCommandCenterViewSummary.successfulFaceVerifications",
+    "BiometricAccessCommandCenterViewSummary.failedVerifications",
+    "BiometricAccessCommandCenterViewSummary.manualReviews"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-184"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-184",
+   "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-184"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 56. 11 of 11 labels bound to a contract property; 11 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -338,10 +412,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Biometric requirements can be activated or deactivated by product, credential and access location without development.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Select) and no display directory — it is settings, not a population",
   "purpose": "Configure which ticket/credential types can or must use biometric verification. The matrix specifically requires biometric checks to be configurable by ticket type, including memberships, annual passes, multi-day and multi-attraction products.",
-  "purposeNote": "Biometric requirements can be activated or deactivated by product, credential and access location without development.",
   "layout": {
    "template": "form",
    "regions": [
@@ -415,16 +489,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setBiometricVerificationProfile",
     "contract": "access",
     "purpose": "Biometric Verification Profile Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setBiometricVerificationProfile"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-185"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-185",
+   "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-185"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 58. 0 of 0 labels bound to a contract property; 8 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -487,10 +559,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Face Pass enrollment follows a controlled, configurable and fully auditable workflow.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture Required Consent; Capture Face; Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure persistent Face Pass registration. The source specifies that Face Pass may be registered through the App, ticket counters or Annual Pass counter.",
-  "purposeNote": "Face Pass enrollment follows a controlled, configurable and fully auditable workflow.",
   "layout": {
    "template": "form",
    "regions": [
@@ -564,16 +636,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setFacePassEnrollment",
     "contract": "access",
     "purpose": "Face Pass Enrollment Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setFacePassEnrollment"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-186"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-186",
+   "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-186"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 59. 0 of 0 labels bound to a contract property; 8 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -636,10 +706,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Face Pass capture cannot proceed when the applicable configured consent requirement has not been satisfied.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure by) and no display directory — it is settings, not a population",
   "purpose": "Manage consent requirements associated with persistent biometric enrollment. The matrix requires App users to provide consent before Face Pass registration and requires guardian consent for minors. On-site enrollment also requires consent before facial data is captured.",
-  "purposeNote": "Face Pass capture cannot proceed when the applicable configured consent requirement has not been satisfied.",
   "layout": {
    "template": "form",
    "regions": [
@@ -693,7 +763,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-187"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-187",
+   "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-187"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 60. 0 of 0 labels bound to a contract property; 5 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -756,10 +827,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Temporary biometric identities are clearly separated from persistent biometric profiles and follow their configured automatic deletion lifecycle.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Face Captured) and no display directory — it is settings, not a population",
   "purpose": "Configure the temporary biometric model separately from Face Pass. The matrix describes Face Tag as temporarily stored facial data, enrollable at ticket counters or entry gates, with biometric data permanently deleted once the associated ticket is fully redeemed.",
-  "purposeNote": "Temporary biometric identities are clearly separated from persistent biometric profiles and follow their configured automatic deletion lifecycle.",
   "layout": {
    "template": "form",
    "regions": [
@@ -779,6 +850,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save Face Tag profile",
+       "operation": "setFaceTagTemporaryEnrollment",
+       "provenance": "contract access.yaml PUT /face-tag-temporary (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -794,12 +877,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Face Tag Temporary Enrollment",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setFaceTagTemporaryEnrollment",
+    "contract": "access",
+    "purpose": "Save Face Tag profile",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-188"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-188",
+   "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-188"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 61. 0 of 0 labels bound to a contract property; 1 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -862,10 +952,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Biometric verification sensitivity can be configured by access context and provider capability.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure biometric verification behavior. The source requires a configurable Biometric Check Level determining the scoring of biometric comparison.",
-  "purposeNote": "Biometric verification sensitivity can be configured by access context and provider capability.",
   "layout": {
    "template": "form",
    "regions": [
@@ -904,6 +994,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 62 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save thresholds",
+       "operation": "setFaceMatchingVerification",
+       "provenance": "contract access.yaml PUT /face-matching-verification (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -919,12 +1021,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Face Matching & Verification Thresholds",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setFaceMatchingVerification",
+    "contract": "access",
+    "purpose": "Save thresholds",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-189"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-189",
+   "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-189"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 62. 0 of 0 labels bound to a contract property; 6 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -987,10 +1096,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Biometric re-enrollment cannot silently replace the identity attached to a credential.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Prevent guests from replacing a registered biometric identity with another person's face. The source explicitly states that customers may re-register Face Pass, but the system must compare the new facial data with the previous profile. If the difference exceeds an acceptable threshold, the update is blocked and venue assistance is required.",
-  "purposeNote": "Biometric re-enrollment cannot silently replace the identity attached to a credential.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1005,11 +1114,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "FaceChangeReEnrollmentIdentityProtectionView.existingProfileReference",
         "FaceChangeReEnrollmentIdentityProtectionView.newCaptureReference",
         "FaceChangeReEnrollmentIdentityProtectionView.matchResult",
-        "FaceChangeReEnrollmentIdentityProtectionView.credential",
-        "FaceChangeReEnrollmentIdentityProtectionView.guest",
+        "FaceChangeReEnrollmentIdentityProtectionView.credentialId",
+        "FaceChangeReEnrollmentIdentityProtectionView.guestId",
         "FaceChangeReEnrollmentIdentityProtectionView.reasonForReEnrollment",
         "FaceChangeReEnrollmentIdentityProtectionView.previousChanges",
-        "FaceChangeReEnrollmentIdentityProtectionView.operator"
+        "FaceChangeReEnrollmentIdentityProtectionView.operatorId"
        ],
        "bindsTo": "FaceChangeReEnrollmentIdentityProtectionView",
        "operation": "listFaceChangeEnrollment",
@@ -1029,11 +1138,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "FaceChangeReEnrollmentIdentityProtectionView.existingProfileReference",
         "FaceChangeReEnrollmentIdentityProtectionView.newCaptureReference",
         "FaceChangeReEnrollmentIdentityProtectionView.matchResult",
-        "FaceChangeReEnrollmentIdentityProtectionView.credential",
-        "FaceChangeReEnrollmentIdentityProtectionView.guest",
+        "FaceChangeReEnrollmentIdentityProtectionView.credentialId",
+        "FaceChangeReEnrollmentIdentityProtectionView.guestId",
         "FaceChangeReEnrollmentIdentityProtectionView.reasonForReEnrollment",
         "FaceChangeReEnrollmentIdentityProtectionView.previousChanges",
-        "FaceChangeReEnrollmentIdentityProtectionView.operator"
+        "FaceChangeReEnrollmentIdentityProtectionView.operatorId"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Current Face”, “SIGNIFICANT IDENTITY DIFFERENCE”, “CHANGE BLOCKED”, “Change Reasons”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 63 §Show"
@@ -1062,15 +1171,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "FaceChangeReEnrollmentIdentityProtectionView.existingProfileReference",
     "FaceChangeReEnrollmentIdentityProtectionView.newCaptureReference",
     "FaceChangeReEnrollmentIdentityProtectionView.matchResult",
-    "FaceChangeReEnrollmentIdentityProtectionView.credential",
-    "FaceChangeReEnrollmentIdentityProtectionView.guest",
+    "FaceChangeReEnrollmentIdentityProtectionView.credentialId",
+    "FaceChangeReEnrollmentIdentityProtectionView.guestId",
     "FaceChangeReEnrollmentIdentityProtectionView.reasonForReEnrollment"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-190"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-190",
+   "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-190"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 63. 8 of 8 labels bound to a contract property; 8 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1133,10 +1243,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Biometric verification integrates transparently into the normal TICVAI admission and exit decision flow.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure how facial verification interacts with the physical access-control journey.",
-  "purposeNote": "Biometric verification integrates transparently into the normal TICVAI admission and exit decision flow.",
   "gaps": [
    {
     "operation": null,
@@ -1160,6 +1270,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "derived": true,
        "impliedBy": "listBiometricValidationGate",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setBiometricVerificationProfile",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setBiometricVerificationProfile"
       }
      ]
     }
@@ -1178,18 +1302,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Biometric Validation at Gate",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setBiometricVerificationProfile",
+    "contract": "access",
+    "purpose": "Choose which gates, zones and attractions require a face match",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listBiometricValidationGate"
+    ]
    }
   ],
   "entryState": {
-   "preloaded": [
-    "BiometricValidationAtGateView.decisionReturned",
-    "BiometricValidationAtGateView.biometricMatchValidAccess"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-191"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-191",
+   "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-191"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 65. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1252,10 +1384,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Biometric information follows explicit, auditable lifecycle and deletion rules independently from ticket history.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure separately for) and no display directory — it is settings, not a population",
   "purpose": "Manage biometric-data lifecycle and deletion rules.",
-  "purposeNote": "Biometric information follows explicit, auditable lifecycle and deletion rules independently from ticket history.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1284,6 +1416,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 66 §Configure separately for"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save retention rule",
+       "operation": "setBiometricLifecycleRetention",
+       "notes": "Step-up (mfa) on save. The retention period is still provisional: how long Face Pass, Face Tag and failed capture data may be kept per region is the client's make-or-break question (K1).",
+       "provenance": "contract access.yaml PUT /biometric-lifecycle-retention (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -1299,12 +1444,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Biometric Lifecycle, Retention & Deletion",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setBiometricLifecycleRetention",
+    "contract": "access",
+    "purpose": "Save retention rule",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-192"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-192",
+   "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-192"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 66. 0 of 0 labels bound to a contract property; 4 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1359,16 +1511,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from BO-184, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "No biometric access configuration enters production without testing, authorization, version control and auditability. Board 5 — Final 10-Screen Structure # Backend Screen Main Responsibility 5.1 Biometric Access Command Center Biometric estate and operational health",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Test biometric configurations before live deployment.",
-  "purposeNote": "No biometric access configuration enters production without testing, authorization, version control and auditability. Board 5 — Final 10-Screen Structure # Backend Screen Main Responsibility 5.1 Biometric Access Command Center Biometric estate and operational health",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Low-confidence match, Duplicate profile. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Access Control Module_Reference.pdf, page 67 §Support"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
@@ -1418,6 +1565,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "Duplicate profile",
        "provenance": "pack Access Control Module_Reference.pdf, page 67 §Support"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Run simulation",
+       "operation": "simulateBiometricConfiguration",
+       "provenance": "contract access.yaml POST /biometric/simulate (decided 29 September, VM close-out)"
       }
      ]
     }
@@ -1436,14 +1589,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Biometric Simulation, Audit & Publication",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "simulateBiometricConfiguration",
+    "contract": "access",
+    "purpose": "Run simulation",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-193"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-193",
+   "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-193"
   },
-  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 67. 0 of 8 labels bound to a contract property; 10 of 69 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 67. 0 of 8 labels bound to a contract property; 10 of 69 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `simulateBiometricConfiguration`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1481,7 +1641,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/biometric",
   "contract": "access",
   "summary": "Biometric Simulation, Audit & Publication",
-  "permission": "SCOPE_VIEW",
+  "permission": "AUDIT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -1525,10 +1685,25 @@ Method, path, parameters, request and response for every operation these screens
     "name": "result",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "reasonCode",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "BiometricSimulationAuditPublicationView"
+  "responds": "Page"
  },
  "listBiometricAccess": {
   "method": "GET",
@@ -1539,9 +1714,20 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "BiometricAccessCommandCenterView"
+  "responds": "Page"
  },
  "listBiometricConsentGuardian": {
   "method": "GET",
@@ -1552,9 +1738,50 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "countryJurisdiction",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "tenantId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "credentialType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "enrollmentChannel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "guestCategory",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "BiometricConsentGuardianManagementView"
+  "responds": "Page"
  },
  "listBiometricLifecycleRetention": {
   "method": "GET",
@@ -1591,9 +1818,20 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "FaceChangeReEnrollmentIdentityProtectionView"
+  "responds": "Page"
  },
  "listFaceMatchingVerification": {
   "method": "GET",
@@ -1621,6 +1859,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "FaceTagTemporaryEnrollmentView"
  },
+ "setBiometricLifecycleRetention": {
+  "method": "PUT",
+  "path": "/biometric-lifecycle-retention",
+  "contract": "access",
+  "summary": "Save a biometric retention rule",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "BiometricLifecycleRetentionDeletionInput",
+  "responds": "BiometricLifecycleRetentionDeletionView"
+ },
  "setBiometricVerificationProfile": {
   "method": "PUT",
   "path": "/biometric-verification-profile",
@@ -1630,9 +1887,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "BiometricVerificationProfileBuilderInput",
   "responds": "BiometricVerificationProfileBuilderView"
+ },
+ "setFaceMatchingVerification": {
+  "method": "PUT",
+  "path": "/face-matching-verification",
+  "contract": "access",
+  "summary": "Save face matching and verification thresholds",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FaceMatchingVerificationThresholdsInput",
+  "responds": "FaceMatchingVerificationThresholdsView"
  },
  "setFacePassEnrollment": {
   "method": "PUT",
@@ -1643,9 +1925,53 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "FacePassEnrollmentConfigurationInput",
   "responds": "FacePassEnrollmentConfigurationView"
+ },
+ "setFaceTagTemporaryEnrollment": {
+  "method": "PUT",
+  "path": "/face-tag-temporary",
+  "contract": "access",
+  "summary": "Save a Face Tag profile",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FaceTagTemporaryEnrollmentInput",
+  "responds": "FaceTagTemporaryEnrollmentView"
+ },
+ "simulateBiometricConfiguration": {
+  "method": "POST",
+  "path": "/biometric/simulate",
+  "contract": "access",
+  "summary": "Run a biometric scenario before publishing",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "BiometricSimulationInput",
+  "responds": "BiometricSimulationAuditPublicationView"
  }
 }
 ```
@@ -1656,128 +1982,53 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
- "BiometricAccessCommandCenterView": {
+ "BiometricLifecycleRetentionDeletionInput": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Biometric Access Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — request only; the write configures the rules the matching View reads back (decided 29 September, VM close-out)",
+  "description": "**What Biometric Lifecycle, Retention & Deletion submits** (decided 29 September, VM close-out). The writable fields of its View; the figures the screen computes are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "required": [
+   "venueId",
+   "dataCategory",
+   "retentionDays",
+   "deletionTrigger"
+  ],
   "properties": {
-   "activeFacePassProfiles": {
+   "policyId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Absent creates a retention rule"
+   },
+   "venueId": {
+    "type": "string"
+   },
+   "dataCategory": {
+    "type": "string",
+    "enum": [
+     "facePass",
+     "faceTag",
+     "failedEnrollmentCaptures",
+     "abandonedRegistrations",
+     "temporaryCaptures"
+    ],
+    "description": "Biometric data category this rule governs"
+   },
+   "retentionDays": {
     "type": "integer",
-    "description": "Active Face Pass Profiles"
+    "minimum": 0,
+    "description": "Maximum retention in days. **No default and no maximum here on purpose**: the lawful period per region is the client counsel's value (make-or-break (a), see the operation)"
    },
-   "activeFaceTags": {
-    "type": "integer",
-    "description": "Active Face Tags"
-   },
-   "enrollmentsToday": {
+   "deletionTrigger": {
     "type": "string",
-    "description": "Enrollments Today"
-   },
-   "successfulFaceVerifications": {
-    "type": "integer",
-    "description": "Successful Face Verifications"
-   },
-   "failedVerifications": {
-    "type": "integer",
-    "description": "Failed Verifications"
-   },
-   "manualReviews": {
-    "type": "integer",
-    "description": "Manual Reviews"
-   },
-   "reEnrollmentRequests": {
-    "type": "integer",
-    "description": "Re-enrollment Requests"
-   },
-   "blockedFaceChanges": {
-    "type": "integer",
-    "description": "Blocked Face Changes"
-   },
-   "profilesPendingDeletion": {
-    "type": "string",
-    "description": "Profiles Pending Deletion"
-   },
-   "cameraReaderHealth": {
-    "type": "string",
-    "description": "Camera/Reader Health"
-   },
-   "biometricSecurityAlerts": {
-    "type": "integer",
-    "description": "Biometric Security Alerts"
-   },
-   "ai": {
-    "type": "string",
-    "description": "AI"
-   }
-  }
- },
- "BiometricConsentGuardianManagementView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Biometric Consent & Guardian Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "countryJurisdiction": {
-    "type": "string",
-    "description": "Country/Jurisdiction"
-   },
-   "tenant": {
-    "type": "string",
-    "description": "Tenant"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "credential": {
-    "type": "string",
-    "description": "Credential"
-   },
-   "enrollmentChannel": {
-    "type": "string",
-    "description": "Enrollment Channel"
-   },
-   "guestCategory": {
-    "type": "string",
-    "description": "Guest Category"
-   },
-   "consentRecordId": {
-    "type": "string",
-    "description": "Consent record ID"
-   },
-   "policyVersion": {
-    "type": "string",
-    "description": "Policy/version"
-   },
-   "timestamp": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Timestamp"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "guardianReferenceWhereApplicable": {
-    "type": "string",
-    "description": "Guardian reference where applicable"
-   },
-   "operatorWhereApplicable": {
-    "type": "string",
-    "description": "Operator where applicable"
-   },
-   "withdrawalDeletionStatus": {
-    "type": "string",
-    "description": "withdrawal/deletion status"
-   },
-   "from": {
-    "type": "string",
-    "description": "from"
-   },
-   "consentRecordMayBeRetained": {
-    "type": "string",
-    "description": "consent record may be retained"
+    "enum": [
+     "deletionRequest",
+     "ticketFullyRedeemed",
+     "endOfVisit",
+     "ticketExpiration",
+     "membershipEnded",
+     "captureFailed",
+     "registrationAbandoned"
+    ],
+    "description": "Event that starts the retention clock"
    }
   }
  },
@@ -1787,41 +2038,39 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Biometric Lifecycle, Retention & Deletion displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "verificationMethod": {
+   "dataCategory": {
     "type": "string",
-    "description": "verification method"
+    "enum": [
+     "facePass",
+     "faceTag",
+     "failedEnrollmentCaptures",
+     "abandonedRegistrations",
+     "temporaryCaptures"
+    ],
+    "description": "Biometric data category this retention rule governs"
    },
-   "activeCredential": {
+   "policyId": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string"
+   },
+   "retentionDays": {
     "type": "integer",
-    "description": "Active Credential?"
+    "description": "Maximum retention in days; value set per region once confirmed. No default (make-or-break (a), see `setBiometricLifecycleRetention`)"
    },
-   "alreadyValidatedUsingFacePass": {
+   "deletionTrigger": {
     "type": "string",
-    "description": "Already validated using Face Pass?"
-   },
-   "reasonShown": {
-    "type": "string",
-    "description": "Reason shown"
-   },
-   "facePass": {
-    "type": "string",
-    "description": "Face Pass"
-   },
-   "faceTag": {
-    "type": "string",
-    "description": "Face Tag"
-   },
-   "failedEnrollmentCaptures": {
-    "type": "integer",
-    "description": "Failed enrollment captures"
-   },
-   "abandonedRegistrations": {
-    "type": "string",
-    "description": "abandoned registrations"
-   },
-   "temporaryCaptures": {
-    "type": "string",
-    "description": "temporary captures"
+    "enum": [
+     "deletionRequest",
+     "ticketFullyRedeemed",
+     "endOfVisit",
+     "ticketExpiration",
+     "membershipEnded",
+     "captureFailed",
+     "registrationAbandoned"
+    ],
+    "description": "Event that starts the retention clock (decided 29 September, VM close-out)"
    }
   }
  },
@@ -1831,109 +2080,113 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Biometric Simulation, Audit & Publication displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "validFacePass": {
+   "scenario": {
     "type": "string",
-    "description": "Valid Face Pass"
+    "enum": [
+     "validFacePass",
+     "faceMismatch",
+     "noBiometricProfile",
+     "lowConfidenceMatch",
+     "livenessFailure",
+     "duplicateProfile",
+     "reEnrollmentAttempt",
+     "childAssignedAdult",
+     "faceTagExpired",
+     "faceTagDeleted",
+     "offlineBiometric",
+     "cameraUnavailable",
+     "alternativeVerificationFallback"
+    ],
+    "description": "Simulated scenario (simulation rows only)"
    },
-   "faceMismatch": {
+   "eventId": {
+    "type": "string"
+   },
+   "occurredAt": {
     "type": "string",
-    "description": "Face mismatch"
+    "format": "date-time"
    },
-   "noBiometricProfile": {
+   "isSimulation": {
+    "type": "boolean"
+   },
+   "guestId": {
+    "type": "string"
+   },
+   "credentialId": {
+    "type": "string"
+   },
+   "faceProfileReference": {
+    "type": "string"
+   },
+   "gateId": {
+    "type": "string"
+   },
+   "deviceId": {
+    "type": "string"
+   },
+   "operatorId": {
+    "type": "string"
+   },
+   "result": {
     "type": "string",
-    "description": "No biometric profile"
+    "enum": [
+     "allowed",
+     "review",
+     "denied"
+    ]
    },
-   "lowConfidenceMatch": {
+   "reasonCode": {
+    "type": "string"
+   },
+   "decisionTrace": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Checks passed or failed, e.g. face profile active, match policy satisfied, ticket valid"
+   }
+  }
+ },
+ "BiometricSimulationInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only (decided 29 September, VM close-out)",
+  "description": "One simulated biometric validation, run before a biometric profile is published (decided 29 September, VM close-out).",
+  "required": [
+   "scenario",
+   "venueId"
+  ],
+  "properties": {
+   "scenario": {
     "type": "string",
-    "description": "Low-confidence match"
+    "enum": [
+     "validFacePass",
+     "faceMismatch",
+     "noBiometricProfile",
+     "lowConfidenceMatch",
+     "livenessFailure",
+     "duplicateProfile",
+     "reEnrollmentAttempt",
+     "childAssignedAdult",
+     "faceTagExpired",
+     "faceTagDeleted",
+     "offlineBiometric",
+     "cameraUnavailable",
+     "alternativeVerificationFallback"
+    ]
    },
-   "livenessFailure": {
+   "venueId": {
+    "type": "string"
+   },
+   "gateGroupId": {
     "type": "string",
-    "description": "Liveness failure"
-   },
-   "reEnrollmentAttempt": {
-    "type": "string",
-    "description": "Re-enrollment attempt"
-   },
-   "childAssignedAdult": {
-    "type": "string",
-    "description": "Child + assigned adult"
-   },
-   "faceTagExpired": {
-    "type": "string",
-    "description": "Face Tag expired"
-   },
-   "faceTagDeleted": {
-    "type": "string",
-    "description": "Face Tag deleted"
-   },
-   "offlineBiometricScenario": {
-    "type": "integer",
-    "description": "Offline biometric scenario"
-   },
-   "cameraUnavailable": {
-    "type": "string",
-    "description": "Camera unavailable"
-   },
-   "alternativeVerificationFallback": {
-    "type": "string",
-    "description": "alternative verification fallback"
-   },
-   "faceProfileActive": {
-    "type": "integer",
-    "description": "✓ Face profile active"
-   },
-   "verificationPolicySatisfied": {
-    "type": "string",
-    "description": "✓ Verification policy satisfied"
-   },
-   "matchPolicySatisfied": {
-    "type": "string",
-    "description": "✓ Match policy satisfied"
-   },
-   "credentialResolved": {
-    "type": "string",
-    "description": "✓ Credential resolved"
-   },
-   "ticketValid": {
-    "type": "string",
-    "description": "✓ Ticket valid"
-   },
-   "accessEntitlementValid": {
-    "type": "string",
-    "description": "✓ Access entitlement valid"
-   },
-   "tenant": {
-    "type": "string",
-    "description": "Tenant"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "park": {
-    "type": "string",
-    "description": "Park"
+    "description": "Empty simulates at every gate group of the venue"
    },
    "credentialType": {
-    "type": "string",
-    "description": "Credential type"
+    "type": "string"
    },
-   "gateGroup": {
+   "profileId": {
     "type": "string",
-    "description": "Gate group"
-   },
-   "withAppropriateFallbackRules": {
-    "type": "string",
-    "description": "with appropriate fallback rules"
-   },
-   "required": {
-    "type": "boolean",
-    "description": "required"
-   },
-   "hardware": {
-    "type": "string",
-    "description": "hardware"
+    "description": "The draft biometric verification profile to test; empty tests the published one"
    }
   }
  },
@@ -1943,13 +2196,34 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Biometric Validation at Gate displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "decisionReturned": {
-    "type": "string",
-    "description": "Decision returned"
+   "ruleId": {
+    "type": "string"
    },
-   "biometricMatchValidAccess": {
+   "accessPointId": {
+    "type": "string"
+   },
+   "outcome": {
     "type": "string",
-    "description": "Biometric Match + Valid Access"
+    "enum": [
+     "green",
+     "yellow",
+     "red"
+    ]
+   },
+   "conditions": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Conditions that give this outcome, e.g. uncertain match, face mismatch, revoked profile"
+   },
+   "outcomeProfileId": {
+    "type": "string",
+    "description": "Gate response profile from the validation outcome designer"
+   },
+   "exitCaptureEnabled": {
+    "type": "boolean",
+    "description": "Face capture at exit records exit time"
    }
   }
  },
@@ -1959,6 +2233,28 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Biometric Verification Profile Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
+   "faceRequirement": {
+    "type": "string",
+    "enum": [
+     "notUsed",
+     "optional",
+     "required"
+    ],
+    "description": "Whether face verification is not used, allowed, or required at this location (e.g. main entry required, attractions credential only)"
+   },
+   "biometricType": {
+    "type": "string",
+    "enum": [
+     "facePass",
+     "faceTag",
+     "otherProvider"
+    ],
+    "description": "Biometric model this profile uses"
+   },
+   "profileId": {
+    "type": "string",
+    "description": "Biometric verification profile identifier"
+   },
    "selectType": {
     "type": "string",
     "enum": [
@@ -1974,39 +2270,37 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "description": "Vocabulary listed under Select."
    },
-   "venue": {
+   "venueId": {
     "type": "string",
     "description": "Venue"
    },
-   "park": {
+   "parkId": {
     "type": "string",
     "description": "Park"
    },
-   "zone": {
+   "zoneId": {
     "type": "string",
     "description": "Zone"
    },
-   "attraction": {
+   "attractionId": {
     "type": "string",
     "description": "Attraction"
    },
-   "gate": {
+   "gateId": {
     "type": "string",
     "description": "Gate"
    },
-   "mainEntryFaceRequired": {
-    "type": "boolean",
-    "description": "Main Entry → Face Required"
-   },
-   "attractionsCredentialOnly": {
-    "type": "string",
-    "description": "Attractions → Credential Only"
-   },
-   "vipLoungeFaceRequired": {
-    "type": "boolean",
-    "description": "VIP Lounge → Face Required"
+   "name": {
+    "type": "string"
    }
-  }
+  },
+  "required": [
+   "profileId",
+   "venueId",
+   "selectType",
+   "biometricType",
+   "faceRequirement"
+  ]
  },
  "BiometricVerificationProfileBuilderView": {
   "type": "object",
@@ -2014,17 +2308,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Biometric Verification Profile Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "facePass": {
+   "faceRequirement": {
     "type": "string",
-    "description": "Face Pass"
+    "enum": [
+     "notUsed",
+     "optional",
+     "required"
+    ],
+    "description": "Whether face verification is not used, allowed, or required at this location (e.g. main entry required, attractions credential only)"
    },
-   "faceTag": {
+   "biometricType": {
     "type": "string",
-    "description": "Face Tag"
+    "enum": [
+     "facePass",
+     "faceTag",
+     "otherProvider"
+    ],
+    "description": "Biometric model this profile uses"
    },
-   "supportedFutureBiometricProvider": {
+   "profileId": {
     "type": "string",
-    "description": "Supported future biometric provider"
+    "description": "Biometric verification profile identifier"
    },
    "selectType": {
     "type": "string",
@@ -2041,92 +2345,118 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "description": "Vocabulary listed under Select."
    },
-   "venue": {
+   "venueId": {
     "type": "string",
     "description": "Venue"
    },
-   "park": {
+   "parkId": {
     "type": "string",
     "description": "Park"
    },
-   "zone": {
+   "zoneId": {
     "type": "string",
     "description": "Zone"
    },
-   "attraction": {
+   "attractionId": {
     "type": "string",
     "description": "Attraction"
    },
-   "gate": {
+   "gateId": {
     "type": "string",
     "description": "Gate"
    },
-   "mainEntryFaceRequired": {
-    "type": "boolean",
-    "description": "Main Entry → Face Required"
-   },
-   "attractionsCredentialOnly": {
-    "type": "string",
-    "description": "Attractions → Credential Only"
-   },
-   "vipLoungeFaceRequired": {
-    "type": "boolean",
-    "description": "VIP Lounge → Face Required"
+   "name": {
+    "type": "string"
    }
-  }
+  },
+  "required": [
+   "profileId",
+   "venueId",
+   "selectType",
+   "biometricType",
+   "faceRequirement"
+  ]
  },
- "FaceChangeReEnrollmentIdentityProtectionView": {
+ "FaceMatchingVerificationThresholdsInput": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Face Change, Re-enrollment & Identity Protection displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — request only; the write configures the rules the matching View reads back (decided 29 September, VM close-out)",
+  "description": "**What Face Matching & Verification Thresholds submits** (decided 29 September, VM close-out). The writable fields of its View; the figures the screen computes are deliberately absent, because a figure the system computed is not a figure a client may send back. Proposed defaults are ours (our build plan); the scores are a 0-1 scale whatever the face vendor reports, normalised by the adapter (R077).",
+  "required": [
+   "venueId",
+   "accessContext",
+   "highConfidenceMin",
+   "reviewRangeMin"
+  ],
   "properties": {
-   "existingProfileReference": {
+   "profileId": {
     "type": "string",
-    "description": "Existing profile reference"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Absent creates a threshold profile"
    },
-   "newCaptureReference": {
+   "venueId": {
+    "type": "string"
+   },
+   "accessContext": {
+    "type": "string",
+    "maxLength": 100,
+    "description": "Where the thresholds apply, e.g. main entry, child protection"
+   },
+   "highConfidenceMin": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "description": "Score at or above which the match is high confidence (allow if every other rule passes)"
+   },
+   "reviewRangeMin": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "description": "Score at or above which the match goes to operator review; below it is denied. Must be below highConfidenceMin"
+   },
+   "retryQuantity": {
     "type": "integer",
-    "description": "New capture reference"
+    "minimum": 0,
+    "maximum": 5,
+    "default": 2
    },
-   "matchResult": {
-    "type": "string",
-    "description": "match result"
+   "livenessCheck": {
+    "type": "boolean",
+    "default": true
    },
-   "credential": {
-    "type": "string",
-    "description": "credential"
+   "duplicateFaceCheck": {
+    "type": "boolean",
+    "default": true
    },
-   "guest": {
-    "type": "string",
-    "description": "guest"
-   },
-   "reasonForReEnrollment": {
-    "type": "string",
-    "description": "reason for re-enrollment"
-   },
-   "previousChanges": {
-    "type": "integer",
-    "description": "previous changes"
-   },
-   "operator": {
-    "type": "string",
-    "description": "operator"
-   },
-   "auditHistory": {
-    "type": "string",
-    "description": "audit history"
-   },
-   "reasonsType": {
+   "imageQuality": {
     "type": "string",
     "enum": [
-     "appearanceChange",
-     "poorOriginalCapture",
-     "technicalIssue",
-     "guestRequest",
-     "recovery"
+     "low",
+     "medium",
+     "high"
     ],
-    "description": "Vocabulary listed under Change Reasons."
+    "default": "medium",
+    "description": "Minimum image quality accepted"
+   },
+   "captureTimeout": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 60,
+    "default": 10,
+    "description": "Seconds"
+   },
+   "maskObstructionHandling": {
+    "type": "string",
+    "enum": [
+     "deny",
+     "operatorReview",
+     "fallbackMethod"
+    ],
+    "default": "operatorReview"
+   },
+   "operatorFallback": {
+    "type": "boolean",
+    "default": true,
+    "description": "Review-range results go to operator verification"
    }
   }
  },
@@ -2136,33 +2466,60 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Face Matching & Verification Thresholds displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "venuePolicy": {
-    "type": "string",
-    "description": "venue policy"
-   },
    "livenessCheck": {
-    "type": "string",
+    "type": "boolean",
     "description": "Liveness check"
    },
    "duplicateFaceCheck": {
-    "type": "string",
+    "type": "boolean",
     "description": "Duplicate-face check"
    },
    "imageQuality": {
     "type": "string",
-    "description": "image quality"
+    "enum": [
+     "low",
+     "medium",
+     "high"
+    ],
+    "description": "Minimum image quality accepted (decided 29 September, VM close-out)"
    },
    "captureTimeout": {
-    "type": "string",
-    "description": "capture timeout"
+    "type": "integer",
+    "description": "Seconds"
    },
    "maskObstructionHandling": {
     "type": "string",
-    "description": "mask/obstruction handling"
+    "enum": [
+     "deny",
+     "operatorReview",
+     "fallbackMethod"
+    ],
+    "description": "What a masked or obstructed face leads to (decided 29 September, VM close-out)"
    },
    "operatorFallback": {
+    "type": "boolean",
+    "description": "Review-range results go to operator verification"
+   },
+   "profileId": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string"
+   },
+   "accessContext": {
     "type": "string",
-    "description": "operator fallback"
+    "description": "Where the thresholds apply, e.g. main entry, child protection"
+   },
+   "highConfidenceMin": {
+    "type": "number",
+    "description": "Score at or above which the match is high confidence (allow if all other rules pass)"
+   },
+   "reviewRangeMin": {
+    "type": "number",
+    "description": "Score at or above which the match goes to operator review; below it is denied"
+   },
+   "retryQuantity": {
+    "type": "integer"
    }
   }
  },
@@ -2172,25 +2529,23 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Face Pass Enrollment Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "ticvaiApp": {
+   "venueId": {
     "type": "string",
-    "description": "☑ TICVAI App"
+    "description": "Venue this enrolment configuration applies to"
    },
-   "ticketCounter": {
-    "type": "string",
-    "description": "☑ Ticket Counter"
-   },
-   "annualPassCounter": {
-    "type": "string",
-    "description": "☑ Annual Pass Counter"
-   },
-   "selfServiceKiosk": {
-    "type": "string",
-    "description": "☐ Self-Service Kiosk"
-   },
-   "otherAuthorizedChannel": {
-    "type": "string",
-    "description": "☐ Other authorized channel"
+   "enrollmentChannels": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "ticvaiApp",
+      "ticketCounter",
+      "annualPassCounter",
+      "selfServiceKiosk",
+      "otherAuthorizedChannel"
+     ]
+    },
+    "description": "Channels where Face Pass enrolment is enabled"
    },
    "accountLoginRequired": {
     "type": "boolean",
@@ -2213,19 +2568,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "minimum image quality"
    },
    "operatorVerification": {
-    "type": "string",
-    "description": "operator verification"
+    "type": "boolean",
+    "description": "An operator must verify the capture"
    },
    "enrollmentExpiry": {
-    "type": "string",
-    "format": "date-time",
-    "description": "enrollment expiry"
+    "type": "integer",
+    "description": "Days an enrolment stays valid before re-enrolment is needed"
    },
-   "alreadyAssociatedWith": {
-    "type": "string",
-    "description": "already associated with"
+   "duplicateFaceDetection": {
+    "type": "boolean",
+    "description": "Block a face already associated with another annual pass"
    }
-  }
+  },
+  "required": [
+   "venueId"
+  ]
  },
  "FacePassEnrollmentConfigurationView": {
   "type": "object",
@@ -2233,25 +2590,23 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Face Pass Enrollment Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "ticvaiApp": {
+   "venueId": {
     "type": "string",
-    "description": "☑ TICVAI App"
+    "description": "Venue this enrolment configuration applies to"
    },
-   "ticketCounter": {
-    "type": "string",
-    "description": "☑ Ticket Counter"
-   },
-   "annualPassCounter": {
-    "type": "string",
-    "description": "☑ Annual Pass Counter"
-   },
-   "selfServiceKiosk": {
-    "type": "string",
-    "description": "☐ Self-Service Kiosk"
-   },
-   "otherAuthorizedChannel": {
-    "type": "string",
-    "description": "☐ Other authorized channel"
+   "enrollmentChannels": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "ticvaiApp",
+      "ticketCounter",
+      "annualPassCounter",
+      "selfServiceKiosk",
+      "otherAuthorizedChannel"
+     ]
+    },
+    "description": "Channels where Face Pass enrolment is enabled"
    },
    "accountLoginRequired": {
     "type": "boolean",
@@ -2274,17 +2629,84 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "minimum image quality"
    },
    "operatorVerification": {
-    "type": "string",
-    "description": "operator verification"
+    "type": "boolean",
+    "description": "An operator must verify the capture"
    },
    "enrollmentExpiry": {
-    "type": "string",
-    "format": "date-time",
-    "description": "enrollment expiry"
+    "type": "integer",
+    "description": "Days an enrolment stays valid before re-enrolment is needed"
    },
-   "alreadyAssociatedWith": {
+   "duplicateFaceDetection": {
+    "type": "boolean",
+    "description": "Block a face already associated with another annual pass"
+   }
+  },
+  "required": [
+   "venueId"
+  ]
+ },
+ "FaceTagTemporaryEnrollmentInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; the write configures the rules the matching View reads back (decided 29 September, VM close-out)",
+  "description": "**What Face Tag Temporary Enrollment submits** (decided 29 September, VM close-out). The writable fields of its View; the figures the screen computes are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "required": [
+   "venueId",
+   "name",
+   "enrollmentChannels",
+   "bindTo",
+   "deletionTrigger"
+  ],
+  "properties": {
+   "profileId": {
     "type": "string",
-    "description": "already associated with"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Absent creates a Face Tag profile"
+   },
+   "venueId": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "enrollmentChannels": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "ticketCounter",
+      "entryGate"
+     ]
+    },
+    "minItems": 1,
+    "description": "Where a Face Tag may be captured"
+   },
+   "bindTo": {
+    "type": "string",
+    "enum": [
+     "ticket",
+     "visit",
+     "temporaryCredential"
+    ],
+    "default": "ticket",
+    "description": "What the Face Tag is bound to"
+   },
+   "deletionTrigger": {
+    "type": "string",
+    "enum": [
+     "ticketFullyRedeemed",
+     "endOfVisit",
+     "ticketExpiration",
+     "credentialCancellation",
+     "operationalRetentionThreshold"
+    ],
+    "default": "ticketFullyRedeemed",
+    "description": "When the Face Tag is deleted automatically. The matrix: deleted once the ticket is fully redeemed"
+   },
+   "retentionThresholdHours": {
+    "type": "integer",
+    "minimum": 1,
+    "description": "Used only when deletionTrigger is operationalRetentionThreshold, and then required. **No default and no maximum here on purpose**: the longest lawful period is the client counsel's value (make-or-break (a), see the operation)"
    }
   }
  },
@@ -2294,45 +2716,68 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Face Tag Temporary Enrollment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "ticketCounter": {
-    "type": "string",
-    "description": "Ticket Counter"
+   "enrollmentChannels": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "ticketCounter",
+      "entryGate"
+     ]
+    },
+    "description": "Where a Face Tag may be captured"
    },
-   "entryGate": {
+   "bindTo": {
     "type": "string",
-    "description": "Entry Gate"
+    "enum": [
+     "ticket",
+     "visit",
+     "temporaryCredential"
+    ],
+    "description": "What the Face Tag is bound to"
    },
-   "ticket": {
+   "deletionTrigger": {
     "type": "string",
-    "description": "Ticket"
+    "enum": [
+     "ticketFullyRedeemed",
+     "endOfVisit",
+     "ticketExpiration",
+     "credentialCancellation",
+     "operationalRetentionThreshold"
+    ],
+    "description": "When the Face Tag is automatically deleted; default ticketFullyRedeemed"
    },
-   "visit": {
-    "type": "string",
-    "description": "Visit"
+   "profileId": {
+    "type": "string"
    },
-   "temporaryCredential": {
-    "type": "string",
-    "description": "Temporary Credential"
+   "venueId": {
+    "type": "string"
    },
-   "alternativeConfigurableTriggersWherePermitted": {
-    "type": "string",
-    "description": "Alternative configurable triggers where permitted"
+   "name": {
+    "type": "string"
    },
-   "endOfVisit": {
-    "type": "string",
-    "description": "End of visit"
-   },
-   "ticketExpiration": {
-    "type": "string",
-    "description": "Ticket expiration"
-   },
-   "credentialCancellation": {
-    "type": "string",
-    "description": "Credential cancellation"
-   },
-   "operationalRetentionThreshold": {
+   "retentionThresholdHours": {
     "type": "integer",
-    "description": "operational retention threshold"
+    "description": "Used when deletionTrigger is operationalRetentionThreshold. No default (make-or-break (a), see `setFaceTagTemporaryEnrollment`)"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
    }
   }
  }

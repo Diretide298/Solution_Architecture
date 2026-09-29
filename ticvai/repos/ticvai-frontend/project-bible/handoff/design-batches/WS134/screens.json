@@ -1,0 +1,1013 @@
+[
+ {
+  "id": "BO-727",
+  "name": "F&B Command Center",
+  "module": "Operations",
+  "requiresModule": "fnb",
+  "wave": 3,
+  "source": {
+   "pack": "F&B_Backend_Structure_Module Sample Reference v1.0.pdf",
+   "board": "1",
+   "number": "1",
+   "page": 4
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/operations/f-b-command-center-bo-727",
+   "component": "apps/venue-management-web/src/routes/operations/FBCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-728",
+    "BO-729",
+    "BO-730",
+    "BO-731",
+    "BO-732",
+    "BO-733"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-728",
+     "trigger": "Outlet Management",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-729",
+     "trigger": "Create / Edit Outlet",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-730",
+     "trigger": "Outlet Types & Templates",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-731",
+     "trigger": "Operating Hours & Service Periods",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-732",
+     "trigger": "POS & Device Assignment",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-733",
+     "trigger": "Service Channel Configuration",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen a metric directory (§Top KPI cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "purpose": "F&B Command Center",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Today's Sales",
+       "provenance": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 4 §Top KPI cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Orders Today",
+       "provenance": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 4 §Top KPI cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Average Order Value",
+       "provenance": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 4 §Top KPI cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Open Outlets",
+       "provenance": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 4 §Top KPI cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Active POS",
+       "provenance": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 4 §Top KPI cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Orders in Preparation",
+       "provenance": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 4 §Top KPI cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Average Preparation Time",
+       "provenance": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 4 §Top KPI cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Unavailable Items",
+       "provenance": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 4 §Top KPI cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Critical Stock Alerts",
+       "provenance": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 4 §Top KPI cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Operational Alerts",
+       "provenance": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 4 §Top KPI cards"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The record list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the record untouched.",
+   "emptyFirstRun": "No record yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the record are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listOutlets",
+    "contract": "tenancy",
+    "purpose": "F&B outlets",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-727",
+   "workshopBoard": "wireframes/WS57 F&B Backend Structure Module Sample Reference v1.0 Board 1.dc.html#bo-727"
+  },
+  "apisNote": "Regenerated 9 September 2026 from F&B_Backend_Structure_Module Sample Reference v1.0.pdf page 4. 0 of 0 labels bound to a contract property; 10 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-728",
+  "name": "Outlet Management",
+  "module": "Operations",
+  "requiresModule": "fnb",
+  "wave": 3,
+  "source": {
+   "pack": "F&B_Backend_Structure_Module Sample Reference v1.0.pdf",
+   "board": "1",
+   "number": "2",
+   "page": 5
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/operations/outlet-management-bo-728",
+   "component": "apps/venue-management-web/src/routes/operations/OutletManagement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-727"
+   ],
+   "exitTo": [
+    "BO-727"
+   ],
+   "transitions": [
+    {
+     "to": "BO-727",
+     "trigger": "Back to F&B Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Outlet Management",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 5"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 5"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listOutlets",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The outlet list.",
+   "error": "Could not load. Names which read failed and leaves the outlet untouched.",
+   "emptyFirstRun": "No outlet yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the outlet are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listOutlets",
+    "contract": "tenancy",
+    "purpose": "List outlets",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-728",
+   "workshopBoard": "wireframes/WS57 F&B Backend Structure Module Sample Reference v1.0 Board 1.dc.html#bo-728"
+  },
+  "apisNote": "Regenerated 9 September 2026 from F&B_Backend_Structure_Module Sample Reference v1.0.pdf page 5. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-729",
+  "name": "Create / Edit Outlet",
+  "module": "Operations",
+  "requiresModule": "fnb",
+  "wave": 3,
+  "source": {
+   "pack": "F&B_Backend_Structure_Module Sample Reference v1.0.pdf",
+   "board": "1",
+   "number": "3",
+   "page": 5
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/operations/create-edit-outlet-bo-729",
+   "component": "apps/venue-management-web/src/routes/operations/CreateEditOutlet.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-727"
+   ],
+   "exitTo": [
+    "BO-727"
+   ],
+   "transitions": [
+    {
+     "to": "BO-727",
+     "trigger": "Back to F&B Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Create / Edit Outlet",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 5"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 5"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMenus",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createTable",
+       "label": "Create table",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createTable"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The create edit outlet list.",
+   "error": "Could not load. Names which read failed and leaves the create edit outlet untouched.",
+   "emptyFirstRun": "No create edit outlet yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the create edit outlet are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listMenus",
+    "contract": "fnb",
+    "purpose": "Menus",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createTable",
+    "contract": "fnb",
+    "purpose": "Add a table to the outlet floor",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listMenus"
+    ]
+   },
+   {
+    "operationId": "updateTable",
+    "contract": "fnb",
+    "purpose": "Change a table (covers, shape, joinable)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listMenus"
+    ]
+   },
+   {
+    "operationId": "setSectionLayout",
+    "contract": "fnb",
+    "purpose": "Divide the floor into sections and give each a server",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listMenus"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "outletId",
+     "from": "BO-727"
+    },
+    {
+     "name": "tableId",
+     "from": "navigation"
+    }
+   ],
+   "coldEntry": "Opened from BO-727 with the outlet picked there. Opened cold (a bookmark or a refresh), it shows the list to pick from rather than an empty record, and says plainly if the outlet no longer exists."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-729",
+   "workshopBoard": "wireframes/WS57 F&B Backend Structure Module Sample Reference v1.0 Board 1.dc.html#bo-729"
+  },
+  "apisNote": "Regenerated 9 September 2026 from F&B_Backend_Structure_Module Sample Reference v1.0.pdf page 5. 0 of 0 labels bound to a contract property; 0 of 3 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-730",
+  "name": "Outlet Types & Templates",
+  "module": "Operations",
+  "requiresModule": "fnb",
+  "wave": 3,
+  "source": {
+   "pack": "F&B_Backend_Structure_Module Sample Reference v1.0.pdf",
+   "board": "1",
+   "number": "4",
+   "page": 7
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/operations/outlet-types-templates-bo-730",
+   "component": "apps/venue-management-web/src/routes/operations/OutletTypesTemplates.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-727"
+   ],
+   "exitTo": [
+    "BO-727"
+   ],
+   "transitions": [
+    {
+     "to": "BO-727",
+     "trigger": "Back to F&B Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Outlet Types & Templates",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 7"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 7"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "+ Create Template",
+       "operation": "setOutletTemplate",
+       "provenance": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 7 §Buttons"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMenus",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The outlet types templates list.",
+   "error": "Could not load. Names which read failed and leaves the outlet types templates untouched.",
+   "emptyFirstRun": "No outlet types templates yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the outlet types templates are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listMenus",
+    "contract": "fnb",
+    "purpose": "Menu items",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listOutletTemplates",
+    "contract": "fnb",
+    "purpose": "The outlet templates",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setOutletTemplate",
+    "contract": "fnb",
+    "purpose": "Create template",
+    "trigger": "onAction"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-730",
+   "workshopBoard": "wireframes/WS57 F&B Backend Structure Module Sample Reference v1.0 Board 1.dc.html#bo-730"
+  },
+  "apisNote": "Regenerated 9 September 2026 from F&B_Backend_Structure_Module Sample Reference v1.0.pdf page 7. 0 of 0 labels bound to a contract property; 1 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `setOutletTemplate`, `listOutletTemplates`.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-731",
+  "name": "Operating Hours & Service Periods",
+  "module": "Operations",
+  "requiresModule": "fnb",
+  "wave": 3,
+  "source": {
+   "pack": "F&B_Backend_Structure_Module Sample Reference v1.0.pdf",
+   "board": "1",
+   "number": "5",
+   "page": 7
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/operations/operating-hours-service-periods-bo-731",
+   "component": "apps/venue-management-web/src/routes/operations/OperatingHoursServicePeriods.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-727"
+   ],
+   "exitTo": [
+    "BO-727"
+   ],
+   "transitions": [
+    {
+     "to": "BO-727",
+     "trigger": "Back to F&B Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Operating Hours & Service Periods",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 7"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 7"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listKitchenTickets",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The operating hours service list.",
+   "error": "Could not load. Names which read failed and leaves the operating hours service untouched.",
+   "emptyFirstRun": "No operating hours service yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the operating hours service are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listKitchenTickets",
+    "contract": "fnb",
+    "purpose": "Kitchen operations",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-731",
+   "workshopBoard": "wireframes/WS57 F&B Backend Structure Module Sample Reference v1.0 Board 1.dc.html#bo-731"
+  },
+  "apisNote": "Regenerated 9 September 2026 from F&B_Backend_Structure_Module Sample Reference v1.0.pdf page 7. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-732",
+  "name": "POS & Device Assignment",
+  "module": "Operations",
+  "requiresModule": "fnb",
+  "wave": 3,
+  "source": {
+   "pack": "F&B_Backend_Structure_Module Sample Reference v1.0.pdf",
+   "board": "1",
+   "number": "6",
+   "page": 8
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/operations/pos-device-assignment-bo-732",
+   "component": "apps/venue-management-web/src/routes/operations/PosDeviceAssignment.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-727"
+   ],
+   "exitTo": [
+    "BO-727"
+   ],
+   "transitions": [
+    {
+     "to": "BO-727",
+     "trigger": "Back to F&B Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Device cards/table) and no metric row",
+  "purpose": "POS & Device Assignment",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 8 §Device cards/table"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every pos device",
+       "columns": [
+        "Terminal Outlet Type Cashier Payment Printer Status"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 8 §Device cards/table"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected pos device",
+       "bindsTo": null,
+       "columns": [
+        "Terminal Outlet Type Cashier Payment Printer Status"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Main”, “Restaurant”, “I would also display”.",
+       "provenance": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 8 §Device cards/table"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The pos device list.",
+   "error": "Could not load. Names which read failed and leaves the pos device untouched.",
+   "emptyFirstRun": "No pos device yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the pos device are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listOutlets",
+    "contract": "tenancy",
+    "purpose": "Outlet configuration",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Terminal Outlet Type Cashier Payment Printer Status"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-732",
+   "workshopBoard": "wireframes/WS57 F&B Backend Structure Module Sample Reference v1.0 Board 1.dc.html#bo-732"
+  },
+  "apisNote": "Regenerated 9 September 2026 from F&B_Backend_Structure_Module Sample Reference v1.0.pdf page 8. 0 of 1 labels bound to a contract property; 16 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-733",
+  "name": "Service Channel Configuration",
+  "module": "Operations",
+  "requiresModule": "fnb",
+  "wave": 3,
+  "source": {
+   "pack": "F&B_Backend_Structure_Module Sample Reference v1.0.pdf",
+   "board": "1",
+   "number": "7",
+   "page": 9
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/operations/service-channel-configuration-bo-733",
+   "component": "apps/venue-management-web/src/routes/operations/ServiceChannelConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-727"
+   ],
+   "exitTo": [
+    "BO-727"
+   ],
+   "transitions": [
+    {
+     "to": "BO-727",
+     "trigger": "Back to F&B Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Service Channel Configuration",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 9"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Service channels",
+       "columns": [
+        "Channel",
+        "Status",
+        "Available outlets",
+        "Menu",
+        "Price book",
+        "Payment",
+        "Guest login",
+        "Operating hours",
+        "Maximum items per order",
+        "Minimum order"
+       ],
+       "notes": "POS Counter, Dine-In, QR Table Order, Mobile App, B2C Web, Kiosk, Takeaway, Delivery, VIP / Hospitality, Event Catering. The bound read is `getKpiValues`, which carries no channel configuration.",
+       "provenance": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 9"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected channel rules",
+       "columns": [
+        "Status",
+        "Available outlets",
+        "Menu",
+        "Price book",
+        "Payment",
+        "Guest login",
+        "Operating hours",
+        "Maximum items per order",
+        "Minimum order"
+       ],
+       "notes": "The pack's QR Table Ordering example (page 10).",
+       "provenance": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 10"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Orders by channel",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.name",
+        "KpiValue.value",
+        "KpiValue.comparison"
+       ],
+       "operation": "getKpiValues",
+       "notes": "The only use `getKpiValues` has here; needs a per-channel KPI code, which is not seeded.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The service channel list.",
+   "error": "Could not load. Names which read failed and leaves the service channel untouched.",
+   "emptyFirstRun": "No service channel yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the service channel are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "F&B performance",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setFnbReservationPolicy",
+    "contract": "fnb",
+    "purpose": "Set turn times and seating buffers for table reservations",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "setFnbServiceChargePolicy",
+    "contract": "fnb",
+    "purpose": "Set the service charge per channel",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-733",
+   "workshopBoard": "wireframes/WS57 F&B Backend Structure Module Sample Reference v1.0 Board 1.dc.html#bo-733"
+  },
+  "apisNote": "Regenerated 9 September 2026 from F&B_Backend_Structure_Module Sample Reference v1.0.pdf page 9. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf p.9; pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf p.10; contract reporting.yaml GET /kpi-values. Pack labels with no schema field yet (shown as plain labels): Channel, Channel status, Available outlets, Menu, Price book, Payment options, Guest login, Operating hours, Maximum items per order, Minimum order, A channel-configuration read (bound op is getKpiValues).",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

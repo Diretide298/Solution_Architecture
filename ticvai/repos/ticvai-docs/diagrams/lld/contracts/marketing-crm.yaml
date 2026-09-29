@@ -1,5 +1,5 @@
 id: LLD-marketing-crm
-title: marketing-crm — 248 operations
+title: marketing-crm — 253 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -29,8 +29,17 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - marketing.form_definition
+  - marketing.guest_relationship
+  - marketing.waiver_requirement
+  - orders.group_booking
+  writes:
+  - cache:idempotency
+  - marketing.message_dispatch
+  - marketing.waiver_requirement
+  - marketing.waiver_requirement_event
 - operation: activateAudience
   verb: POST
   path: /audience-activations
@@ -254,8 +263,17 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - marketing.agent_availability
+  - marketing.agent_service_profile
+  - marketing.case
+  - marketing.case_category
+  - marketing.case_routing_rule
+  - marketing.service_queue
+  - marketing.sla_policy
+  writes:
+  - cache:idempotency
 - operation: createChallenge
   verb: POST
   path: /challenges
@@ -368,6 +386,7 @@ operations:
   writes:
   - cache:idempotency
   - marketing.message_template
+  - marketing.message_template_version
 - operation: createReferral
   verb: POST
   path: /referrals
@@ -473,6 +492,7 @@ operations:
   writes:
   - cache:idempotency
   - marketing.case
+  - marketing.case_escalation
 - operation: getAudienceOverlap
   verb: GET
   path: /audience-overlap
@@ -481,7 +501,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.consent_record
+  - marketing.guest_profile
+  - marketing.segment
+  - marketing.segment_criterion
+  - marketing.suppression
   writes: []
 - operation: getCampaign
   verb: GET
@@ -626,7 +651,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.consent_record
+  - marketing.guest_profile
+  - marketing.loyalty_position
+  - marketing.touch_point
+  - orders.sales_order
   writes: []
 - operation: getGuestLoyalty
   verb: GET
@@ -685,7 +715,18 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - marketing.case
+  - marketing.conversation
+  - marketing.form_submission
+  - marketing.guest_note
+  - marketing.loyalty_points
+  - marketing.message_dispatch
+  - marketing.review
+  - marketing.touch_point
+  - marketing.waiver_signature
+  - orders.sales_order
   writes: []
 - operation: getIdentityResolutionRules
   verb: GET
@@ -959,7 +1000,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.agent_availability
+  - marketing.agent_service_profile
+  - marketing.case
+  - marketing.conversation
+  - marketing.service_queue
   writes: []
 - operation: listAudienceActivations
   verb: GET
@@ -1003,7 +1049,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.business_event
+  - marketing.message_template
+  - marketing.message_trigger
+  - marketing.message_trigger_condition
   writes: []
 - operation: listCampaigns
   verb: GET
@@ -1016,6 +1066,17 @@ operations:
   reads:
   - marketing.campaign
   - marketing.segment_criterion
+  writes: []
+- operation: listCaseCategories
+  verb: GET
+  path: /case-categories
+  scope: venue
+  permission: CASE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.case_category
   writes: []
 - operation: listCaseResolutionClosure
   verb: GET
@@ -1049,7 +1110,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.business_event
+  - marketing.communication_provider
+  - marketing.message_dispatch
+  - marketing.message_dispatch_attempt
+  - marketing.message_template
+  - marketing.message_trigger
   writes: []
 - operation: listComplianceEvidenceWaiver
   verb: GET
@@ -1059,7 +1126,16 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.form_definition
+  - marketing.form_definition_field
+  - marketing.form_submission
+  - marketing.guest_document
+  - marketing.waiver_requirement
+  - marketing.waiver_requirement_event
+  - marketing.waiver_signature
+  - marketing.waiver_verification
+  - pii.subject
   writes: []
 - operation: listConsentAnswers
   verb: GET
@@ -1080,7 +1156,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.consent_capture_point
+  - marketing.consent_propagation
+  - marketing.consent_record
+  - marketing.consent_record_channel
   writes: []
 - operation: listConsentPreferenceCommunication
   verb: GET
@@ -1090,7 +1170,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.communication_policy_decision
+  - marketing.consent_record
+  - marketing.message_dispatch
+  - marketing.suppression
   writes: []
 - operation: listConsentPurposes
   verb: GET
@@ -1127,7 +1211,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.agent_availability
+  - marketing.case
+  - marketing.conversation
+  - marketing.form_submission
+  - marketing.service_queue
+  - marketing.sla_policy
   writes: []
 - operation: listContactAutomation
   verb: GET
@@ -1196,7 +1286,16 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.consent_purpose
+  - marketing.consent_record
+  - marketing.consent_record_channel
+  - marketing.guest_preference
+  - marketing.guest_profile
+  - marketing.privacy_audit_event
+  - marketing.privacy_request
+  - marketing.tracking_technology
+  - pii.subject
   writes: []
 - operation: listCustomerSatisfactionFeedback
   verb: GET
@@ -1206,7 +1305,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.case
+  - marketing.feedback_classification
+  - marketing.form_definition
+  - marketing.form_submission
+  - marketing.review
   writes: []
 - operation: listCustomerService
   verb: GET
@@ -1216,7 +1320,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.case
+  - marketing.case_compensation_request
+  - marketing.case_internal_request
+  - marketing.case_message
+  - marketing.sla_policy
   writes: []
 - operation: listCustomerServiceProfile
   verb: GET
@@ -1226,7 +1335,19 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - marketing.case
+  - marketing.consent_record
+  - marketing.guest_preference
+  - marketing.guest_profile
+  - marketing.loyalty_position
+  - marketing.suppression
+  - orders.group_booking
+  - orders.reservation
+  - orders.sales_order
+  - pii.subject
+  - pii.subject_contact
   writes: []
 - operation: listDataProcessingPurpose
   verb: GET
@@ -1280,7 +1401,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.business_event
+  - marketing.communication_provider
+  - marketing.communication_routing_rule
+  - marketing.message_dispatch
+  - marketing.message_dispatch_attempt
+  - marketing.message_trigger
   writes: []
 - operation: listDeliveryQueueFailure
   verb: GET
@@ -1290,7 +1417,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.business_event
+  - marketing.communication_provider
+  - marketing.message_dispatch
+  - marketing.message_dispatch_attempt
+  - marketing.message_template
+  - marketing.message_trigger
   writes: []
 - operation: listDigitalSigningCollection
   verb: GET
@@ -1300,7 +1433,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.form_submission
+  - marketing.message_dispatch
+  - marketing.waiver_requirement
+  - marketing.waiver_requirement_event
   writes: []
 - operation: listDuplicateCandidates
   verb: GET
@@ -1344,7 +1481,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.case
+  - marketing.case_escalation
+  - orders.sales_order
   writes: []
 - operation: listForms
   verb: GET
@@ -1412,7 +1552,8 @@ operations:
   audience:
   - guest
   offline: false
-  reads: []
+  reads:
+  - marketing.loyalty_position
   writes: []
 - operation: listLostItems
   verb: GET
@@ -1492,7 +1633,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.form_submission
+  - marketing.guest_relationship
+  - marketing.waiver_requirement
+  - orders.group_booking
+  - orders.order_line
+  - pii.subject
+  - pii.subject_contact
   writes: []
 - operation: listMissingExpiredInvalid
   verb: GET
@@ -1502,7 +1650,17 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.performance
+  - marketing.form_submission
+  - marketing.message_dispatch
+  - marketing.waiver_exception
+  - marketing.waiver_requirement
+  - marketing.waiver_requirement_event
+  - marketing.waiver_verification
+  - orders.group_booking
+  - orders.order_line
+  - pii.subject
   writes: []
 - operation: listMyCases
   verb: GET
@@ -1524,7 +1682,8 @@ operations:
   audience:
   - guest
   offline: true
-  reads: []
+  reads:
+  - marketing.message_dispatch
   writes: []
 - operation: listParticipantWaiverStatus
   verb: GET
@@ -1534,7 +1693,16 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.performance
+  - marketing.form_definition
+  - marketing.form_submission
+  - marketing.waiver_exception
+  - marketing.waiver_requirement
+  - marketing.waiver_verification
+  - orders.group_booking
+  - orders.order_line
+  - pii.subject
   writes: []
 - operation: listPrivacy
   verb: GET
@@ -1544,7 +1712,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.consent_record
+  - marketing.guest_profile
+  - marketing.legal_hold
+  - marketing.privacy_action
+  - marketing.privacy_exception
+  - marketing.privacy_incident
+  - marketing.privacy_request
+  - marketing.retention_policy
   writes: []
 - operation: listPrivacyCompliance
   verb: GET
@@ -1554,7 +1730,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.consent_propagation
+  - marketing.consent_record
+  - marketing.privacy_action
+  - marketing.privacy_exception
+  - marketing.privacy_request
+  - marketing.retention_policy
+  - marketing.tracking_technology
   writes: []
 - operation: listPrivacyComplianceExceptions
   verb: GET
@@ -1575,7 +1758,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.communication_preference_type
+  - marketing.consent_capture_point
+  - marketing.consent_purpose
+  - marketing.tracking_technology
   writes: []
 - operation: listPrivacyEvidenceCompliance
   verb: GET
@@ -1596,7 +1783,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.consent_record
+  - marketing.privacy_notice_governance
   writes: []
 - operation: listProductEventExperience
   verb: GET
@@ -1617,7 +1806,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.communication_provider
+  - marketing.message_dispatch
+  - marketing.message_dispatch_attempt
   writes: []
 - operation: listQualityAgentEvaluation
   verb: GET
@@ -1698,6 +1890,17 @@ operations:
   - marketing.segment
   - marketing.segment_criterion
   writes: []
+- operation: listServiceQueues
+  verb: GET
+  path: /service-queues
+  scope: venue
+  permission: CASE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.service_queue
+  writes: []
 - operation: listServiceRootCause
   verb: GET
   path: /service-root-cause
@@ -1706,7 +1909,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.case
+  - marketing.case_category
+  - marketing.conversation
+  - marketing.form_submission
+  - orders.sales_order
   writes: []
 - operation: listSiteWaiverException
   verb: GET
@@ -1738,7 +1946,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.case
+  - marketing.sla_policy
   writes: []
 - operation: listSystemTransactionalTemplate
   verb: GET
@@ -1748,7 +1958,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.business_event
+  - marketing.message_template
+  - marketing.message_template_version
+  - marketing.message_trigger
   writes: []
 - operation: listUnifiedInteractionCommunication
   verb: GET
@@ -1758,7 +1972,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.case_message
+  - marketing.conversation
+  - marketing.conversation_message
+  - marketing.kiosk_assist_session
+  - marketing.message_dispatch
   writes: []
 - operation: listVersioningEffectiveDate
   verb: GET
@@ -1768,7 +1987,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.form_definition
+  - marketing.form_submission
+  - marketing.waiver_signature
+  - marketing.waiver_version_control
   writes: []
 - operation: listWaiver
   verb: GET
@@ -1778,7 +2001,16 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.performance
+  - marketing.form_definition
+  - marketing.form_submission
+  - marketing.waiver_exception
+  - marketing.waiver_requirement
+  - marketing.waiver_signature
+  - marketing.waiver_verification
+  - orders.group_booking
+  - orders.order_line
   writes: []
 - operation: listWaiverComplianceOperational
   verb: GET
@@ -1788,7 +2020,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.form_submission
+  - marketing.message_dispatch
+  - marketing.waiver_exception
+  - marketing.waiver_requirement
+  - marketing.waiver_requirement_event
+  - marketing.waiver_verification
   writes: []
 - operation: listWaiverComplianceRisk
   verb: GET
@@ -1798,7 +2036,18 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.form_definition
+  - marketing.form_definition_field
+  - marketing.form_submission
+  - marketing.waiver_association
+  - marketing.waiver_exception
+  - marketing.waiver_requirement
+  - marketing.waiver_requirement_event
+  - marketing.waiver_signatory_rule
+  - marketing.waiver_trigger_rule
+  - marketing.waiver_verification
+  - marketing.waiver_version_control
   writes: []
 - operation: listWaiverConsent
   verb: GET
@@ -1808,7 +2057,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.form_definition
+  - marketing.waiver_association
+  - marketing.waiver_master
+  - marketing.waiver_version_control
   writes: []
 - operation: listWaiverSignatures
   verb: GET
@@ -1851,7 +2104,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.form_definition
+  - marketing.form_submission
+  - marketing.waiver_requirement
+  - marketing.waiver_signature
+  - marketing.waiver_verification
+  - pii.subject
   writes: []
 - operation: markMyNotificationsRead
   verb: POST
@@ -1861,8 +2120,12 @@ operations:
   audience:
   - guest
   offline: true
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - marketing.message_dispatch
+  writes:
+  - cache:idempotency
+  - marketing.message_dispatch
 - operation: matchGuest
   verb: POST
   path: /guests/match
@@ -1974,9 +2237,12 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - marketing.consent_record
   - marketing.guest_profile
   writes:
   - cache:idempotency
+  - marketing.consent_propagation
+  - marketing.consent_record
   - marketing.guest_profile
 - operation: recordConsentAnswers
   verb: POST
@@ -2182,8 +2448,17 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - marketing.guest_profile
+  - marketing.legal_hold
+  - marketing.retention_policy
+  - marketing.retention_run
+  writes:
+  - cache:idempotency
+  - marketing.guest_profile
+  - marketing.privacy_action
+  - marketing.privacy_audit_event
 - operation: searchGuests
   verb: GET
   path: /guests
@@ -2228,7 +2503,9 @@ operations:
   - marketing.message_dispatch
   writes:
   - cache:idempotency
+  - marketing.communication_policy_decision
   - marketing.message_dispatch
+  - marketing.message_dispatch_attempt
 - operation: setAgentAvailability
   verb: PUT
   path: /agent-availability
@@ -2276,8 +2553,17 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - marketing.business_event
+  - marketing.message_template
+  - marketing.message_trigger
+  - marketing.message_trigger_condition
+  writes:
+  - cache:idempotency
+  - marketing.business_event
+  - marketing.message_trigger
+  - marketing.message_trigger_condition
 - operation: setCallDisposition
   verb: POST
   path: /conversations/{conversationId}/disposition
@@ -2294,6 +2580,20 @@ operations:
   - cache:idempotency
   - marketing.case
   - marketing.conversation
+- operation: setCaseCategoryDefinition
+  verb: PUT
+  path: /case-categories
+  scope: venue
+  permission: CASE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.case_category
+  writes:
+  - cache:idempotency
+  - marketing.case_category
 - operation: setCaseInternalRequest
   verb: PUT
   path: /escalation-collaboration-internal
@@ -2714,6 +3014,21 @@ operations:
   - marketing.privacy_exception
   writes:
   - marketing.privacy_exception
+- operation: setPrivacyNoticePolicyGovernance
+  verb: PUT
+  path: /privacy-notice-policy
+  scope: tenant
+  permission: GUEST_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.privacy_notice_governance
+  - whitelabel.policy
+  writes:
+  - cache:idempotency
+  - marketing.privacy_notice_governance
 - operation: setPrivacyRequest
   verb: PUT
   path: /data-subject-customer
@@ -2804,6 +3119,22 @@ operations:
   - cache:idempotency
   - cache:resolution
   - control.seo_metadata
+- operation: setServiceQueueDefinition
+  verb: PUT
+  path: /service-queues
+  scope: venue
+  permission: CASE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.case
+  - marketing.case_routing_rule
+  - marketing.service_queue
+  writes:
+  - cache:idempotency
+  - marketing.service_queue
 - operation: setSignatorySignatureGuardian
   verb: PUT
   path: /signatory-signature-guardian
@@ -2864,8 +3195,10 @@ operations:
   offline: false
   reads:
   - marketing.waiver_exception
+  - marketing.waiver_requirement
   writes:
   - marketing.waiver_exception
+  - marketing.waiver_requirement_event
 - operation: setWaiverTemplateMaster
   verb: PUT
   path: /waiver-template-master
@@ -2898,8 +3231,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.form_submission
+  - marketing.waiver_requirement
+  - marketing.waiver_verification
   writes:
+  - marketing.waiver_requirement
+  - marketing.waiver_requirement_event
   - marketing.waiver_verification
 - operation: startKioskAssist
   verb: POST
@@ -2946,11 +3284,14 @@ operations:
   - marketing.consent_record
   - marketing.form_definition
   - marketing.form_submission
+  - marketing.waiver_requirement
   - pii.subject
   writes:
   - cache:idempotency
   - marketing.consent_record
   - marketing.form_submission
+  - marketing.waiver_requirement
+  - marketing.waiver_requirement_event
 - operation: submitReview
   verb: POST
   path: /reviews

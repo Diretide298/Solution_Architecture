@@ -1,0 +1,294 @@
+{
+ "allocateResources": {
+  "method": "POST",
+  "path": "/resource-allocations",
+  "contract": "resources",
+  "summary": "Fill a requirement from the pool, rotating rather than repeating",
+  "permission": "RESOURCE_BOOK",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceBooking"
+ },
+ "bookResource": {
+  "method": "POST",
+  "path": "/resource-bookings",
+  "contract": "resources",
+  "summary": "Reserve a specific resource for a window — staff only",
+  "permission": "RESOURCE_BOOK",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceBooking"
+ },
+ "cancelResourceBooking": {
+  "method": "DELETE",
+  "path": "/resource-bookings/{bookingId}",
+  "contract": "resources",
+  "summary": "Cancel one occurrence, or the whole series",
+  "permission": "RESOURCE_BOOK",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "scope",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "reason",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceBooking"
+ },
+ "createResourceBlock": {
+  "method": "POST",
+  "path": "/resource-blocks",
+  "contract": "resources",
+  "summary": "Take a resource out of service for a window, with a reason",
+  "permission": "RESOURCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourceBlock",
+  "responds": "ResourceBlock"
+ },
+ "getResourceCalendar": {
+  "method": "GET",
+  "path": "/resource-calendar",
+  "contract": "resources",
+  "summary": "Every resource against time, with conflicts already marked",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "resourceTypeId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "granularity",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceCalendarRow"
+ },
+ "getResourceSchedule": {
+  "method": "GET",
+  "path": "/resources/{resourceId}/schedule",
+  "contract": "resources",
+  "summary": "The pattern of when it is normally available",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResourceSchedule"
+ },
+ "listResourceBlocks": {
+  "method": "GET",
+  "path": "/resource-blocks",
+  "contract": "resources",
+  "summary": "Operational, setup and maintenance blocks",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "resourceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceBlock"
+ },
+ "listResourceBookings": {
+  "method": "GET",
+  "path": "/resource-bookings",
+  "contract": "resources",
+  "summary": "Bookings, filtered",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "resourceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceBooking"
+ },
+ "releaseResourceBlock": {
+  "method": "DELETE",
+  "path": "/resource-blocks/{blockId}",
+  "contract": "resources",
+  "summary": "Put it back into service",
+  "permission": "RESOURCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setResourceSchedule": {
+  "method": "PUT",
+  "path": "/resources/{resourceId}/schedule",
+  "contract": "resources",
+  "summary": "Operating hours, working pattern and bookable slots",
+  "permission": "RESOURCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourceSchedule",
+  "responds": "ResourceSchedule"
+ },
+ "suggestResources": {
+  "method": "GET",
+  "path": "/resource-suggestions",
+  "contract": "resources",
+  "summary": "Resources matching a requirement, by attribute",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "resourceTypeId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "attributes",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Resource"
+ },
+ "updateResourceBooking": {
+  "method": "PATCH",
+  "path": "/resource-bookings/{bookingId}",
+  "contract": "resources",
+  "summary": "Extend, shorten or reassign a booking",
+  "permission": "RESOURCE_BOOK",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceBooking"
+ }
+}

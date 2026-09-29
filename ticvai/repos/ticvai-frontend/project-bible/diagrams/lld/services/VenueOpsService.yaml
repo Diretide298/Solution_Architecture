@@ -1,18 +1,18 @@
 id: LLD-VenueOpsService
-title: VenueOpsService — 270 operations, 113 tables
+title: VenueOpsService — 274 operations, 119 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
-why: '**Six small domains, 270 operations, one team.** Queue, maintenance, bookable resources, venue
+why: '**Six small domains, 274 operations, one team.** Queue, maintenance, bookable resources, venue
   mapping, media assets and arcade. None is large enough to deploy alone, all are venue-scoped, none
   is on the critical sale path, and **all six are licensed as optional modules** — a venue that buys
   none of them should not be running six idle services.'
 scale: Low and steady. Queue readings are the only frequent write.
 ifDown: Down degrades venue operations. Selling and admitting continue.
 coverage:
-  operations: 270
+  operations: 274
   inAFlow: 50
-  percent: 19%
+  percent: 18%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -27,7 +27,7 @@ schemas:
   - postgres
   largestTable: maintenance.work_order
 - schema: resources
-  tables: 18
+  tables: 20
   stores:
   - postgres
   largestTable: resources.resource_type
@@ -37,17 +37,17 @@ schemas:
   - postgres
   largestTable: venuemap.map
 - schema: assets
-  tables: 13
+  tables: 14
   stores:
   - postgres
   largestTable: assets.media_asset
 - schema: games
-  tables: 21
+  tables: 23
   stores:
   - postgres
-  largestTable: games.entitlement
+  largestTable: games.game
 - schema: rental
-  tables: 23
+  tables: 24
   stores:
   - postgres
   largestTable: rental.pricing_profile
@@ -58,7 +58,7 @@ schemas:
   largestTable: transport.pass_type
 operationsByContract:
 - contract: resources
-  count: 58
+  count: 61
   operations:
   - operation: allocateResources
     verb: POST
@@ -74,7 +74,7 @@ operationsByContract:
     scope: venue
     permission: RESOURCE_BOOK
     offline: false
-    reads: 3
+    reads: 5
     writes: 2
   - operation: cancelResourceBooking
     verb: DELETE
@@ -140,6 +140,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: createResourceCost
+    verb: POST
+    path: /resource-costs
+    scope: venue
+    permission: RESOURCE_MANAGE
+    offline: false
+    reads: 4
+    writes: 2
   - operation: createResourceHold
     verb: POST
     path: /resource-holds
@@ -164,6 +172,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: deleteResourceCost
+    verb: DELETE
+    path: /resource-costs/{costId}
+    scope: venue
+    permission: RESOURCE_MANAGE
+    offline: false
+    reads: 2
+    writes: 3
   - operation: extendResourceHold
     verb: POST
     path: /resource-holds/{holdId}/extend
@@ -186,7 +202,7 @@ operationsByContract:
     scope: venue
     permission: RESOURCE_VIEW
     offline: false
-    reads: 0
+    reads: 8
     writes: 0
   - operation: getPerformanceManifest
     verb: GET
@@ -234,7 +250,7 @@ operationsByContract:
     scope: venue
     permission: RESOURCE_VIEW
     offline: false
-    reads: 0
+    reads: 8
     writes: 0
   - operation: getResourceCostAnalytics
     verb: GET
@@ -242,7 +258,7 @@ operationsByContract:
     scope: venue
     permission: RESOURCE_VIEW
     offline: false
-    reads: 0
+    reads: 6
     writes: 0
   - operation: getResourceDependencies
     verb: GET
@@ -290,7 +306,7 @@ operationsByContract:
     scope: venue
     permission: RESOURCE_VIEW
     offline: false
-    reads: 0
+    reads: 7
     writes: 0
   - operation: listProductStartTimes
     verb: GET
@@ -298,7 +314,7 @@ operationsByContract:
     scope: venue
     permission: RESOURCE_VIEW
     offline: false
-    reads: 0
+    reads: 6
     writes: 0
   - operation: listResourceAttributes
     verb: GET
@@ -331,6 +347,14 @@ operationsByContract:
     permission: RESOURCE_VIEW
     offline: false
     reads: 1
+    writes: 0
+  - operation: listResourceCosts
+    verb: GET
+    path: /resource-costs
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 2
     writes: 0
   - operation: listResourcePackages
     verb: GET
@@ -370,16 +394,16 @@ operationsByContract:
     scope: venue
     permission: RESOURCE_MANAGE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 2
+    writes: 2
   - operation: relinquishResourceHold
     verb: DELETE
     path: /resource-holds/{holdId}
     scope: venue
     permission: ORDER_CREATE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 2
+    writes: 2
   - operation: reorderPerformanceManifest
     verb: PUT
     path: /performances/{performanceId}/manifest
@@ -466,8 +490,8 @@ operationsByContract:
     scope: venue
     permission: RESOURCE_CONFIGURE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 3
+    writes: 2
   - operation: setResourceVenueAssignment
     verb: PUT
     path: /resources/{resourceId}/venues
@@ -573,8 +597,8 @@ operationsByContract:
     scope: venue
     permission: RENTAL_BOOK
     offline: false
-    reads: 2
-    writes: 1
+    reads: 3
+    writes: 3
   - operation: createRentalCategory
     verb: POST
     path: /rental-categories
@@ -605,16 +629,16 @@ operationsByContract:
     scope: venue
     permission: RENTAL_VIEW
     offline: false
-    reads: 0
-    writes: 0
+    reads: 7
+    writes: 1
   - operation: extendRental
     verb: POST
     path: /rental-bookings/{bookingId}/extend
     scope: venue
     permission: RENTAL_OPERATE
     offline: false
-    reads: 2
-    writes: 0
+    reads: 3
+    writes: 2
   - operation: getRentalAgreement
     verb: GET
     path: /agreements/{agreementId}
@@ -629,7 +653,7 @@ operationsByContract:
     scope: venue
     permission: RENTAL_VIEW
     offline: false
-    reads: 0
+    reads: 9
     writes: 0
   - operation: getRentalBooking
     verb: GET
@@ -653,8 +677,8 @@ operationsByContract:
     scope: venue
     permission: RENTAL_CONFIGURE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 3
+    writes: 4
   - operation: listOverdueRentals
     verb: GET
     path: /rental-bookings/overdue
@@ -717,8 +741,8 @@ operationsByContract:
     scope: venue
     permission: RENTAL_VIEW
     offline: false
-    reads: 0
-    writes: 0
+    reads: 7
+    writes: 1
   - operation: recordRentalInspection
     verb: POST
     path: /rental-bookings/{bookingId}/inspection
@@ -829,8 +853,8 @@ operationsByContract:
     scope: venue
     permission: RENTAL_PRICE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 8
+    writes: 1
   - operation: swapRentalEquipment
     verb: POST
     path: /rental-bookings/{bookingId}/swap
@@ -869,10 +893,10 @@ operationsByContract:
     scope: venue
     permission: RENTAL_CONFIGURE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 12
+    writes: 1
 - contract: games
-  count: 39
+  count: 40
   operations:
   - operation: authoriseGameplay
     verb: POST
@@ -944,7 +968,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 0
+    reads: 8
     writes: 0
   - operation: getGamePricing
     verb: GET
@@ -952,7 +976,7 @@ operationsByContract:
     scope: venue
     permission: PRICE_VIEW
     offline: false
-    reads: 0
+    reads: 5
     writes: 0
   - operation: getGameplaySyncStatus
     verb: GET
@@ -960,7 +984,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 0
+    reads: 5
     writes: 0
   - operation: getGameplayValidationRules
     verb: GET
@@ -1050,6 +1074,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: reportReaderQueue
+    verb: PUT
+    path: /readers/{readerId}/offline-queue
+    scope: venue
+    permission: null
+    offline: false
+    reads: 3
+    writes: 2
   - operation: setAttractionType
     verb: PUT
     path: /attraction-types
@@ -1096,8 +1128,8 @@ operationsByContract:
     scope: venue
     permission: PRICE_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 3
+    writes: 3
   - operation: setGameplayValidationRules
     verb: PUT
     path: /gameplay-validation-rules
@@ -1153,15 +1185,15 @@ operationsByContract:
     permission: null
     offline: false
     reads: 2
-    writes: 3
+    writes: 4
   - operation: testReader
     verb: POST
     path: /readers/{readerId}/test
     scope: venue
     permission: DEVICE_CONFIGURE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 5
+    writes: 1
   - operation: transferGameCard
     verb: POST
     path: /game-cards/{cardCode}/transfer
@@ -1184,8 +1216,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 7
+    writes: 1
 - contract: maintenance
   count: 36
   operations:
@@ -1526,15 +1558,15 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 0
-    writes: 0
+    reads: 2
+    writes: 2
   - operation: getNextTransportDeparture
     verb: GET
     path: /transport/departures/next
     scope: venue
     permission: null
     offline: false
-    reads: 0
+    reads: 8
     writes: 0
   - operation: getTransportFareTable
     verb: GET
@@ -1566,7 +1598,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: true
-    reads: 0
+    reads: 3
     writes: 0
   - operation: importTransportNetwork
     verb: POST
@@ -1590,7 +1622,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 0
+    reads: 5
     writes: 0
   - operation: listTransportPassTypes
     verb: GET
@@ -1646,7 +1678,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 0
+    reads: 5
     writes: 0
   - operation: saveFavouriteRoute
     verb: POST
@@ -1662,7 +1694,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 0
+    reads: 8
     writes: 0
   - operation: setTransportFareTable
     verb: PUT
@@ -1737,24 +1769,24 @@ operationsByContract:
     scope: venue
     permission: ASSET_LIBRARY_MANAGE
     offline: false
-    reads: 1
-    writes: 0
+    reads: 3
+    writes: 3
   - operation: bulkUpdateMediaAssets
     verb: POST
     path: /media-assets/bulk
     scope: venue
     permission: ASSET_LIBRARY_MANAGE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 4
+    writes: 4
   - operation: completeUpload
     verb: POST
     path: /media/uploads/{uploadId}/complete
     scope: venue
     permission: ASSET_LIBRARY_MANAGE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: createCollection
     verb: POST
     path: /media/collections
@@ -1793,7 +1825,7 @@ operationsByContract:
     scope: venue
     permission: ASSET_LIBRARY_VIEW
     offline: false
-    reads: 0
+    reads: 4
     writes: 0
   - operation: getExpiringRights
     verb: GET
@@ -1817,7 +1849,7 @@ operationsByContract:
     scope: venue
     permission: ASSET_LIBRARY_VIEW
     offline: false
-    reads: 0
+    reads: 4
     writes: 0
   - operation: getMediaTaxonomy
     verb: GET
@@ -1833,7 +1865,7 @@ operationsByContract:
     scope: tenant
     permission: ASSET_LIBRARY_VIEW
     offline: false
-    reads: 0
+    reads: 5
     writes: 0
   - operation: listCollections
     verb: GET
@@ -1874,7 +1906,7 @@ operationsByContract:
     permission: ASSET_LIBRARY_MANAGE
     offline: false
     reads: 2
-    writes: 2
+    writes: 4
   - operation: requestMediaRendition
     verb: POST
     path: /media-assets/{assetId}/renditions
@@ -1905,8 +1937,8 @@ operationsByContract:
     scope: tenant
     permission: ASSET_LIBRARY_MANAGE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 2
+    writes: 2
   - operation: setMediaAssetTags
     verb: PUT
     path: /media-assets/{assetId}/tags
@@ -2191,7 +2223,7 @@ operationsByContract:
     scope: venue
     permission: VENUE_MAP_VIEW
     offline: true
-    reads: 0
+    reads: 3
     writes: 0
   - operation: listVenueMaps
     verb: GET
@@ -2257,8 +2289,10 @@ tables:
   - acceptVenueLabelProposals
   - acceptWalkwayProposals
   - acceptWorkOrder
+  - analyseMediaAsset
   - attachWorkOrderEvidence
   - bookResource
+  - bulkUpdateMediaAssets
   - callNextParties
   - cancelWorkOrder
   - checkInResource
@@ -2274,11 +2308,18 @@ tables:
   - createMaintenancePlan
   - createPrize
   - createQueue
+  - createRentalBooking
   - createResource
+  - createResourceCost
   - createUpload
   - createVenueMap
   - createWorkOrder
+  - deleteFavouriteRoute
   - deleteMediaAsset
+  - deleteResourceCost
+  - explainRentalPrice
+  - extendRental
+  - importRentalCatalogue
   - importVenueGeometry
   - issueGameCard
   - joinQueue
@@ -2286,6 +2327,7 @@ tables:
   - overrideWaitingGuest
   - pauseWorkOrder
   - publishVenueMap
+  - quoteRentalPrice
   - recordAuthorityNotification
   - recordGamePlay
   - recordWorkOrderParts
@@ -2293,21 +2335,29 @@ tables:
   - redeemPrize
   - redeemWaitingGuest
   - rejectWorkOrder
+  - releaseResourceBlock
+  - relinquishResourceHold
   - reorderPerformanceManifest
   - replaceMediaAsset
   - reportIncident
+  - reportReaderQueue
   - resumeWorkOrder
   - setAssetStatus
+  - setGamePricing
+  - setMediaAssetRights
   - setPathClosure
   - setQueueStatus
   - setReaderProfile
   - setResourceQualifications
+  - setResourceSelectionPolicy
   - setVenuePoint
   - setWaitTime
+  - simulateRentalPricing
   - startWorkOrder
   - submitInspection
   - submitQueueReading
   - testQueueFeed
+  - testReader
   - transferGameCard
   - updateAsset
   - updateGame
@@ -2316,13 +2366,17 @@ tables:
   - updateMediaAsset
   - updateQueue
   - updateWorkOrder
+  - validateGameConfiguration
+  - validateRentalProduct
   - verifyWorkOrder
   readBy:
   - acceptVenueLabelProposals
   - acceptWalkwayProposals
   - acceptWorkOrder
+  - analyseMediaAsset
   - attachWorkOrderEvidence
   - bookResource
+  - bulkUpdateMediaAssets
   - callNextParties
   - cancelWorkOrder
   - checkInResource
@@ -2339,10 +2393,15 @@ tables:
   - createPrize
   - createQueue
   - createResource
+  - createResourceCost
   - createUpload
   - createVenueMap
   - createWorkOrder
+  - deleteFavouriteRoute
   - deleteMediaAsset
+  - deleteResourceCost
+  - explainRentalPrice
+  - importRentalCatalogue
   - importVenueGeometry
   - issueGameCard
   - joinQueue
@@ -2350,6 +2409,7 @@ tables:
   - overrideWaitingGuest
   - pauseWorkOrder
   - publishVenueMap
+  - quoteRentalPrice
   - recordAuthorityNotification
   - recordGamePlay
   - recordWorkOrderParts
@@ -2357,21 +2417,29 @@ tables:
   - redeemPrize
   - redeemWaitingGuest
   - rejectWorkOrder
+  - releaseResourceBlock
+  - relinquishResourceHold
   - reorderPerformanceManifest
   - replaceMediaAsset
   - reportIncident
+  - reportReaderQueue
   - resumeWorkOrder
   - setAssetStatus
+  - setGamePricing
+  - setMediaAssetRights
   - setPathClosure
   - setQueueStatus
   - setReaderProfile
   - setResourceQualifications
+  - setResourceSelectionPolicy
   - setVenuePoint
   - setWaitTime
+  - simulateRentalPricing
   - startWorkOrder
   - submitInspection
   - submitQueueReading
   - testQueueFeed
+  - testReader
   - transferGameCard
   - updateAsset
   - updateGame
@@ -2380,6 +2448,8 @@ tables:
   - updateMediaAsset
   - updateQueue
   - updateWorkOrder
+  - validateGameConfiguration
+  - validateRentalProduct
   - verifyWorkOrder
 - store: cache:resolution
   kind: cache
@@ -2411,13 +2481,15 @@ tables:
   columns: 11
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - assets
   foreignWriters: null
 - table: assets.audit
   columns: 8
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - assets
   foreignWriters: null
 - table: assets.distribution_channel
   columns: 10
@@ -2427,7 +2499,7 @@ tables:
   - assets
   foreignWriters: null
 - table: assets.media_asset
-  columns: 24
+  columns: 25
   store: postgres
   parent: null
   writtenBy:
@@ -2445,6 +2517,13 @@ tables:
   store: postgres
   parent: assets.media_collection
   writtenBy: []
+  foreignWriters: null
+- table: assets.media_fingerprint
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - assets
   foreignWriters: null
 - table: assets.media_upload
   columns: 12
@@ -2572,6 +2651,13 @@ tables:
   writtenBy:
   - games
   foreignWriters: null
+- table: games.pricing_exception
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - games
+  foreignWriters: null
 - table: games.prize
   columns: 12
   store: postgres
@@ -2603,6 +2689,13 @@ tables:
   columns: 7
   store: postgres
   parent: null
+  writtenBy:
+  - games
+  foreignWriters: null
+- table: games.reader_sync_status
+  columns: 8
+  store: postgres
+  parent: games.reader
   writtenBy:
   - games
   foreignWriters: null
@@ -2640,6 +2733,7 @@ tables:
   parent: null
   writtenBy:
   - maintenance
+  - rental
   foreignWriters: null
 - table: maintenance.asset_category
   columns: 14
@@ -2816,7 +2910,8 @@ tables:
   columns: 17
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - rental
   foreignWriters: null
 - table: rental.damage_assessment
   columns: 10
@@ -2922,6 +3017,12 @@ tables:
   writtenBy:
   - rental
   foreignWriters: null
+- table: rental.quote
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: rental.settlement
   columns: 15
   store: postgres
@@ -2974,7 +3075,8 @@ tables:
   columns: 13
   store: postgres
   parent: resources.resource
-  writtenBy: []
+  writtenBy:
+  - resources
   foreignWriters: null
 - table: resources.resource_block
   columns: 8
@@ -2990,6 +3092,13 @@ tables:
   writtenBy:
   - resources
   foreignWriters: null
+- table: resources.resource_cost
+  columns: 10
+  store: postgres
+  parent: resources.resource
+  writtenBy:
+  - resources
+  foreignWriters: null
 - table: resources.resource_dependency
   columns: 12
   store: postgres
@@ -3001,7 +3110,8 @@ tables:
   columns: 15
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - resources
   foreignWriters: null
 - table: resources.resource_package
   columns: 13
@@ -3044,6 +3154,13 @@ tables:
   writtenBy:
   - resources
   foreignWriters: null
+- table: resources.selection_policy
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - resources
+  foreignWriters: null
 - table: resources.venue_assignment
   columns: 10
   store: postgres
@@ -3080,7 +3197,8 @@ tables:
   columns: 8
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - transport
   foreignWriters: null
 - table: transport.network_import
   columns: 10

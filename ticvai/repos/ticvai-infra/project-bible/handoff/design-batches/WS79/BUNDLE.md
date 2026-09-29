@@ -1,6 +1,6 @@
 # WS79 — Game and Ride board 2
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 7 operations · 7 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `DEVICE_CONFIGURE, DEVICE_MANAGE, DEVICE_VIEW, PRODUCT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-404` | Reader Management Dashboard | commandCentre | 0 | 0 | — |
-| `BO-405` | Reader Directory | listDetail | 0 | 1 | — |
-| `BO-406` | Reader Profile & Device Setup | configEditor | 0 | 0 | — |
-| `BO-407` | Reader Credit & Payment Configuration | configEditor | 0 | 0 | — |
-| `BO-408` | Reader / Attraction Assignment | listDetail | 0 | 0 | — |
-| `BO-409` | Retap Delay & Transaction Protection | configEditor | 0 | 0 | — |
-| `BO-410` | Free Game Glow & Reader Display Rules | configEditor | 0 | 0 | — |
-| `BO-411` | Reader Theme & Experience Configuration | configEditor | 0 | 0 | — |
-| `BO-412` | Real-Time Tap Validation & Reader Response | listDetail | 0 | 0 | — |
-| `BO-413` | Balance Check Reader & Device Test Console | listDetail | 0 | 0 | — |
+| `BO-404` | Reader Management Dashboard | commandCentre | 1 | 0 | — |
+| `BO-405` | Reader Directory | listDetail | 4 | 1 | — |
+| `BO-406` | Reader Profile & Device Setup | configEditor | 1 | 0 | — |
+| `BO-407` | Reader Credit & Payment Configuration | configEditor | 2 | 0 | — |
+| `BO-408` | Reader / Attraction Assignment | listDetail | 1 | 0 | — |
+| `BO-409` | Retap Delay & Transaction Protection | configEditor | 1 | 0 | — |
+| `BO-410` | Free Game Glow & Reader Display Rules | configEditor | 1 | 0 | — |
+| `BO-411` | Reader Theme & Experience Configuration | configEditor | 1 | 0 | — |
+| `BO-412` | Real-Time Tap Validation & Reader Response | listDetail | 1 | 0 | — |
+| `BO-413` | Balance Check Reader & Device Test Console | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -260,10 +259,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the reader are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listReaders",
+    "contract": "games",
+    "purpose": "Readers and their health",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-404"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-404",
+   "workshopBoard": "wireframes/WS59 Game and Ride Board 2.dc.html#bo-404"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 13. 0 of 6 labels bound to a contract property; 14 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -329,11 +337,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "patternReason": "the pack gives this screen a display directory (§Directory Columns) and no metric row",
   "purpose": "Maintain the master inventory of physical readers connected to TICVAI. The source requires the ability to define a minimum of three reader types.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 8 actions on this screen and the screen declares 0 operations.** Unserved: Add Reader, Edit, Clone Configuration, Assign, Unassign, Disable, Search, Export. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Game_and_Ride_Module.pdf, page 14 §Actions"
-   },
    {
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
@@ -412,6 +415,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "secondaryButton",
        "label": "Clone Configuration",
+       "operation": "cloneReaderConfiguration",
        "provenance": "pack Game_and_Ride_Module.pdf, page 14 §Actions"
       },
       {
@@ -459,7 +463,38 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the reader are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listReaders",
+    "contract": "games",
+    "purpose": "The directory",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "registerDevice",
+    "contract": "tenancy",
+    "purpose": "Register a new reader device",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Add Reader; Edit, Assign, Unassign, Disable"
+   },
+   {
+    "operationId": "setReaderConfiguration",
+    "contract": "games",
+    "purpose": "Edit the reader, assign/unassign it to a game (gameId) or disable it (status)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Add Reader; Edit, Assign, Unassign, Disable",
+    "invalidates": [
+     "listReaders"
+    ]
+   },
+   {
+    "operationId": "cloneReaderConfiguration",
+    "contract": "games",
+    "purpose": "Clone configuration",
+    "trigger": "onAction"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Reader ID",
@@ -468,13 +503,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "Serial Number",
     "Venue",
     "Zone"
+   ],
+   "params": [
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-405"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-405",
+   "workshopBoard": "wireframes/WS59 Game and Ride Board 2.dc.html#bo-405"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 14. 0 of 11 labels bound to a contract property; 19 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 14. 0 of 11 labels bound to a contract property; 19 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Search are choices sent by `listReaders`; Add Reader: `registerDevice`; Edit, Assign, Unassign, Disable: `setReaderConfiguration`; Export dropped (export is served by reporting exportReportResult); still owed by a contract change: `cloneReaderConfiguration`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -582,10 +624,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setReaderProfile",
+    "contract": "games",
+    "purpose": "How a reader behaves and what it shows",
+    "trigger": "onAction"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-406"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-406",
+   "workshopBoard": "wireframes/WS59 Game and Ride Board 2.dc.html#bo-406"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 15. 0 of 0 labels bound to a contract property; 4 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -688,12 +738,43 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setReaderConfiguration",
+    "contract": "games",
+    "purpose": "Profile and device setup",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listReaders"
+    ]
+   },
+   {
+    "operationId": "enrolDevice",
+    "contract": "tenancy",
+    "purpose": "Enrol the device behind it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-407"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-407",
+   "workshopBoard": "wireframes/WS59 Game and Ride Board 2.dc.html#bo-407"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 16. 0 of 0 labels bound to a contract property; 4 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "session"
+    },
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -770,7 +851,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setReaderConfiguration",
+       "label": "Save reader configuration",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setReaderConfiguration"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The reader attraction list.",
@@ -779,12 +880,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the reader attraction are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setReaderConfiguration",
+    "contract": "games",
+    "purpose": "Credit and payment acceptance",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listReaders"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-408"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-408",
+   "workshopBoard": "wireframes/WS59 Game and Ride Board 2.dc.html#bo-408"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 17. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -858,6 +979,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "selectField",
        "label": "Retap Protection: ON/OFF",
        "provenance": "pack Game_and_Ride_Module.pdf, page 17 §Configuration"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setReaderConfiguration",
+       "label": "Save reader configuration",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setReaderConfiguration"
       }
      ]
     }
@@ -870,12 +1005,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setReaderConfiguration",
+    "contract": "games",
+    "purpose": "Which attraction it opens",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listReaders"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-409"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-409",
+   "workshopBoard": "wireframes/WS59 Game and Ride Board 2.dc.html#bo-409"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 17. 0 of 0 labels bound to a contract property; 1 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -986,12 +1141,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setReaderConfiguration",
+    "contract": "games",
+    "purpose": "Retap delay",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listReaders"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-410"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-410",
+   "workshopBoard": "wireframes/WS59 Game and Ride Board 2.dc.html#bo-410"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 18. 0 of 0 labels bound to a contract property; 6 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1127,12 +1302,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setReaderConfiguration",
+    "contract": "games",
+    "purpose": "Free-game glow and display",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listReaders"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-411"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-411",
+   "workshopBoard": "wireframes/WS59 Game and Ride Board 2.dc.html#bo-411"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 19. 0 of 0 labels bound to a contract property; 11 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1246,15 +1441,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the real-time tap validation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setReaderConfiguration",
+    "contract": "games",
+    "purpose": "Theme and experience",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listReaders"
+    ]
+   }
+  ],
   "entryState": {
    "preloaded": [
     "↓"
+   ],
+   "params": [
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-412"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-412",
+   "workshopBoard": "wireframes/WS59 Game and Ride Board 2.dc.html#bo-412"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 20. 0 of 1 labels bound to a contract property; 1 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1372,16 +1585,31 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the balance check reader are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "testReader",
+    "contract": "games",
+    "purpose": "Balance check and device test",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Validation result",
     "Deduction source"
+   ],
+   "params": [
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-413"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-413",
+   "workshopBoard": "wireframes/WS59 Game and Ride Board 2.dc.html#bo-413"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 21. 0 of 2 labels bound to a contract property; 8 of 61 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1415,7 +1643,146 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
-{}
+{
+ "cloneReaderConfiguration": {
+  "method": "POST",
+  "path": "/readers/{readerId}/clone",
+  "contract": "games",
+  "summary": "Copy one reader's configuration onto other readers",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Reader"
+ },
+ "enrolDevice": {
+  "method": "POST",
+  "path": "/devices/{deviceId}/enrolment",
+  "contract": "tenancy",
+  "summary": "Take a registered device through enrolment to activation",
+  "permission": "DEVICE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DeviceEnrolment",
+  "responds": "RegisteredDevice"
+ },
+ "listReaders": {
+  "method": "GET",
+  "path": "/readers",
+  "contract": "games",
+  "summary": "Readers, their attractions and their health",
+  "permission": "DEVICE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Reader"
+ },
+ "registerDevice": {
+  "method": "POST",
+  "path": "/devices",
+  "contract": "tenancy",
+  "summary": "Register a device",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RegisteredDevice",
+  "responds": "RegisteredDevice"
+ },
+ "setReaderConfiguration": {
+  "method": "PUT",
+  "path": "/readers/{readerId}",
+  "contract": "games",
+  "summary": "What this reader charges, opens, shows and refuses",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Reader",
+  "responds": "Reader"
+ },
+ "setReaderProfile": {
+  "method": "PUT",
+  "path": "/reader-profiles",
+  "contract": "games",
+  "summary": "How a reader behaves and what it shows",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ReaderProfile",
+  "responds": "ReaderProfile"
+ },
+ "testReader": {
+  "method": "POST",
+  "path": "/readers/{readerId}/test",
+  "contract": "games",
+  "summary": "Prove a reader works before a guest finds out it does not",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ReaderTestResult"
+ }
+}
 ```
 
 ## `schemas.json`
@@ -1423,5 +1790,443 @@ Method, path, parameters, request and response for every operation these screens
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
-{}
+{
+ "DeviceCapability": {
+  "type": "string",
+  "description": "BL-179. **Something a driver reports, not something the platform provides.** The list grows as vendors are added, which is ADR-0015's whole position: adding a vendor is a driver plus configuration rather than a core change.\n**`genderClassification` is here because `VenueSettings.segregatedAccess. genderVerification` already offers `deviceAssisted` and nothing answered it** — a switch with no driver behind it. Where a venue's access hardware performs the check and the venue chooses to use it, the result is **advisory to the steward and never decisive at the turnstile** (`ValidationResult.advisory`). 3.2.45 asks for rejection; the package deviates deliberately and CF-130 records why.\n",
+  "enum": [
+   "genderClassification"
+  ]
+ },
+ "DeviceEnrolment": {
+  "x-ticvai-persistence": "platform.device",
+  "type": "object",
+  "description": "BL-160. **The body `enrolDevice` accepts, named so that it writes.**\nIt was an anonymous inline object, and `derive-lineage` reads writes from the schema an operation accepts — so the one operation that moves a device through its whole lifecycle recorded no writes at all, and `platform.device` looked like a table only `registerDevice` touched.\n**Provisioning is inside enrolment rather than beside it**, which is why `configurationProfileId` is here: a device that is enrolled but unprovisioned is a device that will fail at the gate on its first morning.\n",
+  "required": [
+   "state"
+  ],
+  "properties": {
+   "state": {
+    "type": "string",
+    "enum": [
+     "enrolled",
+     "provisioned",
+     "active",
+     "deactivated",
+     "retired"
+    ],
+    "description": "**The target state, not the current one.** `registered` is absent because `registerDevice` is what produces it and nothing transitions back to it.\n"
+   },
+   "configurationProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true,
+    "description": "**Recorded on the `tenancy.device_audit` row, not on the device.** Required in practice for `deactivated` and `retired`, where an investigation six months later needs to know why a gate stopped working.\n"
+   }
+  }
+ },
+ "DeviceKind": {
+  "type": "string",
+  "enum": [
+   "receiptPrinter",
+   "ticketPrinter",
+   "labelPrinter",
+   "cashDrawer",
+   "barcodeScanner",
+   "rfidReader",
+   "nfcReader",
+   "cardReader",
+   "idReader",
+   "biometricReader",
+   "accessReader",
+   "paymentTerminal",
+   "customerDisplay",
+   "signageDisplay",
+   "kitchenDisplay",
+   "turnstileController",
+   "wristbandEncoder",
+   "signaturePad",
+   "scale",
+   "camera"
+  ]
+ },
+ "Reader": {
+  "type": "object",
+  "x-ticvai-persistence": "games.reader",
+  "description": "Board 2. **A `tenancy` device with a game configuration on it.**",
+  "required": [
+   "deviceId"
+  ],
+  "properties": {
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "`tenancy.RegisteredDevice`. **Enrolment, firmware and tamper state live there.**\n"
+   },
+   "gameId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "readerProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "acceptedCreditTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "acceptsDirectPay": {
+    "type": "boolean",
+    "default": false
+   },
+   "retapDelaySeconds": {
+    "type": "integer",
+    "default": 3,
+    "description": "**The setting that stops a guest paying twice for one go.** A wristband held against a reader for a second and a half is two taps to the hardware and one intention to the guest.\n"
+   },
+   "displayRules": {
+    "type": "object",
+    "properties": {
+     "freeGameGlow": {
+      "type": "boolean",
+      "default": true,
+      "description": "**What tells a guest their entitlement was used rather than their money.** Without it the complaint arrives at the desk.\n"
+     },
+     "showBalance": {
+      "type": "boolean",
+      "default": true
+     },
+     "showPrice": {
+      "type": "boolean",
+      "default": true
+     },
+     "themeCode": {
+      "type": "string",
+      "nullable": true
+     },
+     "languages": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "ioMapping": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Board 9.6. Which output starts the game, which input reports it finished. **Deliberately open.** The keys are the reader model's own I/O lines, so the shape belongs to the vendor adaptor for that model (game readers are a driver, not a build — ADR-0012, ADR-0015), not to this contract.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "unconfigured",
+     "active",
+     "offline",
+     "maintenance",
+     "disabled"
+    ]
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "ReaderProfile": {
+  "type": "object",
+  "x-ticvai-persistence": "games.reader_profile",
+  "description": "BL-153. **`games` is well built on the money and what is missing sits at the reader.**\n10.2.14 and 10.2.17 want a different colour for a free game and a different one for insufficient credit — **because a guest at an arcade machine cannot read a message, they can only see a light.** The whole interaction is a second long and happens across a noisy room.\n",
+  "required": [
+   "id",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "displayBehaviour": {
+    "type": "object",
+    "description": "**What the reader shows, per outcome.** Colour and tone, because the guest is looking at a machine rather than a screen.\n",
+    "properties": {
+     "accepted": {
+      "type": "string"
+     },
+     "freeGame": {
+      "type": "string"
+     },
+     "insufficientCredit": {
+      "type": "string"
+     },
+     "cardBlocked": {
+      "type": "string"
+     },
+     "readError": {
+      "type": "string"
+     }
+    }
+   },
+   "retryPricing": {
+    "type": "object",
+    "nullable": true,
+    "description": "**A retry after a machine fault is not a second play.** Without this a guest whose game crashed pays twice, and the attendant refunds by hand — which is how an arcade loses money and goodwill at once.\n",
+    "properties": {
+     "isFree": {
+      "type": "boolean",
+      "default": true
+     },
+     "withinSeconds": {
+      "type": "integer",
+      "default": 60
+     },
+     "maxRetries": {
+      "type": "integer",
+      "default": 1
+     }
+    }
+   },
+   "rePlayWindowSeconds": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**A second tap within this window is the same play, not a new one.** A guest tapping twice because nothing appeared to happen should not be charged twice.\n"
+   },
+   "entitlementProductIds": {
+    "type": "array",
+    "description": "**Per-game entitlement.** A pass that includes ten specific rides needs the reader to know which, and a card that works everywhere is a different product.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "ReaderTestResult": {
+  "type": "object",
+  "description": "Boards 2.10 and 9.9. **Each check separately**, because they send an engineer to different places.\n",
+  "properties": {
+   "readerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "testedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "checks": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "check": {
+       "type": "string",
+       "enum": [
+        "connectivity",
+        "cardRead",
+        "balanceCheck",
+        "display",
+        "sound",
+        "gameTrigger",
+        "gameCompleteSignal"
+       ]
+      },
+      "passed": {
+       "type": "boolean"
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "overall": {
+    "type": "string",
+    "enum": [
+     "pass",
+     "partial",
+     "fail"
+    ]
+   }
+  }
+ },
+ "RegisteredDevice": {
+  "x-ticvai-persistence": "platform.device",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "driver",
+   "workstationId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "kind": {
+    "$ref": "#/components/schemas/DeviceKind"
+   },
+   "driver": {
+    "type": "string",
+    "description": "Built to an open standard where one exists — ESC/POS, UnifiedPOS, OSDP. Adding a vendor is a driver plus configuration, not a core change (ADR-0015).\n"
+   },
+   "identifier": {
+    "type": "string",
+    "nullable": true
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "model": {
+    "type": "string",
+    "nullable": true
+   },
+   "pushToken": {
+    "type": "string",
+    "format": "password",
+    "nullable": true,
+    "writeOnly": true,
+    "description": "BL-163. **Guest devices register for push and staff devices did not** — `registerGuestDevice` exists with a token, platform and failure count, and a scanner that cannot be told anything is a scanner somebody has to walk to.\nWrite-only, and marked `writeOnly`: accepted by `registerDevice` and never returned by `listDevices` or `getDevice`. **A push token is a credential**, and the rule that no surface holds a provider key applies here too.\n"
+   },
+   "pushPlatform": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "ios",
+     "android",
+     "web",
+     "windows"
+    ]
+   },
+   "pushFailureCount": {
+    "type": "integer",
+    "default": 0,
+    "readOnly": true,
+    "description": "**Consecutive failures.** A token that has failed repeatedly is a device that was wiped or reassigned, and continuing to push to it is how a notification queue fills with nothing.\n"
+   },
+   "offlineScope": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "none",
+     "readOnly",
+     "sellAndScan",
+     "fullVenue"
+    ],
+    "description": "BL-163. **What this device may do with no connection**, which was unstated for the staff app while `venue-pos` and `venue-scanner` had it settled.\n**`fullVenue` on a personal handset is a decision, not a default** — a device that can do everything offline is a device that carries the whole venue's data in somebody's pocket.\n"
+   },
+   "firmwareVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "As the device last reported it on its heartbeat."
+   },
+   "isRequired": {
+    "type": "boolean",
+    "description": "True blocks shift open when the device is unreachable."
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "online",
+     "offline",
+     "error",
+     "consumableLow",
+     "needsAttention",
+     "unknown"
+    ],
+    "description": "What the device last said on its heartbeat; `unknown` until it has."
+   },
+   "batteryPercent": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "minimum": 0,
+    "maximum": 100,
+    "description": "Board 1 of the client's POS design set, 20 August. **A wristband encoder at 8% is a gate that stops working in an hour**, and nothing in the package carried it.\n**Null where the device has no battery**, which is most of them — a receipt printer reporting 100% forever is worse than one reporting nothing.\n"
+   },
+   "lastCheckedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Distinct from `lastHeartbeatAt`.** A heartbeat is the workstation saying the device is attached; a check is the device answering. **A printer with no paper heartbeats perfectly**, which is why the client's board shows both columns.\n"
+   },
+   "health": {
+    "type": "string",
+    "enum": [
+     "healthy",
+     "warning",
+     "degraded",
+     "offline",
+     "unknown"
+    ],
+    "default": "unknown",
+    "readOnly": true,
+    "description": "**Derived, not reported.** Computed from heartbeat age, battery, firmware currency and error rate — a device does not know whether it is healthy, and asking it produces a fleet that is 100% healthy and 12% broken.\n"
+   },
+   "lastHeartbeatAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "capabilities": {
+    "type": "array",
+    "readOnly": true,
+    "items": {
+     "$ref": "#/components/schemas/DeviceCapability"
+    },
+    "description": "BL-179. **What this driver reports it can do, beyond reading media.** ADR-0015 is standards-first — the device does what the device does — and until now a venue could switch on a feature that depended on hardware without anything being able to say whether the hardware was there.\n**A capability absent is a capability unavailable**, not a capability assumed. A venue setting that requires one is refused where no device in scope reports it, rather than silently doing nothing at the gate.\n"
+   },
+   "enrolmentState": {
+    "type": "string",
+    "enum": [
+     "registered",
+     "enrolled",
+     "provisioned",
+     "active",
+     "deactivated",
+     "retired"
+    ],
+    "default": "registered",
+    "readOnly": true,
+    "description": "BL-160. **Where the device is in its life, which is not the same question as whether it is answering.** `enrolDevice` has taken the whole matrix — registered, enrolled, provisioned, active, deactivated, retired — since 16.1.2, and until now there was no column for it to land in, so the operation read this table and wrote nothing.\n**Distinct from `status` and from `health`.** `status` is what the device last said and `health` is what we computed from it; a decommissioned turnstile still sitting on the network is `online` and `retired` at once, and neither column contradicts the other. **A device that is `retired` is refused at the gate whatever its status says.**\nThe transition itself — who moved it, from what, and why — is a `tenancy.device_audit` record. It is not repeated here, because the latest transition stored in two places is one place to go stale.\n"
+   },
+   "retiredAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Set when `enrolmentState` reaches `retired`, and null otherwise.** Derivable from `tenancy.device_audit`, and kept as a column for the same reason `maintenance.asset.retired_on` is one: a retirement date you reconstruct from an audit log is a date nobody filters a fleet by.\n"
+   },
+   "configurationProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The profile this device was provisioned with.** `enrolDevice` has accepted one since 16.1.3 and there was nowhere to keep it, so the answer to *\"what is this reader configured as\"* lived only in the request that set it.\n"
+   }
+  }
+ }
+}
 ```

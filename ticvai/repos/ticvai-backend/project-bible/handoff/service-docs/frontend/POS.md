@@ -60,7 +60,7 @@
 | [KIT-007](#kit-007-guest-collection-buzzer-digital-notification) | Guest Collection, Buzzer & Digital Notification | Kitchen | 2 | 2 |
 | [KIT-008](#kit-008-exceptions-re-fire-unavailable-items) | Exceptions, Re-Fire & Unavailable Items | Kitchen | 2 | 6 |
 | [KIT-009](#kit-009-sla-priority-service-rules) | SLA, Priority & Service Rules | Kitchen | 2 | 3 |
-| [KIT-010](#kit-010-kitchen-performance-ai-operational-optimization) | Kitchen Performance, AI & Operational Optimization | Kitchen | 2 | 2 |
+| [KIT-010](#kit-010-kitchen-performance-ai-operational-optimization) | Kitchen Performance, AI & Operational Optimization | Kitchen | 2 | 3 |
 | [POS-004](#pos-004-sell-seat-map) | Sell — Seat Map | Sell | 2 | 11 |
 | [POS-008](#pos-008-reports) | Reports | Reports | 2 | 7 |
 | [POS-009](#pos-009-staff-roster) | Staff Roster | Shift | 2 | 16 |
@@ -1991,6 +1991,7 @@
 |---|---|---|---|---|
 | `getDashboard` | [ReportingService](../backend/ReportingService.md#getdashboard) | onLoad | Read a dashboard with tile data | `REPORT_VIEW_VENUE` |
 | `askReportingQuestion` | [ReportingService](../backend/ReportingService.md#askreportingquestion) | onAction | Natural-language reporting query | `REPORT_VIEW_VENUE` |
+| `recordDashboardView` | [ReportingService](../backend/ReportingService.md#recorddashboardview) | background | Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it. | `REPORT_VIEW_VENUE` |
 
 **States**
 

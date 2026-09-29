@@ -1,0 +1,71 @@
+id: LLD-AccessBiometricProfile
+title: AccessBiometricProfile — 8 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/access-biometric-profile.yaml
+entity: AccessBiometricProfile
+contract: access
+enum: AccessBiometricProfile.status
+enumKind: inline
+enumSchema: AccessBiometricProfile
+enumProperty: status
+owner: access
+description: One biometric profile of a venue, one of four kinds told apart by `profileKind` (a verification
+  profile, a Face Pass enrolment policy, a Face Tag enrolment profile or a face-match threshold profile)
+  (declared 29 September, writers pass). Each kind has its own upsert write (`setBiometricVerificationProfile`,
+  `setFacePassEnrollment`, `setFaceTagTemporaryEnrollment`, `setFaceMatchingVerification`), and the
+  write for a row's kind is the only one that moves it.
+initial:
+- active
+- inactive
+terminal: []
+transitions:
+- from: active
+  to: inactive
+  operation: setBiometricVerificationProfile
+  trigger: operation
+  guard: Body `status` `inactive`; a verification profile is switched off; credentials it covered no
+    longer need a face at the locations it named
+- from: inactive
+  to: active
+  operation: setBiometricVerificationProfile
+  trigger: operation
+  guard: Body `status` `active`; a verification profile is switched on again
+- from: active
+  to: inactive
+  operation: setFacePassEnrollment
+  trigger: operation
+  guard: Body `status` `inactive`; a Face Pass enrolment policy is switched off; no new Face Pass enrolment
+    on its channels
+- from: inactive
+  to: active
+  operation: setFacePassEnrollment
+  trigger: operation
+  guard: Body `status` `active`; a Face Pass enrolment policy is switched on again
+- from: active
+  to: inactive
+  operation: setFaceTagTemporaryEnrollment
+  trigger: operation
+  guard: Body `status` `inactive`; a Face Tag profile is switched off; tags already captured are still
+    deleted at their trigger
+- from: inactive
+  to: active
+  operation: setFaceTagTemporaryEnrollment
+  trigger: operation
+  guard: Body `status` `active`; a Face Tag profile is switched on again
+- from: active
+  to: inactive
+  operation: setFaceMatchingVerification
+  trigger: operation
+  guard: Body `status` `inactive`; a threshold profile is switched off; a decision already made is not
+    re-scored
+- from: inactive
+  to: active
+  operation: setFaceMatchingVerification
+  trigger: operation
+  guard: Body `status` `active`; a threshold profile is switched on again; it applies from the next
+    match
+openQuestions: null
+notes: '**No terminal state, by design** (`terminal: []`): a profile is configuration, switched off
+  and on again, never finished. Each input carries `status` (`active` or `inactive`, default `active`);
+  an inactive profile is not applied at any gate and stays for reuse.'

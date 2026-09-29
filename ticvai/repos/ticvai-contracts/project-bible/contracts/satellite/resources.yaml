@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Resources
   version: 1.0.0
-  x-ticvai-screen-count: 57
+  x-ticvai-screen-count: 60
   x-ticvai-tier: satellite
   x-ticvai-module: 1 — Ticketing Catalogue
   x-ticvai-platforms:
@@ -290,6 +290,14 @@ paths:
 
         **A live `ResourceHold` is a conflict here** like a booking: staff cannot book a cabana a guest
         is holding at checkout.
+
+        **It reads `resources.selection_policy` when the booking is for an order** (decided 29 September,
+        writers pass; DM4). With `orderId` given, the policy of the order line''s ticket type decides
+        whether a named `resourceId` stands for the guest''s choice: under `guestMayChoose` it is honoured
+        (within `resourceTypeId` where the policy sets one), under `autoAssign` it is ignored and the
+        platform picks as for `resourceKind`, the same rule as `allocateResources.preferredResourceIds`,
+        and the response names what was booked. A booking with no `orderId` is a staff booking and the
+        policy does not apply.
 
         '
       tags:
@@ -1974,6 +1982,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Released
   /resource-allocations:
     post:
@@ -2245,28 +2256,12 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-              - ticketTypeId
-              - mode
-              properties:
-                ticketTypeId:
-                  type: string
-                  format: uuid
-                mode:
-                  type: string
-                  enum:
-                  - autoAssign
-                  - guestMayChoose
-                resourceTypeId:
-                  type: string
-                  format: uuid
-                  nullable: true
-                showQualifications:
-                  type: boolean
-                  default: false
+              $ref: '#/components/schemas/ResourceSelectionPolicy'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
   /resource-suggestions:
     get:
@@ -3008,9 +3003,170 @@ paths:
                   $ref: '#/components/schemas/ResourceCostAnalytics'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+  /resource-costs:
+    get:
+      operationId: listResourceCosts
+      x-ticvai-consumed-by:
+        - "P08 BO-903 Equipment & Asset Command Center"
+        - "P08 BO-912 Asset Lifecycle, Depreciation & Retirement"
+        - "P08 BO-945 Resource Cost, Revenue & Efficiency Analytics"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass; pack labels on BO-945 (Transfer cost, Asset operating
+        cost, Resource replacement cost); data model DM4 open item on resources.resource_cost; shape follows
+        listResourceBlocks with the Page envelope'
+      summary: Cost entries booked against resources
+      description: 'The `resources.resource_cost` rows inside the caller''s venue scope, newest
+        `incurredOn` first (decided 29 September, writers pass). The detail behind the money columns of
+        `getResourceCostAnalytics`.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: resourceId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: kind
+        in: query
+        schema:
+          type: string
+          enum:
+          - transfer
+          - operating
+          - replacement
+      - name: from
+        in: query
+        description: Only entries incurred on or after this date.
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        description: Only entries incurred on or before this date.
+        schema:
+          type: string
+          format: date
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Cost entries
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ResourceCostEntry'
+    post:
+      operationId: createResourceCost
+      x-ticvai-consumed-by:
+        - "P08 BO-903 Equipment & Asset Command Center"
+        - "P08 BO-910 Maintenance & Resource Blocking"
+        - "P08 BO-912 Asset Lifecycle, Depreciation & Retirement"
+        - "P08 BO-945 Resource Cost, Revenue & Efficiency Analytics"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass; pack labels on BO-945 (Transfer cost, Asset operating
+        cost, Resource replacement cost); data model DM4 open item on resources.resource_cost; shape follows
+        createResourceBlock'
+      summary: Book a transfer, operating or replacement cost against a resource
+      description: '**The writer of `resources.resource_cost`** (decided 29 September, writers pass). One
+        entry per cost: moving a resource between venues (`transfer`, which needs `fromVenueId` and
+        `toVenueId`, different, else `422`), running or maintaining it (`operating`), or replacing a
+        retired or lost item (`replacement`). The amount is in the venue''s currency and positive; a
+        correction is a delete and a new entry, not an edit, so the analytics for a closed window do not
+        move silently. An unknown `resourceId` at this venue is `422`.
+
+        **Maintenance and transfers do not write it on their own.** A cost is a number somebody knows,
+        not one the platform can infer from a work order, so it is entered here (our build plan).
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceCostEntry'
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceCostEntry'
+        '422':
+          description: Unknown resource at this venue; a `transfer` without both venues or with the same
+            venue twice; a non-positive amount.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /resource-costs/{costId}:
+    parameters:
+    - name: costId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    delete:
+      operationId: deleteResourceCost
+      x-ticvai-consumed-by:
+        - "P08 BO-945 Resource Cost, Revenue & Efficiency Analytics"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass; correction path for resources.resource_cost; shape
+        follows releaseResourceBlock'
+      summary: Remove a cost entry booked in error
+      description: 'Removes one `resources.resource_cost` row (decided 29 September, writers pass). The
+        removal is recorded on `resources.resource_audit` with who and when, because the analytics it fed
+        change.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Removed
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
 
 components:
   schemas:
+
     ResourceBookingProgressInput:
       type: object
       x-ticvai-persistence: none — request only; the step is recorded on resources.booking
@@ -3137,7 +3293,7 @@ components:
           readOnly: true
     ResourceCostAnalytics:
       type: object
-      x-ticvai-persistence: none — projection over bookings, transfers, maintenance and replacement costs, computed at read time
+      x-ticvai-persistence: none — projection over resources.resource_cost, bookings and maintenance work orders, computed at read time
       description: One group's cost and revenue for the window (decided 29 September, readiness close-out; BO-945).
       required:
       - key
@@ -3162,6 +3318,99 @@ components:
           - $ref: ../shared/common.yaml#/components/schemas/Money
           nullable: true
           description: Total cost over booked hours; null when nothing was booked.
+    ResourceSelectionPolicy:
+      type: object
+      x-ticvai-persistence: resources.selection_policy
+      description: '**Whether the guest may choose the resource, per ticket type**: the body of
+        `setResourceSelectionPolicy` and its row, one per ticket type, replaced by each `PUT` (decided
+        29 September, data model DM4).
+
+        '
+      required:
+      - ticketTypeId
+      - mode
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        ticketTypeId:
+          type: string
+          format: uuid
+          description: One policy per ticket type; a `PUT` for a ticket type that has one replaces it.
+        mode:
+          type: string
+          enum:
+          - autoAssign
+          - guestMayChoose
+        resourceTypeId:
+          type: string
+          format: uuid
+          nullable: true
+        showQualifications:
+          type: boolean
+          default: false
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005), written at `venue` scope.
+    ResourceCostEntry:
+      type: object
+      x-ticvai-persistence: resources.resource_cost
+      description: '**One cost booked against a resource**: a transfer between locations, an operating
+        cost or a replacement. `getResourceCostAnalytics` sums these per group and window (decided 29
+        September, data model DM4).
+
+        '
+      required:
+      - id
+      - resourceId
+      - kind
+      - amount
+      - incurredOn
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        resourceId:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - transfer
+          - operating
+          - replacement
+        amount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        incurredOn:
+          type: string
+          format: date
+        fromVenueId:
+          type: string
+          format: uuid
+          nullable: true
+          description: A `transfer` only, with `toVenueId`.
+        toVenueId:
+          type: string
+          format: uuid
+          nullable: true
+        note:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005), written at `venue` scope.
     ProductStartTime:
       x-ticvai-persistence: none — computed on read
       type: object

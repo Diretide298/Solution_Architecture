@@ -39,10 +39,7 @@
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-284 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-285",
@@ -101,20 +98,89 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can view, search and manage the complete portfolio of membership and annual-pass products from one workspace.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Identify) and no metric row",
   "purpose": "Provide administrators with a centralized view of all membership, annual pass, season pass and subscription-style admission products.",
-  "purposeNote": "Administrators can view, search and manage the complete portfolio of membership and annual-pass products from one workspace.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 16 actions on this screen and the screen declares 1 operation.** Unserved: Monthly Membership, Fixed-Term Membership, Corporate Membership, Family Membership, Individual Membership, Student Membership, VIP Membership, Custom Membership …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable types such as"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active Membership Products",
+       "bindsTo": "MembershipAnnualPassCommandCenterSummary.activeMembershipProducts",
+       "operation": "listMembershipAnnualPass",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Annual Pass Products",
+       "bindsTo": "MembershipAnnualPassCommandCenterSummary.annualPassProducts",
+       "operation": "listMembershipAnnualPass",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Draft Products",
+       "bindsTo": "MembershipAnnualPassCommandCenterSummary.draftProducts",
+       "operation": "listMembershipAnnualPass",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Active Members",
+       "bindsTo": "MembershipAnnualPassCommandCenterSummary.activeMembers",
+       "operation": "listMembershipAnnualPass",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Family Memberships",
+       "bindsTo": "MembershipAnnualPassCommandCenterSummary.familyMemberships",
+       "operation": "listMembershipAnnualPass",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Memberships expiring soon",
+       "bindsTo": "MembershipAnnualPassCommandCenterSummary.membershipsExpiringSoon",
+       "operation": "listMembershipAnnualPass",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Renewal-Enabled Products",
+       "bindsTo": "MembershipAnnualPassCommandCenterSummary.renewalEnabledProducts",
+       "operation": "listMembershipAnnualPass",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Suspended Products",
+       "bindsTo": "MembershipAnnualPassCommandCenterSummary.suspendedProducts",
+       "operation": "listMembershipAnnualPass",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Products with configuration issues",
+       "bindsTo": "MembershipAnnualPassCommandCenterSummary.productsWithConfigurationIssues",
+       "operation": "listMembershipAnnualPass",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Average membership duration",
+       "bindsTo": "MembershipAnnualPassCommandCenterSummary.averageMembershipDuration",
+       "operation": "listMembershipAnnualPass",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -123,35 +189,20 @@
        "kind": "dataTable",
        "label": "Every membership annual pass",
        "columns": [
-        "MembershipAnnualPassCommandCenterView.activeMembershipProducts",
-        "MembershipAnnualPassCommandCenterView.annualPassProducts",
-        "MembershipAnnualPassCommandCenterView.draftProducts",
-        "MembershipAnnualPassCommandCenterView.activeMembers",
-        "MembershipAnnualPassCommandCenterView.familyMemberships",
-        "MembershipAnnualPassCommandCenterView.membershipsExpiringSoon",
-        "MembershipAnnualPassCommandCenterView.renewalEnabledProducts",
-        "MembershipAnnualPassCommandCenterView.suspendedProducts",
-        "MembershipAnnualPassCommandCenterView.productsWithConfigurationIssues",
-        "MembershipAnnualPassCommandCenterView.averageMembershipDuration",
         "MembershipAnnualPassCommandCenterView.productId",
         "MembershipAnnualPassCommandCenterView.membershipName",
         "MembershipAnnualPassCommandCenterView.type",
         "MembershipAnnualPassCommandCenterView.tier",
         "MembershipAnnualPassCommandCenterView.venueAttraction",
-        "MembershipAnnualPassCommandCenterView.validity",
+        "MembershipAnnualPassCommandCenterView.validityMethod",
         "MembershipAnnualPassCommandCenterView.activationMethod",
-        "MembershipAnnualPassCommandCenterView.renewal",
-        "MembershipAnnualPassCommandCenterView.familyIndividual",
+        "MembershipAnnualPassCommandCenterView.renewalMode",
+        "MembershipAnnualPassCommandCenterView.membershipStructure",
         "MembershipAnnualPassCommandCenterView.currentMembers",
-        "MembershipAnnualPassCommandCenterView.effectiveDates",
+        "MembershipAnnualPassCommandCenterView.effectiveFrom",
         "MembershipAnnualPassCommandCenterView.status",
         "MembershipAnnualPassCommandCenterView.owner",
-        "MembershipAnnualPassCommandCenterView.missingEntitlements",
-        "MembershipAnnualPassCommandCenterView.missingPricingAssociation",
-        "MembershipAnnualPassCommandCenterView.missingValidity",
-        "MembershipAnnualPassCommandCenterView.invalidEligibility",
-        "MembershipAnnualPassCommandCenterView.conflictingRules",
-        "MembershipAnnualPassCommandCenterView.missingRenewalPolicy"
+        "MembershipAnnualPassCommandCenterView.validationIssues"
        ],
        "bindsTo": "MembershipAnnualPassCommandCenterView",
        "operation": "listMembershipAnnualPass",
@@ -168,35 +219,20 @@
        "label": "The selected membership annual pass",
        "bindsTo": "MembershipAnnualPassCommandCenterView",
        "columns": [
-        "MembershipAnnualPassCommandCenterView.activeMembershipProducts",
-        "MembershipAnnualPassCommandCenterView.annualPassProducts",
-        "MembershipAnnualPassCommandCenterView.draftProducts",
-        "MembershipAnnualPassCommandCenterView.activeMembers",
-        "MembershipAnnualPassCommandCenterView.familyMemberships",
-        "MembershipAnnualPassCommandCenterView.membershipsExpiringSoon",
-        "MembershipAnnualPassCommandCenterView.renewalEnabledProducts",
-        "MembershipAnnualPassCommandCenterView.suspendedProducts",
-        "MembershipAnnualPassCommandCenterView.productsWithConfigurationIssues",
-        "MembershipAnnualPassCommandCenterView.averageMembershipDuration",
         "MembershipAnnualPassCommandCenterView.productId",
         "MembershipAnnualPassCommandCenterView.membershipName",
         "MembershipAnnualPassCommandCenterView.type",
         "MembershipAnnualPassCommandCenterView.tier",
         "MembershipAnnualPassCommandCenterView.venueAttraction",
-        "MembershipAnnualPassCommandCenterView.validity",
+        "MembershipAnnualPassCommandCenterView.validityMethod",
         "MembershipAnnualPassCommandCenterView.activationMethod",
-        "MembershipAnnualPassCommandCenterView.renewal",
-        "MembershipAnnualPassCommandCenterView.familyIndividual",
+        "MembershipAnnualPassCommandCenterView.renewalMode",
+        "MembershipAnnualPassCommandCenterView.membershipStructure",
         "MembershipAnnualPassCommandCenterView.currentMembers",
-        "MembershipAnnualPassCommandCenterView.effectiveDates",
+        "MembershipAnnualPassCommandCenterView.effectiveFrom",
         "MembershipAnnualPassCommandCenterView.status",
         "MembershipAnnualPassCommandCenterView.owner",
-        "MembershipAnnualPassCommandCenterView.missingEntitlements",
-        "MembershipAnnualPassCommandCenterView.missingPricingAssociation",
-        "MembershipAnnualPassCommandCenterView.missingValidity",
-        "MembershipAnnualPassCommandCenterView.invalidEligibility",
-        "MembershipAnnualPassCommandCenterView.conflictingRules",
-        "MembershipAnnualPassCommandCenterView.missingRenewalPolicy"
+        "MembershipAnnualPassCommandCenterView.validationIssues"
        ],
        "notes": null,
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Display"
@@ -268,20 +304,21 @@
   ],
   "entryState": {
    "preloaded": [
-    "MembershipAnnualPassCommandCenterView.activeMembershipProducts",
-    "MembershipAnnualPassCommandCenterView.annualPassProducts",
-    "MembershipAnnualPassCommandCenterView.draftProducts",
-    "MembershipAnnualPassCommandCenterView.activeMembers",
-    "MembershipAnnualPassCommandCenterView.familyMemberships",
-    "MembershipAnnualPassCommandCenterView.membershipsExpiringSoon"
+    "MembershipAnnualPassCommandCenterSummary.activeMembershipProducts",
+    "MembershipAnnualPassCommandCenterSummary.annualPassProducts",
+    "MembershipAnnualPassCommandCenterSummary.draftProducts",
+    "MembershipAnnualPassCommandCenterSummary.activeMembers",
+    "MembershipAnnualPassCommandCenterSummary.familyMemberships",
+    "MembershipAnnualPassCommandCenterSummary.membershipsExpiringSoon"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-284"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-284",
+   "workshopBoard": "wireframes/WS82 Membership   Annual Pass Management Board 1.dc.html#bo-284"
   },
-  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 4. 29 of 29 labels bound to a contract property; 45 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 4. 29 of 29 labels bound to a contract property; 45 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Monthly Membership, Fixed-Term Membership, Corporate Membership, Family Membership, Individual Membership, Student Membership, VIP Membership, Custom Membership … are choices sent by `listMembershipAnnualPass`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -342,10 +379,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can create and version membership products and tiers with clear relationships to the central TICVAI product catalogue.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture; Define; Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure the fundamental definition and hierarchy of a membership/pass.",
-  "purposeNote": "Administrators can create and version membership products and tiers with clear relationships to the central TICVAI product catalogue.",
   "layout": {
    "template": "form",
    "regions": [
@@ -494,16 +531,21 @@
     "operationId": "setMembershipProductTier",
     "contract": "subscription",
     "purpose": "Membership Product & Tier Builder",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "setMembershipProgramme",
+    "contract": "catalogue",
+    "purpose": "Define a membership programme",
     "trigger": "onAction",
-    "invalidates": [
-     "setMembershipProductTier"
-    ]
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-285"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-285",
+   "workshopBoard": "wireframes/WS82 Membership   Annual Pass Management Board 1.dc.html#bo-285"
   },
   "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 5. 0 of 0 labels bound to a contract property; 23 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -566,10 +608,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "rules and returns an explainable result.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Configure whether qualification requires) and no display directory — it is settings, not a population",
   "purpose": "Determine who is allowed to purchase, activate, hold or renew a particular membership.",
-  "purposeNote": "rules and returns an explainable result.",
   "layout": {
    "template": "form",
    "regions": [
@@ -658,16 +700,14 @@
     "operationId": "setMembershipEligibilityQualification",
     "contract": "subscription",
     "purpose": "Membership Eligibility & Qualification Rule Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setMembershipEligibilityQualification"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-286"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-286",
+   "workshopBoard": "wireframes/WS82 Membership   Annual Pass Management Board 1.dc.html#bo-286"
   },
   "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 11 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -785,16 +825,14 @@
     "operationId": "setValidityActivationExpiry",
     "contract": "subscription",
     "purpose": "Validity, Activation & Expiry Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setValidityActivationExpiry"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-287"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-287",
+   "workshopBoard": "wireframes/WS82 Membership   Annual Pass Management Board 1.dc.html#bo-287"
   },
   "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 0 of 5 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -857,17 +895,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can define the complete admission and benefit package associated with every membership tier.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Define exactly what the member receives. This is the heart of the membership product.",
-  "purposeNote": "Administrators can define the complete admission and benefit package associated with every membership tier.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Guest Tickets, Booking Privileges. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Support"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -953,12 +984,42 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Attraction Access",
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Event Access",
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Zone Access",
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Priority Entry",
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Guest Tickets",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Support"
       },
       {
        "kind": "secondaryButton",
-       "label": "Booking Privileges",
+       "label": "F&B Benefit",
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Retail Benefit",
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Rental Benefit",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Support"
       }
      ]
@@ -976,18 +1037,44 @@
     "operationId": "setMembershipEntitlementAdmission",
     "contract": "subscription",
     "purpose": "Membership Entitlement & Admission Benefit Builder",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "setMembershipBenefit",
+    "contract": "catalogue",
+    "purpose": "Define a benefit",
     "trigger": "onAction",
-    "invalidates": [
-     "setMembershipEntitlementAdmission"
-    ]
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "setPlanBenefits",
+    "contract": "catalogue",
+    "purpose": "Replace the benefits a plan grants",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "listEntitlementTemplates",
+    "contract": "catalogue",
+    "purpose": "The membership plan templates whose benefits are set",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-288"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-288",
+   "workshopBoard": "wireframes/WS82 Membership   Annual Pass Management Board 1.dc.html#bo-288"
   },
-  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 16 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 24 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Attraction Access, Event Access, Zone Access, Priority Entry, Guest Tickets, F&B Benefit, Retail Benefit, Rental Benefit … are choices sent by `setMembershipEntitlementAdmission`.",
+  "entryState": {
+   "params": [
+    {
+     "name": "templateId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1048,10 +1135,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Membership entitlement usage is governed consistently across reservation, ticketing and access-control channels.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Maintain counters such as) and no metric row",
   "purpose": "Control how membership entitlements may actually be consumed. Screen 13.1.5 defines what the member receives. Screen 13.1.6 defines how it may be used.",
-  "purposeNote": "Membership entitlement usage is governed consistently across reservation, ticketing and access-control channels.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1062,9 +1149,6 @@
       {
        "kind": "dataTable",
        "label": "Every membership usage visit",
-       "columns": [
-        "MembershipUsageVisitConsumptionRulesView.parking12UsesThisYear"
-       ],
        "bindsTo": "MembershipUsageVisitConsumptionRulesView",
        "operation": "listMembershipUsageVisit",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 11 §Maintain counters such as"
@@ -1079,9 +1163,6 @@
        "kind": "detailPanel",
        "label": "The selected membership usage visit",
        "bindsTo": "MembershipUsageVisitConsumptionRulesView",
-       "columns": [
-        "MembershipUsageVisitConsumptionRulesView.parking12UsesThisYear"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “Unlimited annual visits”, “Access Integration”.",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 11 §Maintain counters such as"
       }
@@ -1102,17 +1183,35 @@
     "contract": "subscription",
     "purpose": "Membership Usage, Visit & Consumption Rules",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPlanBenefits",
+    "contract": "catalogue",
+    "purpose": "Save the usage limit and period of each benefit a plan grants",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "listEntitlementTemplates",
+    "contract": "catalogue",
+    "purpose": "The membership plan templates whose usage rules are set",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
-   "preloaded": [
-    "MembershipUsageVisitConsumptionRulesView.parking12UsesThisYear"
+   "preloaded": [],
+   "params": [
+    {
+     "name": "templateId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-289"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-289",
+   "workshopBoard": "wireframes/WS82 Membership   Annual Pass Management Board 1.dc.html#bo-289"
   },
   "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 11. 1 of 1 labels bound to a contract property; 20 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1175,10 +1274,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "roles, eligibility and shared/individual entitlements.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Possible configured action) and no display directory — it is settings, not a population",
   "purpose": "Support memberships covering more than one person while preserving individual identities and entitlements.",
-  "purposeNote": "roles, eligibility and shared/individual entitlements.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1317,16 +1416,14 @@
     "operationId": "setFamilyHouseholdDependent",
     "contract": "subscription",
     "purpose": "Family, Household & Dependent Membership Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setFamilyHouseholdDependent"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-290"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-290",
+   "workshopBoard": "wireframes/WS82 Membership   Annual Pass Management Board 1.dc.html#bo-290"
   },
   "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 12. 0 of 0 labels bound to a contract property; 21 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1389,10 +1486,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Membership products can be commercially sold across authorized channels using centrally governed pricing, tax, fee and payment services.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure sale through; Configure) and no display directory — it is settings, not a population",
   "purpose": "Connect the membership contract to TICVAI's central commercial engines without duplicating pricing configuration.",
-  "purposeNote": "Membership products can be commercially sold across authorized channels using centrally governed pricing, tax, fee and payment services.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1476,6 +1573,19 @@
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "operation": "publishChannelAvailability",
+       "notes": "**Names the membership products, the channels they go on or come off, and from when**, before it runs. A publish with no stated consequence is one somebody presses meaning to save.",
+       "provenance": "contract catalogue.yaml PUT /channel-availability (authored: required by check-screens)"
+      }
+     ]
     }
    ]
   },
@@ -1491,14 +1601,43 @@
     "contract": "subscription",
     "purpose": "Membership Commercial, Pricing & Channel Association",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPrices",
+    "contract": "catalogue",
+    "purpose": "Set the membership price in a price list",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "publishChannelAvailability",
+    "contract": "catalogue",
+    "purpose": "Choose the channels that sell the membership",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "listPriceLists",
+    "contract": "catalogue",
+    "purpose": "The price lists a membership is priced on",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-291"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-291",
+   "workshopBoard": "wireframes/WS82 Membership   Annual Pass Management Board 1.dc.html#bo-291"
   },
   "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 15 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "priceListId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1559,17 +1698,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "continuity, commercial terms and required customer consent.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; At renewal, configure whether) and no display directory — it is settings, not a population",
   "purpose": "Define how a membership moves from one validity period into the next.",
-  "purposeNote": "continuity, commercial terms and required customer consent.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Customer Self-Service Renewal. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Membership___Annual_Pass_Management_Reference.pdf, page 15 §Support"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1640,7 +1772,22 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Manual Renewal",
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 15 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Customer Self-Service Renewal",
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 15 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Agent-Assisted Renewal",
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 15 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Invitation-Only Renewal",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 15 §Support"
       }
      ]
@@ -1658,18 +1805,16 @@
     "operationId": "setRenewalAutoMembership",
     "contract": "subscription",
     "purpose": "Renewal, Auto-Renewal & Membership Continuity Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setRenewalAutoMembership"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-292"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-292",
+   "workshopBoard": "wireframes/WS82 Membership   Annual Pass Management Board 1.dc.html#bo-292"
   },
-  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 12 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 15 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Manual Renewal, Customer Self-Service Renewal, Agent-Assisted Renewal, Invitation-Only Renewal are choices sent by `setRenewalAutoMembership`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1722,10 +1867,10 @@
    "notes": "**Reached from BO-284, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Only validated, approved and correctly versioned membership configurations can become commercially active, with complete impact and audit history. Board 1 — Final Screen Register # Backend Screen Core Responsibility 13.1. Membership & Annual Pass Command Center Portfolio management 1 13.1. Membership Product & Tier Builder Product/tier definition 2 13.1. Membership Eligibility & Qualification Rule Builder Member eligibility 3 13.1. Validity, Activation & Expiry Configuration Membership lifecycle 4 13.1. Benefits and Membership Entitlement & Admission Benefit Builder 5 entitlements 13.1. Member",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Synchronize relevant configuration with; AI Configuration Review) and no display directory — it is settings, not a population",
   "purpose": "Provide the final governance layer before a membership/pass configuration becomes commercially available.",
-  "purposeNote": "Only validated, approved and correctly versioned membership configurations can become commercially active, with complete impact and audit history. Board 1 — Final Screen Register # Backend Screen Core Responsibility 13.1. Membership & Annual Pass Command Center Portfolio management 1 13.1. Membership Product & Tier Builder Product/tier definition 2 13.1. Membership Eligibility & Qualification Rule Builder Member eligibility 3 13.1. Validity, Activation & Expiry Configuration Membership lifecycle 4 13.1. Benefits and Membership Entitlement & Admission Benefit Builder 5 entitlements 13.1. Member",
   "layout": {
    "template": "form",
    "regions": [
@@ -1799,16 +1944,14 @@
     "operationId": "approveMembershipProductValidation",
     "contract": "subscription",
     "purpose": "Membership Product Validation, Approval, Publication & Versioning",
-    "trigger": "onAction",
-    "invalidates": [
-     "approveMembershipProductValidation"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-293"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-293",
+   "workshopBoard": "wireframes/WS82 Membership   Annual Pass Management Board 1.dc.html#bo-293"
   },
   "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 17. 0 of 0 labels bound to a contract property; 8 of 112 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

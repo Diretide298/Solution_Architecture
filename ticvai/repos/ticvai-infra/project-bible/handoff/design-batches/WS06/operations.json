@@ -1,23 +1,63 @@
 {
+ "listAccessPoints": {
+  "method": "GET",
+  "path": "/access-points",
+  "contract": "access",
+  "summary": "List access points",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listDeviceGate": {
   "method": "GET",
   "path": "/device-gate",
   "contract": "access",
   "summary": "Device & Gate Command Center",
-  "permission": "SCOPE_VIEW",
+  "permission": "DEVICE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "DeviceGateCommandCenterView"
+  "responds": "Page"
  },
  "listDeviceTypeHardware": {
   "method": "GET",
   "path": "/device-type-hardware",
   "contract": "access",
   "summary": "Device Type & Hardware Library",
-  "permission": "SCOPE_VIEW",
+  "permission": "DEVICE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -43,37 +83,103 @@
   "path": "/hardware-compatibility-health",
   "contract": "access",
   "summary": "Hardware Compatibility, Health, Testing & Deployment",
-  "permission": "SCOPE_VIEW",
+  "permission": "DEVICE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "HardwareCompatibilityHealthTestingDeploymentView"
+  "responds": "Page"
  },
  "listPhysicalDeviceRegistration": {
   "method": "GET",
   "path": "/physical-device-registration",
   "contract": "access",
   "summary": "Physical Device Registration & Provisioning",
-  "permission": "SCOPE_VIEW",
+  "permission": "DEVICE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PhysicalDeviceRegistrationProvisioningView"
+  "responds": "Page"
+ },
+ "publishHardwareDeployment": {
+  "method": "POST",
+  "path": "/hardware-deployments",
+  "contract": "access",
+  "summary": "Deploy a gate configuration version",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "HardwareDeploymentInput",
+  "responds": "HardwareDeploymentView"
+ },
+ "registerDevice": {
+  "method": "POST",
+  "path": "/devices",
+  "contract": "tenancy",
+  "summary": "Register a device",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RegisteredDevice",
+  "responds": "RegisteredDevice"
  },
  "setDeviceSoftwareContent": {
   "method": "PUT",
   "path": "/device-software-content",
   "contract": "access",
   "summary": "Device Software, Content & Remote Configuration",
-  "permission": "ACCESS_POINT_CONFIGURE",
+  "permission": "DEVICE_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "DeviceSoftwareContentRemoteConfigurationInput",
   "responds": "DeviceSoftwareContentRemoteConfigurationView"
  },
@@ -82,11 +188,17 @@
   "path": "/handheld-mobile-access",
   "contract": "access",
   "summary": "Handheld & Mobile Access Device Configuration",
-  "permission": "ACCESS_POINT_CONFIGURE",
+  "permission": "DEVICE_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "HandheldMobileAccessDeviceConfigurationInput",
   "responds": "HandheldMobileAccessDeviceConfigurationView"
  },
@@ -95,11 +207,17 @@
   "path": "/reader-scanner-peripheral",
   "contract": "access",
   "summary": "Reader, Scanner & Peripheral Configuration",
-  "permission": "ACCESS_POINT_CONFIGURE",
+  "permission": "DEVICE_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ReaderScannerPeripheralConfigurationInput",
   "responds": "ReaderScannerPeripheralConfigurationView"
  },
@@ -112,9 +230,34 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "TurnstileLaneBehaviorConfigurationInput",
   "responds": "TurnstileLaneBehaviorConfigurationView"
+ },
+ "setTurnstileMode": {
+  "method": "PUT",
+  "path": "/access-points/{accessPointId}/mode",
+  "contract": "access",
+  "summary": "Set the operating mode of an access point",
+  "permission": "TURNSTILE_MODE_SET",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessPoint"
  },
  "setValidationOutcomeGuest": {
   "method": "PUT",
@@ -125,7 +268,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ValidationOutcomeGuestFeedbackDesignerInput",
   "responds": "ValidationOutcomeGuestFeedbackDesignerView"
  }

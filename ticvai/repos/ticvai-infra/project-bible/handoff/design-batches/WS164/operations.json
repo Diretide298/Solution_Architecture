@@ -1,0 +1,250 @@
+{
+ "getResourceAllocationPolicy": {
+  "method": "GET",
+  "path": "/resource-allocation-policy",
+  "contract": "resources",
+  "summary": "How the platform chooses between equally valid resources",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResourceAllocationPolicy"
+ },
+ "getResourceAuditTrail": {
+  "method": "GET",
+  "path": "/resources/{resourceId}/audit",
+  "contract": "resources",
+  "summary": "Every material change, with who and why",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResourceAuditEntry"
+ },
+ "getResourceCostAnalytics": {
+  "method": "GET",
+  "path": "/resource-cost-analytics",
+  "contract": "resources",
+  "summary": "What resources cost and earn, grouped",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceCostAnalytics"
+ },
+ "getResourceUtilisation": {
+  "method": "GET",
+  "path": "/resource-utilisation",
+  "contract": "resources",
+  "summary": "How much of each resource's available time was used",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceUtilisation"
+ },
+ "listAnalyticsPipelines": {
+  "method": "GET",
+  "path": "/analytics-pipelines",
+  "contract": "reporting",
+  "summary": "Data sources, refresh state and freshness",
+  "permission": "REPORT_VIEW_TENANT",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AnalyticsPipeline"
+ },
+ "listDemandBookingCurve": {
+  "method": "GET",
+  "path": "/demand-booking-curve",
+  "contract": "catalogue",
+  "summary": "AI Demand Forecasting & Booking Curve Studio",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "performance",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "horizon",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMemberExceptionOverride": {
+  "method": "GET",
+  "path": "/member-exception-override",
+  "contract": "subscription",
+  "summary": "Member Exceptions, Overrides & Service Recovery",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "exceptionType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "approvalStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "membershipId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listResources": {
+  "method": "GET",
+  "path": "/resources",
+  "contract": "resources",
+  "summary": "Resources at this venue",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "availableFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "availableTo",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Resource"
+ },
+ "setResourceAllocationPolicy": {
+  "method": "PUT",
+  "path": "/resource-allocation-policy",
+  "contract": "resources",
+  "summary": "Rotation, priority and scoring",
+  "permission": "RESOURCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourceAllocationPolicy",
+  "responds": "ResourceAllocationPolicy"
+ }
+}

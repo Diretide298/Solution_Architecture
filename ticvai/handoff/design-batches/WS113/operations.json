@@ -1,0 +1,112 @@
+{
+ "createAccreditationProgramme": {
+  "method": "POST",
+  "path": "/accreditation-programmes",
+  "contract": "accreditation",
+  "summary": "Define a programme, its categories and its window",
+  "permission": "ACCREDITATION_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccreditationProgramme",
+  "responds": "AccreditationProgramme"
+ },
+ "listAccreditationHolders": {
+  "method": "GET",
+  "path": "/accreditation-holders",
+  "contract": "accreditation",
+  "summary": "Everybody accredited, and what state they are in",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "programmeId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "organisationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "expiringWithinDays",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationHolder"
+ },
+ "setAccessProfile": {
+  "method": "PUT",
+  "path": "/accreditation-access-profiles",
+  "contract": "accreditation",
+  "summary": "Define which zones, on which dates, at which times",
+  "permission": "ACCREDITATION_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessProfile",
+  "responds": "AccessProfile"
+ },
+ "setAccreditationStatus": {
+  "method": "POST",
+  "path": "/accreditation-holders/{holderId}/status",
+  "contract": "accreditation",
+  "summary": "Suspend, reactivate, revoke or expire an accreditation",
+  "permission": "ACCREDITATION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationHolder"
+ },
+ "setAccreditationValidity": {
+  "method": "PUT",
+  "path": "/accreditation-validity",
+  "contract": "accreditation",
+  "summary": "Validity periods, renewal windows and expiry behaviour",
+  "permission": "ACCREDITATION_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccreditationValidity",
+  "responds": "AccreditationValidity"
+ }
+}

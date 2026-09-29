@@ -1,0 +1,91 @@
+{
+ "listAccessProfiles": {
+  "method": "GET",
+  "path": "/accreditation-access-profiles",
+  "contract": "accreditation",
+  "summary": "Named bundles of zones, dates and times",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccessProfile"
+ },
+ "previewAccessImpact": {
+  "method": "POST",
+  "path": "/accreditation-access-profiles/preview",
+  "contract": "accreditation",
+  "summary": "Who this change would affect, and how",
+  "permission": "ACCREDITATION_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessProfile",
+  "responds": "AccessImpact"
+ },
+ "setAccessProfile": {
+  "method": "PUT",
+  "path": "/accreditation-access-profiles",
+  "contract": "accreditation",
+  "summary": "Define which zones, on which dates, at which times",
+  "permission": "ACCREDITATION_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessProfile",
+  "responds": "AccessProfile"
+ },
+ "setAccreditationStatus": {
+  "method": "POST",
+  "path": "/accreditation-holders/{holderId}/status",
+  "contract": "accreditation",
+  "summary": "Suspend, reactivate, revoke or expire an accreditation",
+  "permission": "ACCREDITATION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationHolder"
+ },
+ "setHolderAccess": {
+  "method": "PUT",
+  "path": "/accreditation-holders/{holderId}/access",
+  "contract": "accreditation",
+  "summary": "Assign profiles, and any exception on top",
+  "permission": "ACCREDITATION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "HolderAccess",
+  "responds": "HolderAccess"
+ }
+}

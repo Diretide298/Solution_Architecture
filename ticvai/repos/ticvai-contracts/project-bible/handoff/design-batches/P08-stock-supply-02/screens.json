@@ -1,5 +1,426 @@
 [
  {
+  "id": "BO-105",
+  "name": "Stock & Supply",
+  "module": "Stock & Supply",
+  "requiresModule": "core",
+  "wave": 1,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/stock-supply",
+   "component": "apps/venue-management-web/src/routes/home/StockSupplyList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-049",
+    "BO-050",
+    "BO-051",
+    "BO-052",
+    "BO-078",
+    "BO-079",
+    "BO-080",
+    "BO-081",
+    "BO-082",
+    "BO-083",
+    "BO-137",
+    "BO-138",
+    "BO-139",
+    "BO-140",
+    "BO-141"
+   ],
+   "transitions": [
+    {
+     "to": "BO-049",
+     "trigger": "Stock Levels",
+     "carries": [
+      "itemId"
+     ],
+     "provenance": "derived — BO-049 declares entryState.params itemId and BO-105 holds itemId, so an edge into it carries them"
+    },
+    {
+     "to": "BO-052",
+     "trigger": "Goods Receipt",
+     "carries": [
+      "purchaseOrderId"
+     ],
+     "provenance": "derived — BO-052 declares entryState.params purchaseOrderId, receiptId, transferId and BO-105 holds purchaseOrderId, so an edge into it carries them"
+    },
+    {
+     "to": "BO-078",
+     "trigger": "Requisitions",
+     "carries": [
+      "requisitionId"
+     ],
+     "provenance": "derived — BO-078 declares entryState.params requisitionId and BO-105 holds requisitionId, so an edge into it carries them"
+    },
+    {
+     "to": "BO-079",
+     "trigger": "Stock Count",
+     "provenance": "derived — BO-079 declares entryState.params countId and BO-105 holds none of them, so the edge carries nothing and BO-079 opens cold"
+    },
+    {
+     "to": "BO-080",
+     "trigger": "Stock Transfers",
+     "provenance": "derived — BO-080 declares entryState.params transferId and BO-105 holds none of them, so the edge carries nothing and BO-080 opens cold"
+    },
+    {
+     "to": "BO-081",
+     "trigger": "Inventory Items",
+     "carries": [
+      "itemId"
+     ],
+     "provenance": "derived — BO-081 declares entryState.params itemId and BO-105 holds itemId, so an edge into it carries them"
+    },
+    {
+     "to": "BO-083",
+     "trigger": "Suppliers",
+     "carries": [
+      "supplierId"
+     ],
+     "provenance": "derived — BO-083 declares entryState.params supplierId and BO-105 holds supplierId, so an edge into it carries them"
+    },
+    {
+     "to": "BO-137",
+     "trigger": "Recipe Consumption & Theoretical Inventory",
+     "provenance": "derived — BO-137 declares entryState.params countId, runId and BO-105 holds none of them, so the edge carries nothing and BO-137 opens cold"
+    },
+    {
+     "to": "BO-138",
+     "trigger": "Production Execution & Batch Management",
+     "provenance": "derived — BO-138 declares entryState.params runId and BO-105 holds none of them, so the edge carries nothing and BO-138 opens cold"
+    },
+    {
+     "to": "BO-139",
+     "trigger": "Wastage, Spoilage, Returns & Write-Off",
+     "provenance": "derived — BO-139 declares entryState.params outletId and BO-105 holds none of them, so the edge carries nothing and BO-139 opens cold"
+    },
+    {
+     "to": "BO-140",
+     "trigger": "Product Availability, 86 & Operational Food Safety",
+     "carries": [
+      "itemId"
+     ],
+     "provenance": "derived — BO-140 declares entryState.params itemId and BO-105 holds itemId, so an edge into it carries them"
+    },
+    {
+     "to": "BO-141",
+     "trigger": "Operational Alerts, AI Replenishment & Action Center",
+     "provenance": "derived — BO-141 declares entryState.params alertId and BO-105 holds none of them, so the edge carries nothing and BO-141 opens cold"
+    },
+    {
+     "to": "BO-051",
+     "trigger": "Purchase Orders",
+     "provenance": "moved 29 September, VM close-out: purchase orders sit in Stock & Supply beside Goods Receipt; BO-051 opens its list without an id",
+     "carries": [
+      "purchaseOrderId"
+     ]
+    }
+   ]
+  },
+  "notes": "Section landing. **9 screens reach the entry point through here** — before 20 August they reached it through nothing.",
+  "density": "compact",
+  "boardFrames": [
+   "Inventory Board 7.dc.html#inv-7a"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listInventoryItems` reads the population and `getVenueSettings` reads one of them — list, select, act",
+  "purpose": "Everything in stock & supply.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listInventoryItems",
+       "notes": "Sends `?venueId=` to `listInventoryItems`.",
+       "provenance": "contract inventory.yaml GET /inventory-items"
+      },
+      {
+       "kind": "textField",
+       "label": "Category id",
+       "operation": "listInventoryItems",
+       "notes": "Sends `?categoryId=` to `listInventoryItems`.",
+       "provenance": "contract inventory.yaml GET /inventory-items"
+      },
+      {
+       "kind": "toggle",
+       "label": "Below reorder point",
+       "operation": "listInventoryItems",
+       "notes": "Sends `?belowReorderPoint=` to `listInventoryItems`.",
+       "provenance": "contract inventory.yaml GET /inventory-items"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "listInventoryItems",
+       "notes": "Sends `?search=` to `listInventoryItems`.",
+       "provenance": "contract inventory.yaml GET /inventory-items"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every inventory",
+       "bindsTo": "InventoryItem",
+       "columns": [
+        "InventoryItem.sku",
+        "InventoryItem.barcode",
+        "InventoryItem.name",
+        "InventoryItem.venueId",
+        "InventoryItem.categoryId",
+        "InventoryItem.baseUnit",
+        "InventoryItem.purchaseUnit",
+        "InventoryItem.purchaseUnitFactor",
+        "InventoryItem.costingMethod",
+        "InventoryItem.reorderPoint",
+        "InventoryItem.reorderQuantity",
+        "InventoryItem.parLevel"
+       ],
+       "operation": "listInventoryItems",
+       "provenance": "contract inventory.yaml GET /inventory-items"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every purchase order",
+       "bindsTo": "PurchaseOrder",
+       "columns": [
+        "PurchaseOrder.id",
+        "PurchaseOrder.purchaseOrderNumber",
+        "PurchaseOrder.requisitionId",
+        "PurchaseOrder.quotationId",
+        "PurchaseOrder.supplierId",
+        "PurchaseOrder.supplierName",
+        "PurchaseOrder.kind",
+        "PurchaseOrder.blanketParentId",
+        "PurchaseOrder.contractPriceValidUntil",
+        "PurchaseOrder.rfqId",
+        "PurchaseOrder.supplierInvoiceRef",
+        "PurchaseOrder.matchStatus"
+       ],
+       "operation": "listPurchaseOrders",
+       "provenance": "contract inventory.yaml GET /purchase-orders"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Takings and admissions today",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.code",
+        "KpiValue.name",
+        "KpiValue.value",
+        "KpiValue.period",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ],
+       "operation": "getKpiValues",
+       "notes": "**Takings and admissions**, from `getKpiValues?kpiCodes=takings,admissions`; with no `period` the period is today in the venue's time zone (decided 28 September, audit R283).",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      },
+      {
+       "kind": "cardList",
+       "bindsTo": "screens",
+       "notes": "9 screens. **No attention counts** until a summary operation exists to supply them (decided 28 September, audit R283).",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search stock & supply",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected inventory",
+       "bindsTo": "InventoryItem",
+       "columns": [
+        "InventoryItem.sku",
+        "InventoryItem.barcode",
+        "InventoryItem.name",
+        "InventoryItem.venueId",
+        "InventoryItem.categoryId",
+        "InventoryItem.baseUnit",
+        "InventoryItem.purchaseUnit",
+        "InventoryItem.purchaseUnitFactor",
+        "InventoryItem.costingMethod",
+        "InventoryItem.reorderPoint",
+        "InventoryItem.reorderQuantity",
+        "InventoryItem.parLevel",
+        "InventoryItem.preferredSupplierId",
+        "InventoryItem.allowNegativeStock",
+        "InventoryItem.isPerishable",
+        "InventoryItem.shelfLifeDays"
+       ],
+       "operation": "listInventoryItems",
+       "provenance": "contract inventory.yaml GET /inventory-items"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The venue settings",
+       "bindsTo": "VenueSettings",
+       "columns": [
+        "VenueSettings.id",
+        "VenueSettings.venueId",
+        "VenueSettings.currencyCode",
+        "VenueSettings.currencyScale",
+        "VenueSettings.supportHours",
+        "VenueSettings.quietHours",
+        "VenueSettings.biometrics",
+        "VenueSettings.segregatedAccess",
+        "VenueSettings.alerting"
+       ],
+       "operation": "getVenueSettings",
+       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create inventory item",
+       "operation": "createInventoryItem",
+       "provenance": "contract inventory.yaml POST /inventory-items"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The list, with counts.",
+   "error": "Could not load. Venue Home is still reachable.",
+   "emptyFirstRun": "**Nothing configured in stock & supply yet.** The action is the first thing to set up, not a blank list.",
+   "emptyNoResults": "Nothing matches the filter.",
+   "emptyNoAccess": "You do not have permission for stock & supply. **Said plainly** — an empty section reads as broken."
+  },
+  "apis": [
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Today's takings and admissions tiles — `kpiCodes=takings,admissions`, period defaulting to today (decided 28 September, audit R283)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getVenueSettings",
+    "contract": "tenancy",
+    "purpose": "What is enabled here",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listInventoryItems",
+    "contract": "inventory",
+    "purpose": "Stock on hand",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPurchaseOrders",
+    "contract": "inventory",
+    "purpose": "Orders placed with suppliers",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createInventoryItem",
+    "contract": "inventory",
+    "purpose": "Add an item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listInventoryItems"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**Resolves from the session, so a cold arrival is the ordinary case** — a manager bookmarks the back office and opens it every morning. A principal with more than one venue is asked which before the page renders, rather than shown the first one.",
+   "preloaded": [
+    "VenueSettings.id",
+    "VenueSettings.venueId",
+    "VenueSettings.supportHours",
+    "VenueSettings.quietHours",
+    "VenueSettings.segregatedAccess"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-105"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateInventoryItem",
+    "component": "modal",
+    "trigger": "Create inventory item",
+    "body": "**Collects what `createInventoryItem` sends before it is called.** Required: `sku`, `name`, `venueId`, `baseUnit`, `costingMethod`. Optional: `barcode`, `categoryId`, `purchaseUnit`, `purchaseUnitFactor`, `reorderPoint`, `reorderQuantity`, `parLevel`, `preferredSupplierId`, `allowNegativeStock`, `isPerishable`, `shelfLifeDays`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateInventoryItemRequest",
+    "confirm": {
+     "label": "Create inventory item",
+     "operation": "createInventoryItem"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "sku",
+      "name",
+      "venueId",
+      "baseUnit",
+      "costingMethod",
+      "barcode",
+      "categoryId",
+      "purchaseUnit",
+      "purchaseUnitFactor",
+      "reorderPoint",
+      "reorderQuantity",
+      "parLevel",
+      "preferredSupplierId",
+      "allowNegativeStock",
+      "isPerishable",
+      "shelfLifeDays"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /inventory-items"
+   }
+  ],
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
   "id": "BO-137",
   "name": "Recipe Consumption & Theoretical Inventory",
   "module": "Stock & Supply",
@@ -32,10 +453,7 @@
     {
      "to": "BO-105",
      "trigger": "Stock & Supply",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-105 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-105 declares entryState.params  and BO-137 holds none of them, so the edge carries nothing and BO-105 opens cold"
     }
    ]
   },
@@ -48,13 +466,6 @@
   "pattern": "listDetail",
   "patternReason": "`listRecipes` reads the population and `getCountVariance` reads one of them — list, select, act",
   "purpose": "Recipe Consumption & Theoretical Inventory — from the client design board, 20 August.",
-  "gaps": [
-   {
-    "operation": "listProductionRuns",
-    "why": "**2 declared operations reach no component on this screen**: listProductionRuns, getProductionRun. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -63,8 +474,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "listRecipes",
+       "notes": "Sends `?search=` to `listRecipes`.",
+       "provenance": "contract fnb.yaml GET /recipes"
+      },
+      {
+       "kind": "textField",
+       "label": "Menu item id",
+       "operation": "listRecipes",
+       "notes": "Sends `?menuItemId=` to `listRecipes`.",
+       "provenance": "contract fnb.yaml GET /recipes"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every recipe consumption theoretical",
+       "label": "Every recipe",
        "bindsTo": "Recipe",
        "columns": [
         "Recipe.menuItemId",
@@ -74,6 +499,30 @@
        ],
        "operation": "listRecipes",
        "provenance": "contract fnb.yaml GET /recipes"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every production run",
+       "bindsTo": "ProductionRun",
+       "columns": [
+        "ProductionRun.id",
+        "ProductionRun.recipeId",
+        "ProductionRun.productionPlanId",
+        "ProductionRun.producingOutletId",
+        "ProductionRun.forOutletIds",
+        "ProductionRun.plannedQuantity",
+        "ProductionRun.actualQuantity",
+        "ProductionRun.scheduledFor",
+        "ProductionRun.status",
+        "ProductionRun.varianceReason"
+       ],
+       "operation": "listProductionRuns",
+       "provenance": "contract fnb.yaml GET /production-runs"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search recipe consumption",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -83,7 +532,39 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected recipe consumption theoretical",
+       "label": "The selected recipe",
+       "bindsTo": "Recipe",
+       "columns": [
+        "Recipe.menuItemId",
+        "Recipe.yield",
+        "Recipe.ingredients",
+        "Recipe.costPerPortion"
+       ],
+       "operation": "listRecipes",
+       "provenance": "contract fnb.yaml GET /recipes"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The production run",
+       "bindsTo": "ProductionRun",
+       "columns": [
+        "ProductionRun.id",
+        "ProductionRun.recipeId",
+        "ProductionRun.productionPlanId",
+        "ProductionRun.producingOutletId",
+        "ProductionRun.forOutletIds",
+        "ProductionRun.plannedQuantity",
+        "ProductionRun.actualQuantity",
+        "ProductionRun.scheduledFor",
+        "ProductionRun.status",
+        "ProductionRun.varianceReason"
+       ],
+       "operation": "getProductionRun",
+       "provenance": "contract fnb.yaml GET /production-runs/{runId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The count variance",
        "bindsTo": "CountVariance",
        "columns": [
         "CountVariance.countId",
@@ -95,26 +576,15 @@
        "provenance": "contract inventory.yaml GET /stock-counts/{countId}/variance"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search recipe consumption",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The recipe consumption theoretical list.",
    "error": "Could not load. Names which read failed and leaves the recipe consumption theoretical untouched.",
-   "emptyFirstRun": "No recipe consumption theoretical yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the recipe consumption theoretical are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No recipe consumption theoretical yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on search, menuItemId and the recipe consumption theoretical are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listRecipes` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -139,7 +609,7 @@
     "operationId": "getProductionRun",
     "contract": "fnb",
     "purpose": "One run — its plan, its output, and the gap",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -159,16 +629,17 @@
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first. A run opened from the list.",
    "preloaded": [
-    "CountVariance.countId",
-    "CountVariance.totalVarianceValue",
-    "CountVariance.exceptionCount",
-    "CountVariance.lines"
+    "Recipe.menuItemId",
+    "Recipe.yield",
+    "Recipe.ingredients",
+    "Recipe.costPerPortion"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-137",
+   "derivedFrom": "wireframes/reference/FnB Board 2.dc.html",
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
@@ -221,10 +692,7 @@
     {
      "to": "BO-105",
      "trigger": "Stock & Supply",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-105 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-105 declares entryState.params  and BO-138 holds none of them, so the edge carries nothing and BO-105 opens cold"
     }
    ]
   },
@@ -241,8 +709,15 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "numberField",
+       "label": "Within days",
+       "operation": "listExpiringBatches",
+       "notes": "Sends `?withinDays=` to `listExpiringBatches`.",
+       "provenance": "contract inventory.yaml GET /stock-batches/expiring"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every production execution batch",
+       "label": "Every stock batch",
        "bindsTo": "StockBatch",
        "columns": [
         "StockBatch.id",
@@ -258,6 +733,11 @@
        ],
        "operation": "listExpiringBatches",
        "provenance": "contract inventory.yaml GET /stock-batches/expiring"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search production execution",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -267,7 +747,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected production execution batch",
+       "label": "The selected stock batch",
        "bindsTo": "StockBatch",
        "columns": [
         "StockBatch.id",
@@ -292,26 +772,15 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Plan",
+       "label": "Plan production run",
        "operation": "planProductionRun",
        "provenance": "contract fnb.yaml POST /production-runs"
       },
       {
        "kind": "secondaryButton",
-       "label": "Complete",
+       "label": "Complete production run",
        "operation": "completeProductionRun",
        "provenance": "contract fnb.yaml POST /production-runs/{runId}/complete"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search production execution",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -320,9 +789,9 @@
   "states": {
    "loading": "The production execution batch list.",
    "error": "Could not load. Names which read failed and leaves the production execution batch untouched.",
-   "emptyFirstRun": "No production execution batch yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the production execution batch are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No production execution batch yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on withinDays and the production execution batch are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listExpiringBatches` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -376,6 +845,54 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-138"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formPlanProductionRun",
+    "component": "modal",
+    "trigger": "Plan production run",
+    "body": "**Collects what `planProductionRun` sends before it is called.** Required: `id`, `recipeId`, `plannedQuantity`, `status`. Optional: `productionPlanId`, `producingOutletId`, `forOutletIds`, `actualQuantity`, `scheduledFor`, `varianceReason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ProductionRun",
+    "confirm": {
+     "label": "Plan production run",
+     "operation": "planProductionRun"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "recipeId",
+      "plannedQuantity",
+      "status",
+      "productionPlanId",
+      "producingOutletId",
+      "forOutletIds",
+      "actualQuantity",
+      "scheduledFor",
+      "varianceReason"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /production-runs"
+   },
+   {
+    "id": "formCompleteProductionRun",
+    "component": "modal",
+    "trigger": "Complete production run",
+    "body": "**Collects what `completeProductionRun` sends before it is called.** Required: `actualQuantity`, `recordedAt`. Optional: `varianceReason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Complete production run",
+     "operation": "completeProductionRun"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "actualQuantity",
+      "recordedAt",
+      "varianceReason"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /production-runs/{runId}/complete"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -424,25 +941,19 @@
     {
      "to": "BO-105",
      "trigger": "Stock & Supply",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-105 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-105 declares entryState.params  and BO-139 holds none of them, so the edge carries nothing and BO-105 opens cold"
     }
    ]
   },
   "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.",
   "density": "compact",
+  "boardFrames": [
+   "Inventory Board 3.dc.html#inv-3g",
+   "Inventory Board 3.dc.html#inv-3j"
+  ],
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`recordWaste`) and no read of a population — it is settings, not a list",
   "purpose": "Wastage, Spoilage, Returns & Write-Off — from the client design board, 20 August.",
-  "gaps": [
-   {
-    "operation": "recordWaste",
-    "why": "**`recordWaste` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
-    "source": "contract fnb.yaml POST /outlets/{outletId}/waste"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -452,7 +963,7 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Record",
+       "label": "Record waste",
        "operation": "recordWaste",
        "provenance": "contract fnb.yaml POST /outlets/{outletId}/waste"
       }
@@ -466,6 +977,40 @@
        "kind": "searchField",
        "label": "Search wastage, spoilage, returns",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "textField",
+       "label": "Id",
+       "operation": "recordWaste",
+       "notes": "Required.",
+       "provenance": "contract fnb.yaml POST /outlets/{outletId}/waste"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Lines",
+       "operation": "recordWaste",
+       "notes": "Required.",
+       "provenance": "contract fnb.yaml POST /outlets/{outletId}/waste"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reason",
+       "operation": "recordWaste",
+       "notes": "Required.",
+       "provenance": "contract fnb.yaml POST /outlets/{outletId}/waste"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Recorded at",
+       "operation": "recordWaste",
+       "notes": "Required.",
+       "provenance": "contract fnb.yaml POST /outlets/{outletId}/waste"
+      },
+      {
+       "kind": "textField",
+       "label": "Note",
+       "operation": "recordWaste",
+       "provenance": "contract fnb.yaml POST /outlets/{outletId}/waste"
       }
      ]
     }
@@ -474,8 +1019,8 @@
   "states": {
    "loading": "The saved wastage spoilage returns.",
    "error": "Could not load. Names which read failed and leaves the wastage spoilage returns untouched.",
-   "emptyFirstRun": "No wastage spoilage returns configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No wastage spoilage returns configured. The form opens empty and `recordWaste` saves the first one; it says what the platform does in the meantime.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_MODIFY`, which `recordWaste` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -552,14 +1097,11 @@
     {
      "to": "BO-105",
      "trigger": "Stock & Supply",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-105 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-105 declares entryState.params  and BO-140 holds none of them, so the edge carries nothing and BO-105 opens cold"
     }
    ]
   },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not.",
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Availability is immediate (decided 28 September, audit R110)** — the 86 toggle calls `setItemAvailability` at once; the Save changes step is gone. Reason Other needs a note (audit R222).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listExpiringBatches` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -572,8 +1114,15 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "numberField",
+       "label": "Within days",
+       "operation": "listExpiringBatches",
+       "notes": "Sends `?withinDays=` to `listExpiringBatches`.",
+       "provenance": "contract inventory.yaml GET /stock-batches/expiring"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every product availability operational",
+       "label": "Every stock batch",
        "bindsTo": "StockBatch",
        "columns": [
         "StockBatch.id",
@@ -589,6 +1138,11 @@
        ],
        "operation": "listExpiringBatches",
        "provenance": "contract inventory.yaml GET /stock-batches/expiring"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search product availability, 86",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -598,7 +1152,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected product availability operational",
+       "label": "The selected stock batch",
        "bindsTo": "StockBatch",
        "columns": [
         "StockBatch.id",
@@ -622,21 +1176,11 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Save changes",
+       "kind": "toggle",
+       "label": "Available",
        "operation": "setItemAvailability",
+       "notes": "**Takes effect immediately** (decided 28 September, audit R110) — switching an item off (86) or back on calls `setItemAvailability` at once and every terminal in the outlet follows; there is no Save changes step. Switching off asks only for the reason.",
        "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/availability"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search product availability, 86",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -645,9 +1189,9 @@
   "states": {
    "loading": "The product availability operational list.",
    "error": "Could not load. Names which read failed and leaves the product availability operational untouched.",
-   "emptyFirstRun": "No product availability operational yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the product availability operational are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No product availability operational yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on withinDays and the product availability operational are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listExpiringBatches` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -664,6 +1208,13 @@
     "contract": "inventory",
     "purpose": "What is about to go out of date",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setTemperatureCheckpoint",
+    "contract": "fnb",
+    "purpose": "Define a temperature checkpoint and its safe range",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
    }
   ],
   "entryState": {
@@ -692,6 +1243,27 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-140"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetItemAvailability",
+    "component": "modal",
+    "trigger": "Available",
+    "body": "**The reason prompt when an item is switched off (86); confirming it is the call** — nothing waits for a later save (decided 28 September, audit R110). `isAvailable` and `recordedAt` come from the toggle. Optional: `reason` (soldOut, ingredientUnavailable, equipmentDown, seasonal, other), `note`, `restoreAt`. **Choosing Other makes the note required** — the prompt will not confirm without it and the server refuses 400 (decided 28 September, audit R222). Switching an item back on sends at once with no prompt. Dismissing leaves the item as it was.",
+    "confirm": {
+     "label": "86 now",
+     "operation": "setItemAvailability"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason",
+      "note",
+      "restoreAt"
+     ]
+    },
+    "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/availability"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -729,10 +1301,12 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-105"
+    "BO-105",
+    "BO-464"
    ],
    "exitTo": [
-    "BO-105"
+    "BO-105",
+    "BO-464"
    ],
    "inferred": false,
    "notes": "**Returns to BO-105.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
@@ -740,15 +1314,23 @@
     {
      "to": "BO-105",
      "trigger": "Stock & Supply",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-105 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-105 declares entryState.params  and BO-141 holds none of them, so the edge carries nothing and BO-105 opens cold"
+    },
+    {
+     "to": "BO-464",
+     "trigger": "Back to Game & Ride Operations Control Center",
+     "provenance": "inherited from BO-472 when it was merged here, 28 September (audit R276)",
+     "back": true
     }
    ]
   },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not.",
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Absorbed BO-472 on 28 September (audit R276)**: Operational Alerts & Exception Center (Games & Rides board 8) called only `listAlerts`, already here; it is retired and BO-464 now opens this screen for the operational exception queue.",
   "density": "compact",
+  "boardFrames": [
+   "Inventory Board 4.dc.html#inv-4g",
+   "Inventory Board 7.dc.html#inv-7c",
+   "Inventory Board 1.dc.html#inv-10"
+  ],
   "pattern": "listDetail",
   "patternReason": "`listAlerts` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "Operational Alerts, AI Replenishment & Action Center — from the client design board, 20 August.",
@@ -760,8 +1342,43 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listAlerts",
+       "notes": "Sends `?status=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Severity",
+       "operation": "listAlerts",
+       "notes": "Sends `?severity=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listAlerts",
+       "notes": "Sends `?workstationId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Shift id",
+       "operation": "listAlerts",
+       "notes": "Sends `?shiftId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Item id",
+       "operation": "listAlerts",
+       "notes": "Sends `?itemId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every operational alerts replenishment",
+       "label": "Every alert",
        "bindsTo": "Alert",
        "columns": [
         "Alert.id",
@@ -779,6 +1396,11 @@
        ],
        "operation": "listAlerts",
        "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search operational alerts, ai replenishment",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -788,7 +1410,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected operational alerts replenishment",
+       "label": "The selected alert",
        "bindsTo": "Alert",
        "columns": [
         "Alert.id",
@@ -815,26 +1437,16 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Acknowledge",
+       "label": "Acknowledge alert",
        "operation": "acknowledgeAlert",
        "provenance": "contract reporting.yaml POST /alerts/{alertId}/acknowledge"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create requisition",
        "operation": "createRequisition",
+       "permission": "PROCUREMENT_REQUEST",
        "provenance": "contract inventory.yaml POST /requisitions"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search operational alerts, ai replenishment",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -843,9 +1455,9 @@
   "states": {
    "loading": "The operational alerts replenishment list.",
    "error": "Could not load. Names which read failed and leaves the operational alerts replenishment untouched.",
-   "emptyFirstRun": "No operational alerts replenishment yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the operational alerts replenishment are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No operational alerts replenishment yet. Offers Create requisition (`createRequisition`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on status, severity, workstationId, shiftId, itemId and the operational alerts replenishment are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -899,6 +1511,49 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-141"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAcknowledgeAlert",
+    "component": "modal",
+    "trigger": "Acknowledge alert",
+    "body": "**Collects what `acknowledgeAlert` sends before it is called.** Nothing in the body is required. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Acknowledge alert",
+     "operation": "acknowledgeAlert"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "note"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /alerts/{alertId}/acknowledge"
+   },
+   {
+    "id": "formCreateRequisition",
+    "component": "modal",
+    "trigger": "Create requisition",
+    "body": "**Collects what `createRequisition` sends before it is called.** Required: `id`, `venueId`, `lines`, `requiredBy`. Optional: `departmentId`, `costCenterId`, `justification`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateRequisitionRequest",
+    "confirm": {
+     "label": "Create requisition",
+     "operation": "createRequisition"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "lines",
+      "requiredBy",
+      "departmentId",
+      "costCenterId",
+      "justification"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /requisitions"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

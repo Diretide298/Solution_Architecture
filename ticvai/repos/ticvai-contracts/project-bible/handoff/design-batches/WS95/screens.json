@@ -186,7 +186,15 @@
    "emptyNoResults": "The filter narrowed it and the rental return are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listRentalBookings",
+    "contract": "rental",
+    "purpose": "Expected back",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Expected Returns Today",
@@ -199,7 +207,8 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-564"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-564",
+   "workshopBoard": "wireframes/WS123 Rental Management Board 8.dc.html#bo-564"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 92. 0 of 8 labels bound to a contract property; 18 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -277,7 +286,19 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getRentalBooking",
+       "notes": "One record, read-only."
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The return scan rental list.",
@@ -286,12 +307,29 @@
    "emptyNoResults": "The filter narrowed it and the return scan rental are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getRentalBooking",
+    "contract": "rental",
+    "purpose": "Retrieve by scan",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-565"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-565",
+   "workshopBoard": "wireframes/WS123 Rental Management Board 8.dc.html#bo-565"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 93. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "bookingId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -367,7 +405,26 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "returnRental",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "returnRental"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The return summary actual list.",
@@ -376,12 +433,35 @@
    "emptyNoResults": "The filter narrowed it and the return summary actual are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "returnRental",
+    "contract": "rental",
+    "purpose": "Record the actual return time",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getRentalBooking",
+     "listRentalBookings",
+     "getRentalAvailability",
+     "listOverdueRentals"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-566"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-566",
+   "workshopBoard": "wireframes/WS123 Rental Management Board 8.dc.html#bo-566"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 94. 0 of 0 labels bound to a contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "bookingId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -457,7 +537,26 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "recordRentalInspection",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "recordRentalInspection"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The post-rental condition inspection list.",
@@ -466,12 +565,32 @@
    "emptyNoResults": "The filter narrowed it and the post-rental condition inspection are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "recordRentalInspection",
+    "contract": "rental",
+    "purpose": "Condition on the way back",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getRentalBooking"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-567"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-567",
+   "workshopBoard": "wireframes/WS123 Rental Management Board 8.dc.html#bo-567"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 95. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "bookingId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -547,7 +666,26 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "recordRentalInspection",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "recordRentalInspection"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The before after condition list.",
@@ -556,12 +694,32 @@
    "emptyNoResults": "The filter narrowed it and the before after condition are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "recordRentalInspection",
+    "contract": "rental",
+    "purpose": "Before against after",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getRentalBooking"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-568"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-568",
+   "workshopBoard": "wireframes/WS123 Rental Management Board 8.dc.html#bo-568"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 96. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "bookingId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -637,7 +795,26 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "assessRentalDamage",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "assessRentalDamage"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The damage assessment charge list.",
@@ -646,12 +823,32 @@
    "emptyNoResults": "The filter narrowed it and the damage assessment charge are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "assessRentalDamage",
+    "contract": "rental",
+    "purpose": "Price the damage",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getRentalBooking"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-569"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-569",
+   "workshopBoard": "wireframes/WS123 Rental Management Board 8.dc.html#bo-569"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 97. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "bookingId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -727,7 +924,26 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "returnRental",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "returnRental"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The partial return missing list.",
@@ -736,12 +952,35 @@
    "emptyNoResults": "The filter narrowed it and the partial return missing are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "returnRental",
+    "contract": "rental",
+    "purpose": "Partial return, with what is missing",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getRentalBooking",
+     "listRentalBookings",
+     "getRentalAvailability",
+     "listOverdueRentals"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-570"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-570",
+   "workshopBoard": "wireframes/WS123 Rental Management Board 8.dc.html#bo-570"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 98. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "bookingId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -817,7 +1056,26 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "returnRental",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "returnRental"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The late fees damage list.",
@@ -826,12 +1084,35 @@
    "emptyNoResults": "The filter narrowed it and the late fees damage are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "returnRental",
+    "contract": "rental",
+    "purpose": "Late fee, damage and settlement",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getRentalBooking",
+     "listRentalBookings",
+     "getRentalAvailability",
+     "listOverdueRentals"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-571"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-571",
+   "workshopBoard": "wireframes/WS123 Rental Management Board 8.dc.html#bo-571"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 99. 0 of 0 labels bound to a contract property; 0 of 3 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "bookingId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -907,7 +1188,26 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "returnRental",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "returnRental"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The deposit release capture list.",
@@ -916,12 +1216,35 @@
    "emptyNoResults": "The filter narrowed it and the deposit release capture are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "returnRental",
+    "contract": "rental",
+    "purpose": "Capture or release the deposit",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getRentalBooking",
+     "listRentalBookings",
+     "getRentalAvailability",
+     "listOverdueRentals"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-572"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-572",
+   "workshopBoard": "wireframes/WS123 Rental Management Board 8.dc.html#bo-572"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 100. 0 of 0 labels bound to a contract property; 0 of 4 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "bookingId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -997,7 +1320,26 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "returnRental",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "returnRental"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The return completion equipment list.",
@@ -1006,12 +1348,50 @@
    "emptyNoResults": "The filter narrowed it and the return completion equipment are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "returnRental",
+    "contract": "rental",
+    "purpose": "Complete, and dispose of the equipment",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getRentalBooking",
+     "listRentalBookings",
+     "getRentalAvailability",
+     "listOverdueRentals"
+    ]
+   },
+   {
+    "operationId": "setAssetStatus",
+    "contract": "maintenance",
+    "purpose": "Back into the pool, or not",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getAsset",
+     "listAssets"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-573"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-573",
+   "workshopBoard": "wireframes/WS123 Rental Management Board 8.dc.html#bo-573"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 101. 0 of 0 labels bound to a contract property; 0 of 118 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "assetId",
+     "from": "navigation"
+    },
+    {
+     "name": "bookingId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

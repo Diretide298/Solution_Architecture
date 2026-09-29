@@ -2775,6 +2775,34 @@ screens:
       - kind: selectField
         label: Attachments
         provenance: pack Customer Service_Reference.pdf, page 9 §Capture
+      - kind: textField
+        label: Parent category id
+        operation: listCaseCategories
+        notes: Sends `?parentCategoryId=` to `listCaseCategories`.
+        provenance: contract marketing-crm.yaml GET /case-categories
+      - kind: toggle
+        label: Top level only
+        operation: listCaseCategories
+        notes: Sends `?topLevelOnly=` to `listCaseCategories`.
+        provenance: contract marketing-crm.yaml GET /case-categories
+      - kind: toggle
+        label: Is active
+        operation: listCaseCategories
+        notes: Sends `?isActive=` to `listCaseCategories`.
+        provenance: contract marketing-crm.yaml GET /case-categories
+      - kind: dataTable
+        label: Every case category
+        bindsTo: CaseCategory
+        columns:
+        - CaseCategory.id
+        - CaseCategory.code
+        - CaseCategory.name
+        - CaseCategory.parentCategoryId
+        - CaseCategory.defaultPriority
+        - CaseCategory.isActive
+        - CaseCategory.scopePath
+        operation: listCaseCategories
+        provenance: contract marketing-crm.yaml GET /case-categories
     - name: actionBar
       slot: publish
       components:
@@ -2793,6 +2821,10 @@ screens:
     contract: marketing-crm
     purpose: Case Creation, Classification & Intelligent Routing
     trigger: onAction
+  - operationId: listCaseCategories
+    contract: marketing-crm
+    purpose: List case categories and subcategories
+    trigger: onLoad
   wireframe:
     status: notStarted
     provenance: generated
@@ -3794,6 +3826,23 @@ screens:
       - kind: selectField
         label: Emergency handling
         provenance: pack Customer Service_Reference.pdf, page 25 §Configure
+      - kind: toggle
+        label: Is active
+        operation: listServiceQueues
+        notes: Sends `?isActive=` to `listServiceQueues`.
+        provenance: contract marketing-crm.yaml GET /service-queues
+      - kind: dataTable
+        label: Every service queue
+        bindsTo: ServiceQueue
+        columns:
+        - ServiceQueue.id
+        - ServiceQueue.code
+        - ServiceQueue.name
+        - ServiceQueue.overflowWaitSeconds
+        - ServiceQueue.isActive
+        - ServiceQueue.scopePath
+        operation: listServiceQueues
+        provenance: contract marketing-crm.yaml GET /service-queues
     - name: actionBar
       slot: publish
       components:
@@ -3812,6 +3861,12 @@ screens:
       - kind: secondaryButton
         label: Access Control
         provenance: pack Customer Service_Reference.pdf, page 25 §Support configurable queues such as
+      - kind: secondaryButton
+        label: Save service queue definition
+        operation: setServiceQueueDefinition
+        permission: CASE_MANAGE
+        notes: '**An upsert keyed on `code`**, which is unique in the venue and never changes once created.'
+        provenance: contract marketing-crm.yaml PUT /service-queues
   states:
     loading: The queue configuration as saved.
     error: Could not load. Names which read failed and leaves the queue untouched.
@@ -3824,6 +3879,17 @@ screens:
     contract: queue
     purpose: List queues
     trigger: onLoad
+  - operationId: listServiceQueues
+    contract: marketing-crm
+    purpose: List customer-service queues
+    trigger: onLoad
+  - operationId: setServiceQueueDefinition
+    contract: marketing-crm
+    purpose: Create or change a customer-service queue
+    trigger: onAction
+    invalidates:
+    - listQueues
+    - listServiceQueues
   wireframe:
     status: notStarted
     provenance: generated
@@ -3832,6 +3898,27 @@ screens:
   apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 25. 0 of 0 labels bound
     to a contract property; 25 of 52 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  overlays:
+  - id: formSetServiceQueueDefinition
+    component: modal
+    trigger: Save service queue definition
+    body: '**Collects what `setServiceQueueDefinition` sends before it is called.** Required: `id`, `code`,
+      `name`, `isActive`. Optional: `overflowWaitSeconds`, `scopePath`. Dismissing sends nothing; the
+      screen behind is unchanged.'
+    bindsTo: ServiceQueue
+    confirm:
+      label: Save service queue definition
+      operation: setServiceQueueDefinition
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - code
+      - name
+      - isActive
+      - overflowWaitSeconds
+      - scopePath
+    provenance: contract marketing-crm.yaml PUT /service-queues
 - id: SUP-021
   name: Intelligent Routing, Skills & Assignment Engine
   module: Support
@@ -3895,6 +3982,51 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: setIntelligentRoutingSkill
+      - kind: textField
+        label: Parent category id
+        operation: listCaseCategories
+        notes: Sends `?parentCategoryId=` to `listCaseCategories`.
+        provenance: contract marketing-crm.yaml GET /case-categories
+      - kind: toggle
+        label: Top level only
+        operation: listCaseCategories
+        notes: Sends `?topLevelOnly=` to `listCaseCategories`.
+        provenance: contract marketing-crm.yaml GET /case-categories
+      - kind: toggle
+        label: Is active
+        operation: listCaseCategories
+        notes: Sends `?isActive=` to `listCaseCategories`.
+        provenance: contract marketing-crm.yaml GET /case-categories
+      - kind: dataTable
+        label: Every case category
+        bindsTo: CaseCategory
+        columns:
+        - CaseCategory.id
+        - CaseCategory.code
+        - CaseCategory.name
+        - CaseCategory.parentCategoryId
+        - CaseCategory.defaultPriority
+        - CaseCategory.isActive
+        - CaseCategory.scopePath
+        operation: listCaseCategories
+        provenance: contract marketing-crm.yaml GET /case-categories
+      - kind: toggle
+        label: Is active
+        operation: listServiceQueues
+        notes: Sends `?isActive=` to `listServiceQueues`.
+        provenance: contract marketing-crm.yaml GET /service-queues
+      - kind: dataTable
+        label: Every service queue
+        bindsTo: ServiceQueue
+        columns:
+        - ServiceQueue.id
+        - ServiceQueue.code
+        - ServiceQueue.name
+        - ServiceQueue.overflowWaitSeconds
+        - ServiceQueue.isActive
+        - ServiceQueue.scopePath
+        operation: listServiceQueues
+        provenance: contract marketing-crm.yaml GET /service-queues
   states:
     loading: The intelligent routing skills list.
     error: Could not load. Names which read failed and leaves the intelligent routing skills untouched.
@@ -3909,6 +4041,14 @@ screens:
     contract: marketing-crm
     purpose: Intelligent Routing, Skills & Assignment Engine
     trigger: onAction
+  - operationId: listCaseCategories
+    contract: marketing-crm
+    purpose: List case categories and subcategories
+    trigger: onLoad
+  - operationId: listServiceQueues
+    contract: marketing-crm
+    purpose: List customer-service queues
+    trigger: onLoad
   wireframe:
     status: notStarted
     provenance: generated

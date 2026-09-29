@@ -1,5 +1,5 @@
 id: LLD-WalletService
-title: WalletService — 59 operations, 28 tables
+title: WalletService — 59 operations, 29 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -24,7 +24,7 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: wallet
-  tables: 28
+  tables: 29
   stores:
   - postgres
   largestTable: wallet.wallet_type
@@ -110,7 +110,7 @@ operationsByContract:
     scope: tenant
     permission: WALLET_VIEW
     offline: false
-    reads: 0
+    reads: 14
     writes: 0
   - operation: expireCreditLots
     verb: POST
@@ -118,8 +118,8 @@ operationsByContract:
     scope: venue
     permission: WALLET_OPERATE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 5
+    writes: 5
   - operation: getCreditConsumptionPolicy
     verb: GET
     path: /credit-consumption-policy
@@ -166,7 +166,7 @@ operationsByContract:
     scope: tenant
     permission: WALLET_VIEW
     offline: false
-    reads: 0
+    reads: 3
     writes: 0
   - operation: getWalletReconciliation
     verb: GET
@@ -174,7 +174,7 @@ operationsByContract:
     scope: tenant
     permission: WALLET_VIEW
     offline: false
-    reads: 0
+    reads: 3
     writes: 0
   - operation: issueGiftCard
     verb: POST
@@ -278,8 +278,8 @@ operationsByContract:
     scope: tenant
     permission: WALLET_CONFIGURE
     offline: false
-    reads: 1
-    writes: 0
+    reads: 14
+    writes: 3
   - operation: raiseWalletDispute
     verb: POST
     path: /wallet-disputes
@@ -318,8 +318,8 @@ operationsByContract:
     scope: tenant
     permission: WALLET_CONFIGURE
     offline: false
-    reads: 1
-    writes: 0
+    reads: 3
+    writes: 13
   - operation: reverseWalletFunding
     verb: POST
     path: /wallet-funding/reversals
@@ -454,8 +454,8 @@ operationsByContract:
     scope: venue
     permission: WALLET_VIEW
     offline: false
-    reads: 0
-    writes: 0
+    reads: 6
+    writes: 1
   - operation: suspendWallet
     verb: POST
     path: /wallets/{walletId}/suspend
@@ -522,10 +522,14 @@ tables:
   - adjustWallet
   - blockGiftCard
   - closeWallet
+  - expireCreditLots
   - issueGiftCard
   - loadGameCredits
+  - publishWalletConfiguration
   - redeemGiftCard
   - reinstateWallet
+  - restoreWalletConfigurationVersion
+  - simulateCreditConsumption
   - suspendWallet
   - topUpWallet
   - transferWalletBalance
@@ -535,10 +539,14 @@ tables:
   - adjustWallet
   - blockGiftCard
   - closeWallet
+  - expireCreditLots
   - issueGiftCard
   - loadGameCredits
+  - publishWalletConfiguration
   - redeemGiftCard
   - reinstateWallet
+  - restoreWalletConfigurationVersion
+  - simulateCreditConsumption
   - suspendWallet
   - topUpWallet
   - transferWalletBalance
@@ -553,7 +561,8 @@ tables:
   columns: 10
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - wallet
   foreignWriters: null
 - table: wallet.authentication_policy
   columns: 2
@@ -579,7 +588,15 @@ tables:
   columns: 6
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - wallet
+  foreignWriters: null
+- table: wallet.configuration_version_snapshot
+  columns: 6
+  store: postgres
+  parent: wallet.configuration_version
+  writtenBy:
+  - wallet
   foreignWriters: null
 - table: wallet.consumption_policy
   columns: 7
@@ -606,7 +623,8 @@ tables:
   columns: 12
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - wallet
   foreignWriters: null
 - table: wallet.credit_type
   columns: 15

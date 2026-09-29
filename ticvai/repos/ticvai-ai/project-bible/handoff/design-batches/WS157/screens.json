@@ -1,0 +1,1846 @@
+[
+ {
+  "id": "BO-873",
+  "name": "Staff Resource Directory",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "3",
+   "number": "01",
+   "page": 33
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/staff-resource-directory-bo-873",
+   "component": "apps/venue-management-web/src/routes/rentals/StaffResourceDirectory.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-874",
+    "BO-875",
+    "BO-876",
+    "BO-877",
+    "BO-878",
+    "BO-879",
+    "BO-880",
+    "BO-881",
+    "BO-882"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-874",
+     "trigger": "Staff Resource Profile",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-875",
+     "trigger": "Skills & Competency Management",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-876",
+     "trigger": "Certification & Expiry Management",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-877",
+     "trigger": "Qualification & Assignment Rule Engine",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-878",
+     "trigger": "Staff Availability & Working Pattern",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-879",
+     "trigger": "Shift Template & Assignment Configuration",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-880",
+     "trigger": "Break, Leave & Absence Configuration",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-881",
+     "trigger": "Overtime & Working-Hour Rules",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-882",
+     "trigger": "Workforce Integration & Synchronization Center",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide the centralized master directory for all personnel who may be assigned as operational resources within TICVAI.",
+  "purposeNote": "Authorized users can locate and manage staff resources from one centralized directory using structured filters or conversational AI.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 33"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search staff resource",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 33 §Users shall filter by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Venue",
+        "Department",
+        "Role",
+        "Staff type",
+        "Skill",
+        "Certification",
+        "Qualification",
+        "Availability",
+        "Employment type",
+        "Status"
+       ],
+       "notes": "The pack filters this screen by venue, department, role, staff type, skill, certification and 4 more — which are present is a decision the pack already made.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 33 §Users shall filter by"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The staff resource list.",
+   "error": "Could not load. Names which read failed and leaves the staff resource untouched.",
+   "emptyFirstRun": "No staff resource yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the staff resource are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPrincipals",
+    "contract": "identity",
+    "purpose": "The staff directory",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-873",
+   "workshopBoard": "wireframes/WS128 Resource Management Configuration Board 3.dc.html#bo-873"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 33. 0 of 10 labels bound to a contract property; 10 of 58 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-874",
+  "name": "Staff Resource Profile",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "3",
+   "number": "02",
+   "page": 35
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/staff-resource-profile-bo-874",
+   "component": "apps/venue-management-web/src/routes/rentals/StaffResourceProfile.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-873"
+   ],
+   "exitTo": [
+    "BO-873"
+   ],
+   "transitions": [
+    {
+     "to": "BO-873",
+     "trigger": "Back to Staff Resource Directory",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Maintain the operational resource profile for an individual employee or contractor. This profile shall complement the organization's HR employee record rather than unnecessarily duplicate an HR system.",
+  "purposeNote": "Each staff resource has a complete operational profile that can be safely referenced by scheduling, resource allocation, event management, mobile operations, and AI services.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Resource priority",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 35 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer selectable yes/no",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 35 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Individual selection allowed yes/no",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 35 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Bookable yes/no",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 35 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Scheduling enabled yes/no",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 35 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum concurrent assignment",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 35 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Default assignment duration",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 35 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Preferred operating area",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 35 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Languages",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 35 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tags",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 35 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Employment Classification",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 35 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "External agency",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 35 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "External employee ID",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 35 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Source system",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 35 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Synchronization status",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 35 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Last synchronization",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 35 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The staff resource profile configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the staff resource profile untouched.",
+   "emptyFirstRun": "No staff resource profile configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "getPrincipal",
+    "contract": "identity",
+    "purpose": "One person",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listResources",
+    "contract": "resources",
+    "purpose": "Them as a bookable resource",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getEmployee",
+    "contract": "workforce",
+    "purpose": "Show the HR record behind the staff resource (agency, external id, externally mastered fields)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) External agency, External employee ID; Source system, Synchronization status, Last synchronization"
+   },
+   {
+    "operationId": "listIntegrationSources",
+    "contract": "workforce",
+    "purpose": "Show the source system, its sync status and last sync",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) External agency, External employee ID; Source system, Synchronization status, Last synchronization"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-874",
+   "workshopBoard": "wireframes/WS128 Resource Management Configuration Board 3.dc.html#bo-874"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 35. 0 of 0 labels bound to a contract property; 16 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** External agency, External employee ID: `getEmployee`; Source system, Synchronization status, Last synchronization: `listIntegrationSources`.",
+  "entryState": {
+   "params": [
+    {
+     "name": "principalId",
+     "from": "session"
+    },
+    {
+     "name": "employeeId",
+     "from": "BO-873"
+    }
+   ],
+   "coldEntry": "Opened from BO-873 with the employee picked there. Opened cold (a bookmark or a refresh), it shows the list to pick from rather than an empty record, and says plainly if the employee no longer exists."
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-875",
+  "name": "Skills & Competency Management",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "3",
+   "number": "03",
+   "page": 36
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/skills-competency-management-bo-875",
+   "component": "apps/venue-management-web/src/routes/rentals/SkillsCompetencyManagement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-873"
+   ],
+   "exitTo": [
+    "BO-873"
+   ],
+   "transitions": [
+    {
+     "to": "BO-873",
+     "trigger": "Back to Staff Resource Directory",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Define what each staff resource is capable of performing.",
+  "purposeNote": "Administrators can maintain reusable staff competencies and proficiency levels that are available to the assignment and AI recommendation engines.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 36"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 36"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setResourceQualifications",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setResourceQualifications"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The skills competency list.",
+   "error": "Could not load. Names which read failed and leaves the skills competency untouched.",
+   "emptyFirstRun": "No skills competency yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the skills competency are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setResourceQualifications",
+    "contract": "resources",
+    "purpose": "Skills and competencies",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-875",
+   "workshopBoard": "wireframes/WS128 Resource Management Configuration Board 3.dc.html#bo-875"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 36. 0 of 0 labels bound to a contract property; 0 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "resourceId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-876",
+  "name": "Certification & Expiry Management",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "3",
+   "number": "04",
+   "page": 38
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/certification-expiry-management-bo-876",
+   "component": "apps/venue-management-web/src/routes/rentals/CertificationExpiryManagement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-873"
+   ],
+   "exitTo": [
+    "BO-873"
+   ],
+   "transitions": [
+    {
+     "to": "BO-873",
+     "trigger": "Back to Staff Resource Directory",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Administrators shall configure) and no display directory — it is settings, not a population",
+  "purpose": "Manage certifications, licenses and credentials required for staff assignments.",
+  "purposeNote": "unqualified staff from being assigned where mandatory certification rules apply.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Certification code",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 38 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Certification name",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 38 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Issuing authority",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 38 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Applicable roles",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 38 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Applicable resource types",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 38 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Applicable venues",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 38 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Validity period",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 38 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Renewal requirements",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 38 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Mandatory/optional",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 38 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Warning period",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 38 §Administrators shall configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The certification expiry configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the certification expiry untouched.",
+   "emptyFirstRun": "No certification expiry configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "setResourceQualifications",
+    "contract": "resources",
+    "purpose": "Certification and expiry",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "validateWorkforceCompliance",
+    "contract": "workforce",
+    "purpose": "What has lapsed",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-876",
+   "workshopBoard": "wireframes/WS128 Resource Management Configuration Board 3.dc.html#bo-876"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 38. 0 of 0 labels bound to a contract property; 10 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "resourceId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-877",
+  "name": "Qualification & Assignment Rule Engine",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "3",
+   "number": "05",
+   "page": 39
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/qualification-assignment-rule-engine-bo-877",
+   "component": "apps/venue-management-web/src/routes/rentals/QualificationAssignmentRuleEngine.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-873"
+   ],
+   "exitTo": [
+    "BO-873"
+   ],
+   "transitions": [
+    {
+     "to": "BO-873",
+     "trigger": "Back to Staff Resource Directory",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Convert skills, certifications and operational policies into machine-enforceable assignment rules.",
+  "purposeNote": "Staff assignment requirements are machine-readable, testable and automatically enforced before assignment confirmation.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 39"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 39"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Minimum requirement",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 39 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Preferred requirement",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 39 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Mandatory requirement",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 39 §Support"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The qualification rule list.",
+   "error": "Could not load. Names which read failed and leaves the qualification rule untouched.",
+   "emptyFirstRun": "No qualification rule yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the qualification rule are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setResourceQualifications",
+    "contract": "resources",
+    "purpose": "Qualification rules",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "suggestResources",
+    "contract": "resources",
+    "purpose": "Who qualifies",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setExperienceResourceRequirements",
+    "contract": "resources",
+    "purpose": "Save qualification requirements as mandatory or preferred with a minimum quantity",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Minimum requirement, Preferred requirement, Mandatory requirement",
+    "invalidates": [
+     "suggestResources"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-877",
+   "workshopBoard": "wireframes/WS128 Resource Management Configuration Board 3.dc.html#bo-877"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 39. 0 of 0 labels bound to a contract property; 3 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Minimum requirement, Preferred requirement, Mandatory requirement: `setExperienceResourceRequirements`.",
+  "entryState": {
+   "params": [
+    {
+     "name": "resourceId",
+     "from": "navigation"
+    },
+    {
+     "name": "experienceId",
+     "from": "navigation"
+    }
+   ],
+   "coldEntry": "Opened from BO-873 with the experience picked there. Opened cold (a bookmark or a refresh), it shows the list to pick from rather than an empty record, and says plainly if the experience no longer exists."
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-878",
+  "name": "Staff Availability & Working Pattern",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "3",
+   "number": "06",
+   "page": 40
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/staff-availability-working-pattern-bo-878",
+   "component": "apps/venue-management-web/src/routes/rentals/StaffAvailabilityWorkingPattern.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-873"
+   ],
+   "exitTo": [
+    "BO-873"
+   ],
+   "transitions": [
+    {
+     "to": "BO-873",
+     "trigger": "Back to Staff Resource Directory",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure; Users shall configure) and no display directory — it is settings, not a population",
+  "purpose": "Define when an individual staff resource is normally available to work.",
+  "purposeNote": "Each staff resource has a reliable working-availability pattern that feeds the centralized Resource Calendar and assignment engine.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Working days",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Start time",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "End time",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Time zone",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Effective period",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Weekly hours",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Availability type",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Seasonal pattern",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Availability Types",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Additional availability",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 40 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Temporary unavailability",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 40 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Special working day",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 40 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue reassignment",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 40 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Restricted hours",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 40 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Calendar Preview",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 40 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Available",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 40 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Working",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 40 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Unavailable",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 40 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Leave",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 40 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Break",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 40 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Existing assignment",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 40 §Users shall configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "External schedule",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 40 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The staff availability working configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the staff availability working untouched.",
+   "emptyFirstRun": "No staff availability working configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "getResourceSchedule",
+    "contract": "resources",
+    "purpose": "Availability and working pattern",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setResourceSchedule",
+    "contract": "resources",
+    "purpose": "Set it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setFieldOwnership",
+    "contract": "workforce",
+    "purpose": "Declare the working pattern mastered by an external workforce system",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) External schedule"
+   },
+   {
+    "operationId": "listIntegrationSources",
+    "contract": "workforce",
+    "purpose": "The integration sources whose field ownership is set",
+    "trigger": "onAction"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-878",
+   "workshopBoard": "wireframes/WS128 Resource Management Configuration Board 3.dc.html#bo-878"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 40. 0 of 0 labels bound to a contract property; 22 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** External schedule: `setFieldOwnership`.",
+  "entryState": {
+   "params": [
+    {
+     "name": "resourceId",
+     "from": "navigation"
+    },
+    {
+     "name": "sourceId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-879",
+  "name": "Shift Template & Assignment Configuration",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "3",
+   "number": "07",
+   "page": 41
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/shift-template-assignment-configuration-bo-879",
+   "component": "apps/venue-management-web/src/routes/rentals/ShiftTemplateAssignmentConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-873"
+   ],
+   "exitTo": [
+    "BO-873"
+   ],
+   "transitions": [
+    {
+     "to": "BO-873",
+     "trigger": "Back to Staff Resource Directory",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Administrators shall define) and no display directory — it is settings, not a population",
+  "purpose": "Configure reusable workforce shift structures that can later be used by the operational roster engine.",
+  "purposeNote": "Administrators can create reusable governed shift structures that can subsequently be consumed by rostering and workforce scheduling.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Maximum shifts per day",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 41 §Administrators shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum consecutive days",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 41 §Administrators shall define"
+      },
+      {
+       "kind": "textField",
+       "label": "Minimum rest between shifts",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 41 §Administrators shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Allowed roles",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 41 §Administrators shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue restrictions",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 41 §Administrators shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Skill requirements",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 41 §Administrators shall define"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The shift template configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the shift template untouched.",
+   "emptyFirstRun": "No shift template configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "listShiftTemplates",
+    "contract": "workforce",
+    "purpose": "Shift templates",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setShiftTemplate",
+    "contract": "workforce",
+    "purpose": "Define one",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listShiftTemplates"
+    ]
+   },
+   {
+    "operationId": "listShiftPatterns",
+    "contract": "workforce",
+    "purpose": "Shift patterns",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "setShiftPattern",
+    "contract": "workforce",
+    "purpose": "Define a shift pattern and its break",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listShiftTemplates",
+     "listShiftPatterns"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-879",
+   "workshopBoard": "wireframes/WS128 Resource Management Configuration Board 3.dc.html#bo-879"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 41. 0 of 0 labels bound to a contract property; 6 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-880",
+  "name": "Break, Leave & Absence Configuration",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "3",
+   "number": "08",
+   "page": 42
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/break-leave-absence-configuration-bo-880",
+   "component": "apps/venue-management-web/src/routes/rentals/BreakLeaveAbsenceConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-873"
+   ],
+   "exitTo": [
+    "BO-873"
+   ],
+   "transitions": [
+    {
+     "to": "BO-873",
+     "trigger": "Back to Staff Resource Directory",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Ensure employee availability reflects breaks, approved leave, absences and other workforce exceptions.",
+  "purposeNote": "Breaks, leave and absences are automatically reflected in staff availability and cannot be ignored by downstream scheduling without authorized override.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Break type",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 42 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Minimum shift duration",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 42 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Break duration",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 42 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Paid/unpaid",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 42 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Mandatory/optional",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 42 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Earliest break",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 42 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Latest break",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 42 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Number of breaks",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 42 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Leave Types",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 42 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Administrative block",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 42 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The break leave absence configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the break leave absence untouched.",
+   "emptyFirstRun": "No break leave absence configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "listLeaveRequests",
+    "contract": "workforce",
+    "purpose": "Leave and absence",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "requestLeave",
+    "contract": "workforce",
+    "purpose": "Request time off",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listLeaveRequests",
+     "getStaffingCoverage"
+    ]
+   },
+   {
+    "operationId": "listLeaveTypes",
+    "contract": "workforce",
+    "purpose": "Leave types",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "setLeaveType",
+    "contract": "workforce",
+    "purpose": "Define a leave type",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listLeaveRequests",
+     "listLeaveTypes"
+    ]
+   },
+   {
+    "operationId": "listLeaveBalances",
+    "contract": "workforce",
+    "purpose": "Leave balances",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "createResourceBlock",
+    "contract": "resources",
+    "purpose": "Block the staff resource's time for an administrative reason",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Administrative block"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-880",
+   "workshopBoard": "wireframes/WS128 Resource Management Configuration Board 3.dc.html#bo-880"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 42. 0 of 0 labels bound to a contract property; 10 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Administrative block: `createResourceBlock`.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-881",
+  "name": "Overtime & Working-Hour Rules",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "3",
+   "number": "09",
+   "page": 44
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/overtime-working-hour-rules-bo-881",
+   "component": "apps/venue-management-web/src/routes/rentals/OvertimeWorkingHourRules.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-873"
+   ],
+   "exitTo": [
+    "BO-873"
+   ],
+   "transitions": [
+    {
+     "to": "BO-873",
+     "trigger": "Back to Staff Resource Directory",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Administrators shall configure) and no display directory — it is settings, not a population",
+  "purpose": "Configure workforce rules controlling employee working hours and overtime eligibility before operational rostering occurs.",
+  "purposeNote": "Working-hour and overtime rules are configurable and automatically considered before staff assignments are confirmed.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Standard daily hours",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Standard weekly hours",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum daily hours",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum weekly hours",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Minimum rest period",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Maximum consecutive working days",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Overtime threshold",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Approval required",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 44 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The overtime working-hour rules configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the overtime working-hour rules untouched.",
+   "emptyFirstRun": "No overtime working-hour rules configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "setStaffingRules",
+    "contract": "workforce",
+    "purpose": "Overtime and working-hour rules",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getStaffingCoverage",
+     "validateWorkforceCompliance"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-881",
+   "workshopBoard": "wireframes/WS128 Resource Management Configuration Board 3.dc.html#bo-881"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 44. 0 of 0 labels bound to a contract property; 8 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Approval required are choices sent by `setStaffingRules` (overtime.requiresApproval).",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-882",
+  "name": "Workforce Integration & Synchronization Center",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "3",
+   "number": "10",
+   "page": 45
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/workforce-integration-synchronization-center-bo-882",
+   "component": "apps/venue-management-web/src/routes/rentals/WorkforceIntegrationSynchronizationCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-873"
+   ],
+   "exitTo": [
+    "BO-873"
+   ],
+   "transitions": [
+    {
+     "to": "BO-873",
+     "trigger": "Back to Staff Resource Directory",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Connect TICVAI Resource Management with external HR, workforce management, payroll, identity, and employee systems where applicable. Provide TICVAI with a centralized, intelligent Workforce Operations & Rostering Engine that converts staff profiles, availability, skills, certifications, working-hour rules, and demand forecasts into executable operational rosters. Board 4 shall enable managers to: Build operational rosters Assign employees to attractions, venues, events, and activities Define minimum staffing requirements Validate role and skill coverage Identify staffing shortages Manage shift swaps, transfers, pickups, and releases Monitor planned versus actual attendance Capture check-in/check-out and attendance exceptions Validate workforce compliance before assignments Calculate and forecast labor costs Use AI to optimize staffing",
+  "purposeNote": "clear field ownership, traceability and operational consistency.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 45 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every workforce integration synchronization",
+       "columns": [
+        "Connected systems",
+        "Last synchronization",
+        "Successful records",
+        "Failed records",
+        "Warnings",
+        "Mapping errors",
+        "Authentication status",
+        "Conflict Handling"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 45 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected workforce integration synchronization",
+       "bindsTo": null,
+       "columns": [
+        "Connected systems",
+        "Last synchronization",
+        "Successful records",
+        "Failed records",
+        "Warnings",
+        "Mapping errors",
+        "Authentication status",
+        "Conflict Handling"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Integration Sources”, “External System Master”, “For example”, “Board 3 Shared Governance”, “Board 3 End-to-End Outcome”, “The platform understands”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 45 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "API",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 45 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Webhooks/event-driven integration",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 45 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Scheduled synchronization",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 45 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Manual synchronization",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 45 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "File import where required",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 45 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Integration Monitoring",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 45 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The workforce integration synchronization list.",
+   "error": "Could not load. Names which read failed and leaves the workforce integration synchronization untouched.",
+   "emptyFirstRun": "No workforce integration synchronization yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the workforce integration synchronization are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listRotaAssignments",
+    "contract": "workforce",
+    "purpose": "Rota synchronisation",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listIntegrationSources",
+    "contract": "workforce",
+    "purpose": "Connected workforce systems",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "setIntegrationSource",
+    "contract": "workforce",
+    "purpose": "Connect or reconfigure an external workforce system",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listRotaAssignments",
+     "listIntegrationSources"
+    ]
+   },
+   {
+    "operationId": "getFieldOwnership",
+    "contract": "workforce",
+    "purpose": "Which system masters each field",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "setFieldOwnership",
+    "contract": "workforce",
+    "purpose": "Declare who masters each field",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listRotaAssignments",
+     "listIntegrationSources",
+     "getFieldOwnership"
+    ]
+   },
+   {
+    "operationId": "listSyncRuns",
+    "contract": "workforce",
+    "purpose": "Synchronisation runs",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "startSync",
+    "contract": "workforce",
+    "purpose": "Run a synchronisation now",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listRotaAssignments",
+     "listIntegrationSources",
+     "getFieldOwnership",
+     "listSyncRuns"
+    ]
+   },
+   {
+    "operationId": "listSyncConflicts",
+    "contract": "workforce",
+    "purpose": "Disagreements between systems",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "resolveSyncConflict",
+    "contract": "workforce",
+    "purpose": "Settle a disagreement",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listRotaAssignments",
+     "listIntegrationSources",
+     "getFieldOwnership",
+     "listSyncRuns"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Connected systems",
+    "Last synchronization",
+    "Successful records",
+    "Failed records",
+    "Warnings",
+    "Mapping errors"
+   ],
+   "params": [
+    {
+     "name": "sourceId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-882",
+   "workshopBoard": "wireframes/WS128 Resource Management Configuration Board 3.dc.html#bo-882"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 45. 0 of 8 labels bound to a contract property; 14 of 111 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** API, Webhooks/event-driven integration, Scheduled synchronization, File import where required: `setIntegrationSource`; Manual synchronization: `startSync`; Integration Monitoring: `listSyncRuns`.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

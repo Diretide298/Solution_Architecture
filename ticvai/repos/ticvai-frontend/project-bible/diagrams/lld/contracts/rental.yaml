@@ -79,7 +79,10 @@ operations:
   reads:
   - rental.booking
   - rental.participant
+  - rental.quote
   writes:
+  - cache:idempotency
+  - rental.booking
   - rental.participant
 - operation: createRentalCategory
   verb: POST
@@ -125,8 +128,16 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - rental.deposit_policy
+  - rental.duration_rules
+  - rental.location_rule
+  - rental.pricing_profile
+  - rental.product
+  - rental.quote
+  writes:
+  - cache:idempotency
 - operation: extendRental
   verb: POST
   path: /rental-bookings/{bookingId}/extend
@@ -138,7 +149,10 @@ operations:
   reads:
   - rental.booking
   - rental.participant
-  writes: []
+  - rental.quote
+  writes:
+  - cache:idempotency
+  - rental.booking
 - operation: getRentalAgreement
   verb: GET
   path: /agreements/{agreementId}
@@ -160,7 +174,16 @@ operations:
   - staff
   - guest
   offline: false
-  reads: []
+  reads:
+  - maintenance.asset
+  - rental.availability_rules
+  - rental.blackout
+  - rental.booking
+  - rental.duration_rules
+  - rental.equipment_assignment
+  - rental.inventory_model
+  - rental.location_rule
+  - rental.product
   writes: []
 - operation: getRentalBooking
   verb: GET
@@ -193,8 +216,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - maintenance.asset_category
+  - rental.product
+  writes:
+  - cache:idempotency
+  - maintenance.asset
+  - rental.inventory_model
+  - rental.product
 - operation: listOverdueRentals
   verb: GET
   path: /rental-bookings/overdue
@@ -283,8 +313,16 @@ operations:
   - staff
   - guest
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - rental.deposit_policy
+  - rental.duration_rules
+  - rental.location_rule
+  - rental.pricing_profile
+  - rental.product
+  - rental.quote
+  writes:
+  - cache:idempotency
 - operation: recordRentalInspection
   verb: POST
   path: /rental-bookings/{bookingId}/inspection
@@ -451,8 +489,17 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - rental.deposit_policy
+  - rental.duration_rules
+  - rental.fee_policy
+  - rental.location_rule
+  - rental.pricing_profile
+  - rental.product
+  - rental.quote
+  writes:
+  - cache:idempotency
 - operation: swapRentalEquipment
   verb: POST
   path: /rental-bookings/{bookingId}/swap
@@ -509,5 +556,18 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - maintenance.asset_category
+  - rental.agreement_rules
+  - rental.availability_rules
+  - rental.deposit_policy
+  - rental.duration_rules
+  - rental.fee_policy
+  - rental.inventory_model
+  - rental.location_rule
+  - rental.operational_rules
+  - rental.pricing_profile
+  - rental.product
+  writes:
+  - cache:idempotency

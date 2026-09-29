@@ -1,4 +1,4 @@
--- control — 49 tables
+-- control — 73 tables
 -- **Derived. Do not hand-edit.**
 
 -- The one credential model (CF-135a). 2.7.52, 7.1.25 and 7.1.30 each asserted their own. Bound to
@@ -30,8 +30,8 @@ CREATE TABLE IF NOT EXISTS control.api_licence (
 );
 
 -- Rate limits per client (13.1.36). A quota protects the venue, not the developer. Hangs off:
--- reaches control.cell through its keys; references control.api_client. Reached by: 1 operations
--- read it and 1 write it.
+-- reaches control.partner through its keys; references control.api_client. Reached by: 1
+-- operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS control.api_limit (
     id                                uuid PRIMARY KEY,
     client_id                         uuid NOT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS control.api_limit (
 );
 
 -- API versions and sunset dates (13.1.31–35, ADR-0031). With third parties a breaking change with
--- no window breaks somebody else business. Hangs off: reaches control.cell through its keys.
+-- no window breaks somebody else business. Hangs off: reaches control.partner through its keys.
 -- Reached by: 3 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS control.api_version (
     version                           text NOT NULL,
@@ -144,7 +144,7 @@ CREATE TABLE IF NOT EXISTS control.cell (
 );
 
 -- identical cells serving a region. Scaling out is launching another, not growing one Hangs off: a
--- child of control.cell; reaches control.cell through its keys; references control.cell,
+-- child of control.cell; reaches control.partner through its keys; references control.cell,
 -- platform.scope. Reached by: 2 operations read it and 1 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS control.cell_cluster (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -313,8 +313,8 @@ CREATE TABLE IF NOT EXISTS control.invoice_line (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
--- Something bought beyond the plan. Hangs off: a child of control.tenant; reaches control.cell
--- through its keys; references control.tenant. Reached by: 6 operations read it and 2 write it; 1
+-- Something bought beyond the plan. Hangs off: a child of control.tenant; reaches control.partner
+-- through its keys; references control.tenant. Reached by: 7 operations read it and 2 write it; 1
 -- tables reference it.
 CREATE TABLE IF NOT EXISTS control.licence_add_on (
     tenant_id                         uuid,
@@ -452,14 +452,47 @@ CREATE TABLE IF NOT EXISTS control.onboarding_application (
     provisioned_tenant_id             uuid
 );
 
+-- Holds 28 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner (
+    id                                uuid PRIMARY KEY NOT NULL,
+    legal_entity_name                 text NOT NULL,
+    trading_name                      text NOT NULL,
+    partner_type                      text NOT NULL,
+    registration_number               text,
+    tax_vat_number                    text,
+    country                           text NOT NULL,
+    city                              text,
+    registered_address                text,
+    business_address                  text,
+    website                           text,
+    main_telephone                    text,
+    general_email                     text,
+    preferred_language                text,
+    default_currency                  text,
+    time_zone                         text,
+    account_manager_principal_id      uuid,
+    commercial_manager_principal_id   uuid,
+    finance_owner_principal_id        uuid,
+    operational_owner_principal_id    uuid,
+    technical_owner_principal_id      uuid,
+    parent_partner_id                 uuid,
+    classification_tags               text[],
+    status                            text NOT NULL CONSTRAINT partner_status_chk CHECK (status IN ('lead', 'applicant', 'underReview', 'approved', 'configuration', 'active', 'restricted', 'suspended', 'terminated', 'archived')),
+    risk_rating                       text CONSTRAINT partner_risk_rating_chk CHECK (risk_rating IN ('low', 'medium', 'high', 'critical')),
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
 -- Net rate or commission, credit terms, validity. Versioned — an order placed last week used last
--- week’s rate Hangs off: reaches control.cell through its keys; references approvals.request,
--- assets.media_asset, identity.principal. Reached by: 8 operations read it and 3 write it; 1
--- tables reference it.
+-- week’s rate Hangs off: a child of control.partner; reaches control.partner through its keys;
+-- references approvals.request, assets.media_asset, control.partner. Reached by: 42 operations
+-- read it and 7 write it; 10 tables reference it; written by 2 contracts — approvals,
+-- subscription.
 CREATE TABLE IF NOT EXISTS control.partner_agreement (
     id                                uuid PRIMARY KEY,
     partner_id                        uuid NOT NULL,
-    partner_name                      text,
     version                           integer,
     status                            text CONSTRAINT partner_agreement_status_chk CHECK (status IN ('pendingApproval', 'active', 'expiringSoon', 'expired', 'suspended', 'terminated')),
     rate_mode                         text NOT NULL CONSTRAINT partner_agreement_rate_mode_chk CHECK (rate_mode IN ('netRate', 'commission')),
@@ -485,7 +518,542 @@ CREATE TABLE IF NOT EXISTS control.partner_agreement (
     valid_to                          date,
     expiry_alert_days                 integer DEFAULT 30,
     approval_request_id               text,
-    notes                             text
+    notes                             text,
+    agreement_name                    text,
+    agreement_type                    text,
+    contract_reference                text,
+    legal_entity_id                   uuid,
+    brand_id                          uuid,
+    territory                         text,
+    commercial_owner_principal_id     uuid,
+    finance_owner_principal_id        uuid,
+    pricing_basis                     text CONSTRAINT partner_agreement_pricing_basis_chk CHECK (pricing_basis IN ('retailPrice', 'netRate', 'discountFromRetail', 'markup', 'derivedRate')),
+    payment_model                     text CONSTRAINT partner_agreement_payment_model_chk CHECK (payment_model IN ('creditAccount', 'prepaid', 'payPerTransaction')),
+    renewal_type                      text CONSTRAINT partner_agreement_renewal_type_chk CHECK (renewal_type IN ('manual', 'auto')),
+    renewal_notice_days               integer,
+    is_renegotiation_required         boolean DEFAULT false,
+    renewal_requires_approval         boolean,
+    minimum_commitment                integer,
+    sales_target                      numeric(18,4),
+    agreement_value                   numeric(18,4),
+    commission_terms                  text,
+    credit_terms                      text,
+    allocation_terms                  text,
+    cancellation_conditions           text,
+    refund_conditions                 text,
+    booking_restrictions              text,
+    settlement_terms                  text,
+    scope_path                        ltree NOT NULL
+);
+
+-- Holds 23 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner_allocation (
+    id                                uuid PRIMARY KEY NOT NULL,
+    partner_id                        uuid NOT NULL,
+    agreement_id                      uuid NOT NULL,
+    venue_id                          uuid,
+    event_id                          uuid,
+    product_id                        uuid,
+    ticket_type                       text,
+    allocation_model                  text NOT NULL CONSTRAINT partner_allocation_allocation_model_chk CHECK (allocation_model IN ('guaranteed', 'onRequest', 'shared', 'fixedQuantity', 'percentage', 'rolling', 'seasonal')),
+    quantity                          integer,
+    allocation_percent                numeric(18,4),
+    minimum_commitment                integer,
+    maximum_allocation                integer,
+    commitment_rule                   text CONSTRAINT partner_allocation_commitment_rule_chk CHECK (commitment_rule IN ('useItOrRelease', 'takeOrPay', 'guaranteedMinimum')),
+    sell_through_target               numeric(18,4),
+    return_rule                       text,
+    release_mode                      text NOT NULL CONSTRAINT partner_allocation_release_mode_chk CHECK (release_mode IN ('automatic', 'manual')),
+    release_hours_before_event        integer,
+    release_date                      timestamptz,
+    per_member_limit                  integer,
+    approval_request_id               uuid,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
+-- Holds 31 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner_application (
+    id                                uuid PRIMARY KEY NOT NULL,
+    partner_id                        uuid,
+    company_name                      text NOT NULL,
+    trading_name                      text,
+    country                           text,
+    requested_partner_type            text,
+    markets                           text[],
+    expected_sales_volume             integer,
+    requested_products                text[],
+    requested_venues                  text[],
+    preferred_distribution_method     text CONSTRAINT partner_application_preferred_distribution_method_chk CHECK (preferred_distribution_method IN ('b2bPortal', 'api', 'otaConnection', 'agentPortal', 'affiliateLink', 'voucherDistribution', 'bulkTicketExport', 'other')),
+    estimated_annual_business         numeric(18,4),
+    contact_name                      text,
+    contact_email                     text,
+    billing_requirements              text,
+    business_case                     text,
+    territory                         text,
+    credit_request                    numeric(18,4),
+    payment_terms                     text,
+    tax_registration_number           text,
+    product_requirements              text,
+    fulfillment_requirements          text,
+    api_integration_requirements      text,
+    stage                             text NOT NULL DEFAULT 'application' CONSTRAINT partner_application_stage_chk CHECK (stage IN ('application', 'businessVerification', 'documentation', 'commercialReview', 'financeReview', 'technicalReview', 'approval', 'configuration', 'activation')),
+    status                            text NOT NULL DEFAULT 'submitted' CONSTRAINT partner_application_status_chk CHECK (status IN ('submitted', 'inReview', 'moreInformationRequested', 'approved', 'rejected', 'withdrawn')),
+    submitted_at                      timestamptz NOT NULL,
+    sla_due_at                        timestamptz,
+    approval_request_id               text,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner_application_review_task (
+    partner_application_id            uuid NOT NULL,
+    department                        text NOT NULL,
+    assignee_principal_id             uuid,
+    due_at                            timestamptz,
+    is_completed                      boolean NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 16 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner_billing_profile (
+    id                                uuid PRIMARY KEY NOT NULL,
+    partner_id                        uuid NOT NULL,
+    agreement_id                      uuid NOT NULL,
+    consolidated_billing              boolean DEFAULT false,
+    billing_entity_name               text,
+    invoice_frequency                 text NOT NULL CONSTRAINT partner_billing_profile_invoice_frequency_chk CHECK (invoice_frequency IN ('perTransaction', 'weekly', 'monthly')),
+    invoice_grouping                  text CONSTRAINT partner_billing_profile_invoice_grouping_chk CHECK (invoice_grouping IN ('perPartner', 'perBranch', 'perVenue', 'perEvent', 'perPurchaseOrder')),
+    statement_frequency               text CONSTRAINT partner_billing_profile_statement_frequency_chk CHECK (statement_frequency IN ('weekly', 'monthly')),
+    tax_profile_id                    text,
+    is_purchase_order_required        boolean DEFAULT false,
+    billing_contact_id                uuid,
+    finance_email                     text,
+    allowed_payment_methods           text[],
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
+-- Holds 15 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner_booking_limit (
+    id                                uuid PRIMARY KEY NOT NULL,
+    partner_id                        uuid,
+    agreement_id                      uuid,
+    maximum_tickets_per_booking       integer,
+    maximum_booking_value             numeric(18,4),
+    daily_booking_limit               integer,
+    monthly_booking_limit             integer,
+    event_limit                       integer,
+    product_limit                     integer,
+    hold_limit                        integer,
+    hold_duration_minutes             integer,
+    cancellation_limit_percent        numeric(18,4),
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
+-- Holds 12 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner_capability_grant (
+    id                                uuid PRIMARY KEY NOT NULL,
+    partner_id                        uuid NOT NULL,
+    capability                        text NOT NULL CONSTRAINT partner_capability_grant_capability_chk CHECK (capability IN ('searchAvailability', 'createBooking', 'holdInventory', 'confirmBooking', 'cancelBooking', 'modifyBooking', 'rescheduleBooking', 'downloadTicket', 'printTicket', 'sendTicket', 'accessCustomerDetails', 'useCredit', 'usePaymentCard', 'viewCommission', 'viewNetRates', 'accessReports', 'exportData', 'useApi', 'createSubAgents', 'refund', 'manualPriceOverride', 'creditAdjustment', 'highValueBooking', 'customerDataExport')),
+    is_allowed                        boolean NOT NULL,
+    requires_internal_approval        boolean DEFAULT false,
+    grant_type                        text NOT NULL CONSTRAINT partner_capability_grant_grant_type_chk CHECK (grant_type IN ('permanent', 'temporary', 'seasonal', 'eventSpecific')),
+    effective_from                    date,
+    effective_to                      date,
+    event_id                          uuid,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
+-- Holds 20 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner_case (
+    id                                uuid PRIMARY KEY NOT NULL,
+    partner_id                        uuid NOT NULL,
+    contact_id                        uuid,
+    category                          text NOT NULL CONSTRAINT partner_case_category_chk CHECK (category IN ('bookingDispute', 'pricingDispute', 'commissionDispute', 'creditDispute', 'invoiceDispute', 'cancellationDispute', 'ticketIssue', 'allocationIssue', 'apiIssue', 'settlementDispute')),
+    priority                          text NOT NULL CONSTRAINT partner_case_priority_chk CHECK (priority IN ('low', 'medium', 'high', 'urgent')),
+    order_id                          uuid,
+    invoice_reference                 text,
+    settlement_batch_id               uuid,
+    amount_in_dispute                 numeric(18,4),
+    description                       text NOT NULL,
+    evidence                          text[],
+    owner_principal_id                uuid,
+    sla_policy_id                     uuid,
+    status                            text NOT NULL DEFAULT 'open' CONSTRAINT partner_case_status_chk CHECK (status IN ('open', 'assigned', 'investigating', 'waitingPartner', 'waitingInternal', 'resolutionProposed', 'resolved', 'closed')),
+    first_response_at                 timestamptz,
+    resolution_target_at              timestamptz NOT NULL,
+    resolved_at                       timestamptz,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
+-- Holds 28 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner_change_request (
+    id                                uuid PRIMARY KEY NOT NULL,
+    partner_id                        uuid NOT NULL,
+    order_id                          uuid NOT NULL,
+    request_type                      text NOT NULL CONSTRAINT partner_change_request_request_type_chk CHECK (request_type IN ('fullCancellation', 'partialCancellation', 'dateChange', 'performanceChange', 'quantityReduction', 'productChange', 'ticketReissue', 'customerNameChange', 'refundRequest')),
+    quantity                          integer,
+    reason                            text,
+    original_state                    text,
+    new_state                         text,
+    original_value                    numeric(18,4),
+    is_cancellation_allowed           boolean,
+    cancellation_fee                  numeric(18,4),
+    refund_or_credit                  numeric(18,4),
+    financial_impact                  numeric(18,4),
+    allocation_impact                 integer,
+    commission_adjustment             numeric(18,4),
+    approval_reasons                  text[],
+    status                            text NOT NULL DEFAULT 'requested' CONSTRAINT partner_change_request_status_chk CHECK (status IN ('requested', 'pendingApproval', 'approved', 'rejected', 'processed')),
+    requested_by_principal_id         uuid,
+    approved_by_principal_id          uuid,
+    approval_request_id               text,
+    refund_id                         uuid,
+    requested_at                      timestamptz NOT NULL,
+    target_performance_id             uuid,
+    target_product_id                 uuid,
+    new_customer_name                 text,
+    is_fee_waiver_requested           boolean DEFAULT false,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
+);
+
+-- Holds 16 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner_commercial_exception (
+    id                                uuid PRIMARY KEY NOT NULL,
+    partner_id                        uuid NOT NULL,
+    agreement_id                      uuid,
+    request_type                      text NOT NULL CONSTRAINT partner_commercial_exception_request_type_chk CHECK (request_type IN ('priceException', 'creditException', 'allocationException', 'commissionException', 'bookingLimitException', 'paymentTermException', 'cancellationException')),
+    current_rule                      text,
+    requested_exception               text NOT NULL,
+    amount_impact                     numeric(18,4),
+    reason                            text,
+    effective_from                    date,
+    effective_to                      date,
+    requested_by_principal_id         uuid,
+    status                            text NOT NULL DEFAULT 'pendingApproval' CONSTRAINT partner_commercial_exception_status_chk CHECK (status IN ('pendingApproval', 'approved', 'rejected', 'returned', 'expired')),
+    approval_request_id               text,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
+-- Holds 23 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner_commission_line (
+    id                                uuid PRIMARY KEY NOT NULL,
+    partner_id                        uuid NOT NULL,
+    agreement_id                      uuid NOT NULL,
+    agreement_version                 integer NOT NULL,
+    order_id                          uuid NOT NULL,
+    product_id                        uuid,
+    gross_value                       numeric(18,4),
+    net_rate                          numeric(18,4),
+    commission_basis                  numeric(18,4),
+    commission_percent                numeric(18,4),
+    commission_amount                 numeric(18,4),
+    incentive                         numeric(18,4),
+    adjustment                        numeric(18,4),
+    adjustment_reason                 text CONSTRAINT partner_commission_line_adjustment_reason_chk CHECK (adjustment_reason IN ('cancellation', 'refund', 'chargeback', 'partialFulfillment', 'commissionCorrection', 'incentiveQualification')),
+    payable_amount                    numeric(18,4),
+    settlement_period                 text CONSTRAINT partner_commission_line_settlement_period_chk CHECK (settlement_period IN ('perTransaction', 'weekly', 'monthly', 'eventBased', 'customCycle')),
+    period                            text,
+    legal_entity_id                   uuid,
+    status                            text NOT NULL DEFAULT 'calculated' CONSTRAINT partner_commission_line_status_chk CHECK (status IN ('calculated', 'reconciled', 'financeReview', 'approved', 'scheduled', 'paid', 'onHold', 'disputed', 'reversed')),
+    settlement_batch_id               uuid,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
+-- Holds 20 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner_commission_rule (
+    id                                uuid PRIMARY KEY NOT NULL,
+    partner_id                        uuid NOT NULL,
+    agreement_id                      uuid NOT NULL,
+    commission_model                  text NOT NULL CONSTRAINT partner_commission_rule_commission_model_chk CHECK (commission_model IN ('fixedPercentage', 'fixedAmount', 'productSpecific', 'tiered', 'volumeBased', 'revenueBased', 'performanceIncentive', 'campaignIncentive')),
+    product_id                        uuid,
+    product_category                  text,
+    venue_id                          uuid,
+    event_id                          uuid,
+    market                            text,
+    sales_channel                     text,
+    commission_percent                numeric(18,4),
+    commission_amount                 numeric(18,4),
+    volume_window                     text CONSTRAINT partner_commission_rule_volume_window_chk CHECK (volume_window IN ('calendarMonth', 'calendarQuarter', 'calendarYear', 'agreementYear', 'rolling12Months')),
+    incentive_type                    text CONSTRAINT partner_commission_rule_incentive_type_chk CHECK (incentive_type IN ('volumeBonus', 'growthBonus', 'targetAchievement', 'seasonalIncentive', 'newProductIncentive', 'strategicPartnerBonus')),
+    effective_from                    date NOT NULL,
+    effective_to                      date,
+    approval_request_id               uuid,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
+-- Holds 4 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner_commission_rule_tier (
+    partner_commission_rule_id        uuid NOT NULL,
+    from_units                        integer NOT NULL,
+    commission_percent                numeric(18,4) NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 16 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner_contact (
+    id                                uuid PRIMARY KEY NOT NULL,
+    partner_id                        uuid NOT NULL,
+    name                              text NOT NULL,
+    position                          text,
+    department                        text,
+    email                             text,
+    mobile                            text,
+    telephone                         text,
+    language                          text,
+    time_zone                         text,
+    contact_type                      text NOT NULL CONSTRAINT partner_contact_contact_type_chk CHECK (contact_type IN ('primary', 'commercial', 'reservations', 'finance', 'technical', 'operations', 'management', 'emergency')),
+    principal_id                      uuid,
+    status                            text NOT NULL DEFAULT 'active' CONSTRAINT partner_contact_status_chk CHECK (status IN ('invited', 'active', 'disabled', 'revoked', 'expired')),
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
+-- Holds 19 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner_credit_profile (
+    id                                uuid PRIMARY KEY NOT NULL,
+    partner_id                        uuid NOT NULL,
+    agreement_id                      uuid NOT NULL,
+    is_credit_enabled                 boolean NOT NULL DEFAULT false,
+    temporary_credit_limit            numeric(18,4),
+    temporary_limit_until             date,
+    credit_owner_principal_id         uuid,
+    approval_authority                text,
+    risk_classification               text CONSTRAINT partner_credit_profile_risk_classification_chk CHECK (risk_classification IN ('low', 'medium', 'high', 'critical')),
+    warning_threshold_percent         numeric(18,4) DEFAULT 70,
+    high_risk_threshold_percent       numeric(18,4) DEFAULT 90,
+    block_threshold_percent           numeric(18,4) DEFAULT 100,
+    credit_status                     text NOT NULL DEFAULT 'notEnabled' CONSTRAINT partner_credit_profile_credit_status_chk CHECK (credit_status IN ('notEnabled', 'withinLimit', 'warning', 'highRisk', 'onHold', 'blocked')),
+    effective_from                    date,
+    effective_to                      date,
+    approval_request_id               uuid,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
+-- Holds 21 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner_distribution_right (
+    id                                uuid PRIMARY KEY NOT NULL,
+    partner_id                        uuid NOT NULL,
+    country                           text,
+    region                            text,
+    city                              text,
+    market                            text,
+    brand_id                          uuid,
+    venue_id                          uuid,
+    attraction_id                     uuid,
+    event_id                          uuid,
+    is_allowed                        boolean NOT NULL,
+    distribution_methods              text[],
+    exclusivity                       text NOT NULL CONSTRAINT partner_distribution_right_exclusivity_chk CHECK (exclusivity IN ('nonExclusive', 'exclusive', 'preferred', 'restricted')),
+    sub_agent_rule                    text CONSTRAINT partner_distribution_right_sub_agent_rule_chk CHECK (sub_agent_rule IN ('allowed', 'prohibited', 'approvalRequired')),
+    maximum_hierarchy_depth           integer,
+    effective_from                    date NOT NULL,
+    effective_to                      date,
+    review_date                       date,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
+-- Holds 18 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner_document (
+    id                                uuid PRIMARY KEY NOT NULL,
+    partner_id                        uuid NOT NULL,
+    agreement_id                      uuid,
+    document_type                     text NOT NULL,
+    document_number                   text,
+    issue_date                        date,
+    expiry_date                       date,
+    issuing_authority                 text,
+    file_ref                          text,
+    verification_status               text NOT NULL DEFAULT 'missing' CONSTRAINT partner_document_verification_status_chk CHECK (verification_status IN ('missing', 'uploaded', 'underReview', 'verified', 'rejected', 'expiring', 'expired')),
+    verified_by_principal_id          uuid,
+    verified_at                       timestamptz,
+    is_mandatory                      boolean DEFAULT false,
+    expiry_action                     text CONSTRAINT partner_document_expiry_action_chk CHECK (expiry_action IN ('warnOnly', 'blockNewBookings', 'blockCreditTransactions', 'suspendPartner', 'requireManualReview')),
+    notes                             text,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
+-- Holds 30 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner_rate (
+    id                                uuid PRIMARY KEY NOT NULL,
+    partner_id                        uuid NOT NULL,
+    agreement_id                      uuid NOT NULL,
+    product_id                        uuid,
+    product_family                    text,
+    venue_id                          uuid,
+    event_id                          uuid,
+    ticket_type                       text,
+    price_category                    text,
+    market                            text,
+    channel                           text,
+    pricing_model                     text NOT NULL CONSTRAINT partner_rate_pricing_model_chk CHECK (pricing_model IN ('retailPrice', 'netRate', 'discountFromRetail', 'markup', 'derivedRate')),
+    net_rate                          numeric(18,4),
+    discount_percent                  numeric(18,4),
+    max_markup_percent                numeric(18,4),
+    pricing_profile_id                text,
+    seasonal_rate                     boolean DEFAULT false,
+    effective_from                    date NOT NULL,
+    effective_to                      date,
+    blackout_dates                    text[],
+    event_exceptions                  text[],
+    minimum_permitted_rate            numeric(18,4),
+    max_discount_percent              numeric(18,4),
+    margin_floor                      numeric(18,4),
+    is_manual_override_allowed        boolean DEFAULT false,
+    approval_threshold                numeric(18,4),
+    approval_request_id               text,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
+-- Holds 4 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner_rate_volume_band (
+    partner_rate_id                   uuid NOT NULL,
+    from_units                        integer NOT NULL,
+    discount_percent                  numeric(18,4) NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 14 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner_reconciliation_exception (
+    id                                uuid PRIMARY KEY NOT NULL,
+    partner_id                        uuid NOT NULL,
+    order_id                          uuid,
+    partner_reference                 text,
+    compared_source                   text NOT NULL CONSTRAINT partner_reconciliation_exception_compared_source_chk CHECK (compared_source IN ('ticvaiOrders', 'ticketsIssued', 'partnerRates', 'paymentsCredit', 'commission', 'invoices', 'cancellationsRefunds')),
+    mismatch_type                     text NOT NULL CONSTRAINT partner_reconciliation_exception_mismatch_type_chk CHECK (mismatch_type IN ('missingTransaction', 'duplicateTransaction', 'price', 'quantity', 'tax', 'commission', 'payment', 'cancellation', 'settlement')),
+    partner_amount                    numeric(18,4),
+    ticvai_amount                     numeric(18,4),
+    status                            text NOT NULL DEFAULT 'open' CONSTRAINT partner_reconciliation_exception_status_chk CHECK (status IN ('open', 'investigating', 'matched', 'corrected', 'differenceAccepted', 'adjusted', 'disputed', 'escalated')),
+    assignee_principal_id             uuid,
+    root_cause_group                  text,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
+-- Holds 16 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner_scope_assignment (
+    id                                uuid PRIMARY KEY NOT NULL,
+    partner_id                        uuid NOT NULL,
+    brand_id                          uuid,
+    venue_id                          uuid,
+    attraction_id                     uuid,
+    business_unit                     text,
+    event_portfolio                   text,
+    market                            text,
+    is_authorized                     boolean NOT NULL,
+    start_date                        date NOT NULL,
+    end_date                          date,
+    seasonal_scope                    boolean DEFAULT false,
+    scope_exclusions                  text[],
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
+-- Holds 16 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner_security (
+    id                                uuid PRIMARY KEY NOT NULL,
+    partner_id                        uuid NOT NULL,
+    agreement_id                      uuid,
+    security_type                     text NOT NULL CONSTRAINT partner_security_security_type_chk CHECK (security_type IN ('cashDeposit', 'bankGuarantee', 'securityDeposit', 'letterOfCredit', 'prepaymentBalance', 'corporateGuarantee', 'other')),
+    amount                            numeric(18,4) NOT NULL,
+    currency                          text NOT NULL,
+    issuing_institution               text,
+    reference                         text,
+    effective_date                    date NOT NULL,
+    expiry_date                       date,
+    document_id                       uuid,
+    verification_status               text NOT NULL DEFAULT 'pending' CONSTRAINT partner_security_verification_status_chk CHECK (verification_status IN ('pending', 'verified', 'rejected', 'expired')),
+    expiry_action                     text CONSTRAINT partner_security_expiry_action_chk CHECK (expiry_action IN ('generateWarning', 'reduceCredit', 'blockNewCreditSales', 'placePartnerOnHold', 'requireFinanceReview')),
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner_settlement_batch (
+    id                                uuid PRIMARY KEY NOT NULL,
+    partner_id                        uuid NOT NULL,
+    legal_entity_id                   uuid,
+    currency                          text NOT NULL,
+    period                            text NOT NULL,
+    settlement_period                 text CONSTRAINT partner_settlement_batch_settlement_period_chk CHECK (settlement_period IN ('perTransaction', 'weekly', 'monthly', 'eventBased', 'customCycle')),
+    status                            text NOT NULL DEFAULT 'calculated' CONSTRAINT partner_settlement_batch_status_chk CHECK (status IN ('calculated', 'reconciled', 'financeReview', 'approved', 'scheduled', 'paid', 'onHold', 'disputed', 'reversed')),
+    scheduled_date                    date,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
+-- Holds 16 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.partner_status_history (
+    id                                uuid PRIMARY KEY NOT NULL,
+    partner_id                        uuid NOT NULL,
+    action                            text NOT NULL CONSTRAINT partner_status_history_action_chk CHECK (action IN ('approve', 'activate', 'restrict', 'suspend', 'reactivate', 'terminate', 'archive')),
+    from_status                       text CONSTRAINT partner_status_history_from_status_chk CHECK (from_status IN ('lead', 'applicant', 'underReview', 'approved', 'configuration', 'active', 'restricted', 'suspended', 'terminated', 'archived')),
+    to_status                         text NOT NULL CONSTRAINT partner_status_history_to_status_chk CHECK (to_status IN ('lead', 'applicant', 'underReview', 'approved', 'configuration', 'active', 'restricted', 'suspended', 'terminated', 'archived')),
+    reason_category                   text NOT NULL CONSTRAINT partner_status_history_reason_category_chk CHECK (reason_category IN ('commercial', 'compliance', 'credit', 'fraud', 'contractExpiry', 'performance', 'technical', 'managementDecision')),
+    reason_note                       text,
+    suspension_scope                  text CONSTRAINT partner_status_history_suspension_scope_chk CHECK (suspension_scope IN ('full', 'selected')),
+    restrictions                      text[],
+    restricted_venue_ids              text[],
+    restricted_markets                text[],
+    effective_from                    timestamptz NOT NULL,
+    requested_by_principal_id         uuid,
+    approval_request_id               text,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz
 );
 
 -- A principal on a partner branch (2.7.51, BL-075). A partner was a flat account. Quota and credit
@@ -494,6 +1062,10 @@ CREATE TABLE IF NOT EXISTS control.partner_user (
     id                                uuid PRIMARY KEY NOT NULL,
     partner_id                        uuid NOT NULL,
     principal_id                      uuid NOT NULL,
+    role                              text,
+    sales_location                    text,
+    currency                          text,
+    account_expires_at                timestamptz,
     branch_scope_path                 ltree NOT NULL,
     allocation_quota                  integer,
     credit_limit_override             numeric(18,4),
@@ -501,7 +1073,7 @@ CREATE TABLE IF NOT EXISTS control.partner_user (
 );
 
 -- a shipped version. Promoted through dev, staging and production; superseded by a later one Hangs
--- off: reaches control.cell through its keys; references identity.principal. Reached by: 5
+-- off: reaches control.partner through its keys; references identity.principal. Reached by: 5
 -- operations read it and 3 write it; 3 tables reference it.
 CREATE TABLE IF NOT EXISTS control.release (
     version                           text NOT NULL,
@@ -612,8 +1184,8 @@ CREATE TABLE IF NOT EXISTS control.scaling_policy (
 );
 
 -- Titles, canonicals, hreflang and schema markup (22.11). An attraction that does not appear in
--- search sells through OTAs at OTA commission. Hangs off: reaches control.cell through its keys.
--- Reached by: 2 operations read it and 1 write it.
+-- search sells through OTAs at OTA commission. Hangs off: reaches control.partner through its
+-- keys. Reached by: 2 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS control.seo_metadata (
     id                                uuid PRIMARY KEY NOT NULL,
     entity_kind                       text NOT NULL CONSTRAINT seo_metadata_entity_kind_chk CHECK (entity_kind IN ('contentPage', 'product', 'event', 'performance', 'membership', 'promotion', 'venue')),
@@ -674,8 +1246,8 @@ CREATE TABLE IF NOT EXISTS control.tenant (
 );
 
 -- a tenant moving between cells — shared to dedicated, or rebalancing Hangs off: a child of
--- control.tenant; reaches control.cell through its keys; references control.cell, control.tenant,
--- control.tenant_migration_plan. Reached by: 3 operations read it and 2 write it.
+-- control.tenant; reaches control.partner through its keys; references control.cell,
+-- control.tenant, control.tenant_migration_plan. Reached by: 3 operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS control.tenant_migration (
     id                                uuid PRIMARY KEY NOT NULL,
     plan_id                           uuid NOT NULL,
@@ -695,7 +1267,7 @@ CREATE TABLE IF NOT EXISTS control.tenant_migration (
 );
 
 -- computed against cell state; expires, because a plan made for a different world is not a plan
--- Hangs off: a child of control.tenant; reaches control.cell through its keys; references
+-- Hangs off: a child of control.tenant; reaches control.partner through its keys; references
 -- control.cell, control.tenant. Reached by: 1 operations read it and 1 write it; 1 tables
 -- reference it.
 CREATE TABLE IF NOT EXISTS control.tenant_migration_plan (
@@ -794,7 +1366,7 @@ CREATE TABLE IF NOT EXISTS control.webhook_delivery (
 );
 
 -- An external subscriber to business events (13.1.26, 13.3.18). The 29 events existed and nothing
--- outside could receive one. Hangs off: reaches control.cell through its keys; references
+-- outside could receive one. Hangs off: reaches control.partner through its keys; references
 -- control.api_client. Reached by: 3 operations read it and 1 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS control.webhook_subscription (
     id                                uuid PRIMARY KEY NOT NULL,

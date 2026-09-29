@@ -1,0 +1,423 @@
+{
+ "cloneSeatMap": {
+  "method": "POST",
+  "path": "/seat-maps/{seatMapId}/clone",
+  "contract": "seating",
+  "summary": "Clone a map, optionally into another venue",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatMap"
+ },
+ "createAccessPolicy": {
+  "method": "POST",
+  "path": "/access-policies",
+  "contract": "identity",
+  "summary": "Write a policy without writing code",
+  "permission": "PERMISSION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessPolicy",
+  "responds": "AccessPolicy"
+ },
+ "createEmergencyAccessOverride": {
+  "method": "POST",
+  "path": "/access-overrides",
+  "contract": "identity",
+  "summary": "Bypass the policy, loudly",
+  "permission": "PERMISSION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "EmergencyAccessOverride"
+ },
+ "deployConfigurationProfile": {
+  "method": "POST",
+  "path": "/configuration-profiles/{profileId}/deploy",
+  "contract": "tenancy",
+  "summary": "Push a version to a fleet, in stages",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ProfileDeployment",
+  "responds": null
+ },
+ "getOrgUnit": {
+  "method": "GET",
+  "path": "/org-units/{orgUnitId}",
+  "contract": "tenancy",
+  "summary": "Read a scope node",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OrgUnit"
+ },
+ "getRegionSettings": {
+  "method": "GET",
+  "path": "/regions/{regionId}/settings",
+  "contract": "tenancy",
+  "summary": "Read region settings",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RegionSettings"
+ },
+ "getVenueSettings": {
+  "method": "GET",
+  "path": "/venues/{venueId}/settings",
+  "contract": "tenancy",
+  "summary": "Operational settings for this venue",
+  "permission": "TENANT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VenueSettings"
+ },
+ "getVenueSettingsDefaults": {
+  "method": "GET",
+  "path": "/venue-settings-defaults",
+  "contract": "tenancy",
+  "summary": "The tenant's default for every venue setting",
+  "permission": "TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VenueSettings"
+ },
+ "getWorkstationHealth": {
+  "method": "GET",
+  "path": "/workstations/{workstationId}/health",
+  "contract": "tenancy",
+  "summary": "A score a manager can sort by, and what is dragging it down",
+  "permission": "DEVICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "listAccessPolicies": {
+  "method": "GET",
+  "path": "/access-policies",
+  "contract": "identity",
+  "summary": "Attribute-based access policies",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessPolicy"
+ },
+ "listDenominations": {
+  "method": "GET",
+  "path": "/denominations",
+  "contract": "shift",
+  "summary": "The notes and coins a till counts",
+  "permission": "SHIFT_OPEN",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "includeInactive",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Denomination"
+ },
+ "listSeatMaps": {
+  "method": "GET",
+  "path": "/seat-maps",
+  "contract": "seating",
+  "summary": "List seat maps",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listVenueMaps": {
+  "method": "GET",
+  "path": "/venue-maps",
+  "contract": "venue-map",
+  "summary": "Maps for this venue",
+  "permission": "VENUE_MAP_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VenueMap"
+ },
+ "setAccessPolicyState": {
+  "method": "POST",
+  "path": "/access-policies/{policyId}/state",
+  "contract": "identity",
+  "summary": "Submit, approve, activate or retire a policy",
+  "permission": "PERMISSION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessPolicy"
+ },
+ "setConfigurationProfile": {
+  "method": "PUT",
+  "path": "/configuration-profiles",
+  "contract": "tenancy",
+  "summary": "What a class of workstation is configured to be",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ConfigurationProfile",
+  "responds": "ConfigurationProfile"
+ },
+ "setDenominations": {
+  "method": "PUT",
+  "path": "/denominations",
+  "contract": "shift",
+  "summary": "Set the notes and coins a region's tills count",
+  "permission": "REGION_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SetDenominationsRequest",
+  "responds": "Denomination"
+ },
+ "setVenueSettings": {
+  "method": "PUT",
+  "path": "/venues/{venueId}/settings",
+  "contract": "tenancy",
+  "summary": "Set support hours, quiet hours, segregated access and alerting",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VenueSettings",
+  "responds": "VenueSettings"
+ },
+ "setVenueSettingsDefaults": {
+  "method": "PUT",
+  "path": "/venue-settings-defaults",
+  "contract": "tenancy",
+  "summary": "Set the tenant's default for every venue setting",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VenueSettings",
+  "responds": "VenueSettings"
+ },
+ "setVisualWorkflow": {
+  "method": "PUT",
+  "path": "/visual-workflow",
+  "contract": "approvals",
+  "summary": "Visual Workflow Designer",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VisualWorkflowDesignerInput",
+  "responds": "VisualWorkflowDesignerView"
+ },
+ "simulateAccessPolicy": {
+  "method": "POST",
+  "path": "/access-policies/simulate",
+  "contract": "identity",
+  "summary": "What this policy would decide, before it decides anything",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessDecision"
+ },
+ "updateAccessPolicy": {
+  "method": "PUT",
+  "path": "/access-policies/{policyId}",
+  "contract": "identity",
+  "summary": "Change a policy, as a new version",
+  "permission": "PERMISSION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessPolicy",
+  "responds": "AccessPolicy"
+ },
+ "updateRegionSettings": {
+  "method": "PUT",
+  "path": "/regions/{regionId}/settings",
+  "contract": "tenancy",
+  "summary": "Update region settings",
+  "permission": "REGION_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RegionSettings",
+  "responds": "RegionSettings"
+ },
+ "updateSeats": {
+  "method": "PATCH",
+  "path": "/seat-maps/{seatMapId}/seats",
+  "contract": "seating",
+  "summary": "Bulk-amend seats",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "BulkUpdateSeatsRequest",
+  "responds": null
+ }
+}

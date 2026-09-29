@@ -429,8 +429,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - tenancy.device_credential
+  writes:
+  - cache:idempotency
+  - tenancy.device_audit
+  - tenancy.device_credential
 - operation: rollbackDeviceFirmware
   verb: POST
   path: /device-firmware/rollouts/{rolloutId}/rollback

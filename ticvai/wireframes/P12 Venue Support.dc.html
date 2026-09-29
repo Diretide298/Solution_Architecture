@@ -488,7 +488,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createCaseClassificationIntelligent</div>
+          <div><b>OPERATIONS</b> &middot; createCaseClassificationIntelligent · listCaseCategories</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#sup-009">SUP-009</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -728,12 +728,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listQueues</div>
+          <div><b>OPERATIONS</b> &middot; listQueues · listServiceQueues · setServiceQueueDefinition</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#sup-019">SUP-019</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetServiceQueueDefinition &middot; <i>Save service queue definition</i> &middot; <b>Save service queue definition</b> &middot; Cancel <span class="dis">discards id · code · name · isActive · overflowWaitSeconds · scopePath</span></div></div>
         </div>
       </div>
       <div id="sup-021" class="scr" data-ws="WS26">
@@ -753,12 +753,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><b>Parent category id</b><div class="chip">Parent category id</div><span class="why">Sends `?parentCategoryId=` to `listCaseCategories`.</span></div><div class="panel"><b>Top level only</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?topLevelOnly=` to `listCaseCategories`.</span></div></div><div class="side"><div class="panel"><b>Is active</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?isActive=` to `listCaseCategories`.</span></div><div class="panel"><b>Every case category</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setIntelligentRoutingSkill</div>
+          <div><b>OPERATIONS</b> &middot; setIntelligentRoutingSkill · listCaseCategories · listServiceQueues</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#sup-019">SUP-019</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>

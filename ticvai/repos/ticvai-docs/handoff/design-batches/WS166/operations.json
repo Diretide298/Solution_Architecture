@@ -1,0 +1,180 @@
+{
+ "commitImportJob": {
+  "method": "POST",
+  "path": "/seat-maps/{seatMapId}/import/{jobId}",
+  "contract": "seating",
+  "summary": "Apply a parsed import",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ImportJob"
+ },
+ "getImportJob": {
+  "method": "GET",
+  "path": "/seat-maps/{seatMapId}/import/{jobId}",
+  "contract": "seating",
+  "summary": "Import progress and findings",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ImportJob"
+ },
+ "getSeatMapImport": {
+  "method": "GET",
+  "path": "/seat-map-imports/{importId}",
+  "contract": "seating",
+  "summary": "How the import went",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SeatMapImportJob"
+ },
+ "importSeatGeometry": {
+  "method": "POST",
+  "path": "/seat-maps/{seatMapId}/import/geometry",
+  "contract": "seating",
+  "summary": "Import seat geometry from a plan",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ImportGeometryRequest",
+  "responds": null
+ },
+ "importSeatManifest": {
+  "method": "POST",
+  "path": "/seat-maps/{seatMapId}/import/manifest",
+  "contract": "seating",
+  "summary": "Import the logical seat structure",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ImportManifestRequest",
+  "responds": null
+ },
+ "importSeatMap": {
+  "method": "POST",
+  "path": "/seat-map-imports",
+  "contract": "seating",
+  "summary": "Import a seat map from a plan or a manifest",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatMapImportJob"
+ },
+ "publishSeatMap": {
+  "method": "POST",
+  "path": "/seat-maps/{seatMapId}/publish",
+  "contract": "seating",
+  "summary": "Validate and publish a seat map",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatMap"
+ },
+ "setMapZones": {
+  "method": "PUT",
+  "path": "/seat-maps/{seatMapId}/zones",
+  "contract": "seating",
+  "summary": "Standing areas, suites, stages and obstructions",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MapZone"
+ },
+ "updateSeats": {
+  "method": "PATCH",
+  "path": "/seat-maps/{seatMapId}/seats",
+  "contract": "seating",
+  "summary": "Bulk-amend seats",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "BulkUpdateSeatsRequest",
+  "responds": null
+ },
+ "validateSeatMap": {
+  "method": "POST",
+  "path": "/seat-maps/{seatMapId}/validate",
+  "contract": "seating",
+  "summary": "Run validation without publishing",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ValidationReport"
+ }
+}

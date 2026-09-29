@@ -14,7 +14,6 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-084",
     "BO-085",
     "BO-086"
@@ -22,30 +21,14 @@
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-084",
      "trigger": "Approval Inbox",
-     "carries": [
-      "requestId"
-     ],
-     "provenance": "derived — BO-084 declares entryState.params requestId, so an edge into it must carry them"
+     "provenance": "derived — BO-084 declares entryState.params requestId and BO-088 holds none of them, so the edge carries nothing and BO-084 opens cold"
     },
     {
      "to": "BO-085",
      "trigger": "Approval Request",
-     "carries": [
-      "requestId"
-     ],
-     "provenance": "derived — BO-085 declares entryState.params requestId, so an edge into it must carry them"
+     "provenance": "derived — BO-085 declares entryState.params requestId and BO-088 holds none of them, so the edge carries nothing and BO-085 opens cold"
     }
    ]
   },
@@ -63,7 +46,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every approval analytics",
+       "label": "Every index job",
        "bindsTo": "IndexJob",
        "columns": [
         "IndexJob.id",
@@ -90,7 +73,30 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected approval analytics",
+       "label": "The selected index job",
+       "bindsTo": "IndexJob",
+       "columns": [
+        "IndexJob.id",
+        "IndexJob.sourceId",
+        "IndexJob.kind",
+        "IndexJob.reason",
+        "IndexJob.status",
+        "IndexJob.recordsTotal",
+        "IndexJob.recordsEmbedded",
+        "IndexJob.recordsFailed",
+        "IndexJob.failureSample",
+        "IndexJob.shadowCollection",
+        "IndexJob.shardKey",
+        "IndexJob.embeddingModel",
+        "IndexJob.startedAt",
+        "IndexJob.completedAt"
+       ],
+       "operation": "listIndexJobs",
+       "provenance": "contract ai.yaml GET /index-jobs"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The approval analytics",
        "bindsTo": "ApprovalAnalytics",
        "columns": [
         "ApprovalAnalytics.from",
@@ -108,9 +114,9 @@
   "states": {
    "loading": "The approval analytics list.",
    "error": "Could not load. Names which read failed and leaves the approval analytics untouched.",
-   "emptyFirstRun": "No approval analytics yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the approval analytics are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No approval analytics yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listIndexJobs` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `APPROVAL_VIEW`, which `getApprovalAnalytics` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -128,10 +134,11 @@
   ],
   "entryState": {
    "preloaded": [
-    "ApprovalAnalytics.from",
-    "ApprovalAnalytics.to",
-    "ApprovalAnalytics.groupBy",
-    "ApprovalAnalytics.rows"
+    "IndexJob.id",
+    "IndexJob.sourceId",
+    "IndexJob.kind",
+    "IndexJob.reason",
+    "IndexJob.status"
    ]
   },
   "wireframe": {
@@ -196,58 +203,37 @@
     {
      "to": "BO-053",
      "trigger": "Staff Directory",
-     "carries": [
-      "principalId"
-     ],
-     "provenance": "derived — BO-053 declares entryState.params principalId, so an edge into it must carry them"
+     "provenance": "derived — BO-053 declares entryState.params  and BO-106 holds none of them, so the edge carries nothing and BO-053 opens cold"
     },
     {
      "to": "BO-055",
      "trigger": "Rota & Scheduling",
-     "carries": [
-      "assignmentId"
-     ],
-     "provenance": "derived — BO-055 declares entryState.params assignmentId, so an edge into it must carry them"
+     "provenance": "derived — BO-055 declares entryState.params assignmentId and BO-106 holds none of them, so the edge carries nothing and BO-055 opens cold"
     },
     {
      "to": "BO-056",
      "trigger": "Time & Attendance",
-     "carries": [
-      "recordId"
-     ],
-     "provenance": "derived — BO-056 declares entryState.params recordId, so an edge into it must carry them"
+     "provenance": "derived — BO-056 declares entryState.params recordId and BO-106 holds none of them, so the edge carries nothing and BO-056 opens cold"
     },
     {
      "to": "BO-066",
      "trigger": "Notification Settings",
-     "carries": [
-      "announcementId"
-     ],
-     "provenance": "derived — BO-066 declares entryState.params announcementId, so an edge into it must carry them"
+     "provenance": "derived — BO-066 declares entryState.params announcementId and BO-106 holds none of them, so the edge carries nothing and BO-066 opens cold"
     },
     {
      "to": "BO-084",
      "trigger": "Approval Inbox",
-     "carries": [
-      "requestId"
-     ],
-     "provenance": "derived — BO-084 declares entryState.params requestId, so an edge into it must carry them"
+     "provenance": "derived — BO-084 declares entryState.params requestId and BO-106 holds none of them, so the edge carries nothing and BO-084 opens cold"
     },
     {
      "to": "BO-085",
      "trigger": "Approval Request",
-     "carries": [
-      "requestId"
-     ],
-     "provenance": "derived — BO-085 declares entryState.params requestId, so an edge into it must carry them"
+     "provenance": "derived — BO-085 declares entryState.params requestId and BO-106 holds none of them, so the edge carries nothing and BO-085 opens cold"
     },
     {
      "to": "BO-087",
      "trigger": "Approval Delegations",
-     "carries": [
-      "delegationId"
-     ],
-     "provenance": "derived — BO-087 declares entryState.params delegationId, so an edge into it must carry them"
+     "provenance": "derived — BO-087 declares entryState.params delegationId and BO-106 holds none of them, so the edge carries nothing and BO-087 opens cold"
     }
    ]
   },
@@ -255,7 +241,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listRoles` reads the population and `getVenueSettings` reads one of them — list, select, act",
-  "purpose": "Everything in people & access rights, and what in it needs attention.",
+  "purpose": "Everything in people & access rights.",
   "layout": {
    "template": "split",
    "regions": [
@@ -265,7 +251,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every people access rights",
+       "label": "Every role",
        "bindsTo": "Role",
        "columns": [
         "Role.id",
@@ -280,6 +266,33 @@
        ],
        "operation": "listRoles",
        "provenance": "contract identity.yaml GET /roles"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Takings and admissions today",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.code",
+        "KpiValue.name",
+        "KpiValue.value",
+        "KpiValue.period",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ],
+       "operation": "getKpiValues",
+       "notes": "**Takings and admissions**, from `getKpiValues?kpiCodes=takings,admissions`; with no `period` the period is today in the venue's time zone (decided 28 September, audit R283).",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      },
+      {
+       "kind": "cardList",
+       "bindsTo": "screens",
+       "notes": "11 screens. **No attention counts** until a summary operation exists to supply them (decided 28 September, audit R283).",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search people & access rights",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -289,35 +302,39 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected people access rights",
+       "label": "The selected role",
+       "bindsTo": "Role",
+       "columns": [
+        "Role.id",
+        "Role.code",
+        "Role.name",
+        "Role.description",
+        "Role.permissions",
+        "Role.inheritsFromRoleId",
+        "Role.isSystem",
+        "Role.principalCount",
+        "Role.grantCount"
+       ],
+       "operation": "listRoles",
+       "provenance": "contract identity.yaml GET /roles"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The venue settings",
        "bindsTo": "VenueSettings",
        "columns": [
         "VenueSettings.id",
         "VenueSettings.venueId",
+        "VenueSettings.currencyCode",
+        "VenueSettings.currencyScale",
         "VenueSettings.supportHours",
         "VenueSettings.quietHours",
+        "VenueSettings.biometrics",
         "VenueSettings.segregatedAccess",
         "VenueSettings.alerting"
        ],
        "operation": "getVenueSettings",
        "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "cardList",
-       "bindsTo": "screens",
-       "notes": "11 screens, each with what needs attention.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "searchField",
-       "label": "Search people & access rights",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -331,6 +348,12 @@
    "emptyNoAccess": "You do not have permission for people & access rights. **Said plainly** — an empty section reads as broken."
   },
   "apis": [
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Today's takings and admissions tiles — `kpiCodes=takings,admissions`, period defaulting to today (decided 28 September, audit R283)",
+    "trigger": "onLoad"
+   },
    {
     "operationId": "getVenueSettings",
     "contract": "tenancy",

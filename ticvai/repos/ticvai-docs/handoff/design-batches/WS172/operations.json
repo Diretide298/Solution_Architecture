@@ -1,0 +1,135 @@
+{
+ "allocateGroupSeats": {
+  "method": "POST",
+  "path": "/group-seat-requests/{requestId}/allocate",
+  "contract": "seating",
+  "summary": "Find and hold the best contiguous block for a group",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GroupSeatAllocation"
+ },
+ "createApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests",
+  "contract": "approvals",
+  "summary": "Raise a request",
+  "permission": "APPROVAL_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateApprovalRequest",
+  "responds": "ApprovalRequest"
+ },
+ "createGroupSeatRequest": {
+  "method": "POST",
+  "path": "/group-seat-requests",
+  "contract": "seating",
+  "summary": "Take a group enquiry before any seat is held",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GroupSeatRequest",
+  "responds": "GroupSeatRequest"
+ },
+ "listGroupSeatRequests": {
+  "method": "GET",
+  "path": "/group-seat-requests",
+  "contract": "seating",
+  "summary": "Group bookings, their status and their deposits",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GroupSeatRequest"
+ },
+ "recordDeposit": {
+  "method": "POST",
+  "path": "/deposits",
+  "contract": "finance",
+  "summary": "Money taken before the sale is complete",
+  "permission": "LEDGER_POST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Deposit"
+ },
+ "releaseSeatHoldPool": {
+  "method": "POST",
+  "path": "/seat-hold-pools/{poolId}/release",
+  "contract": "seating",
+  "summary": "Put held seats back on sale, convert them, or reassign them",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatHoldPool"
+ },
+ "setGroupSeatRoster": {
+  "method": "PUT",
+  "path": "/group-seat-requests/{requestId}/roster",
+  "contract": "seating",
+  "summary": "Who sits where, when the names arrive",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ }
+}

@@ -1,6 +1,6 @@
 # WS30 — Membership   Annual Pass Management board 2
 
-**10 screens · 10 operations · 11 schemas · 2 permissions**
+**10 screens · 19 operations · 18 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `PLATFORM_CELL_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `APPROVAL_REQUEST, GUEST_MANAGE, ORDER_MODIFY, PLATFORM_CELL_MANAGE, PLATFORM_TENANT_VIEW, PRODUCT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -62,16 +61,16 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `BO-294` | Member Operations Command Center | listDetail | 1 | 0 | — |
-| `BO-295` | Member 360° Membership Account Workspace | listDetail | 1 | 0 | — |
-| `BO-296` | Membership Activation, Assignment & Credential Management | listDetail | 1 | 0 | — |
+| `BO-295` | Member 360° Membership Account Workspace | listDetail | 2 | 0 | — |
+| `BO-296` | Membership Activation, Assignment & Credential Management | listDetail | 2 | 0 | — |
 | `BO-297` | Visit, Admission & Entitlement Usage Monitor | listDetail | 1 | 0 | — |
-| `BO-298` | Membership Freeze, Suspension & Reactivation Management | configEditor | 1 | 1 | — |
-| `BO-299` | Membership Upgrade, Downgrade & Product Migration Operations | listDetail | 1 | 1 | — |
-| `BO-300` | Renewal Operations & Auto-Renewal Management | listDetail | 1 | 0 | — |
-| `BO-301` | Member Exceptions, Overrides & Service Recovery | listDetail | 1 | 0 | — |
+| `BO-298` | Membership Freeze, Suspension & Reactivation Management | configEditor | 4 | 1 | — |
+| `BO-299` | Membership Upgrade, Downgrade & Product Migration Operations | listDetail | 2 | 1 | — |
+| `BO-300` | Renewal Operations & Auto-Renewal Management | listDetail | 2 | 0 | — |
+| `BO-301` | Member Exceptions, Overrides & Service Recovery | listDetail | 5 | 0 | — |
 | `BO-302` | Member Lifecycle History, Audit & Case Timeline | listDetail | 1 | 0 | — |
 | `BO-303` | Membership Analytics, Renewal Intelligence & AI Retention Center | commandCentre | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-297, BO-299, BO-300, BO-301, BO-302 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-300, BO-302 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

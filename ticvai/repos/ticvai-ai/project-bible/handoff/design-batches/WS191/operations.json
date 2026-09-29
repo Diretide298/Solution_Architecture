@@ -1,0 +1,121 @@
+{
+ "linkWalletCredential": {
+  "method": "POST",
+  "path": "/wallet-credentials",
+  "contract": "wallet",
+  "summary": "Bind a wristband, card or device to a wallet",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": true,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletCredential",
+  "responds": "WalletCredential"
+ },
+ "listPaymentTerminals": {
+  "method": "GET",
+  "path": "/payment-terminals",
+  "contract": "payments",
+  "summary": "Terminals, and the payment configuration on each",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PaymentTerminal"
+ },
+ "listWalletTransactions": {
+  "method": "GET",
+  "path": "/wallets/{subjectId}/transactions",
+  "contract": "wallet",
+  "summary": "Wallet transaction history",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "setWalletAuthenticationPolicy": {
+  "method": "PUT",
+  "path": "/wallet-authentication-policy",
+  "contract": "wallet",
+  "summary": "Which proof of identity a wallet spend needs, by amount, channel and kind",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletAuthenticationPolicy",
+  "responds": "WalletAuthenticationPolicy"
+ },
+ "setWalletChannelRules": {
+  "method": "PUT",
+  "path": "/wallet-channel-rules",
+  "contract": "wallet",
+  "summary": "Where a wallet may be used, on what, and when it may not",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletChannelRules",
+  "responds": "WalletChannelRules"
+ },
+ "simulateCreditConsumption": {
+  "method": "POST",
+  "path": "/credit-consumption/simulate",
+  "contract": "wallet",
+  "summary": "Which credit this purchase would actually use",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CreditAllocation"
+ }
+}

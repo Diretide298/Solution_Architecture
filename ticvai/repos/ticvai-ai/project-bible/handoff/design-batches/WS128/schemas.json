@@ -1,0 +1,59 @@
+{
+ "EventCapacityProfile": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.event_capacity_profile",
+  "description": "Event board 4.2. **Capacity is four numbers, not one.**",
+  "properties": {
+   "eventId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "mode": {
+    "type": "string",
+    "enum": [
+     "reservedSeating",
+     "unreservedSeating",
+     "standing",
+     "mixed",
+     "capacityOnly"
+    ],
+    "description": "**The same hall is seated on Friday and standing on Saturday**, so the mode is per performance.\n"
+   },
+   "safeMaximum": {
+    "type": "integer"
+   },
+   "sellable": {
+    "type": "integer"
+   },
+   "held": {
+    "type": "integer",
+    "default": 0
+   },
+   "accessibleProvision": {
+    "type": "integer",
+    "default": 0
+   },
+   "companionSeats": {
+    "type": "integer",
+    "default": 0
+   },
+   "overbookPercent": {
+    "type": "number",
+    "default": 0
+   },
+   "seatMapId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ }
+}

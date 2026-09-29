@@ -1,1 +1,359 @@
-{}
+{
+ "approveMembershipProductValidation": {
+  "method": "PUT",
+  "path": "/membership-product-validation",
+  "contract": "subscription",
+  "summary": "Membership Product Validation, Approval, Publication & Versioning",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MembershipProductValidationApprovalPublicationVersioInput",
+  "responds": "MembershipProductValidationApprovalPublicationVersioView"
+ },
+ "createRentalCategory": {
+  "method": "POST",
+  "path": "/rental-categories",
+  "contract": "rental",
+  "summary": "Define a category and its defaults",
+  "permission": "RENTAL_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalCategory",
+  "responds": "RentalCategory"
+ },
+ "createRentalProduct": {
+  "method": "POST",
+  "path": "/rental-products",
+  "contract": "rental",
+  "summary": "Define a rental product",
+  "permission": "RENTAL_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalProduct",
+  "responds": "RentalProduct"
+ },
+ "getRentalProduct": {
+  "method": "GET",
+  "path": "/rental-products/{productId}",
+  "contract": "rental",
+  "summary": "The master configuration of one rental product",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RentalProduct"
+ },
+ "importRentalCatalogue": {
+  "method": "POST",
+  "path": "/rental-products/import",
+  "contract": "rental",
+  "summary": "Load a client's rental items and inventory at onboarding",
+  "permission": "RENTAL_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RentalImportResult"
+ },
+ "listAuditRecords": {
+  "method": "GET",
+  "path": "/audit-records",
+  "contract": "tenancy",
+  "summary": "Who did what, where, and when",
+  "permission": "AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "orgUnitId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "action",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "subjectRef",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "platformStaffGrantId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listRentalCategories": {
+  "method": "GET",
+  "path": "/rental-categories",
+  "contract": "rental",
+  "summary": "Reusable categories, with the defaults products inherit",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RentalCategory"
+ },
+ "listRentalProducts": {
+  "method": "GET",
+  "path": "/rental-products",
+  "contract": "rental",
+  "summary": "Rental products across venues and locations",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "trackingModel",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RentalProduct"
+ },
+ "publishRentalProduct": {
+  "method": "POST",
+  "path": "/rental-products/{productId}/publish",
+  "contract": "rental",
+  "summary": "Move a product through draft, review, approval and activation",
+  "permission": "RENTAL_APPROVE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RentalProduct"
+ },
+ "setRentalAgreementRequirements": {
+  "method": "PUT",
+  "path": "/rental-products/{productId}/agreement",
+  "contract": "rental",
+  "summary": "The agreement, waiver and signature a rental needs",
+  "permission": "RENTAL_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalAgreementRules",
+  "responds": "RentalAgreementRules"
+ },
+ "setRentalDurationRules": {
+  "method": "PUT",
+  "path": "/rental-products/{productId}/duration",
+  "contract": "rental",
+  "summary": "Minimum, maximum, increment, extension and turnaround",
+  "permission": "RENTAL_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalDurationRules",
+  "responds": "RentalDurationRules"
+ },
+ "setRentalInventoryModel": {
+  "method": "PUT",
+  "path": "/rental-products/{productId}/inventory-model",
+  "contract": "rental",
+  "summary": "Pooled, serialised or hybrid",
+  "permission": "RENTAL_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalInventoryModel",
+  "responds": "RentalInventoryModel"
+ },
+ "setRentalOperationalRules": {
+  "method": "PUT",
+  "path": "/rental-products/{productId}/rules",
+  "contract": "rental",
+  "summary": "Who may rent it, how many, and what must happen at the counter",
+  "permission": "RENTAL_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalOperationalRules",
+  "responds": "RentalOperationalRules"
+ },
+ "setRentalProductLocations": {
+  "method": "PUT",
+  "path": "/rental-products/{productId}/locations",
+  "contract": "rental",
+  "summary": "Where it can be collected, and where it can be returned",
+  "permission": "RENTAL_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RentalLocationRule"
+ },
+ "updateRentalProduct": {
+  "method": "PUT",
+  "path": "/rental-products/{productId}",
+  "contract": "rental",
+  "summary": "Change a rental product",
+  "permission": "RENTAL_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalProduct",
+  "responds": "RentalProduct"
+ },
+ "validateRentalProduct": {
+  "method": "POST",
+  "path": "/rental-products/{productId}/validate",
+  "contract": "rental",
+  "summary": "What is still missing before this can be sold",
+  "permission": "RENTAL_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RentalConfigurationFinding"
+ }
+}

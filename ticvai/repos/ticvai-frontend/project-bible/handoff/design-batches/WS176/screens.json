@@ -1,0 +1,1486 @@
+[
+ {
+  "id": "BO-1061",
+  "name": "Platform Command Center",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "12",
+   "number": "01",
+   "page": 50
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/platform-command-center-bo-1061",
+   "component": "apps/venue-management-web/src/routes/access-venue/PlatformCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-1062",
+    "BO-1063",
+    "BO-1064",
+    "BO-1065",
+    "BO-1066",
+    "BO-1067",
+    "BO-1068",
+    "BO-1069",
+    "BO-1070"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-1062",
+     "trigger": "Tenant & Brand Context",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1063",
+     "trigger": "Venue-Specific Configuration",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1064",
+     "trigger": "Naming, Numbering & Localization",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1065",
+     "trigger": "Currency, Timezone & Channels",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1066",
+     "trigger": "Roles, Permissions & Masking",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1067",
+     "trigger": "Seat Approval Workflows",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1068",
+     "trigger": "Lifecycle & Environment Promotion",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1069",
+     "trigger": "Platform Health & Observability",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1070",
+     "trigger": "Setup, Clone & Inheritance",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide a platform-wide view of tenant, venue and environment readiness. Show tenants, brands, venues, environments, active users, pending approvals, deployments and failed jobs. Display service status, API health, capacity, incidents and configuration exceptions. Restrict cross-tenant visibility to authorized platform roles and preserve every context switch. Enforce tenant isolation and environment separation at UI, API, data, cache, event and export layers; venue overrides cannot weaken mandatory platform security or compliance policies. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 50"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 50"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listVenueMaps",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The platform list.",
+   "error": "Could not load. Names which read failed and leaves the platform untouched.",
+   "emptyFirstRun": "No platform yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the platform are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listVenueMaps",
+    "contract": "venue-map",
+    "purpose": "Venues and their maps",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listSeatMaps",
+    "contract": "seating",
+    "purpose": "Seat maps across them",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1061",
+   "workshopBoard": "wireframes/WS151 Seat Management Venue Mapping Reference v1.0 Board 12.dc.html#bo-1061"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 50. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1062",
+  "name": "Tenant & Brand Context",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "12",
+   "number": "02",
+   "page": 50
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/tenant-brand-context-bo-1062",
+   "component": "apps/venue-management-web/src/routes/access-venue/TenantBrandContext.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1061"
+   ],
+   "exitTo": [
+    "BO-1061"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1061",
+     "trigger": "Back to Platform Command Center",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure the hierarchy and isolation boundary for seat management. Maintain tenant, legal entity, brand, region, venue ownership, status and data-residency classification. Configure tenant isolation, encryption context, export restriction, cross-brand sharing and support-access policy. Show inherited platform settings and the venues, users, integrations and environments within each context. Enforce tenant isolation and environment separation at UI, API, data, cache, event and export layers; venue overrides cannot weaken mandatory platform security or compliance policies. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 50"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 50"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getOrgUnit",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Venue setting defaults",
+       "bindsTo": "VenueSettings",
+       "columns": [
+        "VenueSettings.supportHours",
+        "VenueSettings.quietHours",
+        "VenueSettings.alerting",
+        "VenueSettings.displayCurrencies",
+        "VenueSettings.shiftVarianceThreshold",
+        "VenueSettings.catalogue",
+        "VenueSettings.inventory",
+        "VenueSettings.seating",
+        "VenueSettings.promotions",
+        "VenueSettings.fnb",
+        "VenueSettings.queue",
+        "VenueSettings.reporting"
+       ],
+       "operation": "getVenueSettingsDefaults",
+       "notes": "**The inherited settings** — the tenant's default for every venue setting, which a venue inherits wherever it leaves a limit null (decided 28 September, audit R094).",
+       "provenance": "contract tenancy.yaml GET /venue-settings-defaults"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save venue setting defaults",
+       "operation": "setVenueSettingsDefaults",
+       "permission": "TENANT_CONFIGURE",
+       "provenance": "contract tenancy.yaml PUT /venue-settings-defaults"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The tenant brand context list.",
+   "error": "Could not load. Names which read failed and leaves the tenant brand context untouched.",
+   "emptyFirstRun": "No tenant brand context yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the tenant brand context are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getOrgUnit",
+    "contract": "tenancy",
+    "purpose": "Tenant and brand context",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getVenueSettingsDefaults",
+    "contract": "tenancy",
+    "purpose": "The tenant's default for every venue setting — the inherited settings (audit R094)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setVenueSettingsDefaults",
+    "contract": "tenancy",
+    "purpose": "Set the tenant's default for every venue setting (tenant scope, TENANT_CONFIGURE; audit R094)",
+    "trigger": "onAction",
+    "invalidates": [
+     "getVenueSettingsDefaults"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1062",
+   "workshopBoard": "wireframes/WS151 Seat Management Venue Mapping Reference v1.0 Board 12.dc.html#bo-1062"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 50. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "orgUnitId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "formSetVenueSettingsDefaults",
+    "component": "modal",
+    "trigger": "Save venue setting defaults",
+    "body": "**Collects what `setVenueSettingsDefaults` sends before it is called.** The body is a `VenueSettings`: every field is the default a venue inherits where it leaves the setting null (decided 28 September, audit R094). Tenant scope; needs `TENANT_CONFIGURE`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "VenueSettings",
+    "confirm": {
+     "label": "Save venue setting defaults",
+     "operation": "setVenueSettingsDefaults"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "supportHours",
+      "quietHours",
+      "alerting",
+      "displayCurrencies",
+      "catalogue",
+      "inventory",
+      "seating",
+      "promotions",
+      "fnb",
+      "queue",
+      "reporting"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /venue-settings-defaults"
+   }
+  ],
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1063",
+  "name": "Venue-Specific Configuration",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "12",
+   "number": "03",
+   "page": 50
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/venue-specific-configuration-bo-1063",
+   "component": "apps/venue-management-web/src/routes/access-venue/VenueSpecificConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1061"
+   ],
+   "exitTo": [
+    "BO-1061"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1061",
+     "trigger": "Back to Platform Command Center",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Set local defaults without creating separate seat systems. Configure default map, lock/hold duration, naming, accessibility, sales channels, approvals and publishing policy. Map local entrances, devices, price/seat categories, operating calendars and venue-specific exceptions. Display which settings inherit from platform/tenant/brand and require justification for permitted overrides. Enforce tenant isolation and environment separation at UI, API, data, cache, event and export layers; venue overrides cannot weaken mandatory platform security or compliance policies. Configuration Scope of Work | Version 1.0 50 Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 50"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 50"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getVenueSettings",
+       "notes": "One record, read-only. **Shows the configured limits** (decided 28 September, audit R094); a limit the venue has not set is null and shows the tenant default it inherits."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setVenueSettings",
+       "label": "Save venue settings",
+       "notes": "The act the screen exists for. Saves the venue's own limits; clearing one sends null, which inherits the tenant default (audit R094)."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setVenueSettings"
+      },
+      {
+       "kind": "numberField",
+       "label": "Seats per guest booking",
+       "bindsTo": "VenueSettings.seating.maxSeatsPerGuestOrder",
+       "operation": "setVenueSettings",
+       "notes": "**How many seats one guest may take in one booking on Guest Web and the Guest App** (decided 29 September, rev 3 REV3-7). Default 10, from 1 to 50; left empty, the venue inherits the tenant default. `createSeatHold` counts the seats asked for plus those the guest already holds on the performance and refuses above it with `seat-limit-exceeded`. Staff and POS sales keep 10 per sale (audit R080 (c)) and do not read it.",
+       "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The venue-specific list.",
+   "error": "Could not load. Names which read failed and leaves the venue-specific untouched.",
+   "emptyFirstRun": "No venue-specific yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the venue-specific are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getVenueSettings",
+    "contract": "tenancy",
+    "purpose": "Venue configuration",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setVenueSettings",
+    "contract": "tenancy",
+    "purpose": "Change it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1063",
+   "workshopBoard": "wireframes/WS151 Seat Management Venue Mapping Reference v1.0 Board 12.dc.html#bo-1063"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 50. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1064",
+  "name": "Naming, Numbering & Localization",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "12",
+   "number": "04",
+   "page": 51
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/naming-numbering-localization-bo-1064",
+   "component": "apps/venue-management-web/src/routes/access-venue/NamingNumberingLocalization.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1061"
+   ],
+   "exitTo": [
+    "BO-1061"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1061",
+     "trigger": "Back to Platform Command Center",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Control how seat entities and values appear in each venue and language. Configure venue/section/row/seat code formats, numbering direction, padding, prefixes and reserved values. Maintain translated labels, supported languages, text direction, pluralization and fallback language. Validate uniqueness and preview labels on map, ticket, cart, POS, access device and report. Enforce tenant isolation and environment separation at UI, API, data, cache, event and export layers; venue overrides cannot weaken mandatory platform security or compliance policies. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 51"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 51"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateSeats",
+       "label": "Save seats",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getRegionSettings",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateSeats"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The naming numbering localization list.",
+   "error": "Could not load. Names which read failed and leaves the naming numbering localization untouched.",
+   "emptyFirstRun": "No naming numbering localization yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the naming numbering localization are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "updateSeats",
+    "contract": "seating",
+    "purpose": "Naming and numbering",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getRegionSettings",
+    "contract": "tenancy",
+    "purpose": "Localisation",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1064",
+   "workshopBoard": "wireframes/WS151 Seat Management Venue Mapping Reference v1.0 Board 12.dc.html#bo-1064"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 51. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "regionId",
+     "from": "navigation"
+    },
+    {
+     "name": "seatMapId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1065",
+  "name": "Currency, Timezone & Channels",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "12",
+   "number": "05",
+   "page": 51
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/currency-timezone-channels-bo-1065",
+   "component": "apps/venue-management-web/src/routes/access-venue/CurrencyTimezoneChannels.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1061"
+   ],
+   "exitTo": [
+    "BO-1061"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1061",
+     "trigger": "Back to Platform Command Center",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure regional display and channel availability. Set currency, rounding, date/time/number formats, timezone, week start and daylight-saving behavior. Enable web, mobile, POS, box office, call center, B2B, partner API and marketplace channels per venue. Define locale defaults and fail-safe behavior when a channel or currency is unavailable. Enforce tenant isolation and environment separation at UI, API, data, cache, event and export layers; venue overrides cannot weaken mandatory platform security or compliance policies. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 51"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 51"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateRegionSettings",
+       "label": "Save region settings",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateRegionSettings"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The currency timezone channels list.",
+   "error": "Could not load. Names which read failed and leaves the currency timezone channels untouched.",
+   "emptyFirstRun": "No currency timezone channels yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the currency timezone channels are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listDenominations",
+    "contract": "shift",
+    "purpose": "The notes and coins tills count",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setDenominations",
+    "contract": "shift",
+    "purpose": "Set a currency's notes and coins",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDenominations"
+    ]
+   },
+   {
+    "operationId": "updateRegionSettings",
+    "contract": "tenancy",
+    "purpose": "Currency, timezone and channels",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1065",
+   "workshopBoard": "wireframes/WS151 Seat Management Venue Mapping Reference v1.0 Board 12.dc.html#bo-1065"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 51. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "regionId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1066",
+  "name": "Roles, Permissions & Masking",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "12",
+   "number": "06",
+   "page": 51
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/roles-permissions-masking-bo-1066",
+   "component": "apps/venue-management-web/src/routes/access-venue/RolesPermissionsMasking.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1061"
+   ],
+   "exitTo": [
+    "BO-1061"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1061",
+     "trigger": "Back to Platform Command Center",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Enforce least-privilege access to seat administration and operational data. Configure RBAC/PBAC for maps, layouts, inventory, locks, holds, pricing, reports, integrations and audit. Apply venue/region scope, field masking, temporary/delegated access, segregation of duties and emergency override. Preview effective access for a user/context and log sensitive read, export and administrative actions. Enforce tenant isolation and environment separation at UI, API, data, cache, event and export layers; venue overrides cannot weaken mandatory platform security or compliance policies. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 51"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 51"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAccessPolicies",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createAccessPolicy",
+       "label": "Create access policy",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createAccessPolicy"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The roles permissions masking list.",
+   "error": "Could not load. Names which read failed and leaves the roles permissions masking untouched.",
+   "emptyFirstRun": "No roles permissions masking yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the roles permissions masking are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAccessPolicies",
+    "contract": "identity",
+    "purpose": "Who may see and change what",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createAccessPolicy",
+    "contract": "identity",
+    "purpose": "Write a policy",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "simulateAccessPolicy",
+    "contract": "identity",
+    "purpose": "What this policy would decide, before it decides anything",
+    "trigger": "onAction",
+    "provenance": "wiring gap, 19 September 2026 — the screen showed the noun and could not act on it"
+   },
+   {
+    "operationId": "updateAccessPolicy",
+    "contract": "identity",
+    "purpose": "Change a data-access policy, as a new version",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listAccessPolicies"
+    ]
+   },
+   {
+    "operationId": "setAccessPolicyState",
+    "contract": "identity",
+    "purpose": "Submit, approve, activate or retire a policy",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listAccessPolicies"
+    ]
+   },
+   {
+    "operationId": "createEmergencyAccessOverride",
+    "contract": "identity",
+    "purpose": "Bypass the policy, loudly, with a reason and an expiry",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listAccessPolicies"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1066",
+   "workshopBoard": "wireframes/WS151 Seat Management Venue Mapping Reference v1.0 Board 12.dc.html#bo-1066"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 51. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "policyId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1067",
+  "name": "Seat Approval Workflows",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "12",
+   "number": "07",
+   "page": 51
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/seat-approval-workflows-bo-1067",
+   "component": "apps/venue-management-web/src/routes/access-venue/SeatApprovalWorkflows.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1061"
+   ],
+   "exitTo": [
+    "BO-1061"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1061",
+     "trigger": "Back to Platform Command Center",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure governance paths for high-impact seat changes. Define workflow by map/layout, capacity, seat kill, hold, accessibility, pricing, integration and override change type. Set stages, approver roles, thresholds, quorum, SLA, escalation, delegation, comments and evidence. Prevent requester self-approval where segregation rules apply and preserve decision history. Enforce tenant isolation and environment separation at UI, API, data, cache, event and export layers; venue overrides cannot weaken mandatory platform security or compliance policies. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 51",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 51"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 51"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setVisualWorkflow",
+       "label": "Save visual workflow",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setVisualWorkflow"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The seat approval workflows list.",
+   "error": "Could not load. Names which read failed and leaves the seat approval workflows untouched.",
+   "emptyFirstRun": "No seat approval workflows yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the seat approval workflows are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setVisualWorkflow",
+    "contract": "approvals",
+    "purpose": "Seat approval workflows",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1067",
+   "workshopBoard": "wireframes/WS151 Seat Management Venue Mapping Reference v1.0 Board 12.dc.html#bo-1067"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 51. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1068",
+  "name": "Lifecycle & Environment Promotion",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "12",
+   "number": "08",
+   "page": 52
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/lifecycle-environment-promotion-bo-1068",
+   "component": "apps/venue-management-web/src/routes/access-venue/LifecycleEnvironmentPromotion.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1061"
+   ],
+   "exitTo": [
+    "BO-1061"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1061",
+     "trigger": "Back to Platform Command Center",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Move approved configuration safely from draft to production. Provide Draft, Test, Staging and Production contexts with version, owner, status and dependency checks. Promote signed configuration packages through required gates, automated tests and approvals. Support comparison, rollback, failed-promotion recovery and prohibition of direct unapproved production edits. Enforce tenant isolation and environment separation at UI, API, data, cache, event and export layers; venue overrides cannot weaken mandatory platform security or compliance policies. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 52"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 52"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "deployConfigurationProfile",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "deployConfigurationProfile"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Promotes this configuration to the target environment.** What is running there now is replaced, and the previous version stays restorable.",
+       "provenance": "authored — required by check-screens, 19 September 2026"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The lifecycle environment promotion list.",
+   "error": "Could not load. Names which read failed and leaves the lifecycle environment promotion untouched.",
+   "emptyFirstRun": "No lifecycle environment promotion yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the lifecycle environment promotion are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "deployConfigurationProfile",
+    "contract": "tenancy",
+    "purpose": "Promote configuration",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1068",
+   "workshopBoard": "wireframes/WS151 Seat Management Venue Mapping Reference v1.0 Board 12.dc.html#bo-1068"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 52. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "profileId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1069",
+  "name": "Platform Health & Observability",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "12",
+   "number": "09",
+   "page": 52
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/platform-health-observability-bo-1069",
+   "component": "apps/venue-management-web/src/routes/access-venue/PlatformHealthObservability.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1061"
+   ],
+   "exitTo": [
+    "BO-1061"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1061",
+     "trigger": "Back to Platform Command Center",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Monitor the technical services that protect seat-state correctness. Show API latency/error, event lag, lock service, inventory service, cache, database, queue and webhook health. Configure SLOs, thresholds, alerts, correlation, incident ownership and capacity forecasts by tenant/venue. Drill from a metric to traces, logs and affected performances without exposing restricted tenant data. Enforce tenant isolation and environment separation at UI, API, data, cache, event and export layers; venue overrides cannot weaken mandatory platform security or compliance policies. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 52"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 52"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getWorkstationHealth",
+       "notes": "One record, read-only."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The platform health observability list.",
+   "error": "Could not load. Names which read failed and leaves the platform health observability untouched.",
+   "emptyFirstRun": "No platform health observability yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the platform health observability are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getWorkstationHealth",
+    "contract": "tenancy",
+    "purpose": "Platform health",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1069",
+   "workshopBoard": "wireframes/WS151 Seat Management Venue Mapping Reference v1.0 Board 12.dc.html#bo-1069"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 52. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "workstationId",
+     "from": "session"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1070",
+  "name": "Setup, Clone & Inheritance",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "12",
+   "number": "10",
+   "page": 52
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/setup-clone-inheritance-bo-1070",
+   "component": "apps/venue-management-web/src/routes/access-venue/SetupCloneInheritance.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1061"
+   ],
+   "exitTo": [
+    "BO-1061"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1061",
+     "trigger": "Back to Platform Command Center",
+     "provenance": "structural — pack board 12 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Accelerate onboarding while keeping configuration lineage visible. Guide setup of tenant, brand, venue, locale, map, categories, locks/holds, channels, workflows and integrations. Clone an authorized source venue or template and choose which settings, maps and rules to copy or inherit. Show inherited, overridden, missing and conflicting settings and validate completeness before activation. Enforce tenant isolation and environment separation at UI, API, data, cache, event and export layers; venue overrides cannot weaken mandatory platform security or compliance policies. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 52 Board 13 - Seat APIs, Webhooks & Audit Governance Figure 13. High-definition configuration board with all 10 screens. Visual reference: information architecture and configuration coverage; detailed production behavior is defined in the following scope. Configuration Scope of Work | Version 1.0 53",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Setup, Clone & Inheritance declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 52"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 52"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "cloneSeatMap",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "cloneSeatMap"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The clone inheritance list.",
+   "error": "Could not load. Names which read failed and leaves the clone inheritance untouched.",
+   "emptyFirstRun": "No clone inheritance yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the clone inheritance are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "cloneSeatMap",
+    "contract": "seating",
+    "purpose": "Clone a map into a new venue",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setConfigurationProfile",
+    "contract": "tenancy",
+    "purpose": "Inherited settings",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1070",
+   "workshopBoard": "wireframes/WS151 Seat Management Venue Mapping Reference v1.0 Board 12.dc.html#bo-1070"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 52. 0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "seatMapId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

@@ -1,16 +1,108 @@
 {
- "approveManualOverrideSupervisor": {
-  "method": "PUT",
-  "path": "/manual-override-supervisor",
+ "cancelGateModeChange": {
+  "method": "POST",
+  "path": "/gate-mode-changes/{changeId}/cancel",
   "contract": "access",
-  "summary": "Manual Override & Supervisor Approval",
+  "summary": "Cancel a scheduled gate mode change",
+  "permission": "TURNSTILE_MODE_SET",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessGateModeChange"
+ },
+ "deletePodium": {
+  "method": "DELETE",
+  "path": "/podiums/{podiumId}",
+  "contract": "access",
+  "summary": "Delete a podium",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "deleteReasonCode": {
+  "method": "DELETE",
+  "path": "/reason-codes/{reasonCodeId}",
+  "contract": "access",
+  "summary": "Delete a validation reason code",
   "permission": "ACCESS_POINT_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": "ManualOverrideSupervisorApprovalInput",
-  "responds": "ManualOverrideSupervisorApprovalView"
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "endPodiumShift": {
+  "method": "POST",
+  "path": "/podium-shifts/{shiftId}/end",
+  "contract": "access",
+  "summary": "End an operator shift on a podium",
+  "permission": "TURNSTILE_MODE_SET",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessPodiumShift"
+ },
+ "listAccessPoints": {
+  "method": "GET",
+  "path": "/access-points",
+  "contract": "access",
+  "summary": "List access points",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listCredentialDisableBlacklist": {
   "method": "GET",
@@ -21,9 +113,20 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CredentialDisableBlacklistWhitelistOperationsView"
+  "responds": "Page"
  },
  "listLiveAccess": {
   "method": "GET",
@@ -34,9 +137,20 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "LiveAccessOperationsCommandCenterView"
+  "responds": "Page"
  },
  "listLiveGateMode": {
   "method": "GET",
@@ -47,9 +161,20 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "LiveGateModeLaneControlView"
+  "responds": "Page"
  },
  "listPodiumConsole": {
   "method": "GET",
@@ -73,29 +198,51 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "QueueThroughputLaneOptimizationView"
+  "responds": "Page"
  },
  "listShiftHandoverSummary": {
   "method": "GET",
   "path": "/shift-handover-summary",
   "contract": "access",
   "summary": "Operations Audit, Shift Handover & Control Summary",
-  "permission": "SCOPE_VIEW",
+  "permission": "AUDIT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "OperationsAuditShiftHandoverControlSummaryView"
+  "responds": "Page"
  },
  "listTicketCredentialInvestigation": {
   "method": "GET",
   "path": "/ticket-credential-investigation",
   "contract": "access",
   "summary": "Ticket & Credential Investigation Console",
-  "permission": "SCOPE_VIEW",
+  "permission": "TICKET_LOOKUP",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -139,10 +286,40 @@
     "name": "membership",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "guestName",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "email",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "mobile",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "externalPartnerReference",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "TicketCredentialInvestigationConsoleView"
+  "responds": "Page"
  },
  "listValidationExceptionReason": {
   "method": "GET",
@@ -157,17 +334,118 @@
   "requestBody": null,
   "responds": "ValidationExceptionReasonCodeManagerView"
  },
+ "overrideAccess": {
+  "method": "POST",
+  "path": "/access/override",
+  "contract": "access",
+  "summary": "Admit against a failed validation",
+  "permission": "ACCESS_OVERRIDE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ValidationResult"
+ },
  "setOperationalIncidentException": {
   "method": "PUT",
   "path": "/operational-incident-exception",
   "contract": "access",
   "summary": "Operational Incident & Exception Workspace",
+  "permission": "INCIDENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "OperationalIncidentExceptionWorkspaceInput",
+  "responds": "OperationalIncidentExceptionWorkspaceView"
+ },
+ "setPodium": {
+  "method": "PUT",
+  "path": "/podiums",
+  "contract": "access",
+  "summary": "Create or replace a podium",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessPodium",
+  "responds": "AccessPodium"
+ },
+ "setReasonCode": {
+  "method": "PUT",
+  "path": "/reason-codes",
+  "contract": "access",
+  "summary": "Create or replace a validation reason code",
   "permission": "ACCESS_POINT_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": "OperationalIncidentExceptionWorkspaceInput",
-  "responds": "OperationalIncidentExceptionWorkspaceView"
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessReasonCode",
+  "responds": "AccessReasonCode"
+ },
+ "setTurnstileMode": {
+  "method": "PUT",
+  "path": "/access-points/{accessPointId}/mode",
+  "contract": "access",
+  "summary": "Set the operating mode of an access point",
+  "permission": "TURNSTILE_MODE_SET",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessPoint"
+ },
+ "startPodiumShift": {
+  "method": "POST",
+  "path": "/podiums/{podiumId}/shifts",
+  "contract": "access",
+  "summary": "Start an operator shift on a podium",
+  "permission": "TURNSTILE_MODE_SET",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessPodiumShift"
  }
 }

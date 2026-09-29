@@ -1,23 +1,4 @@
 {
- "adjustLoyaltyPoints": {
-  "method": "POST",
-  "path": "/guests/{subjectId}/loyalty/adjust",
-  "contract": "marketing-crm",
-  "summary": "Manually adjust points",
-  "permission": "LEDGER_POST",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "LoyaltyPosition"
- },
  "askReportingQuestion": {
   "method": "POST",
   "path": "/reports/ask",
@@ -36,6 +17,82 @@
   ],
   "requestBody": null,
   "responds": "NaturalLanguageAnswer"
+ },
+ "cancelWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/cancel",
+  "contract": "maintenance",
+  "summary": "Cancel a work order",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ },
+ "closeCorrectiveAction": {
+  "method": "POST",
+  "path": "/food-safety/corrective-actions/{actionId}/close",
+  "contract": "fnb",
+  "summary": "Close a signed finding",
+  "permission": "INCIDENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CorrectiveAction"
+ },
+ "closeWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/close",
+  "contract": "maintenance",
+  "summary": "Administratively closed",
+  "permission": "MAINTENANCE_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ },
+ "completeWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/complete",
+  "contract": "maintenance",
+  "summary": "Complete a work order",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
  },
  "configureWorkstation": {
   "method": "PUT",
@@ -189,6 +246,25 @@
   "requestBody": "WebhookSubscription",
   "responds": "WebhookSubscription"
  },
+ "createWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders",
+  "contract": "maintenance",
+  "summary": "Raise a work order",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateWorkOrderRequest",
+  "responds": "WorkOrder"
+ },
  "deleteReport": {
   "method": "DELETE",
   "path": "/reports/{reportId}",
@@ -227,6 +303,25 @@
   "requestBody": "ProfileDeployment",
   "responds": null
  },
+ "escalateCorrectiveAction": {
+  "method": "POST",
+  "path": "/food-safety/corrective-actions/{actionId}/escalate",
+  "contract": "fnb",
+  "summary": "Escalate a finding",
+  "permission": "INCIDENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CorrectiveAction"
+ },
  "getAccessPoint": {
   "method": "GET",
   "path": "/access-points/{accessPointId}",
@@ -240,35 +335,11 @@
   "requestBody": null,
   "responds": "AccessPoint"
  },
- "getConsentHistory": {
-  "method": "GET",
-  "path": "/guests/{subjectId}/consents/history",
-  "contract": "marketing-crm",
-  "summary": "Full consent history",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "getFinancialReport": {
   "method": "GET",
   "path": "/reports/financial",
   "contract": "finance",
-  "summary": "P&L, balance sheet or cash flow",
+  "summary": "Financial statements, revenue and tax summaries",
   "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -303,31 +374,24 @@
   "requestBody": null,
   "responds": "FinancialReport"
  },
- "getGuestConsents": {
+ "getFnbDeliveryPolicy": {
   "method": "GET",
-  "path": "/guests/{subjectId}/consents",
-  "contract": "marketing-crm",
-  "summary": "Read a guest's consent state",
-  "permission": "GUEST_VIEW",
+  "path": "/fnb-delivery-policy",
+  "contract": "fnb",
+  "summary": "How an outlet does takeaway and delivery",
+  "permission": "PRODUCT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": true
+   }
+  ],
   "requestBody": null,
-  "responds": "ConsentState"
- },
- "getGuestLoyalty": {
-  "method": "GET",
-  "path": "/guests/{subjectId}/loyalty",
-  "contract": "marketing-crm",
-  "summary": "A guest's loyalty position",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "LoyaltyPosition"
+  "responds": "FnbDeliveryPolicy"
  },
  "getGuestMenu": {
   "method": "GET",
@@ -353,19 +417,6 @@
   "requestBody": null,
   "responds": "GuestMenu"
  },
- "getGuestProfile": {
-  "method": "GET",
-  "path": "/guests/{subjectId}",
-  "contract": "marketing-crm",
-  "summary": "Read a guest profile",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "GuestProfileDetail"
- },
  "getHaccpStatus": {
   "method": "GET",
   "path": "/food-safety/status",
@@ -378,6 +429,45 @@
   "parameters": [],
   "requestBody": null,
   "responds": null
+ },
+ "getKpiValues": {
+  "method": "GET",
+  "path": "/kpi-values",
+  "contract": "reporting",
+  "summary": "Current values, against target, with movement",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kpiIds",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kpiCodes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "compareTo",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KpiValue"
  },
  "getOfflinePackage": {
   "method": "GET",
@@ -499,7 +589,7 @@
   "path": "/venues/{venueId}/settings",
   "contract": "tenancy",
   "summary": "Operational settings for this venue",
-  "permission": "TENANT_CONFIGURE",
+  "permission": "TENANT_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -507,18 +597,18 @@
   "requestBody": null,
   "responds": "VenueSettings"
  },
- "getWishlist": {
+ "getWorkOrder": {
   "method": "GET",
-  "path": "/guests/{subjectId}/wishlist",
-  "contract": "marketing-crm",
-  "summary": "Read a guest's saved items",
-  "permission": null,
-  "offlineCapable": false,
+  "path": "/work-orders/{workOrderId}",
+  "contract": "maintenance",
+  "summary": "Read a work order",
+  "permission": "WORK_ORDER_VIEW",
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
+  "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "Wishlist"
+  "responds": "WorkOrderDetail"
  },
  "getWorkstation": {
   "method": "GET",
@@ -545,6 +635,25 @@
   "parameters": [],
   "requestBody": null,
   "responds": null
+ },
+ "issueDeviceCredential": {
+  "method": "POST",
+  "path": "/devices/{deviceId}/credentials",
+  "contract": "tenancy",
+  "summary": "Give the device an identity it can prove",
+  "permission": "DEVICE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DeviceCredential"
  },
  "listAccessPoints": {
   "method": "GET",
@@ -587,6 +696,26 @@
   "parameters": [
    {
     "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "severity",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "shiftId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "itemId",
     "in": "query",
     "required": null
    }
@@ -656,7 +785,7 @@
   "path": "/audit-records",
   "contract": "tenancy",
   "summary": "Who did what, where, and when",
-  "permission": "AI_AUDIT_VIEW",
+  "permission": "AUDIT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -687,6 +816,11 @@
     "required": null
    },
    {
+    "name": "platformStaffGrantId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": "from",
     "in": "query",
     "required": null
@@ -695,10 +829,20 @@
     "name": "to",
     "in": "query",
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Page"
  },
  "listDevices": {
   "method": "GET",
@@ -772,30 +916,6 @@
   ],
   "requestBody": null,
   "responds": "Page"
- },
- "listGuestDevices": {
-  "method": "GET",
-  "path": "/guests/{subjectId}/devices",
-  "contract": "marketing-crm",
-  "summary": "A guest's registered devices",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestDevice"
  },
  "listIncidents": {
   "method": "GET",
@@ -1126,12 +1246,18 @@
   "method": "GET",
   "path": "/webhook-subscriptions",
   "contract": "public-api",
-  "summary": "What this client is subscribed to",
+  "summary": "The tenant's webhook subscriptions, filterable by API client",
   "permission": "DEVELOPER_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "clientId",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "WebhookSubscription"
  },
@@ -1242,25 +1368,6 @@
   "requestBody": null,
   "responds": "TicketStatus"
  },
- "mergeGuestProfiles": {
-  "method": "POST",
-  "path": "/guests/{subjectId}/merge",
-  "contract": "marketing-crm",
-  "summary": "Merge a duplicate profile into this one",
-  "permission": "GUEST_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "MergeResult"
- },
  "overrideAccess": {
   "method": "POST",
   "path": "/access/override",
@@ -1280,6 +1387,44 @@
   "requestBody": null,
   "responds": "ValidationResult"
  },
+ "pauseWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/pause",
+  "contract": "maintenance",
+  "summary": "Stopped, and why",
+  "permission": "MAINTENANCE_EXECUTE",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ },
+ "recordCorrectiveAction": {
+  "method": "POST",
+  "path": "/food-safety/corrective-actions/{actionId}/action",
+  "contract": "fnb",
+  "summary": "Record what was done about a finding",
+  "permission": "INCIDENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CorrectiveAction"
+ },
  "recordDeviceHeartbeat": {
   "method": "POST",
   "path": "/devices/{deviceId}/heartbeat",
@@ -1289,7 +1434,13 @@
   "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": null
  },
@@ -1331,6 +1482,25 @@
   "requestBody": "RegisteredDevice",
   "responds": "RegisteredDevice"
  },
+ "rejectWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/reject",
+  "contract": "maintenance",
+  "summary": "The assignee declines, with a reason",
+  "permission": "MAINTENANCE_EXECUTE",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ },
  "reserveMerchandise": {
   "method": "POST",
   "path": "/outlets/{outletId}/reserve",
@@ -1349,6 +1519,30 @@
   ],
   "requestBody": null,
   "responds": "MerchandiseReservation"
+ },
+ "revokeDeviceCredential": {
+  "method": "DELETE",
+  "path": "/devices/{deviceId}/credentials",
+  "contract": "tenancy",
+  "summary": "Cut a device off now",
+  "permission": "DEVICE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "reason",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "runReport": {
   "method": "POST",
@@ -1388,45 +1582,6 @@
   "requestBody": null,
   "responds": "ReportDefinition"
  },
- "searchGuests": {
-  "method": "GET",
-  "path": "/guests",
-  "contract": "marketing-crm",
-  "summary": "Search guest profiles",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "search",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "segmentId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "hasConsentFor",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "setAccessPointGeofence": {
   "method": "PUT",
   "path": "/access-points/{accessPointId}/geofence",
@@ -1443,8 +1598,27 @@
     "required": null
    }
   ],
-  "requestBody": null,
+  "requestBody": "AccessPointGeofence",
   "responds": "AccessPoint"
+ },
+ "setFnbDeliveryPolicy": {
+  "method": "PUT",
+  "path": "/fnb-delivery-policy",
+  "contract": "fnb",
+  "summary": "Set takeaway and delivery rules",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FnbDeliveryPolicy",
+  "responds": "FnbDeliveryPolicy"
  },
  "setOfflinePolicy": {
   "method": "PUT",
@@ -1550,7 +1724,13 @@
   "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ScanSyncResult"
  },
@@ -1572,25 +1752,6 @@
   ],
   "requestBody": null,
   "responds": "AccessPoint"
- },
- "updateGuestProfile": {
-  "method": "PATCH",
-  "path": "/guests/{subjectId}",
-  "contract": "marketing-crm",
-  "summary": "Amend a guest profile",
-  "permission": "GUEST_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestProfileDetail"
  },
  "updateOrgUnit": {
   "method": "PATCH",
@@ -1648,6 +1809,25 @@
   ],
   "requestBody": "CreateReportRequest",
   "responds": "ReportDefinition"
+ },
+ "updateWorkOrder": {
+  "method": "PATCH",
+  "path": "/work-orders/{workOrderId}",
+  "contract": "maintenance",
+  "summary": "Assign, reprioritise or amend",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
  },
  "validateAccess": {
   "method": "POST",

@@ -1,6 +1,6 @@
 # P08-food-beverage-01 — P08 · Food & Beverage
 
-**8 screens · 29 operations · 17 schemas · 7 permissions**
+**8 screens · 34 operations · 31 schemas · 9 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 7 permissions apply here:
-  `ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, SCOPE_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 9 permissions apply here:
+  `ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE, SCOPE_VIEW, TENANT_CONFIGURE, TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **10 of these operations work offline**: acceptFnbOrder, cancelFnbOrder, createFnbOrder, getFnbOrder, getVenueSettings, listKitchenStations, listKitchenTickets, listProductionRuns
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,11 +60,15 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-020` | F&B Order Management | listDetail | 11 | 1 | — |
-| `BO-021` | Order Search | statusTracker | 2 | 0 | — |
-| `BO-045` | Menu Management | listDetail | 10 | 0 | — |
-| `BO-046` | Kitchen Display | listDetail | 5 | 0 | — |
-| `BO-104` | Food & Beverage | listDetail | 3 | 0 | — |
-| `BO-134` | Kitchen & Preparation Stations | listDetail | 2 | 0 | — |
-| `BO-135` | Order Routing & KDS/Printer Rules | listDetail | 2 | 0 | — |
-| `BO-136` | F&B Global Settings & Controls | listDetail | 5 | 0 | — |
+| `BO-020` | F&B Order Management | listDetail | 11 | 7 | — |
+| `BO-021` | Order Search | statusTracker | 2 | 1 | — |
+| `BO-045` | Menu Management | listDetail | 12 | 7 | — |
+| `BO-046` | Kitchen Display | listDetail | 5 | 3 | — |
+| `BO-104` | Food & Beverage | listDetail | 4 | 1 | — |
+| `BO-134` | Kitchen & Preparation Stations | listDetail | 4 | 1 | — |
+| `BO-135` | Order Routing & KDS/Printer Rules | listDetail | 2 | 1 | — |
+| `BO-136` | F&B Global Settings & Controls | listDetail | 5 | 2 | — |
+
+## Thin screens in this batch
+
+**BO-021 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

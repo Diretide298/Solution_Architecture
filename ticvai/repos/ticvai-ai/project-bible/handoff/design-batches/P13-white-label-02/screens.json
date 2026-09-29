@@ -27,29 +27,17 @@
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-013 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "carries": [
-      "uploadId"
-     ],
-     "provenance": "derived — CMS-002 declares entryState.params uploadId, so an edge into it must carry them"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-013 holds none of them, so the edge carries nothing and CMS-002 opens cold"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "carries": [
-      "bannerId",
-      "pageId",
-      "policyKind",
-      "version"
-     ],
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version, so an edge into it must carry them"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-013 holds none of them, so the edge carries nothing and CMS-003 opens cold"
     }
    ]
   },
@@ -163,20 +151,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save SEO metadata",
        "operation": "setSeoMetadata",
        "provenance": "contract marketing-crm.yaml PUT /seo-metadata"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -186,7 +163,7 @@
    "loading": "Detail loads",
    "error": "Could not load",
    "emptyFirstRun": "Not found — it may have been deleted or moved out of scope",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `MARKETING_MANAGE`, which `setSeoMetadata` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -253,29 +230,17 @@
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-011 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "carries": [
-      "uploadId"
-     ],
-     "provenance": "derived — CMS-002 declares entryState.params uploadId, so an edge into it must carry them"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-011 holds none of them, so the edge carries nothing and CMS-002 opens cold"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "carries": [
-      "bannerId",
-      "pageId",
-      "policyKind",
-      "version"
-     ],
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version, so an edge into it must carry them"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-011 holds none of them, so the edge carries nothing and CMS-003 opens cold"
     }
    ]
   },
@@ -284,13 +249,6 @@
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`setLanguages`) and no read of a population — it is settings, not a list",
   "purpose": "Fill in what every language is missing.",
-  "gaps": [
-   {
-    "operation": "setLanguages",
-    "why": "**`setLanguages` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
-    "source": "contract white-label.yaml PUT /tenant-config/languages"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -300,7 +258,7 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save languages",
        "operation": "setLanguages",
        "provenance": "contract white-label.yaml PUT /tenant-config/languages"
       }
@@ -311,24 +269,18 @@
      "slot": "carried",
      "components": [
       {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
+       "kind": "multiSelect",
+       "label": "Languages",
+       "operation": "setLanguages",
+       "notes": "Required.",
+       "provenance": "contract white-label.yaml PUT /tenant-config/languages"
       },
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setLanguages",
-       "label": "Save languages",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setLanguages",
-       "provenance": "carried from the previous definition"
+       "kind": "textField",
+       "label": "Default language",
+       "operation": "setLanguages",
+       "notes": "Required.",
+       "provenance": "contract white-label.yaml PUT /tenant-config/languages"
       }
      ]
     }
@@ -337,8 +289,8 @@
   "states": {
    "loading": "The saved translations.",
    "error": "Could not load. Names which read failed and leaves the translations untouched.",
-   "emptyFirstRun": "No translations configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No translations configured. The form opens empty and `setLanguages` saves the first one; it says what the platform does in the meantime.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `setLanguages` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -408,29 +360,20 @@
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-012 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "carries": [
-      "uploadId"
-     ],
-     "provenance": "derived — CMS-002 declares entryState.params uploadId, so an edge into it must carry them"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-012 holds none of them, so the edge carries nothing and CMS-002 opens cold"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
      "carries": [
-      "bannerId",
-      "pageId",
-      "policyKind",
       "version"
      ],
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version, so an edge into it must carry them"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-012 holds version, so an edge into it carries them"
     }
    ]
   },
@@ -448,7 +391,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected rtl preview",
+       "label": "The tenant config",
        "bindsTo": "TenantConfig",
        "columns": [
         "TenantConfig.isDraft",
@@ -478,39 +421,19 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Validate",
+       "label": "Validate tenant config",
        "operation": "validateTenantConfig",
        "provenance": "contract white-label.yaml POST /tenant-config/validate"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "validateTenantConfig",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The rtl preview list.",
+   "loading": "The rtl preview, read by `getTenantConfig`.",
    "error": "Could not load. Names which read failed and leaves the rtl preview untouched.",
-   "emptyFirstRun": "No rtl preview yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the rtl preview are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No rtl preview yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getTenantConfig` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -579,40 +502,34 @@
    "fromFlows": true,
    "transitions": [
     {
-     "to": "CMS-015",
-     "trigger": "Rolls back when something is wrong",
-     "provenance": "flow F22 step 5→6"
-    },
-    {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-014 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "carries": [
-      "uploadId"
-     ],
-     "provenance": "derived — CMS-002 declares entryState.params uploadId, so an edge into it must carry them"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-014 holds none of them, so the edge carries nothing and CMS-002 opens cold"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
      "carries": [
-      "bannerId",
-      "pageId",
-      "policyKind",
       "version"
      ],
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version, so an edge into it must carry them"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-014 holds version, so an edge into it carries them"
+    },
+    {
+     "to": "CMS-015",
+     "trigger": "Rolls back when something is wrong",
+     "provenance": "flow F22 step 5→6",
+     "carries": [
+      "version"
+     ]
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**A rollback arrives here as a draft (decided 28 September, audit R139 (b)).** Version History (CMS-015) restores an old version into the working draft with `restoreConfigVersion` and reviews it with `diffConfigVersion`; only this screen's `publishTenantConfig` puts it live, with a note. A rollback is never one click.",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing",
@@ -626,7 +543,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected publishing workflow",
+       "label": "The tenant app status",
        "bindsTo": "TenantAppStatus",
        "columns": [
         "TenantAppStatus.isPublished",
@@ -644,6 +561,12 @@
        ],
        "operation": "getTenantAppStatus",
        "provenance": "contract white-label.yaml GET /tenant-config/status"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishTenantConfig",
+       "notes": "Declares `publishTenantConfig`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -653,13 +576,13 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Publish",
+       "label": "Publish tenant config",
        "operation": "publishTenantConfig",
        "provenance": "contract white-label.yaml POST /tenant-config/publish"
       },
       {
        "kind": "secondaryButton",
-       "label": "Validate",
+       "label": "Validate tenant config",
        "operation": "validateTenantConfig",
        "provenance": "contract white-label.yaml POST /tenant-config/validate"
       },
@@ -670,47 +593,14 @@
        "provenance": "authored — required by check-screens"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "publishTenantConfig",
-       "label": "Publish tenant config",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "publishTenantConfig",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishTenantConfig",
-       "notes": "Declares `publishTenantConfig`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
-   "loading": "The publishing workflow list.",
+   "loading": "The publishing workflow, read by `getTenantAppStatus`.",
    "error": "Could not load. Names which read failed and leaves the publishing workflow untouched.",
-   "emptyFirstRun": "No publishing workflow yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the publishing workflow are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No publishing workflow yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_PUBLISH`, which `publishTenantConfig` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -738,6 +628,26 @@
    "board": "wireframes/P13 Venue CMS.dc.html#cms-014"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formPublishTenantConfig",
+    "component": "modal",
+    "trigger": "Publish tenant config",
+    "body": "**Collects what `publishTenantConfig` sends before it is called.** Required: `note`. Optional: `scheduledFor`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Publish tenant config",
+     "operation": "publishTenantConfig"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "note",
+      "scheduledFor"
+     ]
+    },
+    "provenance": "contract white-label.yaml POST /tenant-config/publish"
+   }
+  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -775,47 +685,48 @@
    "status": "notStarted"
   },
   "navigation": {
+   "entryFrom": [
+    "CMS-001",
+    "CMS-014"
+   ],
    "exitTo": [
     "CMS-001",
     "CMS-002",
-    "CMS-003"
+    "CMS-003",
+    "CMS-014"
    ],
    "inferred": true,
    "transitions": [
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-015 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "carries": [
-      "uploadId"
-     ],
-     "provenance": "derived — CMS-002 declares entryState.params uploadId, so an edge into it must carry them"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-015 holds none of them, so the edge carries nothing and CMS-002 opens cold"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
      "carries": [
-      "bannerId",
-      "pageId",
-      "policyKind",
       "version"
      ],
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version, so an edge into it must carry them"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-015 holds version, so an edge into it carries them"
+    },
+    {
+     "to": "CMS-014",
+     "trigger": "Review and publish the restored draft",
+     "provenance": "decided 28 September, audit R139 (b) — a restore lands in the working draft, and the publish is a separate, deliberate step"
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**Absorbed CMS-020 on 28 September (audit R276)**: the Change Log listed the same `listConfigVersions` rows (who published what, when, with which note) and nothing else, so it brought no operation; its entry from the Tenant Workspace (CMS-001) now lands here.\n\n**Rollback is restore, then review, then publish — never one click (decided 28 September, audit R139 (b)).** **Restore config version** calls `restoreConfigVersion`, which copies the chosen version into the working draft and publishes nothing. The screen then shows **Diff config version** of the live version against the restored draft (`diffConfigVersion`) as the review, and **Review and publish the restored draft** goes to the Publishing Workflow (CMS-014), where `publishTenantConfig` puts it live with a note.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listConfigVersions` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "See what changed and go back if it was wrong.",
+  "purpose": "See who changed what and go back if it was wrong — by restoring into the draft, reviewing, then publishing.",
   "layout": {
    "template": "split",
    "regions": [
@@ -825,7 +736,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every version history",
+       "label": "Every config version",
        "bindsTo": "ConfigVersion",
        "columns": [
         "ConfigVersion.publishedAt",
@@ -849,7 +760,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected version history",
+       "label": "The selected config version",
        "bindsTo": "ConfigVersion",
        "columns": [
         "ConfigVersion.publishedAt",
@@ -873,41 +784,17 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Diff",
+       "label": "Diff config version",
        "operation": "diffConfigVersion",
+       "notes": "After a restore this is the review step — the live version against the restored draft — before anything is published (decided 28 September, audit R139 (b)).",
        "provenance": "contract white-label.yaml GET /tenant-config/versions/{version}/diff"
       },
       {
        "kind": "secondaryButton",
-       "label": "Restore",
+       "label": "Restore config version",
        "operation": "restoreConfigVersion",
+       "notes": "Restores into the working draft only; nothing goes live until it is reviewed and published on CMS-014 (decided 28 September, audit R139 (b)).",
        "provenance": "contract white-label.yaml POST /tenant-config/versions/{version}/restore"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listConfigVersions",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "restoreConfigVersion",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -916,9 +803,9 @@
   "states": {
    "loading": "The version history list.",
    "error": "Could not load. Names which read failed and leaves the version history untouched.",
-   "emptyFirstRun": "No version history yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the version history are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No version history yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listConfigVersions` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listConfigVersions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -931,12 +818,12 @@
     "operationId": "diffConfigVersion",
     "contract": "white-label",
     "purpose": "Compare a version against the working draft",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "restoreConfigVersion",
     "contract": "white-label",
-    "purpose": "Restore a previous version",
+    "purpose": "Restore a previous version into the working draft; it does not publish (audit R139 (b))",
     "trigger": "onAction",
     "invalidates": [
      "listConfigVersions"
@@ -965,6 +852,22 @@
    "board": "wireframes/P13 Venue CMS.dc.html#cms-015"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "confirmRestoreConfigVersion",
+    "component": "confirmDialog",
+    "trigger": "Restore config version",
+    "body": "**Restores the chosen version into the working draft and publishes nothing** (decided 28 September, audit R139 (b)). Names the version and says that any unpublished changes in the draft are replaced. Guests keep seeing the live version until the restored draft is reviewed (`diffConfigVersion`) and published on CMS-014.",
+    "confirm": {
+     "label": "Restore into draft",
+     "operation": "restoreConfigVersion"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract white-label.yaml POST /tenant-config/versions/{version}/restore"
+   }
+  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1005,7 +908,11 @@
    "exitTo": [
     "CMS-001",
     "CMS-002",
-    "CMS-003"
+    "CMS-003",
+    "CMS-013",
+    "CMS-017",
+    "CMS-018",
+    "CMS-101"
    ],
    "inferred": false,
    "entryFrom": [
@@ -1016,29 +923,35 @@
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-016 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "carries": [
-      "uploadId"
-     ],
-     "provenance": "derived — CMS-002 declares entryState.params uploadId, so an edge into it must carry them"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-016 holds none of them, so the edge carries nothing and CMS-002 opens cold"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
      "carries": [
-      "bannerId",
-      "pageId",
-      "policyKind",
       "version"
      ],
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version, so an edge into it must carry them"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-016 holds version, so an edge into it carries them"
+    },
+    {
+     "to": "CMS-017",
+     "trigger": "Domain & Certificate",
+     "provenance": "derived — CMS-017 declares entryState.params domainId and CMS-016 holds none of them, so the edge carries nothing and CMS-017 opens cold"
+    },
+    {
+     "to": "CMS-018",
+     "trigger": "Consent & Legal",
+     "provenance": "derived — CMS-018 declares entryState.params policyKind, questionId and CMS-016 holds none of them, so the edge carries nothing and CMS-018 opens cold"
+    },
+    {
+     "to": "CMS-101",
+     "trigger": "Help me choose",
+     "provenance": "authored 29 September, rev 3 REV3-11 — Help me choose sits on the booking page these settings shape, so it is set up from here"
     }
    ]
   },
@@ -1046,7 +959,7 @@
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getTenantConfig` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "The values the whole site inherits from.",
+  "purpose": "The values the whole site inherits from, and the booking-flow settings each venue may override (decided 29 September, rev 3 CFG-11).",
   "layout": {
    "template": "detail",
    "regions": [
@@ -1056,7 +969,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected site settings",
+       "label": "The tenant config",
        "bindsTo": "TenantConfig",
        "columns": [
         "TenantConfig.isDraft",
@@ -1077,34 +990,130 @@
        ],
        "operation": "getTenantConfig",
        "provenance": "contract white-label.yaml GET /tenant-config"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The booking flow config",
+       "bindsTo": "BookingFlowConfig",
+       "columns": [
+        "BookingFlowConfig.preset",
+        "BookingFlowConfig.stepIndicator",
+        "BookingFlowConfig.cartLayout",
+        "BookingFlowConfig.cardLayout",
+        "BookingFlowConfig.cardSize",
+        "BookingFlowConfig.extrasStep",
+        "BookingFlowConfig.seatPicker",
+        "BookingFlowConfig.mapView",
+        "BookingFlowConfig.density",
+        "BookingFlowConfig.embedMode",
+        "BookingFlowConfig.heroBanner",
+        "BookingFlowConfig.searchInBanner",
+        "BookingFlowConfig.singleEventPage",
+        "BookingFlowConfig.quantitiesOnAddOns",
+        "BookingFlowConfig.cartSideInRtl",
+        "BookingFlowConfig.categoryDisplay",
+        "BookingFlowConfig.eventBannerDates",
+        "BookingFlowConfig.timesPerPage",
+        "BookingFlowConfig.dayPartFilter",
+        "BookingFlowConfig.dayPartBoundaries",
+        "BookingFlowConfig.performanceReveal",
+        "BookingFlowConfig.signInAt",
+        "BookingFlowConfig.seatEventDateMode",
+        "BookingFlowConfig.seatViewPosition",
+        "BookingFlowConfig.seatTimeBar",
+        "BookingFlowConfig.ticketCategories",
+        "BookingFlowConfig.ticketTags",
+        "BookingFlowConfig.cardInfo",
+        "BookingFlowConfig.quickTour",
+        "BookingFlowConfig.conciergeMascot",
+        "BookingFlowConfig.showInfoOnly",
+        "BookingFlowConfig.locationSwitcher",
+        "BookingFlowConfig.consentQuestionIds",
+        "BookingFlowConfig.venueOverrides"
+       ],
+       "operation": "getBookingFlowConfig",
+       "notes": "**The rev 3 booking rules, each with its default** (decided 29 September, rev 3). `timesPerPage` 8, 12, 24 or all (24) and `dayPartFilter` (on), with `dayPartBoundaries` afternoon from 12:00 and evening from 17:00 in the venue time zone (REV3-1); `performanceReveal` date, then time, then tickets, or all at once (REV3-2); `signInAt` after add-ons or at payment (REV3-3); `seatEventDateMode` an inline step or a pop-up on the seat map (REV3-4); `seatViewPosition` bottom, right, left or top, web only (REV3-5); `seatTimeBar` (on, REV3-6); `cartLayout` gains `floatingIcon` and `cartSideInRtl` keeps the basket right or mirrors it (REV3-10); `showInfoOnly` (on, REV3-14); `ticketCategories` category then subcategory, or a flat list (REV3-16); `locationSwitcher` (REV3-18); `quickTour` (off, REV3-20); `ticketTags` (on, 23SEP-3); `cardInfo` (on, 23SEP-6); `categoryDisplay` grid or row strip (23SEP-18); `eventBannerDates` (off, 23SEP-19); `conciergeMascot` (on, CFG-5). `cardLayout`, `cardSize` and `density` are fixed lists now: stacked rows, split rows, cards across, poster cards; compact, standard, large, extra large; compact, standard, roomy (DG-6). **There is no swim-consent toggle and no F&B-modifier toggle**: a consent question is attached to the flow or the product (REV3-26), and modifiers show when an item has groups attached (REV3-9).",
+       "provenance": "contract white-label.yaml GET /tenant-config/booking-flow"
+      },
+      {
+       "kind": "selectField",
+       "label": "Settings for",
+       "operation": "getBookingFlowConfig",
+       "notes": "**Which level is being edited** (decided 29 September, rev 3 CFG-11). *All venues* edits the tenant settings; picking a venue edits that venue's entry in `venueOverrides` and shows beside each field the tenant value it inherits. Sends `?effectiveForVenueId=` to show the settings in force at that venue, resolved field by field. Venues from `listOrgUnits`.",
+       "provenance": "contract white-label.yaml GET /tenant-config/booking-flow"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Venues that differ from the tenant",
+       "bindsTo": "BookingFlowVenueOverride",
+       "columns": [
+        "BookingFlowVenueOverride.venueId",
+        "BookingFlowVenueOverride.settings"
+       ],
+       "operation": "getBookingFlowConfig",
+       "notes": "**One row per venue that overrides anything** (decided 29 September, rev 3 CFG-11). The editor sets only the fields that differ; a field left empty inherits the tenant value, and clearing one removes it from the override. A venue that is not one of the tenant's active venues, or a second row for the same venue, is refused `400` and the row is marked. An override kept for a closed venue is shown greyed: it has no effect.",
+       "provenance": "contract white-label.yaml GET /tenant-config/booking-flow"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Consent questions this booking flow asks",
+       "bindsTo": "BookingFlowConfig.consentQuestionIds",
+       "operation": "listConsentQuestions",
+       "notes": "**The questions every booking in this flow asks, whatever the product** (decided 29 September, rev 3 REV3-26), e.g. a water park's \"Are you able to swim?\". Options are the active questions from `listConsentQuestions`, written on CMS-018; a product's own questions are attached on BO-008. The guest is asked the union, each question once. Overridable per venue like every other setting here.",
+       "provenance": "contract marketing-crm.yaml GET /consent-questions"
       }
      ]
     },
     {
-     "name": "contentBody",
-     "slot": "carried",
+     "name": "actionBar",
+     "slot": "rowActions",
      "components": [
       {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
+       "kind": "primaryButton",
+       "label": "Save booking flow config",
+       "operation": "setBookingFlowConfig",
+       "provenance": "contract white-label.yaml PUT /tenant-config/booking-flow"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The site settings list.",
+   "loading": "The site settings, read by `getTenantConfig`.",
    "error": "Could not load. Names which read failed and leaves the site settings untouched.",
-   "emptyFirstRun": "No site settings yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the site settings are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoResults": "A venue picked in Settings for with no override shows the tenant settings it inherits, labelled as inherited, rather than an empty form (rev 3 CFG-11).",
+   "emptyFirstRun": "No site settings yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getBookingFlowConfig` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "getBookingFlowConfig",
+    "contract": "white-label",
+    "purpose": "How the guest booking flow looks and steps",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setBookingFlowConfig",
+    "contract": "white-label",
+    "purpose": "Preset, step indicator, cart layout, embed mode",
+    "trigger": "onAction"
+   },
    {
     "operationId": "getTenantConfig",
     "contract": "white-label",
     "purpose": "Full working configuration",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listConsentQuestions",
+    "contract": "marketing-crm",
+    "purpose": "The venue's consent questions, to attach to the booking flow (rev 3 REV3-26)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOrgUnits",
+    "contract": "tenancy",
+    "purpose": "The tenant's venues, for the per-venue override picker (rev 3 CFG-11)",
     "trigger": "onLoad"
    }
   ],
@@ -1114,6 +1123,59 @@
    "board": "wireframes/P13 Venue CMS.dc.html#cms-016"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetBookingFlowConfig",
+    "component": "modal",
+    "trigger": "Save booking flow config",
+    "body": "**Collects what `setBookingFlowConfig` sends before it is called.** Nothing in the body is required. Optional: `preset`, `stepIndicator`, `cartLayout`, `cardLayout`, `cardSize`, `extrasStep`, `seatPicker`, `mapView`, `density`, `embedMode`, `heroBanner`, `searchInBanner`, `singleEventPage`, `quantitiesOnAddOns`, the rev 3 booking rules on the panel above, `consentQuestionIds` and `venueOverrides` (decided 29 September, rev 3 CFG-11). **The body is the tenant settings plus every venue override**: saving a venue's override sends the whole configuration with that venue's row changed. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "BookingFlowConfig",
+    "confirm": {
+     "label": "Save booking flow config",
+     "operation": "setBookingFlowConfig"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "preset",
+      "stepIndicator",
+      "cartLayout",
+      "cardLayout",
+      "cardSize",
+      "extrasStep",
+      "seatPicker",
+      "mapView",
+      "density",
+      "embedMode",
+      "heroBanner",
+      "searchInBanner",
+      "singleEventPage",
+      "quantitiesOnAddOns",
+      "cartSideInRtl",
+      "categoryDisplay",
+      "eventBannerDates",
+      "timesPerPage",
+      "dayPartFilter",
+      "dayPartBoundaries",
+      "performanceReveal",
+      "signInAt",
+      "seatEventDateMode",
+      "seatViewPosition",
+      "seatTimeBar",
+      "ticketCategories",
+      "ticketTags",
+      "cardInfo",
+      "quickTour",
+      "conciergeMascot",
+      "showInfoOnly",
+      "locationSwitcher",
+      "consentQuestionIds",
+      "venueOverrides"
+     ]
+    },
+    "provenance": "contract white-label.yaml PUT /tenant-config/booking-flow"
+   }
+  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1165,29 +1227,17 @@
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-017 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "carries": [
-      "uploadId"
-     ],
-     "provenance": "derived — CMS-002 declares entryState.params uploadId, so an edge into it must carry them"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-017 holds none of them, so the edge carries nothing and CMS-002 opens cold"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "carries": [
-      "bannerId",
-      "pageId",
-      "policyKind",
-      "version"
-     ],
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version, so an edge into it must carry them"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-017 holds none of them, so the edge carries nothing and CMS-003 opens cold"
     }
    ]
   },
@@ -1205,7 +1255,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every domain certificate",
+       "label": "Every custom domain",
        "bindsTo": "CustomDomain",
        "columns": [
         "CustomDomain.id",
@@ -1229,7 +1279,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected domain certificate",
+       "label": "The selected custom domain",
        "bindsTo": "CustomDomain",
        "columns": [
         "CustomDomain.id",
@@ -1253,32 +1303,21 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Claim",
+       "label": "Claim custom domain",
        "operation": "claimCustomDomain",
        "provenance": "contract white-label.yaml POST /tenant-domains"
       },
       {
        "kind": "secondaryButton",
-       "label": "Verify",
+       "label": "Verify custom domain",
        "operation": "verifyCustomDomain",
        "provenance": "contract white-label.yaml POST /tenant-domains/{domainId}/verify"
       },
       {
        "kind": "secondaryButton",
-       "label": "Release hold",
+       "label": "Release custom domain",
        "operation": "relinquishCustomDomain",
        "provenance": "contract white-label.yaml DELETE /tenant-domains/{domainId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1288,8 +1327,8 @@
    "loading": "Detail loads",
    "error": "Could not load",
    "emptyFirstRun": "Not found — it may have been deleted or moved out of scope",
-   "emptyNoResults": "The filter narrowed it and the domain certificate are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoResults": "Never shown: `listCustomDomains` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listCustomDomains` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1348,6 +1387,27 @@
    "board": "wireframes/P13 Venue CMS.dc.html#cms-017"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formClaimCustomDomain",
+    "component": "modal",
+    "trigger": "Claim custom domain",
+    "body": "**Collects what `claimCustomDomain` sends before it is called.** Required: `hostname`, `kind`. Optional: `verificationMethod`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Claim custom domain",
+     "operation": "claimCustomDomain"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "hostname",
+      "kind",
+      "verificationMethod"
+     ]
+    },
+    "provenance": "contract white-label.yaml POST /tenant-domains"
+   }
+  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1375,7 +1435,7 @@
   "id": "CMS-018",
   "name": "Consent & Legal",
   "module": "White Label",
-  "requiresModule": "marketing",
+  "requiresModule": "core",
   "wave": 2,
   "capability": "C00",
   "implementation": {
@@ -1399,44 +1459,104 @@
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-018 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "carries": [
-      "uploadId"
-     ],
-     "provenance": "derived — CMS-002 declares entryState.params uploadId, so an edge into it must carry them"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-018 holds none of them, so the edge carries nothing and CMS-002 opens cold"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
      "carries": [
-      "bannerId",
-      "pageId",
       "policyKind",
       "version"
      ],
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version, so an edge into it must carry them"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-018 holds policyKind, version, so an edge into it carries them"
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**Rewired 23 September (L7).** The screen called the maintenance equipment register, guest CRM or subscription billing where its purpose names White Labelling. Its operations now match its purpose.",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "`listGuestDevices` reads the population and `getGuestConsents` reads one of them — list, select, act",
-  "purpose": "Manage the notices every consent is captured against.",
-  "gaps": [
+  "patternReason": "`listPolicies` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Manage the notices every consent is captured against, and the booking consent questions a venue asks (\"Are you able to swim?\", \"I accept the risk\"), with the record of every answer (decided 29 September, rev 3 REV3-26).",
+  "states": {
+   "loading": "The consent legal list.",
+   "error": "Could not load. Names which read failed and leaves the consent legal untouched.",
+   "emptyFirstRun": "No consent legal yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "`listPolicies` takes no filter. The consent questions (kind, status) and the consent records (order, guest, question) do: an empty result names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listPolicies` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
    {
-    "operation": "getConsentHistory",
-    "why": "**5 declared operations reach no component on this screen**: getConsentHistory, getGuestLoyalty, getGuestProfile, getWishlist, searchGuests. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "operationId": "listPolicies",
+    "contract": "white-label",
+    "purpose": "Privacy, terms and cookie notices",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPolicy",
+    "contract": "white-label",
+    "purpose": "Edit and publish a notice",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPolicies"
+    ]
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "What guests can consent to",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "Set the consent purposes",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPolicies"
+    ]
+   },
+   {
+    "operationId": "listConsentQuestions",
+    "contract": "marketing-crm",
+    "purpose": "The venue's booking consent questions (rev 3 REV3-26)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createConsentQuestion",
+    "contract": "marketing-crm",
+    "purpose": "Define a consent question, created at version 1",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentQuestions"
+    ]
+   },
+   {
+    "operationId": "updateConsentQuestion",
+    "contract": "marketing-crm",
+    "purpose": "Change a question (a new version) or retire it",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentQuestions"
+    ]
+   },
+   {
+    "operationId": "listConsentAnswers",
+    "contract": "marketing-crm",
+    "purpose": "The consent records, filtered by order, guest or question",
+    "trigger": "onAction"
    }
   ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-018"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1446,24 +1566,76 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every consent legal",
-       "bindsTo": "GuestDevice",
+       "label": "Every policy",
+       "bindsTo": "Policy",
        "columns": [
-        "GuestDevice.id",
-        "GuestDevice.subjectId",
-        "GuestDevice.platform",
-        "GuestDevice.tokenFingerprint",
-        "GuestDevice.appVersion",
-        "GuestDevice.osVersion",
-        "GuestDevice.deviceModel",
-        "GuestDevice.locale",
-        "GuestDevice.status",
-        "GuestDevice.failureCount",
-        "GuestDevice.registeredAt",
-        "GuestDevice.lastSeenAt"
+        "Policy.kind",
+        "Policy.title",
+        "Policy.body",
+        "Policy.requiresReconsent",
+        "Policy.effectiveFrom",
+        "Policy.publishedByPrincipalId",
+        "Policy.publishedAt",
+        "Policy.scopePath"
        ],
-       "operation": "listGuestDevices",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
+       "operation": "listPolicies",
+       "provenance": "contract white-label.yaml GET /tenant-config/policies"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every consent purpose config",
+       "bindsTo": "ConsentPurposeConfig",
+       "columns": [
+        "ConsentPurposeConfig.purpose",
+        "ConsentPurposeConfig.displayName",
+        "ConsentPurposeConfig.description",
+        "ConsentPurposeConfig.channels",
+        "ConsentPurposeConfig.noticeVersion",
+        "ConsentPurposeConfig.isRequiredForService",
+        "ConsentPurposeConfig.expiresAfterMonths"
+       ],
+       "operation": "listConsentPurposes",
+       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every booking consent question",
+       "bindsTo": "ConsentQuestion",
+       "columns": [
+        "ConsentQuestion.kind",
+        "ConsentQuestion.text",
+        "ConsentQuestion.version",
+        "ConsentQuestion.scope",
+        "ConsentQuestion.required",
+        "ConsentQuestion.blockingAnswer",
+        "ConsentQuestion.status",
+        "ConsentQuestion.updatedAt"
+       ],
+       "operation": "listConsentQuestions",
+       "notes": "**A consent, not a data field** (decided 29 September, rev 3 REV3-26). Each question has its own text per locale, a version, and whether it is asked for each person or once per booking. Filter by `kind` and `status`. **Attaching** is done where the question is used: to a booking flow on CMS-016 (`BookingFlowConfig.consentQuestionIds`, per venue), to a product on BO-008 (`Product.consentQuestionIds`).",
+       "provenance": "contract marketing-crm.yaml GET /consent-questions"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Consent records",
+       "bindsTo": "BookingConsentRecord",
+       "columns": [
+        "BookingConsentRecord.answeredAt",
+        "BookingConsentRecord.questionId",
+        "BookingConsentRecord.questionVersion",
+        "BookingConsentRecord.answer",
+        "BookingConsentRecord.scope",
+        "BookingConsentRecord.personName",
+        "BookingConsentRecord.orderId",
+        "BookingConsentRecord.answeredBySubjectId",
+        "BookingConsentRecord.answeredByPrincipalId",
+        "BookingConsentRecord.source",
+        "BookingConsentRecord.blocksBooking",
+        "BookingConsentRecord.supersededAt"
+       ],
+       "operation": "listConsentAnswers",
+       "notes": "**What was asked, at which version, what was answered, for whom, by whom and when** (rev 3 REV3-26). Filter by order, guest or question. Read-only: an answer is never edited here, and a superseded answer stays listed with `supersededAt`.",
+       "provenance": "contract marketing-crm.yaml GET /consent-answers"
       }
      ]
     },
@@ -1473,14 +1645,37 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected consent legal",
-       "bindsTo": "ConsentState",
+       "label": "The selected policy",
+       "bindsTo": "Policy",
        "columns": [
-        "ConsentState.subjectId",
-        "ConsentState.purposes"
+        "Policy.kind",
+        "Policy.title",
+        "Policy.body",
+        "Policy.requiresReconsent",
+        "Policy.effectiveFrom",
+        "Policy.publishedByPrincipalId",
+        "Policy.publishedAt",
+        "Policy.scopePath"
        ],
-       "operation": "getGuestConsents",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/consents"
+       "operation": "listPolicies",
+       "provenance": "contract white-label.yaml GET /tenant-config/policies"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The selected consent question",
+       "bindsTo": "ConsentQuestion",
+       "columns": [
+        "ConsentQuestion.kind",
+        "ConsentQuestion.text",
+        "ConsentQuestion.helpText",
+        "ConsentQuestion.version",
+        "ConsentQuestion.scope",
+        "ConsentQuestion.required",
+        "ConsentQuestion.blockingAnswer",
+        "ConsentQuestion.status"
+       ],
+       "operation": "listConsentQuestions",
+       "provenance": "contract marketing-crm.yaml GET /consent-questions"
       }
      ]
     },
@@ -1490,181 +1685,143 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Record",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+       "label": "Save policy",
+       "operation": "setPolicy",
+       "provenance": "contract white-label.yaml PUT /tenant-config/policies/{policyKind}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Adjust",
-       "operation": "adjustLoyaltyPoints",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/loyalty/adjust"
+       "label": "Save consent purposes",
+       "operation": "setConsentPurposes",
+       "provenance": "contract marketing-crm.yaml PUT /consent-purposes"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "New consent question",
+       "operation": "createConsentQuestion",
+       "provenance": "contract marketing-crm.yaml POST /consent-questions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save as new version",
+       "operation": "updateConsentQuestion",
+       "notes": "**A change to what the guest is asked is a new version, never an edit** (rev 3 REV3-26): changing the text, scope, required or blocking answer raises `version` by one, and every answer already given keeps the version it was given against.",
+       "provenance": "contract marketing-crm.yaml PATCH /consent-questions/{questionId}"
       },
       {
        "kind": "destructiveButton",
-       "label": "Merge",
-       "operation": "mergeGuestProfiles",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/merge"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updateGuestProfile",
-       "provenance": "contract marketing-crm.yaml PATCH /guests/{subjectId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listGuestDevices",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "searchField",
-       "derived": true,
-       "impliedBy": "searchGuests",
-       "label": "Search",
-       "notes": "A search that returns nothing must say so differently from a search not yet run.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "recordConsent",
-       "provenance": "carried from the previous definition"
+       "label": "Retire question",
+       "operation": "updateConsentQuestion",
+       "notes": "Sets `status` to `retired`. It stops being asked on every flow and product it is attached to and changes no version; the answers already given stay on record.",
+       "provenance": "contract marketing-crm.yaml PATCH /consent-questions/{questionId}"
       }
      ]
     }
+   ]
+  },
+  "entryState": {
+   "params": [
+    {
+     "name": "policyKind",
+     "from": "navigation"
+    },
+    {
+     "name": "questionId",
+     "from": "navigation"
+    }
+   ],
+   "preloaded": [
+    "Policy.kind",
+    "Policy.title",
+    "Policy.body",
+    "Policy.requiresReconsent",
+    "Policy.effectiveFrom"
    ]
   },
   "overlays": [
    {
-    "id": "confirmMergeGuestProfiles",
-    "component": "confirmDialog",
-    "trigger": "Merge",
-    "body": "**Names what `mergeGuestProfiles` changes and what it leaves alone**, in the consequence rather than the verb. A consent legal this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/merge"
+    "id": "formSetPolicy",
+    "component": "modal",
+    "trigger": "Save policy",
+    "body": "**Collects what `setPolicy` sends before it is called.** Required: `body`, `requiresReconsent`. Optional: `effectiveFrom`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save policy",
+     "operation": "setPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "body",
+      "requiresReconsent",
+      "effectiveFrom"
+     ]
+    },
+    "provenance": "contract white-label.yaml PUT /tenant-config/policies/{policyKind}"
+   },
+   {
+    "id": "formSetConsentPurposes",
+    "component": "modal",
+    "trigger": "Save consent purposes",
+    "body": "**Collects what `setConsentPurposes` sends before it is called.** Required: `purposes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save consent purposes",
+     "operation": "setConsentPurposes"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "purposes"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml PUT /consent-purposes"
+   },
+   {
+    "id": "formCreateConsentQuestion",
+    "component": "modal",
+    "trigger": "New consent question",
+    "body": "**Collects what `createConsentQuestion` sends before it is called.** Required: `kind`, `text` (every tenant language). Optional: `helpText`, `scope` (`perPerson`, the default, or `perBooking`), `required` (default true: checkout waits for it) and `blockingAnswer` (`yes`, `no` or `none`, the default: the answer that stops the booking for the person or booking it covers). Created at version 1 (rev 3 REV3-26). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ConsentQuestion",
+    "confirm": {
+     "label": "Create question",
+     "operation": "createConsentQuestion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "text",
+      "helpText",
+      "scope",
+      "required",
+      "blockingAnswer"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /consent-questions"
+   },
+   {
+    "id": "formUpdateConsentQuestion",
+    "component": "modal",
+    "trigger": "Save as new version",
+    "body": "**Says, before saving, that the guest will be asked version N+1 from the next cart read** and that answers already given keep their version (rev 3 REV3-26). Optional: `text`, `helpText`, `scope`, `required`, `blockingAnswer`, `status`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ConsentQuestion",
+    "confirm": {
+     "label": "Save new version",
+     "operation": "updateConsentQuestion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "text",
+      "helpText",
+      "scope",
+      "required",
+      "blockingAnswer",
+      "status"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml PATCH /consent-questions/{questionId}"
    }
   ],
-  "states": {
-   "loading": "The consent legal list.",
-   "error": "Could not load. Names which read failed and leaves the consent legal untouched.",
-   "emptyFirstRun": "No consent legal yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the consent legal are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getGuestConsents",
-    "contract": "marketing-crm",
-    "purpose": "Read a guest's consent state",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getConsentHistory",
-    "contract": "marketing-crm",
-    "purpose": "Full consent history",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "recordConsent",
-    "contract": "marketing-crm",
-    "purpose": "Record a consent decision",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "adjustLoyaltyPoints",
-    "contract": "marketing-crm",
-    "purpose": "Manually adjust points",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "getGuestLoyalty",
-    "contract": "marketing-crm",
-    "purpose": "A guest's loyalty position",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getGuestProfile",
-    "contract": "marketing-crm",
-    "purpose": "Read a guest profile",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Read a guest's saved items",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listGuestDevices",
-    "contract": "marketing-crm",
-    "purpose": "A guest's registered devices",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "mergeGuestProfiles",
-    "contract": "marketing-crm",
-    "purpose": "Merge a duplicate profile into this one",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "searchGuests",
-    "contract": "marketing-crm",
-    "purpose": "Search guest profiles",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "updateGuestProfile",
-    "contract": "marketing-crm",
-    "purpose": "Amend a guest profile",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "subjectId",
-     "from": "session"
-    }
-   ],
-   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
-   "preloaded": [
-    "ConsentState.subjectId",
-    "ConsentState.purposes"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-018"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1716,29 +1873,17 @@
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-019 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "carries": [
-      "uploadId"
-     ],
-     "provenance": "derived — CMS-002 declares entryState.params uploadId, so an edge into it must carry them"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-019 holds none of them, so the edge carries nothing and CMS-002 opens cold"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "carries": [
-      "bannerId",
-      "pageId",
-      "policyKind",
-      "version"
-     ],
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version, so an edge into it must carry them"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-019 holds none of them, so the edge carries nothing and CMS-003 opens cold"
     }
    ]
   },
@@ -1747,13 +1892,6 @@
   "pattern": "listDetail",
   "patternReason": "`listPrincipals` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "Say who in the tenant may change what.",
-  "gaps": [
-   {
-    "operation": "listRoles",
-    "why": "**1 declared operation reach no component on this screen**: listRoles. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1762,8 +1900,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Scope path",
+       "operation": "listPrincipals",
+       "notes": "Sends `?scopePath=` to `listPrincipals`.",
+       "provenance": "contract identity.yaml GET /principals"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is active",
+       "operation": "listPrincipals",
+       "notes": "Sends `?isActive=` to `listPrincipals`.",
+       "provenance": "contract identity.yaml GET /principals"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every user access",
+       "label": "Every principal",
        "bindsTo": "Principal",
        "columns": [
         "Principal.id",
@@ -1778,6 +1930,24 @@
        ],
        "operation": "listPrincipals",
        "provenance": "contract identity.yaml GET /principals"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every role",
+       "bindsTo": "Role",
+       "columns": [
+        "Role.id",
+        "Role.code",
+        "Role.name",
+        "Role.description",
+        "Role.permissions",
+        "Role.inheritsFromRoleId",
+        "Role.isSystem",
+        "Role.principalCount",
+        "Role.grantCount"
+       ],
+       "operation": "listRoles",
+       "provenance": "contract identity.yaml GET /roles"
       }
      ]
     },
@@ -1787,7 +1957,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected user access",
+       "label": "The selected principal",
        "bindsTo": "Principal",
        "columns": [
         "Principal.id",
@@ -1804,33 +1974,15 @@
        "provenance": "contract identity.yaml GET /principals"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listPrincipals",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The user access list.",
    "error": "Could not load. Names which read failed and leaves the user access untouched.",
-   "emptyFirstRun": "No user access yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the user access are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No user access yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on scopePath, isActive and the user access are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1885,88 +2037,90 @@
   }
  },
  {
-  "id": "CMS-020",
-  "name": "Change Log",
+  "id": "CMS-101",
+  "name": "Help Me Choose",
   "module": "White Label",
   "requiresModule": "core",
   "wave": 2,
-  "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
-   "route": "/white-label/change-log",
-   "component": "apps/venue-management-web/src/routes/white-label/ChangeLogDetail.tsx",
+   "route": "/white-label/help-me-choose",
+   "component": "apps/venue-management-web/src/routes/white-label/HelpMeChoose.tsx",
    "status": "notStarted"
   },
   "navigation": {
+   "entryFrom": [
+    "CMS-016"
+   ],
    "exitTo": [
-    "CMS-001",
-    "CMS-002",
-    "CMS-003"
+    "CMS-016"
    ],
    "inferred": false,
-   "entryFrom": [
-    "CMS-001"
-   ],
-   "notes": "**Reached from CMS-001** — a top-level workspace section. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.",
+   "notes": "**Reached from CMS-016 Site Settings**, beside the booking-flow settings, because Help me choose sits on the booking page those settings shape (decided 29 September, rev 3 REV3-11).",
    "transitions": [
     {
-     "to": "CMS-001",
-     "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
-    },
-    {
-     "to": "CMS-002",
-     "trigger": "Brand Kit",
-     "carries": [
-      "uploadId"
-     ],
-     "provenance": "derived — CMS-002 declares entryState.params uploadId, so an edge into it must carry them"
-    },
-    {
-     "to": "CMS-003",
-     "trigger": "Typography",
-     "carries": [
-      "bannerId",
-      "pageId",
-      "policyKind",
-      "version"
-     ],
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version, so an edge into it must carry them"
+     "to": "CMS-016",
+     "trigger": "Back to Site Settings",
+     "provenance": "authored 29 September, rev 3 REV3-11",
+     "back": true
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "**Added 29 September for rev 3 REV3-11: Help me choose is venue configuration, never hard-coded.** A venue sets up one or two questions, each with two to four answers (title, one-liner, icon, optional badge), and the answer picked on the last question opens the product, category, event or booking module that fits through a result card. **Two sources, one review**: staff write a set-up here, and once the venue's products are uploaded the `ai` service proposes set-ups (`source` `aiSuggested`), which land here as drafts. **A suggestion is never published by itself**: a person reviews it, edits it or dismisses it, previews it and publishes it. One published set-up per venue; publishing another returns the old one to draft.",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "`listConfigVersions` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "See who changed what, before the publish that carried it.",
+  "patternReason": "`listGuidedChoices` reads the venue's set-ups and the editor acts on one of them — list, select, act",
+  "purpose": "Set up a venue's Help me choose, review what the assistant suggests from the venue's products, preview it and publish it.",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "filters",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "operation": "listGuidedChoices",
+       "notes": "The venue whose set-ups are shown (path `venueId`); defaults to the session venue.",
+       "provenance": "contract white-label.yaml GET /venues/{venueId}/guided-choices"
+      },
+      {
+       "kind": "selectField",
+       "label": "Source",
+       "operation": "listGuidedChoices",
+       "notes": "Sends `?source=`, `manual` or `aiSuggested`. **Suggestions awaiting review** is `aiSuggested` with status `draft`, and is the default view while any exist.",
+       "provenance": "contract white-label.yaml GET /venues/{venueId}/guided-choices"
+      },
+      {
+       "kind": "selectField",
+       "label": "Status",
+       "operation": "listGuidedChoices",
+       "notes": "Sends `?status=`, `draft` or `published`.",
+       "provenance": "contract white-label.yaml GET /venues/{venueId}/guided-choices"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every change log",
-       "bindsTo": "ConfigVersion",
+       "label": "Every Help me choose set-up at this venue",
+       "bindsTo": "GuidedChoice",
        "columns": [
-        "ConfigVersion.publishedAt",
-        "ConfigVersion.publishedByPrincipalId",
-        "ConfigVersion.publishedByName",
-        "ConfigVersion.note",
-        "ConfigVersion.isCurrent",
-        "ConfigVersion.scheduledFor",
-        "ConfigVersion.contentHash",
-        "ConfigVersion.pendingBuildTimeChanges",
-        "ConfigVersion.scopePath"
+        "GuidedChoice.name",
+        "GuidedChoice.status",
+        "GuidedChoice.source",
+        "GuidedChoice.mode",
+        "GuidedChoice.showBanner",
+        "GuidedChoice.publishedAt",
+        "GuidedChoice.updatedAt"
        ],
-       "operation": "listConfigVersions",
-       "provenance": "contract white-label.yaml GET /tenant-config/versions"
+       "operation": "listGuidedChoices",
+       "notes": "**An AI suggestion is labelled as one** on its row, and keeps `source` `aiSuggested` after a person edits it, so a report can count how many proposals were published.",
+       "provenance": "contract white-label.yaml GET /venues/{venueId}/guided-choices"
       }
      ]
     },
@@ -1976,74 +2130,226 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected change log",
-       "bindsTo": "ConfigVersion",
+       "label": "The selected set-up",
+       "bindsTo": "GuidedChoice",
        "columns": [
-        "ConfigVersion.publishedAt",
-        "ConfigVersion.publishedByPrincipalId",
-        "ConfigVersion.publishedByName",
-        "ConfigVersion.note",
-        "ConfigVersion.isCurrent",
-        "ConfigVersion.scheduledFor",
-        "ConfigVersion.contentHash",
-        "ConfigVersion.pendingBuildTimeChanges",
-        "ConfigVersion.scopePath"
+        "GuidedChoice.name",
+        "GuidedChoice.mode",
+        "GuidedChoice.showBanner",
+        "GuidedChoice.questions",
+        "GuidedChoice.status",
+        "GuidedChoice.source",
+        "GuidedChoice.suggestionRef",
+        "GuidedChoice.publishedAt",
+        "GuidedChoice.publishedBy"
        ],
-       "operation": "listConfigVersions",
-       "provenance": "contract white-label.yaml GET /tenant-config/versions"
+       "operation": "listGuidedChoices",
+       "notes": "**The editor.** `mode`: a button on the booking page, a pop-up on the guest's first arrival as well, or off (configured but not shown). `showBanner`: the dark banner under the products. One or two questions, two to four answers each: title, one-liner (140 characters), icon, badge (24 characters), target (a product, category, event or booking module, picked from `listProducts`, `listProductCategories` and `listEvents`) and the result card (title, body, image; absent fields fall back to the target's own). Every text in every tenant language.",
+       "provenance": "contract white-label.yaml GET /venues/{venueId}/guided-choices"
+      },
+      {
+       "kind": "livePreview",
+       "label": "Preview",
+       "notes": "**Renders the draft as a guest would meet it**: the button or pop-up, the banner, each question and the result card, in each language and in both directions. Drawn from the record in hand; it calls nothing and publishes nothing, and guests keep seeing the published set-up until Publish.",
+       "provenance": "authored 29 September, rev 3 REV3-11"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "impliedBy": "publishGuidedChoice",
+       "notes": "Names the venue, says that guests there see this set-up from now on, and that **the set-up published there before returns to draft** (one published per venue). Refused `422` when an answer targets a product, category, event or module that is not on sale or not enabled, naming the answer; only staff publish (`TENANT_PUBLISH`), never the assistant.",
+       "provenance": "contract white-label.yaml POST /guided-choices/{guidedChoiceId}/publish"
       }
      ]
     },
     {
-     "name": "contentBody",
-     "slot": "carried",
+     "name": "actionBar",
+     "slot": "rowActions",
      "components": [
       {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
+       "kind": "primaryButton",
+       "label": "New set-up",
+       "operation": "createGuidedChoice",
+       "provenance": "contract white-label.yaml POST /venues/{venueId}/guided-choices"
       },
       {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listConfigVersions",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
+       "kind": "secondaryButton",
+       "label": "Save draft",
+       "operation": "updateGuidedChoice",
+       "notes": "A draft only. A published set-up is refused `409`; unpublish it first or create a new draft.",
+       "provenance": "contract white-label.yaml PATCH /guided-choices/{guidedChoiceId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Publish",
+       "operation": "publishGuidedChoice",
+       "provenance": "contract white-label.yaml POST /guided-choices/{guidedChoiceId}/publish"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Unpublish",
+       "operation": "unpublishGuidedChoice",
+       "notes": "Guests stop seeing Help me choose at this venue; the set-up returns to draft.",
+       "provenance": "contract white-label.yaml POST /guided-choices/{guidedChoiceId}/unpublish"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Delete draft or dismiss suggestion",
+       "operation": "deleteGuidedChoice",
+       "notes": "A draft only; a published set-up is refused `409`. Dismissing an AI suggestion is this delete.",
+       "provenance": "contract white-label.yaml DELETE /guided-choices/{guidedChoiceId}"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The change log list.",
-   "error": "Could not load. Names which read failed and leaves the change log untouched.",
-   "emptyFirstRun": "No change log yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the change log are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The venue's Help me choose set-ups, read by `listGuidedChoices`.",
+   "error": "Could not load. Names which read failed and leaves the set-ups untouched.",
+   "emptyFirstRun": "**No Help me choose at this venue, so guests see none.** Offers New set-up, and says that once the venue's products are uploaded the assistant proposes set-ups here as drafts for review.",
+   "emptyNoResults": "The source or status filter matched nothing and the venue's other set-ups are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listGuidedChoices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "listConfigVersions",
+    "operationId": "listGuidedChoices",
     "contract": "white-label",
-    "purpose": "Version history",
+    "purpose": "The venue's set-ups, filtered by source and status (rev 3 REV3-11)",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "createGuidedChoice",
+    "contract": "white-label",
+    "purpose": "Start a set-up by hand, as a draft",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuidedChoices"
+    ]
+   },
+   {
+    "operationId": "updateGuidedChoice",
+    "contract": "white-label",
+    "purpose": "Edit a draft, including an AI suggestion under review",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuidedChoices"
+    ]
+   },
+   {
+    "operationId": "deleteGuidedChoice",
+    "contract": "white-label",
+    "purpose": "Delete a draft or dismiss a suggestion",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuidedChoices"
+    ]
+   },
+   {
+    "operationId": "publishGuidedChoice",
+    "contract": "white-label",
+    "purpose": "Make a reviewed set-up the one guests see at this venue",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuidedChoices"
+    ]
+   },
+   {
+    "operationId": "unpublishGuidedChoice",
+    "contract": "white-label",
+    "purpose": "Stop showing it to guests; back to draft",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuidedChoices"
+    ]
+   },
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "Products an answer can open",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listProductCategories",
+    "contract": "catalogue",
+    "purpose": "Categories an answer can open",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listEvents",
+    "contract": "catalogue",
+    "purpose": "Events an answer can open",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
-   "preloaded": [
-    "ConfigVersion.publishedAt",
-    "ConfigVersion.publishedByPrincipalId",
-    "ConfigVersion.publishedByName",
-    "ConfigVersion.note",
-    "ConfigVersion.isCurrent"
-   ]
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "guidedChoiceId",
+     "from": "navigation"
+    }
+   ],
+   "coldEntry": "Resolves the venue from the session and opens on the suggestions awaiting review, or on the list when there are none."
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-020"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-101"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateGuidedChoice",
+    "component": "modal",
+    "trigger": "New set-up",
+    "body": "**Collects what `createGuidedChoice` sends before it is called.** Required: `name` (staff-facing), `mode`, `questions` (one or two, each with two to four answers and a target per answer). Optional: `showBanner` (default on). Created as a draft; guests see nothing until it is published. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "GuidedChoice",
+    "confirm": {
+     "label": "Create draft",
+     "operation": "createGuidedChoice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "mode",
+      "showBanner",
+      "questions"
+     ]
+    },
+    "provenance": "contract white-label.yaml POST /venues/{venueId}/guided-choices"
+   },
+   {
+    "id": "confirmPublishGuidedChoice",
+    "component": "confirmDialog",
+    "trigger": "Publish",
+    "body": "**Names the venue and the set-up that stops showing there**, since only one is published per venue. An answer whose target is not on sale or not enabled blocks the publish and is named (`422`).",
+    "confirm": {
+     "label": "Publish to guests",
+     "operation": "publishGuidedChoice"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract white-label.yaml POST /guided-choices/{guidedChoiceId}/publish"
+   },
+   {
+    "id": "confirmDeleteGuidedChoice",
+    "component": "confirmDialog",
+    "trigger": "Delete draft or dismiss suggestion",
+    "body": "Names the set-up and, for an AI suggestion, says that dismissing it removes it and the assistant's reasoning with it. A published set-up cannot be deleted (`409`).",
+    "confirm": {
+     "label": "Delete",
+     "operation": "deleteGuidedChoice"
+    },
+    "dismiss": {
+     "label": "Keep it"
+    },
+    "provenance": "contract white-label.yaml DELETE /guided-choices/{guidedChoiceId}"
+   }
+  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",

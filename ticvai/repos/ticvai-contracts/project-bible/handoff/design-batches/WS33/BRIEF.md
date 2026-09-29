@@ -1,6 +1,6 @@
 # WS33 — Order   Reservation Management board 3
 
-**10 screens · 10 operations · 11 schemas · 2 permissions**
+**10 screens · 15 operations · 14 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `ORDER_CREATE, ORDER_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 7 permissions apply here:
+  `ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, PAYMENT_CONFIGURE, PAYMENT_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -64,8 +63,8 @@ convincingly. It is never a caption.
 | `BO-324` | Payment & Order Financial Command Center | listDetail | 1 | 0 | — |
 | `BO-325` | Order Payment Detail & Transaction Ledger | listDetail | 1 | 1 | — |
 | `BO-326` | Multi-Payment, Split Tender & Payment Allocation Configuration | configEditor | 1 | 0 | — |
-| `BO-327` | Deposit, Partial Payment & Outstanding Balance Management | listDetail | 1 | 0 | — |
-| `BO-328` | Order Split, Merge & Transaction Relationship Management | listDetail | 1 | 0 | — |
+| `BO-327` | Deposit, Partial Payment & Outstanding Balance Management | listDetail | 5 | 1 | — |
+| `BO-328` | Order Split, Merge & Transaction Relationship Management | listDetail | 2 | 0 | — |
 | `BO-329` | Related Order & Transaction Relationship Explorer | listDetail | 1 | 0 | — |
 | `BO-330` | External Payment, Partner & Settlement Reference Mapping | configEditor | 1 | 0 | — |
 | `BO-331` | Payment Reconciliation & Exception Management | listDetail | 1 | 0 | — |
@@ -74,4 +73,4 @@ convincingly. It is never a caption.
 
 ## Thin screens in this batch
 
-**BO-327, BO-328, BO-331, BO-332 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-331, BO-332 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

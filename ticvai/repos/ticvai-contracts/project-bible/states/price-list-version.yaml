@@ -1,0 +1,38 @@
+# Price list version — state model
+# Contract: catalogue.PriceListVersion.status
+# Checked by tools/check-states.py. Added 29 September (writers pass).
+
+entity: Price list version
+contract: catalogue
+enum: PriceListVersion.status
+enumKind: inline
+enumSchema: PriceListVersion
+enumProperty: status
+owner: catalogue
+initial:
+- scheduled
+terminal:
+- superseded
+- rolledBack
+transitions:
+- from: scheduled
+  to: active
+  trigger: timer
+  guard: '`effectiveFrom` is reached and the publication has completed'
+- from: active
+  to: superseded
+  trigger: cascade
+  guard: A later version of the same list becomes `active`
+- from: scheduled
+  to: rolledBack
+  trigger: job
+  guard: A `stopScheduledPublication` or `rollback` action (`requestPricingRollback`) completes before it takes
+    effect, or the publication is cancelled with `publishPricingEffectiveDate`
+- from: active
+  to: rolledBack
+  trigger: job
+  guard: A `rollback` action (`requestPricingRollback`) completes; the restored content is written as a new
+    `scheduled` version, never by editing this one
+notes: '**Created `scheduled` by `publishPricingEffectiveDate`** when an approved change request publishes; an
+  immediate publication reaches `active` in the same run. A version is immutable: `snapshot` never changes,
+  only `status`. At most one `active` version per list.'

@@ -1,0 +1,185 @@
+{
+ "activateGiftCard": {
+  "method": "POST",
+  "path": "/gift-cards/{giftCardId}/activate",
+  "contract": "wallet",
+  "summary": "Activate a card at the point of sale",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GiftCard"
+ },
+ "createVoucherType": {
+  "method": "POST",
+  "path": "/voucher-types",
+  "contract": "wallet",
+  "summary": "Define a voucher or benefit",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VoucherType",
+  "responds": "VoucherType"
+ },
+ "expireCreditLots": {
+  "method": "POST",
+  "path": "/credit-lots/expire",
+  "contract": "wallet",
+  "summary": "Expire, extend or forfeit credit that has run out of time",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CreditExpiryResult"
+ },
+ "getGiftCard": {
+  "method": "GET",
+  "path": "/gift-cards/{cardCode}",
+  "contract": "wallet",
+  "summary": "Check a gift card balance",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GiftCard"
+ },
+ "getWalletLiability": {
+  "method": "GET",
+  "path": "/wallet-liability",
+  "contract": "wallet",
+  "summary": "What is outstanding, and what is breakage",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "asOf",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletLiabilityRow"
+ },
+ "issueGiftCard": {
+  "method": "POST",
+  "path": "/gift-cards",
+  "contract": "wallet",
+  "summary": "Issue or activate a gift card",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "IssueGiftCardRequest",
+  "responds": "GiftCard"
+ },
+ "listVoucherTypes": {
+  "method": "GET",
+  "path": "/voucher-types",
+  "contract": "wallet",
+  "summary": "Voucher, coupon and benefit definitions",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VoucherType"
+ },
+ "publishWalletConfiguration": {
+  "method": "POST",
+  "path": "/wallet-configuration/publish",
+  "contract": "wallet",
+  "summary": "Validate and publish the wallet configuration as a version",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletConfigurationVersion"
+ },
+ "redeemGiftCard": {
+  "method": "POST",
+  "path": "/gift-cards/{giftCardId}/redeem",
+  "contract": "wallet",
+  "summary": "Spend against a card",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GiftCard"
+ },
+ "setGiftCardProduct": {
+  "method": "PUT",
+  "path": "/gift-card-products",
+  "contract": "wallet",
+  "summary": "Denominations, validity, activation and distribution",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GiftCardProduct",
+  "responds": "GiftCardProduct"
+ }
+}

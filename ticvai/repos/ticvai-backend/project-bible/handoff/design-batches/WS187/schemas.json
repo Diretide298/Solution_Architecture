@@ -1,0 +1,385 @@
+{
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Wallet": {
+  "x-ticvai-persistence": "wallet.wallet + wallet.credit_lot",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "balance",
+   "currency",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "balance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "credits": {
+    "type": "array",
+    "description": "4.3.5 and 4.3.19. **One balance and one bonus balance with one expiry could not express what the requirement asks for** — cash, bonus and redemption credit, each with its own expiry.\n**The expiries are the reason this is a list.** Cash a guest paid for should outlive a promotional credit they were given, and a single `expiresAt` either expires the money they paid or never expires the promotion.\n**Consumed first-expiry-first-out across all three** (4.3.19), which is also the order that is fairest to the guest — spend what is about to die before what is not.\n**One entry per `active` lot in `wallet.credit_lot`** for this wallet: `amount` is the lot's `remaining_amount`, `expiresAt` its `expires_at`, `sourceRef` its `source_reference`. `kind` and `isRefundable` are not stored on the lot; they come from the lot's credit type (`listCreditLots` returns the lots themselves).\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "amount"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "cash",
+        "bonus",
+        "redemption",
+        "refund",
+        "goodwill"
+       ],
+       "description": "**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability.\n",
+       "x-ticvai-persisted": false
+      },
+      "amount": {
+       "x-ticvai-column": "remaining_amount",
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "expiresAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "sourceRef": {
+       "type": "string",
+       "nullable": true,
+       "x-ticvai-column": "source_reference"
+      },
+      "isRefundable": {
+       "type": "boolean",
+       "default": false,
+       "x-ticvai-persisted": false,
+       "description": "**True only for `cash`.** A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice.\n"
+      }
+     }
+    }
+   },
+   "bonusBalance": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Promotional value. Typically non-refundable and spent first."
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "suspended",
+     "closed"
+    ]
+   },
+   "homeCellName": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where the authoritative balance lives. Present when the guest is linked across cells.\n"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastActivityAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "WalletAdjustment": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.adjustment",
+  "description": "Board 7.7. **A correction, distinguishable from a spend.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "walletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "reversal",
+     "chargeback",
+     "goodwill",
+     "correction",
+     "writeOff"
+    ]
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "affectedLotIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "reason": {
+    "type": "string"
+   },
+   "performedBy": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "approvedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletFundingRules": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.funding_rules",
+  "description": "Board 2, which is the 27 August minute one screen for one.",
+  "properties": {
+   "walletTypeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "minimumTopUp": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "maximumTopUp": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "presetAmounts": {
+    "type": "array",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/Money"
+    }
+   },
+   "allowedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "allowedFundingSources": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "card",
+      "cash",
+      "bankTransfer",
+      "voucher",
+      "corporateAccount",
+      "loyaltyConversion"
+     ]
+    }
+   },
+   "bonusRules": {
+    "type": "array",
+    "description": "Board 2.3. *Top up 200, get 20.* **The bonus is a separate lot of a separate credit type**, which is how it can expire on different terms from the cash.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "minimumAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "bonusAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "bonusPercent": {
+       "type": "number",
+       "nullable": true
+      },
+      "bonusCreditTypeId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "validFrom": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      },
+      "validTo": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "autoReload": {
+    "type": "object",
+    "description": "Board 2.5, matrix 4.3.28. **Fires when the balance drops.**",
+    "properties": {
+     "enabled": {
+      "type": "boolean",
+      "default": false
+     },
+     "thresholdAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "reloadAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "maximumPerDay": {
+      "type": "integer",
+      "nullable": true
+     }
+    }
+   },
+   "recurringFunding": {
+    "type": "object",
+    "description": "Board 2.6, matrix 4.3.29 — ***\"distinct from auto-reload\"***. **Fires on a date**, which is what an allowance needs.\n",
+    "properties": {
+     "enabled": {
+      "type": "boolean",
+      "default": false
+     },
+     "cadence": {
+      "type": "string",
+      "enum": [
+       "daily",
+       "weekly",
+       "monthly"
+      ]
+     },
+     "amount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "dayOfWeek": {
+      "type": "string",
+      "nullable": true
+     },
+     "dayOfMonth": {
+      "type": "integer",
+      "nullable": true
+     }
+    }
+   },
+   "approvalAboveAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "velocityLimits": {
+    "type": "object",
+    "description": "**A fraud control, not a commercial one.** Ten top-ups of ninety-nine in an hour is a card being tested, and a daily cap in total value does not catch it.\n",
+    "properties": {
+     "maxTransactionsPerHour": {
+      "type": "integer",
+      "nullable": true
+     },
+     "maxTransactionsPerDay": {
+      "type": "integer",
+      "nullable": true
+     },
+     "maxAmountPerDay": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "maxAmountPerMonth": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletReconciliation": {
+  "type": "object",
+  "description": "Board 9.4. **Three sources, and the exception names which pair disagrees.**",
+  "properties": {
+   "from": {
+    "type": "string",
+    "format": "date"
+   },
+   "to": {
+    "type": "string",
+    "format": "date"
+   },
+   "subLedgerTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "generalLedgerTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "acquirerTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "exceptions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "pair": {
+       "type": "string",
+       "enum": [
+        "subLedgerVsGeneralLedger",
+        "subLedgerVsAcquirer",
+        "generalLedgerVsAcquirer"
+       ]
+      },
+      "difference": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "transactionIds": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       }
+      },
+      "likelyCause": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,144 @@
+id: LLD-Waiver requirement
+title: Waiver requirement — 25 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/waiver-requirement.yaml
+entity: Waiver requirement
+contract: marketing-crm
+enum: WaiverRequirement.status
+enumKind: inline
+enumSchema: WaiverRequirement
+enumProperty: status
+owner: marketing-crm
+initial:
+- notAssigned
+- assigned
+terminal:
+- superseded
+transitions:
+- from: notAssigned
+  to: assigned
+  trigger: job
+  guard: A published form version is assigned to the participant (the booking matched a waiver trigger
+    rule and the form has a published version)
+- from: assigned
+  to: sent
+  operation: actOnWaiverRequirements
+  trigger: operation
+  guard: '`send` or `generateQr` issued a link; a delivery address exists for the channel, or the action
+    is refused with `noDeliveryAddress`'
+- from: sent
+  to: opened
+  trigger: externalEvent
+  guard: The participant or signatory opened a link that is still valid (issued at the latest `linkIssuedAt`,
+    not expired, not already used when single use)
+- from: opened
+  to: inProgress
+  trigger: externalEvent
+  guard: The signatory was identified and started answering
+- from: assigned
+  to: completed
+  operation: submitForm
+  trigger: operation
+  guard: Signed on site (kiosk, POS, staff-assisted device) against the assigned version
+- from: sent
+  to: completed
+  operation: submitForm
+  trigger: operation
+  guard: A submission by an authorised signatory against the assigned version
+- from: opened
+  to: completed
+  operation: submitForm
+  trigger: operation
+  guard: A submission by an authorised signatory against the assigned version
+- from: inProgress
+  to: completed
+  operation: submitForm
+  trigger: operation
+  guard: '**Only a submission completes a requirement.** No staff action marks it completed (decided
+    29 September, readiness close-out)'
+- from: completed
+  to: verified
+  operation: setWaiverVerificationValidation
+  trigger: operation
+  guard: Verification result `verified`
+- from: completed
+  to: rejected
+  operation: setWaiverVerificationValidation
+  trigger: operation
+  guard: Verification result `rejected` or `correctionRequired`, with a reason code
+- from: completed
+  to: assigned
+  operation: actOnWaiverRequirements
+  trigger: operation
+  guard: '`requestCorrection` or `requestResign`, with a reason kept on the requirement''s history'
+  isReversal: true
+- from: rejected
+  to: sent
+  operation: actOnWaiverRequirements
+  trigger: operation
+  guard: '`resend`, `generateNewLink` or `requestCorrection` issued a new link; the earlier link stops
+    working'
+- from: sent
+  to: expired
+  trigger: timer
+  guard: The link expired unused (default the start of the activity)
+- from: opened
+  to: expired
+  trigger: timer
+  guard: The link expired before submission
+- from: verified
+  to: expired
+  trigger: timer
+  guard: The acceptance lapsed (`FormSubmission.expiresAt`)
+- from: expired
+  to: sent
+  operation: actOnWaiverRequirements
+  trigger: operation
+  guard: '`resend` or `generateNewLink` issued a new link'
+- from: notAssigned
+  to: superseded
+  trigger: cascade
+  guard: The booking line was cancelled or amended so the participant no longer needs this waiver
+- from: assigned
+  to: superseded
+  trigger: cascade
+  guard: The booking line was cancelled or amended, or `replaceSignatory` / a new requirement replaced
+    it
+- from: sent
+  to: superseded
+  trigger: cascade
+  guard: The booking line was cancelled or amended
+- from: opened
+  to: superseded
+  trigger: cascade
+  guard: The booking line was cancelled or amended
+- from: inProgress
+  to: superseded
+  trigger: cascade
+  guard: The booking line was cancelled or amended
+- from: completed
+  to: superseded
+  trigger: cascade
+  guard: The booking line was cancelled or amended; the submission and its evidence are kept
+- from: verified
+  to: superseded
+  trigger: cascade
+  guard: The booking line was cancelled or amended; the submission and its evidence are kept
+- from: rejected
+  to: superseded
+  trigger: cascade
+  guard: The booking line was cancelled or amended
+- from: expired
+  to: superseded
+  trigger: cascade
+  guard: The booking line was cancelled or amended
+notes: '**Only a submission and its verification move a requirement to `completed` or `verified`** (decided
+  29 September, readiness close-out); every staff action in `actOnWaiverRequirements` sends, reopens
+  or reassigns. Each move is also a `WaiverRequirementEvent` row. `assignVersion` and `assignOwner`
+  change the row without changing its status.
+
+
+  **`requestResign` and `requestCorrection` reopen a `completed` requirement only, never a `verified`
+  one** (decided 29 September, writers pass): once staff have verified a waiver, a new signature is
+  a new requirement, not a reopened one.'

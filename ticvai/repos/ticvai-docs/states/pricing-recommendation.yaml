@@ -1,0 +1,84 @@
+# AI pricing recommendation — state model
+# Contract: catalogue.PricingRecommendation.status
+# Checked by tools/check-states.py. Added 29 September (writers pass).
+
+entity: AI pricing recommendation
+contract: catalogue
+enum: PricingRecommendation.status
+enumKind: inline
+enumSchema: PricingRecommendation
+enumProperty: status
+owner: catalogue
+initial:
+- pending
+terminal:
+- accepted
+- rejected
+- modified
+- ignored
+transitions:
+- from: pending
+  to: accepted
+  operation: decidePricingRecommendation
+  trigger: operation
+  guard: '`accept` or `schedule`; carried out by `createLiveDynamicPrice`, which re-checks guardrails'
+- from: pending
+  to: modified
+  operation: decidePricingRecommendation
+  trigger: operation
+  guard: '`modify` with a `humanSelectedPrice` inside the guardrails'
+- from: pending
+  to: rejected
+  operation: decidePricingRecommendation
+  trigger: operation
+  guard: '`reject` with a `rejectionReason`'
+- from: pending
+  to: sentForApproval
+  operation: decidePricingRecommendation
+  trigger: operation
+  guard: '`sendForApproval`; the governance level is above the caller''s'
+- from: pending
+  to: sentToSimulation
+  operation: setPricing
+  trigger: operation
+  guard: '`simulationSource: aiRecommendation` with `sourceReference` naming this recommendation'
+- from: sentToSimulation
+  to: accepted
+  operation: decidePricingRecommendation
+  trigger: operation
+  guard: '`accept` or `schedule` after the simulation'
+- from: sentToSimulation
+  to: modified
+  operation: decidePricingRecommendation
+  trigger: operation
+  guard: '`modify` after the simulation'
+- from: sentToSimulation
+  to: rejected
+  operation: decidePricingRecommendation
+  trigger: operation
+  guard: '`reject` after the simulation'
+- from: sentToSimulation
+  to: sentForApproval
+  operation: decidePricingRecommendation
+  trigger: operation
+  guard: '`sendForApproval` after the simulation'
+- from: sentForApproval
+  to: accepted
+  trigger: externalEvent
+  guard: The approval request is approved
+  requiresApproval: true
+- from: sentForApproval
+  to: rejected
+  trigger: externalEvent
+  guard: The approval request is rejected
+- from: pending
+  to: ignored
+  trigger: timer
+  guard: '`expiresAt` passes with no decision'
+- from: sentToSimulation
+  to: ignored
+  trigger: timer
+  guard: '`expiresAt` passes with no decision'
+notes: '**Created `pending` by the recommendation engine job**, never through the API. AI recommends; it never
+  publishes (MoM 1 Sep 2026 §4.8): an accepted or modified recommendation changes a price only through
+  `createLiveDynamicPrice`.'

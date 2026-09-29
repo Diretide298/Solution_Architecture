@@ -1,0 +1,48 @@
+id: LLD-AccessDynamicPolicyVersion
+title: AccessDynamicPolicyVersion — 4 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/access-dynamic-policy-version.yaml
+entity: AccessDynamicPolicyVersion
+contract: access
+enum: AccessDynamicPolicyVersion.status
+enumKind: inline
+enumSchema: AccessDynamicPolicyVersion
+enumProperty: status
+owner: access
+description: One immutable version of a dynamic access policy, with the content as saved, its approval
+  status and, for a rollback, the version it restored (declared 29 September, writers pass). `setVisualDynamicPolicy`,
+  `setContextTimeEvent` and `rollbackAccessPolicy` each write a new version, `pendingApproval` where
+  `evaluateApprovalRequirement` requires approval and `active` at once where it does not. **A rollback
+  writes a new version, never rewinds**, so a decision made under a wrong version stays explainable.
+initial:
+- pendingApproval
+- active
+terminal:
+- superseded
+- rejected
+transitions:
+- from: pendingApproval
+  to: active
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Granted; this version becomes the policy's `currentVersion`
+  requiresApproval: true
+- from: pendingApproval
+  to: rejected
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Rejected, with a reason; the version in force stays active
+- from: active
+  to: superseded
+  trigger: cascade
+  guard: A newer version of the same policy became active (a change or a rollback's restored version)
+- from: pendingApproval
+  to: superseded
+  trigger: cascade
+  guard: A newer version of the same policy became active while this one was still waiting; its approval
+    request is withdrawn
+openQuestions: null
+notes: '**Created only, never edited.** The three writes create versions (a rollback''s carries `restoredFromVersion`);
+  the approvals engine and the arrival of a newer version are the only things that move one. `superseded`
+  and `rejected` are terminal.'

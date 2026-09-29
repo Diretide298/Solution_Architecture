@@ -1,0 +1,1019 @@
+{
+ "ApprovalDecision": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.decision",
+  "required": [
+   "level",
+   "principalId",
+   "decision",
+   "decidedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "level": {
+    "type": "integer"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "isDelegate": {
+    "type": "boolean"
+   },
+   "delegatedFrom": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "decision": {
+    "type": "string",
+    "enum": [
+     "approve",
+     "reject"
+    ]
+   },
+   "comment": {
+    "type": "string",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "usedMfa": {
+    "type": "boolean"
+   },
+   "signatureRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "ApprovalKind": {
+  "type": "string",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n",
+  "enum": [
+   "refund",
+   "priceOverride",
+   "discountOverride",
+   "complimentaryTicket",
+   "membershipCancellation",
+   "accessPermissionChange",
+   "configurationChange",
+   "aiRecommendation",
+   "releasePromotion",
+   "requisition",
+   "stockWriteOff",
+   "journalEntry",
+   "periodClose",
+   "periodReopen",
+   "purchaseOrderCancel",
+   "purchaseOrderShortClose",
+   "tenantMigration",
+   "productChange",
+   "pricingChange"
+  ]
+ },
+ "ApprovalMode": {
+  "type": "string",
+  "description": "11.1.43–11.1.46. **Sequential** asks one at a time, **parallel** asks everyone at once, **consensus** needs all of them, **majority** needs more than half.\nParallel and consensus differ in when it completes: parallel completes on the first approval, consensus waits for all. Conflating them is how a four-eyes rule turns into a one-eye rule.\n",
+  "enum": [
+   "sequential",
+   "parallel",
+   "consensus",
+   "majority"
+  ]
+ },
+ "ApprovalRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.request",
+  "required": [
+   "id",
+   "kind",
+   "status",
+   "requestedByPrincipalId",
+   "requestedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ApprovalKind"
+   },
+   "rerouteOnNoApprover": {
+    "type": "boolean",
+    "default": true,
+    "description": "BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"
+   },
+   "outOfOfficeDelegateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "allowEmailApproval": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"
+   },
+   "reopenedFrom": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"
+   },
+   "status": {
+    "$ref": "#/components/schemas/ApprovalStatus"
+   },
+   "subjectContract": {
+    "type": "string"
+   },
+   "subjectType": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "summary": {
+    "type": "string"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "justification": {
+    "type": "string",
+    "nullable": true
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "matrixVersion": {
+    "type": "integer"
+   },
+   "mode": {
+    "$ref": "#/components/schemas/ApprovalMode"
+   },
+   "currentLevel": {
+    "type": "integer"
+   },
+   "totalLevels": {
+    "type": "integer"
+   },
+   "pendingApprovers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "principalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "displayName": {
+       "type": "string"
+      },
+      "isDelegate": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "decisions": {
+    "type": "array",
+    "description": "Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n",
+    "items": {
+     "$ref": "#/components/schemas/ApprovalDecision"
+    }
+   },
+   "escalations": {
+    "type": "array",
+    "description": "11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "reason": {
+       "type": "string"
+      },
+      "fromLevel": {
+       "type": "integer"
+      },
+      "toLevel": {
+       "type": "integer"
+      },
+      "wasAutomatic": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "resubmittedFromId": {
+    "type": "string",
+    "nullable": true
+   },
+   "reopenedFromId": {
+    "type": "string",
+    "nullable": true
+   },
+   "slaDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "slaBreached": {
+    "type": "boolean"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "requestedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "ApprovalStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "pending",
+   "escalated",
+   "returned",
+   "informationRequested",
+   "approved",
+   "rejected",
+   "withdrawn",
+   "expired",
+   "cancelled"
+  ]
+ },
+ "CreateApprovalRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only",
+  "required": [
+   "id",
+   "kind",
+   "subjectContract",
+   "subjectType",
+   "subjectId",
+   "scopePath",
+   "summary"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ApprovalKind"
+   },
+   "subjectContract": {
+    "type": "string",
+    "description": "Which contract owns the thing being approved."
+   },
+   "subjectType": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string",
+    "description": "**A reference, never a copy.** A copy goes stale between raising and deciding, and an approver reading a stale copy approves something that no longer exists.\n"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "summary": {
+    "type": "string",
+    "maxLength": 300,
+    "description": "What the approver sees in their queue before opening it."
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "attributes": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "justification": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "isDraft": {
+    "type": "boolean",
+    "default": false,
+    "description": "True saves the request at `draft` without routing it; `submitApprovalRequest` sends it later (decided 28 September, audit R129).\n"
+   }
+  }
+ },
+ "EventResourceCostEstimate": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over the event resource plan and the rates in resources and workforce, computed at read time",
+  "description": "What `estimateEventResourceCost` returns (decided 29 September, readiness close-out): the event's resource plan priced, one line per requirement or contractor, with the total by kind.",
+  "required": [
+   "eventId",
+   "lines",
+   "total"
+  ],
+  "properties": {
+   "eventId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "quantity",
+      "total"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "venue",
+        "equipment",
+        "staff",
+        "external",
+        "transport"
+       ],
+       "description": "The cost heading on BO-920. Mapped from the requirement kind: space -> venue, equipment and service -> equipment, staff -> staff, contractor -> external, vehicle -> transport."
+      },
+      "requirementId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "description": "The `EventResourcePlan.requirements[].id` priced; null on a contractor line."
+      },
+      "organisationId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "description": "The contractor organisation, on an `external` line."
+      },
+      "label": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "hours": {
+       "type": "number",
+       "nullable": true,
+       "description": "Booked hours the unit cost applies to, where the rate is per hour."
+      },
+      "unitCost": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "total": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "costSource": {
+       "type": "string",
+       "enum": [
+        "resourceRate",
+        "workforceRate",
+        "contractorQuote",
+        "manual"
+       ]
+      }
+     }
+    }
+   },
+   "totalsByKind": {
+    "type": "object",
+    "description": "The sum of `lines[].total` for each kind, keyed by `kind`.",
+    "additionalProperties": {
+     "$ref": "../shared/common.yaml#/components/schemas/Money"
+    }
+   },
+   "total": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "unpricedRequirementIds": {
+    "type": "array",
+    "description": "Requirements with no rate to price them; left out of `total` rather than guessed.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   }
+  }
+ },
+ "EventResourcePlan": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.event_resource_plan",
+  "description": "Event board 6. **Secured against required is the only number an event manager wants.**\n",
+  "properties": {
+   "eventId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "requirements": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "space",
+        "equipment",
+        "staff",
+        "contractor",
+        "vehicle",
+        "service"
+       ]
+      },
+      "resourceTypeId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "roleCode": {
+       "type": "string",
+       "nullable": true
+      },
+      "quantity": {
+       "type": "integer"
+      },
+      "from": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "to": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "locationScopePath": {
+       "type": "string",
+       "nullable": true
+      },
+      "securedCount": {
+       "type": "integer",
+       "readOnly": true
+      },
+      "status": {
+       "type": "string",
+       "enum": [
+        "required",
+        "partiallySecured",
+        "secured",
+        "atRisk"
+       ]
+      },
+      "bookingIds": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       }
+      }
+     }
+    }
+   },
+   "contractors": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "organisationId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "role": {
+       "type": "string"
+      },
+      "headcount": {
+       "type": "integer"
+      },
+      "accreditationProgrammeId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "insuranceVerified": {
+       "type": "boolean",
+       "default": false
+      }
+     }
+    }
+   },
+   "readiness": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "notPlanned",
+     "planning",
+     "atRisk",
+     "ready"
+    ]
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "ResourceBooking": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.booking",
+  "required": [
+   "id",
+   "resourceId",
+   "from",
+   "to",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "resourceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "from": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "to": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "$ref": "#/components/schemas/ResourceBookingStatus"
+   },
+   "holdId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The `ResourceHold` this booking was converted from, where a guest picked the resource on a venue map (rev 3 REV3-15). Null for a staff booking or an allocation.\n"
+   },
+   "recurrenceGroupId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Ties the occurrences of a recurring booking. **Cancelling one week does not cancel the series**, and cancelling the series is a separate act with a separate confirmation.\n"
+   },
+   "depositAuthorisationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The hold, through `orders.authoriseStoredValue` (CF-126). **A deposit taken and refunded is two transactions and a fee; held and released is neither.**\n"
+   },
+   "checkedOutAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "dueBackAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "returnedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "conditionOut": {
+    "type": "string",
+    "nullable": true
+   },
+   "conditionIn": {
+    "type": "string",
+    "nullable": true
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the latest offline check-out or check-in write reached the server. **The device times are `checkedOutAt` and `returnedAt`**, taken from each write's `recordedAt`; this is the server's half of the pair naming-and-style 5.2 requires. Null while pending.\n"
+   }
+  }
+ },
+ "ResourceBookingStatus": {
+  "type": "string",
+  "enum": [
+   "reserved",
+   "checkedOut",
+   "returned",
+   "overdue",
+   "cancelled",
+   "noShow"
+  ]
+ },
+ "ResourceCalendarRow": {
+  "type": "object",
+  "description": "Board 2.01. **One resource across the window, with its states already computed** — including conflict, which a client cannot derive from a booking list.\n",
+  "properties": {
+   "resourceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "resourceName": {
+    "type": "string"
+   },
+   "resourceTypeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "utilisationPercent": {
+    "type": "number"
+   },
+   "segments": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "from": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "to": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "state": {
+       "type": "string",
+       "enum": [
+        "available",
+        "reserved",
+        "assigned",
+        "partiallyUtilised",
+        "fullyUtilised",
+        "unavailable",
+        "onBreak",
+        "onLeave",
+        "underMaintenance",
+        "operationallyBlocked",
+        "pendingApproval",
+        "conflict"
+       ]
+      },
+      "bookingId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "conflictsWith": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "ResourcePackage": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.resource_package",
+  "description": "Board 1.08. **A package may hold placeholders.** \"One technician\" is a slot, and naming a person would make the package unbookable whenever they are off.\n",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "applicableVenueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "components": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ResourceRequirement"
+    }
+   },
+   "allocationPriority": {
+    "type": "integer",
+    "default": 0
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "minimumMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "maximumMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "requiresApproval": {
+    "type": "boolean",
+    "default": false
+   },
+   "internalCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "ResourceRequirement": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.resource_requirement",
+  "description": "**A type and a quantity, never a named resource.** This is what makes the 26 August rule enforceable — the product states what it needs and the platform decides which one.\nFor resources placed on a published venue map the rule is superseded (decided 29 September, rev 3 REV3-15): the guest names the resource through a `ResourceHold`, and no requirement is needed.\n",
+  "required": [
+   "quantity"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "resourceTypeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "resourceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**A fixed component, and the exception rather than the rule.** Meeting Room A really is Meeting Room A; the technician is not.\n"
+   },
+   "quantity": {
+    "type": "integer",
+    "default": 1
+   },
+   "mandatory": {
+    "type": "boolean",
+    "default": true
+   },
+   "requiredQualifications": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "requiredAttributes": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "substituteResourceIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "RotaAssignment": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.rota_assignment",
+  "required": [
+   "principalId",
+   "venueId",
+   "startsAt",
+   "endsAt",
+   "position"
+  ],
+  "properties": {
+   "overtimeMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "description": "BL-044, 1.2.83. **UAE labour law limits working hours and mandates rest periods**, and nothing in the package counted either. Derived from attendance against the shift.\n"
+   },
+   "restPeriodBefore": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Minutes since the previous shift ended. **The check that stops a closing shift followed by an opening one**, which is legal in most places and unsafe in all of them.\n"
+   },
+   "breachesWorkingHourLimit": {
+    "type": "boolean",
+    "default": false,
+    "readOnly": true,
+    "description": "**Flagged at assignment, not discovered at payroll.** A rota that breaches a statutory limit is a rota somebody has to redo, and finding out a month later means it was worked.\n"
+   },
+   "labourCost": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "**Cost at the point of scheduling.** A manager building a rota without seeing its cost is a manager who finds out from finance.\n"
+   },
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "departmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "position": {
+    "type": "string",
+    "description": "What they are rostered to do — gate steward, cashier, lifeguard, technician. **Most positions never touch a till**, which is why a rota assignment is not a shift.\n**A position code, not a label.** It is the same value as `StaffingRules.minimumCover[].positionCode`, `OpenShift.positionCode` and `StaffingCoverage.positionCode`: coverage counts rostered people per position, so an assignment spelled differently from the rule it fills is counted against nothing and the gap stays open. Tenant-defined, which is why it is not an enum here.\n"
+   },
+   "requiredRoleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Checked on assignment. A rota naming someone unqualified is a rota that gets overridden."
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where the position needs a till. **The link between a rota and a cash session**, without merging the two.\n"
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "endsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "$ref": "#/components/schemas/RotaStatus"
+   },
+   "breakMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "RotaStatus": {
+  "type": "string",
+  "enum": [
+   "planned",
+   "published",
+   "confirmed",
+   "swapPending",
+   "cancelled",
+   "completed",
+   "noShow"
+  ]
+ },
+ "Space": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.space",
+  "description": "Event board 3.2. **Bookable, as distinct from navigable** — `venue-map` owns the geometry.\n",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueMapZoneId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "resourceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Where the space is also a bookable `resources` resource**, so its calendar and conflict detection come from there rather than a second scheduler.\n"
+   },
+   "parentSpaceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "maximumCapacity": {
+    "type": "integer",
+    "nullable": true
+   },
+   "safeCapacity": {
+    "type": "integer",
+    "nullable": true
+   },
+   "setupMinutes": {
+    "type": "integer",
+    "default": 0
+   },
+   "teardownMinutes": {
+    "type": "integer",
+    "default": 0
+   },
+   "accessRules": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": true
+   },
+   "bookable": {
+    "type": "boolean",
+    "default": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ }
+}

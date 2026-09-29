@@ -1,6 +1,6 @@
 # P13-white-label-01 — P13 · White Label (1 of 2)
 
-**10 screens · 60 operations · 76 schemas · 18 permissions**
+**10 screens · 54 operations · 54 schemas · 8 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 18 permissions apply here:
-  `ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW, ASSET_MANAGE, ASSET_VIEW, ORDER_CREATE, ORDER_VIEW, PLATFORM_BILLING_MANAGE, PLATFORM_BILLING_VIEW, PLATFORM_CELL_MANAGE, PLATFORM_CELL_VIEW, PLATFORM_TENANT_MANAGE, PLATFORM_TENANT_TERMINATE`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 8 permissions apply here:
+  `ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW, ORDER_CREATE, ORDER_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, TENANT_CONFIGURE, TENANT_PUBLISH`. A control nobody can use must say so,
   not sit enabled and fail.
-- **7 of these operations work offline**: getAsset, getMediaAsset, getMediaEntitlements, getTenantLicences, listAssets, lookupAsset, setAssetStatus
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,20 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `CMS-001` | Tenant Workspace | listDetail | 21 | 3 | — |
-| `CMS-002` | Brand Kit | statusTracker | 4 | 0 | — |
-| `CMS-003` | Typography | statusTracker | 4 | 0 | — |
-| `CMS-004` | Logo & Assets | listDetail | 7 | 0 | — |
-| `CMS-005` | Theme Editor | statusTracker | 2 | 0 | — |
-| `CMS-006` | Component Preview | listDetail | 5 | 0 | — |
-| `CMS-007` | Page Builder | statusTracker | 2 | 0 | — |
-| `CMS-008` | Content Blocks | listDetail | 2 | 0 | — |
-| `CMS-009` | Navigation & Menus | listDetail | 5 | 0 | — |
-| `CMS-010` | Media Library | listDetail | 12 | 1 | — |
+| `CMS-001` | Tenant Workspace | statusTracker | 7 | 3 | — |
+| `CMS-002` | Brand Kit | statusTracker | 4 | 3 | — |
+| `CMS-003` | Typography | statusTracker | 4 | 2 | — |
+| `CMS-004` | Logo & Assets | statusTracker | 4 | 2 | — |
+| `CMS-005` | Theme Editor | statusTracker | 2 | 1 | — |
+| `CMS-006` | Component Preview | listDetail | 5 | 2 | — |
+| `CMS-007` | Page Builder | statusTracker | 9 | 4 | — |
+| `CMS-008` | Content Blocks | listDetail | 8 | 5 | — |
+| `CMS-009` | Navigation & Menus | listDetail | 6 | 3 | — |
+| `CMS-010` | Media Library | listDetail | 12 | 9 | — |
+
+## Thin screens in this batch
+
+**CMS-005 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -84,7 +87,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "id": "CMS-001",
   "name": "Tenant Workspace",
   "module": "White Label",
-  "requiresModule": "membership",
+  "requiresModule": "core",
   "wave": 2,
   "capability": "C00",
   "implementation": {
@@ -98,6 +101,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "CMS-002",
     "CMS-003",
     "CMS-004",
+    "CMS-008",
+    "CMS-009",
+    "CMS-010",
+    "CMS-011",
+    "CMS-016",
+    "CMS-015",
+    "CMS-019",
+    "CMS-021",
+    "CMS-031",
+    "CMS-041",
+    "CMS-051",
     "CMS-061",
     "CMS-071",
     "CMS-081",
@@ -106,11 +120,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "inferred": true,
    "isEntryPoint": true,
    "transitions": [
-    {
-     "to": "CMS-003",
-     "trigger": "Typography",
-     "provenance": "flow F102 step 1→2"
-    },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
@@ -140,77 +149,225 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "CMS-091",
      "trigger": "Asset Distribution & Delivery Command Center",
      "provenance": "structural — pack board 4 wiring, 11 September 2026"
+    },
+    {
+     "to": "CMS-008",
+     "trigger": "Content Blocks",
+     "provenance": "derived — CMS-008 declares entryState.params bannerId, promoBlockId and CMS-001 holds none of them, so the edge carries nothing and CMS-008 opens cold"
+    },
+    {
+     "to": "CMS-009",
+     "trigger": "Navigation & Menus",
+     "provenance": "derived — CMS-009 declares entryState.params menuId and CMS-001 holds none of them, so the edge carries nothing and CMS-009 opens cold"
+    },
+    {
+     "to": "CMS-010",
+     "trigger": "Media Library",
+     "provenance": "derived — CMS-010 declares entryState.params mediaCode, mediaId, uploadId and CMS-001 holds none of them, so the edge carries nothing and CMS-010 opens cold"
+    },
+    {
+     "to": "CMS-011",
+     "trigger": "Translations",
+     "provenance": "structural — CMS-001 is P13's home screen and its exits are its launcher"
+    },
+    {
+     "to": "CMS-016",
+     "trigger": "Site Settings",
+     "provenance": "structural — CMS-001 is P13's home screen and its exits are its launcher"
+    },
+    {
+     "to": "CMS-019",
+     "trigger": "User Access",
+     "provenance": "structural — CMS-001 is P13's home screen and its exits are its launcher"
+    },
+    {
+     "to": "CMS-015",
+     "trigger": "Version History",
+     "provenance": "structural — CMS-001 is P13's home screen and its exits are its launcher",
+     "carries": [
+      "version"
+     ]
+    },
+    {
+     "to": "CMS-021",
+     "trigger": "Privacy & Consent Configuration Command Center",
+     "provenance": "structural — CMS-001 is P13's home screen and its exits are its launcher"
+    },
+    {
+     "to": "CMS-031",
+     "trigger": "Privacy Operations Command Center",
+     "provenance": "structural — CMS-001 is P13's home screen and its exits are its launcher"
+    },
+    {
+     "to": "CMS-041",
+     "trigger": "Waiver & Consent Command Center",
+     "provenance": "structural — CMS-001 is P13's home screen and its exits are its launcher"
+    },
+    {
+     "to": "CMS-051",
+     "trigger": "Waiver Operations Command Center",
+     "provenance": "structural — CMS-001 is P13's home screen and its exits are its launcher"
+    },
+    {
+     "to": "CMS-003",
+     "trigger": "Typography",
+     "provenance": "flow F102 step 1→2",
+     "carries": [
+      "version"
+     ]
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **The tenant workspace.** Lands a tenant on what is live rather than on a form. **Declared 20 August** — `isEntryPoint` existed in the schema and five platforms used none, so every screen in them read as unreachable. **Drawn 31 August** — `Marketing Board 7.dc.html` frame `crm-7f` (*Agent Workspace*), matched on title at 0.84 within this board’s platforms.",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **The tenant workspace.** Lands a tenant on what is live rather than on a form. **Declared 20 August** — `isEntryPoint` existed in the schema and five platforms used none, so every screen in them read as unreachable. **Drawn 31 August** — `Marketing Board 7.dc.html` frame `crm-7f` (*Agent Workspace*), matched on title at 0.84 within this board’s platforms.\n\n**Rewired 23 September (L7).** The screen called the maintenance equipment register, guest CRM or subscription billing where its purpose names White Labelling. Its operations now match its purpose.",
   "density": "compact",
   "boardFrames": [
    "Marketing Board 7.dc.html#crm-7f"
   ],
-  "pattern": "listDetail",
-  "patternReason": "`listTenants` reads the population and `getSsoConfig` reads one of them — list, select, act",
+  "pattern": "statusTracker",
+  "patternReason": "`getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing",
   "purpose": "Land a tenant somewhere that shows what is live and what is not.",
-  "gaps": [
+  "states": {
+   "loading": "The tenant, read by `getTenantAppStatus`.",
+   "error": "Could not load. Names which read failed and leaves the tenant untouched.",
+   "emptyFirstRun": "No tenant yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getTenantConfig` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
    {
-    "operation": "getEntitlementUsage",
-    "why": "**7 declared operations reach no component on this screen**: getEntitlementUsage, getSubscription, getTenant, getTenantLicences, getUsageMetering, listSubscriptionInvoices, listTenantCells. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "operationId": "getTenantAppStatus",
+    "contract": "white-label",
+    "purpose": "Whether the guest web and app are live",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getTenantConfig",
+    "contract": "white-label",
+    "purpose": "The published configuration",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getModuleEnablement",
+    "contract": "white-label",
+    "purpose": "Which modules guests can see",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getFeatureToggles",
+    "contract": "white-label",
+    "purpose": "Which features are switched on",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setModuleEnablement",
+    "contract": "white-label",
+    "purpose": "Switch a module on or off for guests",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "setFeatureToggles",
+    "contract": "white-label",
+    "purpose": "Switch a feature on or off",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "setMaintenanceMode",
+    "contract": "white-label",
+    "purpose": "Put the guest web and app into maintenance, and set the rest of the live app status — minimum app version, contact details, availability (decided 28 September, audit R073)",
+    "trigger": "onAction"
    }
   ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-001",
+   "derivedFrom": "wireframes/reference/Marketing Board 7.dc.html",
+   "note": "**Drawn by Claude Design on `Marketing Board 7.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "layout": {
-   "template": "split",
+   "template": "detail",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every tenant",
-       "bindsTo": "Tenant",
-       "columns": [
-        "Tenant.id",
-        "Tenant.code",
-        "Tenant.name",
-        "Tenant.status",
-        "Tenant.suspensionMode",
-        "Tenant.suspensionReason",
-        "Tenant.planId",
-        "Tenant.planName",
-        "Tenant.cellCount",
-        "Tenant.venueCount",
-        "Tenant.billingEmail",
-        "Tenant.accountManagerPrincipalId"
-       ],
-       "operation": "listTenants",
-       "provenance": "contract subscription.yaml GET /tenants"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
+     "slot": "record",
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected tenant",
-       "bindsTo": "SsoProviderConfig",
+       "label": "The tenant app status",
+       "bindsTo": "TenantAppStatus",
        "columns": [
-        "SsoProviderConfig.id",
-        "SsoProviderConfig.displayName",
-        "SsoProviderConfig.protocol",
-        "SsoProviderConfig.metadataUrl",
-        "SsoProviderConfig.issuer",
-        "SsoProviderConfig.clientId",
-        "SsoProviderConfig.clientSecretRef",
-        "SsoProviderConfig.groupMappings",
-        "SsoProviderConfig.autoProvisionPrincipals",
-        "SsoProviderConfig.isEnforced",
-        "SsoProviderConfig.isActive"
+        "TenantAppStatus.isPublished",
+        "TenantAppStatus.publishedVersion",
+        "TenantAppStatus.publishedAt",
+        "TenantAppStatus.draftVersion",
+        "TenantAppStatus.hasUnpublishedChanges",
+        "TenantAppStatus.activeModuleCount",
+        "TenantAppStatus.licensedModuleCount",
+        "TenantAppStatus.activePageCount",
+        "TenantAppStatus.isInMaintenance",
+        "TenantAppStatus.maintenanceMessage",
+        "TenantAppStatus.expectedBackAt",
+        "TenantAppStatus.minimumAppVersion",
+        "TenantAppStatus.contact",
+        "TenantAppStatus.availability",
+        "TenantAppStatus.availabilityMessage",
+        "TenantAppStatus.recentChanges"
        ],
-       "operation": "getSsoConfig",
-       "provenance": "contract identity.yaml GET /tenants/sso-config"
+       "operation": "getTenantAppStatus",
+       "provenance": "contract white-label.yaml GET /tenant-config/status"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The tenant config",
+       "bindsTo": "TenantConfig",
+       "columns": [
+        "TenantConfig.isDraft",
+        "TenantConfig.brand",
+        "TenantConfig.appIcons",
+        "TenantConfig.bookingFlow",
+        "TenantConfig.theme",
+        "TenantConfig.fonts",
+        "TenantConfig.footer",
+        "TenantConfig.notificationBranding",
+        "TenantConfig.enabledPaymentMethods",
+        "TenantConfig.accessibility",
+        "TenantConfig.header",
+        "TenantConfig.navigation",
+        "TenantConfig.homepage",
+        "TenantConfig.modules",
+        "TenantConfig.features",
+        "TenantConfig.languages"
+       ],
+       "operation": "getTenantConfig",
+       "provenance": "contract white-label.yaml GET /tenant-config"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The module enablement",
+       "bindsTo": "ModuleEnablement",
+       "columns": [
+        "ModuleEnablement.moduleKey",
+        "ModuleEnablement.displayName",
+        "ModuleEnablement.isLicensed",
+        "ModuleEnablement.isEnabled",
+        "ModuleEnablement.referencedBy"
+       ],
+       "operation": "getModuleEnablement",
+       "provenance": "contract white-label.yaml GET /tenant-config/modules"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The feature toggle",
+       "bindsTo": "FeatureToggle",
+       "columns": [
+        "FeatureToggle.featureKey",
+        "FeatureToggle.displayName",
+        "FeatureToggle.isEnabled",
+        "FeatureToggle.changeScope",
+        "FeatureToggle.requiresConfiguration"
+       ],
+       "operation": "getFeatureToggles",
+       "provenance": "contract white-label.yaml GET /tenant-config/features"
       }
      ]
     },
@@ -220,123 +377,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
-       "operation": "setSsoConfig",
-       "provenance": "contract identity.yaml PUT /tenants/sso-config"
+       "label": "Save module enablement",
+       "operation": "setModuleEnablement",
+       "provenance": "contract white-label.yaml PUT /tenant-config/modules"
       },
       {
        "kind": "secondaryButton",
-       "label": "Add",
-       "operation": "addLicenceAddOn",
-       "provenance": "contract subscription.yaml POST /tenants/{tenantId}/licences/add-ons"
+       "label": "Save feature toggles",
+       "operation": "setFeatureToggles",
+       "provenance": "contract white-label.yaml PUT /tenant-config/features"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createTenant",
-       "provenance": "contract subscription.yaml POST /tenants"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Generate",
-       "operation": "generateInvoice",
-       "provenance": "contract subscription.yaml POST /tenants/{tenantId}/invoices"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Preview",
-       "operation": "previewSubscriptionChange",
-       "provenance": "contract subscription.yaml POST /tenants/{tenantId}/subscription/preview"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Provision",
-       "operation": "provisionCell",
-       "provenance": "contract subscription.yaml POST /tenants/{tenantId}/cells"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reactivate",
-       "operation": "reactivateTenant",
-       "provenance": "contract subscription.yaml POST /tenants/{tenantId}/reactivate"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Remove",
-       "operation": "removeLicenceAddOn",
-       "provenance": "contract subscription.yaml DELETE /tenants/{tenantId}/licences/add-ons"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setSubscription",
-       "provenance": "contract subscription.yaml PUT /tenants/{tenantId}/subscription"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Suspend",
-       "operation": "suspendTenant",
-       "provenance": "contract subscription.yaml POST /tenants/{tenantId}/suspend"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Terminate",
-       "operation": "terminateTenant",
-       "provenance": "contract subscription.yaml POST /tenants/{tenantId}/terminate"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updateTenant",
-       "provenance": "contract subscription.yaml PATCH /tenants/{tenantId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listTenants",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setSsoConfig",
-       "label": "Save sso config",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "removeLicenceAddOn",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "label": "Remove licence add on",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setSsoConfig",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
+       "label": "Save maintenance mode",
+       "operation": "setMaintenanceMode",
+       "provenance": "contract white-label.yaml PUT /tenant-config/status"
       }
      ]
     }
@@ -344,221 +399,63 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "overlays": [
    {
-    "id": "confirmRemoveLicenceAddOn",
-    "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeLicenceAddOn` changes and what it leaves alone**, in the consequence rather than the verb. A tenant this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract subscription.yaml DELETE /tenants/{tenantId}/licences/add-ons"
+    "id": "formSetModuleEnablement",
+    "component": "modal",
+    "trigger": "Save module enablement",
+    "body": "**Collects what `setModuleEnablement` sends before it is called.** Required: `modules`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save module enablement",
+     "operation": "setModuleEnablement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "modules"
+     ]
+    },
+    "provenance": "contract white-label.yaml PUT /tenant-config/modules"
    },
    {
-    "id": "confirmSuspendTenant",
-    "component": "confirmDialog",
-    "trigger": "Suspend",
-    "body": "**Names what `suspendTenant` changes and what it leaves alone**, in the consequence rather than the verb. A tenant this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract subscription.yaml POST /tenants/{tenantId}/suspend"
+    "id": "formSetFeatureToggles",
+    "component": "modal",
+    "trigger": "Save feature toggles",
+    "body": "**Collects what `setFeatureToggles` sends before it is called.** Required: `features`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save feature toggles",
+     "operation": "setFeatureToggles"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "features"
+     ]
+    },
+    "provenance": "contract white-label.yaml PUT /tenant-config/features"
    },
    {
-    "id": "confirmTerminateTenant",
-    "component": "confirmDialog",
-    "trigger": "Terminate",
-    "body": "**Names what `terminateTenant` changes and what it leaves alone**, in the consequence rather than the verb. A tenant this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract subscription.yaml POST /tenants/{tenantId}/terminate"
+    "id": "formSetMaintenanceMode",
+    "component": "modal",
+    "trigger": "Save maintenance mode",
+    "body": "**Collects what `setMaintenanceMode` sends before it is called.** Required: `isInMaintenance`. Optional: `message`, `expectedBackAt`, `minimumAppVersion` (`ios`, `android`), `contact` (`phone`, `email`, `whatsapp`, `address`, `openingHours`), `availability` (`open`, `soldOut`, `closed`) and `availabilityMessage`. **The live app status is set here, not published** (decided 28 September, audit R073 (b)(f)): a guest app below `minimumAppVersion` for its platform is sent to the forced upgrade (GST-047), the contact details feed WEB-028 and the availability feeds WEB-029's sold-out and closed states. A field not sent is left as it is, so clearing maintenance does not clear the contact details. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save maintenance mode",
+     "operation": "setMaintenanceMode"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "isInMaintenance",
+      "message",
+      "expectedBackAt",
+      "minimumAppVersion",
+      "contact",
+      "availability",
+      "availabilityMessage"
+     ]
+    },
+    "provenance": "contract white-label.yaml PUT /tenant-config/status"
    }
   ],
-  "states": {
-   "loading": "The tenant list.",
-   "error": "Could not load. Names which read failed and leaves the tenant untouched.",
-   "emptyFirstRun": "No tenant yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the tenant are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getSsoConfig",
-    "contract": "identity",
-    "purpose": "Read SSO configuration",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listTenants",
-    "contract": "subscription",
-    "purpose": "List tenants",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setSsoConfig",
-    "contract": "identity",
-    "purpose": "Configure an identity provider",
-    "trigger": "onAction",
-    "invalidates": [
-     "listTenants"
-    ]
-   },
-   {
-    "operationId": "addLicenceAddOn",
-    "contract": "subscription",
-    "purpose": "License a module outside the plan",
-    "trigger": "onAction",
-    "invalidates": [
-     "listTenants"
-    ]
-   },
-   {
-    "operationId": "createTenant",
-    "contract": "subscription",
-    "purpose": "Create a tenant",
-    "trigger": "onAction",
-    "invalidates": [
-     "listTenants"
-    ]
-   },
-   {
-    "operationId": "generateInvoice",
-    "contract": "subscription",
-    "purpose": "Generate an invoice for a period",
-    "trigger": "onAction",
-    "invalidates": [
-     "listTenants"
-    ]
-   },
-   {
-    "operationId": "getEntitlementUsage",
-    "contract": "subscription",
-    "purpose": "Usage against licensed limits",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getSubscription",
-    "contract": "subscription",
-    "purpose": "Read the current subscription",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getTenant",
-    "contract": "subscription",
-    "purpose": "Read a tenant with cells and subscription",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getTenantLicences",
-    "contract": "subscription",
-    "purpose": "What a tenant is licensed to use",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getUsageMetering",
-    "contract": "subscription",
-    "purpose": "Metered usage for a period",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listSubscriptionInvoices",
-    "contract": "subscription",
-    "purpose": "List subscription invoices",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listTenantCells",
-    "contract": "subscription",
-    "purpose": "List a tenant's cells",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "previewSubscriptionChange",
-    "contract": "subscription",
-    "purpose": "Preview the effect of a plan change",
-    "trigger": "onAction",
-    "invalidates": [
-     "listTenants"
-    ]
-   },
-   {
-    "operationId": "provisionCell",
-    "contract": "subscription",
-    "purpose": "Provision a cell for a region",
-    "trigger": "onAction",
-    "invalidates": [
-     "listTenants"
-    ]
-   },
-   {
-    "operationId": "reactivateTenant",
-    "contract": "subscription",
-    "purpose": "Lift a suspension",
-    "trigger": "onAction",
-    "invalidates": [
-     "listTenants"
-    ]
-   },
-   {
-    "operationId": "removeLicenceAddOn",
-    "contract": "subscription",
-    "purpose": "Remove an add-on",
-    "trigger": "onAction",
-    "invalidates": [
-     "listTenants"
-    ]
-   },
-   {
-    "operationId": "setSubscription",
-    "contract": "subscription",
-    "purpose": "Assign or change a subscription",
-    "trigger": "onAction",
-    "invalidates": [
-     "listTenants"
-    ]
-   },
-   {
-    "operationId": "suspendTenant",
-    "contract": "subscription",
-    "purpose": "Suspend a tenant",
-    "trigger": "onAction",
-    "invalidates": [
-     "listTenants"
-    ]
-   },
-   {
-    "operationId": "terminateTenant",
-    "contract": "subscription",
-    "purpose": "Begin termination",
-    "trigger": "onAction",
-    "invalidates": [
-     "listTenants"
-    ]
-   },
-   {
-    "operationId": "updateTenant",
-    "contract": "subscription",
-    "purpose": "Amend tenant details",
-    "trigger": "onAction",
-    "invalidates": [
-     "listTenants"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "tenantId",
-     "from": "session"
-    }
-   ],
-   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
-   "preloaded": [
-    "SsoProviderConfig.id",
-    "SsoProviderConfig.displayName",
-    "SsoProviderConfig.protocol",
-    "SsoProviderConfig.metadataUrl",
-    "SsoProviderConfig.issuer"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-001",
-   "note": "**Drawn by Claude Design on `Marketing Board 7.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 21 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -613,29 +510,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-002 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "carries": [
-      "bannerId",
-      "pageId",
-      "policyKind",
-      "version"
-     ],
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version, so an edge into it must carry them"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-002 holds none of them, so the edge carries nothing and CMS-003 opens cold"
     },
     {
      "to": "CMS-004",
      "trigger": "Logo & Assets",
-     "carries": [
-      "assetId"
-     ],
-     "provenance": "derived — CMS-004 declares entryState.params assetId, so an edge into it must carry them"
+     "provenance": "derived — CMS-004 declares entryState.params  and CMS-002 holds none of them, so the edge carries nothing and CMS-004 opens cold"
     }
    ]
   },
@@ -653,11 +538,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected brand kit",
+       "label": "The brand identity",
        "bindsTo": "BrandIdentity",
        "columns": [
         "BrandIdentity.logoAssetRef",
         "BrandIdentity.logoDarkAssetRef",
+        "BrandIdentity.logoVariant",
         "BrandIdentity.faviconAssetRef",
         "BrandIdentity.splashImageAssetRefs",
         "BrandIdentity.splashDurationSeconds",
@@ -676,58 +562,31 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save brand identity",
        "operation": "setBrandIdentity",
        "provenance": "contract white-label.yaml PUT /tenant-config/brand"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create upload",
        "operation": "createUpload",
        "provenance": "contract assets.yaml POST /media/uploads"
       },
       {
        "kind": "secondaryButton",
-       "label": "Complete",
+       "label": "Complete upload",
        "operation": "completeUpload",
        "provenance": "contract assets.yaml POST /media/uploads/{uploadId}/complete"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setBrandIdentity",
-       "label": "Save brand identity",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setBrandIdentity",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The brand kit list.",
+   "loading": "The brand kit, read by `getBrandIdentity`.",
    "error": "Could not load. Names which read failed and leaves the brand kit untouched.",
-   "emptyFirstRun": "No brand kit yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the brand kit are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No brand kit yet. Offers Create upload (`createUpload`).",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getBrandIdentity` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -770,6 +629,75 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P13 Venue CMS.dc.html#cms-002"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetBrandIdentity",
+    "component": "modal",
+    "trigger": "Save brand identity",
+    "body": "**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional: `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`, `splashChangeScope`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "BrandIdentity",
+    "confirm": {
+     "label": "Save brand identity",
+     "operation": "setBrandIdentity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "logoAssetRef",
+      "logoDarkAssetRef",
+      "logoVariant",
+      "faviconAssetRef",
+      "splashImageAssetRefs",
+      "splashDurationSeconds",
+      "splashBackgroundColour",
+      "showLoadingIndicator",
+      "splashChangeScope"
+     ]
+    },
+    "provenance": "contract white-label.yaml PUT /tenant-config/brand"
+   },
+   {
+    "id": "formCreateUpload",
+    "component": "modal",
+    "trigger": "Create upload",
+    "body": "**Collects what `createUpload` sends before it is called.** Required: `filename`, `contentType`, `sizeBytes`. Optional: `venueId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create upload",
+     "operation": "createUpload"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "filename",
+      "contentType",
+      "sizeBytes",
+      "venueId"
+     ]
+    },
+    "provenance": "contract assets.yaml POST /media/uploads"
+   },
+   {
+    "id": "formCompleteUpload",
+    "component": "modal",
+    "trigger": "Complete upload",
+    "body": "**Collects what `completeUpload` sends before it is called.** Nothing in the body is required. Optional: `title`, `altText`, `tags`, `collectionIds`, `rights`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Complete upload",
+     "operation": "completeUpload"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "title",
+      "altText",
+      "tags",
+      "collectionIds",
+      "rights"
+     ]
+    },
+    "provenance": "contract assets.yaml POST /media/uploads/{uploadId}/complete"
+   }
+  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -816,33 +744,30 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "inferred": true,
    "transitions": [
     {
-     "to": "CMS-006",
-     "trigger": "Component Preview",
-     "provenance": "flow F102 step 2→3"
-    },
-    {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-003 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "carries": [
-      "uploadId"
-     ],
-     "provenance": "derived — CMS-002 declares entryState.params uploadId, so an edge into it must carry them"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-003 holds none of them, so the edge carries nothing and CMS-002 opens cold"
     },
     {
      "to": "CMS-004",
      "trigger": "Logo & Assets",
+     "provenance": "derived — CMS-004 declares entryState.params  and CMS-003 holds none of them, so the edge carries nothing and CMS-004 opens cold"
+    },
+    {
+     "to": "CMS-006",
+     "trigger": "Component Preview",
+     "provenance": "flow F102 step 2→3",
      "carries": [
-      "assetId"
-     ],
-     "provenance": "derived — CMS-004 declares entryState.params assetId, so an edge into it must carry them"
+      "bannerId",
+      "pageId",
+      "policyKind",
+      "version"
+     ]
     }
    ]
   },
@@ -851,13 +776,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "statusTracker",
   "patternReason": "`getFonts` reads one record and nothing reads a population — the screen is about that one thing",
   "purpose": "Choose the two typefaces and the scale under them.",
-  "gaps": [
-   {
-    "operation": "getTheme",
-    "why": "**1 declared operation reach no component on this screen**: getTheme. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "detail",
    "regions": [
@@ -867,7 +785,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected typography",
+       "label": "The font config",
        "bindsTo": "FontConfig",
        "columns": [
         "FontConfig.primaryLatin",
@@ -879,6 +797,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getFonts",
        "provenance": "contract white-label.yaml GET /tenant-config/fonts"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The theme",
+       "bindsTo": "Theme",
+       "columns": [
+        "Theme.primaryColour",
+        "Theme.secondaryColour",
+        "Theme.accentColour",
+        "Theme.backgroundColour",
+        "Theme.textColour",
+        "Theme.darkMode",
+        "Theme.cornerRadius",
+        "Theme.surfaceStyle",
+        "Theme.buttonStyle"
+       ],
+       "operation": "getTheme",
+       "provenance": "contract white-label.yaml GET /tenant-config/theme"
       }
      ]
     },
@@ -888,52 +824,25 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save fonts",
        "operation": "setFonts",
        "provenance": "contract white-label.yaml PUT /tenant-config/fonts"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save theme",
        "operation": "setTheme",
        "provenance": "contract white-label.yaml PUT /tenant-config/theme"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setFonts",
-       "label": "Save fonts",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setFonts",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The typography list.",
+   "loading": "The typography, read by `getFonts`.",
    "error": "Could not load. Names which read failed and leaves the typography untouched.",
-   "emptyFirstRun": "No typography yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the typography are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No typography yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getFonts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -988,6 +897,57 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P13 Venue CMS.dc.html#cms-003"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetFonts",
+    "component": "modal",
+    "trigger": "Save fonts",
+    "body": "**Collects what `setFonts` sends before it is called.** Required: `primaryLatin`. Optional: `primaryArabic`, `secondaryLatin`, `secondaryArabic`, `customFontAssetRefs`, `changeScope`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "FontConfig",
+    "confirm": {
+     "label": "Save fonts",
+     "operation": "setFonts"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "primaryLatin",
+      "primaryArabic",
+      "secondaryLatin",
+      "secondaryArabic",
+      "customFontAssetRefs",
+      "changeScope"
+     ]
+    },
+    "provenance": "contract white-label.yaml PUT /tenant-config/fonts"
+   },
+   {
+    "id": "formSetTheme",
+    "component": "modal",
+    "trigger": "Save theme",
+    "body": "**Collects what `setTheme` sends before it is called.** Required: `primaryColour`, `secondaryColour`, `backgroundColour`, `textColour`. Optional: `accentColour`, `darkMode`, `cornerRadius`, `surfaceStyle` (glass or solid, default glass) and `buttonStyle` (solid, outline or pill, default solid; decided 29 September, rev 3 CFG-3). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "Theme",
+    "confirm": {
+     "label": "Save theme",
+     "operation": "setTheme"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "primaryColour",
+      "secondaryColour",
+      "backgroundColour",
+      "textColour",
+      "accentColour",
+      "darkMode",
+      "cornerRadius",
+      "surfaceStyle",
+      "buttonStyle"
+     ]
+    },
+    "provenance": "contract white-label.yaml PUT /tenant-config/theme"
+   }
+  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1015,7 +975,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "id": "CMS-004",
   "name": "Logo & Assets",
   "module": "White Label",
-  "requiresModule": "maintenance",
+  "requiresModule": "core",
   "wave": 2,
   "capability": "C00",
   "implementation": {
@@ -1035,89 +995,101 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-004 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "carries": [
-      "uploadId"
-     ],
-     "provenance": "derived — CMS-002 declares entryState.params uploadId, so an edge into it must carry them"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-004 holds none of them, so the edge carries nothing and CMS-002 opens cold"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "carries": [
-      "bannerId",
-      "pageId",
-      "policyKind",
-      "version"
-     ],
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version, so an edge into it must carry them"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-004 holds none of them, so the edge carries nothing and CMS-003 opens cold"
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**Rewired 23 September (L7).** The screen called the maintenance equipment register, guest CRM or subscription billing where its purpose names White Labelling. Its operations now match its purpose.",
   "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listAssets` reads the population and `getAsset` reads one of them — list, select, act",
+  "pattern": "statusTracker",
+  "patternReason": "`getBrandIdentity` reads one record and nothing reads a population — the screen is about that one thing",
   "purpose": "Hold the marks every surface needs, at the sizes it needs them.",
-  "gaps": [
+  "states": {
+   "loading": "The logo assets, read by `getBrandIdentity`.",
+   "error": "Could not load. Names which read failed and leaves the logo assets untouched.",
+   "emptyFirstRun": "No logo assets yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getBrandIdentity` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
    {
-    "operation": "getAssetHistory",
-    "why": "**1 declared operation reach no component on this screen**: getAssetHistory. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "operationId": "getBrandIdentity",
+    "contract": "white-label",
+    "purpose": "The logo, favicon and splash in use",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getAppIcons",
+    "contract": "white-label",
+    "purpose": "The app icon set at every size",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setAppIcons",
+    "contract": "white-label",
+    "purpose": "Replace the app icon set",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "setBrandIdentity",
+    "contract": "white-label",
+    "purpose": "Replace a logo, favicon or splash",
+    "trigger": "onAction"
    }
   ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-004"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "layout": {
-   "template": "split",
+   "template": "detail",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every logo assets",
-       "bindsTo": "Asset",
-       "columns": [
-        "Asset.assetTag",
-        "Asset.name",
-        "Asset.venueId",
-        "Asset.categoryId",
-        "Asset.locationDescription",
-        "Asset.criticality",
-        "Asset.manufacturer",
-        "Asset.model",
-        "Asset.serialNumber",
-        "Asset.commissionedAt",
-        "Asset.warrantyExpiresAt",
-        "Asset.supplierId"
-       ],
-       "operation": "listAssets",
-       "provenance": "contract maintenance.yaml GET /assets"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
+     "slot": "record",
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected logo assets",
-       "bindsTo": "AssetDetail",
+       "label": "The brand identity",
+       "bindsTo": "BrandIdentity",
        "columns": [
-        "AssetDetail.openWorkOrders",
-        "AssetDetail.maintenancePlans",
-        "AssetDetail.documents"
+        "BrandIdentity.logoAssetRef",
+        "BrandIdentity.logoDarkAssetRef",
+        "BrandIdentity.logoVariant",
+        "BrandIdentity.faviconAssetRef",
+        "BrandIdentity.splashImageAssetRefs",
+        "BrandIdentity.splashDurationSeconds",
+        "BrandIdentity.splashBackgroundColour",
+        "BrandIdentity.showLoadingIndicator",
+        "BrandIdentity.splashChangeScope"
        ],
-       "operation": "getAsset",
-       "provenance": "contract maintenance.yaml GET /assets/{assetId}"
+       "operation": "getBrandIdentity",
+       "provenance": "contract white-label.yaml GET /tenant-config/brand"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The app icons",
+       "bindsTo": "AppIcons",
+       "columns": [
+        "AppIcons.sourceAssetRef",
+        "AppIcons.derived",
+        "AppIcons.changeScope",
+        "AppIcons.liveVersion",
+        "AppIcons.requiresRebuild"
+       ],
+       "operation": "getAppIcons",
+       "provenance": "contract white-label.yaml GET /tenant-config/app-icons"
       }
      ]
     },
@@ -1127,153 +1099,65 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createAsset",
-       "provenance": "contract maintenance.yaml POST /assets"
+       "label": "Save app icons",
+       "operation": "setAppIcons",
+       "provenance": "contract white-label.yaml PUT /tenant-config/app-icons"
       },
       {
        "kind": "secondaryButton",
-       "label": "Lookup",
-       "operation": "lookupAsset",
-       "provenance": "contract maintenance.yaml GET /assets/lookup"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setAssetStatus",
-       "provenance": "contract maintenance.yaml PUT /assets/{assetId}/status"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updateAsset",
-       "provenance": "contract maintenance.yaml PATCH /assets/{assetId}"
+       "label": "Save brand identity",
+       "operation": "setBrandIdentity",
+       "provenance": "contract white-label.yaml PUT /tenant-config/brand"
       }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "formSetAppIcons",
+    "component": "modal",
+    "trigger": "Save app icons",
+    "body": "**Collects what `setAppIcons` sends before it is called.** Required: `sourceAssetRef`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save app icons",
+     "operation": "setAppIcons"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "sourceAssetRef"
      ]
     },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAssets",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createAsset",
-       "label": "Create asset",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "searchField",
-       "derived": true,
-       "impliedBy": "lookupAsset",
-       "label": "Search",
-       "notes": "A search that returns nothing must say so differently from a search not yet run.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createAsset",
-       "provenance": "carried from the previous definition"
-      }
+    "provenance": "contract white-label.yaml PUT /tenant-config/app-icons"
+   },
+   {
+    "id": "formSetBrandIdentity",
+    "component": "modal",
+    "trigger": "Save brand identity",
+    "body": "**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional: `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`, `splashChangeScope`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "BrandIdentity",
+    "confirm": {
+     "label": "Save brand identity",
+     "operation": "setBrandIdentity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "logoAssetRef",
+      "logoDarkAssetRef",
+      "logoVariant",
+      "faviconAssetRef",
+      "splashImageAssetRefs",
+      "splashDurationSeconds",
+      "splashBackgroundColour",
+      "showLoadingIndicator",
+      "splashChangeScope"
      ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The logo assets list.",
-   "error": "Could not load. Names which read failed and leaves the logo assets untouched.",
-   "emptyFirstRun": "No logo assets yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the logo assets are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listAssets",
-    "contract": "maintenance",
-    "purpose": "List assets",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getAsset",
-    "contract": "maintenance",
-    "purpose": "Read an asset with history and documents",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createAsset",
-    "contract": "maintenance",
-    "purpose": "Register an asset",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAssets"
-    ]
-   },
-   {
-    "operationId": "getAssetHistory",
-    "contract": "maintenance",
-    "purpose": "Service history",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "lookupAsset",
-    "contract": "maintenance",
-    "purpose": "Find an asset by tag or QR",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setAssetStatus",
-    "contract": "maintenance",
-    "purpose": "Take an asset out of service or return it",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAssets"
-    ]
-   },
-   {
-    "operationId": "updateAsset",
-    "contract": "maintenance",
-    "purpose": "Amend an asset",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAssets"
-    ]
+    },
+    "provenance": "contract white-label.yaml PUT /tenant-config/brand"
    }
   ],
-  "entryState": {
-   "params": [
-    {
-     "name": "assetId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `assetId`.",
-   "preloaded": [
-    "AssetDetail.openWorkOrders",
-    "AssetDetail.maintenancePlans",
-    "AssetDetail.documents"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-004"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1315,6 +1199,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "CMS-001",
     "CMS-002",
     "CMS-003",
+    "CMS-006",
     "CMS-007"
    ],
    "inferred": true,
@@ -1328,33 +1213,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-005 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "carries": [
-      "uploadId"
-     ],
-     "provenance": "derived — CMS-002 declares entryState.params uploadId, so an edge into it must carry them"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-005 holds none of them, so the edge carries nothing and CMS-002 opens cold"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "carries": [
-      "bannerId",
-      "pageId",
-      "policyKind",
-      "version"
-     ],
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version, so an edge into it must carry them"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-005 holds none of them, so the edge carries nothing and CMS-003 opens cold"
+    },
+    {
+     "to": "CMS-006",
+     "trigger": "Component Preview",
+     "provenance": "derived — CMS-006 declares entryState.params bannerId, pageId, policyKind, version and CMS-005 holds none of them, so the edge carries nothing and CMS-006 opens cold"
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**A failing colour contrast is refused, not warned (decided 28 September, audit R139 (a)).** `setTheme` answers `400` with a `ContrastProblem` naming each failing pair (foreground, background, ratio, the ratio required, where it is used); the theme is not saved, and the editor keeps the entered colours and marks the failing pairs so they can be corrected. There is no save-anyway.",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getTheme` reads one record and nothing reads a population — the screen is about that one thing",
@@ -1368,7 +1246,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected theme editor",
+       "label": "The theme",
        "bindsTo": "Theme",
        "columns": [
         "Theme.primaryColour",
@@ -1377,7 +1255,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "Theme.backgroundColour",
         "Theme.textColour",
         "Theme.darkMode",
-        "Theme.cornerRadius"
+        "Theme.cornerRadius",
+        "Theme.surfaceStyle",
+        "Theme.buttonStyle"
        ],
        "operation": "getTheme",
        "provenance": "contract white-label.yaml GET /tenant-config/theme"
@@ -1390,46 +1270,30 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save theme",
        "operation": "setTheme",
        "provenance": "contract white-label.yaml PUT /tenant-config/theme"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
       },
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setTheme",
-       "label": "Save theme",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setTheme",
-       "provenance": "carried from the previous definition"
+       "kind": "banner",
+       "label": "Contrast refused",
+       "bindsTo": "ContrastProblem",
+       "columns": [
+        "ContrastProblem.failures"
+       ],
+       "operation": "setTheme",
+       "notes": "Shown when `setTheme` answers 400. Lists every failing pair; the theme was not saved (decided 28 September, audit R139 (a)).",
+       "provenance": "contract white-label.yaml PUT /tenant-config/theme"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The theme editor list.",
+   "loading": "The theme editor, read by `getTheme`.",
    "error": "Could not load. Names which read failed and leaves the theme editor untouched.",
-   "emptyFirstRun": "No theme editor yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the theme editor are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No theme editor yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getTheme` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1451,6 +1315,34 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P13 Venue CMS.dc.html#cms-005"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetTheme",
+    "component": "modal",
+    "trigger": "Save theme",
+    "body": "**Collects what `setTheme` sends before it is called.** Required: `primaryColour`, `secondaryColour`, `backgroundColour`, `textColour`. Optional: `accentColour`, `darkMode`, `cornerRadius`, `surfaceStyle` (glass or solid, default glass) and `buttonStyle` (solid, outline or pill, default solid; decided 29 September, rev 3 CFG-3). **A colour pair that fails contrast is refused** (`400 ContrastProblem`, decided 28 September, audit R139 (a)): the modal stays open with the failing pairs marked. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "Theme",
+    "confirm": {
+     "label": "Save theme",
+     "operation": "setTheme"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "primaryColour",
+      "secondaryColour",
+      "backgroundColour",
+      "textColour",
+      "accentColour",
+      "darkMode",
+      "cornerRadius",
+      "surfaceStyle",
+      "buttonStyle"
+     ]
+    },
+    "provenance": "contract white-label.yaml PUT /tenant-config/theme"
+   }
+  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1503,18 +1395,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-006 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "carries": [
-      "uploadId"
-     ],
-     "provenance": "derived — CMS-002 declares entryState.params uploadId, so an edge into it must carry them"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-006 holds none of them, so the edge carries nothing and CMS-002 opens cold"
     },
     {
      "to": "CMS-003",
@@ -1525,14 +1411,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "policyKind",
       "version"
      ],
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version, so an edge into it must carry them"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-006 holds bannerId, pageId, policyKind, version, so an edge into it carries them"
     },
     {
      "to": "ADM-016",
      "trigger": "White-Label Branding Management",
      "provenance": "flow F102 step 3→4",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "bannerId",
+      "pageId",
+      "policyKind",
+      "version"
+     ]
     }
    ]
   },
@@ -1550,7 +1442,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every component preview",
+       "label": "Every config version",
        "bindsTo": "ConfigVersion",
        "columns": [
         "ConfigVersion.publishedAt",
@@ -1565,6 +1457,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listConfigVersions",
        "provenance": "contract white-label.yaml GET /tenant-config/versions"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishTenantConfig",
+       "notes": "Declares `publishTenantConfig`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1574,7 +1472,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected component preview",
+       "label": "The selected config version",
        "bindsTo": "ConfigVersion",
        "columns": [
         "ConfigVersion.publishedAt",
@@ -1598,25 +1496,25 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create preview",
        "operation": "createPreview",
        "provenance": "contract white-label.yaml POST /tenant-config/preview"
       },
       {
        "kind": "secondaryButton",
-       "label": "Diff",
+       "label": "Diff config version",
        "operation": "diffConfigVersion",
        "provenance": "contract white-label.yaml GET /tenant-config/versions/{version}/diff"
       },
       {
        "kind": "secondaryButton",
-       "label": "Publish",
+       "label": "Publish tenant config",
        "operation": "publishTenantConfig",
        "provenance": "contract white-label.yaml POST /tenant-config/publish"
       },
       {
        "kind": "secondaryButton",
-       "label": "Restore",
+       "label": "Restore config version",
        "operation": "restoreConfigVersion",
        "provenance": "contract white-label.yaml POST /tenant-config/versions/{version}/restore"
       },
@@ -1627,54 +1525,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "authored — required by check-screens"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createPreview",
-       "label": "Create preview",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listConfigVersions",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createPreview",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishTenantConfig",
-       "notes": "Declares `publishTenantConfig`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The component preview list.",
    "error": "Could not load. Names which read failed and leaves the component preview untouched.",
-   "emptyFirstRun": "No component preview yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the component preview are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No component preview yet. Offers Create preview (`createPreview`).",
+   "emptyNoResults": "Never shown: `listConfigVersions` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listConfigVersions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1690,7 +1549,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "diffConfigVersion",
     "contract": "white-label",
     "purpose": "Compare a version against the working draft",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listConfigVersions",
@@ -1751,6 +1610,46 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P13 Venue CMS.dc.html#cms-006"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreatePreview",
+    "component": "modal",
+    "trigger": "Create preview",
+    "body": "**Collects what `createPreview` sends before it is called.** Nothing in the body is required. Optional: `platform`, `theme`, `language`, `expiresInHours`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create preview",
+     "operation": "createPreview"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "platform",
+      "theme",
+      "language",
+      "expiresInHours"
+     ]
+    },
+    "provenance": "contract white-label.yaml POST /tenant-config/preview"
+   },
+   {
+    "id": "formPublishTenantConfig",
+    "component": "modal",
+    "trigger": "Publish tenant config",
+    "body": "**Collects what `publishTenantConfig` sends before it is called.** Required: `note`. Optional: `scheduledFor`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Publish tenant config",
+     "operation": "publishTenantConfig"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "note",
+      "scheduledFor"
+     ]
+    },
+    "provenance": "contract white-label.yaml POST /tenant-config/publish"
+   }
+  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1805,33 +1704,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-007 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "carries": [
-      "uploadId"
-     ],
-     "provenance": "derived — CMS-002 declares entryState.params uploadId, so an edge into it must carry them"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-007 holds none of them, so the edge carries nothing and CMS-002 opens cold"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
      "carries": [
-      "bannerId",
-      "pageId",
-      "policyKind",
-      "version"
+      "pageId"
      ],
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version, so an edge into it must carry them"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-007 holds pageId, so an edge into it carries them"
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**A section whose module is off is disabled in the builder (decided 28 September, audit R163 (4)).** The builder reads `getModuleEnablement` and applies the mapping on `HomepageSectionKind`: `tickets` needs `ticketsAndBooking`, `whatsOn` needs `events`, `attractions` needs `attractions`, `membership` needs `membership`, `dining` needs `diningAndFnb`, `shop` needs `shop`, `map` needs `map`; `heroBanner`, `quickActions`, `promotions`, `customContent` and `spacer` need none. A section whose module is off cannot be added or made visible, and says which module to switch on (on CMS-001). `setHomepageLayout` refuses such a section with 400 in any case.",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getHomepageLayout` reads one record and nothing reads a population — the screen is about that one thing",
@@ -1845,7 +1735,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected record",
+       "label": "The homepage layout",
        "bindsTo": "HomepageLayout",
        "columns": [
         "HomepageLayout.id",
@@ -1853,6 +1743,39 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getHomepageLayout",
        "provenance": "contract white-label.yaml GET /tenant-config/homepage"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Modules the sections need",
+       "bindsTo": "ModuleEnablement",
+       "columns": [
+        "ModuleEnablement.moduleKey",
+        "ModuleEnablement.displayName",
+        "ModuleEnablement.isEnabled"
+       ],
+       "operation": "getModuleEnablement",
+       "notes": "A section whose module is off (mapping on `HomepageSectionKind`) is shown disabled and cannot be added or made visible (decided 28 September, audit R163 (4)).",
+       "provenance": "contract white-label.yaml GET /tenant-config/modules"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every content page",
+       "bindsTo": "ContentPage",
+       "columns": [
+        "ContentPage.id",
+        "ContentPage.slug",
+        "ContentPage.title",
+        "ContentPage.body",
+        "ContentPage.isEnabled",
+        "ContentPage.status",
+        "ContentPage.iconAssetRef",
+        "ContentPage.categoryCode",
+        "ContentPage.sortOrder",
+        "ContentPage.isReferenced",
+        "ContentPage.scopePath"
+       ],
+       "operation": "listContentPages",
+       "provenance": "contract white-label.yaml GET /tenant-config/pages"
       }
      ]
     },
@@ -1862,48 +1785,69 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save homepage layout",
        "operation": "setHomepageLayout",
        "provenance": "contract white-label.yaml PUT /tenant-config/homepage"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setHomepageLayout",
-       "label": "Save homepage layout",
-       "provenance": "carried from the previous definition"
       },
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setHomepageLayout",
-       "provenance": "carried from the previous definition"
+       "label": "Create content page",
+       "operation": "createContentPage",
+       "provenance": "contract white-label.yaml POST /tenant-config/pages"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save content page",
+       "operation": "updateContentPage",
+       "provenance": "contract white-label.yaml PUT /tenant-config/pages/{pageId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save footer",
+       "operation": "setFooter",
+       "provenance": "contract white-label.yaml PUT /footer"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The record list.",
+   "loading": "The record, read by `getHomepageLayout`.",
    "error": "Could not load. Names which read failed and leaves the record untouched.",
-   "emptyFirstRun": "No record yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the record are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No record yet. Offers Create content page (`createContentPage`).",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listContentPages` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "listContentPages",
+    "contract": "white-label",
+    "purpose": "The guest app's content pages",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createContentPage",
+    "contract": "white-label",
+    "purpose": "Create a content page",
+    "trigger": "onAction",
+    "invalidates": [
+     "listContentPages"
+    ]
+   },
+   {
+    "operationId": "updateContentPage",
+    "contract": "white-label",
+    "purpose": "Edit a content page",
+    "trigger": "onAction",
+    "invalidates": [
+     "listContentPages"
+    ]
+   },
+   {
+    "operationId": "setFooter",
+    "contract": "white-label",
+    "purpose": "Set the guest web and app footer",
+    "trigger": "onAction"
+   },
    {
     "operationId": "getHomepageLayout",
     "contract": "white-label",
@@ -1915,6 +1859,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "white-label",
     "purpose": "Set homepage section order",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getModuleEnablement",
+    "contract": "white-label",
+    "purpose": "Which modules are on, so a section whose module is off is disabled in the builder (decided 28 September, audit R163 (4))",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setHeader",
+    "contract": "white-label",
+    "purpose": "Configure the header",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listContentPages",
+     "getHomepageLayout",
+     "getModuleEnablement"
+    ]
+   },
+   {
+    "operationId": "deleteContentPage",
+    "contract": "white-label",
+    "purpose": "Delete a content page",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listContentPages",
+     "getHomepageLayout",
+     "getModuleEnablement"
+    ]
    }
   ],
   "wireframe": {
@@ -1923,6 +1897,111 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P13 Venue CMS.dc.html#cms-007"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "entryState": {
+   "params": [
+    {
+     "name": "pageId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "formCreateContentPage",
+    "component": "modal",
+    "trigger": "Create content page",
+    "body": "**Collects what `createContentPage` sends before it is called.** Required: `id`, `slug`, `title`, `body`, `status`. Optional: `isEnabled`, `iconAssetRef`, `categoryCode`, `sortOrder`, `isReferenced`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ContentPage",
+    "confirm": {
+     "label": "Create content page",
+     "operation": "createContentPage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "slug",
+      "title",
+      "body",
+      "status",
+      "isEnabled",
+      "iconAssetRef",
+      "categoryCode",
+      "sortOrder",
+      "isReferenced",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract white-label.yaml POST /tenant-config/pages"
+   },
+   {
+    "id": "formUpdateContentPage",
+    "component": "modal",
+    "trigger": "Save content page",
+    "body": "**Collects what `updateContentPage` sends before it is called.** Required: `slug`, `title`, `body`. Optional: `isEnabled`, `iconAssetRef`, `categoryCode`, `sortOrder`, `status`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "UpdateContentPageRequest",
+    "confirm": {
+     "label": "Save content page",
+     "operation": "updateContentPage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "slug",
+      "title",
+      "body",
+      "isEnabled",
+      "iconAssetRef",
+      "categoryCode",
+      "sortOrder",
+      "status"
+     ]
+    },
+    "provenance": "contract white-label.yaml PUT /tenant-config/pages/{pageId}"
+   },
+   {
+    "id": "formSetFooter",
+    "component": "modal",
+    "trigger": "Save footer",
+    "body": "**Collects what `setFooter` sends before it is called.** Required: `id`, `scopePath`. Optional: `columns`, `legalLinks`, `copyrightText`, `socialLinks`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "FooterConfig",
+    "confirm": {
+     "label": "Save footer",
+     "operation": "setFooter"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "columns",
+      "legalLinks",
+      "copyrightText",
+      "socialLinks"
+     ]
+    },
+    "provenance": "contract white-label.yaml PUT /footer"
+   },
+   {
+    "id": "formSetHomepageLayout",
+    "component": "modal",
+    "trigger": "Save homepage layout",
+    "body": "**Collects what `setHomepageLayout` sends before it is called.** Required: `sections`. Optional: `id`. A section whose module is off is disabled here and cannot be made visible (audit R163 (4)). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "HomepageLayout",
+    "confirm": {
+     "label": "Save homepage layout",
+     "operation": "setHomepageLayout"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "sections",
+      "id"
+     ]
+    },
+    "provenance": "contract white-label.yaml PUT /tenant-config/homepage"
+   }
+  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1974,29 +2053,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-008 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "carries": [
-      "uploadId"
-     ],
-     "provenance": "derived — CMS-002 declares entryState.params uploadId, so an edge into it must carry them"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-008 holds none of them, so the edge carries nothing and CMS-002 opens cold"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
      "carries": [
-      "bannerId",
-      "pageId",
-      "policyKind",
-      "version"
+      "bannerId"
      ],
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version, so an edge into it must carry them"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-008 holds bannerId, so an edge into it carries them"
     }
    ]
   },
@@ -2005,13 +2075,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listPromoBlocks` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "Define what a block can and cannot contain.",
-  "gaps": [
-   {
-    "operation": "listBanners",
-    "why": "**1 declared operation reach no component on this screen**: listBanners. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -2021,7 +2084,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every content blocks",
+       "label": "Every promo block",
        "bindsTo": "PromoBlock",
        "columns": [
         "PromoBlock.id",
@@ -2038,6 +2101,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listPromoBlocks",
        "provenance": "contract white-label.yaml GET /tenant-config/promo-blocks"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every banner",
+       "bindsTo": "Banner",
+       "columns": [
+        "Banner.id",
+        "Banner.title",
+        "Banner.subtitle",
+        "Banner.imageAssetRef",
+        "Banner.placement",
+        "Banner.linkTarget",
+        "Banner.startsAt",
+        "Banner.endsAt",
+        "Banner.state",
+        "Banner.sortOrder",
+        "Banner.isActive"
+       ],
+       "operation": "listBanners",
+       "provenance": "contract white-label.yaml GET /tenant-config/banners"
       }
      ]
     },
@@ -2047,7 +2130,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected content blocks",
+       "label": "The selected promo block",
        "bindsTo": "PromoBlock",
        "columns": [
         "PromoBlock.id",
@@ -2068,20 +2151,38 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      ]
     },
     {
-     "name": "contentBody",
-     "slot": "carried",
+     "name": "actionBar",
+     "slot": "rowActions",
      "components": [
       {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
+       "kind": "primaryButton",
+       "label": "Create banner",
+       "operation": "createBanner",
+       "provenance": "contract white-label.yaml POST /tenant-config/banners"
       },
       {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listPromoBlocks",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
+       "kind": "secondaryButton",
+       "label": "Save banner",
+       "operation": "updateBanner",
+       "provenance": "contract white-label.yaml PATCH /tenant-config/banners/{bannerId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create promo block",
+       "operation": "createPromoBlock",
+       "provenance": "contract white-label.yaml POST /tenant-config/promo-blocks"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save promo block",
+       "operation": "updatePromoBlock",
+       "provenance": "contract white-label.yaml PATCH /tenant-config/promo-blocks/{promoBlockId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Delete promo block",
+       "operation": "deletePromoBlock",
+       "provenance": "contract white-label.yaml DELETE /tenant-config/promo-blocks/{promoBlockId}"
       }
      ]
     }
@@ -2090,11 +2191,56 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The content blocks list.",
    "error": "Could not load. Names which read failed and leaves the content blocks untouched.",
-   "emptyFirstRun": "No content blocks yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the content blocks are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No content blocks yet. Offers Create banner (`createBanner`).",
+   "emptyNoResults": "Never shown: `listPromoBlocks` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listPromoBlocks` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "createBanner",
+    "contract": "white-label",
+    "purpose": "Create a banner",
+    "trigger": "onAction",
+    "invalidates": [
+     "listBanners"
+    ]
+   },
+   {
+    "operationId": "updateBanner",
+    "contract": "white-label",
+    "purpose": "Change or schedule a banner",
+    "trigger": "onAction",
+    "invalidates": [
+     "listBanners"
+    ]
+   },
+   {
+    "operationId": "createPromoBlock",
+    "contract": "white-label",
+    "purpose": "Create a promo block",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPromoBlocks"
+    ]
+   },
+   {
+    "operationId": "updatePromoBlock",
+    "contract": "white-label",
+    "purpose": "Change a promo block",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPromoBlocks"
+    ]
+   },
+   {
+    "operationId": "deletePromoBlock",
+    "contract": "white-label",
+    "purpose": "Remove a promo block",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPromoBlocks"
+    ]
+   },
    {
     "operationId": "listPromoBlocks",
     "contract": "white-label",
@@ -2106,6 +2252,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "white-label",
     "purpose": "List banners",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "deleteBanner",
+    "contract": "white-label",
+    "purpose": "Delete a banner",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listPromoBlocks",
+     "listBanners"
+    ]
    }
   ],
   "entryState": {
@@ -2115,6 +2272,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "PromoBlock.description",
     "PromoBlock.iconAssetRef",
     "PromoBlock.promotionId"
+   ],
+   "params": [
+    {
+     "name": "bannerId",
+     "from": "navigation"
+    },
+    {
+     "name": "promoBlockId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
@@ -2123,6 +2290,120 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P13 Venue CMS.dc.html#cms-008"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateBanner",
+    "component": "modal",
+    "trigger": "Create banner",
+    "body": "**Collects what `createBanner` sends before it is called.** Required: `id`, `title`, `imageAssetRef`, `startsAt`. Optional: `subtitle`, `placement`, `linkTarget`, `endsAt`, `state`, `sortOrder`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "Banner",
+    "confirm": {
+     "label": "Create banner",
+     "operation": "createBanner"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "title",
+      "imageAssetRef",
+      "startsAt",
+      "subtitle",
+      "placement",
+      "linkTarget",
+      "endsAt",
+      "state",
+      "sortOrder",
+      "isActive"
+     ]
+    },
+    "provenance": "contract white-label.yaml POST /tenant-config/banners"
+   },
+   {
+    "id": "formUpdateBanner",
+    "component": "modal",
+    "trigger": "Save banner",
+    "body": "**Collects what `updateBanner` sends before it is called.** Nothing in the body is required. Optional: `title`, `subtitle`, `imageAssetRef`, `placement`, `linkTarget`, `startsAt`, `endsAt`, `sortOrder`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save banner",
+     "operation": "updateBanner"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "title",
+      "subtitle",
+      "imageAssetRef",
+      "placement",
+      "linkTarget",
+      "startsAt",
+      "endsAt",
+      "sortOrder",
+      "isActive"
+     ]
+    },
+    "provenance": "contract white-label.yaml PATCH /tenant-config/banners/{bannerId}"
+   },
+   {
+    "id": "formCreatePromoBlock",
+    "component": "modal",
+    "trigger": "Create promo block",
+    "body": "**Collects what `createPromoBlock` sends before it is called.** Required: `id`, `title`. Optional: `description`, `iconAssetRef`, `promotionId`, `linkTarget`, `startsAt`, `endsAt`, `state`, `sortOrder`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PromoBlock",
+    "confirm": {
+     "label": "Create promo block",
+     "operation": "createPromoBlock"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "title",
+      "description",
+      "iconAssetRef",
+      "promotionId",
+      "linkTarget",
+      "startsAt",
+      "endsAt",
+      "state",
+      "sortOrder",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract white-label.yaml POST /tenant-config/promo-blocks"
+   },
+   {
+    "id": "formUpdatePromoBlock",
+    "component": "modal",
+    "trigger": "Save promo block",
+    "body": "**Collects what `updatePromoBlock` sends before it is called.** Nothing in the body is required. Optional: `title`, `description`, `iconAssetRef`, `promotionId`, `linkTarget`, `startsAt`, `endsAt`, `sortOrder`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save promo block",
+     "operation": "updatePromoBlock"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "title",
+      "description",
+      "iconAssetRef",
+      "promotionId",
+      "linkTarget",
+      "startsAt",
+      "endsAt",
+      "sortOrder"
+     ]
+    },
+    "provenance": "contract white-label.yaml PATCH /tenant-config/promo-blocks/{promoBlockId}"
+   },
+   {
+    "id": "confirmDeletePromoBlock",
+    "component": "confirmDialog",
+    "trigger": "Delete promo block",
+    "body": "**Names what `deletePromoBlock` changes and what it leaves alone**, in the consequence rather than the verb. A content blocks this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract white-label.yaml DELETE /tenant-config/promo-blocks/{promoBlockId}"
+   }
+  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -2174,29 +2455,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-009 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "carries": [
-      "uploadId"
-     ],
-     "provenance": "derived — CMS-002 declares entryState.params uploadId, so an edge into it must carry them"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-009 holds none of them, so the edge carries nothing and CMS-002 opens cold"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "carries": [
-      "bannerId",
-      "pageId",
-      "policyKind",
-      "version"
-     ],
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version, so an edge into it must carry them"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-009 holds none of them, so the edge carries nothing and CMS-003 opens cold"
     }
    ]
   },
@@ -2213,8 +2482,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Outlet id",
+       "operation": "listMenus",
+       "notes": "Sends `?outletId=` to `listMenus`.",
+       "provenance": "contract fnb.yaml GET /menus"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Active at",
+       "operation": "listMenus",
+       "notes": "Sends `?activeAt=` to `listMenus`.",
+       "provenance": "contract fnb.yaml GET /menus"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every navigation menus",
+       "label": "Every menu",
        "bindsTo": "Menu",
        "columns": [
         "Menu.id",
@@ -2236,7 +2519,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected navigation menus",
+       "label": "The selected menu",
        "bindsTo": "Menu",
        "columns": [
         "Menu.id",
@@ -2258,54 +2541,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create menu",
        "operation": "createMenu",
        "provenance": "contract fnb.yaml POST /menus"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save menu sections",
        "operation": "setMenuSections",
        "provenance": "contract fnb.yaml PUT /menus/{menuId}/sections"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save menu",
        "operation": "updateMenu",
        "provenance": "contract fnb.yaml PATCH /menus/{menuId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listMenus",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createMenu",
-       "label": "Create menu",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createMenu",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -2314,9 +2564,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The navigation menus list.",
    "error": "Could not load. Names which read failed and leaves the navigation menus untouched.",
-   "emptyFirstRun": "No navigation menus yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the navigation menus are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No navigation menus yet. Offers Create menu (`createMenu`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on outletId, activeAt and the navigation menus are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listMenus` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2329,7 +2579,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getMenu",
     "contract": "fnb",
     "purpose": "Read a menu with sections and items",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createMenu",
@@ -2357,6 +2607,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listMenus"
     ]
+   },
+   {
+    "operationId": "setNavigation",
+    "contract": "white-label",
+    "purpose": "Set main and overflow navigation",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
    }
   ],
   "entryState": {
@@ -2381,6 +2638,65 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P13 Venue CMS.dc.html#cms-009"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateMenu",
+    "component": "modal",
+    "trigger": "Create menu",
+    "body": "**Collects what `createMenu` sends before it is called.** Required: `code`, `name`, `outletId`. Optional: `availability`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateMenuRequest",
+    "confirm": {
+     "label": "Create menu",
+     "operation": "createMenu"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "outletId",
+      "availability"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /menus"
+   },
+   {
+    "id": "formSetMenuSections",
+    "component": "modal",
+    "trigger": "Save menu sections",
+    "body": "**Collects what `setMenuSections` sends before it is called.** Required: `sections`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save menu sections",
+     "operation": "setMenuSections"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "sections"
+     ]
+    },
+    "provenance": "contract fnb.yaml PUT /menus/{menuId}/sections"
+   },
+   {
+    "id": "formUpdateMenu",
+    "component": "modal",
+    "trigger": "Save menu",
+    "body": "**Collects what `updateMenu` sends before it is called.** Nothing in the body is required. Optional: `name`, `availability`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save menu",
+     "operation": "updateMenu"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "availability",
+      "isActive"
+     ]
+    },
+    "provenance": "contract fnb.yaml PATCH /menus/{menuId}"
+   }
+  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -2432,10 +2748,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-010 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-002",
@@ -2443,33 +2756,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "uploadId"
      ],
-     "provenance": "derived — CMS-002 declares entryState.params uploadId, so an edge into it must carry them"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-010 holds uploadId, so an edge into it carries them"
     },
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "carries": [
-      "bannerId",
-      "pageId",
-      "policyKind",
-      "version"
-     ],
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version, so an edge into it must carry them"
+     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-010 holds none of them, so the edge carries nothing and CMS-003 opens cold"
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**Archive and quarantine are reversible; deletion is the only end of an asset's life (decided 28 September, audit STATE-MEDIA).** An archived asset offers **Restore** (`updateMediaAsset` with `status: ready`); a quarantined one offers **Release**, which is the same call after a reviewer has cleared the scan flag (the state model marks that move as needing approval). **Delete media asset** (`deleteMediaAsset`) removes the asset for good and is refused while it is referenced.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`searchMedia` reads the population and `getMediaEntitlements` reads one of them — list, select, act",
   "purpose": "Hold the imagery, and know where it is used.",
-  "gaps": [
-   {
-    "operation": "getExpiringRights",
-    "why": "**3 declared operations reach no component on this screen**: getExpiringRights, getMediaAsset, listCollections. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -2478,8 +2778,57 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "searchMedia",
+       "notes": "Sends `?kind=` to `searchMedia`.",
+       "provenance": "contract assets.yaml GET /media"
+      },
+      {
+       "kind": "textField",
+       "label": "Tag",
+       "operation": "searchMedia",
+       "notes": "Sends `?tag=` to `searchMedia`.",
+       "provenance": "contract assets.yaml GET /media"
+      },
+      {
+       "kind": "textField",
+       "label": "Collection id",
+       "operation": "searchMedia",
+       "notes": "Sends `?collectionId=` to `searchMedia`.",
+       "provenance": "contract assets.yaml GET /media"
+      },
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "searchMedia",
+       "notes": "Sends `?venueId=` to `searchMedia`.",
+       "provenance": "contract assets.yaml GET /media"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "searchMedia",
+       "notes": "Sends `?search=` to `searchMedia`.",
+       "provenance": "contract assets.yaml GET /media"
+      },
+      {
+       "kind": "toggle",
+       "label": "Unused only",
+       "operation": "searchMedia",
+       "notes": "Sends `?unusedOnly=` to `searchMedia`.",
+       "provenance": "contract assets.yaml GET /media"
+      },
+      {
+       "kind": "numberField",
+       "label": "Rights expiring within days",
+       "operation": "searchMedia",
+       "notes": "Sends `?rightsExpiringWithinDays=` to `searchMedia`.",
+       "provenance": "contract assets.yaml GET /media"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every media",
+       "label": "Every media asset",
        "bindsTo": "MediaAsset",
        "columns": [
         "MediaAsset.id",
@@ -2497,6 +2846,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "searchMedia",
        "provenance": "contract assets.yaml GET /media"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every collection",
+       "bindsTo": "Collection",
+       "columns": [
+        "Collection.id",
+        "Collection.name",
+        "Collection.description",
+        "Collection.venueId",
+        "Collection.parentCollectionId",
+        "Collection.assetCount",
+        "Collection.coverAssetId"
+       ],
+       "operation": "listCollections",
+       "provenance": "contract assets.yaml GET /media/collections"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -2506,7 +2878,75 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected media",
+       "label": "The selected media asset",
+       "bindsTo": "MediaAsset",
+       "columns": [
+        "MediaAsset.id",
+        "MediaAsset.kind",
+        "MediaAsset.status",
+        "MediaAsset.filename",
+        "MediaAsset.contentType",
+        "MediaAsset.sizeBytes",
+        "MediaAsset.title",
+        "MediaAsset.description",
+        "MediaAsset.altText",
+        "MediaAsset.width",
+        "MediaAsset.height",
+        "MediaAsset.durationSeconds",
+        "MediaAsset.customMetadata",
+        "MediaAsset.sharedWithTenantIds",
+        "MediaAsset.tags",
+        "MediaAsset.venueId"
+       ],
+       "operation": "searchMedia",
+       "provenance": "contract assets.yaml GET /media"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The expiring media",
+       "bindsTo": "ExpiringMedia",
+       "columns": [
+        "ExpiringMedia.assetId",
+        "ExpiringMedia.filename",
+        "ExpiringMedia.thumbnailUrl",
+        "ExpiringMedia.licensor",
+        "ExpiringMedia.validTo",
+        "ExpiringMedia.daysRemaining",
+        "ExpiringMedia.isExpired",
+        "ExpiringMedia.isInUse",
+        "ExpiringMedia.liveUsageCount"
+       ],
+       "operation": "getExpiringRights",
+       "provenance": "contract assets.yaml GET /media/rights-expiring"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The media asset",
+       "bindsTo": "MediaAssetDetail",
+       "columns": [
+        "MediaAssetDetail.id",
+        "MediaAssetDetail.kind",
+        "MediaAssetDetail.status",
+        "MediaAssetDetail.filename",
+        "MediaAssetDetail.contentType",
+        "MediaAssetDetail.sizeBytes",
+        "MediaAssetDetail.title",
+        "MediaAssetDetail.description",
+        "MediaAssetDetail.altText",
+        "MediaAssetDetail.width",
+        "MediaAssetDetail.height",
+        "MediaAssetDetail.durationSeconds",
+        "MediaAssetDetail.customMetadata",
+        "MediaAssetDetail.sharedWithTenantIds",
+        "MediaAssetDetail.tags",
+        "MediaAssetDetail.venueId"
+       ],
+       "operation": "getMediaAsset",
+       "provenance": "contract assets.yaml GET /media/{mediaId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The media entitlements",
        "bindsTo": "MediaEntitlements",
        "columns": [
         "MediaEntitlements.mediaCode",
@@ -2528,94 +2968,59 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Append",
+       "label": "Append entitlement to media",
        "operation": "appendEntitlementToMedia",
        "provenance": "contract orders.yaml POST /media/{mediaCode}/entitlements"
       },
       {
        "kind": "secondaryButton",
-       "label": "Complete",
+       "label": "Complete upload",
        "operation": "completeUpload",
        "provenance": "contract assets.yaml POST /media/uploads/{uploadId}/complete"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create collection",
        "operation": "createCollection",
        "provenance": "contract assets.yaml POST /media/collections"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create upload",
        "operation": "createUpload",
        "provenance": "contract assets.yaml POST /media/uploads"
       },
       {
        "kind": "destructiveButton",
-       "label": "Delete",
+       "label": "Delete media asset",
        "operation": "deleteMediaAsset",
        "provenance": "contract assets.yaml DELETE /media/{mediaId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Replace",
+       "label": "Replace media asset",
        "operation": "replaceMediaAsset",
        "provenance": "contract assets.yaml POST /media/{mediaId}/replace"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save media asset",
        "operation": "updateMediaAsset",
        "provenance": "contract assets.yaml PATCH /media/{mediaId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "searchField",
-       "derived": true,
-       "impliedBy": "searchMedia",
-       "label": "Search",
-       "notes": "A search that returns nothing must say so differently from a search not yet run.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "deleteMediaAsset",
-       "label": "Delete media asset",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listCollections",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
       },
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "appendEntitlementToMedia",
-       "provenance": "carried from the previous definition"
+       "label": "Restore media asset",
+       "operation": "updateMediaAsset",
+       "notes": "Shown on an `archived` asset. Sends `status: ready` (decided 28 September, audit STATE-MEDIA).",
+       "provenance": "contract assets.yaml PATCH /media/{mediaId}"
       },
       {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
+       "kind": "secondaryButton",
+       "label": "Release from quarantine",
+       "operation": "updateMediaAsset",
+       "notes": "Shown on a `quarantined` asset, to a reviewer, after the scan flag has been reviewed and cleared. Sends `status: ready` (decided 28 September, audit STATE-MEDIA).",
+       "provenance": "contract assets.yaml PATCH /media/{mediaId}"
       }
      ]
     }
@@ -2625,24 +3030,170 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmDeleteMediaAsset",
     "component": "confirmDialog",
-    "trigger": "Delete",
-    "body": "**Names what `deleteMediaAsset` changes and what it leaves alone**, in the consequence rather than the verb. A media this affects should be identified in the dialog, not just counted.",
+    "trigger": "Delete media asset",
+    "body": "**Names what `deleteMediaAsset` changes and what it leaves alone**, in the consequence rather than the verb. A media this affects should be identified in the dialog, not just counted. **Deletion is the only end of an asset's life and cannot be undone** (decided 28 September, audit STATE-MEDIA); the dialog offers archiving instead where the asset may be wanted again, and lists every reference when it is refused as in use.",
     "provenance": "contract assets.yaml DELETE /media/{mediaId}"
+   },
+   {
+    "id": "confirmRestoreMediaAsset",
+    "component": "confirmDialog",
+    "trigger": "Restore media asset",
+    "body": "**Returns an archived asset to `ready`**, so it can be used again (decided 28 September, audit STATE-MEDIA). Names the asset.",
+    "confirm": {
+     "label": "Restore",
+     "operation": "updateMediaAsset"
+    },
+    "provenance": "contract assets.yaml PATCH /media/{mediaId}"
+   },
+   {
+    "id": "confirmReleaseMediaAsset",
+    "component": "confirmDialog",
+    "trigger": "Release from quarantine",
+    "body": "**Releases a quarantined asset to `ready` after review** (decided 28 September, audit STATE-MEDIA). Names the asset and the scan finding, and records the reviewer; the state model marks this reversal as needing approval.",
+    "confirm": {
+     "label": "Release",
+     "operation": "updateMediaAsset"
+    },
+    "provenance": "contract assets.yaml PATCH /media/{mediaId}"
+   },
+   {
+    "id": "formAppendEntitlementToMedia",
+    "component": "modal",
+    "trigger": "Append entitlement to media",
+    "body": "**Collects what `appendEntitlementToMedia` sends before it is called.** Required: `id`, `lines`, `recordedAt`. Optional: `paymentMethod`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AppendEntitlementRequest",
+    "confirm": {
+     "label": "Append entitlement to media",
+     "operation": "appendEntitlementToMedia"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "lines",
+      "recordedAt",
+      "paymentMethod",
+      "note"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /media/{mediaCode}/entitlements"
+   },
+   {
+    "id": "formCompleteUpload",
+    "component": "modal",
+    "trigger": "Complete upload",
+    "body": "**Collects what `completeUpload` sends before it is called.** Nothing in the body is required. Optional: `title`, `altText`, `tags`, `collectionIds`, `rights`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Complete upload",
+     "operation": "completeUpload"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "title",
+      "altText",
+      "tags",
+      "collectionIds",
+      "rights"
+     ]
+    },
+    "provenance": "contract assets.yaml POST /media/uploads/{uploadId}/complete"
+   },
+   {
+    "id": "formCreateCollection",
+    "component": "modal",
+    "trigger": "Create collection",
+    "body": "**Collects what `createCollection` sends before it is called.** Required: `name`. Optional: `description`, `venueId`, `parentCollectionId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create collection",
+     "operation": "createCollection"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "description",
+      "venueId",
+      "parentCollectionId"
+     ]
+    },
+    "provenance": "contract assets.yaml POST /media/collections"
+   },
+   {
+    "id": "formCreateUpload",
+    "component": "modal",
+    "trigger": "Create upload",
+    "body": "**Collects what `createUpload` sends before it is called.** Required: `filename`, `contentType`, `sizeBytes`. Optional: `venueId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create upload",
+     "operation": "createUpload"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "filename",
+      "contentType",
+      "sizeBytes",
+      "venueId"
+     ]
+    },
+    "provenance": "contract assets.yaml POST /media/uploads"
+   },
+   {
+    "id": "formReplaceMediaAsset",
+    "component": "modal",
+    "trigger": "Replace media asset",
+    "body": "**Collects what `replaceMediaAsset` sends before it is called.** Required: `uploadId`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Replace media asset",
+     "operation": "replaceMediaAsset"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "uploadId",
+      "note"
+     ]
+    },
+    "provenance": "contract assets.yaml POST /media/{mediaId}/replace"
+   },
+   {
+    "id": "formUpdateMediaAsset",
+    "component": "modal",
+    "trigger": "Save media asset",
+    "body": "**Collects what `updateMediaAsset` sends before it is called.** Nothing in the body is required. Optional: `title`, `description`, `altText`, `tags`, `collectionIds`, `rights`, `status`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save media asset",
+     "operation": "updateMediaAsset"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "title",
+      "description",
+      "altText",
+      "tags",
+      "collectionIds",
+      "rights",
+      "status"
+     ]
+    },
+    "provenance": "contract assets.yaml PATCH /media/{mediaId}"
    }
   ],
   "states": {
    "loading": "The media list.",
    "error": "Could not load. Names which read failed and leaves the media untouched.",
-   "emptyFirstRun": "No media yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the media are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No media yet. Offers Create collection (`createCollection`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on kind, tag, collectionId, venueId, search, unusedOnly and the media are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "getMediaEntitlements",
     "contract": "orders",
     "purpose": "What is already on this media",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "searchMedia",
@@ -2705,7 +3256,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getMediaAsset",
     "contract": "assets",
     "purpose": "Read an asset with derivatives and usage",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listCollections",
@@ -2749,11 +3300,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `mediaCode`, `mediaId`, `uploadId`.",
    "preloaded": [
-    "MediaEntitlements.mediaCode",
-    "MediaEntitlements.mediaKind",
-    "MediaEntitlements.subjectId",
-    "MediaEntitlements.isValid",
-    "MediaEntitlements.invalidReason"
+    "MediaAsset.id",
+    "MediaAsset.kind",
+    "MediaAsset.status",
+    "MediaAsset.filename",
+    "MediaAsset.contentType"
    ]
   },
   "wireframe": {
@@ -2794,25 +3345,6 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
- "addLicenceAddOn": {
-  "method": "POST",
-  "path": "/tenants/{tenantId}/licences/add-ons",
-  "contract": "subscription",
-  "summary": "License a module outside the plan",
-  "permission": "PLATFORM_TENANT_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "LicenceAddOn",
-  "responds": "LicencePosition"
- },
  "appendEntitlementToMedia": {
   "method": "POST",
   "path": "/media/{mediaCode}/entitlements",
@@ -2851,15 +3383,15 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "MediaAsset"
  },
- "createAsset": {
+ "createBanner": {
   "method": "POST",
-  "path": "/assets",
-  "contract": "maintenance",
-  "summary": "Register an asset",
-  "permission": "ASSET_MANAGE",
+  "path": "/tenant-config/banners",
+  "contract": "white-label",
+  "summary": "Create a banner",
+  "permission": "TENANT_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -2867,8 +3399,8 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    }
   ],
-  "requestBody": "CreateAssetRequest",
-  "responds": "Asset"
+  "requestBody": "Banner",
+  "responds": "Banner"
  },
  "createCollection": {
   "method": "POST",
@@ -2888,6 +3420,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "Collection"
+ },
+ "createContentPage": {
+  "method": "POST",
+  "path": "/tenant-config/pages",
+  "contract": "white-label",
+  "summary": "Create a content page",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ContentPage",
+  "responds": "ContentPage"
  },
  "createMenu": {
   "method": "POST",
@@ -2927,12 +3478,12 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Preview"
  },
- "createTenant": {
+ "createPromoBlock": {
   "method": "POST",
-  "path": "/tenants",
-  "contract": "subscription",
-  "summary": "Create a tenant",
-  "permission": "PLATFORM_TENANT_MANAGE",
+  "path": "/tenant-config/promo-blocks",
+  "contract": "white-label",
+  "summary": "Create a promotional block",
+  "permission": "TENANT_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
@@ -2943,8 +3494,8 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    }
   ],
-  "requestBody": "CreateTenantRequest",
-  "responds": "Tenant"
+  "requestBody": "PromoBlock",
+  "responds": "PromoBlock"
  },
  "createUpload": {
   "method": "POST",
@@ -2965,6 +3516,44 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "UploadTicket"
  },
+ "deleteBanner": {
+  "method": "DELETE",
+  "path": "/tenant-config/banners/{bannerId}",
+  "contract": "white-label",
+  "summary": "Delete a banner",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "deleteContentPage": {
+  "method": "DELETE",
+  "path": "/tenant-config/pages/{pageId}",
+  "contract": "white-label",
+  "summary": "Delete a content page",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "deleteMediaAsset": {
   "method": "DELETE",
   "path": "/media/{mediaId}",
@@ -2974,6 +3563,25 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "deletePromoBlock": {
+  "method": "DELETE",
+  "path": "/tenant-config/promo-blocks/{promoBlockId}",
+  "contract": "white-label",
+  "summary": "Delete a promotional block",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -3003,61 +3611,18 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "ConfigDiff"
  },
- "generateInvoice": {
-  "method": "POST",
-  "path": "/tenants/{tenantId}/invoices",
-  "contract": "subscription",
-  "summary": "Generate an invoice for a period",
-  "permission": "PLATFORM_BILLING_MANAGE",
+ "getAppIcons": {
+  "method": "GET",
+  "path": "/tenant-config/app-icons",
+  "contract": "white-label",
+  "summary": "Read app icon set",
+  "permission": "TENANT_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "SubscriptionInvoice"
- },
- "getAsset": {
-  "method": "GET",
-  "path": "/assets/{assetId}",
-  "contract": "maintenance",
-  "summary": "Read an asset with history and documents",
-  "permission": "ASSET_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "AssetDetail"
- },
- "getAssetHistory": {
-  "method": "GET",
-  "path": "/assets/{assetId}/history",
-  "contract": "maintenance",
-  "summary": "Service history",
-  "permission": "ASSET_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
+  "responds": "AppIcons"
  },
  "getBrandIdentity": {
   "method": "GET",
@@ -3071,19 +3636,6 @@ Method, path, parameters, request and response for every operation these screens
   "parameters": [],
   "requestBody": null,
   "responds": "BrandIdentity"
- },
- "getEntitlementUsage": {
-  "method": "GET",
-  "path": "/tenants/{tenantId}/entitlement-usage",
-  "contract": "subscription",
-  "summary": "Usage against licensed limits",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "EntitlementUsage"
  },
  "getExpiringRights": {
   "method": "GET",
@@ -3103,6 +3655,19 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "ExpiringMedia"
+ },
+ "getFeatureToggles": {
+  "method": "GET",
+  "path": "/tenant-config/features",
+  "contract": "white-label",
+  "summary": "Read tenant feature toggles",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FeatureToggle"
  },
  "getFonts": {
   "method": "GET",
@@ -3169,57 +3734,50 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Menu"
  },
- "getSsoConfig": {
+ "getModuleEnablement": {
   "method": "GET",
-  "path": "/tenants/sso-config",
-  "contract": "identity",
-  "summary": "Read SSO configuration",
-  "permission": "USER_MANAGE",
+  "path": "/tenant-config/modules",
+  "contract": "white-label",
+  "summary": "Read module enablement",
+  "permission": "TENANT_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [],
   "requestBody": null,
-  "responds": "SsoProviderConfig"
+  "responds": "ModuleEnablement"
  },
- "getSubscription": {
+ "getTenantAppStatus": {
   "method": "GET",
-  "path": "/tenants/{tenantId}/subscription",
-  "contract": "subscription",
-  "summary": "Read the current subscription",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "Subscription"
- },
- "getTenant": {
-  "method": "GET",
-  "path": "/tenants/{tenantId}",
-  "contract": "subscription",
-  "summary": "Read a tenant with cells and subscription",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "TenantDetail"
- },
- "getTenantLicences": {
-  "method": "GET",
-  "path": "/tenants/{tenantId}/licences",
-  "contract": "subscription",
-  "summary": "What a tenant is licensed to use",
-  "permission": "PLATFORM_TENANT_VIEW",
+  "path": "/tenant-config/status",
+  "contract": "white-label",
+  "summary": "App status and recent changes",
+  "permission": null,
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [],
   "requestBody": null,
-  "responds": "LicencePosition"
+  "responds": "TenantAppStatus"
+ },
+ "getTenantConfig": {
+  "method": "GET",
+  "path": "/tenant-config",
+  "contract": "white-label",
+  "summary": "Full working configuration",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "version",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TenantConfig"
  },
  "getTheme": {
   "method": "GET",
@@ -3233,79 +3791,6 @@ Method, path, parameters, request and response for every operation these screens
   "parameters": [],
   "requestBody": null,
   "responds": "Theme"
- },
- "getUsageMetering": {
-  "method": "GET",
-  "path": "/tenants/{tenantId}/usage",
-  "contract": "subscription",
-  "summary": "Metered usage for a period",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "periodStart",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "periodEnd",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "metric",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "UsageReport"
- },
- "listAssets": {
-  "method": "GET",
-  "path": "/assets",
-  "contract": "maintenance",
-  "summary": "List assets",
-  "permission": "ASSET_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "venueId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "categoryId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "maintenanceDue",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
  },
  "listBanners": {
   "method": "GET",
@@ -3373,6 +3858,45 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
+ "listContentPages": {
+  "method": "GET",
+  "path": "/tenant-config/pages",
+  "contract": "white-label",
+  "summary": "List custom content pages",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "slug",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listMenus": {
   "method": "GET",
   "path": "/menus",
@@ -3420,144 +3944,6 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "PromoBlock"
  },
- "listSubscriptionInvoices": {
-  "method": "GET",
-  "path": "/tenants/{tenantId}/invoices",
-  "contract": "subscription",
-  "summary": "List subscription invoices",
-  "permission": "PLATFORM_BILLING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listTenantCells": {
-  "method": "GET",
-  "path": "/tenants/{tenantId}/cells",
-  "contract": "subscription",
-  "summary": "List a tenant's cells",
-  "permission": "PLATFORM_CELL_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "Cell"
- },
- "listTenants": {
-  "method": "GET",
-  "path": "/tenants",
-  "contract": "subscription",
-  "summary": "List tenants",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "planId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "lookupAsset": {
-  "method": "GET",
-  "path": "/assets/lookup",
-  "contract": "maintenance",
-  "summary": "Find an asset by tag or QR",
-  "permission": "ASSET_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "assetTag",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "serialNumber",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AssetDetail"
- },
- "previewSubscriptionChange": {
-  "method": "POST",
-  "path": "/tenants/{tenantId}/subscription/preview",
-  "contract": "subscription",
-  "summary": "Preview the effect of a plan change",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "SetSubscriptionRequest",
-  "responds": "SubscriptionPreview"
- },
- "provisionCell": {
-  "method": "POST",
-  "path": "/tenants/{tenantId}/cells",
-  "contract": "subscription",
-  "summary": "Provision a cell for a region",
-  "permission": "PLATFORM_CELL_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ProvisionCellRequest",
-  "responds": null
- },
  "publishTenantConfig": {
   "method": "POST",
   "path": "/tenant-config/publish",
@@ -3576,44 +3962,6 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "ConfigVersion"
- },
- "reactivateTenant": {
-  "method": "POST",
-  "path": "/tenants/{tenantId}/reactivate",
-  "contract": "subscription",
-  "summary": "Lift a suspension",
-  "permission": "PLATFORM_TENANT_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Tenant"
- },
- "removeLicenceAddOn": {
-  "method": "DELETE",
-  "path": "/tenants/{tenantId}/licences/add-ons",
-  "contract": "subscription",
-  "summary": "Remove an add-on",
-  "permission": "PLATFORM_TENANT_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "LicencePosition"
  },
  "replaceMediaAsset": {
   "method": "POST",
@@ -3712,15 +4060,15 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
- "setAssetStatus": {
+ "setAppIcons": {
   "method": "PUT",
-  "path": "/assets/{assetId}/status",
-  "contract": "maintenance",
-  "summary": "Take an asset out of service or return it",
-  "permission": "ASSET_MANAGE",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
+  "path": "/tenant-config/app-icons",
+  "contract": "white-label",
+  "summary": "Set app icons",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -3728,8 +4076,8 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    }
   ],
-  "requestBody": "SetAssetStatusRequest",
-  "responds": "AssetStatusResult"
+  "requestBody": null,
+  "responds": "AppIcons"
  },
  "setBrandIdentity": {
   "method": "PUT",
@@ -3750,6 +4098,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "BrandIdentity",
   "responds": "BrandIdentity"
  },
+ "setFeatureToggles": {
+  "method": "PUT",
+  "path": "/tenant-config/features",
+  "contract": "white-label",
+  "summary": "Set feature toggles",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FeatureToggle"
+ },
  "setFonts": {
   "method": "PUT",
   "path": "/tenant-config/fonts",
@@ -3768,6 +4135,44 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "FontConfig",
   "responds": "FontConfig"
+ },
+ "setFooter": {
+  "method": "PUT",
+  "path": "/footer",
+  "contract": "white-label",
+  "summary": "Footer columns, legal links and social",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FooterConfig",
+  "responds": "FooterConfig"
+ },
+ "setHeader": {
+  "method": "PUT",
+  "path": "/tenant-config/header",
+  "contract": "white-label",
+  "summary": "Configure the header",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "HeaderConfig",
+  "responds": "HeaderConfig"
  },
  "setHomepageLayout": {
   "method": "PUT",
@@ -3788,6 +4193,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "HomepageLayout",
   "responds": "HomepageLayout"
  },
+ "setMaintenanceMode": {
+  "method": "PUT",
+  "path": "/tenant-config/status",
+  "contract": "white-label",
+  "summary": "Enable or clear maintenance mode, and set the live app status",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TenantAppStatus"
+ },
  "setMenuSections": {
   "method": "PUT",
   "path": "/menus/{menuId}/sections",
@@ -3807,12 +4231,12 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Menu"
  },
- "setSsoConfig": {
+ "setModuleEnablement": {
   "method": "PUT",
-  "path": "/tenants/sso-config",
-  "contract": "identity",
-  "summary": "Configure an identity provider",
-  "permission": "USER_MANAGE",
+  "path": "/tenant-config/modules",
+  "contract": "white-label",
+  "summary": "Enable or disable modules",
+  "permission": "TENANT_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
@@ -3823,15 +4247,15 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    }
   ],
-  "requestBody": "SsoProviderConfig",
-  "responds": "SsoProviderConfig"
+  "requestBody": null,
+  "responds": "ModuleEnablement"
  },
- "setSubscription": {
+ "setNavigation": {
   "method": "PUT",
-  "path": "/tenants/{tenantId}/subscription",
-  "contract": "subscription",
-  "summary": "Assign or change a subscription",
-  "permission": "PLATFORM_TENANT_MANAGE",
+  "path": "/tenant-config/navigation",
+  "contract": "white-label",
+  "summary": "Set main and overflow navigation",
+  "permission": "TENANT_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
@@ -3842,8 +4266,8 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    }
   ],
-  "requestBody": "SetSubscriptionRequest",
-  "responds": "Subscription"
+  "requestBody": "NavigationConfig",
+  "responds": "NavigationConfig"
  },
  "setTheme": {
   "method": "PUT",
@@ -3864,53 +4288,15 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "Theme",
   "responds": "Theme"
  },
- "suspendTenant": {
-  "method": "POST",
-  "path": "/tenants/{tenantId}/suspend",
-  "contract": "subscription",
-  "summary": "Suspend a tenant",
-  "permission": "PLATFORM_TENANT_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Tenant"
- },
- "terminateTenant": {
-  "method": "POST",
-  "path": "/tenants/{tenantId}/terminate",
-  "contract": "subscription",
-  "summary": "Begin termination",
-  "permission": "PLATFORM_TENANT_TERMINATE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "updateAsset": {
+ "updateBanner": {
   "method": "PATCH",
-  "path": "/assets/{assetId}",
-  "contract": "maintenance",
-  "summary": "Amend an asset",
-  "permission": "ASSET_MANAGE",
+  "path": "/tenant-config/banners/{bannerId}",
+  "contract": "white-label",
+  "summary": "Amend or activate a banner",
+  "permission": "TENANT_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -3919,7 +4305,26 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Asset"
+  "responds": "Banner"
+ },
+ "updateContentPage": {
+  "method": "PUT",
+  "path": "/tenant-config/pages/{pageId}",
+  "contract": "white-label",
+  "summary": "Amend a content page",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "UpdateContentPageRequest",
+  "responds": "ContentPage"
  },
  "updateMediaAsset": {
   "method": "PATCH",
@@ -3959,12 +4364,12 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Menu"
  },
- "updateTenant": {
+ "updatePromoBlock": {
   "method": "PATCH",
-  "path": "/tenants/{tenantId}",
-  "contract": "subscription",
-  "summary": "Amend tenant details",
-  "permission": "PLATFORM_TENANT_MANAGE",
+  "path": "/tenant-config/promo-blocks/{promoBlockId}",
+  "contract": "white-label",
+  "summary": "Amend a promotional block",
+  "permission": "TENANT_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
@@ -3976,7 +4381,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Tenant"
+  "responds": "PromoBlock"
  }
 }
 ```
@@ -4019,6 +4424,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "AppAvailability": {
+  "type": "string",
+  "description": "**The sold-out or closed signal (decided 28 September, audit R073).** `open` is the normal state. `soldOut` shows WEB-029's sold-out state across the app while browsing still works; `closed` shows the closed state (a weather closure, a private event). Neither refuses a request on its own: it is what the guest is told, and a sale is still refused by availability where it applies. Set with `setMaintenanceMode`.\n",
+  "enum": [
+   "open",
+   "soldOut",
+   "closed"
+  ],
+  "default": "open"
+ },
  "AppIcons": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
@@ -4028,22 +4443,32 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "sourceAssetRef": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid",
+    "description": "The `MediaAsset` id of the 1024×1024 source."
    },
    "derived": {
     "type": "array",
     "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Generated by `setAppIcons` from the source, one entry per platform and size — the iOS and Android store sets and the web favicons listed on `setAppIcons` (audit R163).",
     "items": {
      "type": "object",
      "properties": {
       "platform": {
-       "type": "string"
+       "type": "string",
+       "enum": [
+        "ios",
+        "android",
+        "web"
+       ]
       },
       "size": {
        "type": "string"
       },
       "assetRef": {
-       "type": "string"
+       "type": "string",
+       "format": "uuid"
       }
      }
     }
@@ -4054,16 +4479,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "$ref": "#/components/schemas/ChangeScope"
      }
     ],
-    "readOnly": true
+    "readOnly": true,
+    "description": "Always `buildTime` — icons are baked into the binary."
    },
    "liveVersion": {
     "type": "string",
     "nullable": true,
+    "readOnly": true,
     "description": "Icon currently shipped. Differs from the draft until the next release."
    },
    "requiresRebuild": {
     "type": "boolean",
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "True while the draft's source differs from the icon in `liveVersion`."
    }
   }
  },
@@ -4078,7 +4507,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID of the new order this creates, and its idempotency key — it must equal the `Idempotency-Key` header."
    },
    "lines": {
     "type": "array",
@@ -4153,238 +4583,141 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "addedEntitlementIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    }
   }
  },
- "Asset": {
-  "x-ticvai-persistence": "maintenance.asset",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/CreateAssetRequest"
-   },
-   {
-    "type": "object",
-    "required": [
-     "id",
-     "status"
-    ],
-    "properties": {
-     "id": {
-      "type": "string",
-      "format": "uuid"
-     },
-     "resourceId": {
-      "type": "string",
-      "format": "uuid",
-      "nullable": true,
-      "description": "1.2.x. **Where this asset is also bookable.** An AV rig is an asset to maintain and a resource to allocate, and they are the same object seen from two sides.\n**`resources` owns the calendar and this owns the condition.** An asset out of service makes its resource unbookable, which is one link rather than two models of availability.\n"
-     },
-     "acquisitionCost": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     },
-     "acquiredOn": {
-      "type": "string",
-      "format": "date",
-      "nullable": true
-     },
-     "depreciation": {
-      "type": "object",
-      "nullable": true,
-      "description": "**Recorded here and posted by `finance`.** Depreciation is an accounting act and the asset register is where the useful life is actually known — an engineer knows a chiller lasts fifteen years and an accountant knows what to do about it.\n",
-      "properties": {
-       "method": {
-        "type": "string",
-        "enum": [
-         "straightLine",
-         "reducingBalance",
-         "unitsOfProduction",
-         "none"
-        ]
-       },
-       "usefulLifeMonths": {
-        "type": "integer"
-       },
-       "residualValue": {
-        "$ref": "../shared/common.yaml#/components/schemas/Money"
-       },
-       "accumulatedDepreciation": {
-        "$ref": "../shared/common.yaml#/components/schemas/Money"
-       }
-      }
-     },
-     "retiredOn": {
-      "type": "string",
-      "format": "date",
-      "nullable": true,
-      "description": "**Retirement is not deletion.** A work order from three years ago still names this asset, and an inspection record with no asset is an inspection of nothing.\n"
-     },
-     "disposalProceeds": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     },
-     "status": {
-      "$ref": "#/components/schemas/AssetStatus"
-     },
-     "statusReason": {
-      "type": "string",
-      "nullable": true
-     },
-     "openWorkOrderCount": {
-      "type": "integer"
-     },
-     "nextMaintenanceDueAt": {
-      "type": "string",
-      "format": "date-time",
-      "nullable": true
-     },
-     "isMaintenanceOverdue": {
-      "type": "boolean"
-     },
-     "lastInspectionAt": {
-      "type": "string",
-      "format": "date-time",
-      "nullable": true
-     },
-     "usageCounter": {
-      "type": "number",
-      "nullable": true,
-      "description": "Cycles, hours or kilometres. Drives usage-based maintenance."
-     }
-    }
-   }
-  ]
- },
- "AssetCriticality": {
-  "type": "string",
-  "enum": [
-   "safetyCritical",
-   "revenueCritical",
-   "standard",
-   "low"
-  ]
- },
- "AssetDetail": {
-  "x-ticvai-persistence": "maintenance.asset",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/Asset"
-   },
-   {
-    "type": "object",
-    "properties": {
-     "openWorkOrders": {
-      "type": "array",
-      "items": {
-       "$ref": "#/components/schemas/WorkOrder"
-      }
-     },
-     "maintenancePlans": {
-      "type": "array",
-      "items": {
-       "$ref": "#/components/schemas/MaintenancePlan"
-      }
-     },
-     "documents": {
-      "type": "array",
-      "description": "Manuals, procedures, certificates. What a technician needs on site.",
-      "items": {
-       "type": "object",
-       "properties": {
-        "ref": {
-         "type": "string"
-        },
-        "name": {
-         "type": "string"
-        },
-        "kind": {
-         "type": "string",
-         "enum": [
-          "manual",
-          "sop",
-          "certificate",
-          "warranty",
-          "drawing",
-          "riskAssessment"
-         ]
-        }
-       }
-      }
-     }
-    }
-   }
-  ]
- },
- "AssetStatus": {
-  "type": "string",
-  "enum": [
-   "inService",
-   "outOfService",
-   "underMaintenance",
-   "awaitingParts",
-   "retired",
-   "disposed"
-  ]
- },
- "AssetStatusResult": {
-  "x-ticvai-persistence": "none — computed",
+ "Banner": {
+  "x-ticvai-persistence": "whitelabel.banner",
   "type": "object",
   "required": [
-   "asset",
-   "downstreamEffects"
+   "id",
+   "title",
+   "imageAssetRef",
+   "startsAt"
   ],
   "properties": {
-   "asset": {
-    "$ref": "#/components/schemas/Asset"
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
    },
-   "downstreamEffects": {
+   "title": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "subtitle": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "imageAssetRef": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "placement": {
+    "type": "string",
+    "enum": [
+     "homepageHero",
+     "homepageBlock",
+     "explore",
+     "checkout"
+    ]
+   },
+   "linkTarget": {
+    "$ref": "#/components/schemas/LinkTarget"
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "endsAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Must follow `startsAt` when set (decided 28 September, audit R163). Null runs the banner with no end."
+   },
+   "state": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ScheduleState"
+     }
+    ],
+    "readOnly": true,
+    "x-ticvai-derived": "sweeper",
+    "description": "Moved by `updateBanner` between `draft` and `scheduled`, and by the schedule timer from `scheduled` to `active` and `active` to `expired` at `startsAt` and `endsAt`, in the tenant's timezone (`states/schedule.yaml`)."
+   },
+   "sortOrder": {
+    "type": "integer"
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "BookingFlowConfig": {
+  "x-ticvai-persistence": "none — embedded in tenant_config",
+  "description": "**Set per tenant, with a per-venue override (decided 29 September, rev 3 CFG-11).** One tenant with several venues (the Kids Club branches, Coastal Aqua beside Union Arena) needs them to differ. The settings in force at a venue are the tenant's, with that venue's entry in `venueOverrides` laid over them field by field. The guest app resolves them for the venue the guest picked (audit R267); `effectiveForVenueId` on `getBookingFlowConfig` returns them resolved.\n",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/BookingFlowSettings"
+   },
+   {
     "type": "object",
-    "description": "What else changed. Surfaced so the person taking a ride out of service sees the commercial consequence at the moment they do it.\n",
     "properties": {
-     "productsSuspended": {
+     "venueOverrides": {
       "type": "array",
+      "maxItems": 200,
+      "default": [],
+      "description": "Per-venue overrides, at most one per venue. A `venueId` that is not one of the tenant's active venues, or appears twice, is refused with 400. An override for a venue later closed is kept and has no effect.",
       "items": {
-       "type": "string",
-       "format": "uuid"
+       "$ref": "#/components/schemas/BookingFlowVenueOverride"
       }
-     },
-     "accessPointBlocked": {
-      "type": "boolean"
-     },
-     "performancesAffected": {
-      "type": "integer"
-     },
-     "workOrderId": {
-      "type": "string",
-      "nullable": true
      }
     }
    }
-  }
+  ]
  },
  "BrandIdentity": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
+  "description": "Every `*AssetRef` here is a `MediaAsset` id from the `assets` library (`createUpload` then `completeUpload`), PNG or SVG and at most 2 MB (decided 28 September, audit R270).\n",
   "required": [
    "logoAssetRef"
   ],
   "properties": {
    "logoAssetRef": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid",
+    "description": "The primary logo."
    },
    "logoDarkAssetRef": {
     "type": "string",
+    "format": "uuid",
     "nullable": true,
     "description": "Used on dark backgrounds. Falls back to the primary logo."
    },
+   "logoVariant": {
+    "type": "string",
+    "enum": [
+     "light",
+     "dark",
+     "duotone"
+    ],
+    "default": "light",
+    "description": "**Which lockup sits in the nav bar, and whose colours drive the theme (decided 29 September, rev 3 CFG-4).** `light` uses `logoAssetRef`, `dark` uses `logoDarkAssetRef` (falling back to the primary logo), and `duotone` the two-colour reading of the primary logo.\n"
+   },
    "faviconAssetRef": {
     "type": "string",
-    "nullable": true
+    "format": "uuid",
+    "nullable": true,
+    "description": "The browser tab icon for the guest web app."
    },
    "splashImageAssetRefs": {
     "type": "array",
+    "description": "Splash images, shown in order. Build-time on the native apps (`splashChangeScope`); immediate on web, reaching guests with the publish (audit R163).",
     "items": {
-     "type": "string"
+     "type": "string",
+     "format": "uuid"
     }
    },
    "splashDurationSeconds": {
@@ -4408,135 +4741,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      }
     ],
     "readOnly": true,
-    "description": "Always `buildTime` for native apps."
+    "description": "Always `buildTime` for native apps. The guest web app takes a splash change at the publish, with no build (audit R163)."
    }
   }
- },
- "Cell": {
-  "x-ticvai-persistence": "control.cell",
-  "x-ticvai-retired-columns": [
-   "tenant_id"
-  ],
-  "type": "object",
-  "required": [
-   "id",
-   "name",
-   "regionId",
-   "countryCode",
-   "tier",
-   "status"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "name": {
-    "type": "string"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/CellKind"
-   },
-   "clusterId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "isReachable": {
-    "type": "boolean",
-    "default": true,
-    "description": "False for `onPremise`. The Control Plane holds the record for licensing and support and **cannot reach the installation** — it may sit behind a firewall with no inbound route. Every operation assuming reachability must handle absence rather than timing out, and a cell that has not called home for a month is not necessarily broken.\n"
-   },
-   "lastContactAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first.\n"
-   },
-   "licenceExpiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "On-premise only. Licensing cannot be enforced by a Control Plane the site cannot reach, so a signed licence file is verified locally. **An expired licence degrades rather than stops** — a venue whose gates refuse entry because a licence lapsed over a weekend is worse than one running unlicensed until Monday.\n"
-   },
-   "participatesInCrossCell": {
-    "type": "boolean",
-    "default": true,
-    "description": "False by default for `onPremise`. Redeeming a pass issued elsewhere requires reaching the issuing cell at that moment, and an on-premise site may not be able to. Exclusion is the honest default; local-then-reconcile carries a double-redemption risk that needs a decision rather than an assumption.\n"
-   },
-   "regionId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "regionName": {
-    "type": "string"
-   },
-   "countryCode": {
-    "type": "string"
-   },
-   "tier": {
-    "$ref": "#/components/schemas/CellTier"
-   },
-   "status": {
-    "$ref": "#/components/schemas/CellStatus"
-   },
-   "cloudProvider": {
-    "type": "string",
-    "nullable": true
-   },
-   "cloudRegion": {
-    "type": "string",
-    "nullable": true
-   },
-   "apiEndpoint": {
-    "type": "string",
-    "nullable": true
-   },
-   "venueCount": {
-    "type": "integer"
-   },
-   "provisionedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "deploymentRef": {
-    "type": "string",
-    "nullable": true,
-    "description": "**A pointer to where this cell runs, not a description of it.** A Kubernetes namespace, an ECS cluster ARN, a stack name — whatever the orchestrator calls the thing.\n\n**The platform does not model instances, nodes or shards** (31 August). Kubernetes already holds instance counts and they change by the second; a table copying them drifts within minutes and the copy would win.\n\n**The line is: routing decisions belong to the platform, provisioning facts belong to the orchestrator.** Qdrant is the proof — ADR-0021 makes the tenant *the* shard key, so nine operations route without a lookup and **a stored shard assignment would be a second copy of something derivable.**\n\n**CF-161 needed a table after all, and this said it did not.** The claim here was that one database per cell or one per service is a build-time decision and the DDL is identical either way. **ADR-0038 answered it per tenant**, which drops `Cell.tenantId`, adds `CellTenant`, `RolloutTenant` and a per-tenant migration row, and takes `control` out of the tenant template. `tools/derive-ddl.py` carried the same claim in its docstring.\n\n**A claim that a question cannot affect your artefact is the one most likely to be left standing after it does**, which is why the correction is recorded here rather than the sentence simply deleted."
-   }
-  }
- },
- "CellKind": {
-  "type": "string",
-  "description": "Four deployment models (ADR-0017). `shared` is the default; the others exist because a client asked or a law requires it.\n\n\n**`burst` added 31 August.** An environment stood up for one on-sale and torn down after (CF-162 scenario c). **It is not a jurisdiction and it is not permanent** — it holds a catalogue snapshot, three services of sixteen, and 17 tables of 380.\n\n**The other four are places data lives. This one is a place data passes through**, which is why it has its own lifecycle and a reconciliation obligation the others do not.",
-  "enum": [
-   "shared",
-   "dedicated",
-   "onPremise",
-   "controlPlane",
-   "burst"
-  ]
- },
- "CellStatus": {
-  "type": "string",
-  "enum": [
-   "provisioning",
-   "active",
-   "migrating",
-   "suspended",
-   "decommissioning",
-   "failed"
-  ]
- },
- "CellTier": {
-  "type": "string",
-  "enum": [
-   "shared",
-   "dedicated",
-   "isolated",
-   "clientHosted"
-  ]
  },
  "ChangeScope": {
   "type": "string",
@@ -4560,7 +4767,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid"
    },
    "name": {
-    "type": "string"
+    "type": "string",
+    "x-ticvai-unique": "tenant",
+    "description": "**Unique per tenant** (decided 28 September, audit R108). A name already used by any collection in the tenant, at any venue or level, is refused with `409 duplicate-code`.\n"
    },
    "description": {
     "type": "string",
@@ -4695,101 +4904,102 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "platforms": {
        "type": "array",
        "items": {
-        "type": "string"
+        "type": "string",
+        "enum": [
+         "ios",
+         "android",
+         "web"
+        ]
        }
       }
      }
     }
    },
+   "snapshot": {
+    "type": "object",
+    "additionalProperties": true,
+    "readOnly": true,
+    "description": "**What this version contained.** The working draft exactly as published, in the shape `getTenantConfig` returns (`TenantConfig`) — so `restoreConfigVersion` has something to copy back and `diffConfigVersion` something to compare. Deliberately an open object here: its shape is `TenantConfig`, and a `$ref` would make it a key to a `tenant_config` row rather than a copy. Written once by `publishTenantConfig` and never changed. Left out of `listConfigVersions` items; a version's content is read with `getTenantConfig?version=`.\n"
+   },
    "scopePath": {
     "type": "string",
+    "readOnly": true,
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
    }
   }
  },
- "CreateAssetRequest": {
-  "x-ticvai-persistence": "none — request only",
+ "ContentPage": {
+  "x-ticvai-persistence": "whitelabel.content_page",
   "type": "object",
   "required": [
-   "assetTag",
-   "name",
-   "venueId",
-   "criticality"
+   "id",
+   "slug",
+   "title",
+   "body",
+   "status"
   ],
   "properties": {
-   "assetTag": {
-    "type": "string",
-    "maxLength": 64
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "categoryId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "locationDescription": {
-    "type": "string",
-    "maxLength": 500
-   },
-   "criticality": {
-    "$ref": "#/components/schemas/AssetCriticality"
-   },
-   "manufacturer": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "model": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "serialNumber": {
-    "type": "string",
-    "maxLength": 128
-   },
-   "commissionedAt": {
-    "type": "string",
-    "format": "date"
-   },
-   "warrantyExpiresAt": {
-    "type": "string",
-    "format": "date"
-   },
-   "supplierId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "linkedProductIds": {
-    "type": "array",
-    "description": "Products this asset delivers. A fault here can stop them selling.\n",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "linkedAccessPointId": {
+   "id": {
     "type": "string",
     "format": "uuid",
-    "nullable": true,
-    "description": "Access point this asset controls. Out of service blocks it."
+    "readOnly": true
    },
-   "requiresInspectionToReturn": {
+   "slug": {
+    "type": "string",
+    "pattern": "^[a-z0-9-]+$"
+   },
+   "title": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "body": {
+    "$ref": "#/components/schemas/LocalisedRichText"
+   },
+   "isEnabled": {
     "type": "boolean",
-    "default": false,
-    "description": "True means a completed inspection is required before return to service. A technician cannot simply declare a ride safe.\n"
+    "default": true,
+    "description": "BL-005. **Enablement is not publication.** A published page that is disabled exists, keeps its URL and its history, and does not render — which is what a tenant wants when a section is seasonal.\n**Unpublishing loses the version; disabling does not.** Collapsing them means a venue turning off its water-park section for winter has to republish it every spring.\n"
    },
-   "documentRefs": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
+   "status": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ContentStatus"
+     }
+    ],
+    "readOnly": true,
+    "description": "Created as `draft`, published by `publishTenantConfig`, archived through `updateContentPage` (`states/content.yaml`)."
+   },
+   "iconAssetRef": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "categoryCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "sortOrder": {
+    "type": "integer"
+   },
+   "isReferenced": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "True when navigation or the homepage links to this page. Blocks deletion. Maintained by `setNavigation` and `setHomepageLayout` in the same transaction as the links they write."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
    }
   }
+ },
+ "ContentStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "published",
+   "archived"
+  ]
  },
  "CreateMenuRequest": {
   "x-ticvai-persistence": "none — request only",
@@ -4817,113 +5027,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
- "CreateTenantRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "code",
-   "name",
-   "billingEmail"
-  ],
-  "properties": {
-   "code": {
-    "type": "string",
-    "maxLength": 64,
-    "pattern": "^[a-z0-9-]+$"
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "billingEmail": {
-    "type": "string"
-   },
-   "billingAddress": {
-    "type": "string",
-    "maxLength": 500
-   },
-   "accountManagerPrincipalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "planId": {
-    "type": "string",
-    "format": "uuid"
-   }
-  }
- },
- "DowngradeConflictProblem": {
-  "x-ticvai-persistence": "none — error shape",
-  "allOf": [
-   {
-    "$ref": "../shared/common.yaml#/components/schemas/Problem"
-   },
-   {
-    "type": "object",
-    "properties": {
-     "modulesInUse": {
-      "type": "array",
-      "description": "Enabled by the tenant but not licensed by the target plan.",
-      "items": {
-       "type": "object",
-       "properties": {
-        "moduleKey": {
-         "type": "string"
-        },
-        "displayName": {
-         "type": "string"
-        },
-        "isEnabled": {
-         "type": "boolean"
-        }
-       }
-      }
-     },
-     "limitsExceeded": {
-      "type": "array",
-      "items": {
-       "type": "object",
-       "properties": {
-        "metric": {
-         "$ref": "#/components/schemas/UsageMetric"
-        },
-        "currentUsage": {
-         "type": "integer"
-        },
-        "targetLimit": {
-         "type": "integer"
-        }
-       }
-      }
-     }
-    }
-   }
-  ]
- },
- "EntitlementLimit": {
-  "type": "object",
-  "required": [
-   "metric",
-   "limit"
-  ],
-  "properties": {
-   "metric": {
-    "$ref": "#/components/schemas/UsageMetric"
-   },
-   "limit": {
-    "type": "integer",
-    "nullable": true,
-    "description": "Null means unlimited."
-   },
-   "overageAllowed": {
-    "type": "boolean",
-    "default": false
-   },
-   "overageUnitPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   }
-  }
- },
  "EntitlementStatus": {
   "type": "string",
   "description": "**What the storage layer holds, and what a guest is shown.** `MediaEntitlements` carried only `isValid` and a reason string — a boolean cannot distinguish a ticket that was used from one that expired, was refunded, or was transferred to somebody else, and those are four different conversations at a gate.\nAdded 17 August. `states/entitlement.yaml` had modelled these six since 14 August and the contract had no enum behind it, which the state checker reported correctly for three days.\n",
@@ -4935,58 +5038,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "cancelled",
    "surrendered"
   ]
- },
- "EntitlementUsage": {
-  "x-ticvai-persistence": "none — aggregated from usage_record",
-  "type": "object",
-  "required": [
-   "tenantId",
-   "metrics"
-  ],
-  "properties": {
-   "tenantId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "metrics": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "metric",
-      "current",
-      "isNearLimit"
-     ],
-     "properties": {
-      "metric": {
-       "$ref": "#/components/schemas/UsageMetric"
-      },
-      "current": {
-       "type": "integer"
-      },
-      "limit": {
-       "type": "integer",
-       "nullable": true
-      },
-      "percentUsed": {
-       "type": "number",
-       "nullable": true
-      },
-      "isNearLimit": {
-       "type": "boolean",
-       "description": "Approaching a limit is an account conversation. Hitting one silently at a gate is an incident.\n"
-      },
-      "isExceeded": {
-       "type": "boolean"
-      }
-     }
-    }
-   },
-   "asAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
  },
  "ExpiringMedia": {
   "x-ticvai-persistence": "none — computed",
@@ -5025,13 +5076,32 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "boolean"
    },
    "isInUse": {
-    "type": "boolean"
+    "type": "boolean",
+    "description": "True while `liveUsageCount` is above zero, that is, while live (published) content references the asset (audit R106 (10)). Drafts and collections do not count."
    },
    "liveUsageCount": {
     "type": "integer",
-    "description": "Expired and live is the combination that matters."
+    "description": "References from live (published) content only (audit R106 (10)). Expired and live is the combination that matters."
    }
   }
+ },
+ "FeatureKey": {
+  "type": "string",
+  "description": "The feature toggles a tenant can set — one list for `FeatureToggle` and the `setFeatureToggles` body, which took a free string where the response had this enum.\n",
+  "enum": [
+   "digitalCompanionMode",
+   "aiConciergeChat",
+   "lostAndFound",
+   "pushNotifications",
+   "socialSharing",
+   "multiLanguage",
+   "appleWallet",
+   "googlePay",
+   "applePay",
+   "cashOnDelivery",
+   "guestCheckout",
+   "uaePassLogin"
+  ]
  },
  "FeatureToggle": {
   "x-ticvai-persistence": "whitelabel.feature_toggle",
@@ -5043,21 +5113,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "featureKey": {
-    "type": "string",
-    "enum": [
-     "digitalCompanionMode",
-     "aiConciergeChat",
-     "lostAndFound",
-     "pushNotifications",
-     "socialSharing",
-     "multiLanguage",
-     "appleWallet",
-     "googlePay",
-     "applePay",
-     "cashOnDelivery",
-     "guestCheckout",
-     "uaePassLogin"
-    ]
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/FeatureKey"
+     }
+    ],
+    "description": "`guestCheckout` is **off by default** (decided 17 September 2026, matrix 2.6.28, placement settled by [ADR-0045](../../docs/adr/0045-every-order-carries-a-proven-contact.md) 18 September): **the venue sets this from the configuration menu**, and it decides which routes the checkout page offers — off, the guest signs in verified at checkout; on, a guest may also check out without an account after proving their contact with a one-time code. **It gates checkout, never the cart.** The kiosk is not governed by it. Rule on `identity` `verifyGuestEmail`.\n"
    },
    "displayName": {
     "type": "string"
@@ -5093,7 +5154,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "primaryArabic": {
     "type": "string",
     "nullable": true,
-    "description": "Required when Arabic is enabled. A Latin face alone leaves Arabic in a system fallback that will not match.\n"
+    "description": "Required when `ar` is among the tenant's languages (audit R163). A Latin face alone leaves Arabic in a system fallback that will not match.\n"
    },
    "secondaryLatin": {
     "type": "string",
@@ -5101,12 +5162,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "secondaryArabic": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "Required whenever `secondaryLatin` is set and `ar` is among the tenant's languages (decided 28 September, audit R163)."
    },
    "customFontAssetRefs": {
     "type": "array",
+    "description": "Uploaded font files, as `MediaAsset` ids.",
     "items": {
-     "type": "string"
+     "type": "string",
+     "format": "uuid"
     }
    },
    "changeScope": {
@@ -5116,14 +5180,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      }
     ],
     "readOnly": true,
+    "x-ticvai-derived": "onRead",
     "description": "Custom font files are `buildTime`; selecting a bundled face is `runtime`."
    }
   }
  },
  "FooterConfig": {
   "type": "object",
-  "x-ticvai-persistence": "control.footer_config",
-  "description": "BL-002. **`setHeader` and `HeaderConfig` exist and the footer does not**, which looked like symmetry until you notice it is not: **a header is chrome and a footer is a link surface.**\nA footer carries the legal links — terms, privacy, accessibility statement, cookie preferences — and **those are the ones a regulator checks.** Treating it as a mirror of the header would have given it a logo and no way to reach a privacy notice.\n",
+  "x-ticvai-persistence": "whitelabel.footer_config + whitelabel.footer_config_column + whitelabel.footer_config_social_link",
+  "description": "BL-002. **`setHeader` and `HeaderConfig` exist and the footer does not**, which looked like symmetry until you notice it is not: **a header is chrome and a footer is a link surface.**\nA footer carries the legal links — terms, privacy, accessibility statement, cookie preferences — and **those are the ones a regulator checks.** Treating it as a mirror of the header would have given it a logo and no way to reach a privacy notice.\n**Where it is stored.** `legalLinks` and `copyrightText` are columns of `whitelabel.footer_config`; each entry of `columns` is a `whitelabel.footer_config_column` row and each entry of `socialLinks` a `whitelabel.footer_config_social_link` row. Part of the working draft (see the header). **In the tenant's own database, not the control plane (decided 28 September, audit R163)**: it moved from `control.footer_config` and its two child tables.\n",
   "required": [
    "id",
    "scopePath"
@@ -5131,10 +5196,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "scopePath": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005), written at `tenant` scope by the server."
    },
    "columns": {
     "type": "array",
@@ -5294,6 +5362,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "HomepageSectionKind": {
   "type": "string",
+  "description": "**Which module each section needs, proposed, client to correct (decided 28 September, audit R163).** `tickets` needs `ticketsAndBooking`; `whatsOn` needs `events`; `attractions` needs `attractions`; `membership` needs `membership`; `dining` needs `diningAndFnb`; `shop` needs `shop`; `map` needs `map`. `heroBanner`, `quickActions`, `promotions`, `customContent` and `spacer` need no module. `setHomepageLayout` refuses a visible section whose module is not enabled, and `setModuleEnablement` refuses to disable a module a section still needs.\n",
   "enum": [
    "heroBanner",
    "quickActions",
@@ -5309,17 +5378,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "spacer"
   ]
  },
- "InvoiceStatus": {
-  "type": "string",
-  "enum": [
-   "draft",
-   "issued",
-   "paid",
-   "overdue",
-   "disputed",
-   "cancelled"
-  ]
- },
  "LanguageConfig": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
@@ -5331,17 +5389,22 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "languages": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[a-z]{2}$"
     }
    },
    "defaultLanguage": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[a-z]{2}$"
    },
    "rtlLanguages": {
     "type": "array",
     "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "The enabled languages written right to left — those whose Unicode CLDR character order is `right-to-left` (Arabic, `ar`, among them). Not configured; it follows from `languages`.",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[a-z]{2}$"
     }
    },
    "translationGaps": {
@@ -5364,97 +5427,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        }
       }
      }
-    }
-   }
-  }
- },
- "LicenceAddOn": {
-  "x-ticvai-persistence": "control.licence_add_on",
-  "type": "object",
-  "required": [
-   "moduleKey"
-  ],
-  "properties": {
-   "moduleKey": {
-    "type": "string"
-   },
-   "limitOverrides": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/EntitlementLimit"
-    }
-   },
-   "price": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "validFrom": {
-    "type": "string",
-    "format": "date"
-   },
-   "validTo": {
-    "type": "string",
-    "format": "date",
-    "nullable": true
-   },
-   "note": {
-    "type": "string",
-    "maxLength": 500
-   }
-  }
- },
- "LicencePosition": {
-  "x-ticvai-persistence": "none — union of plan and add-ons",
-  "type": "object",
-  "required": [
-   "tenantId",
-   "licensedModules",
-   "limits"
-  ],
-  "properties": {
-   "tenantId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "planId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "licensedModules": {
-    "type": "array",
-    "description": "Union of plan modules and add-ons. The White Label Builder reads this and cannot enable anything absent from it.\n",
-    "items": {
-     "type": "object",
-     "required": [
-      "moduleKey",
-      "source"
-     ],
-     "properties": {
-      "moduleKey": {
-       "type": "string"
-      },
-      "displayName": {
-       "type": "string"
-      },
-      "source": {
-       "type": "string",
-       "enum": [
-        "plan",
-        "addOn"
-       ]
-      },
-      "validTo": {
-       "type": "string",
-       "format": "date",
-       "nullable": true
-      }
-     }
-    }
-   },
-   "limits": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/EntitlementLimit"
     }
    }
   }
@@ -5497,101 +5469,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "LocalisedRichText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "description": "Keyed by language code. Values are sanitised HTML.",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
  "LocalisedText": {
   "x-ticvai-persistence": "none — jsonb column",
   "type": "object",
   "additionalProperties": {
    "type": "string"
-  }
- },
- "MaintenancePlan": {
-  "x-ticvai-persistence": "maintenance.maintenance_plan",
-  "type": "object",
-  "required": [
-   "id",
-   "name",
-   "assetId",
-   "taskTemplate"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "assetId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "assetCategoryId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Applies to every asset in the category rather than one."
-   },
-   "intervalDays": {
-    "type": "integer",
-    "nullable": true,
-    "description": "Elapsed-time trigger."
-   },
-   "usageInterval": {
-    "type": "number",
-    "nullable": true,
-    "description": "Usage trigger — cycles, hours, kilometres. **Whichever comes first** when both are set. A ride serviced every three months or ten thousand cycles is one plan.\n"
-   },
-   "leadTimeDays": {
-    "type": "integer",
-    "default": 7,
-    "description": "How far ahead the work order is generated, so parts can be ordered before the job is already late.\n"
-   },
-   "taskTemplate": {
-    "type": "object",
-    "required": [
-     "title",
-     "priority"
-    ],
-    "properties": {
-     "title": {
-      "type": "string"
-     },
-     "description": {
-      "type": "string"
-     },
-     "priority": {
-      "$ref": "#/components/schemas/WorkOrderPriority"
-     },
-     "estimatedMinutes": {
-      "type": "integer"
-     },
-     "inspectionTemplateId": {
-      "type": "string",
-      "format": "uuid"
-     },
-     "requiredPartIds": {
-      "type": "array",
-      "items": {
-       "type": "string",
-       "format": "uuid"
-      }
-     }
-    }
-   },
-   "lastCompletedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "nextDueAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "isActive": {
-    "type": "boolean"
-   }
   }
  },
  "MediaAsset": {
@@ -5629,6 +5519,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "title": {
     "$ref": "#/components/schemas/LocalisedText"
+   },
+   "description": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"
    },
    "altText": {
     "allOf": [
@@ -5828,7 +5726,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "type": "object",
      "properties": {
       "entitlementId": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
       },
       "name": {
        "type": "string"
@@ -5847,7 +5746,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        ]
       },
       "orderId": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
       },
       "addedAt": {
        "type": "string",
@@ -5979,6 +5879,29 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "attributionText": {
     "type": "string",
     "nullable": true
+   },
+   "permittedTerritories": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "ISO country or region codes. **Empty means unrestricted, which is a claim rather than an absence** — an unknown territory and a worldwide licence are not the same thing, and `licenceKind: unknown` is how the second is said.\n"
+   },
+   "permittedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Distribution channel codes, checked by `setMediaDistributionChannels`. Narrower than `permittedUses`, which describes the medium rather than the route.\n"
+   },
+   "modelReleaseHeld": {
+    "type": "boolean",
+    "default": false
+   },
+   "renewalOwner": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
    }
   }
  },
@@ -5995,11 +5918,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "MediaUsage": {
   "x-ticvai-persistence": "assets.media_usage",
   "type": "object",
+  "description": "One place an asset is used. **`surface: product` is written by catalogue** for each item of `Product.media` (decided 29 September, rev 3 23SEP-4): `referenceId` is the product id and `isLive` is true while the product is listed to guests, which is what stops an asset in use on a ticket card being archived from under it.\n",
   "required": [
    "surface",
    "referenceId"
   ],
   "properties": {
+   "extractedText": {
+    "type": "string",
+    "description": "**Text pulled out of an uploaded document**, after extraction. The generic retrieval path for anything a tenant uploads — a PDF nobody can search is a PDF nobody reads.\n"
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -6073,13 +6001,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "isActive": {
     "type": "boolean"
+   },
+   "publishedVersion": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `MenuVersion.version` live now. Null for a menu never published."
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    }
   }
  },
  "MenuAvailability": {
   "x-ticvai-persistence": "none — embedded in menu",
   "type": "object",
-  "description": "When this menu is in force. Absent means always.",
+  "description": "When this menu is in force. Absent means always. Days, times and dates are all read in the Region's time zone, not UTC.",
   "properties": {
    "daysOfWeek": {
     "type": "array",
@@ -6091,21 +6031,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "startTime": {
     "type": "string",
-    "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+    "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+    "description": "Wall-clock time, in the Region's time zone."
    },
    "endTime": {
     "type": "string",
-    "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+    "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+    "description": "Wall-clock time, in the Region's time zone."
    },
    "validFrom": {
     "type": "string",
     "format": "date",
-    "nullable": true
+    "nullable": true,
+    "description": "Calendar day, in the Region's time zone, not UTC."
    },
    "validTo": {
     "type": "string",
     "format": "date",
-    "nullable": true
+    "nullable": true,
+    "description": "Calendar day, in the Region's time zone, not UTC."
    }
   }
  },
@@ -6118,6 +6062,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "sortOrder"
   ],
   "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
    "code": {
     "type": "string"
    },
@@ -6129,9 +6078,28 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "items": {
     "type": "array",
+    "description": "The section's items, in sale-board order. An item's membership is `MenuItem.menuSectionId`.",
     "items": {
      "$ref": "#/components/schemas/MenuItem"
     }
+   }
+  }
+ },
+ "MinimumAppVersion": {
+  "x-ticvai-persistence": "none — embedded in tenant_config",
+  "type": "object",
+  "nullable": true,
+  "description": "**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n",
+  "properties": {
+   "ios": {
+    "type": "string",
+    "nullable": true,
+    "pattern": "^\\d+\\.\\d+\\.\\d+$"
+   },
+   "android": {
+    "type": "string",
+    "nullable": true,
+    "pattern": "^\\d+\\.\\d+\\.\\d+$"
    }
   }
  },
@@ -6160,12 +6128,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "referencedBy": {
     "type": "array",
     "readOnly": true,
-    "description": "Navigation items and homepage sections pointing at this module.",
+    "x-ticvai-derived": "onWrite",
+    "description": "Navigation items and homepage sections pointing at this module. Maintained by `setNavigation` and `setHomepageLayout` in the same transaction as the links they write.",
     "items": {
      "type": "string"
     }
    }
   }
+ },
+ "ModuleKey": {
+  "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
  },
  "NavigationConfig": {
   "x-ticvai-persistence": "whitelabel.navigation_item",
@@ -6248,10 +6220,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The client ULID from `CreateOrderRequest.id`."
    },
    "orderNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "The number a guest reads and a cashier types. **Server-assigned: the venue prefix and a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till holds a reserved range of the venue sequence, so an order taken offline gets its number on the till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap, and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this number.\n"
    },
    "channel": {
     "allOf": [
@@ -6296,6 +6272,33 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "refundedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
+   "droppedPromotions": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Promotions left off this order at checkout because their budget cap would have been exceeded** (decided 28 September, audit R101 (8)). Empty when none was dropped. Returned by `checkoutCart` and `createOrder`, not stored.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "promotionId"
+     ],
+     "properties": {
+      "promotionId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "budgetCapReached"
+       ]
+      }
+     }
+    }
+   },
    "totalPriceVariance": {
     "allOf": [
      {
@@ -6326,12 +6329,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "shiftId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "subjectId": {
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "holdLabel": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `label` a cashier gave when parking it with `holdOrder` — how they find it again. Null on an order never held."
+   },
+   "heldUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."
    },
    "createdAt": {
     "type": "string",
@@ -6384,13 +6402,23 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string"
    },
    "platform": {
-    "type": "string"
+    "type": "string",
+    "enum": [
+     "ios",
+     "android",
+     "web"
+    ]
    },
    "theme": {
-    "type": "string"
+    "type": "string",
+    "enum": [
+     "light",
+     "dark"
+    ]
    },
    "language": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[a-z]{2}$"
    },
    "expiresAt": {
     "type": "string",
@@ -6408,7 +6436,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "title": {
     "$ref": "#/components/schemas/LocalisedText"
@@ -6418,6 +6447,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "iconAssetRef": {
     "type": "string",
+    "format": "uuid",
     "nullable": true
    },
    "promotionId": {
@@ -6437,7 +6467,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "endsAt": {
     "type": "string",
     "format": "date-time",
-    "nullable": true
+    "nullable": true,
+    "description": "Must follow `startsAt` when both are set (decided 28 September, audit R163)."
    },
    "state": {
     "allOf": [
@@ -6445,48 +6476,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "$ref": "#/components/schemas/ScheduleState"
      }
     ],
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-derived": "sweeper",
+    "description": "Moved by the schedule timer at `startsAt` and `endsAt`, in the tenant's timezone, as for `Banner.state`. Once `active` or `expired` the block may only be withdrawn (audit R163)."
    },
    "sortOrder": {
     "type": "integer"
    },
    "scopePath": {
     "type": "string",
+    "readOnly": true,
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
-   }
-  }
- },
- "ProvisionCellRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "regionId",
-   "countryCode",
-   "tier"
-  ],
-  "properties": {
-   "regionId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "countryCode": {
-    "type": "string",
-    "pattern": "^[A-Z]{2}$",
-    "description": "Determines the jurisdiction. Placement must be within it — this is enforced, not trusted.\n"
-   },
-   "tier": {
-    "$ref": "#/components/schemas/CellTier"
-   },
-   "cloudProvider": {
-    "type": "string"
-   },
-   "cloudRegion": {
-    "type": "string"
-   },
-   "clientHostedEndpoint": {
-    "type": "string",
-    "nullable": true,
-    "description": "Required for `clientHosted`, where no in-region cloud exists."
    }
   }
  },
@@ -6499,450 +6499,193 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "expired"
   ]
  },
- "SetAssetStatusRequest": {
-  "x-ticvai-persistence": "none — request only",
+ "TenantAppStatus": {
+  "x-ticvai-persistence": "none — computed",
   "type": "object",
+  "description": "Computed on read. The published fields come from the current `ConfigVersion`, the maintenance fields from the tenant's `tenant_config` row (`setMaintenanceMode`), and the draft fields from the working draft. **Fields marked staff only are left out of a response to a caller without a staff session** (`getTenantAppStatus`).\n",
   "required": [
-   "status",
-   "reason",
-   "recordedAt"
+   "tenantId",
+   "isPublished",
+   "isInMaintenance"
   ],
   "properties": {
-   "status": {
-    "$ref": "#/components/schemas/AssetStatus"
-   },
-   "reason": {
-    "type": "string",
-    "minLength": 3,
-    "maxLength": 1000
-   },
-   "inspectionId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Required for return to service where the asset demands it."
-   },
-   "raiseWorkOrder": {
-    "type": "boolean",
-    "default": false
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "SetSubscriptionRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "planId"
-  ],
-  "properties": {
-   "planId": {
+   "tenantId": {
     "type": "string",
     "format": "uuid"
    },
-   "planVersion": {
-    "type": "string",
-    "description": "Defaults to the current version."
-   },
-   "effectiveFrom": {
-    "type": "string",
-    "format": "date"
-   },
-   "prorate": {
+   "isPublished": {
     "type": "boolean",
-    "default": true
+    "x-ticvai-derived": "onRead",
+    "description": "True once any version has been published."
    },
-   "note": {
-    "type": "string",
-    "maxLength": 500
-   }
-  }
- },
- "SsoGroupMapping": {
-  "x-ticvai-persistence": "identity.sso_group_mapping",
-  "type": "object",
-  "required": [
-   "externalGroup",
-   "roleId"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The table had no key at all — the response returned the external group, the role and the scope, which is everything a caller needs and not the row own identity.\n**(provider, external_group) is unique and would serve**, but a mapping is edited and revoked by an administrator, and **a row addressed by the values it holds cannot be corrected** — changing the group means deleting a mapping and creating another, which loses who granted it and when.\n"
-   },
-   "externalGroup": {
-    "type": "string"
-   },
-   "roleId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "Scope the mapped role is granted at."
-   }
-  }
- },
- "SsoProtocol": {
-  "type": "string",
-  "enum": [
-   "oidc",
-   "saml2"
-  ]
- },
- "SsoProviderConfig": {
-  "x-ticvai-persistence": "identity.sso_provider",
-  "type": "object",
-  "required": [
-   "id",
-   "displayName",
-   "protocol",
-   "groupMappings"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayName": {
-    "type": "string"
-   },
-   "protocol": {
-    "$ref": "#/components/schemas/SsoProtocol"
-   },
-   "metadataUrl": {
+   "publishedVersion": {
     "type": "string",
     "nullable": true
    },
-   "issuer": {
+   "publishedAt": {
     "type": "string",
+    "format": "date-time",
     "nullable": true
    },
-   "clientId": {
+   "draftVersion": {
     "type": "string",
-    "nullable": true
+    "description": "Staff only."
    },
-   "clientSecretRef": {
-    "type": "string",
-    "nullable": true,
-    "description": "Key vault reference. The secret itself is never returned."
-   },
-   "groupMappings": {
-    "type": "array",
-    "minItems": 1,
-    "description": "**A group with no mapping grants nothing.** No default role, ever — otherwise the identity provider becomes a way to mint access nobody configured.\n",
-    "items": {
-     "$ref": "#/components/schemas/SsoGroupMapping"
-    }
-   },
-   "autoProvisionPrincipals": {
+   "hasUnpublishedChanges": {
     "type": "boolean",
-    "default": false,
-    "description": "Create a principal on first successful sign-in."
+    "x-ticvai-derived": "onRead",
+    "description": "Staff only. The working draft differs from the current version's `snapshot`."
    },
-   "isEnforced": {
-    "type": "boolean",
-    "default": false
+   "activeModuleCount": {
+    "type": "integer",
+    "x-ticvai-derived": "onRead",
+    "description": "Staff only. `ModuleEnablement` rows with `isEnabled` true."
    },
-   "isActive": {
+   "licensedModuleCount": {
+    "type": "integer",
+    "x-ticvai-derived": "onRead",
+    "description": "Staff only. `ModuleEnablement` rows with `isLicensed` true."
+   },
+   "activePageCount": {
+    "type": "integer",
+    "x-ticvai-derived": "onRead",
+    "description": "Staff only. Content pages that are `published` and enabled."
+   },
+   "isInMaintenance": {
     "type": "boolean"
-   }
-  }
- },
- "Subscription": {
-  "x-ticvai-persistence": "control.subscription",
-  "type": "object",
-  "required": [
-   "tenantId",
-   "planId",
-   "planVersion",
-   "status",
-   "startsAt"
-  ],
-  "properties": {
-   "tenantId": {
+   },
+   "maintenanceMessage": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "expectedBackAt": {
     "type": "string",
-    "format": "uuid"
-   },
-   "planId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "planName": {
-    "type": "string"
-   },
-   "planVersion": {
-    "type": "string"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "trial",
-     "active",
-     "pastDue",
-     "cancelled",
-     "expired"
-    ]
-   },
-   "startsAt": {
-    "type": "string",
-    "format": "date"
-   },
-   "renewsAt": {
-    "type": "string",
-    "format": "date",
+    "format": "date-time",
     "nullable": true
    },
-   "cancelledAt": {
-    "type": "string",
-    "format": "date",
-    "nullable": true
+   "minimumAppVersion": {
+    "$ref": "#/components/schemas/MinimumAppVersion"
    },
-   "currentPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   "contact": {
+    "$ref": "#/components/schemas/VenueContact"
    },
-   "billingPeriod": {
-    "type": "string"
-   }
-  }
- },
- "SubscriptionInvoice": {
-  "x-ticvai-persistence": "control.invoice + control.invoice_line",
-  "type": "object",
-  "required": [
-   "id",
-   "invoiceNumber",
-   "tenantId",
-   "periodStart",
-   "periodEnd",
-   "status",
-   "total"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
+   "availability": {
+    "$ref": "#/components/schemas/AppAvailability"
    },
-   "invoiceNumber": {
-    "type": "string"
+   "availabilityMessage": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "What the sold-out or closed screen says (WEB-029). Null shows the default wording."
    },
-   "tenantId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "periodStart": {
-    "type": "string",
-    "format": "date"
-   },
-   "periodEnd": {
-    "type": "string",
-    "format": "date"
-   },
-   "status": {
-    "$ref": "#/components/schemas/InvoiceStatus"
-   },
-   "lines": {
+   "venues": {
     "type": "array",
+    "maxItems": 200,
+    "x-ticvai-derived": "onRead",
+    "description": "**Public: the venues a guest can pick** (decided 28 September, audit R267; schema named 29 September, readiness close-out, our build plan). The source of the venue picker on WEB-001 and GST-001, returned with or without a session. **Published only**: a venue is listed when its scope node is active (`tenancy.OrgUnit.isActive`) and it is in the tenant's current published `ConfigVersion`; a venue added or reactivated since the last publish appears after the next publish, and a draft never reaches a guest. Ordered by `name`. Empty when nothing is published.\n",
     "items": {
      "type": "object",
+     "required": [
+      "venueId",
+      "name"
+     ],
      "properties": {
-      "description": {
-       "type": "string"
-      },
-      "kind": {
+      "venueId": {
        "type": "string",
-       "enum": [
-        "basePlan",
-        "addOn",
-        "overage",
-        "oneOff",
-        "credit"
-       ]
+       "format": "uuid",
+       "description": "**The venue's scope node** (`tenancy.OrgUnit.id`, level venue): what every guest screen that declares `venueId` `from: session` reads once the guest picks it."
       },
-      "metric": {
-       "$ref": "#/components/schemas/UsageMetric"
+      "name": {
+       "type": "string",
+       "maxLength": 200,
+       "description": "The venue's name (`tenancy.OrgUnit.name`)."
       },
-      "quantity": {
-       "type": "number"
+      "city": {
+       "type": "string",
+       "maxLength": 120,
+       "nullable": true,
+       "description": "Shown under the name so two venues with similar names can be told apart."
       },
-      "unitPrice": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "amount": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      "openingHoursToday": {
+       "type": "object",
+       "nullable": true,
+       "description": "Today's opening hours in the venue's time zone, from `tenancy.VenueSettings` opening hours. Null when the venue is closed today or has none set.",
+       "properties": {
+        "opens": {
+         "type": "string",
+         "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+        },
+        "closes": {
+         "type": "string",
+         "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+        }
+       }
       }
      }
     }
    },
-   "subtotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "taxAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "total": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "planVersionUsed": {
-    "type": "string",
-    "description": "Priced against the version the tenant is subscribed to, not the latest."
-   },
-   "issuedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "dueAt": {
-    "type": "string",
-    "format": "date",
-    "nullable": true
-   },
-   "paidAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "SubscriptionPreview": {
-  "x-ticvai-persistence": "none — computed",
-  "type": "object",
-  "required": [
-   "canApply",
-   "priceChange"
-  ],
-  "properties": {
-   "canApply": {
-    "type": "boolean"
-   },
-   "priceChange": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "proratedAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "modulesGained": {
+   "whatsNew": {
     "type": "array",
+    "maxItems": 10,
+    "x-ticvai-derived": "onRead",
+    "description": "**Public: the guest \"what's new\"** (decided 29 September, rev 3 GAP-B2). Newest first, at most 10, from `platform-ops.Release.guestReleaseNotes` of the releases the tenant's cell has received; a release with no guest notes is skipped. Returned with or without a staff session.\n",
     "items": {
-     "type": "string"
-    }
-   },
-   "modulesLost": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "conflicts": {
-    "$ref": "#/components/schemas/DowngradeConflictProblem"
-   },
-   "cellTierChange": {
-    "type": "object",
-    "nullable": true,
-    "properties": {
-     "from": {
-      "$ref": "#/components/schemas/CellTier"
-     },
-     "to": {
-      "$ref": "#/components/schemas/CellTier"
-     },
-     "requiresMigration": {
-      "type": "boolean"
+     "type": "object",
+     "required": [
+      "version",
+      "publishedAt",
+      "notes"
+     ],
+     "properties": {
+      "version": {
+       "type": "string",
+       "description": "The release version."
+      },
+      "publishedAt": {
+       "type": "string",
+       "format": "date-time",
+       "description": "When the release reached the tenant's cell."
+      },
+      "notes": {
+       "$ref": "#/components/schemas/LocalisedText"
+      }
      }
     }
-   }
-  }
- },
- "SuspensionMode": {
-  "type": "string",
-  "description": "Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets.\n",
-  "enum": [
-   "readOnly",
-   "noNewSales",
-   "fullLockout"
-  ]
- },
- "Tenant": {
-  "x-ticvai-persistence": "control.tenant",
-  "type": "object",
-  "required": [
-   "id",
-   "code",
-   "name",
-   "status",
-   "createdAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
    },
-   "code": {
-    "type": "string"
-   },
-   "name": {
-    "type": "string"
-   },
-   "status": {
-    "$ref": "#/components/schemas/TenantStatus"
-   },
-   "suspensionMode": {
-    "$ref": "#/components/schemas/SuspensionMode"
-   },
-   "suspensionReason": {
-    "type": "string",
-    "nullable": true
-   },
-   "planId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "planName": {
-    "type": "string",
-    "nullable": true
-   },
-   "cellCount": {
-    "type": "integer"
-   },
-   "venueCount": {
-    "type": "integer"
-   },
-   "billingEmail": {
-    "type": "string"
-   },
-   "accountManagerPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "activatedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
+   "recentChanges": {
+    "type": "array",
+    "description": "Staff only. Names the principal behind each change, so it never reaches a public response.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "area": {
+       "type": "string"
+      },
+      "description": {
+       "type": "string"
+      },
+      "principalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
    }
   }
  },
  "TenantConfig": {
   "x-ticvai-persistence": "whitelabel.tenant_config",
   "type": "object",
+  "description": "**The tenant's working draft**, one row per tenant (see the header). Published versions are `ConfigVersion.snapshot`, not further rows here.\n**Only `tenantId` and `version` are required**, because the draft is built one part at a time: the first `set*` call creates the row with that part alone. A part that is still unset is what `validateTenantConfig` reports (`missingRequiredAsset` and the like) and what blocks `publishTenantConfig` — a storage rule that every part exist would stop the first save.\n",
   "required": [
    "tenantId",
-   "version",
-   "brand",
-   "theme",
-   "fonts",
-   "navigation",
-   "homepage",
-   "languages"
+   "version"
   ],
   "properties": {
    "tenantId": {
@@ -6950,16 +6693,22 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid"
    },
    "version": {
-    "type": "string"
+    "type": "string",
+    "description": "The draft's working version label; the published one is `ConfigVersion.version`."
    },
    "isDraft": {
-    "type": "boolean"
+    "type": "boolean",
+    "readOnly": true,
+    "description": "True for the working draft, which is the only row."
    },
    "brand": {
     "$ref": "#/components/schemas/BrandIdentity"
    },
    "appIcons": {
     "$ref": "#/components/schemas/AppIcons"
+   },
+   "bookingFlow": {
+    "$ref": "#/components/schemas/BookingFlowConfig"
    },
    "theme": {
     "$ref": "#/components/schemas/Theme"
@@ -7035,43 +6784,94 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "updatedAt": {
     "type": "string",
     "format": "date-time"
-   }
-  }
- },
- "TenantDetail": {
-  "x-ticvai-persistence": "control.tenant",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/Tenant"
    },
-   {
-    "type": "object",
-    "properties": {
-     "subscription": {
-      "$ref": "#/components/schemas/Subscription"
-     },
-     "cells": {
-      "type": "array",
-      "items": {
-       "$ref": "#/components/schemas/Cell"
+   "isInMaintenance": {
+    "type": "boolean",
+    "default": false,
+    "description": "Written by `setMaintenanceMode`; read by `getTenantAppStatus`."
+   },
+   "maintenanceMessage": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "The message on the branded maintenance screen."
+   },
+   "expectedBackAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "minimumAppVersion": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MinimumAppVersion"
+     }
+    ],
+    "description": "Live state, written by `setMaintenanceMode` (audit R073)."
+   },
+   "contact": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/VenueContact"
+     }
+    ],
+    "description": "Live state, written by `setMaintenanceMode` (audit R073)."
+   },
+   "availability": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AppAvailability"
+     }
+    ],
+    "description": "Live state, written by `setMaintenanceMode` (audit R073)."
+   },
+   "availabilityMessage": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "Live state, written by `setMaintenanceMode` (audit R073)."
+   },
+   "venues": {
+    "type": "array",
+    "x-ticvai-derived": "onRead",
+    "description": "The tenant's active venues, for the guest venue picker on WEB-001 and GST-001 (decided 28 September, audit R267). Public: returned without a session and cached with the rest of the response. Read from `tenancy` venues; a closed or archived venue is left out.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "venueId",
+      "name"
+     ],
+     "properties": {
+      "venueId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "$ref": "#/components/schemas/LocalisedText"
+      },
+      "city": {
+       "type": "string",
+       "nullable": true
+      },
+      "openingHours": {
+       "allOf": [
+        {
+         "$ref": "#/components/schemas/LocalisedText"
+        }
+       ],
+       "nullable": true,
+       "description": "Today's hours as shown to a guest, e.g. \"10:00 to 22:00\"."
       }
-     },
-     "licences": {
-      "$ref": "#/components/schemas/LicencePosition"
      }
     }
    }
-  ]
- },
- "TenantStatus": {
-  "type": "string",
-  "enum": [
-   "onboarding",
-   "active",
-   "suspended",
-   "terminating",
-   "terminated"
-  ]
+  }
  },
  "Theme": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
@@ -7108,20 +6908,89 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Optional dark variant. Derived from the light theme when absent.",
     "properties": {
      "primaryColour": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^#[0-9A-Fa-f]{6}$"
      },
      "backgroundColour": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^#[0-9A-Fa-f]{6}$"
      },
      "textColour": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^#[0-9A-Fa-f]{6}$"
      }
     }
    },
    "cornerRadius": {
     "type": "integer",
     "minimum": 0,
-    "maximum": 32
+    "maximum": 32,
+    "description": "The prototype's 0 to 22 px slider sits inside these bounds (rev 3 CFG-2, no change). Its named palettes, font pairs and background tones are presets over the colours here and `FontConfig`, not stored values."
+   },
+   "surfaceStyle": {
+    "type": "string",
+    "enum": [
+     "glass",
+     "solid"
+    ],
+    "default": "glass",
+    "description": "Cards and panels as frosted glass or opaque (decided 29 September, rev 3 CFG-3)."
+   },
+   "buttonStyle": {
+    "type": "string",
+    "enum": [
+     "solid",
+     "outline",
+     "pill"
+    ],
+    "default": "solid",
+    "description": "Button shape (decided 29 September, rev 3 CFG-3)."
+   }
+  }
+ },
+ "UpdateContentPageRequest": {
+  "x-ticvai-persistence": "none — request only; the fields land on whitelabel.content_page",
+  "type": "object",
+  "description": "The body of `updateContentPage`: the fields a tenant edits. `id`, `isReferenced` and `scopePath` are the server's, and `status` moves only to `archived` here — publishing is `publishTenantConfig` (`states/content.yaml`).\n",
+  "required": [
+   "slug",
+   "title",
+   "body"
+  ],
+  "properties": {
+   "slug": {
+    "type": "string",
+    "pattern": "^[a-z0-9-]+$"
+   },
+   "title": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "body": {
+    "$ref": "#/components/schemas/LocalisedRichText"
+   },
+   "isEnabled": {
+    "type": "boolean",
+    "default": true
+   },
+   "iconAssetRef": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "categoryCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "sortOrder": {
+    "type": "integer"
+   },
+   "status": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ContentStatus"
+     }
+    ],
+    "description": "Only `archived` is taken — send it to withdraw a published page or abandon a draft (`states/content.yaml`). Any other value is a 400 `validation`. Omit to leave the status as it is."
    }
   }
  },
@@ -7168,236 +7037,65 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "expiresAt": {
     "type": "string",
     "format": "date-time"
-   }
-  }
- },
- "UsageMetric": {
-  "type": "string",
-  "enum": [
-   "venues",
-   "workstations",
-   "activeUsers",
-   "devices",
-   "brandedApps",
-   "aiTokens",
-   "apiCalls",
-   "storageGb",
-   "transactions",
-   "guestProfiles"
-  ]
- },
- "UsageReport": {
-  "x-ticvai-persistence": "none — aggregated",
-  "type": "object",
-  "required": [
-   "tenantId",
-   "periodStart",
-   "periodEnd",
-   "metrics"
-  ],
-  "properties": {
-   "tenantId": {
-    "type": "string",
-    "format": "uuid"
    },
-   "periodStart": {
-    "type": "string",
-    "format": "date"
-   },
-   "periodEnd": {
-    "type": "string",
-    "format": "date"
-   },
-   "metrics": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "metric": {
-       "$ref": "#/components/schemas/UsageMetric"
-      },
-      "total": {
-       "type": "number"
-      },
-      "included": {
-       "type": "number",
-       "nullable": true
-      },
-      "overage": {
-       "type": "number"
-      },
-      "byVenue": {
-       "type": "array",
-       "items": {
-        "type": "object",
-        "properties": {
-         "venueId": {
-          "type": "string",
-          "format": "uuid"
-         },
-         "quantity": {
-          "type": "number"
-         }
-        }
-       }
-      },
-      "byCapability": {
-       "type": "array",
-       "description": "AI tokens only.",
-       "items": {
-        "type": "object",
-        "properties": {
-         "capability": {
-          "type": "string"
-         },
-         "quantity": {
-          "type": "number"
-         }
-        }
-       }
-      }
-     }
-    }
-   }
-  }
- },
- "WorkOrder": {
-  "x-ticvai-persistence": "maintenance.work_order",
-  "type": "object",
-  "required": [
-   "id",
-   "workOrderNumber",
-   "title",
-   "venueId",
-   "status",
-   "priority",
-   "kind",
-   "createdAt"
-  ],
-  "properties": {
-   "downtimeMinutes": {
-    "type": "integer",
-    "nullable": true,
-    "readOnly": true,
-    "description": "**Measured from out-of-service to back-in-service, not from work start to work end.** A ride down for six hours of which two were spent working is down six hours, and the gap between the two numbers is the thing worth managing.\n"
-   },
-   "rootCause": {
-    "type": "string",
-    "nullable": true,
-    "enum": [
-     "wearAndTear",
-     "operatorError",
-     "guestDamage",
-     "manufacturingDefect",
-     "environmental",
-     "softwareFault",
-     "powerFailure",
-     "deferredMaintenance",
-     "unknown"
-    ],
-    "description": "**Structured, because free text cannot be counted.** *Deferred maintenance* is the value a venue least wants to see and most needs to — a fault caused by work that was postponed is an argument for a budget.\n"
-   },
-   "rootCauseNote": {
-    "type": "string",
-    "nullable": true
-   },
-   "escalatedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "escalationLevel": {
-    "type": "integer",
-    "default": 0,
-    "description": "**Escalation is a clock, not a decision.** A work order on a ride nobody has accepted after twenty minutes escalates itself, because the alternative is somebody noticing.\n"
-   },
-   "id": {
+   "filename": {
     "type": "string"
    },
-   "workOrderNumber": {
+   "contentType": {
     "type": "string"
    },
-   "title": {
-    "type": "string"
+   "sizeBytes": {
+    "type": "integer"
    },
    "venueId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "nullable": true
    },
    "assetId": {
     "type": "string",
     "format": "uuid",
-    "nullable": true
-   },
-   "assetName": {
+    "nullable": true,
+    "readOnly": true,
+    "description": "The asset this upload became — created by `completeUpload`, or the asset whose file `replaceMediaAsset` swapped. Null while the transfer is outstanding.\n"
+   }
+  }
+ },
+ "VenueContact": {
+  "x-ticvai-persistence": "none — embedded in tenant_config",
+  "type": "object",
+  "nullable": true,
+  "description": "How a guest reaches the venue: WEB-028 Contact & Venue Information, and the screen shown on an error or when the app cannot help (decided 28 September, audit R073). Public, because nothing here is personal.\n",
+  "properties": {
+   "phone": {
     "type": "string",
     "nullable": true
    },
-   "status": {
-    "$ref": "#/components/schemas/WorkOrderStatus"
-   },
-   "priority": {
-    "$ref": "#/components/schemas/WorkOrderPriority"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/WorkOrderKind"
-   },
-   "assignedToPrincipalId": {
+   "email": {
     "type": "string",
-    "format": "uuid",
+    "format": "email",
     "nullable": true
    },
-   "raisedByPrincipalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "elapsedMinutes": {
-    "type": "integer"
-   },
-   "isTimerRunning": {
-    "type": "boolean"
-   },
-   "dueAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "isOverdue": {
-    "type": "boolean"
-   },
-   "requiresVerification": {
-    "type": "boolean"
-   },
-   "sourcePlanId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "sourceInspectionId": {
+   "whatsapp": {
     "type": "string",
     "nullable": true
    },
-   "sourceIncidentId": {
-    "type": "string",
+   "address": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
     "nullable": true
    },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "completedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "syncedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
+   "openingHours": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "Prose, as the guest reads it. The bookable hours are the catalogue's."
    }
   }
  }

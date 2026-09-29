@@ -13,11 +13,15 @@
   },
   "navigation": {
    "entryFrom": [
+    "BO-036",
     "BO-108",
-    "BO-128"
+    "BO-128",
+    "BO-130"
    ],
    "exitTo": [
+    "BO-037",
     "BO-108",
+    "BO-124",
     "BO-130"
    ],
    "inferred": false,
@@ -31,10 +35,24 @@
     {
      "to": "BO-108",
      "trigger": "Venue Operations",
+     "provenance": "derived — BO-108 declares entryState.params  and BO-129 holds none of them, so the edge carries nothing and BO-108 opens cold"
+    },
+    {
+     "to": "BO-037",
+     "trigger": "Each device's cached package is checked",
+     "provenance": "flow F89 step 2→3",
+     "operation": "setConnectivityThresholds",
      "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-108 declares entryState.params venueId, so an edge into it must carry them"
+      "version"
+     ]
+    },
+    {
+     "to": "BO-124",
+     "trigger": "Its sale board layout is built",
+     "provenance": "flow F79 step 2→3",
+     "carries": [
+      "profileId"
+     ]
     }
    ]
   },
@@ -49,8 +67,8 @@
   "gaps": [
    {
     "operation": "getWorkstationHealth",
-    "why": "**1 declared operation reach no component on this screen**: getWorkstationHealth. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "why": "**`getWorkstationHealth` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
+    "source": "contract tenancy.yaml GET /workstations/{workstationId}/health"
    }
   ],
   "layout": {
@@ -61,8 +79,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listWorkstations",
+       "notes": "Sends `?venueId=` to `listWorkstations`.",
+       "provenance": "contract tenancy.yaml GET /workstations"
+      },
+      {
+       "kind": "textField",
+       "label": "Sale board kind",
+       "operation": "listWorkstations",
+       "notes": "Sends `?saleBoardKind=` to `listWorkstations`.",
+       "provenance": "contract tenancy.yaml GET /workstations"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every software version",
+       "label": "Every workstation",
        "bindsTo": "Workstation",
        "columns": [
         "Workstation.id",
@@ -80,49 +112,7 @@
        ],
        "operation": "listWorkstations",
        "provenance": "contract tenancy.yaml GET /workstations"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save changes",
-       "operation": "setConfigurationProfile",
-       "provenance": "contract tenancy.yaml PUT /configuration-profiles"
       },
-      {
-       "kind": "secondaryButton",
-       "label": "Deploy",
-       "operation": "deployConfigurationProfile",
-       "provenance": "contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Configure",
-       "operation": "configureWorkstation",
-       "provenance": "contract tenancy.yaml PUT /workstations/{workstationId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setConnectivityThresholds",
-       "provenance": "contract tenancy.yaml PUT /connectivity-policy"
-      },
-      {
-       "kind": "publishGate",
-       "label": "What publishing changes",
-       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
-       "provenance": "authored — required by check-screens"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
       {
        "kind": "searchField",
        "label": "Search software, configuration",
@@ -135,15 +125,64 @@
        "provenance": "carried from the previous definition"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save configuration profile",
+       "operation": "setConfigurationProfile",
+       "provenance": "contract tenancy.yaml PUT /configuration-profiles"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Deploy configuration profile",
+       "operation": "deployConfigurationProfile",
+       "provenance": "contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Configure workstation",
+       "operation": "configureWorkstation",
+       "provenance": "contract tenancy.yaml PUT /workstations/{workstationId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save connectivity thresholds",
+       "operation": "setConnectivityThresholds",
+       "provenance": "contract tenancy.yaml PUT /connectivity-policy"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
+       "provenance": "authored — required by check-screens"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "reads",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Workstation health",
+       "operation": "getWorkstationHealth",
+       "notes": "Shows `score`, `status`, `contributors` from `getWorkstationHealth`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
+       "provenance": "contract tenancy.yaml GET /workstations/{workstationId}/health"
+      }
+     ]
     }
    ]
   },
   "states": {
    "loading": "The software version list.",
    "error": "Could not load. Names which read failed and leaves the software version untouched.",
-   "emptyFirstRun": "No software version yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the software version are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No software version yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on venueId, saleBoardKind and the software version are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `DEVICE_VIEW`, which `getWorkstationHealth` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -177,7 +216,7 @@
     "operationId": "getWorkstationHealth",
     "contract": "tenancy",
     "purpose": "getWorkstationHealth",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listWorkstations",
@@ -192,6 +231,37 @@
     "trigger": "onAction",
     "invalidates": [
      "listWorkstations"
+    ]
+   },
+   {
+    "operationId": "listDeviceFirmware",
+    "contract": "tenancy",
+    "purpose": "Firmware versions per device fleet",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "startDeviceFirmwareRollout",
+    "contract": "tenancy",
+    "purpose": "Push an update to a fleet, in waves",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "getWorkstationHealth",
+     "listWorkstations",
+     "listDeviceFirmware"
+    ]
+   },
+   {
+    "operationId": "rollbackDeviceFirmware",
+    "contract": "tenancy",
+    "purpose": "Put the fleet back on the previous version",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "getWorkstationHealth",
+     "listWorkstations",
+     "listDeviceFirmware"
     ]
    }
   ],
@@ -208,6 +278,10 @@
     {
      "name": "workstationId",
      "from": "deepLink"
+    },
+    {
+     "name": "rolloutId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first. Resolves from the session — a till is signed into."
@@ -216,10 +290,120 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-129",
+   "derivedFrom": "wireframes/reference/POS Board 5.dc.html",
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetConfigurationProfile",
+    "component": "modal",
+    "trigger": "Save configuration profile",
+    "body": "**Collects what `setConfigurationProfile` sends before it is called.** Required: `id`, `name`, `venueKindScope`, `status`. Optional: `scopePath`, `settings`, `deployedCount`, `publishedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ConfigurationProfile",
+    "confirm": {
+     "label": "Save configuration profile",
+     "operation": "setConfigurationProfile"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "name",
+      "venueKindScope",
+      "status",
+      "scopePath",
+      "settings",
+      "deployedCount",
+      "publishedAt"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /configuration-profiles"
+   },
+   {
+    "id": "formDeployConfigurationProfile",
+    "component": "modal",
+    "trigger": "Deploy configuration profile",
+    "body": "**Collects what `deployConfigurationProfile` sends before it is called.** Required: `id`, `profileId`, `status`. Optional: `targetWorkstationIds`, `targetFilter`, `strategy`, `succeededCount`, `failedCount`, `failureReasons`, `startedAt`, `completedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ProfileDeployment",
+    "confirm": {
+     "label": "Deploy configuration profile",
+     "operation": "deployConfigurationProfile"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "profileId",
+      "status",
+      "targetWorkstationIds",
+      "targetFilter",
+      "strategy",
+      "succeededCount",
+      "failedCount",
+      "failureReasons",
+      "startedAt",
+      "completedAt"
+     ]
+    },
+    "provenance": "contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy"
+   },
+   {
+    "id": "formConfigureWorkstation",
+    "component": "modal",
+    "trigger": "Configure workstation",
+    "body": "**Collects what `configureWorkstation` sends before it is called.** Required: `name`, `saleBoardId`. Optional: `cashierInputMode`, `guestDisplayContent`, `loadedMediaStockId`, `mediaStockRemaining`, `departmentId`, `accessPointId`, `devices`, `deploymentProfile`, `edgeNodeId`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ConfigureWorkstationRequest",
+    "confirm": {
+     "label": "Configure workstation",
+     "operation": "configureWorkstation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "saleBoardId",
+      "cashierInputMode",
+      "guestDisplayContent",
+      "loadedMediaStockId",
+      "mediaStockRemaining",
+      "departmentId",
+      "accessPointId",
+      "devices",
+      "deploymentProfile",
+      "edgeNodeId",
+      "isActive"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /workstations/{workstationId}"
+   },
+   {
+    "id": "formSetConnectivityThresholds",
+    "component": "modal",
+    "trigger": "Save connectivity thresholds",
+    "body": "**Collects what `setConnectivityThresholds` sends before it is called.** Required: `scopePath`. Optional: `id`, `failuresBeforeOffline`, `probeIntervalSeconds`, `probeTimeoutMs`, `successesBeforeOnline`, `minimumStableSeconds`, `autoSwitch`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ConnectivityPolicy",
+    "confirm": {
+     "label": "Save connectivity thresholds",
+     "operation": "setConnectivityThresholds"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "scopePath",
+      "id",
+      "failuresBeforeOffline",
+      "probeIntervalSeconds",
+      "probeTimeoutMs",
+      "successesBeforeOnline",
+      "minimumStableSeconds",
+      "autoSwitch"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /connectivity-policy"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -261,7 +445,8 @@
     "BO-129"
    ],
    "exitTo": [
-    "BO-108"
+    "BO-108",
+    "BO-129"
    ],
    "inferred": false,
    "notes": "**Returns to BO-108.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
@@ -269,10 +454,16 @@
     {
      "to": "BO-108",
      "trigger": "Venue Operations",
+     "provenance": "derived — BO-108 declares entryState.params  and BO-130 holds none of them, so the edge carries nothing and BO-108 opens cold"
+    },
+    {
+     "to": "BO-129",
+     "trigger": "The connectivity thresholds are set",
+     "provenance": "flow F89 step 1→2",
+     "operation": "setOfflinePolicy",
      "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-108 declares entryState.params venueId, so an edge into it must carry them"
+      "workstationId"
+     ]
     }
    ]
   },
@@ -292,8 +483,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listSyncRejections",
+       "notes": "Sends `?workstationId=` to `listSyncRejections`.",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      },
+      {
+       "kind": "selectField",
+       "label": "Kind",
+       "operation": "listSyncRejections",
+       "notes": "Sends `?kind=` to `listSyncRejections`.",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      },
+      {
+       "kind": "toggle",
+       "label": "Resolved",
+       "operation": "listSyncRejections",
+       "notes": "Sends `?resolved=` to `listSyncRejections`.",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every offline policy rules",
+       "label": "Every sync rejection",
        "bindsTo": "SyncRejection",
        "columns": [
         "SyncRejection.id",
@@ -308,6 +520,11 @@
        ],
        "operation": "listSyncRejections",
        "provenance": "contract orders.yaml GET /sync/rejections"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search offline policy",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -317,7 +534,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected offline policy rules",
+       "label": "The selected sync rejection",
        "bindsTo": "SyncRejection",
        "columns": [
         "SyncRejection.id",
@@ -341,32 +558,21 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save offline policy",
        "operation": "setOfflinePolicy",
        "provenance": "contract tenancy.yaml PUT /offline-policy"
       },
       {
        "kind": "secondaryButton",
-       "label": "Sync",
+       "label": "Sync orders",
        "operation": "syncOrders",
        "provenance": "contract orders.yaml POST /sync/orders"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create order",
        "operation": "createOrder",
        "provenance": "contract orders.yaml POST /orders"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search offline policy",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -375,9 +581,9 @@
   "states": {
    "loading": "The offline policy rules list.",
    "error": "Could not load. Names which read failed and leaves the offline policy rules untouched.",
-   "emptyFirstRun": "No offline policy rules yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the offline policy rules are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No offline policy rules yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on workstationId, kind, resolved and the offline policy rules are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -434,10 +640,82 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-130",
+   "derivedFrom": "wireframes/reference/POS Board 5.dc.html",
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetOfflinePolicy",
+    "component": "modal",
+    "trigger": "Save offline policy",
+    "body": "**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional: `id`, `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "OfflinePolicy",
+    "confirm": {
+     "label": "Save offline policy",
+     "operation": "setOfflinePolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "scopePath",
+      "id",
+      "maxOfflineHours",
+      "allowedOffline",
+      "offlineValueCeiling",
+      "offlineTransactionCeiling",
+      "onCeilingBreach",
+      "requiresManagerToExtend"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /offline-policy"
+   },
+   {
+    "id": "formSyncOrders",
+    "component": "modal",
+    "trigger": "Sync orders",
+    "body": "**Collects what `syncOrders` sends before it is called.** Required: `deviceId`, `orders`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Sync orders",
+     "operation": "syncOrders"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "deviceId",
+      "orders"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /sync/orders"
+   },
+   {
+    "id": "formCreateOrder",
+    "component": "modal",
+    "trigger": "Create order",
+    "body": "**Collects what `createOrder` sends before it is called.** Required: `id`, `venueId`, `channel`, `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `guestLinkId`, `catalogueBundleVersion`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateOrderRequest",
+    "confirm": {
+     "label": "Create order",
+     "operation": "createOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "channel",
+      "lines",
+      "recordedAt",
+      "shiftId",
+      "subjectId",
+      "guestLinkId",
+      "catalogueBundleVersion"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -486,10 +764,7 @@
     {
      "to": "BO-108",
      "trigger": "Venue Operations",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-108 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-108 declares entryState.params  and BO-131 holds none of them, so the edge carries nothing and BO-108 opens cold"
     }
    ]
   },
@@ -552,6 +827,11 @@
        "label": "autoSwitch",
        "bindsTo": "ConnectivityPolicy.autoSwitch",
        "provenance": "contract tenancy.yaml PUT /connectivity-policy"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search connectivity",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -561,20 +841,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save connectivity thresholds",
        "operation": "setConnectivityThresholds",
        "provenance": "contract tenancy.yaml PUT /connectivity-policy"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search connectivity",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -583,8 +852,8 @@
   "states": {
    "loading": "The saved connectivity auto-switch settings.",
    "error": "Could not load. Names which read failed and leaves the connectivity auto-switch settings untouched.",
-   "emptyFirstRun": "No connectivity auto-switch settings configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No connectivity auto-switch settings configured. The form opens empty and `setConnectivityThresholds` saves the first one; it says what the platform does in the meantime.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `setConnectivityThresholds` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -657,10 +926,7 @@
     {
      "to": "BO-108",
      "trigger": "Venue Operations",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-108 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-108 declares entryState.params  and BO-132 holds none of them, so the edge carries nothing and BO-108 opens cold"
     }
    ]
   },
@@ -677,8 +943,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listSyncRejections",
+       "notes": "Sends `?workstationId=` to `listSyncRejections`.",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      },
+      {
+       "kind": "selectField",
+       "label": "Kind",
+       "operation": "listSyncRejections",
+       "notes": "Sends `?kind=` to `listSyncRejections`.",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      },
+      {
+       "kind": "toggle",
+       "label": "Resolved",
+       "operation": "listSyncRejections",
+       "notes": "Sends `?resolved=` to `listSyncRejections`.",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every offline transaction sync",
+       "label": "Every sync rejection",
        "bindsTo": "SyncRejection",
        "columns": [
         "SyncRejection.id",
@@ -693,6 +980,11 @@
        ],
        "operation": "listSyncRejections",
        "provenance": "contract orders.yaml GET /sync/rejections"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search offline transaction monitor",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -702,7 +994,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected offline transaction sync",
+       "label": "The selected sync rejection",
        "bindsTo": "SyncRejection",
        "columns": [
         "SyncRejection.id",
@@ -726,20 +1018,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Sync",
+       "label": "Sync orders",
        "operation": "syncOrders",
        "provenance": "contract orders.yaml POST /sync/orders"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search offline transaction monitor",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -748,9 +1029,9 @@
   "states": {
    "loading": "The offline transaction sync list.",
    "error": "Could not load. Names which read failed and leaves the offline transaction sync untouched.",
-   "emptyFirstRun": "No offline transaction sync yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the offline transaction sync are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No offline transaction sync yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on workstationId, kind, resolved and the offline transaction sync are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -791,6 +1072,26 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-132"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSyncOrders",
+    "component": "modal",
+    "trigger": "Sync orders",
+    "body": "**Collects what `syncOrders` sends before it is called.** Required: `deviceId`, `orders`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Sync orders",
+     "operation": "syncOrders"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "deviceId",
+      "orders"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /sync/orders"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -839,10 +1140,7 @@
     {
      "to": "BO-108",
      "trigger": "Venue Operations",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-108 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-108 declares entryState.params  and BO-133 holds none of them, so the edge carries nothing and BO-108 opens cold"
     },
     {
      "to": "POS-002",
@@ -861,13 +1159,6 @@
   "pattern": "approvalInbox",
   "patternReason": "`decideApprovalRequest` decides items that `listSyncRejections` queues — every row is waiting for a person, so the empty state is success",
   "purpose": "Offline Alerts, Limits & Audit — from the client design board, 20 August.",
-  "gaps": [
-   {
-    "operation": "listAlerts",
-    "why": "**2 declared operations reach no component on this screen**: listAlerts, listAuditRecords. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -875,6 +1166,27 @@
      "name": "contentBody",
      "slot": "queue",
      "components": [
+      {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listSyncRejections",
+       "notes": "Sends `?workstationId=` to `listSyncRejections`.",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      },
+      {
+       "kind": "selectField",
+       "label": "Kind",
+       "operation": "listSyncRejections",
+       "notes": "Sends `?kind=` to `listSyncRejections`.",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      },
+      {
+       "kind": "toggle",
+       "label": "Resolved",
+       "operation": "listSyncRejections",
+       "notes": "Sends `?resolved=` to `listSyncRejections`.",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      },
       {
        "kind": "dataTable",
        "label": "Waiting for a decision",
@@ -892,6 +1204,48 @@
        ],
        "operation": "listSyncRejections",
        "provenance": "contract orders.yaml GET /sync/rejections"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every alert",
+       "bindsTo": "Alert",
+       "columns": [
+        "Alert.id",
+        "Alert.ruleId",
+        "Alert.ruleName",
+        "Alert.metric",
+        "Alert.raisedAt",
+        "Alert.severity",
+        "Alert.status",
+        "Alert.observedValue",
+        "Alert.threshold",
+        "Alert.scopePath",
+        "Alert.workstationId",
+        "Alert.shiftId"
+       ],
+       "operation": "listAlerts",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every audit",
+       "bindsTo": "AuditRecord",
+       "columns": [
+        "AuditRecord.id",
+        "AuditRecord.principalId",
+        "AuditRecord.orgUnitId",
+        "AuditRecord.workstationId",
+        "AuditRecord.action",
+        "AuditRecord.subjectRef",
+        "AuditRecord.occurredAt"
+       ],
+       "operation": "listAuditRecords",
+       "provenance": "contract tenancy.yaml GET /audit-records"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search offline alerts, limits",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -901,7 +1255,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected offline alerts limits",
+       "label": "The selected sync rejection",
        "bindsTo": "SyncRejection",
        "columns": [
         "SyncRejection.id",
@@ -925,32 +1279,22 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Decide",
+       "label": "Decide approval request",
        "operation": "decideApprovalRequest",
        "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/decide"
       },
       {
        "kind": "secondaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
+       "notes": "**Runs the seeded report `voidsAndDiscounts`** — voided lines and discounts by operator, reason and approver (proposed, client to correct; decided 28 September, audit R282). `reportId` is the venue's seeded definition with that code, listed on `listSeededReports`.",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save alert rule",
        "operation": "setAlertRule",
        "provenance": "contract reporting.yaml PUT /alert-rules"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search offline alerts, limits",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -960,8 +1304,8 @@
    "loading": "The offline alerts limits list.",
    "error": "Could not load. Names which read failed and leaves the offline alerts limits untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
-   "emptyNoResults": "The filter narrowed it and the offline alerts limits are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoResults": "Nothing matches the filter on workstationId, kind, resolved and the offline alerts limits are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -994,7 +1338,7 @@
    {
     "operationId": "runReport",
     "contract": "reporting",
-    "purpose": "Run a report",
+    "purpose": "Run the seeded report `voidsAndDiscounts` (proposed, audit R282)",
     "trigger": "onAction",
     "invalidates": [
      "listSyncRejections"
@@ -1038,10 +1382,86 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-133",
+   "derivedFrom": "wireframes/reference/POS Board 5.dc.html",
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formDecideApprovalRequest",
+    "component": "modal",
+    "trigger": "Decide approval request",
+    "body": "**Collects what `decideApprovalRequest` sends before it is called.** Required: `decision`. Optional: `comment`, `reason`, `stepUpToken`, `signature`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Decide approval request",
+     "operation": "decideApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "decision",
+      "comment",
+      "reason",
+      "stepUpToken",
+      "signature"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/decide"
+   },
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   },
+   {
+    "id": "formSetAlertRule",
+    "component": "modal",
+    "trigger": "Save alert rule",
+    "body": "**Collects what `setAlertRule` sends before it is called.** Required: `id`, `name`, `metric`, `comparator`, `threshold`, `severity`, `isActive`, `scopePath`. Optional: `thresholdUpper`, `windowMinutes`, `deliverTo`, `recipientRoleIds`, `cooldownMinutes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AlertRule",
+    "confirm": {
+     "label": "Save alert rule",
+     "operation": "setAlertRule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "name",
+      "metric",
+      "comparator",
+      "threshold",
+      "severity",
+      "isActive",
+      "scopePath",
+      "thresholdUpper",
+      "windowMinutes",
+      "deliverTo",
+      "recipientRoleIds",
+      "cooldownMinutes"
+     ]
+    },
+    "provenance": "contract reporting.yaml PUT /alert-rules"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

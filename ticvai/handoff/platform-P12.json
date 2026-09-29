@@ -11,7 +11,7 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 28,
-  "operations": 56,
+  "operations": 59,
   "contracts": 7,
   "modules": 5,
   "undrawn": 0,
@@ -61,7 +61,7 @@
  "contracts": [
   {
    "contract": "marketing-crm",
-   "operations": 35
+   "operations": 38
   },
   {
    "contract": "identity",
@@ -70,10 +70,6 @@
   {
    "contract": "reporting",
    "operations": 8
-  },
-  {
-   "contract": "queue",
-   "operations": 1
   },
   {
    "contract": "white-label",
@@ -85,6 +81,10 @@
   },
   {
    "contract": "finance",
+   "operations": 1
+  },
+  {
+   "contract": "queue",
    "operations": 1
   }
  ],
@@ -194,7 +194,7 @@
    "module": "Support",
    "wave": 3,
    "route": "/support/case-creation-classification-intelligent-routing-sup-012",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -266,7 +266,7 @@
    "module": "Support",
    "wave": 3,
    "route": "/support/queue-configuration-management-sup-020",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -275,7 +275,7 @@
    "module": "Support",
    "wave": 3,
    "route": "/support/intelligent-routing-skills-assignment-engine-sup-021",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {

@@ -1,0 +1,56 @@
+# Sales channel — state model
+# Contract: catalogue.SalesChannelProfile.status
+# Checked by tools/check-states.py. Added 29 September (data model DM3).
+
+entity: Sales channel
+contract: catalogue
+enum: SalesChannelProfile.status
+enumKind: inline
+enumSchema: SalesChannelProfile
+enumProperty: status
+owner: catalogue
+initial:
+- draft
+terminal: []
+transitions:
+- from: draft
+  to: pendingApproval
+  operation: publishChannelReadinessValidation
+  trigger: operation
+  guard: '`submitForApproval`, and readiness validation has no failed critical item (or `overrideWarnings`
+    for warnings only)'
+- from: pendingApproval
+  to: draft
+  operation: publishChannelReadinessValidation
+  trigger: operation
+  guard: '`returnForChanges`'
+- from: pendingApproval
+  to: scheduled
+  operation: publishChannelReadinessValidation
+  trigger: operation
+  guard: '`scheduleActivation` with a future `scheduledAt`, once approved'
+  requiresApproval: true
+- from: pendingApproval
+  to: active
+  operation: publishChannelReadinessValidation
+  trigger: operation
+  guard: '`activate`, once approved'
+  requiresApproval: true
+- from: scheduled
+  to: active
+  trigger: timer
+  guard: The scheduled activation time is reached and readiness still passes
+- from: active
+  to: suspended
+  operation: publishChannelReadinessValidation
+  trigger: operation
+  guard: '`suspend`, with a reason. Sales stop on the channel; issued tickets are unaffected'
+- from: suspended
+  to: active
+  operation: publishChannelReadinessValidation
+  trigger: operation
+  guard: '`activate` again after the cause is fixed'
+  isReversal: true
+notes: '**A channel is created `draft` by `createChannelProfile`** and never deleted; a channel that stops
+  trading stays `suspended`, which keeps its history, allocations and audit reachable. There is no terminal
+  state by design.'

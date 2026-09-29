@@ -1,1 +1,130 @@
-{}
+{
+ "assignRentalEquipment": {
+  "method": "POST",
+  "path": "/rental-bookings/{bookingId}/equipment",
+  "contract": "rental",
+  "summary": "Bind specific assets to the booking, by scan where required",
+  "permission": "RENTAL_OPERATE",
+  "offlineCapable": true,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RentalEquipmentAssignment"
+ },
+ "checkOutRental": {
+  "method": "POST",
+  "path": "/rental-bookings/{bookingId}/check-out",
+  "contract": "rental",
+  "summary": "Hand it over, with the deposit held and the condition recorded",
+  "permission": "RENTAL_OPERATE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalCheckOut",
+  "responds": "RentalBooking"
+ },
+ "getRentalBooking": {
+  "method": "GET",
+  "path": "/rental-bookings/{bookingId}",
+  "contract": "rental",
+  "summary": "One booking, its timeline and its readiness",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RentalBooking"
+ },
+ "listRentalBookings": {
+  "method": "GET",
+  "path": "/rental-bookings",
+  "contract": "rental",
+  "summary": "Reservations across venues and locations",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RentalBooking"
+ },
+ "lookupAsset": {
+  "method": "GET",
+  "path": "/assets/lookup",
+  "contract": "maintenance",
+  "summary": "Find an asset by tag or QR",
+  "permission": "ASSET_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "assetTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "serialNumber",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AssetDetail"
+ },
+ "recordRentalInspection": {
+  "method": "POST",
+  "path": "/rental-bookings/{bookingId}/inspection",
+  "contract": "rental",
+  "summary": "Condition before or after, with evidence",
+  "permission": "RENTAL_OPERATE",
+  "offlineCapable": true,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalInspection",
+  "responds": "RentalInspection"
+ }
+}

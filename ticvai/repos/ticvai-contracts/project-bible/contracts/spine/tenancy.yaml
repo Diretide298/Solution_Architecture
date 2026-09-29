@@ -684,7 +684,9 @@ paths:
         - "P08 BO-037 Offline Package Status"
         - "P08 BO-128 Live Workstation Health Monitor"
         - "P08 BO-130 Offline Policy & Rules Configuration"
+        - "P08 BO-171 Offline Cryptographic Validation Profile"
         - "P08 BO-206 Offline Validation Policy Builder"
+        - "P08 BO-208 Offline Credential & Revocation Cache"
         - "P08 BO-210 Connectivity Failure & Degraded Mode Policy"
         - "P08 BO-241 Policy Evaluation Architecture & Offline Distribution"
       summary: What a workstation may do with no network, and for how long

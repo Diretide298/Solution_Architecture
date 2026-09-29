@@ -1,4 +1,24 @@
 {
+ "AllergenCode": {
+  "type": "string",
+  "description": "**The fourteen declarable allergens, as one closed list.** Every allergen field in this contract uses it — the menu claim, the ticket line, a substitution's delta, a modifier option, the label on a bag — so a declared set and an actual set compare without anybody normalising case or synonyms. It was the `Allergen.contains` enum; the other fields were free text.\n",
+  "enum": [
+   "gluten",
+   "crustaceans",
+   "eggs",
+   "fish",
+   "peanuts",
+   "soybeans",
+   "milk",
+   "nuts",
+   "celery",
+   "mustard",
+   "sesame",
+   "sulphites",
+   "lupin",
+   "molluscs"
+  ]
+ },
  "CostingMethod": {
   "type": "string",
   "description": "Fixed at item creation. Immutable once movements exist.",
@@ -30,14 +50,15 @@
   ],
   "properties": {
    "countId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "totalVarianceValue": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "exceptionCount": {
     "type": "integer",
-    "description": "Lines beyond tolerance, requiring review before posting."
+    "description": "Lines beyond `VenueSettings.inventory.countVarianceTolerancePercent` (proposed default 2 per cent, audit R094), requiring review before posting."
    },
    "lines": {
     "type": "array",
@@ -108,7 +129,8 @@
     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "purchaseOrderId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "locationId": {
     "type": "string",
@@ -256,7 +278,8 @@
     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "requisitionId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "supplierId": {
     "type": "string",
@@ -277,8 +300,7 @@
      "type": "object",
      "required": [
       "itemId",
-      "quantity",
-      "unitPrice"
+      "quantity"
      ],
      "properties": {
       "itemId": {
@@ -293,7 +315,18 @@
        "type": "string"
       },
       "unitPrice": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "description": "Omitted, the selected quotation line's price. **Editable with a reason** (decided 28 September, audit R171).\n"
+      },
+      "priceOverrideReason": {
+       "type": "string",
+       "maxLength": 500,
+       "nullable": true,
+       "description": "Required when `unitPrice` differs from the quotation line (audit R171)."
       }
      }
     }
@@ -318,7 +351,8 @@
   ],
   "properties": {
    "requisitionId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "reference": {
     "type": "string",
@@ -458,7 +492,8 @@
    },
    "quantity": {
     "type": "number",
-    "description": "Positive increases stock, negative decreases it."
+    "exclusiveMinimum": 0,
+    "description": "Always positive. **The `kind` decides whether it adds or removes stock**, not the sign (decided 28 September, audit R171).\n"
    },
    "unit": {
     "type": "string"
@@ -466,7 +501,7 @@
    "reason": {
     "type": "string",
     "maxLength": 500,
-    "description": "Required for adjustments, which are reported separately."
+    "description": "**Required for `adjustmentIn`, `adjustmentOut` and `waste`** (decided 28 September, audit R171); adjustments are reported separately.\n"
    },
    "costCenterId": {
     "type": "string",
@@ -549,13 +584,17 @@
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "receiptNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152), e.g. `MAR-GR-000431`. Not gapless; only tax invoices are gapless, per legal entity. A receipt recorded offline takes the next number from the range its device holds in reserve.\n"
    },
    "purchaseOrderId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "locationId": {
     "type": "string",
@@ -570,6 +609,12 @@
     "items": {
      "type": "object",
      "properties": {
+      "lineId": {
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "readOnly": true,
+       "description": "One batch or expiry line of the receipt. What `rejectReceivedGoods` addresses (decided 28 September, audit R171).\n"
+      },
       "itemId": {
        "type": "string",
        "format": "uuid"
@@ -602,6 +647,7 @@
     }
    },
    "totalValue": {
+    "x-ticvai-column": "net_value_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "receivedByPrincipalId": {
@@ -657,7 +703,8 @@
       "type": "number"
      },
      "available": {
-      "type": "number"
+      "type": "number",
+      "description": "On-hand minus allocated, where allocated is stock reserved for orders (decided 28 September, audit R171)."
      },
      "averageCost": {
       "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -719,6 +766,7 @@
     "nullable": true
    },
    "price": {
+    "x-ticvai-column": "list_price",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "sortOrder": {
@@ -736,6 +784,13 @@
     "format": "uuid",
     "nullable": true
    },
+   "menuSectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The section the item sits in, set by `setMenuSections` and `applyMenuActions` (`moveSection`)."
+   },
    "isStockTracked": {
     "type": "boolean",
     "description": "True where a recipe exists. Stock-tracked items cannot be sold offline."
@@ -747,6 +802,12 @@
     "type": "string",
     "nullable": true
    },
+   "restoreAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When an unavailable item comes back on its own (`setItemAvailability`). Null means by hand."
+   },
    "preparationMinutes": {
     "type": "integer",
     "nullable": true
@@ -754,22 +815,25 @@
    "allergens": {
     "type": "array",
     "items": {
-     "type": "string"
+     "$ref": "#/components/schemas/AllergenCode"
     }
    }
   }
  },
  "MovementKind": {
   "type": "string",
+  "description": "**The kind decides the direction** (decided 28 September, audit R171). In: `receipt`, `transferIn`, `adjustmentIn`, `countGain`, `production` (the finished item entering stock; the ingredients leave as `issue`). Out: `issue`, `saleDepletion`, `waste`, `adjustmentOut`, `transferOut`, `countLoss`, `supplierReturn`. `adjustment` and `countAdjustment` were split into an in and an out kind so that no kind has two directions.\n",
   "enum": [
    "receipt",
    "issue",
    "saleDepletion",
    "waste",
-   "adjustment",
+   "adjustmentIn",
+   "adjustmentOut",
    "transferOut",
    "transferIn",
-   "countAdjustment",
+   "countGain",
+   "countLoss",
    "supplierReturn",
    "production"
   ]
@@ -807,13 +871,25 @@
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "purchaseOrderNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "**Per venue, in sequence** (decided 28 September, audit R171). Assigned by the server from the venue's gap-free sequence, or the tenant's for an order with no venue. Proposed format `PO-<venue code>-<sequence, six digits>`, client to correct.\n"
    },
    "requisitionId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "Null on a blanket order or an RFQ award, which are raised without one."
+   },
+   "quotationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The quotation selected when the order was raised (`createPurchaseOrder` requires it). **The link that shows the comparison was made**, which `rfqId` alone does not."
    },
    "supplierId": {
     "type": "string",
@@ -835,8 +911,9 @@
    },
    "blanketParentId": {
     "type": "string",
-    "format": "uuid",
-    "nullable": true
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The blanket order this release draws against — another purchase order, so the same id type."
    },
    "contractPriceValidUntil": {
     "type": "string",
@@ -902,6 +979,20 @@
       "unitPrice": {
        "$ref": "../shared/common.yaml#/components/schemas/Money"
       },
+      "quotedUnitPrice": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "nullable": true,
+       "description": "The selected quotation line's price, kept beside `unitPrice` (audit R171)."
+      },
+      "priceOverrideReason": {
+       "type": "string",
+       "nullable": true,
+       "description": "Why `unitPrice` differs from `quotedUnitPrice` (audit R171)."
+      },
       "lineTotal": {
        "$ref": "../shared/common.yaml#/components/schemas/Money"
       }
@@ -909,12 +1000,14 @@
     }
    },
    "subtotal": {
+    "x-ticvai-column": "net_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "taxAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "total": {
+    "x-ticvai-column": "gross_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "expectedDelivery": {
@@ -930,6 +1023,39 @@
     "format": "date-time"
    },
    "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "supplierReference": {
+    "type": "string",
+    "nullable": true,
+    "description": "The supplier's own order reference, from `acknowledgePurchaseOrder`."
+   },
+   "acknowledgedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**Null is the supplier performance figure** — goods arriving against an order never acknowledged."
+   },
+   "closeShortReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Why the balance was written off, from `closePurchaseOrderShort`."
+   },
+   "cancelReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "From `cancelPurchaseOrder`."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The pending approval request raised by `cancelPurchaseOrder` or `closePurchaseOrderShort` (kinds `purchaseOrderCancel`, `purchaseOrderShortClose`; audit R144). Null when none is open."
+   },
+   "cancelledAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true
@@ -985,6 +1111,7 @@
       "type": "string"
      },
      "total": {
+      "x-ticvai-column": "gross_amount",
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      },
      "isSelected": {
@@ -996,7 +1123,7 @@
      },
      "scopePath": {
       "type": "string",
-      "description": "The partition key. A quotation is sought by somebody and the scope says who."
+      "description": "The partition key. A quotation is sought by somebody and the scope says who, the venue that recorded it, against a tenant supplier (audit R183)."
      }
     }
    }
@@ -1012,7 +1139,8 @@
   ],
   "properties": {
    "requisitionId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "quotations": {
     "type": "array",
@@ -1066,6 +1194,32 @@
    }
   }
  },
+ "RecountResult": {
+  "type": "object",
+  "x-ticvai-persistence": "none — response shape",
+  "description": "The lines `requestRecount` reopened.",
+  "required": [
+   "countId",
+   "reopenedLineIds"
+  ],
+  "properties": {
+   "countId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "reopenedLineIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
  "Requisition": {
   "x-ticvai-persistence": "inventory.requisition + inventory.requisition_line",
   "type": "object",
@@ -1080,7 +1234,8 @@
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "requisitionNumber": {
     "type": "string"
@@ -1092,6 +1247,15 @@
    "departmentId": {
     "type": "string",
     "format": "uuid",
+    "nullable": true
+   },
+   "costCenterId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "justification": {
+    "type": "string",
     "nullable": true
    },
    "status": {
@@ -1115,6 +1279,11 @@
       "requestedQuantity": {
        "type": "number"
       },
+      "suggestedQuantity": {
+       "type": "number",
+       "nullable": true,
+       "description": "**Kept, never overwritten** (`updateRequisitionLines`). Null on a line nobody suggested.\n"
+      },
       "approvedQuantity": {
        "type": "number",
        "nullable": true
@@ -1125,6 +1294,15 @@
       },
       "unit": {
        "type": "string"
+      },
+      "reason": {
+       "type": "string",
+       "nullable": true,
+       "description": "Why the requested quantity differs from the suggestion."
+      },
+      "note": {
+       "type": "string",
+       "nullable": true
       },
       "estimatedCost": {
        "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -1157,6 +1335,36 @@
     "format": "date-time"
    },
    "approvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "rejectionReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "From `rejectRequisition`. What the requester reads before copying it into a new draft."
+   },
+   "rejectedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "returnQuestion": {
+    "type": "string",
+    "nullable": true,
+    "description": "From `returnRequisition`. What the requester must answer before resubmitting."
+   },
+   "returnedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "cancelReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "From `cancelRequisition`."
+   },
+   "cancelledAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true
@@ -1212,7 +1420,7 @@
    "isBlind": {
     "type": "boolean",
     "default": true,
-    "description": "Expected quantities withheld from the counting device. Defaults true because a counter who can see the figure reconciles to it rather than to the shelf.\n"
+    "description": "Expected quantities withheld from the counting device. Defaults true because a counter who can see the figure reconciles to it rather than to the shelf. **The expected quantity and the variance stay hidden until the count is submitted** (decided 28 September, audit R110).\n"
    }
   }
  },
@@ -1231,7 +1439,8 @@
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "locationId": {
     "type": "string",
@@ -1287,6 +1496,23 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "recountReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Why the count was last sent back by `recountStockCount`."
+   },
+   "recountSignedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The supervisor whose step-up sent the count back last (audit R144)."
+   },
+   "cancelReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Why it was abandoned, from `cancelStockCount`."
    }
   }
  },
@@ -1349,6 +1575,7 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      },
      "totalCost": {
+      "x-ticvai-column": "net_cost_amount",
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      },
      "principalId": {
@@ -1389,7 +1616,8 @@
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "transferNumber": {
     "type": "string"
@@ -1453,9 +1681,38 @@
     "format": "date-time",
     "nullable": true
    },
+   "closeShortReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Why the balance was written off, from `closeTransferShort`."
+   },
+   "closeShortSignedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The supervisor whose step-up closed the transfer short (audit R144)."
+   },
+   "fromVenueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The venue of `fromLocationId`. Set by the server (audit R183)."
+   },
+   "toVenueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The venue of `toLocationId`. Set by the server (audit R183)."
+   },
    "scopePath": {
     "type": "string",
-    "description": "**The partition key** (ADR-0005). `fromLocationId` and `toLocationId` give the endpoints; **this gives the owner.** A transfer between two venues belongs to the tenant above both, and without it the row is addressable from neither end."
+    "description": "**The partition key** (ADR-0005). `fromLocationId` and `toLocationId` give the endpoints; **this gives the owner**, the source venue's scope.\n\n**Both venues see a transfer between them** (decided 28 September, audit R183). It used to sit at the tenant above both, where neither venue could see it. The row is owned at the source venue and `toScopePath` admits the destination venue too."
+   },
+   "toScopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The destination venue's scope. Row-level security admits a caller whose scope matches `scopePath` or `toScopePath`, so both venues read the transfer (decided 28 September, audit R183).\n"
    }
   }
  },
@@ -1531,7 +1788,9 @@
    },
    "code": {
     "type": "string",
-    "maxLength": 64
+    "maxLength": 64,
+    "x-ticvai-unique": "tenant",
+    "description": "**Unique per tenant** (decided 28 September, audit R108).\n"
    },
    "name": {
     "type": "string",
@@ -1573,9 +1832,26 @@
    "isActive": {
     "type": "boolean"
    },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "onHold",
+     "suspended",
+     "terminated"
+    ],
+    "description": "Set by `updateSupplier`. **A supplier on hold stops appearing in requisitions and purchase orders while its history stays intact.**"
+   },
+   "statusReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "minimumOrderValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
    "scopePath": {
     "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `region`, `tenant` scope.**"
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.** Suppliers are owned at tenant and venues quote against them (decided 28 September, audit R183)."
    }
   }
  },
@@ -1588,172 +1864,5 @@
    "partiallyReceived",
    "cancelled"
   ]
- },
- "VenueSettings": {
-  "type": "object",
-  "x-ticvai-persistence": "platform.venue_settings",
-  "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n",
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "supportHours": {
-    "type": "object",
-    "description": "CF-100. **A venue decides whether its support desk is 24/7 or bounded, and the platform does not.** This was recorded as an open question for eleven days and was never one — the code is identical either way, and what was missing was somewhere to put the answer.\n",
-    "properties": {
-     "mode": {
-      "type": "string",
-      "enum": [
-       "alwaysOn",
-       "businessHours",
-       "custom",
-       "none"
-      ]
-     },
-     "timezone": {
-      "type": "string"
-     },
-     "windows": {
-      "type": "array",
-      "items": {
-       "type": "object",
-       "properties": {
-        "day": {
-         "type": "string",
-         "enum": [
-          "mon",
-          "tue",
-          "wed",
-          "thu",
-          "fri",
-          "sat",
-          "sun"
-         ]
-        },
-        "from": {
-         "type": "string"
-        },
-        "to": {
-         "type": "string"
-        }
-       }
-      }
-     },
-     "outOfHoursMessage": {
-      "type": "string",
-      "nullable": true
-     }
-    }
-   },
-   "quietHours": {
-    "type": "object",
-    "nullable": true,
-    "description": "**When the platform does not send.** A wallet low-balance alert at 3am is a complaint, and journeys and message triggers both respect this.\n**Operational messages ignore it** — a queue-turn alert is why a guest is holding the phone.\n",
-    "properties": {
-     "from": {
-      "type": "string"
-     },
-     "to": {
-      "type": "string"
-     }
-    }
-   },
-   "segregatedAccess": {
-    "type": "object",
-    "nullable": true,
-    "description": "CF-130. **Configured at venue level because it changes by region and the venue is where it is known** — a Ladies Night, a family session, a prayer-time closure.\n**The platform does not infer gender.** 3.2.45 asks for automatic gender recognition and 3.2.46 for rule-based facial recognition validation, and neither is built. Two reasons, and the second is the one that decided it:\n**A Ladies Night ticket is already gendered at the point of sale**, so the gate checks the entitlement the platform issued rather than the face in front of it — deterministic, auditable, and already contracted through `admissionRules`.\n**And these events are staffed.** A steward at the entrance is making the judgment anyway, and a classifier that overrules a person who can see more than it can is a machine and a human disagreeing while a guest waits.\n**`genderVerification` is a switch, not an implementation.** Where a venue's access hardware offers the capability and the venue chooses to use it, this turns it on — following ADR-0015's standards-first driver model, where the device does what the device does. **Not everything needs to be built.**\n",
-    "properties": {
-     "isEnabled": {
-      "type": "boolean",
-      "default": false
-     },
-     "appliesToAccessPointIds": {
-      "type": "array",
-      "items": {
-       "type": "string",
-       "format": "uuid"
-      }
-     },
-     "schedule": {
-      "type": "array",
-      "items": {
-       "type": "object",
-       "properties": {
-        "day": {
-         "type": "string"
-        },
-        "from": {
-         "type": "string"
-        },
-        "to": {
-         "type": "string"
-        },
-        "admits": {
-         "type": "string",
-         "enum": [
-          "all",
-          "women",
-          "womenAndChildren",
-          "families",
-          "members"
-         ]
-        }
-       }
-      }
-     },
-     "entitlementGated": {
-      "type": "boolean",
-      "default": true,
-      "readOnly": true,
-      "description": "**Always true, and stated rather than assumed.** The gate admits on the entitlement. Everything below is advisory on top of that, and nothing replaces it.\n"
-     },
-     "genderVerification": {
-      "type": "string",
-      "enum": [
-       false,
-       "staffAssisted",
-       "deviceAssisted"
-      ],
-      "default": false,
-      "description": "`off` — the entitlement decides and a steward handles exceptions. **The default, and what is contracted.**\n`staffAssisted` — the steward's screen shows the ticket type so they can ask. No inference anywhere.\n`deviceAssisted` — **the venue's access hardware performs the check, not the platform.** Available only where the driver reports the capability, and the result is **advisory to the steward rather than decisive at the turnstile** (3.2.45 asks for rejection; this deviates deliberately).\n"
-     },
-     "overrideRateAlertThreshold": {
-      "type": "number",
-      "nullable": true,
-      "description": "Where `deviceAssisted` is on. **An override rate near zero means the steward has stopped deciding**, and that is the number that says whether the human safeguard is working or decorative.\n"
-     }
-    }
-   },
-   "alerting": {
-    "type": "object",
-    "description": "CF-134. **On-platform notification, marked as read.** Six contracts detect their own trouble and none told a person.\n**The panel is the default and email or WhatsApp only where the matrix names them** — an operational alert that arrives by email is an alert nobody sees in time.\n",
-    "properties": {
-     "channel": {
-      "type": "string",
-      "enum": [
-       "dashboardPanel",
-       "dashboardAndEmail",
-       "dashboardAndWhatsapp"
-      ],
-      "default": "dashboardPanel"
-     },
-     "acknowledgementRequired": {
-      "type": "boolean",
-      "default": true
-     },
-     "escalateAfterMinutes": {
-      "type": "integer",
-      "nullable": true
-     }
-    }
-   }
-  }
  }
 }

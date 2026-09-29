@@ -1,4 +1,23 @@
 {
+ "commitCatalogueImport": {
+  "method": "POST",
+  "path": "/products/import/{jobId}/commit",
+  "contract": "catalogue",
+  "summary": "Apply a parsed catalogue import",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CatalogueImportJob"
+ },
  "createCampaign": {
   "method": "POST",
   "path": "/campaigns",
@@ -18,6 +37,25 @@
   "requestBody": "CreateCampaignRequest",
   "responds": "Campaign"
  },
+ "createDonationCampaign": {
+  "method": "POST",
+  "path": "/donation-campaigns",
+  "contract": "catalogue",
+  "summary": "Create a campaign",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DonationCampaign",
+  "responds": "DonationCampaign"
+ },
  "createJourney": {
   "method": "POST",
   "path": "/journeys",
@@ -36,6 +74,44 @@
   ],
   "requestBody": "Journey",
   "responds": "Journey"
+ },
+ "createUpsellRule": {
+  "method": "POST",
+  "path": "/upsell-rules",
+  "contract": "promotions",
+  "summary": "Create an upsell rule",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "UpsellRule",
+  "responds": "UpsellRule"
+ },
+ "deleteUpsellRule": {
+  "method": "DELETE",
+  "path": "/upsell-rules/{ruleId}",
+  "contract": "promotions",
+  "summary": "Remove an upsell rule",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "generateConfiguration": {
   "method": "POST",
@@ -65,7 +141,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": null
  },
@@ -136,6 +218,19 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listDonationCampaigns": {
+  "method": "GET",
+  "path": "/donation-campaigns",
+  "contract": "catalogue",
+  "summary": "Campaigns a guest can give to",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "DonationCampaign"
+ },
  "listJourneys": {
   "method": "GET",
   "path": "/journeys",
@@ -158,7 +253,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "Journey"
+  "responds": "Page"
  },
  "listMerchandise": {
   "method": "GET",
@@ -215,7 +310,7 @@
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "ProductCategory"
+  "responds": "ProductCategoryNode"
  },
  "listSaleBoards": {
   "method": "GET",
@@ -251,6 +346,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -297,7 +397,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "SerialisedItem"
+  "responds": "Page"
  },
  "listWorkstations": {
   "method": "GET",
@@ -357,6 +457,11 @@
     "name": "includeSiblingOutlets",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -399,25 +504,6 @@
   ],
   "requestBody": "RunReportRequest",
   "responds": "ReportResult"
- },
- "setConfigurationProfile": {
-  "method": "PUT",
-  "path": "/configuration-profiles",
-  "contract": "tenancy",
-  "summary": "What a class of workstation is configured to be",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ConfigurationProfile",
-  "responds": "ConfigurationProfile"
  },
  "setProductCategories": {
   "method": "PUT",
@@ -475,6 +561,25 @@
   ],
   "requestBody": "VenueSettings",
   "responds": "VenueSettings"
+ },
+ "updateDonationCampaign": {
+  "method": "PATCH",
+  "path": "/donation-campaigns/{campaignId}",
+  "contract": "catalogue",
+  "summary": "Amend or close a campaign",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DonationCampaign",
+  "responds": "DonationCampaign"
  },
  "updateMerchandise": {
   "method": "PATCH",

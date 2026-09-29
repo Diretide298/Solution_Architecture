@@ -1,0 +1,87 @@
+{
+ "EventType": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.event_type",
+  "description": "Event board 1.2. **The type decides behaviour, not just a label.**",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "hasPerformances": {
+    "type": "boolean",
+    "default": true,
+    "description": "**An open-run exhibition has none**, and modelling it as 400 daily performances is how a schedule becomes unmanageable.\n"
+   },
+   "capacityBasis": {
+    "type": "string",
+    "enum": [
+     "perPerformance",
+     "perDay",
+     "unlimited"
+    ],
+    "description": "`perSession` was removed: a session is a Performance (decided 28 September, audit R165), so `perPerformance` covers it.\n"
+   },
+   "ticketNamesDate": {
+    "type": "boolean",
+    "default": true
+   },
+   "multiDay": {
+    "type": "boolean",
+    "default": false
+   },
+   "requiresRegistration": {
+    "type": "boolean",
+    "default": false
+   },
+   "requiresAccreditation": {
+    "type": "boolean",
+    "default": false
+   },
+   "seatingModesAllowed": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "defaultLifecycle": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ }
+}

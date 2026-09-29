@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 194
+  x-ticvai-screen-count: 199
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM
   x-ticvai-requirements: 319
@@ -4782,6 +4782,15 @@ paths:
         marketing** and are sent under contract performance rather than marketing consent — but they still
         respect the suppression list, because a hard bounce is a hard bounce.
 
+        **What the send writes, and what writes behind it** (decided 29 September, writers pass; DM6).
+        The call writes the `MessageDispatch` row. The dispatch worker that hands the message to a
+        provider, and the provider webhooks that report back, write `marketing.message_dispatch_attempt`
+        (one row per provider attempt, retries and failover included) and
+        `marketing.communication_policy_decision` (the consent, suppression and channel-policy
+        evaluation of the message, with its inputs as they stood). Campaign sends (`launchCampaign`) go
+        through the same worker and write the same two tables. Neither table has an operation of its
+        own.
+
         '
       tags:
       - message
@@ -4910,6 +4919,13 @@ paths:
         in: query
         schema:
           $ref: '#/components/schemas/CasePriority'
+      - name: membershipId
+        in: query
+        description: The cases about one membership, which is how the membership screens list a member's
+          case notes (decided 29 September, coordinator decision DM4, writers pass).
+        schema:
+          type: string
+          format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -5677,6 +5693,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: venueId
           in: query
           required: false
@@ -6439,6 +6456,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: channel
           in: query
           required: false
@@ -6562,6 +6580,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: venueId
           in: query
           required: false
@@ -6622,6 +6641,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: brandId
           in: query
           required: false
@@ -7258,6 +7278,83 @@ paths:
                         $ref: '#/components/schemas/PrivacyNoticePolicyTermsVersionManagementView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+    put:
+      operationId: setPrivacyNoticePolicyGovernance
+      x-ticvai-consumed-by:
+        - "P13 CMS-028 Privacy Notice, Policy & Terms Version Management"
+        - "P13 CMS-030 Privacy Configuration Testing, Approval & Publication"
+      x-ticvai-audience:
+        - staff
+      x-ticvai-agreed: '29 September: writers pass; marketing.privacy_notice_governance had no writer, listPrivacyNoticePolicy only reads it (DM6); pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.14-15 (17.1.8: lifecycle Draft, Review, Approved, Scheduled, Published, Superseded, Archived; change marked by an authorised user, never by AI); approval through the approvals engine as approvePrivacyTesting does'
+      summary: Set the privacy governance of one version of a privacy document
+      description: >
+        **An upsert keyed on `policyId`: one row per version of one privacy document.** The document
+        itself is white-label's `Policy` (`setPolicy`, never overwritten); this row is what the privacy
+        administrator decides about that version, and is what `listPrivacyNoticePolicy` shows beside it.
+        `status` follows the pack's lifecycle and the caller may move it only forward along it:
+        `draft` to `review` and back; **setting `review` raises an approval request**
+        (`approvals.createApprovalRequest`, on the tenant's approval matrix, never a named job title, as
+        `approvePrivacyTesting` does) and the row waits there. **`approved`, `approvedByPrincipalId` and
+        `approvedAt` are stamped by the decision (`decideApprovalRequest`), never sent here** (409); a
+        rejection returns the row to `draft`. From `approved` the caller sets `scheduled` (the policy's
+        effective date is ahead) or `published`; the document goes live through white-label, or through
+        `approvePrivacyTesting` `publish` when it is part of a change set. When a version is published
+        the server sets the previous published version of the same `documentType` and language to
+        `superseded`; `archived` is reachable only from `superseded`. Any other move is refused (409).
+        `changeClassification`, `requiresReAcceptance` and `requiresNotification` are set by an
+        authorised user and **never determined by AI**; `review` is refused without a
+        `changeClassification` (422), and all three are frozen from `approved` on (409): a different
+        classification is a new version. Publishing never rewrites what a guest accepted
+        (`getConsentHistory` keeps the version). An unknown `policyId` 404. Every change is audited with
+        who, before and after, and when. (decided 29 September, writers pass)
+      tags:
+        - consent
+      x-ticvai-permission: GUEST_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-config-scope-note: '29 September: **tenant, like the document it governs.** A privacy
+        document is white-label''s tenant `Policy` (`setPolicy`, tenant), so its governance cannot be set
+        venue by venue.'
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrivacyNoticeGovernance'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The governance row as stored, with its approval request once in `review`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivacyNoticeGovernance'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: A status move the lifecycle does not allow, approval fields sent by the caller, or a
+            change to the classification after approval.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: '`review` without a `changeClassification`.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /minor-guardian-age:
     put:
       operationId: setMinorGuardianAge
@@ -7394,6 +7491,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: brandId
           in: query
           required: false
@@ -7530,6 +7628,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: subjectId
           in: query
           required: true
@@ -8427,6 +8526,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: analytical
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: from
           in: query
           required: true
@@ -8528,6 +8628,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: agentPrincipalId
           in: query
           required: false
@@ -8578,6 +8679,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: subjectId
           in: query
           required: true
@@ -9342,6 +9444,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: venueId
           in: query
           required: false
@@ -9498,6 +9601,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: venueId
           in: query
           required: false
@@ -10024,6 +10128,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: source
           in: query
           required: false
@@ -10129,6 +10234,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: venueId
           in: query
           required: false
@@ -11613,6 +11719,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: brandId
           in: query
           required: false
@@ -11841,7 +11948,10 @@ paths:
         issue a signed link (any earlier link on the requirement stops working); unless given, the link is
         single use, needs a one-time code sent to the delivery address, and expires when the activity
         starts. `sendReminder` repeats the latest link; `generateQr` returns a QR payload for the link;
-        `requestCorrection` and `requestResign` reopen a completed requirement; `assignVersion` moves an
+        `requestCorrection` and `requestResign` reopen a `completed` requirement only: **a `verified`
+        requirement is not reopened** and the action is refused for it (decided 29 September, writers
+        pass; DM6 state-model question), because verification is the venue's acceptance of the waiver
+        and a resend does not undo it; `assignVersion` moves an
         unsigned requirement to the form's current published version; `replaceSignatory` changes who must
         sign (a guardian the minor's `GuestRelationship` authorises to `signWaiver`); `notifyGroupLeader`
         messages the group booking's leader; `assignOwner` sets the staff owner. Messages go through
@@ -12015,6 +12125,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: venueId
           in: query
           required: false
@@ -12770,6 +12881,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: analytical
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: formId
           in: query
           required: false
@@ -12897,6 +13009,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: analytical
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: venueId
           in: query
           required: false
@@ -13446,6 +13559,9 @@ paths:
                   nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: What would happen, or what did
           content:
             application/json:
@@ -14813,6 +14929,9 @@ paths:
                   default: false
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Marked. Returns the guest's unread count after the change.
           content:
             application/json:
@@ -14823,6 +14942,240 @@ paths:
                   unreadCount:
                     type: integer
                     minimum: 0
+  /case-categories:
+    get:
+      operationId: listCaseCategories
+      x-ticvai-consumed-by:
+        - "P08 BO-800 Routing & Queue Management"
+        - "P08 BO-805 Case Queue & Search"
+        - "P08 BO-806 Case Creation"
+        - "P08 BO-807 Classification & Workflow"
+        - "P12 SUP-012 Case Creation, Classification & Intelligent Routing"
+        - "P12 SUP-021 Intelligent Routing, Skills & Assignment Engine"
+      x-ticvai-audience:
+        - staff
+      x-ticvai-agreed: '29 September: writers pass; marketing.case_category had no reader or writer (DM6); pack ''Customer Service_Reference.pdf'' 10.1 case classification (category and subcategory); shape follows listIntelligentRoutingSkills'
+      summary: List case categories and subcategories
+      description: >
+        **The venue's case taxonomy**, as `setCaseCategoryDefinition` stores it: top-level categories
+        and the subcategories under them (`parentCategoryId`). The category pickers on case creation and
+        classification, the routing rule editor (`match.categoryIds`) and the case filters read it. A
+        retired category (`isActive: false`) is still listed when asked for, because cases raised under
+        it keep it. Ordered by `parentCategoryId` (top level first), then `name`, then `id`; keyset
+        cursor. (decided 29 September, writers pass)
+      tags:
+        - case
+      x-ticvai-permission: CASE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: parentCategoryId
+          in: query
+          required: false
+          description: The subcategories of one category. Omitted, every row is returned.
+          schema:
+            type: string
+            format: uuid
+        - name: topLevelOnly
+          in: query
+          required: false
+          description: Only categories with no parent.
+          schema:
+            type: boolean
+            default: false
+        - name: isActive
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
+        - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Case categories
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/CaseCategory'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+    put:
+      operationId: setCaseCategoryDefinition
+      x-ticvai-consumed-by:
+        - "P08 BO-807 Classification & Workflow"
+      x-ticvai-audience:
+        - staff
+      x-ticvai-agreed: '29 September: writers pass; marketing.case_category had no writer while Case.categoryId and CaseRoutingRule match.categoryIds already point at it (DM6); pack ''Customer Service_Reference.pdf'' 10.1 case classification; shape follows setIntelligentRoutingSkill and setSlaPolicy'
+      summary: Create or change a case category or subcategory
+      description: >
+        **An upsert keyed on `code`**, which is unique in the venue and never changes once created. A
+        row with `parentCategoryId` is a subcategory; the taxonomy is two levels, so the parent must be
+        an existing top-level category of the same venue (422 otherwise, and 422 for a row naming
+        itself). `defaultPriority` is where a new case in the category starts before the routing
+        factors apply. **Categories are never deleted**: cases and routing rules name them, so one is
+        retired with `isActive: false` — it stops being offered on new cases and matched by routing,
+        and every case raised under it keeps it. Retiring a category that still has active
+        subcategories is refused (409); retire them first. AI classification
+        (`createCaseClassificationIntelligent`) only recommends a category; it never creates one.
+        (decided 29 September, writers pass)
+      tags:
+        - case
+      x-ticvai-permission: CASE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CaseCategory'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The category as stored
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaseCategory'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '409':
+          description: Retiring a category that still has active subcategories.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: The parent is not a top-level category of this venue, or the row names itself as
+            its parent.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /service-queues:
+    get:
+      operationId: listServiceQueues
+      x-ticvai-consumed-by:
+        - "P08 BO-800 Routing & Queue Management"
+        - "P08 BO-805 Case Queue & Search"
+        - "P08 BO-808 Assignment & Workload"
+        - "P12 SUP-020 Queue Configuration & Management"
+        - "P12 SUP-021 Intelligent Routing, Skills & Assignment Engine"
+      x-ticvai-audience:
+        - staff
+      x-ticvai-agreed: '29 September: writers pass; marketing.service_queue had no reader or writer (DM6); MoM 31 Aug §4.2 (routing to queues); pack ''Customer Service_Reference.pdf'' p.25 (10.2.2 Queue Configuration & Management); shape follows listIntelligentRoutingSkills'
+      summary: List customer-service queues
+      description: >
+        **The venue's customer-service queues**, as `setServiceQueueDefinition` stores them: the rows
+        a case waits in (`Case.queueId`), a routing rule sends to (`queueId`, `fallbackQueueId`) and an
+        agent works (`AgentAvailability.queueIds`). Live load per queue is `listContact` and
+        `listAgentWorkloadAvailability`, not this. Not the ride and attraction virtual queues
+        (queue contract). Ordered by `name` then `id`; keyset cursor. (decided 29 September, writers
+        pass)
+      tags:
+        - case
+      x-ticvai-permission: CASE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: isActive
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
+        - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Customer-service queues
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ServiceQueue'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+    put:
+      operationId: setServiceQueueDefinition
+      x-ticvai-consumed-by:
+        - "P08 BO-800 Routing & Queue Management"
+        - "P12 SUP-020 Queue Configuration & Management"
+      x-ticvai-audience:
+        - staff
+      x-ticvai-agreed: '29 September: writers pass; marketing.service_queue had no writer while Case.queueId, the routing rules and AgentAvailability.queueIds already point at it (DM6); pack ''Customer Service_Reference.pdf'' p.25 (10.2.2); shape follows setIntelligentRoutingSkill and setSlaPolicy'
+      summary: Create or change a customer-service queue
+      description: >
+        **An upsert keyed on `code`**, which is unique in the venue and never changes once created.
+        `overflowWaitSeconds` is the queue's overflow threshold: a case waiting longer marks the queue
+        `critical` on the contact-centre views; null means the queue never reports overflow. Which cases
+        reach the queue is the routing rules' business (`setIntelligentRoutingSkill`), and which agents
+        work it is the agent's (`setAgentAvailability`), so neither is set here. **Queues are never
+        deleted**: a queue is retired with `isActive: false`, which is refused (409) while an active
+        routing rule names it as `queueId` or `fallbackQueueId`, or while an unresolved case waits in
+        it — move them first. (decided 29 September, writers pass)
+      tags:
+        - case
+      x-ticvai-permission: CASE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceQueue'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The queue as stored
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQueue'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '409':
+          description: Retiring a queue that an active routing rule names, or that an unresolved case still
+            waits in.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
 
 components:
   schemas:
@@ -16507,16 +16860,23 @@ components:
           type: string
     RetentionRunResult:
       type: object
+      x-ticvai-persistence: marketing.retention_run
       description: 'Board 2.8. **Completion evidence is the half that gets forgotten until an audit.**'
       properties:
         runId:
           type: string
           format: uuid
+          x-ticvai-column: id
+          description: The run, stored as `marketing.retention_run`; `PrivacyAction.retentionRunId` points
+            here. Preview runs are stored too, so an executed pass can be compared with what it previewed.
         policyId:
           type: string
           format: uuid
         mode:
           type: string
+          enum:
+          - preview
+          - execute
         recordsAffected:
           type: integer
         byAction:
@@ -16531,6 +16891,8 @@ components:
             type: integer
         dependencies:
           type: array
+          x-ticvai-persisted: false
+          description: Computed for the response; the executed run's detail is in the evidence asset.
           items:
             type: object
             properties:
@@ -18337,7 +18699,8 @@ components:
         event:
           type: string
           description: 'The platform event that fires it — `order.completed`, `access.validated`, `queue.turnApproaching`.
-            **Named from the event catalogue**, so a trigger cannot bind to something nothing publishes.
+            **Named from the event catalogue** (`BusinessEvent.eventType`), so a trigger cannot bind to
+            something nothing publishes. Its conditions are `MessageTriggerCondition` rows.
 
             '
         templateId:
@@ -20221,6 +20584,21 @@ components:
           type: string
           nullable: true
           description: Required for WhatsApp, where templates are pre-approved by the provider.
+        brandId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The brand whose identity the template carries; null for the tenant default.
+        ownership:
+          type: string
+          enum:
+          - platform
+          - crm
+          default: crm
+          description: '`platform` = a transactional template owned by the communication service; `crm` =
+            a marketing template owned by CRM (`listSystemTransactionalTemplate`). Content by language and
+            version is in `MessageTemplateVersion`. (decided 29 September, data model for the agreed
+            operations)'
     MessageDispatch:
       x-ticvai-persistence: marketing.message_dispatch
       type: object
@@ -20245,6 +20623,13 @@ components:
         templateId:
           type: string
           format: uuid
+        messageTriggerId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The `MessageTrigger` that fired it, and through its `event` the `BusinessEvent` and
+            source module; null for a campaign or a direct send. Attempts are in `MessageDispatchAttempt`.
+            (decided 29 September, data model for the agreed operations)
         status:
           type: string
           enum:
@@ -20350,6 +20735,13 @@ components:
         categoryId:
           type: string
           format: uuid
+        membershipId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The identity membership this case concerns (`identity.customer_membership`); member
+            case notes are cases with this set. Must belong to `subjectId` when both are given (422).
+            (decided 29 September, coordinator decision DM4, writers pass)
         priority:
           allOf:
           - $ref: '#/components/schemas/CasePriority'
@@ -20444,6 +20836,19 @@ components:
           type: string
           format: uuid
           nullable: true
+        queueId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The `ServiceQueue` the case waits in, set by routing (`CaseRoutingRule.queueId`). Null
+            once routed straight to an agent. (decided 29 September, data model for the agreed operations)
+        membershipId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The identity membership this case concerns (`identity.customer_membership`); member
+            case notes are cases with this set. (decided 29 September, coordinator decision DM4, writers
+            pass)
         status:
           $ref: '#/components/schemas/CaseStatus'
         priority:
@@ -21609,10 +22014,13 @@ components:
           readOnly: true
     ConsentPreferenceCommunicationPolicyEnforcementView:
       type: object
-      x-ticvai-persistence: none — projection over marketing.communication_policy_decision (new), marketing.message_dispatch
+      x-ticvai-persistence: marketing.communication_policy_decision
       description: >
         One policy evaluation of one communication, with the inputs as they stood when it was evaluated.
-        Append-only evidence; retained per the tenant's retention policy (ADR-0047).
+        Append-only evidence; retained per the tenant's retention policy (ADR-0047). **Job note:** written
+        by the dispatch worker behind `sendTransactionalMessage` and campaign sends (`launchCampaign`)
+        as it evaluates each message, never by an operation of its own (decided 29 September, writers
+        pass; DM6).
       required:
         - id
         - communicationId
@@ -22948,7 +23356,8 @@ components:
           default: active
     PrivacyNoticePolicyTermsVersionManagementView:
       type: object
-      x-ticvai-persistence: none — projection over whitelabel.policy (read through white-label listPolicies)
+      x-ticvai-persistence: none — projection over whitelabel.policy (read through white-label listPolicies),
+        marketing.privacy_notice_governance and marketing.consent_record
       description: One version of one privacy document, with its governance (pack 17.1.8 Version Information).
       required:
       - documentId
@@ -31941,6 +32350,953 @@ components:
             highRisk:
               type: integer
               minimum: 0
+    CommunicationSourceModule:
+      type: string
+      description: The TICVAI module a message or business event originates from (the pack's Source Module).
+      enum:
+      - crm
+      - ticketing
+      - membership
+      - waiver
+      - groupSales
+      - customerService
+      - finance
+      - wallet
+      - resourceManagement
+      - accessControl
+      - other
+    BusinessEvent:
+      type: object
+      x-ticvai-persistence: marketing.business_event
+      description: '**The event registry**: one row per business event a module publishes and a
+        communication may be mapped to (pack 20.2 Business Event & Notification Trigger Mapping).
+        `MessageTrigger.event` names a row''s `eventType`, so a trigger cannot bind to something nothing
+        publishes. Read by `listBusinessEventNotification`; `status` and `priority` are written by
+        `setBusinessEventMapping`. Registered by the platform from the event catalogue, not typed in.
+        (decided 29 September, data model for the agreed operations) **Job note:** rows are created and
+        retired by the event-catalogue registration job (MarketingService, when a module publishes or
+        withdraws an event in the platform event catalogue); no operation creates one, and
+        `setBusinessEventMapping` updates only `status` and `priority`. (decided 29 September, writers
+        pass; DM6)
+
+        '
+      required:
+      - id
+      - eventType
+      - sourceModule
+      - priority
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        eventType:
+          type: string
+          maxLength: 100
+          description: Registered event name, e.g. TicketIssued, MembershipExpiring. Unique per tenant.
+        sourceModule:
+          $ref: '#/components/schemas/CommunicationSourceModule'
+        eventState:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: The precise state that fires it (e.g. scanned, not merely sold).
+        payloadFields:
+          type: array
+          description: Fields the event carries, available to templates as variables.
+          items:
+            type: string
+        priority:
+          type: string
+          enum:
+          - P1
+          - P2
+          - P3
+          - P4
+          default: P3
+        status:
+          type: string
+          enum:
+          - active
+          - inactive
+          default: active
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005).'
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    MessageTriggerCondition:
+      type: object
+      x-ticvai-persistence: marketing.message_trigger_condition
+      description: 'One condition on a `MessageTrigger`; all of a trigger''s conditions must hold for
+        it to fire (e.g. the customer has a valid email and email is permitted; the event is within 24
+        hours). Written by `setBusinessEventMapping` with its trigger, read by
+        `listBusinessEventNotification`. (decided 29 September, data model for the agreed operations)
+
+        '
+      required:
+      - id
+      - messageTriggerId
+      - dimension
+      - operator
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        messageTriggerId:
+          type: string
+          format: uuid
+        dimension:
+          type: string
+          enum:
+          - product
+          - event
+          - venue
+          - brand
+          - customer
+          - channel
+          - time
+          - transactionStatus
+          - membership
+          - bookingType
+        operator:
+          type: string
+          enum:
+          - equals
+          - notEquals
+          - in
+          - withinMinutes
+          - isValid
+          - isPermitted
+        value:
+          type: string
+          maxLength: 500
+          nullable: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005), the trigger''s.'
+    MessageTemplateVersion:
+      type: object
+      x-ticvai-persistence: marketing.message_template_version
+      description: '**One immutable version of one template in one language.** Publishing a template
+        writes a new row; a published row is never edited, so a message can always be shown with the
+        content it was sent with. Read by `listSystemTransactionalTemplate`. (decided 29 September, data
+        model for the agreed operations)
+
+        '
+      required:
+      - id
+      - messageTemplateId
+      - language
+      - version
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        messageTemplateId:
+          type: string
+          format: uuid
+        language:
+          type: string
+          maxLength: 35
+          description: BCP 47 tag.
+        version:
+          type: integer
+          minimum: 1
+          description: Unique per template and language.
+        status:
+          type: string
+          enum:
+          - draft
+          - published
+          - archived
+        subject:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: Email only.
+        header:
+          type: string
+          nullable: true
+        body:
+          type: string
+        footer:
+          type: string
+          nullable: true
+        ctaLabel:
+          type: string
+          maxLength: 100
+          nullable: true
+        ctaUrl:
+          type: string
+          maxLength: 2000
+          nullable: true
+          description: May contain variables, e.g. {{TicketLink}}.
+        attachmentKinds:
+          type: array
+          items:
+            type: string
+            enum:
+            - ticketPdf
+            - invoicePdf
+            - walletPass
+            - calendarInvite
+            - waiverPdf
+        variables:
+          type: array
+          description: Dynamic variables the content uses (e.g. CustomerName, OrderNumber).
+          items:
+            type: string
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+        publishedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+    MessageDispatchAttempt:
+      type: object
+      x-ticvai-persistence: marketing.message_dispatch_attempt
+      description: '**One attempt to hand one message to one provider.** A message retried or failed over
+        has several; `MessageDispatch` keeps the outcome, this keeps how it got there: which provider,
+        how long the provider API took, what it cost, and why an attempt failed. **Job note:** written by
+        the dispatch worker and the provider webhooks behind `sendTransactionalMessage` and campaign
+        sends (`launchCampaign`), never by an operation of its own (decided 29 September, writers pass;
+        DM6); read by `listCommunicationService`, `listDeliveryQueueFailure`,
+        `listProviderHealthUsage` and `listDeliveryCommunicationPlatform`. (decided 29 September, data
+        model for the agreed operations)
+
+        '
+      required:
+      - id
+      - messageDispatchId
+      - attemptNumber
+      - communicationProviderId
+      - channel
+      - outcome
+      - attemptedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        messageDispatchId:
+          type: string
+          description: The `MessageDispatch.id`.
+        attemptNumber:
+          type: integer
+          minimum: 1
+        communicationProviderId:
+          type: string
+          format: uuid
+        channel:
+          $ref: '#/components/schemas/MessageChannel'
+        isFallback:
+          type: boolean
+          default: false
+          description: Sent through a fallback provider or channel rather than the rule's first choice.
+        outcome:
+          type: string
+          enum:
+          - accepted
+          - delivered
+          - failed
+          - rateLimited
+          - timedOut
+        failureCategory:
+          type: string
+          nullable: true
+          enum:
+          - providerUnavailable
+          - invalidAddress
+          - invalidMobile
+          - rateLimited
+          - authenticationError
+          - templateRejected
+          - timeout
+          - consentBlock
+          - unknownError
+        failureMessage:
+          type: string
+          maxLength: 1000
+          nullable: true
+        providerReference:
+          type: string
+          nullable: true
+        apiLatencyMs:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: Time the provider API took to accept or refuse the attempt.
+        cost:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: The provider's charge for the attempt, where it reports one.
+        attemptedAt:
+          type: string
+          format: date-time
+        deliveredAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Provider-confirmed delivery, from its webhook.
+        nextAttemptAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the retry policy schedules the next attempt; null when none is due.
+    ConsentPropagation:
+      type: object
+      x-ticvai-persistence: marketing.consent_propagation
+      description: '**One downstream target a consent withdrawal must reach**, and how far it got. Written
+        when a withdrawal is recorded (one row per target) and updated as each target acknowledges; read
+        by `listConsentEvidenceWithdrawal` (its `propagation`) and `listPrivacyCompliance`. (decided 29
+        September, data model for the agreed operations)
+
+        '
+      required:
+      - id
+      - consentRecordId
+      - target
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        consentRecordId:
+          type: string
+          description: The withdrawal's `ConsentRecord.id`.
+        target:
+          type: string
+          enum:
+          - crm
+          - marketing
+          - campaignAudience
+          - connectedSystem
+        targetName:
+          type: string
+          maxLength: 200
+          nullable: true
+        status:
+          type: string
+          enum:
+          - requested
+          - processed
+          - propagated
+          - acknowledged
+          - failed
+          - retryRequired
+          default: requested
+        attempts:
+          type: integer
+          minimum: 0
+          default: 0
+        error:
+          type: string
+          maxLength: 500
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    PrivacyNoticeGovernance:
+      type: object
+      x-ticvai-persistence: marketing.privacy_notice_governance
+      description: '**The privacy governance of one version of one privacy document.** The document itself
+        is white-label''s `Policy` (`setPolicy`, never overwritten); this row adds what the privacy
+        administrator decides about it: lifecycle status, the change classification (set by an authorised
+        user, **never by AI**), re-acceptance and notification, owner and approval. One row per policy
+        version. Read by `listPrivacyNoticePolicy`; written by `setPrivacyNoticePolicyGovernance` (decided
+        29 September, writers pass). (decided 29 September, data model for the agreed operations)
+
+        '
+      required:
+      - id
+      - policyId
+      - documentType
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        policyId:
+          type: string
+          format: uuid
+          description: The white-label `Policy` version this governs (`documentId` on the view).
+        documentType:
+          type: string
+          enum:
+          - privacyPolicy
+          - privacyNotice
+          - cookieNotice
+          - marketingNotice
+          - biometricPrivacyNotice
+          - childrensPrivacyNotice
+          - locationServicesNotice
+          - other
+        status:
+          type: string
+          enum:
+          - draft
+          - review
+          - approved
+          - scheduled
+          - published
+          - superseded
+          - archived
+          default: draft
+        changeClassification:
+          type: string
+          enum:
+          - minor
+          - material
+          nullable: true
+          description: Set by an authorised user, never by AI.
+        requiresReAcceptance:
+          type: boolean
+          default: false
+        requiresNotification:
+          type: boolean
+          default: false
+        ownerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        approvedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        approvalRequestId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The approvals request raised when the row entered `review` (`setPrivacyNoticePolicyGovernance`);
+            its decision stamps `approvedByPrincipalId` and `approvedAt`. (decided 29 September, writers pass)
+        approvedAt:
+          type: string
+          format: date-time
+          nullable: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005).'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    CaseCategory:
+      type: object
+      x-ticvai-persistence: marketing.case_category
+      description: '**The venue''s case taxonomy**: categories and, under them, subcategories
+        (`parentCategoryId`). `Case.categoryId` and the routing rules'' `match.categoryIds` point here;
+        `createCaseClassificationIntelligent` recommends one. Maintained by `setCaseCategoryDefinition`,
+        read by `listCaseCategories` (decided 29 September, writers pass). (decided 29 September, data
+        model for the agreed operations)
+
+        '
+      required:
+      - id
+      - code
+      - name
+      - isActive
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        code:
+          type: string
+          maxLength: 60
+        name:
+          type: string
+          maxLength: 150
+        parentCategoryId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Set on a subcategory; null on a top-level category.
+        defaultPriority:
+          allOf:
+          - $ref: '#/components/schemas/CasePriority'
+          nullable: true
+          description: The priority a case in this category starts at before routing factors apply.
+        isActive:
+          type: boolean
+          default: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005).'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    ServiceQueue:
+      type: object
+      x-ticvai-persistence: marketing.service_queue
+      description: '**A customer-service queue** (e.g. `eventDaySupport`). Cases (`Case.queueId`),
+        routing rules (`queueId`, `fallbackQueueId`) and agents (`AgentAvailability.queueIds`) name it;
+        `listContact` and `listAgentWorkloadAvailability` report per queue. Maintained by
+        `setServiceQueueDefinition`, read by `listServiceQueues` (decided 29 September, writers pass).
+        (decided 29 September, data model for the agreed operations)
+
+        '
+      required:
+      - id
+      - code
+      - name
+      - isActive
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        code:
+          type: string
+          maxLength: 60
+        name:
+          type: string
+          maxLength: 150
+        overflowWaitSeconds:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: The queue's overflow threshold; a case waiting longer marks the queue `critical`.
+        isActive:
+          type: boolean
+          default: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005).'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    CaseEscalation:
+      type: object
+      x-ticvai-persistence: marketing.case_escalation
+      description: '**One row per escalation of a case**: each `escalateCase` call, and each automatic
+        escalation on an SLA breach. `Case.escalationCount` counts these rows; `listEscalationCriticalCase`
+        shows a case as of its latest one. (decided 29 September, data model for the agreed operations)
+
+        '
+      required:
+      - id
+      - caseId
+      - reason
+      - escalatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        caseId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        reason:
+          type: string
+          maxLength: 500
+          description: The reason given to `escalateCase`, or `SLA breached` for an automatic escalation.
+        reasonCategory:
+          type: string
+          nullable: true
+          enum:
+          - slaRisk
+          - customerComplaint
+          - repeatedContact
+          - highValue
+          - refundException
+          - operationalFailure
+          - systemFailure
+          - legalCompliance
+          - vipCustomer
+          - supervisorRequested
+          - other
+        isAutomatic:
+          type: boolean
+          default: false
+          description: True for an escalation raised by an SLA breach rather than a person.
+        escalatedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        escalatedToPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        previousPriority:
+          $ref: '#/components/schemas/CasePriority'
+        newPriority:
+          allOf:
+          - $ref: '#/components/schemas/CasePriority'
+          nullable: true
+        escalatedAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005), the case''s.'
+    FeedbackClassification:
+      type: object
+      x-ticvai-persistence: marketing.feedback_classification
+      description: '**The AI sentiment and topic of one feedback item** (a survey answer, a review or a
+        complaint case), labelled as AI-derived with its model version. **Job note:** written by the AI
+        service''s classification of new feedback (a survey submission, a review or a complaint case
+        arriving) where the tenant''s AI policy allows it, one row per item and model version; no
+        operation writes it and staff never edit it (decided 29 September, writers pass; DM6). Read by
+        `listCustomerSatisfactionFeedback`. Exactly one of `formSubmissionId`, `reviewId`, `caseId` is
+        set. (decided 29 September, data model for the agreed operations)
+
+        '
+      required:
+      - id
+      - source
+      - classifiedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        source:
+          type: string
+          enum:
+          - csatSurvey
+          - serviceRating
+          - nps
+          - postCaseSurvey
+          - complaint
+          - appFeedback
+          - webFeedback
+          - directComment
+        formSubmissionId:
+          type: string
+          format: uuid
+          nullable: true
+        reviewId:
+          type: string
+          nullable: true
+        caseId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          nullable: true
+        sentiment:
+          type: string
+          nullable: true
+          enum:
+          - positive
+          - neutral
+          - negative
+        topic:
+          type: string
+          maxLength: 100
+          nullable: true
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+          nullable: true
+        modelVersion:
+          type: string
+          maxLength: 100
+          nullable: true
+        classifiedAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005).'
+    WaiverRequirement:
+      type: object
+      x-ticvai-persistence: marketing.waiver_requirement
+      description: '**One waiver one participant must sign for one booking**: which form, who must sign,
+        how the link went out, and where it stands. **Job note:** created by waiver-trigger evaluation, a
+        job on the order event that runs when a booking is confirmed and writes one row per participant
+        and waiver the matching trigger rules (`setWaiverTriggerRule`) require; no operation creates one
+        (decided 29 September, writers pass; DM6). Moved by `actOnWaiverRequirements` (send, resend, correct, reassign) and by the participant''s
+        submission. **No staff action marks it completed or verified**: only a submission and its
+        verification can. `WaiverAccessException.requirementId` points here. Read by every waiver tracking
+        screen. State model: `states/waiver-requirement.yaml`. (decided 29 September, data model for the
+        agreed operations)
+
+        '
+      required:
+      - id
+      - participantSubjectId
+      - orderId
+      - formDefinitionId
+      - isMandatory
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        participantSubjectId:
+          type: string
+          format: uuid
+        orderId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: The booking.
+        orderLineId:
+          type: string
+          nullable: true
+        ticketId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          nullable: true
+          description: The ticket (entitlement) id.
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+        performanceId:
+          type: string
+          format: uuid
+          nullable: true
+        groupBookingId:
+          type: string
+          format: uuid
+          nullable: true
+        venueId:
+          type: string
+          format: uuid
+          nullable: true
+        formDefinitionId:
+          type: string
+          format: uuid
+        formVersion:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: The version assigned, or signed once completed.
+        isMandatory:
+          type: boolean
+          description: False for an optional consent (e.g. media), which never blocks readiness.
+        status:
+          type: string
+          enum:
+          - notAssigned
+          - assigned
+          - sent
+          - opened
+          - inProgress
+          - completed
+          - verified
+          - rejected
+          - expired
+          - superseded
+          default: assigned
+        isDeclined:
+          type: boolean
+          default: false
+          description: An optional consent answered no.
+        signatorySubjectId:
+          type: string
+          format: uuid
+          nullable: true
+        signatoryType:
+          type: string
+          nullable: true
+          enum:
+          - participant
+          - guardian
+          - organisationRepresentative
+        deliveryChannel:
+          type: string
+          nullable: true
+          enum:
+          - email
+          - sms
+          - whatsapp
+          - push
+          - inApp
+          - qrCode
+          - pos
+          - kiosk
+          - staffAssistedDevice
+          - groupPortal
+        linkUse:
+          type: string
+          enum:
+          - singleUse
+          - multiUse
+          default: singleUse
+        linkAuthentication:
+          type: string
+          enum:
+          - oneTimeCode
+          - accountSignIn
+          - bookingReference
+          default: oneTimeCode
+        linkIssuedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: A link issued before this instant no longer works (a new link supersedes the old).
+        linkExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Defaults to the start of the activity.
+        linkUsedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Set when a single-use link is used; a second use is refused.
+        lastSentAt:
+          type: string
+          format: date-time
+          nullable: true
+        nextReminderAt:
+          type: string
+          format: date-time
+          nullable: true
+        formSubmissionId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The submission that completed it.
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        ownerStaffId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The staff owner, set by `assignOwner`.
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005).'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    WaiverRequirementEvent:
+      type: object
+      x-ticvai-persistence: marketing.waiver_requirement_event
+      description: '**The requirement''s timeline, append-only**: every link issued, sent, opened, each
+        signing stage the participant reaches, completion, verification and every staff action with its
+        reason. Written by `actOnWaiverRequirements`, the signing journey and verification; read by the
+        collection, evidence, analytics and risk screens (`auditEvents`, `journey`, `remindersSent`).
+        (decided 29 September, data model for the agreed operations)
+
+        '
+      required:
+      - id
+      - waiverRequirementId
+      - event
+      - actor
+      - occurredAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        waiverRequirementId:
+          type: string
+          format: uuid
+        event:
+          type: string
+          enum:
+          - linkIssued
+          - linkSent
+          - reminderSent
+          - qrGenerated
+          - deliveryFailed
+          - linkOpened
+          - linkExpired
+          - participantIdentified
+          - guardianInformationCompleted
+          - questionsCompleted
+          - acknowledgementsAccepted
+          - signatureSubmitted
+          - validationPassed
+          - validationFailed
+          - evidenceStored
+          - markedComplete
+          - verified
+          - rejected
+          - correctionRequested
+          - resignRequested
+          - versionAssigned
+          - signatoryReplaced
+          - ownerAssigned
+          - groupLeaderNotified
+          - exceptionApproved
+          - evidenceViewed
+        actor:
+          type: string
+          enum:
+          - participant
+          - guardian
+          - staff
+          - system
+        staffId:
+          type: string
+          format: uuid
+          nullable: true
+        channel:
+          type: string
+          nullable: true
+          description: The delivery or signing method, as `WaiverRequirement.deliveryChannel`.
+        messageDispatchId:
+          type: string
+          nullable: true
+          description: The `MessageDispatch` a send, resend or reminder produced.
+        reason:
+          type: string
+          maxLength: 500
+          nullable: true
+        occurredAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005), the requirement''s.'
   securitySchemes:
     bearerAuth:
       type: http

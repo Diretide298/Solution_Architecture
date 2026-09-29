@@ -954,8 +954,8 @@ A `published` choice is unpublished first, or 409.
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | - |
-| Writes | - |
+| Reads | `cache:idempotency`, `whitelabel.guided_choice`, `whitelabel.guided_choice_answer`, `whitelabel.guided_choice_question` |
+| Writes | `cache:idempotency`, `whitelabel.guided_choice`, `whitelabel.guided_choice_answer`, `whitelabel.guided_choice_question` |
 | Called by | CMS-101 |
 
 **Parameters**

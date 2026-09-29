@@ -1,0 +1,59 @@
+# Channel incident — state model
+# Contract: catalogue.ChannelIncident.status
+# Checked by tools/check-states.py. Added 29 September (writers pass).
+
+entity: Channel incident
+contract: catalogue
+enum: ChannelIncident.status
+enumKind: inline
+enumSchema: ChannelIncident
+enumProperty: status
+owner: catalogue
+initial:
+- open
+terminal:
+- closed
+transitions:
+- from: open
+  to: investigating
+  operation: updateChannelIncident
+  trigger: operation
+  guard: Someone takes it (owner set)
+- from: open
+  to: retrying
+  operation: retryChannelIncident
+  trigger: operation
+  guard: The failed call is queued again with the same idempotency reference
+- from: investigating
+  to: retrying
+  operation: retryChannelIncident
+  trigger: operation
+  guard: The failed call is queued again with the same idempotency reference
+- from: retrying
+  to: resolved
+  trigger: job
+  guard: The retried call succeeded
+- from: retrying
+  to: investigating
+  trigger: job
+  guard: The retried call failed again
+- from: open
+  to: resolved
+  trigger: job
+  guard: The sync job's next run succeeds for the same channel and domain
+- from: investigating
+  to: resolved
+  operation: updateChannelIncident
+  trigger: operation
+  guard: '`resolutionNote` given'
+- from: resolved
+  to: closed
+  operation: updateChannelIncident
+  trigger: operation
+  guard: The owner confirms nothing is outstanding
+- from: resolved
+  to: closed
+  trigger: timer
+  guard: Seven days after `resolvedAt` with no new failure (proposed, our build plan)
+notes: '**Opened `open` by the channel sync and order jobs** when a call to or from a channel fails; never
+  created through the API.'

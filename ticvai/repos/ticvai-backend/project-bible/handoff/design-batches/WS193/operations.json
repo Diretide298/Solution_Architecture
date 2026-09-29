@@ -1,0 +1,261 @@
+{
+ "diffWalletConfigurationVersion": {
+  "method": "GET",
+  "path": "/wallet-configuration/versions/{version}/diff",
+  "contract": "wallet",
+  "summary": "Compare a wallet configuration version against another or the working draft",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "against",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletConfigurationDiff"
+ },
+ "linkWalletCredential": {
+  "method": "POST",
+  "path": "/wallet-credentials",
+  "contract": "wallet",
+  "summary": "Bind a wristband, card or device to a wallet",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": true,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletCredential",
+  "responds": "WalletCredential"
+ },
+ "listAuditRecords": {
+  "method": "GET",
+  "path": "/audit-records",
+  "contract": "tenancy",
+  "summary": "Who did what, where, and when",
+  "permission": "AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "orgUnitId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "action",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "subjectRef",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "platformStaffGrantId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listWalletConfigurationVersions": {
+  "method": "GET",
+  "path": "/wallet-configuration/versions",
+  "contract": "wallet",
+  "summary": "Wallet configuration versions, newest first",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listWalletDisputes": {
+  "method": "GET",
+  "path": "/wallet-disputes",
+  "contract": "wallet",
+  "summary": "Contested transactions and operational exceptions",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletDispute"
+ },
+ "publishWalletConfiguration": {
+  "method": "POST",
+  "path": "/wallet-configuration/publish",
+  "contract": "wallet",
+  "summary": "Validate and publish the wallet configuration as a version",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletConfigurationVersion"
+ },
+ "restoreWalletConfigurationVersion": {
+  "method": "POST",
+  "path": "/wallet-configuration/versions/{version}/restore",
+  "contract": "wallet",
+  "summary": "Put a previous wallet configuration back as the working draft",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletConfigurationVersion"
+ },
+ "setWalletRestriction": {
+  "method": "POST",
+  "path": "/wallet-restrictions",
+  "contract": "wallet",
+  "summary": "Block, freeze or restrict a wallet",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletRestriction",
+  "responds": "WalletRestriction"
+ },
+ "setWalletRiskRuleStatus": {
+  "method": "POST",
+  "path": "/wallet-risk-rules/{ruleCode}/status",
+  "contract": "wallet",
+  "summary": "Suspend, emergency-disable or reactivate one risk rule",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletRiskRules"
+ },
+ "setWalletRiskRules": {
+  "method": "PUT",
+  "path": "/wallet-risk-rules",
+  "contract": "wallet",
+  "summary": "Velocity, behaviour and what happens when a rule trips",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletRiskRules",
+  "responds": "WalletRiskRules"
+ },
+ "simulateCreditConsumption": {
+  "method": "POST",
+  "path": "/credit-consumption/simulate",
+  "contract": "wallet",
+  "summary": "Which credit this purchase would actually use",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CreditAllocation"
+ }
+}

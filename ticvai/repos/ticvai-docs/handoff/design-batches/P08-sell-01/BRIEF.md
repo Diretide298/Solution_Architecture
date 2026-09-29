@@ -1,6 +1,6 @@
 # P08-sell-01 — P08 · Sell (1 of 4)
 
-**10 screens · 67 operations · 57 schemas · 10 permissions**
+**10 screens · 85 operations · 78 schemas · 10 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 10 permissions apply here:
   `CAPACITY_CONFIGURE, EVENT_CONFIGURE, PARTNER_MANAGE, PARTNER_VIEW, PERFORMANCE_CONFIGURE, PRICE_CONFIGURE, PRICE_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **12 of these operations work offline**: evaluatePromotions, getPerformance, getProduct, getPromotion, listCatalogueBundles, listEntitlementTemplates, listMerchandise, listPerformances
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,13 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-007` | Product Directory | listDetail | 14 | 0 | — |
-| `BO-009` | Pricing Rules | listDetail | 7 | 0 | — |
-| `BO-010` | Promotions & Coupons | listDetail | 19 | 1 | — |
-| `BO-011` | Packages & Bundles | listDetail | 5 | 0 | — |
-| `BO-012` | Membership Products | listDetail | 12 | 0 | — |
-| `BO-013` | Channel & Distribution | listDetail | 10 | 0 | — |
-| `BO-014` | Catalogue Publishing | listDetail | 13 | 0 | — |
-| `BO-015` | Session Calendar | listDetail | 11 | 1 | — |
-| `BO-016` | Session Template | listDetail | 11 | 1 | — |
-| `BO-017` | Capacity Management | listDetail | 6 | 0 | — |
+| `BO-007` | Product Directory | listDetail | 14 | 7 | — |
+| `BO-009` | Pricing Rules | listDetail | 11 | 4 | — |
+| `BO-010` | Promotions & Coupons | listDetail | 24 | 10 | — |
+| `BO-011` | Packages & Bundles | listDetail | 10 | 4 | — |
+| `BO-012` | Membership Products | listDetail | 12 | 6 | — |
+| `BO-013` | Channel & Distribution | listDetail | 10 | 6 | — |
+| `BO-014` | Catalogue Publishing | listDetail | 13 | 7 | — |
+| `BO-015` | Performance Calendar | listDetail | 11 | 6 | — |
+| `BO-016` | Performance Template | listDetail | 2 | 1 | — |
+| `BO-017` | Capacity Management | listDetail | 8 | 4 | — |
+
+## Thin screens in this batch
+
+**BO-016 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

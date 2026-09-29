@@ -18,6 +18,25 @@
   "requestBody": null,
   "responds": "VenuePoint"
  },
+ "acceptWalkwayProposals": {
+  "method": "POST",
+  "path": "/venue-maps/{mapId}/walkway-proposals",
+  "contract": "venue-map",
+  "summary": "Accept or reject proposed walkways",
+  "permission": "VENUE_MAP_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GraphValidation"
+ },
  "callNextParties": {
   "method": "POST",
   "path": "/queues/{queueId}/call-next",
@@ -262,6 +281,11 @@
     "name": "version",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "draft",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -278,6 +302,11 @@
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": "draft",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": "stepFreeOnly",
     "in": "query",
     "required": null
@@ -285,6 +314,19 @@
   ],
   "requestBody": null,
   "responds": "VenueMapGraph"
+ },
+ "getVenueMapImportJob": {
+  "method": "GET",
+  "path": "/venue-maps/{mapId}/import/{jobId}",
+  "contract": "venue-map",
+  "summary": "Import progress and findings",
+  "permission": "VENUE_MAP_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VenueMapImportJob"
  },
  "getWaitTimes": {
   "method": "GET",
@@ -378,7 +420,7 @@
   "path": "/audit-records",
   "contract": "tenancy",
   "summary": "Who did what, where, and when",
-  "permission": "AI_AUDIT_VIEW",
+  "permission": "AUDIT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -409,6 +451,11 @@
     "required": null
    },
    {
+    "name": "platformStaffGrantId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": "from",
     "in": "query",
     "required": null
@@ -417,10 +464,20 @@
     "name": "to",
     "in": "query",
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Page"
  },
  "listGames": {
   "method": "GET",
@@ -861,7 +918,26 @@
    }
   ],
   "requestBody": null,
-  "responds": "VenuePath"
+  "responds": "PathClosureResult"
+ },
+ "setPlacedResource": {
+  "method": "POST",
+  "path": "/venue-maps/{mapId}/resources",
+  "contract": "venue-map",
+  "summary": "Place or amend a bookable resource on the map",
+  "permission": "VENUE_MAP_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SetPlacedResourceRequest",
+  "responds": "PlacedResource"
  },
  "setQueueStatus": {
   "method": "PUT",
@@ -917,7 +993,7 @@
     "required": null
    }
   ],
-  "requestBody": "VenuePoint",
+  "requestBody": "SetVenuePointRequest",
   "responds": "VenuePoint"
  },
  "setWaitTime": {
@@ -948,7 +1024,13 @@
   "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": null
  },
@@ -961,7 +1043,13 @@
   "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ScanSyncResult"
  },
@@ -1088,7 +1176,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "GraphValidation"
  }

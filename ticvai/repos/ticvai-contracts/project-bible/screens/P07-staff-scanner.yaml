@@ -377,8 +377,8 @@ screens:
       trigger: Gate mode
       carries:
       - accessPointId
-      provenance: derived — SCN-016 declares entryState.params accessPointId and SCN-002 holds accessPointId,
-        so an edge into it carries them
+      provenance: derived — SCN-016 declares entryState.params accessPointId, changeId and SCN-002 holds
+        accessPointId, so an edge into it carries them
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Authoring operations removed 24 August**: createAccessPoint, setAccessPointGeofence,
     updateAccessPoint. **A scanner reads the gate configuration; it does not write it.** An access point
@@ -453,6 +453,19 @@ screens:
         label: Save gate mode
         operation: setTurnstileMode
         provenance: contract access.yaml PUT /access-points/{accessPointId}/mode
+      - kind: secondaryButton
+        label: Start podium shift
+        operation: startPodiumShift
+        permission: TURNSTILE_MODE_SET
+        notes: '**The operator signs in to a podium** (BO-225; P07 SCN-002 where the scanner picks its
+          access point).'
+        provenance: contract access.yaml POST /podiums/{podiumId}/shifts
+      - kind: secondaryButton
+        label: End podium shift
+        operation: endPodiumShift
+        permission: TURNSTILE_MODE_SET
+        notes: '**The operator signs out of the podium**: sets `logoutAt`.'
+        provenance: contract access.yaml POST /podium-shifts/{shiftId}/end
   states:
     loading: The access point direction list.
     error: Could not load. Names which read failed and leaves the access point direction untouched.
@@ -480,10 +493,26 @@ screens:
     trigger: onAction
     invalidates:
     - listAccessPoints
+  - operationId: startPodiumShift
+    contract: access
+    purpose: Start an operator shift on a podium
+    trigger: onAction
+    invalidates:
+    - listAccessPoints
+  - operationId: endPodiumShift
+    contract: access
+    purpose: End an operator shift on a podium
+    trigger: onAction
+    invalidates:
+    - listAccessPoints
   entryState:
     params:
     - name: accessPointId
       from: deepLink
+    - name: podiumId
+      from: session
+    - name: shiftId
+      from: session
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -522,6 +551,33 @@ screens:
       - mode
       - reason
     provenance: contract access.yaml PUT /access-points/{accessPointId}/mode
+  - id: formStartPodiumShift
+    component: modal
+    trigger: Start podium shift
+    body: '**Collects what `startPodiumShift` sends before it is called.** Nothing in the body is required.
+      Optional: `role`, `accessDeviceId`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Start podium shift
+      operation: startPodiumShift
+    dismiss:
+      label: Cancel
+      discards:
+      - role
+      - accessDeviceId
+    provenance: contract access.yaml POST /podiums/{podiumId}/shifts
+  - id: formEndPodiumShift
+    component: modal
+    trigger: End podium shift
+    body: '**Collects what `endPodiumShift` sends before it is called.** Nothing in the body is required.
+      Optional: `handoverNote`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: End podium shift
+      operation: endPodiumShift
+    dismiss:
+      label: Cancel
+      discards:
+      - handoverNote
+    provenance: contract access.yaml POST /podium-shifts/{shiftId}/end
 - id: SCN-003
   name: Ready to scan
   module: Access
@@ -2953,6 +3009,12 @@ screens:
         label: Save gate mode
         operation: setTurnstileMode
         provenance: contract access.yaml PUT /access-points/{accessPointId}/mode
+      - kind: destructiveButton
+        label: Cancel gate mode change
+        operation: cancelGateModeChange
+        permission: TURNSTILE_MODE_SET
+        notes: Cancels a `pending` gate mode change, one `setTurnstileMode` scheduled with a future `effectiveAt`.
+        provenance: contract access.yaml POST /gate-mode-changes/{changeId}/cancel
   states:
     loading: The gate mode list.
     error: Could not load. Names which read failed and leaves the gate mode untouched.
@@ -2979,10 +3041,19 @@ screens:
     contract: access
     purpose: List access points
     trigger: onLoad
+  - operationId: cancelGateModeChange
+    contract: access
+    purpose: Cancel a scheduled gate mode change
+    trigger: onAction
+    invalidates:
+    - listAccessPoints
   entryState:
     params:
     - name: accessPointId
       from: deepLink
+    - name: changeId
+      from: navigation
+      optional: true
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -3021,3 +3092,11 @@ screens:
       - mode
       - reason
     provenance: contract access.yaml PUT /access-points/{accessPointId}/mode
+  - id: confirmCancelGateModeChange
+    component: confirmDialog
+    trigger: Cancel gate mode change
+    body: '**Names what `cancelGateModeChange` changes and what it leaves alone**, in the consequence
+      rather than the verb. A access gate mode change this affects should be identified in the dialog,
+      not just counted. **Collects what `cancelGateModeChange` sends before it is called.** Nothing in
+      the body is required. Optional: `reason`.'
+    provenance: contract access.yaml POST /gate-mode-changes/{changeId}/cancel

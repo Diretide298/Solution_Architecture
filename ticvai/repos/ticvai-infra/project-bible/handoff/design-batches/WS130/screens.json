@@ -1,0 +1,879 @@
+[
+ {
+  "id": "BO-710",
+  "name": "Event Resource Command Center",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "6",
+   "number": "01",
+   "page": 81
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/event-resource-command-center-bo-710",
+   "component": "apps/venue-management-web/src/routes/sell/EventResourceCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-711",
+    "BO-712",
+    "BO-713",
+    "BO-714",
+    "BO-715"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-711",
+     "trigger": "Event Resource Requirement Configuration",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "carries": [
+      "eventId"
+     ]
+    },
+    {
+     "to": "BO-712",
+     "trigger": "Staff & Role Assignment Configuration",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "carries": [
+      "eventId"
+     ]
+    },
+    {
+     "to": "BO-713",
+     "trigger": "Contractor & External Workforce Configuration",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "carries": [
+      "eventId"
+     ]
+    },
+    {
+     "to": "BO-714",
+     "trigger": "Event Shift & Roster Configuration",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-715",
+     "trigger": "Resource Location & Deployment Configuration",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "carries": [
+      "eventId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide management with a consolidated backend view of the financial, commercial, sponsorship, attendance and operational performance of events.",
+  "purposeNote": "Authorized users can obtain a consolidated view of event commercial and operational performance while data visibility remains controlled by tenant, entity and role permissions.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 81"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 81"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getEventResourcePlan",
+       "notes": "One record, read-only."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The event resource list.",
+   "error": "Could not load. Names which read failed and leaves the event resource untouched.",
+   "emptyFirstRun": "No event resource yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the event resource are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getEventResourcePlan",
+    "contract": "catalogue",
+    "purpose": "The resource plan",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-710",
+   "workshopBoard": "wireframes/WS53 Event Management Configuration Backend Structure v1.0 Board 6.dc.html#bo-710"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Event_Management_Configuration_Backend_Structure_v1.0.pdf page 81. 0 of 0 labels bound to a contract property; 0 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "eventId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-711",
+  "name": "Event Resource Requirement Configuration",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "6",
+   "number": "02",
+   "page": 82
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/event-resource-requirement-configuration-bo-711",
+   "component": "apps/venue-management-web/src/routes/sell/EventResourceRequirementConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-710"
+   ],
+   "exitTo": [
+    "BO-710"
+   ],
+   "transitions": [
+    {
+     "to": "BO-710",
+     "trigger": "Back to Event Resource Command Center",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "eventId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure the financial plan and budget against which event performance will be measured.",
+  "purposeNote": "Administrators can create an event-level financial plan and compare budget, commitments, actuals and forecasts using data referenced from the shared Finance services.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 82"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 82"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setEventResourcePlan",
+       "label": "Save event resource plan",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setEventResourcePlan"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The event resource requirement list.",
+   "error": "Could not load. Names which read failed and leaves the event resource requirement untouched.",
+   "emptyFirstRun": "No event resource requirement yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the event resource requirement are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setEventResourcePlan",
+    "contract": "catalogue",
+    "purpose": "What the event needs",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getEventResourcePlan"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-711",
+   "workshopBoard": "wireframes/WS53 Event Management Configuration Backend Structure v1.0 Board 6.dc.html#bo-711"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Event_Management_Configuration_Backend_Structure_v1.0.pdf page 82. 0 of 0 labels bound to a contract property; 0 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "eventId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-712",
+  "name": "Staff & Role Assignment Configuration",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "6",
+   "number": "03",
+   "page": 83
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/staff-role-assignment-configuration-bo-712",
+   "component": "apps/venue-management-web/src/routes/sell/StaffRoleAssignmentConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-710"
+   ],
+   "exitTo": [
+    "BO-710"
+   ],
+   "transitions": [
+    {
+     "to": "BO-710",
+     "trigger": "Back to Event Resource Command Center",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "eventId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Define how financial performance should be measured and attributed to an event.",
+  "purposeNote": "The system provides traceable event profitability using configured financial attribution rules without duplicating the underlying accounting ledger.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 83"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 83"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setEventResourcePlan",
+       "label": "Save event resource plan",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setEventResourcePlan"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The staff role list.",
+   "error": "Could not load. Names which read failed and leaves the staff role untouched.",
+   "emptyFirstRun": "No staff role yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the staff role are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setEventResourcePlan",
+    "contract": "catalogue",
+    "purpose": "Staff and roles",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getEventResourcePlan"
+    ]
+   },
+   {
+    "operationId": "createRotaAssignment",
+    "contract": "workforce",
+    "purpose": "Roster them",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listRotaAssignments",
+     "getStaffingCoverage"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-712",
+   "workshopBoard": "wireframes/WS53 Event Management Configuration Backend Structure v1.0 Board 6.dc.html#bo-712"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Event_Management_Configuration_Backend_Structure_v1.0.pdf page 83. 0 of 0 labels bound to a contract property; 0 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "eventId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-713",
+  "name": "Contractor & External Workforce Configuration",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "6",
+   "number": "04",
+   "page": 84
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/contractor-external-workforce-configuration-bo-713",
+   "component": "apps/venue-management-web/src/routes/sell/ContractorExternalWorkforceConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-710"
+   ],
+   "exitTo": [
+    "BO-710"
+   ],
+   "transitions": [
+    {
+     "to": "BO-710",
+     "trigger": "Back to Event Resource Command Center",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "eventId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Track) and no metric row",
+  "purpose": "Manage sponsors and sponsorship agreements associated with events.",
+  "purposeNote": "Administrators can associate sponsorship agreements and deliverables with an event and track fulfillment against contractual commitments.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 84 §Track"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every contractor external workforce",
+       "columns": [
+        "Contracted → Scheduled → Delivered → Verified"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 84 §Track"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected contractor external workforce",
+       "bindsTo": null,
+       "columns": [
+        "Contracted → Scheduled → Delivered → Verified"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Sponsorship levels may include”.",
+       "provenance": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 84 §Track"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The contractor external workforce list.",
+   "error": "Could not load. Names which read failed and leaves the contractor external workforce untouched.",
+   "emptyFirstRun": "No contractor external workforce yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the contractor external workforce are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setEventResourcePlan",
+    "contract": "catalogue",
+    "purpose": "Contractors and external workforce",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getEventResourcePlan"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Contracted → Scheduled → Delivered → Verified"
+   ],
+   "params": [
+    {
+     "name": "eventId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-713",
+   "workshopBoard": "wireframes/WS53 Event Management Configuration Backend Structure v1.0 Board 6.dc.html#bo-713"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Event_Management_Configuration_Backend_Structure_v1.0.pdf page 84. 0 of 1 labels bound to a contract property; 1 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-714",
+  "name": "Event Shift & Roster Configuration",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "6",
+   "number": "06",
+   "page": 85
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/event-shift-roster-configuration-bo-714",
+   "component": "apps/venue-management-web/src/routes/sell/EventShiftRosterConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-710"
+   ],
+   "exitTo": [
+    "BO-710"
+   ],
+   "transitions": [
+    {
+     "to": "BO-710",
+     "trigger": "Back to Event Resource Command Center",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Allow authorized administrators to use AI to accelerate creation of event configuration from natural-language instructions or existing templates.",
+  "purposeNote": "AI can accelerate event setup while every proposed configuration remains reviewable, editable, permission-controlled and subject to normal approval workflows.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 85 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every event shift roster",
+       "columns": [
+        "AI Proposal",
+        "Existing / Approved Configuration"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 85 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected event shift roster",
+       "bindsTo": null,
+       "columns": [
+        "AI Proposal",
+        "Existing / Approved Configuration"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Administrators can”, “Critical Governance Principle”.",
+       "provenance": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 85 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The event shift roster list.",
+   "error": "Could not load. Names which read failed and leaves the event shift roster untouched.",
+   "emptyFirstRun": "No event shift roster yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the event shift roster are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setShiftTemplate",
+    "contract": "workforce",
+    "purpose": "Event shifts",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listShiftTemplates"
+    ]
+   },
+   {
+    "operationId": "getStaffingCoverage",
+    "contract": "workforce",
+    "purpose": "Where it is short",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "AI Proposal",
+    "Existing / Approved Configuration"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-714",
+   "workshopBoard": "wireframes/WS53 Event Management Configuration Backend Structure v1.0 Board 6.dc.html#bo-714"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Event_Management_Configuration_Backend_Structure_v1.0.pdf page 85. 0 of 2 labels bound to a contract property; 2 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-715",
+  "name": "Resource Location & Deployment Configuration",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "6",
+   "number": "07",
+   "page": 86
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/resource-location-deployment-configuration-bo-715",
+   "component": "apps/venue-management-web/src/routes/sell/ResourceLocationDeploymentConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-710"
+   ],
+   "exitTo": [
+    "BO-710"
+   ],
+   "transitions": [
+    {
+     "to": "BO-710",
+     "trigger": "Back to Event Resource Command Center",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "eventId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Configure KPI by; Display) and no metric row",
+  "purpose": "Configure measurable operational KPIs for staff, instructors and activity operators.",
+  "purposeNote": "Administrators can define measurable operator/instructor KPIs and calculate performance using traceable operational records from completed sessions.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 86 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every resource location deployment",
+       "columns": [
+        "Target vs Actual"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 86 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected resource location deployment",
+       "bindsTo": null,
+       "columns": [
+        "Target vs Actual"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Set”.",
+       "provenance": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 86 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resource location deployment list.",
+   "error": "Could not load. Names which read failed and leaves the resource location deployment untouched.",
+   "emptyFirstRun": "No resource location deployment yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the resource location deployment are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setEventResourcePlan",
+    "contract": "catalogue",
+    "purpose": "Deployment by location",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getEventResourcePlan"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Target vs Actual"
+   ],
+   "params": [
+    {
+     "name": "eventId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-715",
+   "workshopBoard": "wireframes/WS53 Event Management Configuration Backend Structure v1.0 Board 6.dc.html#bo-715"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Event_Management_Configuration_Backend_Structure_v1.0.pdf page 86. 0 of 1 labels bound to a contract property; 1 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

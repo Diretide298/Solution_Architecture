@@ -1,6 +1,6 @@
 # WS12 — Access Control board 12
 
-**10 screens · 10 operations · 10 schemas · 1 permissions**
+**10 screens · 16 operations · 19 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 1 permissions apply here:
-  `SCOPE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `REPORT_SCHEDULE, REPORT_VIEW_VENUE, SCOPE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -69,12 +68,12 @@ convincingly. It is never a caption.
 | `BO-259` | Throughput, Queue & Validation Performance Analytics | commandCentre | 1 | 0 | — |
 | `BO-260` | Validation Outcome & Rejection Analytics | listDetail | 1 | 0 | — |
 | `BO-261` | Guest Dwell Time, Length of Stay & Attraction Flow | commandCentre | 1 | 0 | — |
-| `BO-262` | Access Reports, Scheduled Reporting & Data Export | listDetail | 1 | 0 | — |
+| `BO-262` | Access Reports, Scheduled Reporting & Data Export | listDetail | 7 | 0 | — |
 | `BO-263` | AI Access Intelligence, Forecasting & Executive Insights | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-254, BO-255, BO-256, BO-258, BO-260, BO-262, BO-263 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-255, BO-256, BO-258, BO-260, BO-262, BO-263 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-254 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-255",
@@ -186,13 +182,117 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Management can understand the overall access operation from one screen.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Provide a single executive and operational overview of access performance across all TICVAI-controlled venues.",
-  "purposeNote": "Management can understand the overall access operation from one screen.",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Total Admissions Today",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.totalAdmissionsToday",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Entries",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.entries",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Exits",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.exits",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Currently In Venue",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.currentlyInVenue",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Re-entries",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.reEntries",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Crossovers",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.crossovers",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Group Admissions",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.groupAdmissions",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Fast Pass Uses",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.fastPassUses",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Valid Scans",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.validScans",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Rejected Scans",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.rejectedScans",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Intervention Rate",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.interventionRate",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Seconds",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.averageValidationTime",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Active Gates",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.activeGates",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Offline Devices",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterViewSummary.offlineDevices",
+       "operation": "listAccessMonitoring",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -200,22 +300,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "dataTable",
        "label": "Every access monitoring analytics",
-       "columns": [
-        "AccessMonitoringAnalyticsCommandCenterView.totalAdmissionsToday",
-        "AccessMonitoringAnalyticsCommandCenterView.entries",
-        "AccessMonitoringAnalyticsCommandCenterView.exits",
-        "AccessMonitoringAnalyticsCommandCenterView.currentlyInVenue",
-        "AccessMonitoringAnalyticsCommandCenterView.reEntries",
-        "AccessMonitoringAnalyticsCommandCenterView.crossovers",
-        "AccessMonitoringAnalyticsCommandCenterView.groupAdmissions",
-        "AccessMonitoringAnalyticsCommandCenterView.fastPassUses",
-        "AccessMonitoringAnalyticsCommandCenterView.validScans",
-        "AccessMonitoringAnalyticsCommandCenterView.rejectedScans",
-        "AccessMonitoringAnalyticsCommandCenterView.interventionRate",
-        "AccessMonitoringAnalyticsCommandCenterView.averageValidationTime",
-        "AccessMonitoringAnalyticsCommandCenterView.activeGates",
-        "AccessMonitoringAnalyticsCommandCenterView.offlineDevices"
-       ],
        "bindsTo": "AccessMonitoringAnalyticsCommandCenterView",
        "operation": "listAccessMonitoring",
        "provenance": "pack Access Control Module_Reference.pdf, page 168 §Show"
@@ -230,22 +314,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "detailPanel",
        "label": "The selected access monitoring analytics",
        "bindsTo": "AccessMonitoringAnalyticsCommandCenterView",
-       "columns": [
-        "AccessMonitoringAnalyticsCommandCenterView.totalAdmissionsToday",
-        "AccessMonitoringAnalyticsCommandCenterView.entries",
-        "AccessMonitoringAnalyticsCommandCenterView.exits",
-        "AccessMonitoringAnalyticsCommandCenterView.currentlyInVenue",
-        "AccessMonitoringAnalyticsCommandCenterView.reEntries",
-        "AccessMonitoringAnalyticsCommandCenterView.crossovers",
-        "AccessMonitoringAnalyticsCommandCenterView.groupAdmissions",
-        "AccessMonitoringAnalyticsCommandCenterView.fastPassUses",
-        "AccessMonitoringAnalyticsCommandCenterView.validScans",
-        "AccessMonitoringAnalyticsCommandCenterView.rejectedScans",
-        "AccessMonitoringAnalyticsCommandCenterView.interventionRate",
-        "AccessMonitoringAnalyticsCommandCenterView.averageValidationTime",
-        "AccessMonitoringAnalyticsCommandCenterView.activeGates",
-        "AccessMonitoringAnalyticsCommandCenterView.offlineDevices"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “TOTAL ADMISSIONS”, “CURRENTLY IN VENUE”, “Venue Comparison”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 168 §Show"
       }
@@ -270,18 +338,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "AccessMonitoringAnalyticsCommandCenterView.totalAdmissionsToday",
-    "AccessMonitoringAnalyticsCommandCenterView.entries",
-    "AccessMonitoringAnalyticsCommandCenterView.exits",
-    "AccessMonitoringAnalyticsCommandCenterView.currentlyInVenue",
-    "AccessMonitoringAnalyticsCommandCenterView.reEntries",
-    "AccessMonitoringAnalyticsCommandCenterView.crossovers"
+    "AccessMonitoringAnalyticsCommandCenterViewSummary.totalAdmissionsToday",
+    "AccessMonitoringAnalyticsCommandCenterViewSummary.entries",
+    "AccessMonitoringAnalyticsCommandCenterViewSummary.exits",
+    "AccessMonitoringAnalyticsCommandCenterViewSummary.currentlyInVenue",
+    "AccessMonitoringAnalyticsCommandCenterViewSummary.reEntries",
+    "AccessMonitoringAnalyticsCommandCenterViewSummary.crossovers"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-254"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-254",
+   "workshopBoard": "wireframes/WS29 Access Control Board 12.dc.html#bo-254"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 168. 14 of 14 labels bound to a contract property; 14 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -402,7 +471,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-255"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-255",
+   "workshopBoard": "wireframes/WS29 Access Control Board 12.dc.html#bo-255"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 170. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -465,10 +535,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations can visually identify where access bottlenecks or abnormal conditions are occurring.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Turn the graphical access topology created in Board 1 into a live operational analytics map.",
-  "purposeNote": "Operations can visually identify where access bottlenecks or abnormal conditions are occurring.",
   "layout": {
    "template": "split",
    "regions": [
@@ -480,14 +550,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every graphical access map",
        "columns": [
-        "GraphicalAccessMapLiveGatePerformanceView.gates",
-        "GraphicalAccessMapLiveGatePerformanceView.turnstiles",
-        "GraphicalAccessMapLiveGatePerformanceView.entryPoints",
-        "GraphicalAccessMapLiveGatePerformanceView.exitPoints",
-        "GraphicalAccessMapLiveGatePerformanceView.reEntryGates",
-        "GraphicalAccessMapLiveGatePerformanceView.groupGates",
-        "GraphicalAccessMapLiveGatePerformanceView.vipGates",
-        "GraphicalAccessMapLiveGatePerformanceView.attractionAccess"
+        "GraphicalAccessMapLiveGatePerformanceView.pointType"
        ],
        "bindsTo": "GraphicalAccessMapLiveGatePerformanceView",
        "operation": "listGraphicalAccessMap",
@@ -504,14 +567,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected graphical access map",
        "bindsTo": "GraphicalAccessMapLiveGatePerformanceView",
        "columns": [
-        "GraphicalAccessMapLiveGatePerformanceView.gates",
-        "GraphicalAccessMapLiveGatePerformanceView.turnstiles",
-        "GraphicalAccessMapLiveGatePerformanceView.entryPoints",
-        "GraphicalAccessMapLiveGatePerformanceView.exitPoints",
-        "GraphicalAccessMapLiveGatePerformanceView.reEntryGates",
-        "GraphicalAccessMapLiveGatePerformanceView.groupGates",
-        "GraphicalAccessMapLiveGatePerformanceView.vipGates",
-        "GraphicalAccessMapLiveGatePerformanceView.attractionAccess"
+        "GraphicalAccessMapLiveGatePerformanceView.pointType"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Guests”, “Throughput”, “Success”, “Reject”, “Yellow”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 171 §Display"
@@ -537,18 +593,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "GraphicalAccessMapLiveGatePerformanceView.gates",
-    "GraphicalAccessMapLiveGatePerformanceView.turnstiles",
-    "GraphicalAccessMapLiveGatePerformanceView.entryPoints",
-    "GraphicalAccessMapLiveGatePerformanceView.exitPoints",
-    "GraphicalAccessMapLiveGatePerformanceView.reEntryGates",
-    "GraphicalAccessMapLiveGatePerformanceView.groupGates"
+    "GraphicalAccessMapLiveGatePerformanceView.pointType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-256"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-256",
+   "workshopBoard": "wireframes/WS29 Access Control Board 12.dc.html#bo-256"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 171. 8 of 8 labels bound to a contract property; 12 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -630,15 +682,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "multiSelect",
        "label": "Filter by",
        "columns": [
-        "AttendanceAdmissionAnalyticsView.ticketType",
         "Product",
-        "AttendanceAdmissionAnalyticsView.event",
         "Timeslot",
         "Membership",
-        "AttendanceAdmissionAnalyticsView.channel",
         "B2B Partner",
         "Reseller",
-        "AttendanceAdmissionAnalyticsView.customerSegment",
         "Guest Category"
        ],
        "notes": "The pack filters this screen by ticket type, product, event, timeslot, membership, channel and 4 more — which are present is a decision the pack already made.",
@@ -662,11 +710,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "AttendanceAdmissionAnalyticsView.groupAttendance",
         "AttendanceAdmissionAnalyticsView.membershipAttendance",
         "AttendanceAdmissionAnalyticsView.repeatEntry",
-        "AttendanceAdmissionAnalyticsView.noShowRate",
-        "AttendanceAdmissionAnalyticsView.ticketType",
-        "AttendanceAdmissionAnalyticsView.channel",
-        "AttendanceAdmissionAnalyticsView.event",
-        "AttendanceAdmissionAnalyticsView.dateTime"
+        "AttendanceAdmissionAnalyticsView.noShowRate"
        ],
        "bindsTo": "AttendanceAdmissionAnalyticsView",
        "operation": "listAttendanceAdmission",
@@ -691,11 +735,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "AttendanceAdmissionAnalyticsView.groupAttendance",
         "AttendanceAdmissionAnalyticsView.membershipAttendance",
         "AttendanceAdmissionAnalyticsView.repeatEntry",
-        "AttendanceAdmissionAnalyticsView.noShowRate",
-        "AttendanceAdmissionAnalyticsView.ticketType",
-        "AttendanceAdmissionAnalyticsView.channel",
-        "AttendanceAdmissionAnalyticsView.event",
-        "AttendanceAdmissionAnalyticsView.dateTime"
+        "AttendanceAdmissionAnalyticsView.noShowRate"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Sold”, “Eligible”, “Attended”, “ATTENDANCE RATE”, “Purchased”, “Actual Attendance”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 172 §Show"
@@ -732,7 +772,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-257"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-257",
+   "workshopBoard": "wireframes/WS29 Access Control Board 12.dc.html#bo-257"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 172. 17 of 23 labels bound to a contract property; 23 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -795,10 +836,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Management can understand actual movement patterns rather than only total admission counts.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Measure) and no metric row",
   "purpose": "Analyze complete guest movement across the access journey.",
-  "purposeNote": "Management can understand actual movement patterns rather than only total admission counts.",
   "layout": {
    "template": "split",
    "regions": [
@@ -814,8 +855,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "EntryExitReEntryCrossoverAnalyticsView.averageTimeOutside",
         "EntryExitReEntryCrossoverAnalyticsView.mostUsedReEntryGates",
         "EntryExitReEntryCrossoverAnalyticsView.rejectedReEntry",
-        "EntryExitReEntryCrossoverAnalyticsView.parkAParkB",
-        "EntryExitReEntryCrossoverAnalyticsView.parkBParkA",
         "EntryExitReEntryCrossoverAnalyticsView.crossoverTime",
         "EntryExitReEntryCrossoverAnalyticsView.crossoverProduct"
        ],
@@ -838,8 +877,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "EntryExitReEntryCrossoverAnalyticsView.averageTimeOutside",
         "EntryExitReEntryCrossoverAnalyticsView.mostUsedReEntryGates",
         "EntryExitReEntryCrossoverAnalyticsView.rejectedReEntry",
-        "EntryExitReEntryCrossoverAnalyticsView.parkAParkB",
-        "EntryExitReEntryCrossoverAnalyticsView.parkBParkA",
         "EntryExitReEntryCrossoverAnalyticsView.crossoverTime",
         "EntryExitReEntryCrossoverAnalyticsView.crossoverProduct"
        ],
@@ -870,15 +907,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "EntryExitReEntryCrossoverAnalyticsView.reEntryRate",
     "EntryExitReEntryCrossoverAnalyticsView.averageTimeOutside",
     "EntryExitReEntryCrossoverAnalyticsView.mostUsedReEntryGates",
-    "EntryExitReEntryCrossoverAnalyticsView.rejectedReEntry",
-    "EntryExitReEntryCrossoverAnalyticsView.parkAParkB",
-    "EntryExitReEntryCrossoverAnalyticsView.parkBParkA"
+    "EntryExitReEntryCrossoverAnalyticsView.rejectedReEntry"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-258"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-258",
+   "workshopBoard": "wireframes/WS29 Access Control Board 12.dc.html#bo-258"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 174. 8 of 8 labels bound to a contract property; 8 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -941,10 +977,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Management can identify why specific gates or lanes are underperforming.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Show) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Measure the operational efficiency of gates and validation devices.",
-  "purposeNote": "Management can identify why specific gates or lanes are underperforming.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -1031,7 +1067,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-259"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-259",
+   "workshopBoard": "wireframes/WS29 Access Control Board 12.dc.html#bo-259"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 175. 7 of 7 labels bound to a contract property; 8 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1094,10 +1131,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Management can identify the operational root cause behind access failures.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Analyze why guests are denied or require manual intervention.",
-  "purposeNote": "Management can identify the operational root cause behind access failures.",
   "gaps": [
    {
     "operation": null,
@@ -1156,7 +1193,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-260"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-260",
+   "workshopBoard": "wireframes/WS29 Access Control Board 12.dc.html#bo-260"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 176. 0 of 9 labels bound to a contract property; 9 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1219,10 +1257,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "systems.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Show) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Use access events to understand how guests move through and use the venue.",
-  "purposeNote": "systems.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -1304,7 +1342,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-261"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-261",
+   "workshopBoard": "wireframes/WS29 Access Control Board 12.dc.html#bo-261"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 177. 7 of 7 labels bound to a contract property; 7 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1367,10 +1406,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can create, schedule and export access-control reports without development support.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide configurable operational and management reports.",
-  "purposeNote": "Authorized users can create, schedule and export access-control reports without development support.",
   "gaps": [
    {
     "operation": null,
@@ -1393,19 +1432,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "multiSelect",
        "label": "Filter by",
-       "columns": [
-        "AccessReportsScheduledReportingDataExportView.tenant",
-        "AccessReportsScheduledReportingDataExportView.venue",
-        "AccessReportsScheduledReportingDataExportView.park",
-        "AccessReportsScheduledReportingDataExportView.zone",
-        "AccessReportsScheduledReportingDataExportView.event",
-        "AccessReportsScheduledReportingDataExportView.date",
-        "AccessReportsScheduledReportingDataExportView.ticketType",
-        "AccessReportsScheduledReportingDataExportView.product",
-        "AccessReportsScheduledReportingDataExportView.gate",
-        "AccessReportsScheduledReportingDataExportView.device",
-        "AccessReportsScheduledReportingDataExportView.channel"
-       ],
        "notes": "The pack filters this screen by tenant, venue, park, zone, event, date and 5 more — which are present is a decision the pack already made.",
        "provenance": "pack Access Control Module_Reference.pdf, page 179 §Filters"
       }
@@ -1426,14 +1452,80 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Access Reports, Scheduled Reporting & Data Export",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listReportSchedules",
+    "contract": "reporting",
+    "purpose": "The scheduled access reports",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "runReport",
+    "contract": "reporting",
+    "purpose": "Run an access report now",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listReportSchedules"
+    ]
+   },
+   {
+    "operationId": "createReportSchedule",
+    "contract": "reporting",
+    "purpose": "Schedule an access report or export",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listReportSchedules"
+    ]
+   },
+   {
+    "operationId": "updateReportSchedule",
+    "contract": "reporting",
+    "purpose": "Amend, pause or resume a schedule",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listReportSchedules"
+    ]
+   },
+   {
+    "operationId": "deleteReportSchedule",
+    "contract": "reporting",
+    "purpose": "Delete a schedule",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listReportSchedules"
+    ]
+   },
+   {
+    "operationId": "listReports",
+    "contract": "reporting",
+    "purpose": "The access reports to run or schedule",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-262"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-262",
+   "workshopBoard": "wireframes/WS29 Access Control Board 12.dc.html#bo-262"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 179. 11 of 11 labels bound to a contract property; 11 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "reportId",
+     "from": "navigation"
+    },
+    {
+     "name": "scheduleId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1486,10 +1578,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from BO-254, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "dashboards alone. Board 12 — Final 10-Screen Structure # Backend Screen Main Responsibility 12.1 Access Monitoring & Analytics Command Center Executive access overview 12.2 Live Venue Occupancy & People Counting Real-time occupancy 12.3 Graphical Access Map & Live Gate Performance Visual venue/gate monitoring 12.4 Attendance & Admission Analytics Actual attendance and no-shows 12.5 Entry, Exit, Re-entry & Crossover Analytics Complete guest movement 12.6 Throughput, Queue & Validation Performance Analytics Gate operational efficiency 12.7 Validation Outcome & Rejection Analytics Failure and int",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Forecast) and no metric row",
   "purpose": "Turn access-control data into proactive operational intelligence. This should be the final intelligence screen of the entire Access Control module.",
-  "purposeNote": "dashboards alone. Board 12 — Final 10-Screen Structure # Backend Screen Main Responsibility 12.1 Access Monitoring & Analytics Command Center Executive access overview 12.2 Live Venue Occupancy & People Counting Real-time occupancy 12.3 Graphical Access Map & Live Gate Performance Visual venue/gate monitoring 12.4 Attendance & Admission Analytics Actual attendance and no-shows 12.5 Entry, Exit, Re-entry & Crossover Analytics Complete guest movement 12.6 Throughput, Queue & Validation Performance Analytics Gate operational efficiency 12.7 Validation Outcome & Rejection Analytics Failure and int",
   "layout": {
    "template": "split",
    "regions": [
@@ -1569,7 +1661,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-263"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-263",
+   "workshopBoard": "wireframes/WS29 Access Control Board 12.dc.html#bo-263"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 180. 8 of 8 labels bound to a contract property; 8 of 62 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1604,12 +1697,50 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "createReportSchedule": {
+  "method": "POST",
+  "path": "/report-schedules",
+  "contract": "reporting",
+  "summary": "Schedule a report",
+  "permission": "REPORT_SCHEDULE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateReportScheduleRequest",
+  "responds": "ReportSchedule"
+ },
+ "deleteReportSchedule": {
+  "method": "DELETE",
+  "path": "/report-schedules/{scheduleId}",
+  "contract": "reporting",
+  "summary": "Delete a schedule",
+  "permission": "REPORT_SCHEDULE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "listAccessExecutiveInsight": {
   "method": "GET",
   "path": "/access-executive-insight",
   "contract": "access",
   "summary": "AI Access Intelligence, Forecasting & Executive Insights",
-  "permission": "SCOPE_VIEW",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -1622,24 +1753,91 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/access-monitoring",
   "contract": "access",
   "summary": "Access Monitoring & Analytics Command Center",
-  "permission": "SCOPE_VIEW",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AccessMonitoringAnalyticsCommandCenterView"
+  "responds": "Page"
  },
  "listAccessReportScheduled": {
   "method": "GET",
   "path": "/access-report-scheduled",
   "contract": "access",
   "summary": "Access Reports, Scheduled Reporting & Data Export",
-  "permission": "SCOPE_VIEW",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "park",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "zone",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ticketType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "gate",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "device",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partner",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "AccessReportsScheduledReportingDataExportView"
  },
@@ -1648,7 +1846,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/attendance-admission",
   "contract": "access",
   "summary": "Attendance & Admission Analytics",
-  "permission": "SCOPE_VIEW",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -1687,6 +1885,31 @@ Method, path, parameters, request and response for every operation these screens
     "name": "venue",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "ticketType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerSegment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -1697,7 +1920,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/entry-exit-crossover",
   "contract": "access",
   "summary": "Entry, Exit, Re-entry & Crossover Analytics",
-  "permission": "SCOPE_VIEW",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -1714,7 +1937,23 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "park",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "zone",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "GraphicalAccessMapLiveGatePerformanceView"
  },
@@ -1723,7 +1962,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/guest-dwell-time",
   "contract": "access",
   "summary": "Guest Dwell Time, Length of Stay & Attraction Flow",
-  "permission": "SCOPE_VIEW",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -1744,12 +1983,70 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "LiveVenueOccupancyPeopleCountingView"
  },
+ "listReportSchedules": {
+  "method": "GET",
+  "path": "/report-schedules",
+  "contract": "reporting",
+  "summary": "List scheduled reports",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listReports": {
+  "method": "GET",
+  "path": "/reports",
+  "contract": "reporting",
+  "summary": "List available report definitions",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "category",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listThroughputQueueValidation": {
   "method": "GET",
   "path": "/throughput-queue-validation",
   "contract": "access",
   "summary": "Throughput, Queue & Validation Performance Analytics",
-  "permission": "SCOPE_VIEW",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -1762,7 +2059,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/validation-outcome-rejection",
   "contract": "access",
   "summary": "Validation Outcome & Rejection Analytics",
-  "permission": "SCOPE_VIEW",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -1806,10 +2103,58 @@ Method, path, parameters, request and response for every operation these screens
     "name": "device",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "credentialType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "time",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
   "responds": "ValidationOutcomeRejectionAnalyticsView"
+ },
+ "runReport": {
+  "method": "POST",
+  "path": "/reports/{reportId}/run",
+  "contract": "reporting",
+  "summary": "Run a report",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RunReportRequest",
+  "responds": "ReportResult"
+ },
+ "updateReportSchedule": {
+  "method": "PATCH",
+  "path": "/report-schedules/{scheduleId}",
+  "contract": "reporting",
+  "summary": "Amend, pause or resume a schedule",
+  "permission": "REPORT_SCHEDULE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ReportSchedule"
  }
 }
 ```
@@ -1820,175 +2165,55 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
- "AccessMonitoringAnalyticsCommandCenterView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Access Monitoring & Analytics Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "totalAdmissionsToday": {
-    "type": "integer",
-    "description": "Total Admissions Today"
-   },
-   "entries": {
-    "type": "integer",
-    "description": "Entries"
-   },
-   "exits": {
-    "type": "integer",
-    "description": "Exits"
-   },
-   "currentlyInVenue": {
-    "type": "string",
-    "description": "Currently In Venue"
-   },
-   "reEntries": {
-    "type": "integer",
-    "description": "Re-entries"
-   },
-   "crossovers": {
-    "type": "integer",
-    "description": "Crossovers"
-   },
-   "groupAdmissions": {
-    "type": "integer",
-    "description": "Group Admissions"
-   },
-   "fastPassUses": {
-    "type": "integer",
-    "description": "Fast Pass Uses"
-   },
-   "validScans": {
-    "type": "integer",
-    "description": "Valid Scans"
-   },
-   "rejectedScans": {
-    "type": "integer",
-    "description": "Rejected Scans"
-   },
-   "interventionRate": {
-    "type": "number",
-    "description": "Intervention Rate"
-   },
-   "averageValidationTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Average Validation Time"
-   },
-   "activeGates": {
-    "type": "integer",
-    "description": "Active Gates"
-   },
-   "offlineDevices": {
-    "type": "integer",
-    "description": "Offline Devices"
-   },
-   "totalAdmissions": {
-    "type": "integer",
-    "description": "TOTAL ADMISSIONS (the pack shows 42,684)"
-   },
-   "avgValidation": {
-    "type": "number",
-    "description": "AVG. VALIDATION"
-   }
-  }
- },
  "AccessReportsScheduledReportingDataExportView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Access Reports, Scheduled Reporting & Data Export displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "tenant": {
-    "type": "string",
-    "description": "Tenant"
+   "name": {
+    "type": "string"
    },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
+   "reportId": {
+    "type": "string"
    },
-   "park": {
-    "type": "string",
-    "description": "Park"
+   "formats": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "dashboard",
+      "csv",
+      "xlsx",
+      "pdf",
+      "apiDataFeed",
+      "biIntegration"
+     ]
+    }
    },
-   "zone": {
-    "type": "string",
-    "description": "Zone"
+   "filterCriteria": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Saved filters, e.g. venue=..., gate=..."
    },
-   "event": {
+   "scheduleTime": {
     "type": "string",
-    "description": "Event"
+    "description": "Local time of day, e.g. 07:00"
    },
-   "date": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date"
-   },
-   "ticketType": {
-    "type": "string",
-    "description": "Ticket Type"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "gate": {
-    "type": "string",
-    "description": "Gate"
-   },
-   "device": {
-    "type": "string",
-    "description": "Device"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "partner": {
-    "type": "string",
-    "description": "Partner"
-   },
-   "dashboard": {
-    "type": "string",
-    "description": "Dashboard"
-   },
-   "csv": {
-    "type": "string",
-    "description": "CSV"
-   },
-   "xlsx": {
-    "type": "string",
-    "description": "XLSX"
-   },
-   "pdf": {
-    "type": "string",
-    "description": "PDF"
-   },
-   "apiDataFeed": {
-    "type": "string",
-    "description": "API/Data Feed"
-   },
-   "biIntegration": {
-    "type": "string",
-    "description": "BI integration"
-   },
-   "rbac": {
-    "type": "string",
-    "description": "RBAC"
-   },
-   "tenantIsolation": {
-    "type": "string",
-    "description": "tenant isolation"
-   },
-   "fieldLevelRestrictions": {
-    "type": "string",
-    "description": "field-level restrictions"
-   },
-   "retentionRules": {
-    "type": "string",
-    "description": "retention rules"
+   "recipients": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Authorized recipients or reporting destinations"
    }
-  }
+  },
+  "required": [
+   "reportId",
+   "name"
+  ]
  },
  "AiAccessIntelligenceForecastingExecutiveInsightsView": {
   "type": "object",
@@ -2002,13 +2227,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "peakArrivalTime": {
     "type": "string",
-    "format": "date-time",
-    "description": "Peak Arrival Time"
+    "description": "Forecast time window, e.g. 09:40-10:30"
    },
    "peakExitTime": {
     "type": "string",
-    "format": "date-time",
-    "description": "Peak Exit Time"
+    "description": "Forecast time window"
    },
    "venueOccupancy": {
     "type": "integer",
@@ -2019,8 +2242,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Zone Occupancy"
    },
    "gateDemand": {
-    "type": "string",
-    "description": "Gate Demand"
+    "type": "integer",
+    "description": "Forecast guests per hour at peak across gates"
    },
    "groupArrivalPressure": {
     "type": "string",
@@ -2034,17 +2257,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "Device Capacity"
    },
-   "expectedAttendance": {
-    "type": "integer",
-    "description": "Expected Attendance (the pack shows 28,400)"
-   },
    "currentPlanned": {
-    "type": "string",
-    "description": "Current Planned (the pack shows 10)"
+    "type": "integer",
+    "description": "Entry lanes currently planned"
    },
-   "forecastAiRecommend": {
+   "recommendedEntryLanes": {
+    "type": "integer"
+   },
+   "aiRecommendation": {
     "type": "string",
-    "description": "Forecast → AI Recommend"
+    "description": "Advisory text only; any operational change goes through the normal permission and approval controls"
    }
   }
  },
@@ -2055,15 +2277,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "description": "**What Attendance & Admission Analytics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "ticketsSold": {
-    "type": "string",
+    "type": "integer",
     "description": "Tickets Sold"
    },
    "ticketsEligibleToday": {
-    "type": "string",
+    "type": "integer",
     "description": "Tickets Eligible Today"
    },
    "ticketsScanned": {
-    "type": "string",
+    "type": "integer",
     "description": "Tickets Scanned"
    },
    "uniqueGuests": {
@@ -2083,61 +2305,103 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Membership Attendance"
    },
    "repeatEntry": {
-    "type": "string",
+    "type": "integer",
     "description": "Repeat Entry"
    },
    "attendanceRate": {
-    "type": "integer",
-    "description": "Attendance Rate"
+    "type": "number",
+    "description": "Percent"
    },
    "noShowRate": {
     "type": "number",
     "description": "no-show rate"
-   },
-   "ticketType": {
+   }
+  }
+ },
+ "Cadence": {
+  "x-ticvai-persistence": "none — embedded in schedule",
+  "type": "object",
+  "description": "**What each frequency needs (decided 28 September, audit R158).** `daily`: `timeOfDay`. `weekly`: `dayOfWeek` and `timeOfDay`. `monthly`: `dayOfMonth` and `timeOfDay`, a day past the month's end running on its last day. `quarterly`: `dayOfMonth` and `timeOfDay`, in the first month of each quarter. `onShiftClose` and `onPeriodClose`: nothing else, they run on the event. A field a frequency needs and does not have, or one it does not take, is the 400 on `createReportSchedule`. **Times are in the venue's time zone.**\n",
+  "required": [
+   "frequency"
+  ],
+  "properties": {
+   "frequency": {
     "type": "string",
-    "description": "ticket type"
+    "enum": [
+     "daily",
+     "weekly",
+     "monthly",
+     "quarterly",
+     "onShiftClose",
+     "onPeriodClose"
+    ]
    },
-   "channel": {
-    "type": "string",
-    "description": "channel"
-   },
-   "event": {
-    "type": "string",
-    "description": "event"
-   },
-   "dateTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "date/time"
-   },
-   "customerSegment": {
-    "type": "string",
-    "description": "customer segment"
-   },
-   "sold": {
-    "type": "string",
-    "description": "Sold (the pack shows 25,000)"
-   },
-   "eligible": {
-    "type": "string",
-    "description": "Eligible (the pack shows 23,842)"
-   },
-   "attended": {
-    "type": "string",
-    "description": "Attended (the pack shows 21,384)"
-   },
-   "purchased": {
-    "type": "string",
-    "description": "Purchased (the pack shows 120)"
-   },
-   "actualAttendance": {
+   "dayOfWeek": {
     "type": "integer",
-    "description": "Actual Attendance (the pack shows 112)"
+    "minimum": 0,
+    "maximum": 6
    },
-   "attendance": {
+   "dayOfMonth": {
     "type": "integer",
-    "description": "Attendance (the pack shows 93.3%)"
+    "minimum": 1,
+    "maximum": 31
+   },
+   "timeOfDay": {
+    "type": "string",
+    "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+   },
+   "timeZone": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Always the venue's time zone (decided 28 September, audit R158), returned so a reader knows which. Not taken on a write."
+   }
+  }
+ },
+ "CreateReportScheduleRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "reportId",
+   "cadence",
+   "recipients",
+   "format"
+  ],
+  "properties": {
+   "reportId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "cadence": {
+    "$ref": "#/components/schemas/Cadence"
+   },
+   "parameters": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "As `RunReportRequest.parameters` — keyed by the report's `ReportParameter.key`, applied to every run."
+   },
+   "recipients": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "$ref": "#/components/schemas/Recipient"
+    }
+   },
+   "format": {
+    "$ref": "#/components/schemas/ExportFormat"
+   },
+   "includePersonalData": {
+    "type": "boolean",
+    "default": false
+   },
+   "skipIfEmpty": {
+    "type": "boolean",
+    "default": true,
+    "description": "An empty report every morning trains people to ignore the report."
    }
   }
  },
@@ -2152,12 +2416,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Re-entry rate"
    },
    "averageTimeOutside": {
-    "type": "string",
-    "format": "date-time",
-    "description": "average time outside"
+    "type": "integer",
+    "description": "Minutes"
    },
    "mostUsedReEntryGates": {
-    "type": "integer",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "most-used re-entry gates"
    },
    "rejectedReEntry": {
@@ -2165,35 +2431,84 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "rejected re-entry"
    },
    "reEntryByProduct": {
-    "type": "string",
-    "description": "re-entry by product"
-   },
-   "parkAParkB": {
-    "type": "string",
-    "description": "Park A → Park B"
-   },
-   "parkBParkA": {
-    "type": "string",
-    "description": "Park B → Park A"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Product and re-entry count pairs"
    },
    "crossoverTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "crossover time"
+    "type": "integer",
+    "description": "Average minutes between leaving one park and entering the next"
    },
    "crossoverProduct": {
-    "type": "string",
-    "description": "crossover product"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Products used for crossover, with counts"
    },
    "crossoverUtilization": {
     "type": "number",
     "description": "crossover utilization"
    },
-   "waterPark": {
-    "type": "string",
-    "description": "Water Park (the pack shows 1,327)"
+   "firstEntries": {
+    "type": "integer"
+   },
+   "temporaryExits": {
+    "type": "integer"
+   },
+   "reEntries": {
+    "type": "integer"
+   },
+   "crossovers": {
+    "type": "integer"
+   },
+   "finalExits": {
+    "type": "integer"
+   },
+   "crossoverFlows": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "From park, to park and count, e.g. Park A to Park B"
    }
   }
+ },
+ "ExecutionStatus": {
+  "type": "string",
+  "enum": [
+   "queued",
+   "running",
+   "completed",
+   "failed",
+   "cancelled",
+   "expired"
+  ]
+ },
+ "ExportFormat": {
+  "type": "string",
+  "enum": [
+   "csv",
+   "xlsx",
+   "pdf",
+   "json"
+  ]
+ },
+ "FieldType": {
+  "type": "string",
+  "enum": [
+   "string",
+   "integer",
+   "decimal",
+   "money",
+   "boolean",
+   "date",
+   "dateTime",
+   "uuid",
+   "enum"
+  ]
  },
  "GraphicalAccessMapLiveGatePerformanceView": {
   "type": "object",
@@ -2201,75 +2516,67 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Graphical Access Map & Live Gate Performance displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "gates": {
-    "type": "integer",
-    "description": "Gates"
+   "accessPointId": {
+    "type": "string"
    },
-   "turnstiles": {
-    "type": "integer",
-    "description": "Turnstiles"
-   },
-   "entryPoints": {
-    "type": "integer",
-    "description": "Entry points"
-   },
-   "exitPoints": {
-    "type": "integer",
-    "description": "Exit points"
-   },
-   "reEntryGates": {
-    "type": "integer",
-    "description": "Re-entry gates"
-   },
-   "groupGates": {
-    "type": "integer",
-    "description": "Group gates"
-   },
-   "vipGates": {
-    "type": "integer",
-    "description": "VIP gates"
-   },
-   "attractionAccess": {
+   "pointType": {
     "type": "string",
-    "description": "attraction access"
+    "enum": [
+     "gate",
+     "turnstile",
+     "entryPoint",
+     "exitPoint",
+     "reEntryGate",
+     "groupGate",
+     "vipGate",
+     "attractionAccess",
+     "crossoverPoint"
+    ]
    },
-   "crossoverPoints": {
-    "type": "integer",
-    "description": "crossover points"
-   },
-   "healthy": {
+   "status": {
     "type": "string",
-    "description": "🟢 Healthy"
-   },
-   "warning": {
-    "type": "string",
-    "description": "🟡 Warning"
-   },
-   "critical": {
-    "type": "string",
-    "description": "🔴 Critical"
-   },
-   "offline": {
-    "type": "integer",
-    "description": "⚫ Offline"
+    "enum": [
+     "healthy",
+     "warning",
+     "critical",
+     "offline"
+    ]
    },
    "guests": {
     "type": "integer",
-    "description": "Guests (the pack shows 171 | Pa ge, 4,821)"
+    "description": "Guests (the pack shows 4,821)"
    },
    "success": {
-    "type": "string",
-    "description": "Success (the pack shows 96.4%)"
+    "type": "number",
+    "description": "Success rate, percent"
    },
    "reject": {
-    "type": "string",
-    "description": "Reject (the pack shows 2.1%)"
+    "type": "number",
+    "description": "Reject rate, percent"
    },
    "yellow": {
+    "type": "number",
+    "description": "Operator-review rate, percent"
+   },
+   "name": {
+    "type": "string"
+   },
+   "parentId": {
     "type": "string",
-    "description": "Yellow (the pack shows 1.5%)"
+    "description": "Zone or park the point sits in"
+   },
+   "throughputPerMinute": {
+    "type": "number"
+   },
+   "averageValidationSeconds": {
+    "type": "number"
    }
-  }
+  },
+  "required": [
+   "accessPointId",
+   "pointType",
+   "status"
+  ]
  },
  "GuestDwellTimeLengthOfStayAttractionFlowView": {
   "type": "object",
@@ -2278,32 +2585,31 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "description": "**What Guest Dwell Time, Length of Stay & Attraction Flow displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "averageLengthOfStay": {
-    "type": "number",
-    "description": "Average Length of Stay"
+    "type": "integer",
+    "description": "Minutes, where entry and exit data exist"
    },
    "medianStay": {
-    "type": "string",
-    "description": "Median Stay"
+    "type": "integer",
+    "description": "Minutes"
    },
    "peakArrival": {
     "type": "string",
-    "description": "Peak Arrival"
+    "description": "Time window, e.g. 09:40-10:30"
    },
    "peakDeparture": {
     "type": "string",
-    "description": "Peak Departure"
+    "description": "Time window"
    },
    "zoneDwellTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Zone Dwell Time"
+    "type": "integer",
+    "description": "Average minutes in the selected zone"
    },
    "attractionVisits": {
     "type": "integer",
     "description": "Attraction Visits"
    },
    "fastPassUsage": {
-    "type": "string",
+    "type": "integer",
     "description": "Fast Pass Usage"
    },
    "reEntryBehavior": {
@@ -2318,17 +2624,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "Total Validations (the pack shows 6,211)"
    },
-   "fastPass": {
-    "type": "string",
-    "description": "Fast Pass (the pack shows 1,827)"
-   },
    "repeatVisits": {
     "type": "integer",
     "description": "Repeat Visits (the pack shows 369)"
-   },
-   "unnecessary": {
-    "type": "string",
-    "description": "unnecessary"
    }
   }
  },
@@ -2338,6 +2636,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Live Venue Occupancy & People Counting displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
+   "areaLevel": {
+    "type": "string",
+    "enum": [
+     "venue",
+     "park",
+     "zone",
+     "attraction",
+     "controlledArea"
+    ]
+   },
+   "areaId": {
+    "type": "string"
+   },
    "exits": {
     "type": "integer",
     "description": "Exits (the pack shows ±)"
@@ -2347,7 +2658,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Operational Adjustments (the pack shows =)"
    },
    "current": {
-    "type": "string",
+    "type": "integer",
     "description": "Current (the pack shows 8,214)"
    },
    "capacity": {
@@ -2355,36 +2666,219 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Capacity (the pack shows 12,000)"
    },
    "occupancy": {
-    "type": "integer",
-    "description": "Occupancy (the pack shows 68.5%)"
+    "type": "number",
+    "description": "Percent of capacity"
    },
-   "kidsZone": {
-    "type": "string",
-    "description": "Kids Zone (the pack shows 1,842 / 2,500, 🟢 74%)"
+   "areaName": {
+    "type": "string"
    },
-   "adventureZone": {
-    "type": "string",
-    "description": "Adventure Zone (the pack shows 3,107 / 3,500, 🟠 89%)"
+   "parentAreaId": {
+    "type": "string"
    },
-   "vipZone": {
-    "type": "string",
-    "description": "VIP Zone (the pack shows 421 / 600, 🟢 70%)"
+   "entries": {
+    "type": "integer"
    },
-   "normal": {
+   "status": {
     "type": "string",
-    "description": "Normal (the pack shows 0–79%)"
+    "enum": [
+     "normal",
+     "warning",
+     "high",
+     "critical"
+    ],
+    "description": "Band from the configured occupancy thresholds"
+   }
+  },
+  "required": [
+   "areaId",
+   "areaLevel"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
    },
-   "warning": {
-    "type": "string",
-    "description": "Warning (the pack shows 80–89%)"
+   "nextCursor": {
+    "type": "string"
    },
-   "high": {
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Recipient": {
+  "x-ticvai-persistence": "reporting.schedule_recipient",
+  "type": "object",
+  "description": "One recipient of a schedule. **A row of `reporting.schedule_recipient`, a child of `reporting.schedule`** — `ReportSchedule` declares the pair, which is what gives the table its `schedule_id`. Pull audit 26 September: declared on its own, the table had no column tying a recipient to its schedule.\n",
+  "required": [
+   "kind",
+   "address"
+  ],
+  "properties": {
+   "kind": {
     "type": "string",
-    "description": "High (the pack shows 90–94%)"
+    "enum": [
+     "principal",
+     "email",
+     "sftp",
+     "webhook"
+    ]
    },
-   "critical": {
+   "address": {
+    "type": "string"
+   },
+   "principalId": {
     "type": "string",
-    "description": "Critical (the pack shows 95%+)"
+    "format": "uuid"
+   }
+  }
+ },
+ "ReportResult": {
+  "x-ticvai-persistence": "none — result set, cached in object storage",
+  "type": "object",
+  "required": [
+   "executionId",
+   "columns",
+   "rows"
+  ],
+  "properties": {
+   "executionId": {
+    "type": "string"
+   },
+   "columns": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "key": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string"
+      },
+      "type": {
+       "$ref": "#/components/schemas/FieldType"
+      }
+     }
+    }
+   },
+   "rows": {
+    "type": "array",
+    "description": "**Open on purpose; the shape is `columns`.** Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a `Money`, dates, date-times and uuids as strings. A report's columns are chosen at run time, so no fixed schema can name them.\n",
+    "items": {
+     "type": "object",
+     "additionalProperties": true
+    }
+   },
+   "totals": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Aggregated columns only, keyed and typed as a row is."
+   },
+   "rowCount": {
+    "type": "integer"
+   },
+   "nextCursor": {
+    "type": "string",
+    "nullable": true
+   },
+   "generatedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "dataAsOf": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it prevents an argument about a figure that moved.\n"
+   }
+  }
+ },
+ "ReportSchedule": {
+  "x-ticvai-persistence": "reporting.schedule + reporting.schedule_recipient",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateReportScheduleRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "ownerPrincipalId",
+     "isPaused",
+     "createdAt"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "ownerPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The schedule runs under this principal's permissions, not the recipients'. A standing grant of whatever the owner can see.\n"
+     },
+     "isPaused": {
+      "type": "boolean"
+     },
+     "lastRunAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "lastRunStatus": {
+      "$ref": "#/components/schemas/ExecutionStatus"
+     },
+     "nextRunAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "consecutiveFailures": {
+      "type": "integer"
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  ]
+ },
+ "RunReportRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "properties": {
+   "parameters": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "**Open on purpose; its shape is the report's.** Keyed by `ReportParameter.key` of the definition being run, each value of that parameter's `type`. An `isRequired` parameter with no value here and no `defaultValue` is the `400` `runReport` lists.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Narrows to one venue. Omitting it returns everything the caller's scope permits — it cannot be used to reach beyond that.\n"
+   },
+   "dateFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158)."
+   },
+   "dateTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Defaults to today in the venue's time zone when not sent (audit R158)."
+   },
+   "forceAsync": {
+    "type": "boolean",
+    "default": false,
+    "description": "Queue regardless of size, for a result to be collected later."
    }
   }
  },
@@ -2394,22 +2888,24 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Throughput, Queue & Validation Performance Analytics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
+   "gateId": {
+    "type": "string"
+   },
    "guestsPerMinute": {
-    "type": "string",
+    "type": "number",
     "description": "Guests per Minute"
    },
    "guestsPerHour": {
-    "type": "string",
+    "type": "integer",
     "description": "Guests per Hour"
    },
    "averageScanTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Average Scan Time"
+    "type": "number",
+    "description": "Seconds"
    },
    "averageGateCycle": {
     "type": "number",
-    "description": "Average Gate Cycle"
+    "description": "Seconds"
    },
    "successRate": {
     "type": "number",
@@ -2424,30 +2920,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Manual Intervention Rate"
    },
    "downtime": {
-    "type": "string",
-    "description": "Downtime"
+    "type": "integer",
+    "description": "Minutes"
    },
-   "gateGuestsHrValidationRejectIntervention": {
-    "type": "string",
-    "description": "Gate Guests/hr Validation Reject Intervention"
-   },
-   "g011482039s1208": {
-    "type": "number",
-    "description": "G01 1,482 0.39s 1.2% 0.8%"
-   },
-   "g021391042s1411": {
-    "type": "number",
-    "description": "G02 1,391 0.42s 1.4% 1.1%"
-   },
-   "g03821081s8264": {
-    "type": "number",
-    "description": "G03 821 0.81s 8.2% 6.4%"
-   },
-   "gate03Underperforming": {
-    "type": "string",
-    "description": "GATE 03 — UNDERPERFORMING"
-   },
-   "reasonsType": {
+   "bottleneckReason": {
     "type": "string",
     "enum": [
      "qrReadFailures",
@@ -2457,8 +2933,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "wrongGuestRouting"
     ],
     "description": "Vocabulary listed under Potential reasons."
+   },
+   "gateName": {
+    "type": "string"
+   },
+   "rejectRate": {
+    "type": "number",
+    "description": "Percent"
+   },
+   "underperforming": {
+    "type": "boolean"
    }
-  }
+  },
+  "required": [
+   "gateId"
+  ]
  },
  "ValidationOutcomeRejectionAnalyticsView": {
   "type": "object",
@@ -2473,6 +2962,29 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "overrides": {
     "type": "integer",
     "description": "Overrides (the pack shows 281)"
+   },
+   "allowedRate": {
+    "type": "number",
+    "description": "Percent"
+   },
+   "operatorReviewRate": {
+    "type": "number",
+    "description": "Percent"
+   },
+   "deniedRate": {
+    "type": "number",
+    "description": "Percent"
+   },
+   "overrideRate": {
+    "type": "number",
+    "description": "Overrides as a percent of rejections"
+   },
+   "rejectionReasons": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Reason, count and share, e.g. Wrong Visit Date"
    }
   }
  }

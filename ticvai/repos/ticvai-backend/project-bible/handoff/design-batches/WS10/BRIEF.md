@@ -1,6 +1,6 @@
 # WS10 — Access Control board 10
 
-**10 screens · 10 operations · 15 schemas · 3 permissions**
+**10 screens · 18 operations · 27 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, SCOPE_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, ACCREDITATION_CONFIGURE, APPROVAL_DECIDE, APPROVAL_REQUEST, SCOPE_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-234` | Dynamic Access Policy Command Center | listDetail | 1 | 0 | — |
-| `BO-235` | Access Attribute Catalog | listDetail | 1 | 0 | — |
+| `BO-234` | Dynamic Access Policy Command Center | listDetail | 2 | 0 | — |
+| `BO-235` | Access Attribute Catalog | listDetail | 2 | 0 | — |
 | `BO-236` | Visual Dynamic Policy Builder | listDetail | 1 | 0 | — |
 | `BO-237` | Context, Time, Event & Capacity Policy Builder | commandCentre | 1 | 0 | — |
-| `BO-238` | Identity, Membership & Accreditation Policies | listDetail | 1 | 0 | — |
-| `BO-239` | Policy Scope, Hierarchy & Inheritance | configEditor | 1 | 0 | — |
+| `BO-238` | Identity, Membership & Accreditation Policies | listDetail | 3 | 0 | — |
+| `BO-239` | Policy Scope, Hierarchy & Inheritance | configEditor | 2 | 0 | — |
 | `BO-240` | Authorization Governance & Temporary Access | listDetail | 1 | 0 | — |
-| `BO-241` | Policy Evaluation Architecture & Offline Distribution | listDetail | 1 | 0 | — |
+| `BO-241` | Policy Evaluation Architecture & Offline Distribution | listDetail | 3 | 0 | — |
 | `BO-242` | Policy Simulation, Conflict & Impact Analysis | listDetail | 1 | 0 | — |
-| `BO-243` | Policy Approval, Audit, Analytics & AI Optimization | listDetail | 1 | 1 | — |
+| `BO-243` | Policy Approval, Audit, Analytics & AI Optimization | listDetail | 5 | 1 | — |
 
 ## Thin screens in this batch
 
-**BO-234, BO-235, BO-236, BO-237, BO-238, BO-240, BO-241, BO-242 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-235, BO-236, BO-237, BO-238, BO-240, BO-241, BO-242 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

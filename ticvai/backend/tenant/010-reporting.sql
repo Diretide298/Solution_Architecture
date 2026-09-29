@@ -1,4 +1,4 @@
--- reporting — 21 tables
+-- reporting — 23 tables
 -- **Derived. Do not hand-edit.**
 
 -- A rule that fired. Acknowledged rather than dismissed — an alert that disappears when clicked
@@ -82,6 +82,16 @@ CREATE TABLE IF NOT EXISTS reporting.dashboard_tile (
     parameters                        jsonb,
     refresh_seconds                   integer,
     position                          jsonb NOT NULL
+);
+
+-- Holds 5 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS reporting.dashboard_view (
+    id                                uuid PRIMARY KEY,
+    dashboard_id                      uuid NOT NULL,
+    viewed_by_principal_id            uuid NOT NULL,
+    venue_id                          uuid,
+    opened_at                         timestamptz NOT NULL
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
@@ -302,6 +312,19 @@ CREATE TABLE IF NOT EXISTS reporting.semantic_model (
     published_at                      timestamptz,
     scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS reporting.site_normalisation_basis (
+    id                                uuid PRIMARY KEY,
+    scope_path                        ltree NOT NULL,
+    period_start                      date NOT NULL,
+    period_end                        date NOT NULL,
+    visitors                          integer,
+    operating_hours                   numeric(18,4),
+    staffed_positions                 numeric(18,4),
+    area_square_metres                numeric(18,4)
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing

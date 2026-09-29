@@ -1,1 +1,98 @@
-{}
+{
+ "GoLiveReadiness": {
+  "type": "object",
+  "x-ticvai-persistence": "subscription.go_live_readiness",
+  "description": "Board 8. **The screen that stops a launch going wrong in public.**",
+  "properties": {
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "runAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "notStarted",
+     "running",
+     "blocked",
+     "readyWithWarnings",
+     "ready"
+    ]
+   },
+   "groups": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "ticketingAndProducts",
+        "salesChannels",
+        "payment",
+        "ticketQrAccess",
+        "usersAndSecurity",
+        "integrations",
+        "communications",
+        "financialSetup"
+       ]
+      },
+      "label": {
+       "type": "string"
+      },
+      "checks": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "properties": {
+         "code": {
+          "type": "string"
+         },
+         "label": {
+          "type": "string"
+         },
+         "outcome": {
+          "type": "string",
+          "enum": [
+           "pass",
+           "warn",
+           "fail",
+           "skipped"
+          ]
+         },
+         "detail": {
+          "type": "string",
+          "nullable": true
+         },
+         "remediation": {
+          "type": "string",
+          "nullable": true
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "blockers": {
+    "type": "integer"
+   },
+   "warnings": {
+    "type": "integer"
+   },
+   "signedOffBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "signedOffAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ }
+}

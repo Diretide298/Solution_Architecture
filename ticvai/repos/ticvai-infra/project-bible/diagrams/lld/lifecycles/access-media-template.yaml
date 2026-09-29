@@ -1,0 +1,97 @@
+id: LLD-AccessMediaTemplate
+title: AccessMediaTemplate — 13 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/access-media-template.yaml
+entity: AccessMediaTemplate
+contract: access
+enum: AccessMediaTemplate.status
+enumKind: inline
+enumSchema: AccessMediaTemplate
+enumProperty: status
+owner: access
+description: One media design template and its working design document (declared 29 September, writers
+  pass). The six designer operations write the draft; `approveMultiMediaPreview` submits it through
+  the approvals engine, and a human approves. **Publishing creates a new `AccessMediaTemplateVersion`
+  and never rewrites credentials already issued**; `status` here is the state of the working design,
+  and `currentVersion` keeps pointing at the version in force.
+initial:
+- draft
+terminal:
+- archived
+transitions:
+- from: draft
+  to: pendingApproval
+  operation: approveMultiMediaPreview
+  trigger: operation
+  guard: The pre-publication checks were run on the named template and it was submitted for brand, operations
+    and technical review (`createApprovalRequest`)
+- from: pendingApproval
+  to: published
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Granted, with `publishMode` `publishNow`; a new version is written and becomes `currentVersion`
+  requiresApproval: true
+- from: pendingApproval
+  to: scheduled
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Granted, with `publishMode` `schedule` and a `scheduledAt`
+  requiresApproval: true
+- from: pendingApproval
+  to: draft
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Rejected, with a reason; the design returns to the designer
+- from: scheduled
+  to: published
+  trigger: timer
+  guard: '`scheduledAt` has come'
+- from: published
+  to: draft
+  operation: setDigitalBarcodeTicket
+  trigger: operation
+  guard: The working design of a `digitalBarcode` template is edited; the published version stays in
+    force until the next publication
+- from: published
+  to: draft
+  operation: setPdfPrintablePos
+  trigger: operation
+  guard: The working design of a `pdfPrintablePos` template is edited
+- from: published
+  to: draft
+  operation: setAppleWalletPass
+  trigger: operation
+  guard: The working design of an `appleWallet` template is edited
+- from: published
+  to: draft
+  operation: setGoogleWalletPass
+  trigger: operation
+  guard: The working design of a `googleWallet` template is edited
+- from: published
+  to: draft
+  operation: setRfidNfcCard
+  trigger: operation
+  guard: The working design of an `rfidNfcCard` template is edited
+- from: published
+  to: draft
+  operation: setDigitalCardMembership
+  trigger: operation
+  guard: The working design of a `digitalCardMembership` template is edited
+- from: draft
+  to: archived
+  operation: archiveMediaTemplate
+  trigger: operation
+  guard: A draft that will not be published is retired
+- from: published
+  to: archived
+  operation: archiveMediaTemplate
+  trigger: operation
+  guard: A published template is retired; credentials already issued keep their media, and no new credential
+    resolves to it
+openQuestions: null
+notes: '**The six designer operations create the template in `draft`** (each owns one `designer` value).
+  Editing a published template takes the working design back to `draft` without touching the version
+  in force. **A template `pendingApproval` or `scheduled` is in flight:** a designer write or `archiveMediaTemplate`
+  on it is refused `409 template-in-flight` until the approval is decided or the schedule passes. Archiving
+  is final; a new template is a new design.'

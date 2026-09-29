@@ -39,10 +39,7 @@
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-334 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-335",
@@ -101,10 +98,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can locate any Virtual Ticket and immediately understand its ticket status, entitlement, usage state and all associated media from one centralized workspace.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each record should show) — counts over a population, then the population",
   "purpose": "Provide administrators and operations teams with a centralized view of all Virtual Tickets and their associated media across TICVAI. This is the primary administrative entry point into the Virtual Ticket architecture.",
-  "purposeNote": "Authorized users can locate any Virtual Ticket and immediately understand its ticket status, entitlement, usage state and all associated media from one centralized workspace.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -148,61 +145,61 @@
        "kind": "metricTile",
        "label": "Total Virtual Tickets",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.totalVirtualTickets"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.totalVirtualTickets"
       },
       {
        "kind": "metricTile",
        "label": "Active",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.active"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.active"
       },
       {
        "kind": "metricTile",
        "label": "Pending Activation",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.pendingActivation"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.pendingActivation"
       },
       {
        "kind": "metricTile",
        "label": "Suspended",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.suspended"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.suspended"
       },
       {
        "kind": "metricTile",
        "label": "Used / Consumed",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.usedConsumed"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.usedConsumed"
       },
       {
        "kind": "metricTile",
        "label": "Partially Consumed",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.partiallyConsumed"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.partiallyConsumed"
       },
       {
        "kind": "metricTile",
        "label": "Expired",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.expired"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.expired"
       },
       {
        "kind": "metricTile",
        "label": "Cancelled",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.cancelled"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.cancelled"
       },
       {
        "kind": "metricTile",
        "label": "Revoked",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.revoked"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.revoked"
       },
       {
        "kind": "metricTile",
        "label": "Virtual Tickets with Multiple Media",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.virtualTicketsWithMultipleMedia"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.virtualTicketsWithMultipleMedia"
       },
       {
        "kind": "metricTile",
@@ -213,13 +210,13 @@
        "kind": "metricTile",
        "label": "Media Binding Exceptions",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.mediaBindingExceptions"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.mediaBindingExceptions"
       },
       {
        "kind": "metricTile",
        "label": "Credential Synchronization Issues",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.credentialSynchronizationIssues"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.credentialSynchronizationIssues"
       }
      ]
     },
@@ -238,7 +235,6 @@
         "VirtualTicketCommandCenterView.orderReference",
         "VirtualTicketCommandCenterView.ticketType",
         "VirtualTicketCommandCenterView.seatResourceWhereApplicable",
-        "VirtualTicketCommandCenterView.validFromTo",
         "VirtualTicketCommandCenterView.ticketStatus",
         "VirtualTicketCommandCenterView.usageStatus",
         "VirtualTicketCommandCenterView.numberOfLinkedMedia",
@@ -268,7 +264,6 @@
         "VirtualTicketCommandCenterView.orderReference",
         "VirtualTicketCommandCenterView.ticketType",
         "VirtualTicketCommandCenterView.seatResourceWhereApplicable",
-        "VirtualTicketCommandCenterView.validFromTo",
         "VirtualTicketCommandCenterView.ticketStatus",
         "VirtualTicketCommandCenterView.usageStatus",
         "VirtualTicketCommandCenterView.numberOfLinkedMedia",
@@ -308,12 +303,25 @@
     "contract": "access",
     "purpose": "Virtual Ticket Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listVirtualTicketStatus",
+    "contract": "access",
+    "purpose": "Virtual Ticket Status & Lifecycle Model",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listVirtualTicketArchitecture",
+    "contract": "access",
+    "purpose": "Virtual Ticket Architecture Testing, Governance & Audit",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-334"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-334",
+   "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-334"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 4. 29 of 39 labels bound to a contract property; 50 of 69 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -376,10 +384,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every issued ticket has one persistent, media-independent Virtual Ticket identity that remains authoritative regardless of which credential technologies are attached to it.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Define the authoritative Virtual Ticket object used throughout TICVAI. This screen is extremely important because the Virtual Ticket—not the QR/RFID/card— is the master ticket record.",
-  "purposeNote": "Every issued ticket has one persistent, media-independent Virtual Ticket identity that remains authoritative regardless of which credential technologies are attached to it.",
   "layout": {
    "template": "form",
    "regions": [
@@ -458,16 +466,14 @@
     "operationId": "setVirtualTicketIdentity",
     "contract": "access",
     "purpose": "Virtual Ticket Identity & Master Record Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setVirtualTicketIdentity"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-335"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-335",
+   "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-335"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 6. 0 of 0 labels bound to a contract property; 9 of 59 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -530,10 +536,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "state changes across every credential associated with that ticket.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure the standardized lifecycle of a Virtual Ticket independently from the lifecycle of individual media.",
-  "purposeNote": "state changes across every credential associated with that ticket.",
   "gaps": [
    {
     "operation": null,
@@ -579,17 +585,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "VirtualTicketStatusLifecycleModelView.withGovernedAlternativeStates",
-    "VirtualTicketStatusLifecycleModelView.suspended",
-    "VirtualTicketStatusLifecycleModelView.cancelled",
-    "VirtualTicketStatusLifecycleModelView.voided",
-    "VirtualTicketStatusLifecycleModelView.reissuedSuperseded"
+    "VirtualTicketStatusLifecycleModelView.toStatus"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-336"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-336",
+   "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-336"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 11 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -652,10 +655,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "technologies with their capabilities, providers and technical behavior.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§For each technology configure) and no display directory — it is settings, not a population",
   "purpose": "Maintain the centralized catalogue of credential technologies supported by TICVAI. This makes the credential architecture extensible rather than hard-coded.",
-  "purposeNote": "technologies with their capabilities, providers and technical behavior.",
   "layout": {
    "template": "form",
    "regions": [
@@ -765,6 +768,12 @@
   },
   "apis": [
    {
+    "operationId": "listMediaTypeTechnology",
+    "contract": "access",
+    "purpose": "Media Type & Technology Library",
+    "trigger": "onLoad"
+   },
+   {
     "operationId": "listMediaTypeCredential",
     "contract": "access",
     "purpose": "Media Type & Credential Technology Registry",
@@ -774,7 +783,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-337"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-337",
+   "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-337"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 18 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -837,10 +847,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Ticket without creating duplicate ticket entitlements.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure how one Virtual Ticket can be associated with multiple media simultaneously. This is one of the most important screens in Area 15.",
-  "purposeNote": "Ticket without creating duplicate ticket entitlements.",
   "layout": {
    "template": "form",
    "regions": [
@@ -929,7 +939,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-338"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-338",
+   "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-338"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 12 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -992,10 +1003,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every supported credential can securely and consistently resolve to its authoritative Virtual Ticket without duplicating ticket entitlement data within individual media.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Define how individual media identifiers resolve securely back to the authoritative Virtual Ticket.",
-  "purposeNote": "Every supported credential can securely and consistently resolve to its authoritative Virtual Ticket without duplicating ticket entitlement data within individual media.",
   "gaps": [
    {
     "operation": null,
@@ -1011,6 +1022,17 @@
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Key references",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 12 §Support appropriate"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "components": [
@@ -1040,20 +1062,15 @@
    }
   ],
   "entryState": {
-   "preloaded": [
-    "CredentialIdentityTokenReferenceMappingView.qrToken",
-    "CredentialIdentityTokenReferenceMappingView.rfidUid",
-    "CredentialIdentityTokenReferenceMappingView.walletObject",
-    "CredentialIdentityTokenReferenceMappingView.nfcToken",
-    "CredentialIdentityTokenReferenceMappingView.faceReference"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-339"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-339",
+   "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-339"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 12. 0 of 0 labels bound to a contract property; 0 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 12. 0 of 0 labels bound to a contract property; 1 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Key references dropped (heading).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1114,10 +1131,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "All credential media consistently consume and represent the same authoritative Virtual Ticket entitlement and usage state.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Detect) and no metric row",
   "purpose": "Ensure all media attached to a Virtual Ticket share the same authoritative ticket and entitlement state.",
-  "purposeNote": "All credential media consistently consume and represent the same authoritative Virtual Ticket entitlement and usage state.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1129,11 +1146,7 @@
        "kind": "dataTable",
        "label": "Every entitlement cross-media synchronization",
        "columns": [
-        "EntitlementCrossMediaSynchronizationRulesView.delayedUpdates",
-        "EntitlementCrossMediaSynchronizationRulesView.conflictingStates",
-        "EntitlementCrossMediaSynchronizationRulesView.offlineTransactionsPendingSynchronization",
-        "EntitlementCrossMediaSynchronizationRulesView.providerUpdateFailures",
-        "EntitlementCrossMediaSynchronizationRulesView.staleWalletCredentials"
+        "EntitlementCrossMediaSynchronizationRulesView.monitoredConditions"
        ],
        "bindsTo": "EntitlementCrossMediaSynchronizationRulesView",
        "operation": "listEntitlementCrossMedia",
@@ -1150,11 +1163,7 @@
        "label": "The selected entitlement cross-media synchronization",
        "bindsTo": "EntitlementCrossMediaSynchronizationRulesView",
        "columns": [
-        "EntitlementCrossMediaSynchronizationRulesView.delayedUpdates",
-        "EntitlementCrossMediaSynchronizationRulesView.conflictingStates",
-        "EntitlementCrossMediaSynchronizationRulesView.offlineTransactionsPendingSynchronization",
-        "EntitlementCrossMediaSynchronizationRulesView.providerUpdateFailures",
-        "EntitlementCrossMediaSynchronizationRulesView.staleWalletCredentials"
+        "EntitlementCrossMediaSynchronizationRulesView.monitoredConditions"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Critical Principle”, “For example, TICVAI must prevent”, “Instead”, “Face Credential”, “Virtual Ticket resolved”, “Access transaction recorded”.",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 14 §Detect"
@@ -1180,17 +1189,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "EntitlementCrossMediaSynchronizationRulesView.delayedUpdates",
-    "EntitlementCrossMediaSynchronizationRulesView.conflictingStates",
-    "EntitlementCrossMediaSynchronizationRulesView.offlineTransactionsPendingSynchronization",
-    "EntitlementCrossMediaSynchronizationRulesView.providerUpdateFailures",
-    "EntitlementCrossMediaSynchronizationRulesView.staleWalletCredentials"
+    "EntitlementCrossMediaSynchronizationRulesView.monitoredConditions"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-340"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-340",
+   "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-340"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 14. 5 of 5 labels bound to a contract property; 17 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1253,10 +1259,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "options without compromising the underlying Virtual Ticket.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure when each credential becomes active and how alternative media behave if the preferred credential cannot be used.",
-  "purposeNote": "options without compromising the underlying Virtual Ticket.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1304,6 +1310,21 @@
        "kind": "primaryButton",
        "label": "On ticket activation",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 15 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "On download",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 15 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "On wallet installation",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 15 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "On event date",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 15 §Support"
       }
      ]
     }
@@ -1326,9 +1347,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-341"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-341",
+   "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-341"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 7 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 10 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1389,17 +1411,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Credential media can be securely replaced, revoked and rebound while maintaining continuity of the underlying Virtual Ticket and a complete audit history.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure controlled handling of lost, stolen, damaged, compromised or replaced credential media.",
-  "purposeNote": "Credential media can be securely replaced, revoked and rebound while maintaining continuity of the underlying Virtual Ticket and a complete audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Printed ticket replacement, Suspend Media, Revoke Media. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Support"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1465,6 +1480,11 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Wallet credential replacement",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Printed ticket replacement",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Support"
       },
@@ -1477,6 +1497,17 @@
        "kind": "destructiveButton",
        "label": "Revoke Media",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Allow immediate"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Replace Media",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Allow immediate"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save replacement rule",
+       "operation": "setMediaReplacementRevocation",
+       "provenance": "contract access.yaml PUT /media-replacement-revocation (decided 29 September, VM close-out)"
       }
      ]
     }
@@ -1510,14 +1541,21 @@
     "contract": "access",
     "purpose": "Media Replacement, Revocation & Rebinding Rules",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setMediaReplacementRevocation",
+    "contract": "access",
+    "purpose": "Save replacement rule",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-342"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-342",
+   "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-342"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 13 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 15 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `setMediaReplacementRevocation`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1570,10 +1608,10 @@
    "notes": "**Reached from BO-334, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "and retain complete traceability of configuration and credential-binding changes. Board 1 — Final Screen Register",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configuration Simulator; Configuration Owner; AI Configuration Review) and no display directory — it is settings, not a population",
   "purpose": "Provide the final testing and governance environment for Virtual Ticket and multi-media configurations. Board 1 established what the Virtual Ticket is and how multiple credentials can point to the same authoritative ticket. Board 2 defines how each media type is created, designed, configured, branded, populated with data, previewed, tested and published.",
-  "purposeNote": "and retain complete traceability of configuration and credential-binding changes. Board 1 — Final Screen Register",
   "layout": {
    "template": "form",
    "regions": [
@@ -1647,7 +1685,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-343"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-343",
+   "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-343"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 17. 0 of 0 labels bound to a contract property; 9 of 116 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

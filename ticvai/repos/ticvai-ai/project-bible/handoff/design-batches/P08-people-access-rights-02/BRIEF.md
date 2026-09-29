@@ -1,6 +1,6 @@
 # P08-people-access-rights-02 — P08 · People & Access Rights (2 of 2)
 
-**2 screens · 4 operations · 4 schemas · 4 permissions**
+**2 screens · 5 operations · 6 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `AI_CONFIGURE, APPROVAL_VIEW, ROLE_MANAGE, TENANT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `AI_CONFIGURE, APPROVAL_VIEW, REPORT_VIEW_VENUE, ROLE_MANAGE, TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **2 of these operations work offline**: getVenueSettings, listRoles
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -62,7 +61,7 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `BO-088` | Approval Analytics | listDetail | 2 | 0 | — |
-| `BO-106` | People & Access Rights | listDetail | 2 | 0 | — |
+| `BO-106` | People & Access Rights | listDetail | 3 | 0 | — |
 
 ## Thin screens in this batch
 

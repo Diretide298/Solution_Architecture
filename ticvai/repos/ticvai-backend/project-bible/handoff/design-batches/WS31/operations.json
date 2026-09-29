@@ -8,7 +8,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "OrderCreationSourceChannelConfigurationInput",
   "responds": "OrderCreationSourceChannelConfigurationView"
  },
@@ -100,6 +106,41 @@
     "name": "transactionReference",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "paymentReference",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "externalPartnerReference",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "barcodeQr",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customer",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productEvent",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -127,7 +168,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "CustomerGuestAccountAssignmentInput",
   "responds": "CustomerGuestAccountAssignmentView"
  },
@@ -140,7 +187,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "OrderDetailTransactionWorkspaceInput",
   "responds": "OrderDetailTransactionWorkspaceView"
  },
@@ -153,7 +206,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "OrderReservationStatusLifecycleConfigurationInput",
   "responds": "OrderReservationStatusLifecycleConfigurationView"
  },
@@ -166,7 +225,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ReservationHoldPolicyConfigurationInput",
   "responds": "ReservationHoldPolicyConfigurationView"
  }

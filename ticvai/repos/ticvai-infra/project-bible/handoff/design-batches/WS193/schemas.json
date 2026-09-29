@@ -1,0 +1,502 @@
+{
+ "CreditAllocation": {
+  "type": "object",
+  "description": "Board 3.10. **Which lots this purchase would draw on**, in order.",
+  "properties": {
+   "requested": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "covered": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "shortfall": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "lotId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "creditTypeId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "creditTypeName": {
+       "type": "string"
+      },
+      "amount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "expiresAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "reason": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "rejected": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "creditTypeId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "notEligibleHere",
+        "notEligibleForProduct",
+        "expired",
+        "basketCapReached",
+        "restricted"
+       ]
+      }
+     }
+    }
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "WalletConfigurationDiff": {
+  "x-ticvai-persistence": "none — computed from wallet.configuration_version_snapshot (a published version) against the area tables (the working draft)",
+  "type": "object",
+  "description": "Board 8, p.98. Field-level comparison of two wallet configuration versions, shaped as white-label `ConfigDiff`.",
+  "required": [
+   "fromVersion",
+   "toVersion",
+   "changes"
+  ],
+  "properties": {
+   "fromVersion": {
+    "type": "integer"
+   },
+   "toVersion": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Null when compared against the working draft."
+   },
+   "changes": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "area",
+      "path",
+      "changeKind"
+     ],
+     "properties": {
+      "area": {
+       "type": "string",
+       "enum": [
+        "walletTypes",
+        "creditTypes",
+        "consumptionPolicy",
+        "fundingRules",
+        "channelRules",
+        "authenticationPolicy",
+        "transferRules",
+        "refundPolicy",
+        "riskRules",
+        "accountingMapping",
+        "reconciliationSources",
+        "integrationMappings"
+       ]
+      },
+      "path": {
+       "type": "string"
+      },
+      "changeKind": {
+       "type": "string",
+       "enum": [
+        "added",
+        "removed",
+        "modified"
+       ]
+      },
+      "before": {
+       "type": "string",
+       "nullable": true
+      },
+      "after": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "WalletConfigurationVersion": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.configuration_version",
+  "description": "Boards 1.10 and 10.8. **Ten boards of configuration that interact.**",
+  "properties": {
+   "version": {
+    "type": "integer"
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "publishedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   },
+   "findings": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "severity": {
+       "type": "string",
+       "enum": [
+        "blocking",
+        "warning"
+       ]
+      },
+      "code": {
+       "type": "string"
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletCredential": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.credential",
+  "description": "Boards 6.4 and 6.5. **A credential is not the wallet** — a lost wristband is relinked, not refunded.\n",
+  "required": [
+   "walletId",
+   "kind",
+   "identifier"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "walletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "card",
+     "wristband",
+     "nfc",
+     "rfid",
+     "qr",
+     "mobileApp",
+     "digitalKey"
+    ]
+   },
+   "identifier": {
+    "type": "string"
+   },
+   "linkedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "unlinkedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "lost",
+     "replaced",
+     "blocked",
+     "expired"
+    ]
+   },
+   "replacedByCredentialId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletDispute": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.dispute",
+  "description": "Board 7.9. **Internal, and the venue decides it** — unlike a card chargeback.",
+  "required": [
+   "walletId",
+   "description"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "walletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "transactionIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "description": {
+    "type": "string"
+   },
+   "raisedBy": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "raisedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "investigating",
+     "escalated",
+     "upheld",
+     "rejected",
+     "withdrawn"
+    ],
+    "description": "`escalated` added with `resolveWalletDispute` (VM close-out, 29 September). `upheld`, `rejected` and `withdrawn` are closed."
+   },
+   "resolution": {
+    "type": "string",
+    "nullable": true
+   },
+   "escalatedToRoleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "reprocessedTransactionIds": {
+    "type": "array",
+    "readOnly": true,
+    "description": "Transactions created by a `reprocess` action.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "resolvedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "adjustmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletRestriction": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.restriction",
+  "description": "Board 7.8. **Freeze, block and restrict are three different things.**",
+  "required": [
+   "walletId",
+   "kind",
+   "reason"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "walletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "freeze",
+     "block",
+     "restrict",
+     "none"
+    ],
+    "description": "**`freeze` stops spending and allows funding** — what you do while investigating. **`block` stops both** — a confirmed fraud. **`restrict` limits channels or categories** — what a parent asked for.\n"
+   },
+   "blockedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "blockedCategoryIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "reason": {
+    "type": "string"
+   },
+   "appliedBy": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "appliedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletRiskRules": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.risk_rules",
+  "description": "Boards 8.2 to 8.7. **A risk rule with no action is a report.**",
+  "properties": {
+   "rules": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string"
+      },
+      "signal": {
+       "type": "string",
+       "enum": [
+        "velocityCount",
+        "velocityAmount",
+        "newCredential",
+        "geographyJump",
+        "deviceChange",
+        "dormantThenLarge",
+        "repeatedFailure",
+        "refundPattern"
+       ]
+      },
+      "threshold": {
+       "type": "number"
+      },
+      "windowMinutes": {
+       "type": "integer"
+      },
+      "action": {
+       "type": "string",
+       "enum": [
+        "scoreOnly",
+        "challenge",
+        "holdTransaction",
+        "freezeWallet",
+        "raiseCase"
+       ]
+      },
+      "minimumConfidence": {
+       "type": "number",
+       "nullable": true,
+       "description": "**Required before an automated freeze.** A rule that freezes on a false positive will eventually freeze a family in a queue.\n"
+      },
+      "alertOnAction": {
+       "type": "boolean",
+       "default": true
+      },
+      "status": {
+       "type": "string",
+       "readOnly": true,
+       "enum": [
+        "active",
+        "suspended",
+        "emergencyDisabled"
+       ],
+       "default": "active",
+       "description": "Set by `setWalletRiskRuleStatus`, not by publishing the rule set. A rule not `active` is evaluated for nothing (VM close-out, 29 September)."
+      },
+      "statusReason": {
+       "type": "string",
+       "nullable": true,
+       "readOnly": true
+      },
+      "statusUntil": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true,
+       "readOnly": true,
+       "description": "When a `suspended` rule returns to `active` by itself."
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ }
+}

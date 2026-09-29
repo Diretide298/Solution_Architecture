@@ -41,7 +41,7 @@
   "method": "POST",
   "path": "/approval-requests/{requestId}/decide",
   "contract": "approvals",
-  "summary": "Approve or reject",
+  "summary": "Approve, reject, return or ask for information",
   "permission": "APPROVAL_DECIDE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -102,6 +102,26 @@
     "name": "status",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "severity",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "shiftId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "itemId",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -112,7 +132,7 @@
   "path": "/audit-records",
   "contract": "tenancy",
   "summary": "Who did what, where, and when",
-  "permission": "AI_AUDIT_VIEW",
+  "permission": "AUDIT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -143,6 +163,11 @@
     "required": null
    },
    {
+    "name": "platformStaffGrantId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": "from",
     "in": "query",
     "required": null
@@ -151,10 +176,44 @@
     "name": "to",
     "in": "query",
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Page"
+ },
+ "listDeviceFirmware": {
+  "method": "GET",
+  "path": "/device-firmware",
+  "contract": "tenancy",
+  "summary": "Firmware and software versions, and what is running where",
+  "permission": "DEVICE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "deviceKind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "version",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DeviceFirmware"
  },
  "listSyncRejections": {
   "method": "GET",
@@ -168,6 +227,16 @@
   "parameters": [
    {
     "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "resolved",
     "in": "query",
     "required": null
    },
@@ -218,6 +287,25 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "rollbackDeviceFirmware": {
+  "method": "POST",
+  "path": "/device-firmware/rollouts/{rolloutId}/rollback",
+  "contract": "tenancy",
+  "summary": "Put the fleet back on the previous version",
+  "permission": "DEVICE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DeviceFirmwareRollout"
  },
  "runReport": {
   "method": "POST",
@@ -314,6 +402,25 @@
   "requestBody": "OfflinePolicy",
   "responds": "OfflinePolicy"
  },
+ "startDeviceFirmwareRollout": {
+  "method": "POST",
+  "path": "/device-firmware/rollouts",
+  "contract": "tenancy",
+  "summary": "Push an update to a fleet, in waves",
+  "permission": "DEVICE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DeviceFirmwareRollout",
+  "responds": "DeviceFirmwareRollout"
+ },
  "syncOrders": {
   "method": "POST",
   "path": "/sync/orders",
@@ -323,7 +430,13 @@
   "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "OrderSyncResult"
  }

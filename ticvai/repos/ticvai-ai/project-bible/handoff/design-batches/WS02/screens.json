@@ -39,10 +39,7 @@
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-154 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-155",
@@ -81,12 +78,6 @@
      "operation": "listAccessRule"
     },
     {
-     "to": "BO-161",
-     "trigger": "Works in Guest, Companion & Eligibility Rules",
-     "provenance": "flow F112 step 13→14",
-     "operation": "listAccessRule"
-    },
-    {
      "to": "BO-162",
      "trigger": "Works in Group Admission & Quantity Validation",
      "provenance": "flow F112 step 15→16",
@@ -97,14 +88,23 @@
      "trigger": "Works in Rule Simulation, Conflict Check & Publication",
      "provenance": "flow F112 step 17→18",
      "operation": "listAccessRule"
+    },
+    {
+     "to": "BO-161",
+     "trigger": "Works in Guest, Companion & Eligibility Rules",
+     "provenance": "flow F112 step 13→14",
+     "operation": "listAccessRule",
+     "carries": [
+      "productId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrator can centrally find, understand, create, clone, modify and govern all admission rules.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Show) and a per-row directory (§Each rule displays) — counts over a population, then the population",
   "purpose": "Central configuration dashboard for all access and entitlement rules.",
-  "purposeNote": "Administrator can centrally find, understand, create, clone, modify and govern all admission rules.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -116,73 +116,73 @@
        "kind": "metricTile",
        "label": "Active Access Rules",
        "provenance": "pack Access Control Module_Reference.pdf, page 17 §Show",
-       "bindsTo": "AccessRuleCommandCenterView.activeAccessRules"
+       "bindsTo": "AccessRuleCommandCenterViewSummary.activeAccessRules"
       },
       {
        "kind": "metricTile",
        "label": "Draft Rules",
        "provenance": "pack Access Control Module_Reference.pdf, page 17 §Show",
-       "bindsTo": "AccessRuleCommandCenterView.draftRules"
+       "bindsTo": "AccessRuleCommandCenterViewSummary.draftRules"
       },
       {
        "kind": "metricTile",
        "label": "Scheduled Rules",
        "provenance": "pack Access Control Module_Reference.pdf, page 17 §Show",
-       "bindsTo": "AccessRuleCommandCenterView.scheduledRules"
+       "bindsTo": "AccessRuleCommandCenterViewSummary.scheduledRules"
       },
       {
        "kind": "metricTile",
        "label": "Rules Pending Approval",
        "provenance": "pack Access Control Module_Reference.pdf, page 17 §Show",
-       "bindsTo": "AccessRuleCommandCenterView.rulesPendingApproval"
+       "bindsTo": "AccessRuleCommandCenterViewSummary.rulesPendingApproval"
       },
       {
        "kind": "metricTile",
        "label": "Venues Covered",
        "provenance": "pack Access Control Module_Reference.pdf, page 17 §Show",
-       "bindsTo": "AccessRuleCommandCenterView.venuesCovered"
+       "bindsTo": "AccessRuleCommandCenterViewSummary.venuesCovered"
       },
       {
        "kind": "metricTile",
        "label": "Products/Tickets Covered",
        "provenance": "pack Access Control Module_Reference.pdf, page 17 §Show",
-       "bindsTo": "AccessRuleCommandCenterView.productsTicketsCovered"
+       "bindsTo": "AccessRuleCommandCenterViewSummary.productsTicketsCovered"
       },
       {
        "kind": "metricTile",
        "label": "Rules with Conflicts",
        "provenance": "pack Access Control Module_Reference.pdf, page 17 §Show",
-       "bindsTo": "AccessRuleCommandCenterView.rulesWithConflicts"
+       "bindsTo": "AccessRuleCommandCenterViewSummary.rulesWithConflicts"
       },
       {
        "kind": "metricTile",
        "label": "Rules Using Biometrics",
        "provenance": "pack Access Control Module_Reference.pdf, page 17 §Show",
-       "bindsTo": "AccessRuleCommandCenterView.rulesUsingBiometrics"
+       "bindsTo": "AccessRuleCommandCenterViewSummary.rulesUsingBiometrics"
       },
       {
        "kind": "metricTile",
        "label": "Rules Allowing Override",
        "provenance": "pack Access Control Module_Reference.pdf, page 17 §Show",
-       "bindsTo": "AccessRuleCommandCenterView.rulesAllowingOverride"
+       "bindsTo": "AccessRuleCommandCenterViewSummary.rulesAllowingOverride"
       },
       {
        "kind": "metricTile",
        "label": "Offline-Compatible Rules",
        "provenance": "pack Access Control Module_Reference.pdf, page 17 §Show",
-       "bindsTo": "AccessRuleCommandCenterView.offlineCompatibleRules"
+       "bindsTo": "AccessRuleCommandCenterViewSummary.offlineCompatibleRules"
       },
       {
        "kind": "metricTile",
        "label": "Recently Modified Rules",
        "provenance": "pack Access Control Module_Reference.pdf, page 17 §Show",
-       "bindsTo": "AccessRuleCommandCenterView.recentlyModifiedRules"
+       "bindsTo": "AccessRuleCommandCenterViewSummary.recentlyModifiedRules"
       },
       {
        "kind": "metricTile",
        "label": "Upcoming Rule Changes",
        "provenance": "pack Access Control Module_Reference.pdf, page 17 §Show",
-       "bindsTo": "AccessRuleCommandCenterView.upcomingRuleChanges"
+       "bindsTo": "AccessRuleCommandCenterViewSummary.upcomingRuleChanges"
       }
      ]
     },
@@ -233,12 +233,31 @@
     "contract": "access",
     "purpose": "Access Rule Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listAdmissionRules",
+    "contract": "access",
+    "purpose": "Every admission rule with its scope",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "createAdmissionRules",
+    "contract": "access",
+    "purpose": "Create an access rule (admission profile)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listAccessRule",
+     "listAdmissionRules"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-154"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-154",
+   "workshopBoard": "wireframes/WS19 Access Control Board 2.dc.html#bo-154"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 17. 12 of 13 labels bound to a contract property; 13 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -301,10 +320,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Complex admission rules can be configured without code or vendor development.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide a no-code rule engine. This is where TICVAI should become significantly easier to configure than traditional access-control systems.",
-  "purposeNote": "Complex admission rules can be configured without code or vendor development.",
   "gaps": [
    {
     "operation": null,
@@ -357,16 +376,14 @@
     "operationId": "setVisualAccessRule",
     "contract": "access",
     "purpose": "Visual Access Rule Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setVisualAccessRule"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-155"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-155",
+   "workshopBoard": "wireframes/WS19 Access Control Board 2.dc.html#bo-155"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 18. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -429,10 +446,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "The complete entry → exit → re-entry lifecycle can be configured independently by ticket/product/access policy.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure admission quantity and journey sequencing. The source matrix explicitly requires configurable quantities for entry, exit and same-day re-entry, anti- passback intervals, required exit before re-entry, and required entry before exit.",
-  "purposeNote": "The complete entry → exit → re-entry lifecycle can be configured independently by ticket/product/access policy.",
   "gaps": [
    {
     "operation": null,
@@ -458,6 +475,18 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save admission rules",
+       "operation": "updateAdmissionRules",
+       "provenance": "contract access.yaml PUT /admission-rules/{profileId} (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -474,21 +503,42 @@
     "contract": "access",
     "purpose": "Entry, Exit & Re-entry Rules",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listAdmissionRules",
+    "contract": "access",
+    "purpose": "The admission profiles whose entry, exit and re-entry rules are edited here",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "updateAdmissionRules",
+    "contract": "access",
+    "purpose": "Save entry, exit and re-entry limits (maxReentries, requiresExitBeforeReentry)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listEntryExitRule",
+     "listAdmissionRules"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "EntryExitReEntryRulesView.unlimited",
-    "EntryExitReEntryRulesView.once",
-    "EntryExitReEntryRulesView.nTimes",
-    "EntryExitReEntryRulesView.nPerDay",
-    "EntryExitReEntryRulesView.nPerPeriod"
+    "EntryExitReEntryRulesView.entryMode"
+   ],
+   "params": [
+    {
+     "name": "profileId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-156"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-156",
+   "workshopBoard": "wireframes/WS19 Access Control Board 2.dc.html#bo-156"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 19. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -551,10 +601,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "The system prevents credential sharing and invalid journey sequences while allowing configurable operational exceptions.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure required sequences such as) and no display directory — it is settings, not a population",
   "purpose": "Prevent credential sharing and impossible access sequences.",
-  "purposeNote": "The system prevents credential sharing and invalid journey sequences while allowing configurable operational exceptions.",
   "layout": {
    "template": "form",
    "regions": [
@@ -598,7 +648,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-157"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-157",
+   "workshopBoard": "wireframes/WS19 Access Control Board 2.dc.html#bo-157"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 20. 0 of 0 labels bound to a contract property; 3 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -661,17 +712,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Access validity can be controlled by dates, relative periods, calendars and precise time windows.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Determine when access is permitted.",
-  "purposeNote": "Access validity can be controlled by dates, relative periods, calendars and precise time windows.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: End of Day, End of Week, End of Month. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Access Control Module_Reference.pdf, page 21 §Support"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -721,6 +765,11 @@
      "slot": "publish",
      "components": [
       {
+       "kind": "primaryButton",
+       "label": "From / To",
+       "provenance": "pack Access Control Module_Reference.pdf, page 21 §Support"
+      },
+      {
        "kind": "destructiveButton",
        "label": "End of Day",
        "provenance": "pack Access Control Module_Reference.pdf, page 21 §Support"
@@ -734,6 +783,12 @@
        "kind": "destructiveButton",
        "label": "End of Month",
        "provenance": "pack Access Control Module_Reference.pdf, page 21 §Support"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save admission rules",
+       "operation": "updateAdmissionRules",
+       "provenance": "contract access.yaml PUT /admission-rules/{profileId} (decided 29 September, VM close-out)"
       }
      ]
     }
@@ -774,14 +829,41 @@
     "contract": "access",
     "purpose": "Access Validity & Time Rules",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listAdmissionRules",
+    "contract": "access",
+    "purpose": "The admission profiles whose validity windows are edited here",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "updateAdmissionRules",
+    "contract": "access",
+    "purpose": "Save the admission window (openMinutesBefore, closeMinutesAfter, maxDurationMinutes)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listAccessValidityTime",
+     "listAdmissionRules"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-158"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-158",
+   "workshopBoard": "wireframes/WS19 Access Control Board 2.dc.html#bo-158"
   },
-  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 21. 0 of 0 labels bound to a contract property; 10 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 21. 0 of 0 labels bound to a contract property; 11 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** From / To, End of Day, End of Week, End of Month are choices sent by `updateAdmissionRules` (validity.anchor / validity.endOf once AdmissionRules gains the validity block (VM handoff)).",
+  "entryState": {
+   "params": [
+    {
+     "name": "profileId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -842,16 +924,11 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "A validation event can consume the correct entitlement and immediately calculate the remaining balance.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Determine what gets consumed when access is granted. This is critical because one credential may represent several different entitlements. The matrix specifically describes a single QR capable of carrying park admission, ride entitlement, meal voucher, coupon, photo voucher and re-entry rights.",
-  "purposeNote": "A validation event can consume the correct entitlement and immediately calculate the remaining balance.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Membership benefit. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Access Control Module_Reference.pdf, page 22 §Support"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -872,21 +949,40 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Attraction Admission",
+       "provenance": "pack Access Control Module_Reference.pdf, page 22 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Voucher",
+       "provenance": "pack Access Control Module_Reference.pdf, page 22 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Event",
+       "provenance": "pack Access Control Module_Reference.pdf, page 22 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Experience",
+       "provenance": "pack Access Control Module_Reference.pdf, page 22 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Membership benefit",
        "provenance": "pack Access Control Module_Reference.pdf, page 22 §Support"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save consumption rule",
+       "operation": "setEntitlementConsumption",
+       "provenance": "contract access.yaml PUT /entitlement-consumption (decided 29 September, VM close-out)"
       }
      ]
     },
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listEntitlementConsumption",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
+     "components": []
     }
    ]
   },
@@ -903,23 +999,26 @@
     "contract": "access",
     "purpose": "Entitlement Consumption Engine",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setEntitlementConsumption",
+    "contract": "access",
+    "purpose": "Save consumption rule",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "preloaded": [
-    "EntitlementConsumptionEngineView.parkAdmission",
-    "EntitlementConsumptionEngineView.attractionAdmission",
-    "EntitlementConsumptionEngineView.ride",
-    "EntitlementConsumptionEngineView.fastPass",
-    "EntitlementConsumptionEngineView.meal"
+    "EntitlementConsumptionEngineView.entitlementType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-159"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-159",
+   "workshopBoard": "wireframes/WS19 Access Control Board 2.dc.html#bo-159"
   },
-  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 22. 0 of 0 labels bound to a contract property; 1 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 22. 0 of 0 labels bound to a contract property; 5 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `setEntitlementConsumption`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1004,8 +1103,20 @@
       {
        "kind": "dataTable",
        "derived": true,
-       "impliedBy": "listMultiParkCrossover",
+       "impliedBy": "listMultiParkCrossover2",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save admission rules",
+       "operation": "updateAdmissionRules",
+       "provenance": "contract access.yaml PUT /admission-rules/{profileId} (decided 29 September, VM close-out)"
       }
      ]
     }
@@ -1024,14 +1135,42 @@
     "contract": "access",
     "purpose": "Multi-Park & Crossover Rules",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listAdmissionRules",
+    "contract": "access",
+    "purpose": "The admission profiles that carry crossover rules",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "updateAdmissionRules",
+    "contract": "access",
+    "purpose": "Save which parks a profile admits to (allowedAccessPointIds, scopePath)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listMultiParkCrossover2",
+     "listMultiParkCrossover",
+     "listAdmissionRules"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-160"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-160",
+   "workshopBoard": "wireframes/WS19 Access Control Board 2.dc.html#bo-160"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 23. 0 of 0 labels bound to a contract property; 0 of 3 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "profileId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1092,15 +1231,15 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Access rules can consider guest category, linked persons and companion requirements.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Apply access conditions based on guest characteristics and relationships.",
-  "purposeNote": "Access rules can consider guest category, linked persons and companion requirements.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Child Ticket + Assigned Adult Ticket. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Access Control Module_Reference.pdf, page 24 §Support"
+    "why": "**Seven pack categories are not age categories and are not carried** (decided 28 September, audit R275 (b): the guest categories map onto the age rules). POD, POD Companion, Nanny, VIP, Member, Staff and Accreditation are ticket, credential or entitlement types, not eligibility by age; no contract rule gives them an eligibility meaning. If the client needs one of them as an access condition, it is a new rule, not a field here.",
+    "source": "pack Access Control Module_Reference.pdf, page 24 §Configure"
    }
   ],
   "layout": {
@@ -1111,59 +1250,64 @@
      "slot": "fields",
      "components": [
       {
+       "kind": "detailPanel",
+       "label": "The age rule",
+       "bindsTo": "ProductEligibilityRule",
+       "columns": [
+        "ProductEligibilityRule.minAgeYears",
+        "ProductEligibilityRule.maxAgeYears",
+        "ProductEligibilityRule.accompaniedBelowAge",
+        "ProductEligibilityRule.guardianSignatureAgeFrom",
+        "ProductEligibilityRule.guardianSignatureAgeTo",
+        "ProductEligibilityRule.minHeightCm",
+        "ProductEligibilityRule.maxHeightCm",
+        "ProductEligibilityRule.heightBandsCm"
+       ],
+       "operation": "getProductEligibilityRule",
+       "notes": "**The guest categories are the age bands** (decided 28 September, audit R275 (b)) — Infant under 3, Child 3–12, Junior 13–17, Adult 18–59, Senior 60+ (`EligibilityDeclaration.ageBand`). A product admits the bands its `minAgeYears`/`maxAgeYears` cover; height stays its own limit.",
+       "provenance": "contract catalogue.yaml GET /products/{productId}/eligibility-rule"
+      },
+      {
        "kind": "selectField",
-       "label": "Adult",
-       "provenance": "pack Access Control Module_Reference.pdf, page 24 §Configure"
+       "label": "Infant",
+       "operation": "setProductEligibilityRule",
+       "notes": "Age band infant (under 3). Admitted when the rule's age range includes it (audit R275 (b)).",
+       "provenance": "contract catalogue.yaml PUT /products/{productId}/eligibility-rule"
       },
       {
        "kind": "selectField",
        "label": "Child",
-       "provenance": "pack Access Control Module_Reference.pdf, page 24 §Configure"
+       "operation": "setProductEligibilityRule",
+       "notes": "Age band child (3–12). Admitted when the rule's age range includes it (audit R275 (b)).",
+       "provenance": "contract catalogue.yaml PUT /products/{productId}/eligibility-rule"
       },
       {
        "kind": "selectField",
        "label": "Junior",
-       "provenance": "pack Access Control Module_Reference.pdf, page 24 §Configure"
+       "operation": "setProductEligibilityRule",
+       "notes": "Age band junior (13–17). Admitted when the rule's age range includes it (audit R275 (b)).",
+       "provenance": "contract catalogue.yaml PUT /products/{productId}/eligibility-rule"
+      },
+      {
+       "kind": "selectField",
+       "label": "Adult",
+       "operation": "setProductEligibilityRule",
+       "notes": "Age band adult (18–59). Admitted when the rule's age range includes it (audit R275 (b)).",
+       "provenance": "contract catalogue.yaml PUT /products/{productId}/eligibility-rule"
       },
       {
        "kind": "selectField",
        "label": "Senior",
-       "provenance": "pack Access Control Module_Reference.pdf, page 24 §Configure"
+       "operation": "setProductEligibilityRule",
+       "notes": "Age band senior (60+). Admitted when the rule's age range includes it (audit R275 (b)).",
+       "provenance": "contract catalogue.yaml PUT /products/{productId}/eligibility-rule"
       },
       {
-       "kind": "selectField",
-       "label": "POD",
-       "provenance": "pack Access Control Module_Reference.pdf, page 24 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "POD Companion",
-       "provenance": "pack Access Control Module_Reference.pdf, page 24 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Nanny",
-       "provenance": "pack Access Control Module_Reference.pdf, page 24 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "VIP",
-       "provenance": "pack Access Control Module_Reference.pdf, page 24 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Member",
-       "provenance": "pack Access Control Module_Reference.pdf, page 24 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Staff",
-       "provenance": "pack Access Control Module_Reference.pdf, page 24 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Accreditation",
-       "provenance": "pack Access Control Module_Reference.pdf, page 24 §Configure"
+       "kind": "numberField",
+       "label": "Accompanied below age",
+       "operation": "setProductEligibilityRule",
+       "notes": "**Child Ticket + Assigned Adult Ticket** from the pack — a guest below this age must be accompanied (`accompaniedBelowAge`) (audit R275 (b)).",
+       "provenance": "contract catalogue.yaml PUT /products/{productId}/eligibility-rule"
       }
      ]
     },
@@ -1173,8 +1317,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Child Ticket + Assigned Adult Ticket",
-       "provenance": "pack Access Control Module_Reference.pdf, page 24 §Support"
+       "label": "Save age rule",
+       "operation": "setProductEligibilityRule",
+       "provenance": "contract catalogue.yaml PUT /products/{productId}/eligibility-rule"
       }
      ]
     }
@@ -1188,6 +1333,18 @@
   },
   "apis": [
    {
+    "operationId": "getProductEligibilityRule",
+    "contract": "catalogue",
+    "purpose": "A product's age, height and supervision limits",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setProductEligibilityRule",
+    "contract": "catalogue",
+    "purpose": "Set age, height and supervision limits",
+    "trigger": "onAction"
+   },
+   {
     "operationId": "listGuestCompanionEligibility",
     "contract": "access",
     "purpose": "Guest, Companion & Eligibility Rules",
@@ -1197,9 +1354,47 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-161"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-161",
+   "workshopBoard": "wireframes/WS19 Access Control Board 2.dc.html#bo-161"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 24. 0 of 0 labels bound to a contract property; 12 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "productId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "formSetProductEligibilityRule",
+    "component": "modal",
+    "trigger": "Save age rule",
+    "body": "**Collects what `setProductEligibilityRule` sends before it is called.** The guest categories are the age bands, so the categories chosen become `minAgeYears` and `maxAgeYears`; `accompaniedBelowAge`, the guardian-signature ages, `waiverRequired`, `swimAbility` and the height limits are optional (decided 28 September, audit R275 (b)). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ProductEligibilityRule",
+    "confirm": {
+     "label": "Save age rule",
+     "operation": "setProductEligibilityRule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "minAgeYears",
+      "maxAgeYears",
+      "accompaniedBelowAge",
+      "guardianSignatureAgeFrom",
+      "guardianSignatureAgeTo",
+      "minHeightCm",
+      "maxHeightCm",
+      "heightBandsCm",
+      "waiverRequired",
+      "swimAbility"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /products/{productId}/eligibility-rule"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1260,10 +1455,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Large groups can be admitted quickly without scanning every guest individually when the configured product permits group admission.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Handle B2B groups, school groups, tour groups and family/group tickets efficiently. The matrix specifically calls for faster admission for large B2B groups and the ability for one QR/group ticket to represent multiple admissions.",
-  "purposeNote": "Large groups can be admitted quickly without scanning every guest individually when the configured product permits group admission.",
   "gaps": [
    {
     "operation": null,
@@ -1308,18 +1503,13 @@
    }
   ],
   "entryState": {
-   "preloaded": [
-    "GroupAdmissionQuantityValidationView.authorizedQuantity50",
-    "GroupAdmissionQuantityValidationView.authorizedGuests50",
-    "GroupAdmissionQuantityValidationView.guestsEnteringNow42",
-    "GroupAdmissionQuantityValidationView.entered42",
-    "GroupAdmissionQuantityValidationView.remaining8"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-162"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-162",
+   "workshopBoard": "wireframes/WS19 Access Control Board 2.dc.html#bo-162"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 25. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1374,10 +1564,10 @@
    "notes": "**Reached from BO-154, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Every access rule can be simulated, validated, approved, versioned, published and rolled back with a complete audit trail. Board 2 — Final Screen Structure # Backend Screen Core Responsibility 2.1 Access Rule Command Center Central access-rule management # Backend Screen Core Responsibility 2.2 Visual Access Rule Builder No-code admission logic 2.3 Entry, Exit & Re-entry Rules Admission quantities and lifecycle 2.4 Anti-Passback & Journey Sequence Sharing prevention and sequence control 2.5 Access Validity & Time Rules Dates, calendars, time and expiry 2.6 Entitlement Consumption Engine Consum",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "No access rule should reach a live gate without being tested.",
-  "purposeNote": "Every access rule can be simulated, validated, approved, versioned, published and rolled back with a complete audit trail. Board 2 — Final Screen Structure # Backend Screen Core Responsibility 2.1 Access Rule Command Center Central access-rule management # Backend Screen Core Responsibility 2.2 Visual Access Rule Builder No-code admission logic 2.3 Entry, Exit & Re-entry Rules Admission quantities and lifecycle 2.4 Anti-Passback & Journey Sequence Sharing prevention and sequence control 2.5 Access Validity & Time Rules Dates, calendars, time and expiry 2.6 Entitlement Consumption Engine Consum",
   "gaps": [
    {
     "operation": null,
@@ -1438,16 +1628,14 @@
     "operationId": "publishRuleConflictCheck",
     "contract": "access",
     "purpose": "Rule Simulation, Conflict Check & Publication",
-    "trigger": "onAction",
-    "invalidates": [
-     "publishRuleConflictCheck"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-163"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-163",
+   "workshopBoard": "wireframes/WS19 Access Control Board 2.dc.html#bo-163"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 26. 0 of 0 labels bound to a contract property; 3 of 59 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

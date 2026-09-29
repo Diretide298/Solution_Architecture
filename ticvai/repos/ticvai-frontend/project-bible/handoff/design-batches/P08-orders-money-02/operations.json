@@ -81,7 +81,7 @@
   "contract": "shift",
   "summary": "Blind close-out",
   "permission": "SHIFT_CLOSE",
-  "offlineCapable": true,
+  "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
   "parameters": [
@@ -189,12 +189,50 @@
   "requestBody": "CreateReportRequest",
   "responds": "ReportDefinition"
  },
+ "createReportSchedule": {
+  "method": "POST",
+  "path": "/report-schedules",
+  "contract": "reporting",
+  "summary": "Schedule a report",
+  "permission": "REPORT_SCHEDULE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateReportScheduleRequest",
+  "responds": "ReportSchedule"
+ },
  "deleteReport": {
   "method": "DELETE",
   "path": "/reports/{reportId}",
   "contract": "reporting",
   "summary": "Retire a report definition",
   "permission": "REPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "deleteReportSchedule": {
+  "method": "DELETE",
+  "path": "/report-schedules/{scheduleId}",
+  "contract": "reporting",
+  "summary": "Delete a schedule",
+  "permission": "REPORT_SCHEDULE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -244,7 +282,7 @@
   "method": "GET",
   "path": "/reports/financial",
   "contract": "finance",
-  "summary": "P&L, balance sheet or cash flow",
+  "summary": "Financial statements, revenue and tax summaries",
   "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -381,6 +419,19 @@
   "requestBody": null,
   "responds": "TrialBalance"
  },
+ "getVenueSettings": {
+  "method": "GET",
+  "path": "/venues/{venueId}/settings",
+  "contract": "tenancy",
+  "summary": "Operational settings for this venue",
+  "permission": "TENANT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VenueSettings"
+ },
  "holdOrder": {
   "method": "POST",
   "path": "/orders/{orderId}/hold",
@@ -441,7 +492,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "CashMovement"
+  "responds": "Page"
  },
  "listDeliveryLocations": {
   "method": "GET",
@@ -475,7 +526,36 @@
    }
   ],
   "requestBody": null,
-  "responds": "DeliveryLocation"
+  "responds": "Page"
+ },
+ "listDepositBoxes": {
+  "method": "GET",
+  "path": "/deposit-boxes",
+  "contract": "shift",
+  "summary": "Cash boxes and who holds them",
+  "permission": "SHIFT_OPEN",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "openOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listDiningOutlets": {
   "method": "GET",
@@ -509,7 +589,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "DiningOutlet"
+  "responds": "Page"
  },
  "listLedgerEntries": {
   "method": "GET",
@@ -636,7 +716,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "Refund"
+  "responds": "Page"
  },
  "listOrders": {
   "method": "GET",
@@ -678,6 +758,69 @@
     "in": "query",
     "required": null
    },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listReportExecutions": {
+  "method": "GET",
+  "path": "/report-executions",
+  "contract": "reporting",
+  "summary": "List executions",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "reportId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "mineOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listReportSchedules": {
+  "method": "GET",
+  "path": "/report-schedules",
+  "contract": "reporting",
+  "summary": "List scheduled reports",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
    {
     "name": null,
     "in": null,
@@ -762,6 +905,11 @@
   "parameters": [
    {
     "name": "providerName",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
     "in": "query",
     "required": null
    },
@@ -852,6 +1000,11 @@
     "name": "includeSiblingOutlets",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -882,7 +1035,7 @@
   "contract": "shift",
   "summary": "Open a shift",
   "permission": "SHIFT_OPEN",
-  "offlineCapable": true,
+  "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
   "parameters": [
@@ -899,8 +1052,8 @@
   "method": "POST",
   "path": "/shifts/{shiftId}/no-sale",
   "contract": "shift",
-  "summary": "Open the drawer without a sale",
-  "permission": "SHIFT_SUSPEND",
+  "summary": "Open the Deposit Box without a sale",
+  "permission": "CASH_NO_SALE",
   "offlineCapable": true,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
@@ -1085,6 +1238,25 @@
   "requestBody": "RefundPolicy",
   "responds": "RefundPolicy"
  },
+ "setVenueSettings": {
+  "method": "PUT",
+  "path": "/venues/{venueId}/settings",
+  "contract": "tenancy",
+  "summary": "Set support hours, quiet hours, segregated access and alerting",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VenueSettings",
+  "responds": "VenueSettings"
+ },
  "suspendShift": {
   "method": "POST",
   "path": "/shifts/{shiftId}/suspend",
@@ -1142,6 +1314,25 @@
   "requestBody": "CreateReportRequest",
   "responds": "ReportDefinition"
  },
+ "updateReportSchedule": {
+  "method": "PATCH",
+  "path": "/report-schedules/{scheduleId}",
+  "contract": "reporting",
+  "summary": "Amend, pause or resume a schedule",
+  "permission": "REPORT_SCHEDULE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ReportSchedule"
+ },
  "voidOrder": {
   "method": "POST",
   "path": "/orders/{orderId}/voids",
@@ -1160,5 +1351,24 @@
   ],
   "requestBody": null,
   "responds": "Order"
+ },
+ "withdrawFromDepositBox": {
+  "method": "POST",
+  "path": "/deposit-boxes/{boxId}/withdraw",
+  "contract": "shift",
+  "summary": "A supervisor takes cash out mid-shift",
+  "permission": "CASH_LIFT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DepositBox"
  }
 }

@@ -1,0 +1,296 @@
+{
+ "AccreditationAuditRecord": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.audit",
+  "description": "Board 8.7. **Who gave this person access to that place, when, and on whose authority.**\n",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "action": {
+    "type": "string"
+   },
+   "actorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "previousValue": {
+    "nullable": true
+   },
+   "newValue": {
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "previousRecordHash": {
+    "type": "string",
+    "nullable": true
+   },
+   "recordHash": {
+    "type": "string"
+   },
+   "integrity": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "intact",
+     "broken",
+     "unverifiable"
+    ]
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "AccreditationDocument": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.document",
+  "description": "Board 2.5. **Submitted against a named requirement, not into a folder.**",
+  "required": [
+   "requirementCode",
+   "assetId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "applicationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "requirementCode": {
+    "type": "string"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "submittedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "submitted",
+     "verified",
+     "rejected",
+     "expired"
+    ]
+   },
+   "verifiedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "verifiedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "rejectionReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "**An insurance certificate valid until March accredits somebody until March**, whatever the programme says.\n"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "AccreditationHolder": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.holder",
+  "description": "**A subject who may never sign in to anything.** `identity` owns principals; this owns accredited people.\n",
+  "required": [
+   "id",
+   "fullName"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "accreditationNumber": {
+    "type": "string"
+   },
+   "fullName": {
+    "type": "string"
+   },
+   "photoAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "dateOfBirth": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "nationality": {
+    "type": "string",
+    "nullable": true
+   },
+   "identityDocumentVerified": {
+    "type": "boolean",
+    "default": false
+   },
+   "organisationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "affiliationRole": {
+    "type": "string",
+    "nullable": true
+   },
+   "programmeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "categoryCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "suspended",
+     "revoked",
+     "expired",
+     "archived"
+    ]
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "completenessPercent": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "AccreditationIdentityConflict": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.identity_conflict",
+  "description": "Board 2.7. **One badge revoked and the other still opening doors.**\n\n**Stored, not recomputed on each read** (data model for the agreed operations, 29 September): a suspected pair is raised by `createAccreditationApplication` and `importAccreditationHolders` using `marketing-crm`'s identity resolution, and keeps its id and status while somebody decides it, so a pair rejected as two different people is not raised again on the next import. Resolved by `resolveIdentityConflict` (`pending` to `merged` or `rejected`, decided 29 September, writers pass); lifecycle in `states/accreditation-identity-conflict.yaml`.",
+  "required": [
+   "id",
+   "holderIds",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "holderIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "score": {
+    "type": "number"
+   },
+   "matchedOn": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "differingAccess": {
+    "type": "boolean"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "merged",
+     "rejected"
+    ]
+   },
+   "detectedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "survivingHolderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The holder kept when the conflict was merged"
+   },
+   "resolutionReason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true
+   },
+   "resolvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ }
+}

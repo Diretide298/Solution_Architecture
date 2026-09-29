@@ -1,1 +1,222 @@
-{}
+{
+ "adjustWallet": {
+  "method": "POST",
+  "path": "/wallets/{subjectId}/adjust",
+  "contract": "wallet",
+  "summary": "Manually adjust a wallet balance",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Wallet"
+ },
+ "createCreditType": {
+  "method": "POST",
+  "path": "/credit-types",
+  "contract": "wallet",
+  "summary": "Define a kind of credit, without a release",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreditType",
+  "responds": "CreditType"
+ },
+ "createGameEntitlement": {
+  "method": "POST",
+  "path": "/game-entitlements",
+  "contract": "games",
+  "summary": "Define a pass, package or per-game entitlement",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GameEntitlement",
+  "responds": "GameEntitlement"
+ },
+ "getWallet": {
+  "method": "GET",
+  "path": "/wallets/{subjectId}",
+  "contract": "wallet",
+  "summary": "Read a guest wallet",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Wallet"
+ },
+ "listCreditLots": {
+  "method": "GET",
+  "path": "/credit-lots",
+  "contract": "wallet",
+  "summary": "The tranches behind a balance, with their expiry",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "walletId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "includeExhausted",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CreditLot"
+ },
+ "listCreditTypes": {
+  "method": "GET",
+  "path": "/credit-types",
+  "contract": "wallet",
+  "summary": "The kinds of value that may sit in a wallet",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CreditType"
+ },
+ "listGameEntitlements": {
+  "method": "GET",
+  "path": "/game-entitlements",
+  "contract": "games",
+  "summary": "Passes, packages and per-game entitlements",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GameEntitlement"
+ },
+ "listWalletTransactions": {
+  "method": "GET",
+  "path": "/wallets/{subjectId}/transactions",
+  "contract": "wallet",
+  "summary": "Wallet transaction history",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "setCreditEligibilityRules": {
+  "method": "PUT",
+  "path": "/credit-types/{creditTypeId}/eligibility",
+  "contract": "wallet",
+  "summary": "Where this credit may be spent, and on what",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreditEligibility",
+  "responds": "CreditEligibility"
+ },
+ "setWalletFundingRules": {
+  "method": "PUT",
+  "path": "/wallet-funding-rules",
+  "contract": "wallet",
+  "summary": "Amounts, channels, bonuses, limits and velocity",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletFundingRules",
+  "responds": "WalletFundingRules"
+ },
+ "suspendWallet": {
+  "method": "POST",
+  "path": "/wallets/{walletId}/suspend",
+  "contract": "wallet",
+  "summary": "Freeze a wallet",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Wallet"
+ },
+ "updateCreditType": {
+  "method": "PUT",
+  "path": "/credit-types/{creditTypeId}",
+  "contract": "wallet",
+  "summary": "Change a kind of credit",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreditType",
+  "responds": "CreditType"
+ }
+}

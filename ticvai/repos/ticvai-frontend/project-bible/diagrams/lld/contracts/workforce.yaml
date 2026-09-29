@@ -1,5 +1,5 @@
 id: LLD-workforce
-title: workforce — 43 operations
+title: workforce — 45 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -127,7 +127,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - workforce.attendance
+  - workforce.labour_budget
+  - workforce.rota_assignment
+  - workforce.shift_template
   writes: []
 - operation: getStaffingCoverage
   verb: GET
@@ -137,7 +141,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - workforce.open_shift
+  - workforce.position_requirement
+  - workforce.rota_assignment
+  - workforce.shift_template
+  - workforce.staffing_rules
+  - workforce.training_record
   writes: []
 - operation: listAnnouncements
   verb: GET
@@ -196,6 +206,17 @@ operations:
   offline: false
   reads:
   - workforce.job_title
+  writes: []
+- operation: listLabourBudgets
+  verb: GET
+  path: /labour-budgets
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.labour_budget
   writes: []
 - operation: listLeaveBalances
   verb: GET
@@ -440,6 +461,20 @@ operations:
   - workforce.job_title
   writes:
   - workforce.job_title
+- operation: setLabourBudget
+  verb: PUT
+  path: /labour-budgets
+  scope: venue
+  permission: WORKFORCE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - workforce.labour_budget
+  writes:
+  - cache:idempotency
+  - workforce.labour_budget
 - operation: setLeaveType
   verb: PUT
   path: /leave-types
@@ -485,8 +520,11 @@ operations:
   - staff
   offline: false
   reads:
+  - workforce.position_requirement
   - workforce.staffing_rules
   writes:
+  - cache:idempotency
+  - workforce.position_requirement
   - workforce.staffing_rules
 - operation: setWorkAssignment
   verb: PUT
@@ -533,5 +571,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - identity.principal
+  - workforce.attendance
+  - workforce.employee
+  - workforce.rota_assignment
+  - workforce.staffing_rules
+  - workforce.training_record
   writes: []

@@ -48,7 +48,10 @@
     {
      "to": "BO-416",
      "trigger": "Wallet Account & Balance View",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026"
+     "provenance": "structural — pack board 3 wiring, 11 September 2026",
+     "carries": [
+      "subjectId"
+     ]
     },
     {
      "to": "BO-417",
@@ -78,12 +81,18 @@
     {
      "to": "BO-422",
      "trigger": "Refund, Adjustment & Manual Bonus Control",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026"
+     "provenance": "structural — pack board 3 wiring, 11 September 2026",
+     "carries": [
+      "subjectId"
+     ]
     },
     {
      "to": "BO-423",
      "trigger": "Wallet Credit Transaction Ledger & Audit",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026"
+     "provenance": "structural — pack board 3 wiring, 11 September 2026",
+     "carries": [
+      "subjectId"
+     ]
     }
    ]
   },
@@ -214,12 +223,36 @@
    "emptyNoResults": "The filter narrowed it and the wallet credit are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getWallet",
+    "contract": "wallet",
+    "purpose": "The game credit balance",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listWalletTransactions",
+    "contract": "wallet",
+    "purpose": "Recent movement",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-414"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-414",
+   "workshopBoard": "wireframes/WS60 Game and Ride Board 3.dc.html#bo-414"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 23. 0 of 7 labels bound to a contract property; 15 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -277,6 +310,7 @@
     }
    ]
   },
+  "notes": "**Superseded by `BO-1088` Credit & Balance Type Configuration** from `Wallet_Configuration_Backend_Structure_v1.0.pdf`, 19 September 2026. This screen came from `Game_and_Ride_Module.pdf`, which describes the wallet incidentally; the wallet pack is the workshop dedicated to it and is backed by the 27 August MoM and matrix 4.3.28-4.3.35. It has zero components, so nothing rendered is lost. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "density": "compact",
   "purposeNote": "Administrators can define and maintain distinct wallet value types with controlled usage behavior. Redemption-credit accumulation and prize redemption will be configured in detail under Board 6, rather than duplicated here.",
   "pattern": "configEditor",
@@ -350,10 +384,26 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listCreditTypes",
+    "contract": "wallet",
+    "purpose": "The credit type library",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createCreditType",
+    "contract": "wallet",
+    "purpose": "Define one",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-415"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-415",
+   "workshopBoard": "wireframes/WS60 Game and Ride Board 3.dc.html#bo-415"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 24. 0 of 0 labels bound to a contract property; 10 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -409,7 +459,10 @@
      "to": "BO-414",
      "trigger": "Back to Wallet & Credit Management Dashboard",
      "provenance": "structural — pack board 3 wiring, 11 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "subjectId"
+     ]
     }
    ]
   },
@@ -419,11 +472,6 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Allow authorized operators to inspect all value held in an individual guest wallet. The source requires stored credits to be viewable through operator and self-service kiosks.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: View Transactions, Add Credit — permission controlled, Add Bonus — permission controlled, View Entitlements, Block Wallet. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Game_and_Ride_Module.pdf, page 25 §Actions"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -468,6 +516,10 @@
        "provenance": "pack Game_and_Ride_Module.pdf, page 25 §Actions"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -478,12 +530,63 @@
    "emptyNoResults": "The filter narrowed it and the wallet account balance are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getWallet",
+    "contract": "wallet",
+    "purpose": "Account and balance",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listCreditLots",
+    "contract": "wallet",
+    "purpose": "The lots behind it",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "adjustWallet",
+    "contract": "wallet",
+    "purpose": "Add credit or bonus to the wallet (permission controlled)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Add Credit — permission controlled, Add Bonus — permission controlled; Block Wallet",
+    "invalidates": [
+     "getWallet",
+     "listCreditLots"
+    ]
+   },
+   {
+    "operationId": "suspendWallet",
+    "contract": "wallet",
+    "purpose": "Block the wallet",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Add Credit — permission controlled, Add Bonus — permission controlled; Block Wallet",
+    "invalidates": [
+     "getWallet",
+     "listCreditLots"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-416"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-416",
+   "workshopBoard": "wireframes/WS60 Game and Ride Board 3.dc.html#bo-416"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 25. 0 of 0 labels bound to a contract property; 5 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 25. 0 of 0 labels bound to a contract property; 5 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Add Credit — permission controlled, Add Bonus — permission controlled: `adjustWallet`; Block Wallet: `suspendWallet`; View Transactions, View Entitlements dropped (navigation).",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "navigation"
+    },
+    {
+     "name": "walletId",
+     "from": "navigation"
+    }
+   ],
+   "coldEntry": "Opened from BO-414 with the wallet picked there. Opened cold (a bookmark or a refresh), it shows the list to pick from rather than an empty record, and says plainly if the wallet no longer exists."
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -541,6 +644,7 @@
     }
    ]
   },
+  "notes": "**Superseded by `BO-1095` Top-Up Rule Configuration** from `Wallet_Configuration_Backend_Structure_v1.0.pdf`, 19 September 2026. This screen came from `Game_and_Ride_Module.pdf`, which describes the wallet incidentally; the wallet pack is the workshop dedicated to it and is backed by the 27 August MoM and matrix 4.3.28-4.3.35. It has zero components, so nothing rendered is lost. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "density": "compact",
   "purposeNote": "Administrators can define permitted wallet top-up values and their applicable channels/effective periods.",
   "pattern": "listDetail",
@@ -560,7 +664,27 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setWalletFundingRules",
+       "label": "Save wallet funding rules",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setWalletFundingRules"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The top-up list.",
@@ -569,10 +693,19 @@
    "emptyNoResults": "The filter narrowed it and the top-up are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setWalletFundingRules",
+    "contract": "wallet",
+    "purpose": "Top-up rules",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-417"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-417",
+   "workshopBoard": "wireframes/WS60 Game and Ride Board 3.dc.html#bo-417"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 26. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -632,6 +765,7 @@
     }
    ]
   },
+  "notes": "**Superseded by `BO-1105` Credit Issuance Rule Configuration** from `Wallet_Configuration_Backend_Structure_v1.0.pdf`, 19 September 2026. This screen came from `Game_and_Ride_Module.pdf`, which describes the wallet incidentally; the wallet pack is the workshop dedicated to it and is backed by the 27 August MoM and matrix 4.3.28-4.3.35. It has zero components, so nothing rendered is lost. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "density": "compact",
   "purposeNote": "The system automatically calculates and allocates the correct bonus based on the configured top-up rule.",
   "pattern": "listDetail",
@@ -651,7 +785,27 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setWalletFundingRules",
+       "label": "Save wallet funding rules",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setWalletFundingRules"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The top-up bonus rule list.",
@@ -660,10 +814,19 @@
    "emptyNoResults": "The filter narrowed it and the top-up bonus rule are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setWalletFundingRules",
+    "contract": "wallet",
+    "purpose": "Top-up bonus rules",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-418"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-418",
+   "workshopBoard": "wireframes/WS60 Game and Ride Board 3.dc.html#bo-418"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 27. 0 of 0 labels bound to a contract property; 0 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -742,7 +905,27 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setCreditEligibilityRules",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setCreditEligibilityRules"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The bonus usage restrictions list.",
@@ -751,12 +934,29 @@
    "emptyNoResults": "The filter narrowed it and the bonus usage restrictions are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setCreditEligibilityRules",
+    "contract": "wallet",
+    "purpose": "Bonus usage restrictions",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-419"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-419",
+   "workshopBoard": "wireframes/WS60 Game and Ride Board 3.dc.html#bo-419"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 27. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "creditTypeId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -814,6 +1014,7 @@
     }
    ]
   },
+  "notes": "**Superseded by `BO-1108` Expiry & Validity Policy Configuration** from `Wallet_Configuration_Backend_Structure_v1.0.pdf`, 19 September 2026. This screen came from `Game_and_Ride_Module.pdf`, which describes the wallet incidentally; the wallet pack is the workshop dedicated to it and is backed by the 27 August MoM and matrix 4.3.28-4.3.35. It has zero components, so nothing rendered is lost. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "density": "compact",
   "purposeNote": "Every bonus allocation follows the configured validity rule and becomes unusable after expiry.",
   "pattern": "listDetail",
@@ -833,7 +1034,27 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateCreditType",
+       "label": "Save credit type",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateCreditType"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The bonus validity expiry list.",
@@ -842,12 +1063,29 @@
    "emptyNoResults": "The filter narrowed it and the bonus validity expiry are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "updateCreditType",
+    "contract": "wallet",
+    "purpose": "Bonus validity and expiry",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-420"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-420",
+   "workshopBoard": "wireframes/WS60 Game and Ride Board 3.dc.html#bo-420"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 28. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "creditTypeId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -968,10 +1206,29 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listGameEntitlements",
+    "contract": "games",
+    "purpose": "Free game and ride credit",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createGameEntitlement",
+    "contract": "games",
+    "purpose": "Grant free play",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listGameEntitlements"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-421"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-421",
+   "workshopBoard": "wireframes/WS60 Game and Ride Board 3.dc.html#bo-421"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 29. 0 of 0 labels bound to a contract property; 8 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1027,7 +1284,10 @@
      "to": "BO-414",
      "trigger": "Back to Wallet & Credit Management Dashboard",
      "provenance": "structural — pack board 3 wiring, 11 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "subjectId"
+     ]
     }
    ]
   },
@@ -1050,7 +1310,26 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "adjustWallet",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "adjustWallet"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The refund adjustment manual list.",
@@ -1059,12 +1338,29 @@
    "emptyNoResults": "The filter narrowed it and the refund adjustment manual are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "adjustWallet",
+    "contract": "wallet",
+    "purpose": "Refund, adjust or grant bonus",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-422"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-422",
+   "workshopBoard": "wireframes/WS60 Game and Ride Board 3.dc.html#bo-422"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 30. 0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1118,7 +1414,10 @@
      "to": "BO-414",
      "trigger": "Back to Wallet & Credit Management Dashboard",
      "provenance": "structural — pack board 3 wiring, 11 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "subjectId"
+     ]
     }
    ]
   },
@@ -1141,7 +1440,19 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listWalletTransactions",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The wallet credit transaction list.",
@@ -1150,12 +1461,29 @@
    "emptyNoResults": "The filter narrowed it and the wallet credit transaction are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listWalletTransactions",
+    "contract": "wallet",
+    "purpose": "The credit ledger",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-423"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-423",
+   "workshopBoard": "wireframes/WS60 Game and Ride Board 3.dc.html#bo-423"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 30. 0 of 0 labels bound to a contract property; 0 of 66 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

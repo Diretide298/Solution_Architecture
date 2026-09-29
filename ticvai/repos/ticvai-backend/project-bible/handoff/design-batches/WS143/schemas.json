@@ -1,0 +1,1079 @@
+{
+ "CustomerSatisfactionFeedbackVoiceOfCustomerView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.form_submission and marketing.form_definition (survey forms), marketing.review, marketing.case and marketing.feedback_classification (new, the AI sentiment and topic per feedback item)",
+  "description": "Voice-of-customer figures for the filters given. Rates are shares of feedback items in the period.",
+  "required": [
+   "responses",
+   "breakdown",
+   "comments"
+  ],
+  "properties": {
+   "responses": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Feedback items in the period."
+   },
+   "csat": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "description": "Share of CSAT answers in the top two points of the scale."
+   },
+   "nps": {
+    "type": "integer",
+    "minimum": -100,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Null where the tenant runs no NPS survey."
+   },
+   "surveyResponseRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "description": "Surveys answered over surveys sent."
+   },
+   "positiveRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1
+   },
+   "neutralRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1
+   },
+   "negativeRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1
+   },
+   "complaints": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "repeatContactRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "description": "Customers with a second case within 7 days of the first, over customers with a case."
+   },
+   "customerEffortScore": {
+    "type": "number",
+    "minimum": 1,
+    "maximum": 7,
+    "nullable": true,
+    "description": "Mean CES answer; null where effort is not measured."
+   },
+   "csatChangeRate": {
+    "type": "number",
+    "nullable": true,
+    "description": "Relative change in `csat` against the previous period of equal length."
+   },
+   "breakdown": {
+    "type": "array",
+    "description": "One row per value of the `groupBy` dimension, most responses first.",
+    "items": {
+     "type": "object",
+     "required": [
+      "key",
+      "label",
+      "responses"
+     ],
+     "properties": {
+      "key": {
+       "type": "string",
+       "description": "The id or enum value of the group."
+      },
+      "label": {
+       "type": "string"
+      },
+      "responses": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "csat": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1,
+       "nullable": true
+      },
+      "negativeRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      }
+     }
+    }
+   },
+   "themes": {
+    "type": "array",
+    "maxItems": 20,
+    "description": "AI topic themes, largest share first. Empty when AI is disabled for the tenant.",
+    "items": {
+     "type": "object",
+     "required": [
+      "topic",
+      "shareRate"
+     ],
+     "properties": {
+      "topic": {
+       "type": "string",
+       "maxLength": 100
+      },
+      "shareRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      },
+      "negativeRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      },
+      "changeRate": {
+       "type": "number",
+       "nullable": true,
+       "description": "Relative change in the theme's volume against the previous period."
+      }
+     }
+    }
+   },
+   "trendAlerts": {
+    "type": "array",
+    "maxItems": 10,
+    "items": {
+     "type": "string",
+     "maxLength": 300
+    },
+    "description": "AI-detected shifts, e.g. negative feedback on ticket delivery rising after a release."
+   },
+   "comments": {
+    "type": "array",
+    "maxItems": 50,
+    "description": "The 50 latest comments with text, newest first.",
+    "items": {
+     "type": "object",
+     "required": [
+      "feedbackId",
+      "source",
+      "receivedAt"
+     ],
+     "properties": {
+      "feedbackId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "source": {
+       "type": "string",
+       "enum": [
+        "csatSurvey",
+        "serviceRating",
+        "nps",
+        "postCaseSurvey",
+        "complaint",
+        "appFeedback",
+        "webFeedback",
+        "directComment"
+       ]
+      },
+      "receivedAt": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "comment": {
+       "type": "string",
+       "maxLength": 4000,
+       "nullable": true
+      },
+      "rating": {
+       "type": "number",
+       "nullable": true,
+       "description": "The answer on its survey's own scale."
+      },
+      "ratingScale": {
+       "type": "string",
+       "nullable": true,
+       "enum": [
+        "nps",
+        "csat",
+        "ces",
+        "likert5",
+        "likert7",
+        "stars"
+       ]
+      },
+      "sentiment": {
+       "type": "string",
+       "nullable": true,
+       "enum": [
+        "positive",
+        "neutral",
+        "negative"
+       ]
+      },
+      "topic": {
+       "type": "string",
+       "nullable": true
+      },
+      "caseId": {
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "nullable": true
+      },
+      "agentPrincipalId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "productId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "eventId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "followUpCaseId": {
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "FormDefinition": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.form_definition + marketing.form_definition_field",
+  "description": "CF-129, CL-04. **A waiver, a survey and a data-capture form are one mechanism.**\nA waiver is this form with a signature. A survey is this form with a scale. A demographic capture is this form at the point of sale. They were raised as three separate gaps and share every part: field configuration, conditional display, versioning, an acceptance record and a stored artefact.\n**Three implementations would drift on the version rule first.** A waiver signed against version 3 must stay bound to version 3, and that is the same requirement a survey has when question wording changes mid-campaign — **an NPS score means nothing if you cannot say which question produced it.**\n",
+  "required": [
+   "id",
+   "name",
+   "kind",
+   "version",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "waiver",
+     "survey",
+     "dataCapture",
+     "consentForm",
+     "incidentReport",
+     "registration"
+    ]
+   },
+   "version": {
+    "readOnly": true,
+    "type": "integer",
+    "description": "**Set by the server** — 1 on `createForm`, the next number on every change. **Immutable once anything is submitted against it.** A change creates a new version, and the old one stays readable forever — 2.15.13 requires the exact accepted version retained, which is legal evidence rather than a nicety.\n"
+   },
+   "fields": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/FormField"
+    }
+   },
+   "requiresSignature": {
+    "type": "boolean",
+    "default": false,
+    "description": "**What makes it a waiver.** And 2.15.9 makes ticket issuance conditional on one, which puts this in the purchase path rather than beside it.\n"
+   },
+   "signatureKind": {
+    "type": "string",
+    "enum": [
+     "drawn",
+     "typed",
+     "checkbox",
+     "none"
+    ],
+    "default": "none"
+   },
+   "scoreScale": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "nps",
+     "csat",
+     "ces",
+     "likert5",
+     "likert7",
+     "stars"
+    ],
+    "description": "**What makes it a survey.** Named rather than free-form because a score whose scale is unknown cannot be compared to last quarter's.\n"
+   },
+   "appliesToProductIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "validForMonths": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**How long an acceptance lasts.** A waiver signed last summer may or may not still hold, and 2.15.x asks for a returning participant not to sign again — which only works if the expiry is stated.\n"
+   },
+   "minimumAge": {
+    "type": "integer",
+    "nullable": true
+   },
+   "requiresGuardianForMinors": {
+    "type": "boolean",
+    "default": true,
+    "description": "**A minor cannot waive their own rights.** A guardian signs, and the record has to name them — an unsigned or self-signed minor waiver is worth nothing at the moment it matters.\n"
+   },
+   "status": {
+    "readOnly": true,
+    "type": "string",
+    "enum": [
+     "draft",
+     "published",
+     "superseded",
+     "retired"
+    ]
+   },
+   "legalReviewedBy": {
+    "type": "string",
+    "nullable": true
+   },
+   "legalReviewedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "readOnly": true,
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "FormField": {
+  "type": "object",
+  "description": "One field. **Conditional display is the shared requirement** — a survey branching on an answer and a waiver revealing a medical question on a yes are the same mechanism.\n",
+  "required": [
+   "key",
+   "label",
+   "type"
+  ],
+  "properties": {
+   "key": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "labelLocalised": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "type": {
+    "type": "string",
+    "enum": [
+     "text",
+     "longText",
+     "number",
+     "date",
+     "select",
+     "multiSelect",
+     "boolean",
+     "scale",
+     "signature",
+     "file",
+     "phone",
+     "email"
+    ]
+   },
+   "options": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "isRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "isPersonalData": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Marked at the field, because retention is decided at the field.** A survey answer and a medical condition on the same form have different lifetimes, and a form-level flag makes the whole thing as sensitive as its most sensitive field.\n"
+   },
+   "consentPurposeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "showWhen": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "field": {
+      "type": "string"
+     },
+     "equals": {
+      "type": "string"
+     }
+    }
+   }
+  }
+ },
+ "MessageTrigger": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.message_trigger",
+  "description": "**What fires a message.** Before, during and after a visit are one mechanism with a different sign on the offset.\n",
+  "required": [
+   "id",
+   "event",
+   "templateId",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid"
+   },
+   "event": {
+    "type": "string",
+    "description": "The platform event that fires it — `order.completed`, `access.validated`, `queue.turnApproaching`. **Named from the event catalogue** (`BusinessEvent.eventType`), so a trigger cannot bind to something nothing publishes. Its conditions are `MessageTriggerCondition` rows.\n"
+   },
+   "templateId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "offsetMinutes": {
+    "type": "integer",
+    "default": 0,
+    "description": "Negative fires before the anchor, positive after. **A reminder the day before a visit is -1440 against the performance**, not a separate concept.\n"
+   },
+   "anchor": {
+    "type": "string",
+    "enum": [
+     "eventTime",
+     "performanceStart",
+     "visitEnd"
+    ],
+    "default": "eventTime"
+   },
+   "priority": {
+    "type": "string",
+    "enum": [
+     "operational",
+     "transactional",
+     "marketing"
+    ],
+    "default": "transactional",
+    "description": "**A queue-turn alert and a monthly newsletter are not the same urgency and were the same dispatch.** `operational` bypasses batching and quiet hours; `marketing` never does.\n"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   },
+   "scopePath": {
+    "readOnly": true,
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "RefundCompensationServiceExceptionWorkspaceInput": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.case_compensation_request",
+  "x-ticvai-record-definition": "Request Types",
+  "description": "One refund, compensation or policy-exception request raised from a case. The order, refund and approval are references, never copies.",
+  "required": [
+   "id",
+   "caseId",
+   "requestType",
+   "value",
+   "reason"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID; equals the `Idempotency-Key` header."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "caseId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Required for `fullRefund`, `partialRefund`, `feeWaiver`, `upgrade` and `discount`."
+   },
+   "lineIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    }
+   },
+   "requestType": {
+    "type": "string",
+    "enum": [
+     "fullRefund",
+     "partialRefund",
+     "serviceCredit",
+     "walletCredit",
+     "voucher",
+     "complimentaryTicket",
+     "feeWaiver",
+     "upgrade",
+     "discount",
+     "policyException"
+    ]
+   },
+   "value": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "The money value requested; for a complimentary ticket or upgrade, its face value. This is what the approval thresholds are compared with."
+   },
+   "reason": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 1000
+   },
+   "isPolicyException": {
+    "type": "boolean",
+    "default": false,
+    "description": "True when the standard policy would not allow it; always needs approval."
+   },
+   "exceptionReason": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true,
+    "description": "Required when `isPolicyException` is true."
+   },
+   "submit": {
+    "type": "boolean",
+    "default": false,
+    "description": "False saves a draft; true routes it.",
+    "writeOnly": true
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "draft",
+     "pendingApproval",
+     "approved",
+     "declined",
+     "fulfilled",
+     "failed",
+     "withdrawn"
+    ]
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "readOnly": true,
+    "nullable": true
+   },
+   "fulfilmentOperation": {
+    "type": "string",
+    "readOnly": true,
+    "nullable": true,
+    "description": "e.g. `createRefund`, `topUpWallet`."
+   },
+   "fulfilmentReference": {
+    "type": "string",
+    "readOnly": true,
+    "nullable": true,
+    "description": "The refund, wallet transaction or voucher it produced."
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "RefundCompensationServiceExceptionWorkspaceView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.case_compensation_request (new), orders.sales_order, orders.refund, orders.order_fee, orders.refund_policy and approvals.request",
+  "description": "The request, the order's financial context, the policy evaluation and who must approve.",
+  "required": [
+   "request",
+   "approvalLevel"
+  ],
+  "properties": {
+   "request": {
+    "$ref": "#/components/schemas/RefundCompensationServiceExceptionWorkspaceInput"
+   },
+   "originalTransaction": {
+    "type": "string",
+    "nullable": true,
+    "description": "The order number."
+   },
+   "amountPaid": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "amountUsed": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Value of tickets already scanned or consumed."
+   },
+   "refundableAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "What the refund policy's time bands allow now, less previous refunds."
+   },
+   "previousRefund": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "fees": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "proposedRefund": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "proposedCompensation": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "requestType": {
+      "type": "string"
+     },
+     "value": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    }
+   },
+   "policyEvaluation": {
+    "type": "object",
+    "properties": {
+     "standardPolicy": {
+      "type": "string",
+      "description": "The rule that applies, as the venue's refund policy states it."
+     },
+     "isWithinPolicy": {
+      "type": "boolean"
+     },
+     "policyReference": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   },
+   "approvalLevel": {
+    "type": "string",
+    "enum": [
+     "agent",
+     "secondUser",
+     "approver"
+    ],
+    "description": "From the venue's `selfAuthoriseLimit`, `requiresSecondUserAbove` and `requiresApprovalAbove`; a policy exception is always `approver`."
+   },
+   "aiExplanation": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 1000,
+    "description": "AI-derived and labelled as such; cites a recorded policy or says none applies."
+   }
+  }
+ },
+ "Review": {
+  "x-ticvai-persistence": "marketing.review",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/SubmitReviewRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "status"
+    ],
+    "properties": {
+     "status": {
+      "type": "string",
+      "enum": [
+       "pendingModeration",
+       "published",
+       "hidden",
+       "rejected"
+      ]
+     },
+     "response": {
+      "type": "string",
+      "nullable": true
+     },
+     "responseIsPublic": {
+      "type": "boolean"
+     },
+     "respondedByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "openedCaseId": {
+      "type": "string",
+      "nullable": true,
+      "description": "Case raised automatically where the rating fell below the venue's threshold. Feedback that goes nowhere is worse than no feedback mechanism.\n"
+     }
+    }
+   }
+  ]
+ },
+ "ServiceAnalyticsRootCauseIntelligenceView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.case, marketing.conversation, marketing.form_submission (CSAT) and the related orders and payments",
+  "description": "Service analytics for the filters given, with the comparison asked for.",
+  "required": [
+   "contactVolume",
+   "cases",
+   "drivers",
+   "comparison"
+  ],
+  "properties": {
+   "contactVolume": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Conversations and cases opened, a conversation that became a case counted once."
+   },
+   "cases": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "averageFirstResponseSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "averageResolutionSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "firstContactResolutionRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true
+   },
+   "reopenRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true
+   },
+   "escalationRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true
+   },
+   "slaComplianceRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true
+   },
+   "costPerCase": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "csat": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true
+   },
+   "refundRequests": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "complaintRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true
+   },
+   "comparison": {
+    "type": "object",
+    "required": [
+     "basis",
+     "kpis"
+    ],
+    "properties": {
+     "basis": {
+      "type": "string",
+      "enum": [
+       "previousDay",
+       "previousWeek",
+       "previousMonth",
+       "event",
+       "venue",
+       "product"
+      ]
+     },
+     "compareId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "kpis": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "required": [
+        "kpi"
+       ],
+       "properties": {
+        "kpi": {
+         "type": "string",
+         "description": "The KPI's property name above, e.g. `contactVolume`."
+        },
+        "current": {
+         "type": "number",
+         "nullable": true
+        },
+        "previous": {
+         "type": "number",
+         "nullable": true
+        },
+        "changeRate": {
+         "type": "number",
+         "nullable": true
+        }
+       }
+      }
+     }
+    }
+   },
+   "drivers": {
+    "type": "array",
+    "description": "Contact drivers, most cases first.",
+    "items": {
+     "type": "object",
+     "required": [
+      "driver",
+      "cases",
+      "shareRate"
+     ],
+     "properties": {
+      "driver": {
+       "type": "string",
+       "enum": [
+        "ticketDelivery",
+        "refund",
+        "reschedule",
+        "paymentFailure",
+        "membership",
+        "accessIssue",
+        "groupBooking",
+        "generalInformation",
+        "other"
+       ]
+      },
+      "cases": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "shareRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      },
+      "changeRate": {
+       "type": "number",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "rootCauses": {
+    "type": "array",
+    "maxItems": 20,
+    "description": "Case surges traced to one cause, largest first. Empty when AI is disabled for the tenant.",
+    "items": {
+     "type": "object",
+     "required": [
+      "summary",
+      "cases"
+     ],
+     "properties": {
+      "summary": {
+       "type": "string",
+       "maxLength": 500
+      },
+      "driver": {
+       "type": "string",
+       "nullable": true
+      },
+      "cases": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "causeType": {
+       "type": "string",
+       "enum": [
+        "paymentProvider",
+        "event",
+        "product",
+        "release",
+        "incident",
+        "venueArea",
+        "other"
+       ]
+      },
+      "causeRef": {
+       "type": "string",
+       "nullable": true,
+       "description": "The id of the provider, event, product or incident, where there is one."
+      },
+      "windowStart": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "windowEnd": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "avoidableContacts": {
+    "type": "array",
+    "description": "AI estimate of cases that could have been prevented, by remedy.",
+    "items": {
+     "type": "object",
+     "required": [
+      "preventableBy",
+      "cases"
+     ],
+     "properties": {
+      "preventableBy": {
+       "type": "string",
+       "enum": [
+        "betterB2cInformation",
+        "selfService",
+        "productConfiguration",
+        "improvedNotifications",
+        "technicalFixes",
+        "betterTicketDelivery"
+       ]
+      },
+      "cases": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "recommendation": {
+       "type": "string",
+       "maxLength": 500,
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "SubmitReviewRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "rating",
+   "venueId",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "relatedOrderId": {
+    "type": "string"
+   },
+   "rating": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 5
+   },
+   "body": {
+    "type": "string",
+    "maxLength": 5000
+   },
+   "aspects": {
+    "type": "array",
+    "description": "Aspect chips — the closed set the description always named.",
+    "uniqueItems": true,
+    "items": {
+     "type": "string",
+     "enum": [
+      "exhibitions",
+      "staff",
+      "cleanliness",
+      "food",
+      "value"
+     ]
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ }
+}

@@ -1,1 +1,154 @@
-{}
+{
+ "configureWorkstation": {
+  "method": "PUT",
+  "path": "/workstations/{workstationId}",
+  "contract": "tenancy",
+  "summary": "Configure a workstation",
+  "permission": "WORKSTATION_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ConfigureWorkstationRequest",
+  "responds": "Workstation"
+ },
+ "generateConfiguration": {
+  "method": "POST",
+  "path": "/generate/configuration",
+  "contract": "ai",
+  "summary": "Draft a configuration from a description",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GeneratedConfiguration"
+ },
+ "getGoLiveReadiness": {
+  "method": "GET",
+  "path": "/go-live-readiness",
+  "contract": "subscription",
+  "summary": "Everything that must pass before a tenant can sell",
+  "permission": "PLATFORM_TENANT_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": "tenantId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "GoLiveReadiness"
+ },
+ "getTenantConfig": {
+  "method": "GET",
+  "path": "/tenant-config",
+  "contract": "white-label",
+  "summary": "Full working configuration",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "version",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TenantConfig"
+ },
+ "runGoLiveValidation": {
+  "method": "POST",
+  "path": "/go-live-readiness/run",
+  "contract": "subscription",
+  "summary": "Run the validation plan against a tenant",
+  "permission": "PLATFORM_TENANT_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setChannelListing": {
+  "method": "PUT",
+  "path": "/channel-listings",
+  "contract": "subscription",
+  "summary": "List a product on a channel, with its own allocation",
+  "permission": "PARTNER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ChannelListing",
+  "responds": "ChannelListing"
+ },
+ "setPrices": {
+  "method": "PUT",
+  "path": "/price-lists/{priceListId}/prices",
+  "contract": "catalogue",
+  "summary": "Set prices in bulk",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setVenueSettings": {
+  "method": "PUT",
+  "path": "/venues/{venueId}/settings",
+  "contract": "tenancy",
+  "summary": "Set support hours, quiet hours, segregated access and alerting",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VenueSettings",
+  "responds": "VenueSettings"
+ }
+}

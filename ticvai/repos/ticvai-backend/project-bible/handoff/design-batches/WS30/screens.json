@@ -39,22 +39,7 @@
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-295",
-     "trigger": "Works in Member 360° Membership Account Workspace",
-     "provenance": "flow F139 step 1→2",
-     "operation": "listMember"
-    },
-    {
-     "to": "BO-296",
-     "trigger": "Works in Membership Activation, Assignment & Credential Management",
-     "provenance": "flow F139 step 3→4",
-     "operation": "listMember"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-294 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-297",
@@ -69,24 +54,6 @@
      "operation": "listMember"
     },
     {
-     "to": "BO-299",
-     "trigger": "Works in Membership Upgrade, Downgrade & Product Migration Operations",
-     "provenance": "flow F139 step 9→10",
-     "operation": "listMember"
-    },
-    {
-     "to": "BO-300",
-     "trigger": "Works in Renewal Operations & Auto-Renewal Management",
-     "provenance": "flow F139 step 11→12",
-     "operation": "listMember"
-    },
-    {
-     "to": "BO-301",
-     "trigger": "Works in Member Exceptions, Overrides & Service Recovery",
-     "provenance": "flow F139 step 13→14",
-     "operation": "listMember"
-    },
-    {
      "to": "BO-302",
      "trigger": "Works in Member Lifecycle History, Audit & Case Timeline",
      "provenance": "flow F139 step 15→16",
@@ -97,14 +64,59 @@
      "trigger": "Works in Membership Analytics, Renewal Intelligence & AI Retention Center",
      "provenance": "flow F139 step 17→18",
      "operation": "listMember"
+    },
+    {
+     "to": "BO-295",
+     "trigger": "Works in Member 360° Membership Account Workspace",
+     "provenance": "flow F139 step 1→2",
+     "operation": "listMember",
+     "carries": [
+      "membershipId"
+     ]
+    },
+    {
+     "to": "BO-296",
+     "trigger": "Works in Membership Activation, Assignment & Credential Management",
+     "provenance": "flow F139 step 3→4",
+     "operation": "listMember",
+     "carries": [
+      "membershipId"
+     ]
+    },
+    {
+     "to": "BO-299",
+     "trigger": "Works in Membership Upgrade, Downgrade & Product Migration Operations",
+     "provenance": "flow F139 step 9→10",
+     "operation": "listMember",
+     "carries": [
+      "membershipId"
+     ]
+    },
+    {
+     "to": "BO-300",
+     "trigger": "Works in Renewal Operations & Auto-Renewal Management",
+     "provenance": "flow F139 step 11→12",
+     "operation": "listMember",
+     "carries": [
+      "membershipId"
+     ]
+    },
+    {
+     "to": "BO-301",
+     "trigger": "Works in Member Exceptions, Overrides & Service Recovery",
+     "provenance": "flow F139 step 13→14",
+     "operation": "listMember",
+     "carries": [
+      "membershipId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Membership operations teams can monitor and prioritize the complete member population from one centralized workspace.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide membership teams with a real-time operational dashboard for the complete active member population.",
-  "purposeNote": "Membership operations teams can monitor and prioritize the complete member population from one centralized workspace.",
   "layout": {
    "template": "split",
    "regions": [
@@ -140,24 +152,102 @@
     },
     {
      "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active Members",
+       "bindsTo": "MemberOperationsCommandCenterSummary.activeMembers",
+       "operation": "listMember",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "New Members Today",
+       "bindsTo": "MemberOperationsCommandCenterSummary.newMembersToday",
+       "operation": "listMember",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Activated Today",
+       "bindsTo": "MemberOperationsCommandCenterSummary.activatedToday",
+       "operation": "listMember",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending Activation",
+       "bindsTo": "MemberOperationsCommandCenterSummary.pendingActivation",
+       "operation": "listMember",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Expiring in 30 Days",
+       "bindsTo": "MemberOperationsCommandCenterSummary.expiringIn30Days",
+       "operation": "listMember",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Renewal due",
+       "bindsTo": "MemberOperationsCommandCenterSummary.renewalDue",
+       "operation": "listMember",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Renewed This Month",
+       "bindsTo": "MemberOperationsCommandCenterSummary.renewedThisMonth",
+       "operation": "listMember",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Renewal rate",
+       "bindsTo": "MemberOperationsCommandCenterSummary.renewalRate",
+       "operation": "listMember",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Suspended Memberships",
+       "bindsTo": "MemberOperationsCommandCenterSummary.suspendedMemberships",
+       "operation": "listMember",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Frozen Memberships",
+       "bindsTo": "MemberOperationsCommandCenterSummary.frozenMemberships",
+       "operation": "listMember",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Membership Exceptions",
+       "bindsTo": "MemberOperationsCommandCenterSummary.membershipExceptions",
+       "operation": "listMember",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "At risk members",
+       "bindsTo": "MemberOperationsCommandCenterSummary.atRiskMembers",
+       "operation": "listMember",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
      "slot": "collection",
      "components": [
       {
        "kind": "dataTable",
        "label": "Every member operations",
        "columns": [
-        "MemberOperationsCommandCenterView.activeMembers",
-        "MemberOperationsCommandCenterView.newMembersToday",
-        "MemberOperationsCommandCenterView.activatedToday",
-        "MemberOperationsCommandCenterView.pendingActivation",
-        "MemberOperationsCommandCenterView.expiringIn30Days",
-        "MemberOperationsCommandCenterView.renewalDue",
-        "MemberOperationsCommandCenterView.renewedThisMonth",
-        "MemberOperationsCommandCenterView.renewalRate",
-        "MemberOperationsCommandCenterView.suspendedMemberships",
-        "MemberOperationsCommandCenterView.frozenMemberships",
-        "MemberOperationsCommandCenterView.membershipExceptions",
-        "MemberOperationsCommandCenterView.atRiskMembers",
         "MemberOperationsCommandCenterView.membershipId",
         "MemberOperationsCommandCenterView.member",
         "MemberOperationsCommandCenterView.membershipProduct",
@@ -186,18 +276,6 @@
        "label": "The selected member operations",
        "bindsTo": "MemberOperationsCommandCenterView",
        "columns": [
-        "MemberOperationsCommandCenterView.activeMembers",
-        "MemberOperationsCommandCenterView.newMembersToday",
-        "MemberOperationsCommandCenterView.activatedToday",
-        "MemberOperationsCommandCenterView.pendingActivation",
-        "MemberOperationsCommandCenterView.expiringIn30Days",
-        "MemberOperationsCommandCenterView.renewalDue",
-        "MemberOperationsCommandCenterView.renewedThisMonth",
-        "MemberOperationsCommandCenterView.renewalRate",
-        "MemberOperationsCommandCenterView.suspendedMemberships",
-        "MemberOperationsCommandCenterView.frozenMemberships",
-        "MemberOperationsCommandCenterView.membershipExceptions",
-        "MemberOperationsCommandCenterView.atRiskMembers",
         "MemberOperationsCommandCenterView.membershipId",
         "MemberOperationsCommandCenterView.member",
         "MemberOperationsCommandCenterView.membershipProduct",
@@ -235,18 +313,19 @@
   ],
   "entryState": {
    "preloaded": [
-    "MemberOperationsCommandCenterView.activeMembers",
-    "MemberOperationsCommandCenterView.newMembersToday",
-    "MemberOperationsCommandCenterView.activatedToday",
-    "MemberOperationsCommandCenterView.pendingActivation",
-    "MemberOperationsCommandCenterView.expiringIn30Days",
-    "MemberOperationsCommandCenterView.renewalDue"
+    "MemberOperationsCommandCenterSummary.activeMembers",
+    "MemberOperationsCommandCenterSummary.newMembersToday",
+    "MemberOperationsCommandCenterSummary.activatedToday",
+    "MemberOperationsCommandCenterSummary.pendingActivation",
+    "MemberOperationsCommandCenterSummary.expiringIn30Days",
+    "MemberOperationsCommandCenterSummary.renewalDue"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-294"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-294",
+   "workshopBoard": "wireframes/WS83 Membership   Annual Pass Management Board 2.dc.html#bo-294"
   },
   "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 21. 26 of 35 labels bound to a contract property; 35 of 46 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -309,10 +388,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can understand the complete operational state of a membership without navigating across multiple modules.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Show) and no metric row",
   "purpose": "Provide a complete operational view of an individual member and their membership contract. This should be the primary screen an authorized membership-service agent opens when helping a member.",
-  "purposeNote": "Authorized users can understand the complete operational state of a membership without navigating across multiple modules.",
   "layout": {
    "template": "split",
    "regions": [
@@ -425,13 +504,23 @@
     "operationId": "setMemberMembershipAccount",
     "contract": "subscription",
     "purpose": "Member 360° Membership Account Workspace",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "recordBenefitUsage",
+    "contract": "identity",
+    "purpose": "Consume a member benefit by hand",
     "trigger": "onAction",
-    "invalidates": [
-     "setMemberMembershipAccount"
-    ]
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "membershipId",
+     "from": "navigation"
+    }
+   ],
    "preloaded": [
     "Member360MembershipAccountWorkspaceView.memberName",
     "Member360MembershipAccountWorkspaceView.customerId",
@@ -439,12 +528,14 @@
     "Member360MembershipAccountWorkspaceView.membershipProduct",
     "Member360MembershipAccountWorkspaceView.tier",
     "Member360MembershipAccountWorkspaceView.status"
-   ]
+   ],
+   "coldEntry": "Opened from BO-294 with the membership picked there. Opened cold (a bookmark or a refresh), it shows the list to pick from rather than an empty record, and says plainly if the membership no longer exists."
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-295"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-295",
+   "workshopBoard": "wireframes/WS83 Membership   Annual Pass Management Board 2.dc.html#bo-295"
   },
   "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 22. 24 of 24 labels bound to a contract property; 33 of 51 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -507,17 +598,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Purchased memberships can be securely assigned, verified, activated and linked to appropriate credentials according to Board 1 rules.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Manage the operational process that turns a purchased membership product into an active membership assigned to a specific individual.",
-  "purposeNote": "Purchased memberships can be securely assigned, verified, activated and linked to appropriate credentials according to Board 1 rules.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Review, Link, Escalate. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Membership___Annual_Pass_Management_Reference.pdf, page 24 §Actions depend on configuration"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -569,17 +653,32 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Block",
+       "operation": "resolveMembershipActivation",
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 24 §Actions depend on configuration"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Review",
+       "operation": "resolveMembershipActivation",
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 24 §Actions depend on configuration"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Replace",
+       "operation": "resolveMembershipActivation",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 24 §Actions depend on configuration"
       },
       {
        "kind": "secondaryButton",
        "label": "Link",
+       "operation": "resolveMembershipActivation",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 24 §Actions depend on configuration"
       },
       {
        "kind": "secondaryButton",
        "label": "Escalate",
+       "operation": "resolveMembershipActivation",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 24 §Actions depend on configuration"
       }
      ]
@@ -599,9 +698,21 @@
     "contract": "subscription",
     "purpose": "Membership Activation, Assignment & Credential Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "resolveMembershipActivation",
+    "contract": "orders",
+    "purpose": "Act on activation",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "membershipId",
+     "from": "navigation"
+    }
+   ],
    "preloaded": [
     "MembershipActivationAssignmentCredentialManagementView.purchaseDate",
     "MembershipActivationAssignmentCredentialManagementView.eligibleActivationDate",
@@ -614,9 +725,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-296"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-296",
+   "workshopBoard": "wireframes/WS83 Membership   Annual Pass Management Board 2.dc.html#bo-296"
   },
-  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 24. 6 of 6 labels bound to a contract property; 17 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 24. 6 of 6 labels bound to a contract property; 19 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `resolveMembershipActivation`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -677,13 +789,82 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can trace membership visits and benefit consumption while preserving the Access Control system as the authoritative admission-validation engine.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Detect) and no metric row",
   "purpose": "Provide membership teams with complete visibility of how a member uses admission and other membership entitlements.",
-  "purposeNote": "Authorized users can trace membership visits and benefit consumption while preserving the Access Control system as the authoritative admission-validation engine.",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Total Visits",
+       "bindsTo": "VisitAdmissionEntitlementUsageMonitorSummary.totalVisits",
+       "operation": "listVisitAdmissionEntitlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Visits This Month",
+       "bindsTo": "VisitAdmissionEntitlementUsageMonitorSummary.visitsThisMonth",
+       "operation": "listVisitAdmissionEntitlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Last Visit",
+       "bindsTo": "VisitAdmissionEntitlementUsageMonitorSummary.lastVisit",
+       "operation": "listVisitAdmissionEntitlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Upcoming Reservation start",
+       "bindsTo": "VisitAdmissionEntitlementUsageMonitorSummary.upcomingReservation",
+       "operation": "listVisitAdmissionEntitlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Guest Tickets Used",
+       "bindsTo": "VisitAdmissionEntitlementUsageMonitorSummary.guestTicketsUsed",
+       "operation": "listVisitAdmissionEntitlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Guest Tickets Remaining",
+       "bindsTo": "VisitAdmissionEntitlementUsageMonitorSummary.guestTicketsRemaining",
+       "operation": "listVisitAdmissionEntitlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Parking Uses",
+       "bindsTo": "VisitAdmissionEntitlementUsageMonitorSummary.parkingUses",
+       "operation": "listVisitAdmissionEntitlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Benefit usage",
+       "bindsTo": "VisitAdmissionEntitlementUsageMonitorSummary.benefitUsage",
+       "operation": "listVisitAdmissionEntitlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "No-Shows",
+       "bindsTo": "VisitAdmissionEntitlementUsageMonitorSummary.noShows",
+       "operation": "listVisitAdmissionEntitlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -692,21 +873,7 @@
        "kind": "dataTable",
        "label": "Every visit admission entitlement",
        "columns": [
-        "VisitAdmissionEntitlementUsageMonitorView.totalVisits",
-        "VisitAdmissionEntitlementUsageMonitorView.visitsThisMonth",
-        "VisitAdmissionEntitlementUsageMonitorView.lastVisit",
-        "VisitAdmissionEntitlementUsageMonitorView.upcomingReservation",
-        "VisitAdmissionEntitlementUsageMonitorView.guestTicketsUsed",
-        "VisitAdmissionEntitlementUsageMonitorView.guestTicketsRemaining",
-        "VisitAdmissionEntitlementUsageMonitorView.parkingUses",
-        "VisitAdmissionEntitlementUsageMonitorView.benefitUsage",
-        "VisitAdmissionEntitlementUsageMonitorView.noShows",
-        "VisitAdmissionEntitlementUsageMonitorView.usageAboveLimit",
-        "VisitAdmissionEntitlementUsageMonitorView.invalidReEntry",
-        "VisitAdmissionEntitlementUsageMonitorView.benefitExhausted",
-        "VisitAdmissionEntitlementUsageMonitorView.blackoutAttempt",
-        "VisitAdmissionEntitlementUsageMonitorView.expiredMembershipUsage",
-        "VisitAdmissionEntitlementUsageMonitorView.suspendedMembershipAttempt"
+        "VisitAdmissionEntitlementUsageMonitorView.validationResult"
        ],
        "bindsTo": "VisitAdmissionEntitlementUsageMonitorView",
        "operation": "listVisitAdmissionEntitlement",
@@ -723,21 +890,7 @@
        "label": "The selected visit admission entitlement",
        "bindsTo": "VisitAdmissionEntitlementUsageMonitorView",
        "columns": [
-        "VisitAdmissionEntitlementUsageMonitorView.totalVisits",
-        "VisitAdmissionEntitlementUsageMonitorView.visitsThisMonth",
-        "VisitAdmissionEntitlementUsageMonitorView.lastVisit",
-        "VisitAdmissionEntitlementUsageMonitorView.upcomingReservation",
-        "VisitAdmissionEntitlementUsageMonitorView.guestTicketsUsed",
-        "VisitAdmissionEntitlementUsageMonitorView.guestTicketsRemaining",
-        "VisitAdmissionEntitlementUsageMonitorView.parkingUses",
-        "VisitAdmissionEntitlementUsageMonitorView.benefitUsage",
-        "VisitAdmissionEntitlementUsageMonitorView.noShows",
-        "VisitAdmissionEntitlementUsageMonitorView.usageAboveLimit",
-        "VisitAdmissionEntitlementUsageMonitorView.invalidReEntry",
-        "VisitAdmissionEntitlementUsageMonitorView.benefitExhausted",
-        "VisitAdmissionEntitlementUsageMonitorView.blackoutAttempt",
-        "VisitAdmissionEntitlementUsageMonitorView.expiredMembershipUsage",
-        "VisitAdmissionEntitlementUsageMonitorView.suspendedMembershipAttempt"
+        "VisitAdmissionEntitlementUsageMonitorView.validationResult"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Benefit”, “Guest”, “Parking 18 Unlimited”, “Manual Adjustment”, “Require”.",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 26 §Display"
@@ -763,18 +916,19 @@
   ],
   "entryState": {
    "preloaded": [
-    "VisitAdmissionEntitlementUsageMonitorView.totalVisits",
-    "VisitAdmissionEntitlementUsageMonitorView.visitsThisMonth",
-    "VisitAdmissionEntitlementUsageMonitorView.lastVisit",
-    "VisitAdmissionEntitlementUsageMonitorView.upcomingReservation",
-    "VisitAdmissionEntitlementUsageMonitorView.guestTicketsUsed",
-    "VisitAdmissionEntitlementUsageMonitorView.guestTicketsRemaining"
+    "VisitAdmissionEntitlementUsageMonitorSummary.totalVisits",
+    "VisitAdmissionEntitlementUsageMonitorSummary.visitsThisMonth",
+    "VisitAdmissionEntitlementUsageMonitorSummary.lastVisit",
+    "VisitAdmissionEntitlementUsageMonitorSummary.upcomingReservation",
+    "VisitAdmissionEntitlementUsageMonitorSummary.guestTicketsUsed",
+    "VisitAdmissionEntitlementUsageMonitorSummary.guestTicketsRemaining"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-297"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-297",
+   "workshopBoard": "wireframes/WS83 Membership   Annual Pass Management Board 2.dc.html#bo-297"
   },
   "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 26. 15 of 15 labels bound to a contract property; 24 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -840,13 +994,6 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Freeze Configuration Consumption; Capture) and no display directory — it is settings, not a population",
   "purpose": "Manage temporary interruption of membership rights without necessarily terminating the membership contract.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Suspend, Resume, Administrative Hold. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Membership___Annual_Pass_Management_Reference.pdf, page 27 §Support"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -872,7 +1019,14 @@
       {
        "kind": "selectField",
        "label": "Reason",
+       "notes": "The freeze reasons of `freezeEntitlement`: travelling, injury, personal, seasonal, other. **Choosing Other makes Note required** (decided 28 September, audit R222).",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 27 §Capture"
+      },
+      {
+       "kind": "textField",
+       "label": "Note",
+       "notes": "**Required, at least 3 characters, when the reason is Other** — the form will not submit without it, and `freezeEntitlement` refuses 400 (decided 28 September, audit R222). Optional for every other reason.",
+       "provenance": "contract catalogue.yaml POST /entitlements/{entitlementId}/freeze"
       },
       {
        "kind": "selectField",
@@ -907,6 +1061,11 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Reactivate",
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 27 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Administrative Hold",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 27 §Support"
       }
@@ -935,14 +1094,45 @@
     "contract": "subscription",
     "purpose": "Membership Freeze, Suspension & Reactivation Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "freezeEntitlement",
+    "contract": "catalogue",
+    "purpose": "Pause a membership at the guest's request",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "reinstateEntitlement",
+    "contract": "catalogue",
+    "purpose": "Lift a suspension",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "suspendEntitlement",
+    "contract": "catalogue",
+    "purpose": "Suspend or reactivate the membership entitlement (isSuspended, reason)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Suspend, Administrative Hold, Reactivate; Resume"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "entitlementId",
+     "from": "navigation"
+    }
+   ],
+   "coldEntry": "Opened from BO-294 with the membership entitlement picked there. Opened cold (a bookmark or a refresh), it shows the list to pick from rather than an empty record, and says plainly if the membership entitlement no longer exists."
+  },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-298"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-298",
+   "workshopBoard": "wireframes/WS83 Membership   Annual Pass Management Board 2.dc.html#bo-298"
   },
-  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 27. 0 of 0 labels bound to a contract property; 10 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 27. 0 of 0 labels bound to a contract property; 11 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Suspend, Administrative Hold, Reactivate: `suspendEntitlement`; Resume: `freezeEntitlement`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1003,16 +1193,11 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Memberships can move between tiers/products without losing historical, financial or entitlement integrity.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Manage operational movement of an active member between membership products or tiers.",
-  "purposeNote": "Memberships can move between tiers/products without losing historical, financial or entitlement integrity.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: End of Current Term. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Membership___Annual_Pass_Management_Reference.pdf, page 29 §Support"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -1032,22 +1217,31 @@
      "slot": "rowActions",
      "components": [
       {
+       "kind": "primaryButton",
+       "label": "Next Visit",
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 29 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Next Renewal",
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 29 §Support"
+      },
+      {
        "kind": "destructiveButton",
        "label": "End of Current Term",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 29 §Support"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Migrate membership",
+       "operation": "migrateMembership",
+       "provenance": "contract orders.yaml POST /memberships/{membershipId}/migrations (decided 29 September, VM close-out)"
       }
      ]
     },
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listMembershipUpgradeDowngrade",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
+     "components": []
     }
    ]
   },
@@ -1073,9 +1267,21 @@
     "contract": "subscription",
     "purpose": "Membership Upgrade, Downgrade & Product Migration Operations",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "migrateMembership",
+    "contract": "orders",
+    "purpose": "Migrate membership",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "membershipId",
+     "from": "navigation"
+    }
+   ],
    "preloaded": [
     "MembershipUpgradeDowngradeProductMigrationOperationsView.currentMembership",
     "MembershipUpgradeDowngradeProductMigrationOperationsView.targetMembership",
@@ -1087,9 +1293,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-299"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-299",
+   "workshopBoard": "wireframes/WS83 Membership   Annual Pass Management Board 2.dc.html#bo-299"
   },
-  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 1 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 3 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `migrateMembership`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1150,10 +1357,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Membership teams can monitor and execute manual and automatic renewals while maintaining continuous and correctly versioned membership contracts.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Track) and no metric row",
   "purpose": "Operationally manage memberships approaching expiry and execute the renewal policies configured in Board 1.",
-  "purposeNote": "Membership teams can monitor and execute manual and automatic renewals while maintaining continuous and correctly versioned membership contracts.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1222,9 +1429,22 @@
     "contract": "subscription",
     "purpose": "Renewal Operations & Auto-Renewal Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "renewMembership",
+    "contract": "orders",
+    "purpose": "Renew a membership now, manually",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "membershipId",
+     "from": "navigation"
+    }
+   ],
    "preloaded": [
     "RenewalOperationsAutoRenewalManagementView.member",
     "RenewalOperationsAutoRenewalManagementView.membership",
@@ -1232,12 +1452,14 @@
     "RenewalOperationsAutoRenewalManagementView.expiry",
     "RenewalOperationsAutoRenewalManagementView.renewalWindow",
     "RenewalOperationsAutoRenewalManagementView.renewalPrice"
-   ]
+   ],
+   "coldEntry": "Opened from BO-294 with the membership picked there. Opened cold (a bookmark or a refresh), it shows the list to pick from rather than an empty record, and says plainly if the membership no longer exists."
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-300"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-300",
+   "workshopBoard": "wireframes/WS83 Membership   Annual Pass Management Board 2.dc.html#bo-300"
   },
   "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 30. 10 of 10 labels bound to a contract property; 10 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1306,11 +1528,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Eligibility Override, Freeze Exception, Suspension Override. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Membership___Annual_Pass_Management_Reference.pdf, page 32 §Support"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack Membership___Annual_Pass_Management_Reference.pdf, page 32"
    },
@@ -1330,16 +1547,49 @@
       {
        "kind": "primaryButton",
        "label": "Eligibility Override",
+       "operation": "createMemberException",
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 32 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Expiry Extension",
+       "operation": "createMemberException",
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 32 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Complimentary Renewal",
+       "operation": "createMemberException",
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 32 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Complimentary Benefit",
+       "operation": "createMemberException",
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 32 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Entitlement Adjustment",
+       "operation": "createMemberException",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 32 §Support"
       },
       {
        "kind": "secondaryButton",
        "label": "Freeze Exception",
+       "operation": "createMemberException",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 32 §Support"
       },
       {
        "kind": "secondaryButton",
        "label": "Suspension Override",
+       "operation": "createMemberException",
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 32 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Replacement Credential",
+       "operation": "createMemberException",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 32 §Support"
       }
      ]
@@ -1363,14 +1613,55 @@
     "contract": "subscription",
     "purpose": "Member Exceptions, Overrides & Service Recovery",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "createApprovalRequest",
+    "contract": "approvals",
+    "purpose": "Raise the approval a member exception needs",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "freezeEntitlement",
+    "contract": "catalogue",
+    "purpose": "Grant a freeze as an exception",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "reinstateEntitlement",
+    "contract": "catalogue",
+    "purpose": "Override a suspension",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "createMemberException",
+    "contract": "orders",
+    "purpose": "Record exception",
+    "trigger": "onAction"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "membershipId",
+     "from": "navigation"
+    },
+    {
+     "name": "entitlementId",
+     "from": "navigation"
+    }
+   ],
+   "coldEntry": "Opened from BO-294 with the membership entitlement picked there. Opened cold (a bookmark or a refresh), it shows the list to pick from rather than an empty record, and says plainly if the membership entitlement no longer exists."
+  },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-301"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-301",
+   "workshopBoard": "wireframes/WS83 Membership   Annual Pass Management Board 2.dc.html#bo-301"
   },
-  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 3 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 9 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `createMemberException`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1431,10 +1722,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "The entire membership lifecycle can be reconstructed chronologically with responsible users, systems, rules and related transactions.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Track) and no metric row",
   "purpose": "Maintain a complete historical record of everything that has happened to the membership from purchase to final expiry.",
-  "purposeNote": "The entire membership lifecycle can be reconstructed chronologically with responsible users, systems, rules and related transactions.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1446,22 +1737,10 @@
        "kind": "dataTable",
        "label": "Every member lifecycle history",
        "columns": [
-        "MemberLifecycleHistoryAuditCaseTimelineView.purchase",
-        "MemberLifecycleHistoryAuditCaseTimelineView.assignment",
-        "MemberLifecycleHistoryAuditCaseTimelineView.activation",
-        "MemberLifecycleHistoryAuditCaseTimelineView.visits",
-        "MemberLifecycleHistoryAuditCaseTimelineView.benefitUsage",
-        "MemberLifecycleHistoryAuditCaseTimelineView.dependentChanges",
-        "MemberLifecycleHistoryAuditCaseTimelineView.credentialChanges",
+        "MemberLifecycleHistoryAuditCaseTimelineView.eventType",
         "Freeze",
-        "MemberLifecycleHistoryAuditCaseTimelineView.suspension",
-        "MemberLifecycleHistoryAuditCaseTimelineView.reactivation",
         "Upgrade",
-        "Downgrade",
-        "MemberLifecycleHistoryAuditCaseTimelineView.renewal",
-        "MemberLifecycleHistoryAuditCaseTimelineView.exceptions",
-        "MemberLifecycleHistoryAuditCaseTimelineView.expiry",
-        "MemberLifecycleHistoryAuditCaseTimelineView.cancellation"
+        "Downgrade"
        ],
        "bindsTo": "MemberLifecycleHistoryAuditCaseTimelineView",
        "operation": "listMemberLifecycleCase",
@@ -1478,22 +1757,10 @@
        "label": "The selected member lifecycle history",
        "bindsTo": "MemberLifecycleHistoryAuditCaseTimelineView",
        "columns": [
-        "MemberLifecycleHistoryAuditCaseTimelineView.purchase",
-        "MemberLifecycleHistoryAuditCaseTimelineView.assignment",
-        "MemberLifecycleHistoryAuditCaseTimelineView.activation",
-        "MemberLifecycleHistoryAuditCaseTimelineView.visits",
-        "MemberLifecycleHistoryAuditCaseTimelineView.benefitUsage",
-        "MemberLifecycleHistoryAuditCaseTimelineView.dependentChanges",
-        "MemberLifecycleHistoryAuditCaseTimelineView.credentialChanges",
+        "MemberLifecycleHistoryAuditCaseTimelineView.eventType",
         "Freeze",
-        "MemberLifecycleHistoryAuditCaseTimelineView.suspension",
-        "MemberLifecycleHistoryAuditCaseTimelineView.reactivation",
         "Upgrade",
-        "Downgrade",
-        "MemberLifecycleHistoryAuditCaseTimelineView.renewal",
-        "MemberLifecycleHistoryAuditCaseTimelineView.exceptions",
-        "MemberLifecycleHistoryAuditCaseTimelineView.expiry",
-        "MemberLifecycleHistoryAuditCaseTimelineView.cancellation"
+        "Downgrade"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Before/After Audit”, “Expiry”, “Reason”, “Record”, “Link to”, “Case Notes”.",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 33 §Track"
@@ -1519,18 +1786,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "MemberLifecycleHistoryAuditCaseTimelineView.purchase",
-    "MemberLifecycleHistoryAuditCaseTimelineView.assignment",
-    "MemberLifecycleHistoryAuditCaseTimelineView.activation",
-    "MemberLifecycleHistoryAuditCaseTimelineView.visits",
-    "MemberLifecycleHistoryAuditCaseTimelineView.benefitUsage",
-    "MemberLifecycleHistoryAuditCaseTimelineView.dependentChanges"
+    "MemberLifecycleHistoryAuditCaseTimelineView.eventType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-302"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-302",
+   "workshopBoard": "wireframes/WS83 Membership   Annual Pass Management Board 2.dc.html#bo-302"
   },
   "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 33. 13 of 16 labels bound to a contract property; 16 of 56 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1585,10 +1848,10 @@
    "notes": "**Reached from BO-294, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Management can analyze membership performance and use governed AI intelligence to improve renewal, retention and membership-product performance. Board 2 — Final Screen Register # Backend Screen Core Responsibility 13.2. Member population",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Display; Forecast) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Turn membership operational data into actionable intelligence for retention, renewal, product optimization and member engagement.",
-  "purposeNote": "Management can analyze membership performance and use governed AI intelligence to improve renewal, retention and membership-product performance. Board 2 — Final Screen Register # Backend Screen Core Responsibility 13.2. Member population",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -1627,61 +1890,61 @@
        "kind": "metricTile",
        "label": "Active Members",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 35 §Display",
-       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView.activeMembers"
+       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenSummary.activeMembers"
       },
       {
        "kind": "metricTile",
        "label": "New Memberships",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 35 §Display",
-       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView.newMemberships"
+       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenSummary.newMemberships"
       },
       {
        "kind": "metricTile",
        "label": "Renewal Rate",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 35 §Display",
-       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView.renewalRate"
+       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenSummary.renewalRate"
       },
       {
        "kind": "metricTile",
        "label": "Churn Rate",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 35 §Display",
-       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView.churnRate"
+       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenSummary.churnRate"
       },
       {
        "kind": "metricTile",
        "label": "Auto-Renew Success",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 35 §Display",
-       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView.autoRenewSuccess"
+       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenSummary.autoRenewSuccess"
       },
       {
        "kind": "metricTile",
        "label": "Average Membership Tenure",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 35 §Display",
-       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView.averageMembershipTenure"
+       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenSummary.averageMembershipTenure"
       },
       {
        "kind": "metricTile",
        "label": "Average Visits per Member",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 35 §Display",
-       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView.averageVisitsPerMember"
+       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenSummary.averageVisitsPerMember"
       },
       {
        "kind": "metricTile",
        "label": "Revenue per Member",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 35 §Display",
-       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView.revenuePerMember"
+       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenSummary.revenuePerMember"
       },
       {
        "kind": "metricTile",
        "label": "Membership Utilization",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 35 §Display",
-       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView.membershipUtilization"
+       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenSummary.membershipUtilization"
       },
       {
        "kind": "metricTile",
        "label": "Benefit Utilization",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 35 §Display",
-       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView.benefitUtilization"
+       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenSummary.benefitUtilization"
       },
       {
        "kind": "metricTile",
@@ -1692,25 +1955,25 @@
        "kind": "metricTile",
        "label": "Freeze/Suspension Rate",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 35 §Display",
-       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView.freezeSuspensionRate"
+       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenSummary.freezeSuspensionRate"
       },
       {
        "kind": "metricTile",
        "label": "Expected Renewals",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 35 §Forecast",
-       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView.expectedRenewals"
+       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenSummary.expectedRenewals"
       },
       {
        "kind": "metricTile",
        "label": "Expected Churn",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 35 §Forecast",
-       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView.expectedChurn"
+       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenSummary.expectedChurn"
       },
       {
        "kind": "metricTile",
        "label": "Renewal Revenue",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 35 §Forecast",
-       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView.renewalRevenue"
+       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenSummary.renewalRevenue"
       },
       {
        "kind": "metricTile",
@@ -1721,7 +1984,7 @@
        "kind": "metricTile",
        "label": "Membership Base Growth",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 35 §Forecast",
-       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView.membershipBaseGrowth"
+       "bindsTo": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenSummary.membershipBaseGrowth"
       }
      ]
     }
@@ -1744,18 +2007,19 @@
   ],
   "entryState": {
    "preloaded": [
-    "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView.activeMembers",
-    "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView.newMemberships",
-    "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView.renewalRate",
-    "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView.churnRate",
-    "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView.autoRenewSuccess",
-    "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView.averageMembershipTenure"
+    "MembershipAnalyticsRenewalIntelligenceAiRetentionCenSummary.activeMembers",
+    "MembershipAnalyticsRenewalIntelligenceAiRetentionCenSummary.newMemberships",
+    "MembershipAnalyticsRenewalIntelligenceAiRetentionCenSummary.renewalRate",
+    "MembershipAnalyticsRenewalIntelligenceAiRetentionCenSummary.churnRate",
+    "MembershipAnalyticsRenewalIntelligenceAiRetentionCenSummary.autoRenewSuccess",
+    "MembershipAnalyticsRenewalIntelligenceAiRetentionCenSummary.averageMembershipTenure"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-303"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-303",
+   "workshopBoard": "wireframes/WS83 Membership   Annual Pass Management Board 2.dc.html#bo-303"
   },
   "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 35. 15 of 23 labels bound to a contract property; 27 of 105 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

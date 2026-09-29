@@ -14,7 +14,6 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-008",
     "BO-009",
     "BO-010",
@@ -28,54 +27,39 @@
    ],
    "transitions": [
     {
-     "to": "BO-045",
-     "trigger": "Menu Management",
-     "provenance": "flow F85 step 4→5"
-    },
-    {
      "to": "BO-112",
      "trigger": "Production Planning & Production Sheets",
      "provenance": "flow F78 step 2→3"
-    },
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
     },
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
      "carries": [
       "productId",
-      "venueId"
+      "variantId"
      ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-007 holds productId, variantId, so an edge into it carries them"
     },
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-007 holds none of them, so the edge carries nothing and BO-009 opens cold"
     },
     {
      "to": "BO-010",
      "trigger": "Promotions & Coupons",
      "carries": [
-      "campaignId",
-      "code",
-      "dashboardId",
-      "promotionId",
-      "reportId",
-      "venueId"
+      "code"
      ],
-     "provenance": "derived — BO-010 declares entryState.params campaignId, code, dashboardId, promotionId, reportId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-010 declares entryState.params campaignId, code, dashboardId, promotionId, reportId, voucherId and BO-007 holds code, so an edge into it carries them"
+    },
+    {
+     "to": "BO-045",
+     "trigger": "Menu Management",
+     "provenance": "flow F85 step 4→5",
+     "carries": [
+      "menuId"
+     ]
     }
    ]
   },
@@ -89,13 +73,6 @@
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getProduct` reads one of them — list, select, act",
   "purpose": "Find anything sellable at this venue.",
-  "gaps": [
-   {
-    "operation": "listAlternativeCodes",
-    "why": "**4 declared operations reach no component on this screen**: listAlternativeCodes, listProductVariants, listMenus, listMerchandise. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -103,6 +80,27 @@
      "name": "contentBody",
      "slot": "collection",
      "components": [
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listProducts",
+       "notes": "Sends `?venueId=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listProducts",
+       "notes": "Sends `?kind=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is sellable",
+       "operation": "listProducts",
+       "notes": "Sends `?isSellable=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
       {
        "kind": "dataTable",
        "label": "Every product",
@@ -123,6 +121,76 @@
        ],
        "operation": "listProducts",
        "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every alternative code",
+       "bindsTo": "AlternativeCode",
+       "columns": [
+        "AlternativeCode.code",
+        "AlternativeCode.partnerId",
+        "AlternativeCode.partnerName",
+        "AlternativeCode.variantId",
+        "AlternativeCode.note"
+       ],
+       "operation": "listAlternativeCodes",
+       "provenance": "contract catalogue.yaml GET /products/{productId}/alternative-codes"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every product variant",
+       "bindsTo": "ProductVariant",
+       "columns": [
+        "ProductVariant.id",
+        "ProductVariant.productId",
+        "ProductVariant.sku",
+        "ProductVariant.axisValues",
+        "ProductVariant.name",
+        "ProductVariant.barcode",
+        "ProductVariant.isDefault",
+        "ProductVariant.isActive"
+       ],
+       "operation": "listProductVariants",
+       "provenance": "contract catalogue.yaml GET /products/{productId}/variants"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every menu",
+       "bindsTo": "Menu",
+       "columns": [
+        "Menu.id",
+        "Menu.code",
+        "Menu.name",
+        "Menu.outletId",
+        "Menu.availability",
+        "Menu.sections",
+        "Menu.isActive",
+        "Menu.publishedVersion",
+        "Menu.publishedAt"
+       ],
+       "operation": "listMenus",
+       "provenance": "contract fnb.yaml GET /menus"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every merchandise",
+       "bindsTo": "MerchandiseItem",
+       "columns": [
+        "MerchandiseItem.description",
+        "MerchandiseItem.id",
+        "MerchandiseItem.sku",
+        "MerchandiseItem.barcode",
+        "MerchandiseItem.name",
+        "MerchandiseItem.outletId",
+        "MerchandiseItem.categoryId",
+        "MerchandiseItem.variantId",
+        "MerchandiseItem.inventoryItemId",
+        "MerchandiseItem.price",
+        "MerchandiseItem.onHand",
+        "MerchandiseItem.isReturnable"
+       ],
+       "operation": "listMerchandise",
+       "provenance": "contract retail.yaml GET /merchandise"
       }
      ]
     },
@@ -163,84 +231,52 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create product",
        "operation": "createProduct",
        "provenance": "contract catalogue.yaml POST /products"
       },
       {
        "kind": "secondaryButton",
-       "label": "Resolve",
+       "label": "Resolve product by code",
        "operation": "resolveProductByCode",
        "provenance": "contract catalogue.yaml GET /products/resolve"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save alternative codes",
        "operation": "setAlternativeCodes",
        "provenance": "contract catalogue.yaml PUT /products/{productId}/alternative-codes"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save product attributes",
        "operation": "setProductAttributes",
        "provenance": "contract catalogue.yaml PUT /products/{productId}/attributes"
       },
       {
        "kind": "secondaryButton",
-       "label": "Transition",
+       "label": "Transition product lifecycle",
        "operation": "transitionProductLifecycle",
+       "notes": "**Approve and publish are guarded separately** (decided 28 September, audit R091 (2)): the Approve transition (review to approved) is offered only to a holder of `PRODUCT_APPROVE`, and Publish (approved to live) only to a holder of `PRODUCT_PUBLISH`; the server refuses the other with 403 transition-permission-required.",
        "provenance": "contract catalogue.yaml POST /products/{productId}/lifecycle"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save product",
        "operation": "updateProduct",
        "provenance": "contract catalogue.yaml PATCH /products/{productId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create merchandise",
        "operation": "createMerchandise",
        "provenance": "contract retail.yaml POST /merchandise"
       },
       {
        "kind": "secondaryButton",
-       "label": "Bulk",
+       "label": "Bulk update products",
        "operation": "bulkUpdateProducts",
        "provenance": "contract inventory.yaml POST /products/bulk"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listProducts",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createProduct",
-       "label": "Create product",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createProduct",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -249,9 +285,9 @@
   "states": {
    "loading": "The product list.",
    "error": "Could not load. Names which read failed and leaves the product untouched.",
-   "emptyFirstRun": "No product yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the product are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No product yet. Offers Create product (`createProduct`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the product are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -264,7 +300,7 @@
     "operationId": "getProduct",
     "contract": "catalogue",
     "purpose": "Read a product",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createProduct",
@@ -279,19 +315,19 @@
     "operationId": "listAlternativeCodes",
     "contract": "catalogue",
     "purpose": "External identifiers for a product",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listProductVariants",
     "contract": "catalogue",
     "purpose": "List generated variants",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "resolveProductByCode",
     "contract": "catalogue",
     "purpose": "Resolve a partner code to a product",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "setAlternativeCodes",
@@ -380,10 +416,172 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-007",
+   "derivedFrom": "wireframes/reference/Retail Board 2.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateProduct",
+    "component": "modal",
+    "trigger": "Create product",
+    "body": "**Collects what `createProduct` sends before it is called.** Required: `code`, `name`, `kind`, `venueId`. Optional: `description`, `channels`, `entitlementTemplateId`, `dataMaskValues`, `guestListing` and `notBookableLabel` (REV3-14), `displayTags` (23SEP-3), `media` (23SEP-4), `consentQuestionIds` (REV3-26), `requiresTimeWindow` (REV3-13), all decided 29 September, rev 3. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateProductRequest",
+    "confirm": {
+     "label": "Create product",
+     "operation": "createProduct"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "kind",
+      "venueId",
+      "description",
+      "channels",
+      "entitlementTemplateId",
+      "dataMaskValues",
+      "guestListing",
+      "notBookableLabel",
+      "displayTags",
+      "media",
+      "consentQuestionIds",
+      "requiresTimeWindow"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /products"
+   },
+   {
+    "id": "formSetAlternativeCodes",
+    "component": "modal",
+    "trigger": "Save alternative codes",
+    "body": "**Collects what `setAlternativeCodes` sends before it is called.** Required: `codes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save alternative codes",
+     "operation": "setAlternativeCodes"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "codes"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /products/{productId}/alternative-codes"
+   },
+   {
+    "id": "formSetProductAttributes",
+    "component": "modal",
+    "trigger": "Save product attributes",
+    "body": "**Collects what `setProductAttributes` sends before it is called.** Required: `axes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save product attributes",
+     "operation": "setProductAttributes"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "axes"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /products/{productId}/attributes"
+   },
+   {
+    "id": "formTransitionProductLifecycle",
+    "component": "modal",
+    "trigger": "Transition product lifecycle",
+    "body": "**Collects what `transitionProductLifecycle` sends before it is called.** Required: `transition`, `reason`. Optional: `effectiveAt`. The transition picker lists only what the principal may do — approve needs `PRODUCT_APPROVE`, publish needs `PRODUCT_PUBLISH` (decided 28 September, audit R091 (2)). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Transition product lifecycle",
+     "operation": "transitionProductLifecycle"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "transition",
+      "reason",
+      "effectiveAt"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /products/{productId}/lifecycle"
+   },
+   {
+    "id": "formUpdateProduct",
+    "component": "modal",
+    "trigger": "Save product",
+    "body": "**Collects what `updateProduct` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `channels`, `dataMaskValues`, `guestListing`, `notBookableLabel`, `displayTags`, `media`, `consentQuestionIds`, `requiresTimeWindow` (decided 29 September, rev 3 REV3-14, 23SEP-3, 23SEP-4, REV3-26, REV3-13). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "UpdateProductRequest",
+    "confirm": {
+     "label": "Save product",
+     "operation": "updateProduct"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "description",
+      "channels",
+      "dataMaskValues",
+      "guestListing",
+      "notBookableLabel",
+      "displayTags",
+      "media",
+      "consentQuestionIds",
+      "requiresTimeWindow"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PATCH /products/{productId}"
+   },
+   {
+    "id": "formCreateMerchandise",
+    "component": "modal",
+    "trigger": "Create merchandise",
+    "body": "**Collects what `createMerchandise` sends before it is called.** Required: `sku`, `name`, `outletId`, `variantId`. Optional: `barcode`, `description`, `categoryId`, `inventoryItemId`, `isReturnable`, `returnWindowDays`, `requiresSerialNumber`, `imageAssetRef`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateMerchandiseRequest",
+    "confirm": {
+     "label": "Create merchandise",
+     "operation": "createMerchandise"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "sku",
+      "name",
+      "outletId",
+      "variantId",
+      "barcode",
+      "description",
+      "categoryId",
+      "inventoryItemId",
+      "isReturnable",
+      "returnWindowDays",
+      "requiresSerialNumber",
+      "imageAssetRef"
+     ]
+    },
+    "provenance": "contract retail.yaml POST /merchandise"
+   },
+   {
+    "id": "formBulkUpdateProducts",
+    "component": "modal",
+    "trigger": "Bulk update products",
+    "body": "**Collects what `bulkUpdateProducts` sends before it is called.** Required: `selector`, `changes`. Optional: `previewOnly`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Bulk update products",
+     "operation": "bulkUpdateProducts"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "selector",
+      "changes",
+      "previewOnly"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /products/bulk"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -422,10 +620,9 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-007",
-    "BO-008",
-    "BO-010"
+    "BO-010",
+    "BO-014"
    ],
    "inferred": true,
    "entryFrom": [
@@ -434,44 +631,29 @@
    ],
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-007",
      "trigger": "Product Directory",
      "carries": [
       "productId"
      ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-009 holds productId, so an edge into it carries them"
     },
     {
      "to": "BO-010",
      "trigger": "Promotions & Coupons",
      "carries": [
-      "campaignId",
-      "code",
-      "dashboardId",
-      "promotionId",
-      "reportId",
-      "venueId"
+      "code"
      ],
-     "provenance": "derived — BO-010 declares entryState.params campaignId, code, dashboardId, promotionId, reportId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-010 declares entryState.params campaignId, code, dashboardId, promotionId, reportId, voucherId and BO-009 holds code, so an edge into it carries them"
+    },
+    {
+     "to": "BO-014",
+     "trigger": "The priced range is published to the tills",
+     "provenance": "flow F78 step 3→4",
+     "carries": [
+      "priceListId",
+      "productId"
+     ]
     }
    ]
   },
@@ -483,13 +665,6 @@
   "pattern": "listDetail",
   "patternReason": "`listPriceLists` reads the population and `getPriceList` reads one of them — list, select, act",
   "purpose": "Set what something costs, and when that changes.",
-  "gaps": [
-   {
-    "operation": "listPrices",
-    "why": "**1 declared operation reach no component on this screen**: listPrices. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -498,8 +673,15 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Channel",
+       "operation": "listPriceLists",
+       "notes": "Sends `?channel=` to `listPriceLists`.",
+       "provenance": "contract catalogue.yaml GET /price-lists"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every pricing rules",
+       "label": "Every price list",
        "bindsTo": "PriceList",
        "columns": [
         "PriceList.id",
@@ -515,6 +697,20 @@
        ],
        "operation": "listPriceLists",
        "provenance": "contract catalogue.yaml GET /price-lists"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every price",
+       "bindsTo": "Price",
+       "columns": [
+        "Price.id",
+        "Price.priceListId",
+        "Price.variantId",
+        "Price.amount",
+        "Price.taxCodeId"
+       ],
+       "operation": "listPrices",
+       "provenance": "contract catalogue.yaml GET /price-lists/{priceListId}/prices"
       }
      ]
     },
@@ -524,7 +720,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected pricing rules",
+       "label": "The selected price list",
        "bindsTo": "PriceList",
        "columns": [
         "PriceList.id",
@@ -549,60 +745,27 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create price list",
        "operation": "createPriceList",
        "provenance": "contract catalogue.yaml POST /price-lists"
       },
       {
        "kind": "secondaryButton",
-       "label": "Copy",
+       "label": "Copy price list",
        "operation": "copyPriceList",
        "provenance": "contract catalogue.yaml POST /price-lists/{priceListId}/copy"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save prices",
        "operation": "setPrices",
        "provenance": "contract catalogue.yaml PUT /price-lists/{priceListId}/prices"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save price list",
        "operation": "updatePriceList",
        "provenance": "contract catalogue.yaml PATCH /price-lists/{priceListId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listPriceLists",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createPriceList",
-       "label": "Create price list",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createPriceList",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -611,9 +774,9 @@
   "states": {
    "loading": "The pricing rules list.",
    "error": "Could not load. Names which read failed and leaves the pricing rules untouched.",
-   "emptyFirstRun": "No pricing rules yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the pricing rules are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No pricing rules yet. Offers Create price list (`createPriceList`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on channel and the pricing rules are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRICE_VIEW`, which `listPriceLists` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -626,7 +789,7 @@
     "operationId": "listPrices",
     "contract": "catalogue",
     "purpose": "List prices in a list",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createPriceList",
@@ -650,7 +813,7 @@
     "operationId": "getPriceList",
     "contract": "catalogue",
     "purpose": "Read a price list",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "setPrices",
@@ -669,6 +832,45 @@
     "invalidates": [
      "listPriceLists"
     ]
+   },
+   {
+    "operationId": "bulkChangePrices",
+    "contract": "catalogue",
+    "purpose": "Reprice a category or a whole catalogue",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listPriceLists",
+     "listPrices",
+     "getPriceList"
+    ]
+   },
+   {
+    "operationId": "listDynamicPriceRules",
+    "contract": "catalogue",
+    "purpose": "Dynamic price rules",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "getDynamicPriceRule",
+    "contract": "catalogue",
+    "purpose": "One dynamic rule with its conditions and actions",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "setDynamicPriceRule",
+    "contract": "catalogue",
+    "purpose": "Replace a rule, its conditions and its actions",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listPriceLists",
+     "listPrices",
+     "getPriceList",
+     "listDynamicPriceRules"
+    ]
    }
   ],
   "entryState": {
@@ -676,6 +878,10 @@
     {
      "name": "priceListId",
      "from": "deepLink"
+    },
+    {
+     "name": "ruleId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `priceListId`.",
@@ -691,10 +897,97 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-009",
+   "derivedFrom": "wireframes/reference/Retail Board 2.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreatePriceList",
+    "component": "modal",
+    "trigger": "Create price list",
+    "body": "**Collects what `createPriceList` sends before it is called.** Required: `code`, `name`, `venueId`, `channels`. Optional: `validFrom`, `validTo`, `priority`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreatePriceListRequest",
+    "confirm": {
+     "label": "Create price list",
+     "operation": "createPriceList"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "venueId",
+      "channels",
+      "validFrom",
+      "validTo",
+      "priority"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /price-lists"
+   },
+   {
+    "id": "formCopyPriceList",
+    "component": "modal",
+    "trigger": "Copy price list",
+    "body": "**Collects what `copyPriceList` sends before it is called.** Required: `code`, `name`. Optional: `adjustmentPercent`, `roundTo`, `validFrom`, `validTo`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Copy price list",
+     "operation": "copyPriceList"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "adjustmentPercent",
+      "roundTo",
+      "validFrom",
+      "validTo"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /price-lists/{priceListId}/copy"
+   },
+   {
+    "id": "formSetPrices",
+    "component": "modal",
+    "trigger": "Save prices",
+    "body": "**Collects what `setPrices` sends before it is called.** Required: `prices`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save prices",
+     "operation": "setPrices"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "prices"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /price-lists/{priceListId}/prices"
+   },
+   {
+    "id": "formUpdatePriceList",
+    "component": "modal",
+    "trigger": "Save price list",
+    "body": "**Collects what `updatePriceList` sends before it is called.** Nothing in the body is required. Optional: `name`, `validFrom`, `validTo`, `priority`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save price list",
+     "operation": "updatePriceList"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "validFrom",
+      "validTo",
+      "priority",
+      "isActive"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PATCH /price-lists/{priceListId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -733,9 +1026,7 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-007",
-    "BO-008",
     "BO-009"
    ],
    "inferred": true,
@@ -745,46 +1036,24 @@
    ],
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-007",
      "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-010 holds none of them, so the edge carries nothing and BO-007 opens cold"
     },
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-010 holds none of them, so the edge carries nothing and BO-009 opens cold"
     },
     {
      "to": "ANL-009",
      "trigger": "AI Assistant & Action Center",
      "provenance": "flow F90 step 2→3",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "reportId"
+     ]
     }
    ]
   },
@@ -800,13 +1069,6 @@
   "pattern": "listDetail",
   "patternReason": "`listPromotions` reads the population and `getPromotion` reads one of them — list, select, act",
   "purpose": "Issue a code and control what it does.",
-  "gaps": [
-   {
-    "operation": "listCouponCampaigns",
-    "why": "**4 declared operations reach no component on this screen**: listCouponCampaigns, getPromotionUsage, listCouponCodes, getDashboard. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -815,8 +1077,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listPromotions",
+       "notes": "Sends `?venueId=` to `listPromotions`.",
+       "provenance": "contract promotions.yaml GET /promotions"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listPromotions",
+       "notes": "Sends `?status=` to `listPromotions`.",
+       "provenance": "contract promotions.yaml GET /promotions"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Active at",
+       "operation": "listPromotions",
+       "notes": "Sends `?activeAt=` to `listPromotions`.",
+       "provenance": "contract promotions.yaml GET /promotions"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every promotions coupons",
+       "label": "Every promotion",
        "bindsTo": "Promotion",
        "columns": [
         "Promotion.code",
@@ -834,6 +1117,61 @@
        ],
        "operation": "listPromotions",
        "provenance": "contract promotions.yaml GET /promotions"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every coupon campaign",
+       "bindsTo": "CouponCampaign",
+       "columns": [
+        "CouponCampaign.code",
+        "CouponCampaign.name",
+        "CouponCampaign.venueId",
+        "CouponCampaign.discount",
+        "CouponCampaign.conditions",
+        "CouponCampaign.isSingleUse",
+        "CouponCampaign.maxRedemptionsPerCode",
+        "CouponCampaign.validFrom",
+        "CouponCampaign.validTo",
+        "CouponCampaign.id",
+        "CouponCampaign.generatedCount",
+        "CouponCampaign.redeemedCount"
+       ],
+       "operation": "listCouponCampaigns",
+       "provenance": "contract promotions.yaml GET /coupon-campaigns"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every coupon code",
+       "bindsTo": "CouponCode",
+       "columns": [
+        "CouponCode.code",
+        "CouponCode.campaignId",
+        "CouponCode.batchId",
+        "CouponCode.status",
+        "CouponCode.assignedSubjectId",
+        "CouponCode.redemptionCount",
+        "CouponCode.maxRedemptions",
+        "CouponCode.discount",
+        "CouponCode.invalidReason",
+        "CouponCode.validFrom",
+        "CouponCode.validTo",
+        "CouponCode.redeemedAt"
+       ],
+       "operation": "listCouponCodes",
+       "provenance": "contract promotions.yaml GET /coupon-campaigns/{campaignId}/codes"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishPromotion",
+       "notes": "Declares `publishPromotion`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -843,7 +1181,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected promotions coupons",
+       "label": "The selected promotion",
        "bindsTo": "Promotion",
        "columns": [
         "Promotion.code",
@@ -865,6 +1203,32 @@
        ],
        "operation": "getPromotion",
        "provenance": "contract promotions.yaml GET /promotions/{promotionId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The promotion usage",
+       "bindsTo": "PromotionUsage",
+       "columns": [
+        "PromotionUsage.promotionId",
+        "PromotionUsage.redemptionCount",
+        "PromotionUsage.discountGiven",
+        "PromotionUsage.budgetCap",
+        "PromotionUsage.budgetRemaining",
+        "PromotionUsage.isBudgetExhausted",
+        "PromotionUsage.byChannel"
+       ],
+       "operation": "getPromotionUsage",
+       "provenance": "contract promotions.yaml GET /promotions/{promotionId}/usage"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The dashboard data",
+       "bindsTo": "DashboardData",
+       "columns": [
+        "DashboardData.tileData"
+       ],
+       "operation": "getDashboard",
+       "provenance": "contract reporting.yaml GET /dashboards/{dashboardId}"
       }
      ]
     },
@@ -874,79 +1238,79 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Analyse",
+       "label": "Analyse promotion conflicts",
        "operation": "analysePromotionConflicts",
        "provenance": "contract promotions.yaml GET /promotions/{promotionId}/conflicts"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create coupon campaign",
        "operation": "createCouponCampaign",
        "provenance": "contract promotions.yaml POST /coupon-campaigns"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create promotion",
        "operation": "createPromotion",
        "provenance": "contract promotions.yaml POST /promotions"
       },
       {
        "kind": "secondaryButton",
-       "label": "End",
+       "label": "End promotion",
        "operation": "endPromotion",
        "provenance": "contract promotions.yaml POST /promotions/{promotionId}/end"
       },
       {
        "kind": "secondaryButton",
-       "label": "Evaluate",
+       "label": "Evaluate promotions",
        "operation": "evaluatePromotions",
        "provenance": "contract promotions.yaml POST /promotions/evaluate"
       },
       {
        "kind": "secondaryButton",
-       "label": "Generate",
+       "label": "Generate coupon codes",
        "operation": "generateCouponCodes",
        "provenance": "contract promotions.yaml POST /coupon-campaigns/{campaignId}/codes"
       },
       {
        "kind": "secondaryButton",
-       "label": "Pause",
+       "label": "Pause promotion",
        "operation": "pausePromotion",
        "provenance": "contract promotions.yaml POST /promotions/{promotionId}/pause"
       },
       {
        "kind": "secondaryButton",
-       "label": "Publish",
+       "label": "Publish promotion",
        "operation": "publishPromotion",
        "provenance": "contract promotions.yaml POST /promotions/{promotionId}/publish"
       },
       {
        "kind": "secondaryButton",
-       "label": "Unschedule",
+       "label": "Unschedule promotion",
        "operation": "unschedulePromotion",
        "provenance": "contract promotions.yaml POST /promotions/{promotionId}/unschedule"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save promotion",
        "operation": "updatePromotion",
        "provenance": "contract promotions.yaml PATCH /promotions/{promotionId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Simulate",
+       "label": "Simulate promotion",
        "operation": "simulatePromotion",
        "provenance": "contract promotions.yaml POST /promotions/{promotionId}/simulate"
       },
       {
        "kind": "secondaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
       },
       {
        "kind": "destructiveButton",
-       "label": "Void",
+       "label": "Void coupon code",
        "operation": "voidCouponCode",
        "provenance": "contract promotions.yaml POST /coupon-codes/{code}/void"
       },
@@ -957,60 +1321,6 @@
        "provenance": "authored — required by check-screens"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listPromotions",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createCouponCampaign",
-       "label": "Create coupon campaign",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "voidCouponCode",
-       "label": "Void coupon code",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createCouponCampaign",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishPromotion",
-       "notes": "Declares `publishPromotion`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
@@ -1018,17 +1328,213 @@
    {
     "id": "confirmVoidCouponCode",
     "component": "confirmDialog",
-    "trigger": "Void",
-    "body": "**Names what `voidCouponCode` changes and what it leaves alone**, in the consequence rather than the verb. A promotions coupons this affects should be identified in the dialog, not just counted.",
+    "trigger": "Void coupon code",
+    "body": "**Names what `voidCouponCode` changes and what it leaves alone**, in the consequence rather than the verb. A promotions coupons this affects should be identified in the dialog, not just counted. **Collects what `voidCouponCode` sends before it is called.** Required: `reason`.",
     "provenance": "contract promotions.yaml POST /coupon-codes/{code}/void"
+   },
+   {
+    "id": "formCreateCouponCampaign",
+    "component": "modal",
+    "trigger": "Create coupon campaign",
+    "body": "**Collects what `createCouponCampaign` sends before it is called.** Required: `code`, `name`, `venueId`, `discount`, `validFrom`. Optional: `conditions`, `isSingleUse`, `maxRedemptionsPerCode`, `validTo`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateCouponCampaignRequest",
+    "confirm": {
+     "label": "Create coupon campaign",
+     "operation": "createCouponCampaign"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "venueId",
+      "discount",
+      "validFrom",
+      "conditions",
+      "isSingleUse",
+      "maxRedemptionsPerCode",
+      "validTo"
+     ]
+    },
+    "provenance": "contract promotions.yaml POST /coupon-campaigns"
+   },
+   {
+    "id": "formCreatePromotion",
+    "component": "modal",
+    "trigger": "Create promotion",
+    "body": "**Collects what `createPromotion` sends before it is called.** Required: `code`, `name`, `venueId`, `discount`, `validFrom`. Optional: `description`, `conditions`, `stackingMode`, `stackingGroup`, `precedence`, `validTo`, `maxRedemptions`, `maxRedemptionsPerGuest`, `budgetCap`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreatePromotionRequest",
+    "confirm": {
+     "label": "Create promotion",
+     "operation": "createPromotion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "venueId",
+      "discount",
+      "validFrom",
+      "description",
+      "conditions",
+      "stackingMode",
+      "stackingGroup",
+      "precedence",
+      "validTo",
+      "maxRedemptions",
+      "maxRedemptionsPerGuest",
+      "budgetCap"
+     ]
+    },
+    "provenance": "contract promotions.yaml POST /promotions"
+   },
+   {
+    "id": "formEndPromotion",
+    "component": "modal",
+    "trigger": "End promotion",
+    "body": "**Collects what `endPromotion` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "End promotion",
+     "operation": "endPromotion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract promotions.yaml POST /promotions/{promotionId}/end"
+   },
+   {
+    "id": "formEvaluatePromotions",
+    "component": "modal",
+    "trigger": "Evaluate promotions",
+    "body": "**Collects what `evaluatePromotions` sends before it is called.** Required: `venueId`, `channel`, `lines`. Optional: `subjectId`, `membershipTierId`, `couponCodes`, `evaluateAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "EvaluatePromotionsRequest",
+    "confirm": {
+     "label": "Evaluate promotions",
+     "operation": "evaluatePromotions"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "channel",
+      "lines",
+      "subjectId",
+      "membershipTierId",
+      "couponCodes",
+      "evaluateAt"
+     ]
+    },
+    "provenance": "contract promotions.yaml POST /promotions/evaluate"
+   },
+   {
+    "id": "formGenerateCouponCodes",
+    "component": "modal",
+    "trigger": "Generate coupon codes",
+    "body": "**Collects what `generateCouponCodes` sends before it is called.** Required: `quantity`. Optional: `prefix`, `length`, `assignToSubjectIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Generate coupon codes",
+     "operation": "generateCouponCodes"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "quantity",
+      "prefix",
+      "length",
+      "assignToSubjectIds"
+     ]
+    },
+    "provenance": "contract promotions.yaml POST /coupon-campaigns/{campaignId}/codes"
+   },
+   {
+    "id": "formPausePromotion",
+    "component": "modal",
+    "trigger": "Pause promotion",
+    "body": "**Collects what `pausePromotion` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Pause promotion",
+     "operation": "pausePromotion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract promotions.yaml POST /promotions/{promotionId}/pause"
+   },
+   {
+    "id": "formUpdatePromotion",
+    "component": "modal",
+    "trigger": "Save promotion",
+    "body": "**Collects what `updatePromotion` sends before it is called.** Nothing in the body is required. Optional: `name`, `validTo`, `isPaused`, `conditions`, `discount`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save promotion",
+     "operation": "updatePromotion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "validTo",
+      "isPaused",
+      "conditions",
+      "discount"
+     ]
+    },
+    "provenance": "contract promotions.yaml PATCH /promotions/{promotionId}"
+   },
+   {
+    "id": "formSimulatePromotion",
+    "component": "modal",
+    "trigger": "Simulate promotion",
+    "body": "**Collects what `simulatePromotion` sends before it is called.** Required: `periodFrom`, `periodTo`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Simulate promotion",
+     "operation": "simulatePromotion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "periodFrom",
+      "periodTo"
+     ]
+    },
+    "provenance": "contract promotions.yaml POST /promotions/{promotionId}/simulate"
+   },
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
    }
   ],
   "states": {
    "loading": "The promotions coupons list.",
    "error": "Could not load. Names which read failed and leaves the promotions coupons untouched.",
-   "emptyFirstRun": "No promotions coupons yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the promotions coupons are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No promotions coupons yet. Offers Create coupon campaign (`createCouponCampaign`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on venueId, status, activeAt and the promotions coupons are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRICE_VIEW`, which `listPromotions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1047,7 +1553,7 @@
     "operationId": "analysePromotionConflicts",
     "contract": "promotions",
     "purpose": "Analyse stacking against live promotions",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createCouponCampaign",
@@ -1098,19 +1604,19 @@
     "operationId": "getPromotion",
     "contract": "promotions",
     "purpose": "Read a promotion",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getPromotionUsage",
     "contract": "promotions",
     "purpose": "Redemption count and discount given",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listCouponCodes",
     "contract": "promotions",
     "purpose": "List generated codes",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "pausePromotion",
@@ -1180,6 +1686,65 @@
     "invalidates": [
      "listPromotions"
     ]
+   },
+   {
+    "operationId": "setPromotionVariants",
+    "contract": "promotions",
+    "purpose": "A/B test two versions of a promotion",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listPromotions",
+     "listCouponCampaigns",
+     "analysePromotionConflicts",
+     "getPromotion"
+    ]
+   },
+   {
+    "operationId": "assignCoupon",
+    "contract": "promotions",
+    "purpose": "Assign a coupon code to a named guest",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listPromotions",
+     "listCouponCampaigns",
+     "analysePromotionConflicts",
+     "getPromotion"
+    ]
+   },
+   {
+    "operationId": "listVoucherBatches",
+    "contract": "promotions",
+    "purpose": "Voucher batches issued",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "createVoucherBatch",
+    "contract": "promotions",
+    "purpose": "Issue a voucher batch",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listPromotions",
+     "listCouponCampaigns",
+     "analysePromotionConflicts",
+     "getPromotion"
+    ]
+   },
+   {
+    "operationId": "voidVoucher",
+    "contract": "promotions",
+    "purpose": "Cancel a voucher",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listPromotions",
+     "listCouponCampaigns",
+     "analysePromotionConflicts",
+     "getPromotion"
+    ]
    }
   ],
   "entryState": {
@@ -1207,6 +1772,10 @@
     {
      "name": "code",
      "from": "deepLink"
+    },
+    {
+     "name": "voucherId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "A dashboard opened from a link or a saved view. A coupon code opened from the list, or scanned at a till.",
@@ -1222,6 +1791,7 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-010",
+   "derivedFrom": "wireframes/reference/POS Board 4.dc.html",
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
@@ -1264,7 +1834,6 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-007",
     "BO-008",
     "BO-009"
@@ -1276,39 +1845,26 @@
    ],
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-007",
      "trigger": "Product Directory",
      "carries": [
       "productId"
      ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-011 holds productId, so an edge into it carries them"
     },
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
      "carries": [
       "productId",
-      "venueId"
+      "version"
      ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-011 holds productId, version, so an edge into it carries them"
     },
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-011 holds none of them, so the edge carries nothing and BO-009 opens cold"
     },
     {
      "to": "ANL-009",
@@ -1337,7 +1893,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every packages bundles",
+       "label": "Every bundle",
        "bindsTo": "BundleSummary",
        "columns": [
         "BundleSummary.venueId",
@@ -1352,6 +1908,12 @@
        ],
        "operation": "listCatalogueBundles",
        "provenance": "contract catalogue.yaml GET /catalogue/bundles"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishBundle",
+       "notes": "Declares `publishBundle`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1361,7 +1923,45 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected packages bundles",
+       "label": "The selected bundle",
+       "bindsTo": "BundleSummary",
+       "columns": [
+        "BundleSummary.venueId",
+        "BundleSummary.publishedAt",
+        "BundleSummary.publishedBy",
+        "BundleSummary.contentHash",
+        "BundleSummary.signatureKeyId",
+        "BundleSummary.staleAfter",
+        "BundleSummary.sizeBytes",
+        "BundleSummary.note",
+        "BundleSummary.appliedByWorkstations"
+       ],
+       "operation": "listCatalogueBundles",
+       "provenance": "contract catalogue.yaml GET /catalogue/bundles"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The group package definition",
+       "bindsTo": "GroupPackageDefinition",
+       "columns": [
+        "GroupPackageDefinition.id",
+        "GroupPackageDefinition.productId",
+        "GroupPackageDefinition.kind",
+        "GroupPackageDefinition.maxParticipants",
+        "GroupPackageDefinition.durationMinutes",
+        "GroupPackageDefinition.hostCount",
+        "GroupPackageDefinition.pricingBasis",
+        "GroupPackageDefinition.freeLeaderRatio",
+        "GroupPackageDefinition.paymentMode",
+        "GroupPackageDefinition.includes",
+        "GroupPackageDefinition.scopePath"
+       ],
+       "operation": "getGroupPackageDefinition",
+       "provenance": "contract catalogue.yaml GET /products/{productId}/group-package"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The catalogue bundle",
        "bindsTo": "CatalogueBundle",
        "columns": [
         "CatalogueBundle.venueId",
@@ -1384,19 +1984,19 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Publish",
+       "label": "Publish bundle",
        "operation": "publishBundle",
        "provenance": "contract catalogue.yaml POST /catalogue/bundles"
       },
       {
        "kind": "secondaryButton",
-       "label": "Report",
+       "label": "Report bundle applied",
        "operation": "reportBundleApplied",
        "provenance": "contract catalogue.yaml POST /catalogue/bundles/{version}/applied"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create bundle",
        "operation": "createBundle",
        "provenance": "contract promotions.yaml POST /bundles"
       },
@@ -1405,45 +2005,12 @@
        "label": "What publishing changes",
        "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
        "provenance": "authored — required by check-screens"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listCatalogueBundles",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "publishBundle",
-       "label": "Publish bundle",
-       "provenance": "carried from the previous definition"
       },
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "publishBundle",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishBundle",
-       "notes": "Declares `publishBundle`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
+       "label": "Save group package definition",
+       "operation": "setGroupPackageDefinition",
+       "provenance": "contract catalogue.yaml PUT /products/{productId}/group-package"
       }
      ]
     }
@@ -1452,11 +2019,23 @@
   "states": {
    "loading": "The packages bundles list.",
    "error": "Could not load. Names which read failed and leaves the packages bundles untouched.",
-   "emptyFirstRun": "No packages bundles yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the packages bundles are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No packages bundles yet. Offers Create bundle (`createBundle`).",
+   "emptyNoResults": "Never shown: `listCatalogueBundles` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getGroupPackageDefinition` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "getGroupPackageDefinition",
+    "contract": "catalogue",
+    "purpose": "A school-trip format or party package",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "setGroupPackageDefinition",
+    "contract": "catalogue",
+    "purpose": "Define a school-trip format or party package",
+    "trigger": "onAction"
+   },
    {
     "operationId": "listCatalogueBundles",
     "contract": "catalogue",
@@ -1495,6 +2074,27 @@
     "invalidates": [
      "listCatalogueBundles"
     ]
+   },
+   {
+    "operationId": "createCombo",
+    "contract": "fnb",
+    "purpose": "Create a meal deal priced as one thing",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "setComboSlots",
+    "contract": "fnb",
+    "purpose": "Set what the guest chooses in a combo and what it costs extra",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "updateBundle",
+    "contract": "promotions",
+    "purpose": "Amend a bundle",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
    }
   ],
   "entryState": {
@@ -1502,25 +2102,134 @@
     {
      "name": "version",
      "from": "deepLink"
+    },
+    {
+     "name": "productId",
+     "from": "navigation"
+    },
+    {
+     "name": "bundleId",
+     "from": "navigation"
+    },
+    {
+     "name": "comboId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A version link is expected to point at something superseded — that is what versions are for.** The screen opens the requested version read-only, says it is not current, and links to the one that is. **An old version is history, not an error.** Arrives with `version`.",
    "preloaded": [
-    "CatalogueBundle.venueId",
-    "CatalogueBundle.isDelta",
-    "CatalogueBundle.baseVersion",
-    "CatalogueBundle.signature",
-    "CatalogueBundle.signatureKeyId"
+    "BundleSummary.venueId",
+    "BundleSummary.publishedAt",
+    "BundleSummary.publishedBy",
+    "BundleSummary.contentHash",
+    "BundleSummary.signatureKeyId"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-011",
+   "derivedFrom": "wireframes/reference/Retail Board 5.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetGroupPackageDefinition",
+    "component": "modal",
+    "trigger": "Save group package definition",
+    "body": "**Collects what `setGroupPackageDefinition` sends before it is called.** Required: `kind`, `maxParticipants`, `durationMinutes`. Optional: `id`, `productId`, `hostCount`, `pricingBasis`, `freeLeaderRatio`, `paymentMode`, `includes`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "GroupPackageDefinition",
+    "confirm": {
+     "label": "Save group package definition",
+     "operation": "setGroupPackageDefinition"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "maxParticipants",
+      "durationMinutes",
+      "id",
+      "productId",
+      "hostCount",
+      "pricingBasis",
+      "freeLeaderRatio",
+      "paymentMode",
+      "includes",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /products/{productId}/group-package"
+   },
+   {
+    "id": "formPublishBundle",
+    "component": "modal",
+    "trigger": "Publish bundle",
+    "body": "**Collects what `publishBundle` sends before it is called.** Required: `venueId`. Optional: `note`, `staleAfterHours`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Publish bundle",
+     "operation": "publishBundle"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "note",
+      "staleAfterHours"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /catalogue/bundles"
+   },
+   {
+    "id": "formReportBundleApplied",
+    "component": "modal",
+    "trigger": "Report bundle applied",
+    "body": "**Collects what `reportBundleApplied` sends before it is called.** Required: `appliedAt`, `outcome`. Optional: `error`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Report bundle applied",
+     "operation": "reportBundleApplied"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "appliedAt",
+      "outcome",
+      "error"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /catalogue/bundles/{version}/applied"
+   },
+   {
+    "id": "formCreateBundle",
+    "component": "modal",
+    "trigger": "Create bundle",
+    "body": "**Collects what `createBundle` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `price`, `components`, `allocation`. Optional: `description`, `choiceGroups`, `validFrom`, `validTo`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateBundleRequest",
+    "confirm": {
+     "label": "Create bundle",
+     "operation": "createBundle"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "venueId",
+      "kind",
+      "price",
+      "components",
+      "allocation",
+      "description",
+      "choiceGroups",
+      "validFrom",
+      "validTo"
+     ]
+    },
+    "provenance": "contract promotions.yaml POST /bundles"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1559,7 +2268,6 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-007",
     "BO-008",
     "BO-009"
@@ -1570,39 +2278,26 @@
    ],
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-007",
      "trigger": "Product Directory",
      "carries": [
       "productId"
      ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-012 holds productId, so an edge into it carries them"
     },
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
      "carries": [
       "productId",
-      "venueId"
+      "variantId"
      ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-012 holds productId, variantId, so an edge into it carries them"
     },
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-012 holds none of them, so the edge carries nothing and BO-009 opens cold"
     }
    ]
   },
@@ -1611,13 +2306,6 @@
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getProduct` reads one of them — list, select, act",
   "purpose": "Define what a membership includes.",
-  "gaps": [
-   {
-    "operation": "listEntitlementTemplates",
-    "why": "**3 declared operations reach no component on this screen**: listEntitlementTemplates, listAlternativeCodes, listProductVariants. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1626,8 +2314,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listProducts",
+       "notes": "Sends `?venueId=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listProducts",
+       "notes": "Sends `?kind=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is sellable",
+       "operation": "listProducts",
+       "notes": "Sends `?isSellable=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every membership products",
+       "label": "Every product",
        "bindsTo": "Product",
        "columns": [
         "Product.id",
@@ -1645,6 +2354,58 @@
        ],
        "operation": "listProducts",
        "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every entitlement template",
+       "bindsTo": "EntitlementTemplate",
+       "columns": [
+        "EntitlementTemplate.description",
+        "EntitlementTemplate.id",
+        "EntitlementTemplate.code",
+        "EntitlementTemplate.name",
+        "EntitlementTemplate.validityKind",
+        "EntitlementTemplate.validFromOffsetDays",
+        "EntitlementTemplate.validForDays",
+        "EntitlementTemplate.daysOfWeek",
+        "EntitlementTemplate.expiryAnchor",
+        "EntitlementTemplate.expiryDate",
+        "EntitlementTemplate.carriesStoredValue",
+        "EntitlementTemplate.includedValue"
+       ],
+       "operation": "listEntitlementTemplates",
+       "provenance": "contract catalogue.yaml GET /entitlement-templates"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every alternative code",
+       "bindsTo": "AlternativeCode",
+       "columns": [
+        "AlternativeCode.code",
+        "AlternativeCode.partnerId",
+        "AlternativeCode.partnerName",
+        "AlternativeCode.variantId",
+        "AlternativeCode.note"
+       ],
+       "operation": "listAlternativeCodes",
+       "provenance": "contract catalogue.yaml GET /products/{productId}/alternative-codes"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every product variant",
+       "bindsTo": "ProductVariant",
+       "columns": [
+        "ProductVariant.id",
+        "ProductVariant.productId",
+        "ProductVariant.sku",
+        "ProductVariant.axisValues",
+        "ProductVariant.name",
+        "ProductVariant.barcode",
+        "ProductVariant.isDefault",
+        "ProductVariant.isActive"
+       ],
+       "operation": "listProductVariants",
+       "provenance": "contract catalogue.yaml GET /products/{productId}/variants"
       }
      ]
     },
@@ -1654,7 +2415,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected membership products",
+       "label": "The selected product",
        "bindsTo": "Product",
        "columns": [
         "Product.id",
@@ -1685,78 +2446,45 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create entitlement template",
        "operation": "createEntitlementTemplate",
        "provenance": "contract catalogue.yaml POST /entitlement-templates"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create product",
        "operation": "createProduct",
        "provenance": "contract catalogue.yaml POST /products"
       },
       {
        "kind": "secondaryButton",
-       "label": "Resolve",
+       "label": "Resolve product by code",
        "operation": "resolveProductByCode",
        "provenance": "contract catalogue.yaml GET /products/resolve"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save alternative codes",
        "operation": "setAlternativeCodes",
        "provenance": "contract catalogue.yaml PUT /products/{productId}/alternative-codes"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save product attributes",
        "operation": "setProductAttributes",
        "provenance": "contract catalogue.yaml PUT /products/{productId}/attributes"
       },
       {
        "kind": "secondaryButton",
-       "label": "Transition",
+       "label": "Transition product lifecycle",
        "operation": "transitionProductLifecycle",
        "provenance": "contract catalogue.yaml POST /products/{productId}/lifecycle"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save product",
        "operation": "updateProduct",
        "provenance": "contract catalogue.yaml PATCH /products/{productId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listProducts",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createEntitlementTemplate",
-       "label": "Create entitlement template",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createEntitlementTemplate",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1765,9 +2493,9 @@
   "states": {
    "loading": "The membership products list.",
    "error": "Could not load. Names which read failed and leaves the membership products untouched.",
-   "emptyFirstRun": "No membership products yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the membership products are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No membership products yet. Offers Create entitlement template (`createEntitlementTemplate`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the membership products are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1804,25 +2532,25 @@
     "operationId": "getProduct",
     "contract": "catalogue",
     "purpose": "Read a product",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listAlternativeCodes",
     "contract": "catalogue",
     "purpose": "External identifiers for a product",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listProductVariants",
     "contract": "catalogue",
     "purpose": "List generated variants",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "resolveProductByCode",
     "contract": "catalogue",
     "purpose": "Resolve a partner code to a product",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "setAlternativeCodes",
@@ -1883,6 +2611,142 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-012"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateEntitlementTemplate",
+    "component": "modal",
+    "trigger": "Create entitlement template",
+    "body": "**Collects what `createEntitlementTemplate` sends before it is called.** Required: `id`, `code`, `name`, `validityKind`. Optional: `description`, `validFromOffsetDays`, `validForDays`, `daysOfWeek`, `expiryAnchor`, `expiryDate`, `carriesStoredValue`, `includedValue`, `validTimeWindows`, `blackoutDates`, `fastTrackTier`, `entriesAllowed` and 15 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "EntitlementTemplate",
+    "confirm": {
+     "label": "Create entitlement template",
+     "operation": "createEntitlementTemplate"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "validityKind",
+      "description",
+      "validFromOffsetDays",
+      "validForDays",
+      "daysOfWeek",
+      "expiryAnchor",
+      "expiryDate",
+      "carriesStoredValue",
+      "includedValue",
+      "validTimeWindows",
+      "blackoutDates",
+      "fastTrackTier",
+      "entriesAllowed",
+      "reentryAllowed",
+      "purchaseEligibility"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /entitlement-templates"
+   },
+   {
+    "id": "formCreateProduct",
+    "component": "modal",
+    "trigger": "Create product",
+    "body": "**Collects what `createProduct` sends before it is called.** Required: `code`, `name`, `kind`, `venueId`. Optional: `description`, `channels`, `entitlementTemplateId`, `dataMaskValues`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateProductRequest",
+    "confirm": {
+     "label": "Create product",
+     "operation": "createProduct"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "kind",
+      "venueId",
+      "description",
+      "channels",
+      "entitlementTemplateId",
+      "dataMaskValues"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /products"
+   },
+   {
+    "id": "formSetAlternativeCodes",
+    "component": "modal",
+    "trigger": "Save alternative codes",
+    "body": "**Collects what `setAlternativeCodes` sends before it is called.** Required: `codes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save alternative codes",
+     "operation": "setAlternativeCodes"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "codes"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /products/{productId}/alternative-codes"
+   },
+   {
+    "id": "formSetProductAttributes",
+    "component": "modal",
+    "trigger": "Save product attributes",
+    "body": "**Collects what `setProductAttributes` sends before it is called.** Required: `axes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save product attributes",
+     "operation": "setProductAttributes"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "axes"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /products/{productId}/attributes"
+   },
+   {
+    "id": "formTransitionProductLifecycle",
+    "component": "modal",
+    "trigger": "Transition product lifecycle",
+    "body": "**Collects what `transitionProductLifecycle` sends before it is called.** Required: `transition`, `reason`. Optional: `effectiveAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Transition product lifecycle",
+     "operation": "transitionProductLifecycle"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "transition",
+      "reason",
+      "effectiveAt"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /products/{productId}/lifecycle"
+   },
+   {
+    "id": "formUpdateProduct",
+    "component": "modal",
+    "trigger": "Save product",
+    "body": "**Collects what `updateProduct` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `channels`, `dataMaskValues`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "UpdateProductRequest",
+    "confirm": {
+     "label": "Save product",
+     "operation": "updateProduct"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "description",
+      "channels",
+      "dataMaskValues"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PATCH /products/{productId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1921,7 +2785,6 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-007",
     "BO-008",
     "BO-009",
@@ -1933,44 +2796,35 @@
    ],
    "transitions": [
     {
-     "to": "BO-011",
-     "trigger": "Packages & Bundles",
-     "provenance": "flow F77 step 1→2"
-    },
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-007",
      "trigger": "Product Directory",
      "carries": [
       "productId"
      ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-013 holds productId, so an edge into it carries them"
     },
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
      "carries": [
       "productId",
-      "venueId"
+      "version"
      ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-013 holds productId, version, so an edge into it carries them"
     },
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-013 holds none of them, so the edge carries nothing and BO-009 opens cold"
+    },
+    {
+     "to": "BO-011",
+     "trigger": "Packages & Bundles",
+     "provenance": "flow F77 step 1→2",
      "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+      "productId",
+      "version"
+     ]
     }
    ]
   },
@@ -1982,13 +2836,6 @@
   "pattern": "listDetail",
   "patternReason": "`listChannelCapacities` reads the population and `getChannelAllocations` reads one of them — list, select, act",
   "purpose": "Decide where each product can be sold.",
-  "gaps": [
-   {
-    "operation": "listChannelListings",
-    "why": "**2 declared operations reach no component on this screen**: listChannelListings, listProducts. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1997,8 +2844,15 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Performance id",
+       "operation": "listChannelCapacities",
+       "notes": "Sends `?performanceId=` to `listChannelCapacities`.",
+       "provenance": "contract catalogue.yaml GET /channel-capacities"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every channel distribution",
+       "label": "Every channel capacity",
        "bindsTo": "ChannelCapacity",
        "columns": [
         "ChannelCapacity.id",
@@ -2016,6 +2870,54 @@
        ],
        "operation": "listChannelCapacities",
        "provenance": "contract catalogue.yaml GET /channel-capacities"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every channel listing",
+       "bindsTo": "ChannelListing",
+       "columns": [
+        "ChannelListing.id",
+        "ChannelListing.channelName",
+        "ChannelListing.productId",
+        "ChannelListing.externalProductRef",
+        "ChannelListing.status",
+        "ChannelListing.allocationUnits",
+        "ChannelListing.priceListId",
+        "ChannelListing.adapter",
+        "ChannelListing.adapterCredentialRef",
+        "ChannelListing.pushIntervalMinutes",
+        "ChannelListing.guestDataScope",
+        "ChannelListing.lastPushedAt"
+       ],
+       "operation": "listChannelListings",
+       "provenance": "contract subscription.yaml GET /channel-listings"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every product",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishBundle",
+       "notes": "Declares `publishBundle`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -2025,7 +2927,28 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected channel distribution",
+       "label": "The selected channel capacity",
+       "bindsTo": "ChannelCapacity",
+       "columns": [
+        "ChannelCapacity.id",
+        "ChannelCapacity.performanceId",
+        "ChannelCapacity.name",
+        "ChannelCapacity.seatCategoryId",
+        "ChannelCapacity.oversellAllowance",
+        "ChannelCapacity.oversellBasis",
+        "ChannelCapacity.capacity",
+        "ChannelCapacity.sold",
+        "ChannelCapacity.leased",
+        "ChannelCapacity.remaining",
+        "ChannelCapacity.hasChannelAllocations",
+        "ChannelCapacity.isSeated"
+       ],
+       "operation": "listChannelCapacities",
+       "provenance": "contract catalogue.yaml GET /channel-capacities"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The channel allocation set",
        "bindsTo": "ChannelAllocationSet",
        "columns": [
         "ChannelAllocationSet.channelCapacityId",
@@ -2046,37 +2969,37 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save channel allocations",
        "operation": "setChannelAllocations",
        "provenance": "contract catalogue.yaml PUT /channel-capacities/{channelCapacityId}/channel-allocations"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create channel capacity",
        "operation": "createChannelCapacity",
        "provenance": "contract catalogue.yaml POST /channel-capacities"
       },
       {
        "kind": "secondaryButton",
-       "label": "Release hold",
+       "label": "Release channel allocation",
        "operation": "relinquishChannelAllocation",
        "provenance": "contract catalogue.yaml POST /channel-capacities/{channelCapacityId}/channel-allocations/release"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save channel capacity",
        "operation": "updateChannelCapacity",
        "provenance": "contract catalogue.yaml PATCH /channel-capacities/{channelCapacityId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Publish",
+       "label": "Publish bundle",
        "operation": "publishBundle",
        "provenance": "contract catalogue.yaml POST /catalogue/bundles"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save channel listing",
        "operation": "setChannelListing",
        "provenance": "contract subscription.yaml PUT /channel-listings"
       },
@@ -2087,61 +3010,22 @@
        "provenance": "authored — required by check-screens"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setChannelAllocations",
-       "label": "Save channel allocations",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listChannelCapacities",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setChannelAllocations",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishBundle",
-       "notes": "Declares `publishBundle`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The channel distribution list.",
    "error": "Could not load. Names which read failed and leaves the channel distribution untouched.",
-   "emptyFirstRun": "No channel distribution yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the channel distribution are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No channel distribution yet. Offers Create channel capacity (`createChannelCapacity`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on performanceId and the channel distribution are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getChannelAllocations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "getChannelAllocations",
     "contract": "catalogue",
     "purpose": "Capacity allocated to each channel",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "setChannelAllocations",
@@ -2225,21 +3109,147 @@
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `channelCapacityId`.",
    "preloaded": [
-    "ChannelAllocationSet.channelCapacityId",
-    "ChannelAllocationSet.capacity",
-    "ChannelAllocationSet.allocations",
-    "ChannelAllocationSet.generalPoolUnits",
-    "ChannelAllocationSet.totalSold"
+    "ChannelCapacity.id",
+    "ChannelCapacity.performanceId",
+    "ChannelCapacity.name",
+    "ChannelCapacity.seatCategoryId",
+    "ChannelCapacity.oversellAllowance"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-013",
+   "derivedFrom": "wireframes/reference/Retail Board 5.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetChannelAllocations",
+    "component": "modal",
+    "trigger": "Save channel allocations",
+    "body": "**Collects what `setChannelAllocations` sends before it is called.** Required: `allocations`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save channel allocations",
+     "operation": "setChannelAllocations"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "allocations"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /channel-capacities/{channelCapacityId}/channel-allocations"
+   },
+   {
+    "id": "formCreateChannelCapacity",
+    "component": "modal",
+    "trigger": "Create channel capacity",
+    "body": "**Collects what `createChannelCapacity` sends before it is called.** Required: `performanceId`, `name`, `capacity`. Optional: `seatCategoryId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateEnvelopeRequest",
+    "confirm": {
+     "label": "Create channel capacity",
+     "operation": "createChannelCapacity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "performanceId",
+      "name",
+      "capacity",
+      "seatCategoryId"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /channel-capacities"
+   },
+   {
+    "id": "formRelinquishChannelAllocation",
+    "component": "modal",
+    "trigger": "Release channel allocation",
+    "body": "**Collects what `relinquishChannelAllocation` sends before it is called.** Required: `channels`. Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Release channel allocation",
+     "operation": "relinquishChannelAllocation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "channels",
+      "reason"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /channel-capacities/{channelCapacityId}/channel-allocations/release"
+   },
+   {
+    "id": "formUpdateChannelCapacity",
+    "component": "modal",
+    "trigger": "Save channel capacity",
+    "body": "**Collects what `updateChannelCapacity` sends before it is called.** Nothing in the body is required. Optional: `name`, `capacity`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save channel capacity",
+     "operation": "updateChannelCapacity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "capacity"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PATCH /channel-capacities/{channelCapacityId}"
+   },
+   {
+    "id": "formPublishBundle",
+    "component": "modal",
+    "trigger": "Publish bundle",
+    "body": "**Collects what `publishBundle` sends before it is called.** Required: `venueId`. Optional: `note`, `staleAfterHours`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Publish bundle",
+     "operation": "publishBundle"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "note",
+      "staleAfterHours"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /catalogue/bundles"
+   },
+   {
+    "id": "formSetChannelListing",
+    "component": "modal",
+    "trigger": "Save channel listing",
+    "body": "**Collects what `setChannelListing` sends before it is called.** Required: `id`, `channelName`, `productId`, `status`. Optional: `externalProductRef`, `allocationUnits`, `priceListId`, `adapter`, `adapterCredentialRef`, `pushIntervalMinutes`, `guestDataScope`, `lastPushedAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ChannelListing",
+    "confirm": {
+     "label": "Save channel listing",
+     "operation": "setChannelListing"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "channelName",
+      "productId",
+      "status",
+      "externalProductRef",
+      "allocationUnits",
+      "priceListId",
+      "adapter",
+      "adapterCredentialRef",
+      "pushIntervalMinutes",
+      "guestDataScope",
+      "lastPushedAt",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract subscription.yaml PUT /channel-listings"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2278,42 +3288,33 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-007",
     "BO-008",
     "BO-009"
    ],
    "inferred": true,
    "entryFrom": [
+    "BO-009",
     "BO-102"
    ],
    "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
     {
      "to": "BO-007",
      "trigger": "Product Directory",
      "carries": [
       "productId"
      ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-014 holds productId, so an edge into it carries them"
     },
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
      "carries": [
       "productId",
-      "venueId"
+      "variantId",
+      "version"
      ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-014 holds productId, variantId, version, so an edge into it carries them"
     },
     {
      "to": "BO-009",
@@ -2321,7 +3322,7 @@
      "carries": [
       "priceListId"
      ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-014 holds priceListId, so an edge into it carries them"
     }
    ]
   },
@@ -2334,13 +3335,6 @@
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getProduct` reads one of them — list, select, act",
   "purpose": "Push catalogue changes live, or schedule them.",
-  "gaps": [
-   {
-    "operation": "listAlternativeCodes",
-    "why": "**3 declared operations reach no component on this screen**: listAlternativeCodes, listProductVariants, listPrices. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -2349,8 +3343,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listProducts",
+       "notes": "Sends `?venueId=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listProducts",
+       "notes": "Sends `?kind=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is sellable",
+       "operation": "listProducts",
+       "notes": "Sends `?isSellable=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every catalogue publishing",
+       "label": "Every product",
        "bindsTo": "Product",
        "columns": [
         "Product.id",
@@ -2368,6 +3383,57 @@
        ],
        "operation": "listProducts",
        "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every alternative code",
+       "bindsTo": "AlternativeCode",
+       "columns": [
+        "AlternativeCode.code",
+        "AlternativeCode.partnerId",
+        "AlternativeCode.partnerName",
+        "AlternativeCode.variantId",
+        "AlternativeCode.note"
+       ],
+       "operation": "listAlternativeCodes",
+       "provenance": "contract catalogue.yaml GET /products/{productId}/alternative-codes"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every product variant",
+       "bindsTo": "ProductVariant",
+       "columns": [
+        "ProductVariant.id",
+        "ProductVariant.productId",
+        "ProductVariant.sku",
+        "ProductVariant.axisValues",
+        "ProductVariant.name",
+        "ProductVariant.barcode",
+        "ProductVariant.isDefault",
+        "ProductVariant.isActive"
+       ],
+       "operation": "listProductVariants",
+       "provenance": "contract catalogue.yaml GET /products/{productId}/variants"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every price",
+       "bindsTo": "Price",
+       "columns": [
+        "Price.id",
+        "Price.priceListId",
+        "Price.variantId",
+        "Price.amount",
+        "Price.taxCodeId"
+       ],
+       "operation": "listPrices",
+       "provenance": "contract catalogue.yaml GET /price-lists/{priceListId}/prices"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishBundle",
+       "notes": "Declares `publishBundle`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -2377,7 +3443,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected catalogue publishing",
+       "label": "The selected product",
        "bindsTo": "Product",
        "columns": [
         "Product.id",
@@ -2408,49 +3474,50 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create product",
        "operation": "createProduct",
        "provenance": "contract catalogue.yaml POST /products"
       },
       {
        "kind": "secondaryButton",
-       "label": "Resolve",
+       "label": "Resolve product by code",
        "operation": "resolveProductByCode",
        "provenance": "contract catalogue.yaml GET /products/resolve"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save alternative codes",
        "operation": "setAlternativeCodes",
        "provenance": "contract catalogue.yaml PUT /products/{productId}/alternative-codes"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save product attributes",
        "operation": "setProductAttributes",
        "provenance": "contract catalogue.yaml PUT /products/{productId}/attributes"
       },
       {
        "kind": "secondaryButton",
-       "label": "Transition",
+       "label": "Transition product lifecycle",
        "operation": "transitionProductLifecycle",
+       "notes": "**Approve and publish are guarded separately** (decided 28 September, audit R091 (2)): the Approve transition (review to approved) is offered only to a holder of `PRODUCT_APPROVE`, and Publish (approved to live) only to a holder of `PRODUCT_PUBLISH`; the server refuses the other with 403 transition-permission-required.",
        "provenance": "contract catalogue.yaml POST /products/{productId}/lifecycle"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save product",
        "operation": "updateProduct",
        "provenance": "contract catalogue.yaml PATCH /products/{productId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Publish",
+       "label": "Publish bundle",
        "operation": "publishBundle",
        "provenance": "contract catalogue.yaml POST /catalogue/bundles"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save item availability",
        "operation": "setItemAvailability",
        "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/availability"
       },
@@ -2461,54 +3528,15 @@
        "provenance": "authored — required by check-screens"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listProducts",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createProduct",
-       "label": "Create product",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createProduct",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishBundle",
-       "notes": "Declares `publishBundle`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The catalogue publishing list.",
    "error": "Could not load. Names which read failed and leaves the catalogue publishing untouched.",
-   "emptyFirstRun": "No catalogue publishing yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the catalogue publishing are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No catalogue publishing yet. Offers Create product (`createProduct`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the catalogue publishing are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2521,7 +3549,7 @@
     "operationId": "getProduct",
     "contract": "catalogue",
     "purpose": "Read a product",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createProduct",
@@ -2536,19 +3564,19 @@
     "operationId": "listAlternativeCodes",
     "contract": "catalogue",
     "purpose": "External identifiers for a product",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listProductVariants",
     "contract": "catalogue",
     "purpose": "List generated variants",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "resolveProductByCode",
     "contract": "catalogue",
     "purpose": "Resolve a partner code to a product",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "setAlternativeCodes",
@@ -2643,10 +3671,151 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-014",
+   "derivedFrom": "wireframes/reference/Retail Board 2.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateProduct",
+    "component": "modal",
+    "trigger": "Create product",
+    "body": "**Collects what `createProduct` sends before it is called.** Required: `code`, `name`, `kind`, `venueId`. Optional: `description`, `channels`, `entitlementTemplateId`, `dataMaskValues`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateProductRequest",
+    "confirm": {
+     "label": "Create product",
+     "operation": "createProduct"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "kind",
+      "venueId",
+      "description",
+      "channels",
+      "entitlementTemplateId",
+      "dataMaskValues"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /products"
+   },
+   {
+    "id": "formSetAlternativeCodes",
+    "component": "modal",
+    "trigger": "Save alternative codes",
+    "body": "**Collects what `setAlternativeCodes` sends before it is called.** Required: `codes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save alternative codes",
+     "operation": "setAlternativeCodes"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "codes"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /products/{productId}/alternative-codes"
+   },
+   {
+    "id": "formSetProductAttributes",
+    "component": "modal",
+    "trigger": "Save product attributes",
+    "body": "**Collects what `setProductAttributes` sends before it is called.** Required: `axes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save product attributes",
+     "operation": "setProductAttributes"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "axes"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /products/{productId}/attributes"
+   },
+   {
+    "id": "formTransitionProductLifecycle",
+    "component": "modal",
+    "trigger": "Transition product lifecycle",
+    "body": "**Collects what `transitionProductLifecycle` sends before it is called.** Required: `transition`, `reason`. Optional: `effectiveAt`. The transition picker lists only what the principal may do — approve needs `PRODUCT_APPROVE`, publish needs `PRODUCT_PUBLISH` (decided 28 September, audit R091 (2)). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Transition product lifecycle",
+     "operation": "transitionProductLifecycle"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "transition",
+      "reason",
+      "effectiveAt"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /products/{productId}/lifecycle"
+   },
+   {
+    "id": "formUpdateProduct",
+    "component": "modal",
+    "trigger": "Save product",
+    "body": "**Collects what `updateProduct` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `channels`, `dataMaskValues`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "UpdateProductRequest",
+    "confirm": {
+     "label": "Save product",
+     "operation": "updateProduct"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "description",
+      "channels",
+      "dataMaskValues"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PATCH /products/{productId}"
+   },
+   {
+    "id": "formPublishBundle",
+    "component": "modal",
+    "trigger": "Publish bundle",
+    "body": "**Collects what `publishBundle` sends before it is called.** Required: `venueId`. Optional: `note`, `staleAfterHours`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Publish bundle",
+     "operation": "publishBundle"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "note",
+      "staleAfterHours"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /catalogue/bundles"
+   },
+   {
+    "id": "formSetItemAvailability",
+    "component": "modal",
+    "trigger": "Save item availability",
+    "body": "**Collects what `setItemAvailability` sends before it is called.** Required: `isAvailable`, `recordedAt`. Optional: `reason`, `restoreAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save item availability",
+     "operation": "setItemAvailability"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "isAvailable",
+      "recordedAt",
+      "reason",
+      "restoreAt"
+     ]
+    },
+    "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/availability"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2672,7 +3841,7 @@
  },
  {
   "id": "BO-015",
-  "name": "Session Calendar",
+  "name": "Performance Calendar",
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 1,
@@ -2687,8 +3856,8 @@
    "exitTo": [
     "BO-001",
     "BO-007",
-    "BO-008",
-    "BO-009"
+    "BO-009",
+    "BO-099"
    ],
    "inferred": true,
    "entryFrom": [
@@ -2699,40 +3868,31 @@
      "to": "BO-001",
      "trigger": "Queue Directory",
      "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
+      "eventId"
      ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-015 holds eventId, so an edge into it carries them"
     },
     {
      "to": "BO-007",
      "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-015 holds none of them, so the edge carries nothing and BO-007 opens cold"
     },
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-015 holds none of them, so the edge carries nothing and BO-009 opens cold"
+    },
+    {
+     "to": "BO-099",
+     "trigger": "Performance manifest",
      "carries": [
-      "priceListId"
+      "performanceId"
      ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "stated 28 September — BO-099 Performance Manifest is opened from a Performance (audit R165); the selected performance's id is its path parameter"
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Drawn 26 August** — `Seat Board 2.dc.html` frame `seat-2a`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**",
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Drawn 26 August** — `Seat Board 2.dc.html` frame `seat-2a`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.** **Kept separate from BO-016 (decided 28 September, audit R276)** — this screen lists, creates, changes and cancels performances; the template they are generated from is BO-016 Performance Template.",
   "density": "compact",
   "boardFrames": [
    "Seat Board 2.dc.html#seat-2a"
@@ -2740,13 +3900,6 @@
   "pattern": "listDetail",
   "patternReason": "`listPerformances` reads the population and `getPerformance` reads one of them — list, select, act",
   "purpose": "See what is scheduled and how full it is.",
-  "gaps": [
-   {
-    "operation": "getEvent",
-    "why": "**3 declared operations reach no component on this screen**: getEvent, getSeatAvailability, listEvents. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -2755,8 +3908,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "datePicker",
+       "label": "From",
+       "operation": "listPerformances",
+       "notes": "Sends `?from=` to `listPerformances`.",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
+      },
+      {
+       "kind": "datePicker",
+       "label": "To",
+       "operation": "listPerformances",
+       "notes": "Sends `?to=` to `listPerformances`.",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every session calendar",
+       "label": "Every performance",
        "bindsTo": "Performance",
        "columns": [
         "Performance.id",
@@ -2767,117 +3934,29 @@
         "Performance.requiresApprovalToCancel",
         "Performance.status",
         "Performance.admissionRulesId",
-        "Performance.seatMapId"
+        "Performance.seatMapId",
+        "Performance.language",
+        "Performance.format"
        ],
        "operation": "listPerformances",
        "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected session calendar",
-       "bindsTo": "Performance",
-       "columns": [
-        "Performance.id",
-        "Performance.eventId",
-        "Performance.startsAt",
-        "Performance.endsAt",
-        "Performance.approvalRequestId",
-        "Performance.requiresApprovalToCancel",
-        "Performance.status",
-        "Performance.admissionRulesId",
-        "Performance.seatMapId"
-       ],
-       "operation": "getPerformance",
-       "provenance": "contract catalogue.yaml GET /performances/{performanceId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createPerformances",
-       "provenance": "contract catalogue.yaml POST /events/{eventId}/performances"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Cancel",
-       "operation": "cancelPerformance",
-       "provenance": "contract catalogue.yaml POST /performances/{performanceId}/cancel"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createEvent",
-       "provenance": "contract catalogue.yaml POST /events"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Recommend",
-       "operation": "recommendSeats",
-       "provenance": "contract seating.yaml POST /performances/{performanceId}/seat-recommendations"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updateEvent",
-       "provenance": "contract catalogue.yaml PATCH /events/{eventId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updatePerformance",
-       "provenance": "contract catalogue.yaml PATCH /performances/{performanceId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
       },
       {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listPerformances",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createPerformances",
-       "label": "Create performances",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "cancelPerformance",
-       "label": "Cancel performance",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createPerformances",
-       "provenance": "carried from the previous definition"
+       "label": "Every event",
+       "bindsTo": "Event",
+       "columns": [
+        "Event.id",
+        "Event.code",
+        "Event.name",
+        "Event.venueId",
+        "Event.scopePath",
+        "Event.parentEventId",
+        "Event.performanceCount",
+        "Event.isActive"
+       ],
+       "operation": "listEvents",
+       "provenance": "contract catalogue.yaml GET /events"
       },
       {
        "kind": "confirmDialog",
@@ -2887,6 +3966,106 @@
        "provenance": "carried from the previous definition"
       }
      ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected performance",
+       "bindsTo": "Performance",
+       "columns": [
+        "Performance.id",
+        "Performance.eventId",
+        "Performance.startsAt",
+        "Performance.endsAt",
+        "Performance.approvalRequestId",
+        "Performance.requiresApprovalToCancel",
+        "Performance.status",
+        "Performance.admissionRulesId",
+        "Performance.seatMapId",
+        "Performance.language",
+        "Performance.format"
+       ],
+       "operation": "getPerformance",
+       "provenance": "contract catalogue.yaml GET /performances/{performanceId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The event",
+       "bindsTo": "Event",
+       "columns": [
+        "Event.id",
+        "Event.code",
+        "Event.name",
+        "Event.venueId",
+        "Event.scopePath",
+        "Event.parentEventId",
+        "Event.performanceCount",
+        "Event.isActive"
+       ],
+       "operation": "getEvent",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The seat availability",
+       "bindsTo": "SeatAvailability",
+       "columns": [
+        "SeatAvailability.performanceId",
+        "SeatAvailability.seatMapId",
+        "SeatAvailability.renderMode",
+        "SeatAvailability.totals",
+        "SeatAvailability.byCategory",
+        "SeatAvailability.seats"
+       ],
+       "operation": "getSeatAvailability",
+       "provenance": "contract seating.yaml GET /performances/{performanceId}/seat-availability"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create performances",
+       "operation": "createPerformances",
+       "provenance": "contract catalogue.yaml POST /events/{eventId}/performances"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel performance",
+       "operation": "cancelPerformance",
+       "provenance": "contract catalogue.yaml POST /performances/{performanceId}/cancel"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create event",
+       "operation": "createEvent",
+       "provenance": "contract catalogue.yaml POST /events"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Recommend seats",
+       "operation": "recommendSeats",
+       "provenance": "contract seating.yaml POST /performances/{performanceId}/seat-recommendations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save event",
+       "operation": "updateEvent",
+       "provenance": "contract catalogue.yaml PATCH /events/{eventId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save performance",
+       "operation": "updatePerformance",
+       "provenance": "contract catalogue.yaml PATCH /performances/{performanceId}"
+      }
+     ]
     }
    ]
   },
@@ -2894,24 +4073,133 @@
    {
     "id": "confirmCancelPerformance",
     "component": "confirmDialog",
-    "trigger": "Cancel",
-    "body": "**Names what `cancelPerformance` changes and what it leaves alone**, in the consequence rather than the verb. A session calendar this affects should be identified in the dialog, not just counted.",
+    "trigger": "Cancel performance",
+    "body": "**Names what `cancelPerformance` changes and what it leaves alone**, in the consequence rather than the verb. A session calendar this affects should be identified in the dialog, not just counted. **Collects what `cancelPerformance` sends before it is called.** Required: `reason`. Optional: `guestMessage`, `refundPercentage`, `offerAlternativePerformanceId`, `dryRun`. **A real run needs a supervisor PIN on this device** (`supervisorStepUp` {principalId, credential}); a dry run does not (decided 28 September, audit R144).",
     "provenance": "contract catalogue.yaml POST /performances/{performanceId}/cancel"
+   },
+   {
+    "id": "formCreatePerformances",
+    "component": "modal",
+    "trigger": "Create performances",
+    "body": "**Collects what `createPerformances` sends before it is called.** Required: `startsAt`, `endsAt`. Optional: `admissionRulesId`, `seatMapId`, `language` (BCP 47, e.g. `ar`, `fr`) and `format` (e.g. 2D, 3D, subtitled) for a tour or a screening (decided 29 September, rev 3 REV3-17), `recurrence`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreatePerformancesRequest",
+    "confirm": {
+     "label": "Create performances",
+     "operation": "createPerformances"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "startsAt",
+      "endsAt",
+      "admissionRulesId",
+      "seatMapId",
+      "language",
+      "format",
+      "recurrence"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /events/{eventId}/performances"
+   },
+   {
+    "id": "formCreateEvent",
+    "component": "modal",
+    "trigger": "Create event",
+    "body": "**Collects what `createEvent` sends before it is called.** Required: `code`, `name`, `venueId`. Optional: `parentEventId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateEventRequest",
+    "confirm": {
+     "label": "Create event",
+     "operation": "createEvent"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "venueId",
+      "parentEventId"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /events"
+   },
+   {
+    "id": "formRecommendSeats",
+    "component": "modal",
+    "trigger": "Recommend seats",
+    "body": "**Collects what `recommendSeats` sends before it is called.** Required: `partySize`, `strategy`. Optional: `categoryIds`, `maxPrice`, `accessibleCount`, `maxOptions`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SeatRecommendationRequest",
+    "confirm": {
+     "label": "Recommend seats",
+     "operation": "recommendSeats"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "partySize",
+      "strategy",
+      "categoryIds",
+      "maxPrice",
+      "accessibleCount",
+      "maxOptions"
+     ]
+    },
+    "provenance": "contract seating.yaml POST /performances/{performanceId}/seat-recommendations"
+   },
+   {
+    "id": "formUpdateEvent",
+    "component": "modal",
+    "trigger": "Save event",
+    "body": "**Collects what `updateEvent` sends before it is called.** Nothing in the body is required. Optional: `name`, `parentEventId`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save event",
+     "operation": "updateEvent"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "parentEventId",
+      "isActive"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PATCH /events/{eventId}"
+   },
+   {
+    "id": "formUpdatePerformance",
+    "component": "modal",
+    "trigger": "Save performance",
+    "body": "**Collects what `updatePerformance` sends before it is called.** Nothing in the body is required. Optional: `startsAt`, `endsAt`, `status`, `admissionRulesId`, `language`, `format` (rev 3 REV3-17). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save performance",
+     "operation": "updatePerformance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "startsAt",
+      "endsAt",
+      "status",
+      "admissionRulesId",
+      "language",
+      "format"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PATCH /performances/{performanceId}"
    }
   ],
   "states": {
    "loading": "The session calendar list.",
    "error": "Could not load. Names which read failed and leaves the session calendar untouched.",
-   "emptyFirstRun": "No session calendar yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the session calendar are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No session calendar yet. Offers Create performances (`createPerformances`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on from, to and the session calendar are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listPerformances` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "listPerformances",
     "contract": "catalogue",
     "purpose": "List performances of an event",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getPerformance",
@@ -2950,7 +4238,7 @@
     "operationId": "getEvent",
     "contract": "catalogue",
     "purpose": "Read an event",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getSeatAvailability",
@@ -3016,6 +4304,7 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-015",
+   "derivedFrom": "wireframes/reference/Seat Board 2.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -3044,7 +4333,7 @@
  },
  {
   "id": "BO-016",
-  "name": "Session Template",
+  "name": "Performance Template",
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 1,
@@ -3057,9 +4346,7 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-007",
-    "BO-008",
     "BO-009"
    ],
    "inferred": true,
@@ -3068,57 +4355,25 @@
    ],
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-007",
      "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-016 holds none of them, so the edge carries nothing and BO-007 opens cold"
     },
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-016 holds none of them, so the edge carries nothing and BO-009 opens cold"
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Drawn 26 August** — `Seat Board 2.dc.html` frame `seat-2b`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**",
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Drawn 26 August** — `Seat Board 2.dc.html` frame `seat-2b`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.** **Split from BO-015 on 28 September (audit R276)** — the two carried identical performance and event operations; this screen now owns the performance template (`listPerformanceTemplates`, `setPerformanceTemplate`) and BO-015 keeps the calendar of performances.",
   "density": "compact",
   "boardFrames": [
    "Seat Board 2.dc.html#seat-2b"
   ],
   "pattern": "listDetail",
-  "patternReason": "`listPerformances` reads the population and `getPerformance` reads one of them — list, select, act",
-  "purpose": "Define the pattern the calendar is generated from.",
-  "gaps": [
-   {
-    "operation": "getEvent",
-    "why": "**3 declared operations reach no component on this screen**: getEvent, getSeatAvailability, listEvents. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
+  "patternReason": "`listPerformanceTemplates` reads the population and the selected row is the detail; `setPerformanceTemplate` saves one — list, select, act",
+  "purpose": "Define the pattern the calendar is generated from — slot length, turnaround, concurrent capacity, peak bands and walk-in rules. BO-015 Performance Calendar generates and manages the performances themselves (kept separate, decided 28 September, audit R276).",
   "layout": {
    "template": "split",
    "regions": [
@@ -3128,21 +4383,18 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every session template",
-       "bindsTo": "Performance",
+       "label": "Every performance template",
+       "bindsTo": "PerformanceTemplate",
        "columns": [
-        "Performance.id",
-        "Performance.eventId",
-        "Performance.startsAt",
-        "Performance.endsAt",
-        "Performance.approvalRequestId",
-        "Performance.requiresApprovalToCancel",
-        "Performance.status",
-        "Performance.admissionRulesId",
-        "Performance.seatMapId"
+        "PerformanceTemplate.code",
+        "PerformanceTemplate.name",
+        "PerformanceTemplate.spaceId",
+        "PerformanceTemplate.slotMinutes",
+        "PerformanceTemplate.turnaroundMinutes",
+        "PerformanceTemplate.concurrentCapacity"
        ],
-       "operation": "listPerformances",
-       "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
+       "operation": "listPerformanceTemplates",
+       "provenance": "contract catalogue.yaml GET /performance-templates"
       }
      ]
     },
@@ -3152,21 +4404,21 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected session template",
-       "bindsTo": "Performance",
+       "label": "The selected performance template",
+       "bindsTo": "PerformanceTemplate",
        "columns": [
-        "Performance.id",
-        "Performance.eventId",
-        "Performance.startsAt",
-        "Performance.endsAt",
-        "Performance.approvalRequestId",
-        "Performance.requiresApprovalToCancel",
-        "Performance.status",
-        "Performance.admissionRulesId",
-        "Performance.seatMapId"
+        "PerformanceTemplate.id",
+        "PerformanceTemplate.code",
+        "PerformanceTemplate.name",
+        "PerformanceTemplate.spaceId",
+        "PerformanceTemplate.slotMinutes",
+        "PerformanceTemplate.turnaroundMinutes",
+        "PerformanceTemplate.concurrentCapacity",
+        "PerformanceTemplate.bands",
+        "PerformanceTemplate.walkIn"
        ],
-       "operation": "getPerformance",
-       "provenance": "contract catalogue.yaml GET /performances/{performanceId}"
+       "operation": "listPerformanceTemplates",
+       "provenance": "contract catalogue.yaml GET /performance-templates"
       }
      ]
     },
@@ -3176,221 +4428,74 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createPerformances",
-       "provenance": "contract catalogue.yaml POST /events/{eventId}/performances"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Cancel",
-       "operation": "cancelPerformance",
-       "provenance": "contract catalogue.yaml POST /performances/{performanceId}/cancel"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createEvent",
-       "provenance": "contract catalogue.yaml POST /events"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Recommend",
-       "operation": "recommendSeats",
-       "provenance": "contract seating.yaml POST /performances/{performanceId}/seat-recommendations"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updateEvent",
-       "provenance": "contract catalogue.yaml PATCH /events/{eventId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updatePerformance",
-       "provenance": "contract catalogue.yaml PATCH /performances/{performanceId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listPerformances",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createPerformances",
-       "label": "Create performances",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "cancelPerformance",
-       "label": "Cancel performance",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createPerformances",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
+       "label": "Save performance template",
+       "operation": "setPerformanceTemplate",
+       "provenance": "contract catalogue.yaml PUT /performance-templates"
       }
      ]
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "confirmCancelPerformance",
-    "component": "confirmDialog",
-    "trigger": "Cancel",
-    "body": "**Names what `cancelPerformance` changes and what it leaves alone**, in the consequence rather than the verb. A session template this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract catalogue.yaml POST /performances/{performanceId}/cancel"
-   }
-  ],
   "states": {
-   "loading": "The session template list.",
-   "error": "Could not load. Names which read failed and leaves the session template untouched.",
-   "emptyFirstRun": "No session template yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the session template are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The performance template list.",
+   "error": "Could not load. Names which read failed and leaves the performance templates untouched.",
+   "emptyFirstRun": "No performance template yet. Offers Save performance template (`setPerformanceTemplate`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Never shown: `listPerformanceTemplates` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PERFORMANCE_CONFIGURE`, which `listPerformanceTemplates` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "listPerformances",
+    "operationId": "listPerformanceTemplates",
     "contract": "catalogue",
-    "purpose": "List performances of an event",
+    "purpose": "Slot templates, peak bands and walk-in rules",
     "trigger": "onLoad"
    },
    {
-    "operationId": "getPerformance",
+    "operationId": "setPerformanceTemplate",
     "contract": "catalogue",
-    "purpose": "Read a performance",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createPerformances",
-    "contract": "catalogue",
-    "purpose": "Create performances, singly or by schedule",
+    "purpose": "Create or change a performance template",
     "trigger": "onAction",
     "invalidates": [
-     "listPerformances"
-    ]
-   },
-   {
-    "operationId": "cancelPerformance",
-    "contract": "catalogue",
-    "purpose": "Cancel a performance",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   },
-   {
-    "operationId": "createEvent",
-    "contract": "catalogue",
-    "purpose": "Create an event",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   },
-   {
-    "operationId": "getEvent",
-    "contract": "catalogue",
-    "purpose": "Read an event",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getSeatAvailability",
-    "contract": "seating",
-    "purpose": "Seat status for a performance",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listEvents",
-    "contract": "catalogue",
-    "purpose": "List events",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "recommendSeats",
-    "contract": "seating",
-    "purpose": "Recommend seats for a party",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   },
-   {
-    "operationId": "updateEvent",
-    "contract": "catalogue",
-    "purpose": "Amend an event",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   },
-   {
-    "operationId": "updatePerformance",
-    "contract": "catalogue",
-    "purpose": "Amend a performance",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
+     "listPerformanceTemplates"
     ]
    }
   ],
-  "entryState": {
-   "params": [
-    {
-     "name": "eventId",
-     "from": "deepLink"
-    },
-    {
-     "name": "performanceId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A link to a performance that has happened.** Offers the next performance of the same event.",
-   "preloaded": [
-    "Performance.id",
-    "Performance.eventId",
-    "Performance.startsAt",
-    "Performance.endsAt",
-    "Performance.approvalRequestId"
-   ]
-  },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-016",
+   "derivedFrom": "wireframes/reference/Seat Board 2.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 28 September 2026 on performance templates (audit R276). Until then it was a clone of BO-015 carrying the same 11 performance and event operations; those stay on BO-015.",
+  "overlays": [
+   {
+    "id": "formSetPerformanceTemplate",
+    "component": "modal",
+    "trigger": "Save performance template",
+    "body": "**Collects what `setPerformanceTemplate` sends before it is called.** Required: `code`. Optional: `id`, `name`, `spaceId`, `slotMinutes`, `turnaroundMinutes`, `concurrentCapacity`, `bands`, `walkIn`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PerformanceTemplate",
+    "confirm": {
+     "label": "Save performance template",
+     "operation": "setPerformanceTemplate"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "spaceId",
+      "slotMinutes",
+      "turnaroundMinutes",
+      "concurrentCapacity",
+      "bands",
+      "walkIn"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /performance-templates"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -3429,9 +4534,7 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-007",
-    "BO-008",
     "BO-009"
    ],
    "inferred": true,
@@ -3440,39 +4543,14 @@
    ],
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-007",
      "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-017 holds none of them, so the edge carries nothing and BO-007 opens cold"
     },
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-017 holds none of them, so the edge carries nothing and BO-009 opens cold"
     }
    ]
   },
@@ -3480,7 +4558,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listChannelCapacities` reads the population and `getChannelAllocations` reads one of them — list, select, act",
-  "purpose": "Change how many people a session can take.",
+  "purpose": "Change how many people a performance can take (renamed from session, decided 28 September, audit R165).",
   "layout": {
    "template": "split",
    "regions": [
@@ -3489,8 +4567,15 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Performance id",
+       "operation": "listChannelCapacities",
+       "notes": "Sends `?performanceId=` to `listChannelCapacities`.",
+       "provenance": "contract catalogue.yaml GET /channel-capacities"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every capacity",
+       "label": "Every channel capacity",
        "bindsTo": "ChannelCapacity",
        "columns": [
         "ChannelCapacity.id",
@@ -3517,7 +4602,28 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected capacity",
+       "label": "The selected channel capacity",
+       "bindsTo": "ChannelCapacity",
+       "columns": [
+        "ChannelCapacity.id",
+        "ChannelCapacity.performanceId",
+        "ChannelCapacity.name",
+        "ChannelCapacity.seatCategoryId",
+        "ChannelCapacity.oversellAllowance",
+        "ChannelCapacity.oversellBasis",
+        "ChannelCapacity.capacity",
+        "ChannelCapacity.sold",
+        "ChannelCapacity.leased",
+        "ChannelCapacity.remaining",
+        "ChannelCapacity.hasChannelAllocations",
+        "ChannelCapacity.isSeated"
+       ],
+       "operation": "listChannelCapacities",
+       "provenance": "contract catalogue.yaml GET /channel-capacities"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The channel allocation set",
        "bindsTo": "ChannelAllocationSet",
        "columns": [
         "ChannelAllocationSet.channelCapacityId",
@@ -3538,60 +4644,27 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create channel capacity",
        "operation": "createChannelCapacity",
        "provenance": "contract catalogue.yaml POST /channel-capacities"
       },
       {
        "kind": "secondaryButton",
-       "label": "Release hold",
+       "label": "Release channel allocation",
        "operation": "relinquishChannelAllocation",
        "provenance": "contract catalogue.yaml POST /channel-capacities/{channelCapacityId}/channel-allocations/release"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save channel allocations",
        "operation": "setChannelAllocations",
        "provenance": "contract catalogue.yaml PUT /channel-capacities/{channelCapacityId}/channel-allocations"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save channel capacity",
        "operation": "updateChannelCapacity",
        "provenance": "contract catalogue.yaml PATCH /channel-capacities/{channelCapacityId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listChannelCapacities",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createChannelCapacity",
-       "label": "Create envelope",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createChannelCapacity",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -3600,9 +4673,9 @@
   "states": {
    "loading": "The capacity list.",
    "error": "Could not load. Names which read failed and leaves the capacity untouched.",
-   "emptyFirstRun": "No capacity yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the capacity are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No capacity yet. Offers Create channel capacity (`createChannelCapacity`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on performanceId and the capacity are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -3615,7 +4688,7 @@
     "operationId": "getChannelAllocations",
     "contract": "catalogue",
     "purpose": "Capacity allocated to each channel",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createChannelCapacity",
@@ -3652,6 +4725,25 @@
     "invalidates": [
      "listChannelCapacities"
     ]
+   },
+   {
+    "operationId": "listWaitlistEntries",
+    "contract": "catalogue",
+    "purpose": "Guests waiting for capacity",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "offerWaitlistCapacity",
+    "contract": "catalogue",
+    "purpose": "Tell a waiting guest that capacity appeared",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listChannelCapacities",
+     "getChannelAllocations",
+     "listWaitlistEntries"
+    ]
    }
   ],
   "entryState": {
@@ -3659,15 +4751,19 @@
     {
      "name": "channelCapacityId",
      "from": "deepLink"
+    },
+    {
+     "name": "entryId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `channelCapacityId`.",
    "preloaded": [
-    "ChannelAllocationSet.channelCapacityId",
-    "ChannelAllocationSet.capacity",
-    "ChannelAllocationSet.allocations",
-    "ChannelAllocationSet.generalPoolUnits",
-    "ChannelAllocationSet.totalSold"
+    "ChannelCapacity.id",
+    "ChannelCapacity.performanceId",
+    "ChannelCapacity.name",
+    "ChannelCapacity.seatCategoryId",
+    "ChannelCapacity.oversellAllowance"
    ]
   },
   "wireframe": {
@@ -3676,6 +4772,82 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-017"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateChannelCapacity",
+    "component": "modal",
+    "trigger": "Create channel capacity",
+    "body": "**Collects what `createChannelCapacity` sends before it is called.** Required: `performanceId`, `name`, `capacity`. Optional: `seatCategoryId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateEnvelopeRequest",
+    "confirm": {
+     "label": "Create channel capacity",
+     "operation": "createChannelCapacity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "performanceId",
+      "name",
+      "capacity",
+      "seatCategoryId"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /channel-capacities"
+   },
+   {
+    "id": "formRelinquishChannelAllocation",
+    "component": "modal",
+    "trigger": "Release channel allocation",
+    "body": "**Collects what `relinquishChannelAllocation` sends before it is called.** Required: `channels`. Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Release channel allocation",
+     "operation": "relinquishChannelAllocation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "channels",
+      "reason"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /channel-capacities/{channelCapacityId}/channel-allocations/release"
+   },
+   {
+    "id": "formSetChannelAllocations",
+    "component": "modal",
+    "trigger": "Save channel allocations",
+    "body": "**Collects what `setChannelAllocations` sends before it is called.** Required: `allocations`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save channel allocations",
+     "operation": "setChannelAllocations"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "allocations"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /channel-capacities/{channelCapacityId}/channel-allocations"
+   },
+   {
+    "id": "formUpdateChannelCapacity",
+    "component": "modal",
+    "trigger": "Save channel capacity",
+    "body": "**Collects what `updateChannelCapacity` sends before it is called.** Nothing in the body is required. Optional: `name`, `capacity`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save channel capacity",
+     "operation": "updateChannelCapacity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "capacity"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PATCH /channel-capacities/{channelCapacityId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

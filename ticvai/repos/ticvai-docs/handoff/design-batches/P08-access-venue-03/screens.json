@@ -16,7 +16,8 @@
     "BO-095"
    ],
    "exitTo": [
-    "BO-097"
+    "BO-097",
+    "BO-099"
    ],
    "transitions": [
     {
@@ -24,6 +25,11 @@
      "trigger": "The guest arrives;",
      "provenance": "flow F25 step 3→4",
      "operation": "bookResource"
+    },
+    {
+     "to": "BO-099",
+     "trigger": "Performance Manifest",
+     "provenance": "derived — BO-099 declares entryState.params performanceId and BO-096 holds none of them, so the edge carries nothing and BO-099 opens cold"
     }
    ]
   },
@@ -41,7 +47,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected resource calendar",
+       "label": "The resource availability",
        "bindsTo": "ResourceAvailability",
        "columns": [
         "ResourceAvailability.resourceId",
@@ -50,25 +56,7 @@
        ],
        "operation": "getResourceAvailability",
        "provenance": "contract resources.yaml GET /resources/{resourceId}/availability"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Book",
-       "operation": "bookResource",
-       "provenance": "contract resources.yaml POST /resource-bookings"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+      },
       {
        "kind": "timeline",
        "bindsTo": "ResourceAvailability",
@@ -84,6 +72,18 @@
        "kind": "banner",
        "notes": "Conflicts, named with times. *Not available* on something a guest can see is not an answer",
        "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Book resource",
+       "operation": "bookResource",
+       "provenance": "contract resources.yaml POST /resource-bookings"
       }
      ]
     }
@@ -125,6 +125,31 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-096"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formBookResource",
+    "component": "modal",
+    "trigger": "Book resource",
+    "body": "**Collects what `bookResource` sends before it is called.** Required: `from`, `to`. Optional: `resourceId`, `resourceKind`, `subjectId`, `orderId`, `recurrence`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Book resource",
+     "operation": "bookResource"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "from",
+      "to",
+      "resourceId",
+      "resourceKind",
+      "subjectId",
+      "orderId",
+      "recurrence"
+     ]
+    },
+    "provenance": "contract resources.yaml POST /resource-bookings"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -178,7 +203,7 @@
      "carries": [
       "resourceId"
      ],
-     "provenance": "derived — BO-096 declares entryState.params resourceId, so an edge into it must carry them"
+     "provenance": "derived — BO-096 declares entryState.params resourceId and BO-097 holds resourceId, so an edge into it carries them"
     }
    ]
   },
@@ -211,43 +236,7 @@
        "label": "scale",
        "bindsTo": "Money.scale",
        "provenance": "contract resources.yaml POST /resource-bookings/{bookingId}/check-out"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Check",
-       "operation": "checkOutResource",
-       "provenance": "contract resources.yaml POST /resource-bookings/{bookingId}/check-out"
       },
-      {
-       "kind": "secondaryButton",
-       "label": "Check",
-       "operation": "checkInResource",
-       "provenance": "contract resources.yaml POST /resource-bookings/{bookingId}/check-in"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Authorise",
-       "operation": "authoriseStoredValue",
-       "provenance": "contract orders.yaml POST /stored-value/authorisations"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Release hold",
-       "operation": "relinquishStoredValue",
-       "provenance": "contract orders.yaml POST /stored-value/authorisations/{authorisationId}/release"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
       {
        "kind": "textField",
        "label": "Condition note",
@@ -268,6 +257,42 @@
        "kind": "secondaryButton",
        "label": "Check in",
        "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Check out resource",
+       "operation": "checkOutResource",
+       "provenance": "contract resources.yaml POST /resource-bookings/{bookingId}/check-out"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Check in resource",
+       "operation": "checkInResource",
+       "provenance": "contract resources.yaml POST /resource-bookings/{bookingId}/check-in"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Authorise stored value",
+       "operation": "authoriseStoredValue",
+       "provenance": "contract orders.yaml POST /stored-value/authorisations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Release stored value",
+       "operation": "relinquishStoredValue",
+       "provenance": "contract orders.yaml POST /stored-value/authorisations/{authorisationId}/release"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Capture stored value",
+       "operation": "captureStoredValue",
+       "provenance": "contract orders.yaml POST /stored-value/authorisations/{authorisationId}/capture"
       }
      ]
     }
@@ -304,6 +329,16 @@
     "contract": "orders",
     "purpose": "Release it",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "captureStoredValue",
+    "contract": "orders",
+    "purpose": "Take some or all of the held balance",
+    "trigger": "onAction",
+    "provenance": "wiring gap, 19 September 2026 — the screen showed the noun and could not act on it",
+    "invalidates": [
+     "getStoredValueAuthorisation"
+    ]
    }
   ],
   "entryState": {
@@ -325,6 +360,67 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-097"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCaptureStoredValue",
+    "component": "modal",
+    "trigger": "Capture stored value",
+    "body": "**Collects what `captureStoredValue` sends before it is called.** Required: `amount`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Capture stored value",
+     "operation": "captureStoredValue"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "amount"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /stored-value/authorisations/{authorisationId}/capture"
+   },
+   {
+    "id": "formCheckInResource",
+    "component": "modal",
+    "trigger": "Check in resource",
+    "body": "**Collects what `checkInResource` sends before it is called.** Required: `condition`, `recordedAt`. Optional: `captureAmount`, `note`, `blockFurtherBookings`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Check in resource",
+     "operation": "checkInResource"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "condition",
+      "recordedAt",
+      "captureAmount",
+      "note",
+      "blockFurtherBookings"
+     ]
+    },
+    "provenance": "contract resources.yaml POST /resource-bookings/{bookingId}/check-in"
+   },
+   {
+    "id": "formAuthoriseStoredValue",
+    "component": "modal",
+    "trigger": "Authorise stored value",
+    "body": "**Collects what `authoriseStoredValue` sends before it is called.** Required: `kind`, `instrumentId`, `amount`. Optional: `reference`, `holdSeconds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Authorise stored value",
+     "operation": "authoriseStoredValue"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "instrumentId",
+      "amount",
+      "reference",
+      "holdSeconds"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /stored-value/authorisations"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -423,25 +519,7 @@
        "label": "scopePath",
        "bindsTo": "Qualification.scopePath",
        "provenance": "contract resources.yaml PUT /resources/{resourceId}/qualifications"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save changes",
-       "operation": "setResourceQualifications",
-       "provenance": "contract resources.yaml PUT /resources/{resourceId}/qualifications"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+      },
       {
        "kind": "dataTable",
        "bindsTo": "Qualification[]",
@@ -452,6 +530,18 @@
        "kind": "banner",
        "notes": "Expired qualifications held by staff on today rota",
        "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save resource qualifications",
+       "operation": "setResourceQualifications",
+       "provenance": "contract resources.yaml PUT /resources/{resourceId}/qualifications"
       }
      ]
     }
@@ -511,7 +601,7 @@
  },
  {
   "id": "BO-099",
-  "name": "Session Manifest",
+  "name": "Performance Manifest",
   "module": "Access & Venue",
   "requiresModule": "resources",
   "wave": 2,
@@ -523,10 +613,12 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-096"
+    "BO-096",
+    "BO-015"
    ],
    "exitTo": [
-    "BO-096"
+    "BO-096",
+    "BO-015"
    ],
    "inferred": false,
    "notes": "**Returns to BO-096.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
@@ -534,18 +626,24 @@
     {
      "to": "BO-096",
      "trigger": "Resource Calendar",
+     "provenance": "derived — BO-096 declares entryState.params resourceId and BO-099 holds none of them, so the edge carries nothing and BO-096 opens cold"
+    },
+    {
+     "to": "BO-015",
+     "trigger": "Back to Performance Calendar",
      "carries": [
-      "resourceId"
+      "performanceId"
      ],
-     "provenance": "derived — BO-096 declares entryState.params resourceId, so an edge into it must carry them"
+     "back": true,
+     "provenance": "stated 28 September — the manifest is opened from a Performance (audit R165), so the return goes to the calendar holding that performance"
     }
    ]
   },
   "notes": "CF-125, CF-129. Distinct from duration, which variants already handle.",
   "density": "compact",
   "pattern": "statusTracker",
-  "patternReason": "`getSessionManifest` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "Who is in a session, in what order.",
+  "patternReason": "`getPerformanceManifest` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Who is in a performance, in what order. Opened from a Performance (renamed from session, decided 28 September, audit R165).",
   "layout": {
    "template": "detail",
    "regions": [
@@ -555,42 +653,24 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected session manifest",
-       "bindsTo": "SessionParticipant",
+       "label": "The performance participant",
+       "bindsTo": "PerformanceParticipant",
        "columns": [
-        "SessionParticipant.id",
-        "SessionParticipant.sessionId",
-        "SessionParticipant.subjectId",
-        "SessionParticipant.position",
-        "SessionParticipant.experienceLevel",
-        "SessionParticipant.packageName",
-        "SessionParticipant.notes",
-        "SessionParticipant.hasSignedWaiver"
+        "PerformanceParticipant.id",
+        "PerformanceParticipant.performanceId",
+        "PerformanceParticipant.subjectId",
+        "PerformanceParticipant.position",
+        "PerformanceParticipant.experienceLevel",
+        "PerformanceParticipant.packageName",
+        "PerformanceParticipant.notes",
+        "PerformanceParticipant.hasSignedWaiver"
        ],
-       "operation": "getSessionManifest",
-       "provenance": "contract resources.yaml GET /sessions/{sessionId}/manifest"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Reorder",
-       "operation": "reorderSessionManifest",
-       "provenance": "contract resources.yaml PUT /sessions/{sessionId}/manifest"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+       "operation": "getPerformanceManifest",
+       "provenance": "contract resources.yaml GET /performances/{performanceId}/manifest"
+      },
       {
        "kind": "dataTable",
-       "bindsTo": "SessionParticipant[]",
+       "bindsTo": "PerformanceParticipant[]",
        "notes": "Drag to reorder. **The running order is operational** — an instructor takes beginners first, and booking order puts one between two advanced riders",
        "provenance": "carried from the previous definition"
       },
@@ -600,26 +680,38 @@
        "provenance": "carried from the previous definition"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Reorder performance manifest",
+       "operation": "reorderPerformanceManifest",
+       "provenance": "contract resources.yaml PUT /performances/{performanceId}/manifest"
+      }
+     ]
     }
    ]
   },
   "states": {
    "loading": "Participants in running order",
    "error": "Could not load the manifest.",
-   "emptyFirstRun": "Nobody booked into this session yet.",
+   "emptyFirstRun": "Nobody booked into this performance yet.",
    "emptyNoResults": "No participants match.",
    "emptyNoAccess": "You do not have RESOURCE_VIEW.",
    "offline": "The cached manifest. **An instructor at the water edge needs this more than anyone**, and that is where the signal is worst."
   },
   "apis": [
    {
-    "operationId": "getSessionManifest",
+    "operationId": "getPerformanceManifest",
     "contract": "resources",
     "purpose": "The manifest",
     "trigger": "onLoad"
    },
    {
-    "operationId": "reorderSessionManifest",
+    "operationId": "reorderPerformanceManifest",
     "contract": "resources",
     "purpose": "Change the order",
     "trigger": "onAction"
@@ -628,11 +720,11 @@
   "entryState": {
    "params": [
     {
-     "name": "sessionId",
-     "from": "session"
+     "name": "performanceId",
+     "from": "BO-015"
     }
    ],
-   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case."
+   "coldEntry": "**Opened from a Performance** (decided 28 September, audit R165) — BO-015 Performance Calendar supplies `performanceId`, the path parameter of `getPerformanceManifest` and `reorderPerformanceManifest`. Without one the screen says which performance is missing and returns to the calendar."
   },
   "wireframe": {
    "status": "notStarted",
@@ -640,6 +732,26 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-099"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formReorderPerformanceManifest",
+    "component": "modal",
+    "trigger": "Reorder performance manifest",
+    "body": "**Collects what `reorderPerformanceManifest` sends before it is called.** Required: `order`, `recordedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reorder performance manifest",
+     "operation": "reorderPerformanceManifest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "order",
+      "recordedAt"
+     ]
+    },
+    "provenance": "contract resources.yaml PUT /performances/{performanceId}/manifest"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -709,49 +821,27 @@
     {
      "to": "BO-001",
      "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-103 holds none of them, so the edge carries nothing and BO-001 opens cold"
     },
     {
      "to": "BO-002",
      "trigger": "Queue Configuration",
-     "carries": [
-      "performanceId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-002 declares entryState.params performanceId, queueId, so an edge into it must carry them"
+     "provenance": "derived — BO-002 declares entryState.params performanceId, queueId and BO-103 holds none of them, so the edge carries nothing and BO-002 opens cold"
     },
     {
      "to": "BO-003",
      "trigger": "Queue Integration Setup",
-     "carries": [
-      "feedId",
-      "orderId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-003 declares entryState.params feedId, orderId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-003 declares entryState.params feedId, orderId and BO-103 holds none of them, so the edge carries nothing and BO-003 opens cold"
     },
     {
      "to": "BO-004",
      "trigger": "Manual Wait Time Entry",
-     "carries": [
-      "queueId",
-      "refundId"
-     ],
-     "provenance": "derived — BO-004 declares entryState.params queueId, refundId, so an edge into it must carry them"
+     "provenance": "derived — BO-004 declares entryState.params queueId, refundId and BO-103 holds none of them, so the edge carries nothing and BO-004 opens cold"
     },
     {
      "to": "BO-005",
      "trigger": "Queue Monitor",
-     "carries": [
-      "campaignId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-005 declares entryState.params campaignId, queueId, so an edge into it must carry them"
+     "provenance": "derived — BO-005 declares entryState.params campaignId, queueId and BO-103 holds none of them, so the edge carries nothing and BO-005 opens cold"
     },
     {
      "to": "BO-006",
@@ -759,33 +849,22 @@
      "carries": [
       "accessPointId"
      ],
-     "provenance": "derived — BO-006 declares entryState.params accessPointId, so an edge into it must carry them"
+     "provenance": "derived — BO-006 declares entryState.params accessPointId and BO-103 holds accessPointId, so an edge into it carries them"
     },
     {
      "to": "BO-030",
      "trigger": "Work Order Verification",
-     "carries": [
-      "venueId",
-      "workOrderId"
-     ],
-     "provenance": "derived — BO-030 declares entryState.params venueId, workOrderId, so an edge into it must carry them"
+     "provenance": "derived — BO-030 declares entryState.params workOrderId and BO-103 holds none of them, so the edge carries nothing and BO-030 opens cold"
     },
     {
      "to": "BO-031",
      "trigger": "Asset Register",
-     "carries": [
-      "assetId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-031 declares entryState.params assetId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-031 declares entryState.params assetId and BO-103 holds none of them, so the edge carries nothing and BO-031 opens cold"
     },
     {
      "to": "BO-032",
      "trigger": "Admission Profiles",
-     "carries": [
-      "profileId"
-     ],
-     "provenance": "derived — BO-032 declares entryState.params profileId, so an edge into it must carry them"
+     "provenance": "derived — BO-032 declares entryState.params profileId, ruleId and BO-103 holds none of them, so the edge carries nothing and BO-032 opens cold"
     },
     {
      "to": "BO-033",
@@ -793,90 +872,57 @@
      "carries": [
       "mediaCode"
      ],
-     "provenance": "derived — BO-033 declares entryState.params mediaCode, so an edge into it must carry them"
+     "provenance": "derived — BO-033 declares entryState.params mediaCode and BO-103 holds mediaCode, so an edge into it carries them"
     },
     {
      "to": "BO-038",
      "trigger": "Reconciliation Queue",
-     "carries": [
-      "queueId"
-     ],
-     "provenance": "derived — BO-038 declares entryState.params queueId, so an edge into it must carry them"
+     "provenance": "derived — BO-038 declares entryState.params queueId and BO-103 holds none of them, so the edge carries nothing and BO-038 opens cold"
     },
     {
      "to": "BO-069",
      "trigger": "Asset Register",
-     "carries": [
-      "assetId",
-      "gameId"
-     ],
-     "provenance": "derived — BO-069 declares entryState.params assetId, gameId, so an edge into it must carry them"
+     "provenance": "derived — BO-069 declares entryState.params assetId, gameId and BO-103 holds none of them, so the edge carries nothing and BO-069 opens cold"
     },
     {
      "to": "BO-071",
      "trigger": "Planned Maintenance",
-     "carries": [
-      "roleId"
-     ],
-     "provenance": "derived — BO-071 declares entryState.params roleId, so an edge into it must carry them"
+     "provenance": "derived — BO-071 declares entryState.params roleId and BO-103 holds none of them, so the edge carries nothing and BO-071 opens cold"
     },
     {
      "to": "BO-072",
      "trigger": "Incident Log",
-     "carries": [
-      "incidentId"
-     ],
-     "provenance": "derived — BO-072 declares entryState.params incidentId, so an edge into it must carry them"
+     "provenance": "derived — BO-072 declares entryState.params incidentId and BO-103 holds none of them, so the edge carries nothing and BO-072 opens cold"
     },
     {
      "to": "BO-093",
      "trigger": "Map Import & Labelling",
-     "carries": [
-      "mapId"
-     ],
-     "provenance": "derived — BO-093 declares entryState.params mapId, so an edge into it must carry them"
+     "provenance": "derived — BO-093 declares entryState.params jobId, mapId and BO-103 holds none of them, so the edge carries nothing and BO-093 opens cold"
     },
     {
      "to": "BO-094",
      "trigger": "Map Editor & Publish",
-     "carries": [
-      "mapId",
-      "pathId"
-     ],
-     "provenance": "derived — BO-094 declares entryState.params mapId, pathId, so an edge into it must carry them"
+     "provenance": "derived — BO-094 declares entryState.params mapId, pathId and BO-103 holds none of them, so the edge carries nothing and BO-094 opens cold"
     },
     {
      "to": "BO-096",
      "trigger": "Resource Calendar",
-     "carries": [
-      "resourceId"
-     ],
-     "provenance": "derived — BO-096 declares entryState.params resourceId, so an edge into it must carry them"
+     "provenance": "derived — BO-096 declares entryState.params resourceId and BO-103 holds none of them, so the edge carries nothing and BO-096 opens cold"
     },
     {
      "to": "BO-097",
      "trigger": "Check Out & Check In",
-     "carries": [
-      "authorisationId",
-      "bookingId"
-     ],
-     "provenance": "derived — BO-097 declares entryState.params authorisationId, bookingId, so an edge into it must carry them"
+     "provenance": "derived — BO-097 declares entryState.params authorisationId, bookingId and BO-103 holds none of them, so the edge carries nothing and BO-097 opens cold"
     },
     {
      "to": "BO-098",
      "trigger": "Qualifications",
-     "carries": [
-      "resourceId"
-     ],
-     "provenance": "derived — BO-098 declares entryState.params resourceId, so an edge into it must carry them"
+     "provenance": "derived — BO-098 declares entryState.params resourceId and BO-103 holds none of them, so the edge carries nothing and BO-098 opens cold"
     },
     {
      "to": "BO-099",
-     "trigger": "Session Manifest",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — BO-099 declares entryState.params sessionId, so an edge into it must carry them"
+     "trigger": "Performance Manifest",
+     "provenance": "derived — BO-099 declares entryState.params performanceId and BO-103 holds none of them, so the edge carries nothing and BO-099 opens cold"
     }
    ]
   },
@@ -884,14 +930,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listAccessPoints` reads the population and `getVenueSettings` reads one of them — list, select, act",
-  "purpose": "Everything in access & venue, and what in it needs attention.",
-  "gaps": [
-   {
-    "operation": "listScans",
-    "why": "**1 declared operation reach no component on this screen**: listScans. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
+  "purpose": "Everything in access & venue.",
   "layout": {
    "template": "split",
    "regions": [
@@ -900,8 +939,15 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listAccessPoints",
+       "notes": "Sends `?venueId=` to `listAccessPoints`.",
+       "provenance": "contract access.yaml GET /access-points"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every access venue",
+       "label": "Every access point",
        "bindsTo": "AccessPoint",
        "columns": [
         "AccessPoint.id",
@@ -919,6 +965,54 @@
        ],
        "operation": "listAccessPoints",
        "provenance": "contract access.yaml GET /access-points"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every scan event",
+       "bindsTo": "ScanEvent",
+       "columns": [
+        "ScanEvent.id",
+        "ScanEvent.accessPointId",
+        "ScanEvent.venueId",
+        "ScanEvent.scopePath",
+        "ScanEvent.ticketId",
+        "ScanEvent.mediaCode",
+        "ScanEvent.outcome",
+        "ScanEvent.denyReason",
+        "ScanEvent.direction",
+        "ScanEvent.operatorPrincipalId",
+        "ScanEvent.deviceId",
+        "ScanEvent.overridesScanId"
+       ],
+       "operation": "listScans",
+       "provenance": "contract access.yaml GET /access/scans"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Takings and admissions today",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.code",
+        "KpiValue.name",
+        "KpiValue.value",
+        "KpiValue.period",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ],
+       "operation": "getKpiValues",
+       "notes": "**Takings and admissions**, from `getKpiValues?kpiCodes=takings,admissions`; with no `period` the period is today in the venue's time zone (decided 28 September, audit R283).",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      },
+      {
+       "kind": "cardList",
+       "bindsTo": "screens",
+       "notes": "24 screens. **No attention counts** until a summary operation exists to supply them (decided 28 September, audit R283).",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search access & venue",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -928,35 +1022,46 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected access venue",
+       "label": "The selected access point",
+       "bindsTo": "AccessPoint",
+       "columns": [
+        "AccessPoint.id",
+        "AccessPoint.code",
+        "AccessPoint.name",
+        "AccessPoint.venueId",
+        "AccessPoint.scopePath",
+        "AccessPoint.externalCredentialSources",
+        "AccessPoint.scanAnomalyRules",
+        "AccessPoint.operatingMode",
+        "AccessPoint.vehicleLocationCapture",
+        "AccessPoint.mode",
+        "AccessPoint.direction",
+        "AccessPoint.antiPassbackEnabled",
+        "AccessPoint.requiresExitBeforeReentry",
+        "AccessPoint.driver",
+        "AccessPoint.geofence",
+        "AccessPoint.isActive"
+       ],
+       "operation": "listAccessPoints",
+       "provenance": "contract access.yaml GET /access-points"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The venue settings",
        "bindsTo": "VenueSettings",
        "columns": [
         "VenueSettings.id",
         "VenueSettings.venueId",
+        "VenueSettings.currencyCode",
+        "VenueSettings.currencyScale",
         "VenueSettings.supportHours",
         "VenueSettings.quietHours",
+        "VenueSettings.biometrics",
         "VenueSettings.segregatedAccess",
         "VenueSettings.alerting"
        ],
        "operation": "getVenueSettings",
        "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "cardList",
-       "bindsTo": "screens",
-       "notes": "24 screens, each with what needs attention.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "searchField",
-       "label": "Search access & venue",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -970,6 +1075,12 @@
    "emptyNoAccess": "You do not have permission for access & venue. **Said plainly** — an empty section reads as broken."
   },
   "apis": [
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Today's takings and admissions tiles — `kpiCodes=takings,admissions`, period defaulting to today (decided 28 September, audit R283)",
+    "trigger": "onLoad"
+   },
    {
     "operationId": "getVenueSettings",
     "contract": "tenancy",

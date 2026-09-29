@@ -43,7 +43,10 @@
     {
      "to": "BO-575",
      "trigger": "Maintenance Rule & Service Plan Configuration",
-     "provenance": "structural — pack board 9 wiring, 11 September 2026"
+     "provenance": "structural — pack board 9 wiring, 11 September 2026",
+     "carries": [
+      "planId"
+     ]
     },
     {
      "to": "BO-576",
@@ -53,32 +56,50 @@
     {
      "to": "BO-577",
      "trigger": "Maintenance Work Order",
-     "provenance": "structural — pack board 9 wiring, 11 September 2026"
+     "provenance": "structural — pack board 9 wiring, 11 September 2026",
+     "carries": [
+      "workOrderId"
+     ]
     },
     {
      "to": "BO-578",
      "trigger": "Technician Repair Workspace",
-     "provenance": "structural — pack board 9 wiring, 11 September 2026"
+     "provenance": "structural — pack board 9 wiring, 11 September 2026",
+     "carries": [
+      "workOrderId"
+     ]
     },
     {
      "to": "BO-579",
      "trigger": "Parts, Cost & Maintenance Expense Tracking",
-     "provenance": "structural — pack board 9 wiring, 11 September 2026"
+     "provenance": "structural — pack board 9 wiring, 11 September 2026",
+     "carries": [
+      "workOrderId"
+     ]
     },
     {
      "to": "BO-580",
      "trigger": "Asset Maintenance History & Lifecycle",
-     "provenance": "structural — pack board 9 wiring, 11 September 2026"
+     "provenance": "structural — pack board 9 wiring, 11 September 2026",
+     "carries": [
+      "assetId"
+     ]
     },
     {
      "to": "BO-581",
      "trigger": "Return-to-Service Inspection & Approval",
-     "provenance": "structural — pack board 9 wiring, 11 September 2026"
+     "provenance": "structural — pack board 9 wiring, 11 September 2026",
+     "carries": [
+      "workOrderId"
+     ]
     },
     {
      "to": "BO-582",
      "trigger": "Asset Retirement, Write-Off & Replacement Recommendation",
-     "provenance": "structural — pack board 9 wiring, 11 September 2026"
+     "provenance": "structural — pack board 9 wiring, 11 September 2026",
+     "carries": [
+      "assetId"
+     ]
     },
     {
      "to": "BO-583",
@@ -187,7 +208,22 @@
    "emptyNoResults": "The filter narrowed it and the maintenance are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listWorkOrders",
+    "contract": "maintenance",
+    "purpose": "Open work orders",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getDueMaintenance",
+    "contract": "maintenance",
+    "purpose": "What is due",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Assets Under Maintenance",
@@ -200,7 +236,8 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-574"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-574",
+   "workshopBoard": "wireframes/WS124 Rental Management Board 9.dc.html#bo-574"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 109. 0 of 9 labels bound to a contract property; 19 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -322,12 +359,43 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listMaintenancePlans",
+    "contract": "maintenance",
+    "purpose": "Service plans",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createMaintenancePlan",
+    "contract": "maintenance",
+    "purpose": "Define a plan",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "updateMaintenancePlan",
+    "contract": "maintenance",
+    "purpose": "Change it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-575"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-575",
+   "workshopBoard": "wireframes/WS124 Rental Management Board 9.dc.html#bo-575"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 110. 0 of 0 labels bound to a contract property; 8 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "planId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -442,10 +510,30 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getDueMaintenance",
+    "contract": "maintenance",
+    "purpose": "The maintenance calendar",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Schedule a job",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listWorkOrders",
+     "getDueMaintenance"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-576"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-576",
+   "workshopBoard": "wireframes/WS124 Rental Management Board 9.dc.html#bo-576"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 111. 0 of 0 labels bound to a contract property; 7 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -523,7 +611,39 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listWorkOrders",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getWorkOrder",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createWorkOrder",
+       "label": "Create work order",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createWorkOrder"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The maintenance work order list.",
@@ -532,12 +652,64 @@
    "emptyNoResults": "The filter narrowed it and the maintenance work order are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listWorkOrders",
+    "contract": "maintenance",
+    "purpose": "List work orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getWorkOrder",
+    "contract": "maintenance",
+    "purpose": "The job",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Raise one",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listWorkOrders",
+     "getDueMaintenance"
+    ]
+   },
+   {
+    "operationId": "updateWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Change it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getWorkOrder",
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "attachWorkOrderEvidence",
+    "contract": "maintenance",
+    "purpose": "Photos and documents",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-577"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-577",
+   "workshopBoard": "wireframes/WS124 Rental Management Board 9.dc.html#bo-577"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 112. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "workOrderId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -613,7 +785,26 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "startWorkOrder",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "startWorkOrder"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The technician repair list.",
@@ -622,12 +813,51 @@
    "emptyNoResults": "The filter narrowed it and the technician repair are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "startWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Begin the repair",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getWorkOrder",
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "recordWorkOrderTime",
+    "contract": "maintenance",
+    "purpose": "Time on the job. Pausing the timer with pause reason Other requires a note — the form will not send without it and the server refuses 400 (decided 28 September, audit R222)",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "completeWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Finish it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getWorkOrder",
+     "listWorkOrders"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-578"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-578",
+   "workshopBoard": "wireframes/WS124 Rental Management Board 9.dc.html#bo-578"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 113. 0 of 0 labels bound to a contract property; 0 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "workOrderId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -703,7 +933,26 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "recordWorkOrderParts",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "recordWorkOrderParts"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The parts cost maintenance list.",
@@ -712,12 +961,29 @@
    "emptyNoResults": "The filter narrowed it and the parts cost maintenance are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "recordWorkOrderParts",
+    "contract": "maintenance",
+    "purpose": "Parts and cost",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-579"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-579",
+   "workshopBoard": "wireframes/WS124 Rental Management Board 9.dc.html#bo-579"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 114. 0 of 0 labels bound to a contract property; 0 of 7 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "workOrderId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -793,7 +1059,19 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getAssetHistory",
+       "notes": "One record, read-only."
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The asset maintenance history list.",
@@ -802,12 +1080,29 @@
    "emptyNoResults": "The filter narrowed it and the asset maintenance history are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getAssetHistory",
+    "contract": "maintenance",
+    "purpose": "Its life so far",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-580"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-580",
+   "workshopBoard": "wireframes/WS124 Rental Management Board 9.dc.html#bo-580"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 115. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "assetId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -883,7 +1178,27 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "submitInspection",
+       "label": "Submit inspection",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "submitInspection"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The return-to-service inspection approval list.",
@@ -892,12 +1207,40 @@
    "emptyNoResults": "The filter narrowed it and the return-to-service inspection approval are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "submitInspection",
+    "contract": "maintenance",
+    "purpose": "Return-to-service inspection",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "verifyWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Approve the return to service",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getWorkOrder",
+     "listWorkOrders"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-581"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-581",
+   "workshopBoard": "wireframes/WS124 Rental Management Board 9.dc.html#bo-581"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 116. 0 of 0 labels bound to a contract property; 0 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "workOrderId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -973,7 +1316,33 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setAssetStatus",
+       "label": "Save asset status",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getAssetHistory",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setAssetStatus"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The asset retirement write-off list.",
@@ -982,12 +1351,40 @@
    "emptyNoResults": "The filter narrowed it and the asset retirement write-off are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setAssetStatus",
+    "contract": "maintenance",
+    "purpose": "Retire or write off",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getAsset",
+     "listAssets"
+    ]
+   },
+   {
+    "operationId": "getAssetHistory",
+    "contract": "maintenance",
+    "purpose": "The case for retiring it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-582"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-582",
+   "workshopBoard": "wireframes/WS124 Rental Management Board 9.dc.html#bo-582"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 117. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "assetId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1116,7 +1513,15 @@
    "emptyNoResults": "The filter narrowed it and the maintenance intelligence predictive are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getDueMaintenance",
+    "contract": "maintenance",
+    "purpose": "Predictive maintenance",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Assets at Risk",
@@ -1129,7 +1534,8 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-583"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-583",
+   "workshopBoard": "wireframes/WS124 Rental Management Board 9.dc.html#bo-583"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 118. 0 of 9 labels bound to a contract property; 9 of 99 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

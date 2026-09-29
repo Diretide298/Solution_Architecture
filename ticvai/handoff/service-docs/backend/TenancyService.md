@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `tenancy`, `workforce`, `approvals`, `accreditation` |
 | Schemas owned | `platform`, `workforce`, `approvals`, `accreditation`, `tenancy` |
-| Operations in the slice | 25 of 168 |
+| Operations in the slice | 27 of 172 |
 | Scale | Read-heavy and highly cacheable. Config changes are rare. |
 | If it is down | Same as identity — nothing runs without a scope. |
 
@@ -30,6 +30,8 @@
 
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
+| approvals | [`approveMatrixMultiLevel`](#approvematrixmultilevel) | PUT | `/matrix-multi-level` | setup | 1 |  |
+| approvals | [`approveRoleAuthorityDelegation`](#approveroleauthoritydelegation) | PUT | `/role-authority-delegation` | setup | 1 |  |
 | delegation | [`createApprovalDelegation`](#createapprovaldelegation) | POST | `/delegations` | setup | 1 | ADM-243, BO-087, BO-385 |
 | devices | [`setDeviceAssignment`](#setdeviceassignment) | PUT | `/devices/{deviceId}/assignment` | core | 1 | ADM-582, POS-016 |
 | matrix | [`setApprovalMatrix`](#setapprovalmatrix) | PUT | `/approval-matrices` | setup | 1 | ADM-242, ADM-243, ADM-330, ADM-331, ADM-332, ADM-333 … |
@@ -55,6 +57,193 @@
 | workstation | [`recordDeviceHeartbeat`](#recorddeviceheartbeat) | POST | `/devices/{deviceId}/heartbeat` | core | 1 | BO-036, BO-124, BO-125, POS-016 |
 | workstation | [`updateOutlet`](#updateoutlet) | PATCH | `/outlets/{outletId}` | setup | 1 | BO-044, BO-063 |
 | workstation | [`updateSaleBoard`](#updatesaleboard) | PUT | `/sale-boards/{saleBoardId}` | setup | 1 | BO-109, BO-116, BO-117, BO-118, BO-124, BO-125 … |
+
+## Group: approvals
+
+### approveMatrixMultiLevel
+
+**`PUT /matrix-multi-level`**: Approval Matrix & Multi-Level Approval Configuration
+
+**Drafted from the workshop pack and checked against it on 29 September.** Rules  Workflow  Approval   Automation Engine, page 11. The screen says: Configure when approvals are required and who must approve.
+
+**Every property carries the sentence it came from.** 32 were read from the screen's own bulleted directory and 11 bullets were dropped as prose, examples or hierarchy illustrations rather than bent into fields. Names and types are this package's reading of those sentences, checked against the pack on 29 September.
+
+**Agreed (decided 29 September, readiness close-out).** This duplicates setApprovalMatrix; the sample threshold bands were removed, the approval kinds became one approvalMode enum, and minimumApprovals plus requiredApproverRole express N-of-M. A venue may only tighten a higher rule and in-flight requests keep their matrix version (R129); the approval context list (request, customer, original and proposed value, margin impact, reason, evidence) is what the inbox shows, not a matrix field.
+
+**Overlaps `setApprovalMatrix`,** which stays the operation of record for that write; this one serves the screen's composite view of it.
+
+|  |  |
+|---|---|
+| Permission | `APPROVAL_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `approvals.matrix`, `approvals.rule` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Step-up auth | mfa |
+| Reads | `approvals.matrix`, `approvals.rule`, `cache:idempotency` |
+| Writes | `approvals.matrix`, `approvals.rule`, `cache:idempotency` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ApprovalMatrixMultiLevelApprovalConfigurationInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| code | string | yes | Stable rule code the PUT upserts by |
+| approvalMode | enum (single, sequential, parallel, anyOne, allMustApprove, conditional, multiLevel) | yes | How approvers at this rule combine |
+| amount | Money |  | On the wire this is three fields; in the database it is one column. |
+| amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| percentage | number |  | Percentage |
+| module | string |  | Module |
+| product | string |  | Product |
+| venue | string |  | Venue |
+| department | string |  | Department |
+| customerType | string |  | Customer Type |
+| risk | string |  | Risk |
+| exceptionType | string |  | Exception Type |
+| legalEntity | string |  | Legal Entity |
+| minimumApprovals | integer |  | N in N-of-M: approvals needed from the approver group |
+| rejectionBehavior | enum (rejectRequest, returnToPreviousLevel, returnToRequester) |  | What a rejection at this level does |
+| requestChanges | boolean |  | Approvers may return the request for changes |
+| delegate | boolean |  | Approvers may delegate |
+| reassign | boolean |  | The request may be reassigned |
+| skipConditions | string |  | Skip Conditions |
+| requiredApproverRole | string |  | Role that must always approve, e.g. |
+
+**Response**: `ApprovalMatrixMultiLevelApprovalConfigurationView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| code | string | yes | Stable rule code the PUT upserts by |
+| approvalMode | enum (single, sequential, parallel, anyOne, allMustApprove, conditional, multiLevel) | yes | How approvers at this rule combine |
+| amount | Money |  | On the wire this is three fields; in the database it is one column. |
+| amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| percentage | number |  | Percentage |
+| module | string |  | Module |
+| product | string |  | Product |
+| venue | string |  | Venue |
+| department | string |  | Department |
+| customerType | string |  | Customer Type |
+| risk | string |  | Risk |
+| exceptionType | string |  | Exception Type |
+| legalEntity | string |  | Legal Entity |
+| minimumApprovals | integer |  | N in N-of-M: approvals needed from the approver group |
+| rejectionBehavior | enum (rejectRequest, returnToPreviousLevel, returnToRequester) |  | What a rejection at this level does |
+| requestChanges | boolean |  | Approvers may return the request for changes |
+| delegate | boolean |  | Approvers may delegate |
+| reassign | boolean |  | The request may be reassigned |
+| skipConditions | string |  | Skip Conditions |
+| requiredApproverRole | string |  | Role that must always approve, e.g. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Approval Matrix & Multi-Level Approval Configuration |
+
+### approveRoleAuthorityDelegation
+
+**`PUT /role-authority-delegation`**: Roles, Authority, Delegation & Approval Limits
+
+**Drafted from the workshop pack and checked against it on 29 September.** Rules  Workflow  Approval   Automation Engine, page 13. The screen says: Define who has authority to perform or approve specific actions. This should work with TICVAI RBAC/PBAC rather than replace it.
+
+**Every property carries the sentence it came from.** 24 were read from the screen's own bulleted directory and 14 bullets were dropped as prose, examples or hierarchy illustrations rather than bent into fields. Names and types are this package's reading of those sentences, checked against the pack on 29 September.
+
+**Agreed (decided 29 September, readiness close-out).** Delegation duplicates createApprovalDelegation and authority limits belong in setApprovalMatrix; the pre-assignment checks (user active, delegation valid, scope) and 'requester cannot approve own request' are engine behaviour, already enforced by decideApprovalRequest, so they were removed as fields. Delegation is same role and same venue (R129); AI authority-gap detection is advisory only.
+
+**Overlaps `createApprovalDelegation`,** which stays the operation of record for that write; this one serves the screen's composite view of it.
+
+|  |  |
+|---|---|
+| Permission | `APPROVAL_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `approvals.delegation` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Step-up auth | mfa |
+| Reads | `approvals.delegation`, `approvals.matrix`, `approvals.rule`, `cache:idempotency`, `identity.delegated_access`, `identity.principal` |
+| Writes | `approvals.delegation`, `cache:idempotency` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `RolesAuthorityDelegationApprovalLimitsInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| user | string |  | User |
+| role | string |  | Role |
+| position | string |  | Position |
+| department | string |  | Department |
+| venue | string |  | Venue |
+| businessUnit | string |  | Business Unit |
+| legalEntity | string |  | Legal Entity |
+| region | string |  | Region |
+| delegator | string | yes | Delegator |
+| delegate | string | yes | Delegate |
+| scope | string |  | Scope |
+| start | string (date-time) | yes | Delegation start |
+| end | string (date-time) | yes | Delegation end |
+| reason | string |  | Reason |
+| delegationType | enum (leave, travel, vacancy, eventOperations) |  | Why temporary authority is granted |
+| requiredRole | string |  | Required role |
+| authorityAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| authorityAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| authorityAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| authorityAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| requestKind | string |  | What the authority limit covers, e.g. |
+| authorityPercentage | number |  | Percentage limit where the authority is a percentage, e.g. |
+
+**Response**: `RolesAuthorityDelegationApprovalLimitsView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| user | string |  | User |
+| role | string |  | Role |
+| position | string |  | Position |
+| department | string |  | Department |
+| venue | string |  | Venue |
+| businessUnit | string |  | Business Unit |
+| legalEntity | string |  | Legal Entity |
+| region | string |  | Region |
+| delegator | string | yes | Delegator |
+| delegate | string | yes | Delegate |
+| scope | string |  | Scope |
+| start | string (date-time) | yes | Delegation start |
+| end | string (date-time) | yes | Delegation end |
+| reason | string |  | Reason |
+| delegationType | enum (leave, travel, vacancy, eventOperations) |  | Why temporary authority is granted |
+| requiredRole | string |  | Required role |
+| authorityAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| authorityAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| authorityAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| authorityAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| requestKind | string |  | What the authority limit covers, e.g. |
+| authorityPercentage | number |  | Percentage limit where the authority is a percentage, e.g. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Roles, Authority, Delegation & Approval Limits |
+
 
 ## Group: delegation
 
@@ -522,9 +711,9 @@ A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.2
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `approvals.decision`, `approvals.request`, `approvals.rule`, `cache:idempotency`, `identity.principal` |
-| Writes | `approvals.decision`, `approvals.request`, `cache:idempotency`, `platform.outbox` |
+| Writes | `approvals.decision`, `approvals.request`, `cache:idempotency`, `control.partner_agreement`, `control.partner_application`, `control.partner_change_request`, `marketing.privacy_notice_governance`, `platform.outbox` |
 | Called by | ACC-007, ADM-145, ADM-249, BO-084, BO-085, BO-133, BO-243, BO-367, BO-377, BO-378, BO-940, POS-020 |
-| State model | Approval request ([states/approval-request.yaml](../../../states/approval-request.yaml)): moves `escalated` -> `pending`, `pending` -> `approved`, `escalated` -> `approved`, `pending` -> `rejected`, `escalated` -> `rejected`, `pending` -> `returned`, `escalated` -> `returned`, `pending` -> `informationRequested`, `escalated` -> `informationRequested`<br/>Partner agreement ([states/partner-agreement.yaml](../../../states/partner-agreement.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `terminated`<br/>Refund ([states/refund.yaml](../../../states/refund.yaml)): moves `pendingApproval` -> `pendingGateway`, `pendingApproval` -> `declined`<br/>Shift swap ([states/shift-swap.yaml](../../../states/shift-swap.yaml)): moves `awaitingApproval` -> `approved`, `awaitingApproval` -> `rejected` |
+| State model | AccessConfigurationVersion ([states/access-configuration-version.yaml](../../../states/access-configuration-version.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `scheduled`, `pendingApproval` -> `draft`<br/>AccessDynamicPolicyVersion ([states/access-dynamic-policy-version.yaml](../../../states/access-dynamic-policy-version.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `rejected`<br/>AccessDynamicPolicy ([states/access-dynamic-policy.yaml](../../../states/access-dynamic-policy.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `draft`<br/>AccessMediaTemplateVersion ([states/access-media-template-version.yaml](../../../states/access-media-template-version.yaml)): moves `pendingApproval` -> `published`, `pendingApproval` -> `scheduled`, `pendingApproval` -> `rejected`<br/>AccessMediaTemplate ([states/access-media-template.yaml](../../../states/access-media-template.yaml)): moves `pendingApproval` -> `published`, `pendingApproval` -> `scheduled`, `pendingApproval` -> `draft`<br/>Approval request ([states/approval-request.yaml](../../../states/approval-request.yaml)): moves `escalated` -> `pending`, `pending` -> `approved`, `escalated` -> `approved`, `pending` -> `rejected`, `escalated` -> `rejected`, `pending` -> `returned`, `escalated` -> `returned`, `pending` -> `informationRequested`, `escalated` -> `informationRequested`<br/>Partner agreement ([states/partner-agreement.yaml](../../../states/partner-agreement.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `terminated`<br/>Partner application ([states/partner-application.yaml](../../../states/partner-application.yaml)): moves `inReview` -> `approved`, `inReview` -> `rejected`<br/>Partner change request ([states/partner-change-request.yaml](../../../states/partner-change-request.yaml)): moves `pendingApproval` -> `approved`, `pendingApproval` -> `rejected`<br/>Privacy notice governance ([states/privacy-notice-governance.yaml](../../../states/privacy-notice-governance.yaml)): moves `review` -> `approved`<br/>Refund ([states/refund.yaml](../../../states/refund.yaml)): moves `pendingApproval` -> `pendingGateway`, `pendingApproval` -> `declined`<br/>Shift swap ([states/shift-swap.yaml](../../../states/shift-swap.yaml)): moves `awaitingApproval` -> `approved`, `awaitingApproval` -> `rejected` |
 
 **Parameters**
 
@@ -2338,14 +2527,14 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-143 operations, added to this service in later releases without changing any of the above.
+145 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| accreditation | `createAccreditationApplication`, `createAccreditationProgramme`, `createBadgePrintJob`, `decideAccreditationApplication`, `getAccreditationHolder`, `importAccreditationHolders`, `issueAccreditationCredential`, `listAccessProfiles`, `listAccreditationAccessActivity`, `listAccreditationApplications`, `listAccreditationAudit`, `listAccreditationCredentials`, `listAccreditationHolders`, `listAccreditationIdentityConflicts`, `listAccreditationProgrammes`, `listBadgePrintJobs`, `listBadgeTemplates`, `previewAccessImpact`, `replaceAccreditationCredential`, `setAccessProfile`, `setAccreditationNotificationRules`, `setAccreditationRequirements`, `setAccreditationStatus`, `setAccreditationValidity`, `setBadgeTemplate`, `setHolderAccess`, `submitAccreditationDocument`, `updateAccreditationHolder`, `verifyAccreditationDocument` |
+| accreditation | `createAccreditationApplication`, `createAccreditationProgramme`, `createBadgePrintJob`, `decideAccreditationApplication`, `getAccreditationHolder`, `importAccreditationHolders`, `issueAccreditationCredential`, `listAccessProfiles`, `listAccreditationAccessActivity`, `listAccreditationApplications`, `listAccreditationAudit`, `listAccreditationCredentials`, `listAccreditationHolders`, `listAccreditationIdentityConflicts`, `listAccreditationProgrammes`, `listBadgePrintJobs`, `listBadgeTemplates`, `previewAccessImpact`, `replaceAccreditationCredential`, `resolveIdentityConflict`, `setAccessProfile`, `setAccreditationNotificationRules`, `setAccreditationRequirements`, `setAccreditationStatus`, `setAccreditationValidity`, `setBadgeTemplate`, `setHolderAccess`, `submitAccreditationDocument`, `updateAccreditationHolder`, `verifyAccreditationDocument` |
 | analytics | `getApprovalAnalytics` |
 | announcements | `acknowledgeAnnouncement`, `getAnnouncementReach`, `listAnnouncements`, `publishAnnouncement` |
-| approvals | `approveMatrixMultiLevel`, `approveRoleAuthorityDelegation`, `approveUnifiedDecision`, `approveVersioningGovernance`, `createApprovalEvidencePackage`, `createAutomationAutonomouAction`, `getApprovalRecord`, `issueAccreditationBadge`, `listAccreditationBadges`, `listApprovalControlPolicies`, `listConditionDecisionLogic`, `listCrossModuleOrchestration`, `listProcessAutomationOpportunity`, `listRuleWorkflow`, `listSlaEscalationBottleneck`, `listSlaEscalationReminder`, `listWorkflow`, `listWorkflowAutonomouGovernance`, `listWorkflowExceptionFailure`, `listWorkflowInstanceProcess`, `listWorkflowProcessPerformance`, `setApprovalControlPolicy`, `setApprovalRetentionPolicy`, `setApprovalSlaPolicy`, `setApproverAvailability`, `setTriggerActionCross`, `setVisualBusinessRule`, `setVisualWorkflow`, `signApprovalDecision`, `simulateWorkflowTestingImpact` |
+| approvals | `actOnWorkflowInstance`, `approveUnifiedDecision`, `approveVersioningGovernance`, `createApprovalEvidencePackage`, `createAutomationAutonomouAction`, `getApprovalRecord`, `issueAccreditationBadge`, `listAccreditationBadges`, `listApprovalControlPolicies`, `listConditionDecisionLogic`, `listCrossModuleOrchestration`, `listProcessAutomationOpportunity`, `listRuleWorkflow`, `listSlaEscalationBottleneck`, `listSlaEscalationReminder`, `listWorkflow`, `listWorkflowAutonomouGovernance`, `listWorkflowExceptionFailure`, `listWorkflowInstanceProcess`, `listWorkflowProcessPerformance`, `setApprovalControlPolicy`, `setApprovalRetentionPolicy`, `setApprovalSlaPolicy`, `setApproverAvailability`, `setTriggerActionCross`, `setVisualBusinessRule`, `setVisualWorkflow`, `signApprovalDecision`, `simulateWorkflowTestingImpact` |
 | attendance | `amendAttendance`, `listAttendance`, `recordAttendance` |
 | delegation | `listApprovalDelegations`, `revokeApprovalDelegation` |
 | devices | `enrolDevice`, `getDeviceTelemetry`, `issueDeviceCredential`, `listDeviceAuditRecords`, `listDeviceFirmware`, `listDeviceTamperEvents`, `recordDeviceTamperEvent`, `revokeDeviceCredential`, `rollbackDeviceFirmware`, `startDeviceFirmwareRollout` |
@@ -2356,5 +2545,5 @@ Every table this service owns that the slice reads or writes, with its columns a
 | rota | `requestShiftSwap`, `updateRotaAssignment` |
 | scope | `getOrgUnit` |
 | tenancy | `deployConfigurationProfile`, `getConfigurationProfile`, `getConnectivityPolicy`, `getOfflinePolicy`, `getVenueSettingsDefaults`, `listAuditRecords`, `listCellEndpoints`, `listConfigurationProfiles`, `listProfileDeployments`, `setConfigurationProfile`, `setConnectivityThresholds`, `setOfflinePolicy`, `setVenueSettingsDefaults` |
-| workforce | `broadcastToGuests`, `claimOpenShift`, `getEmployee`, `getFieldOwnership`, `getLabourCost`, `getStaffingCoverage`, `listEmployees`, `listIntegrationSources`, `listJobTitles`, `listLeaveBalances`, `listLeaveRequests`, `listLeaveTypes`, `listOpenShifts`, `listShiftPatterns`, `listShiftSwapRequests`, `listShiftTemplates`, `listSyncConflicts`, `listSyncRuns`, `listTrainingRecords`, `listWorkAssignments`, `requestLeave`, `resolveSyncConflict`, `setFieldOwnership`, `setIntegrationSource`, `setJobTitle`, `setLeaveType`, `setShiftPattern`, `setShiftTemplate`, `setStaffingRules`, `setWorkAssignment`, `startSync`, `validateWorkforceCompliance` |
+| workforce | `broadcastToGuests`, `claimOpenShift`, `getEmployee`, `getFieldOwnership`, `getLabourCost`, `getStaffingCoverage`, `listEmployees`, `listIntegrationSources`, `listJobTitles`, `listLabourBudgets`, `listLeaveBalances`, `listLeaveRequests`, `listLeaveTypes`, `listOpenShifts`, `listShiftPatterns`, `listShiftSwapRequests`, `listShiftTemplates`, `listSyncConflicts`, `listSyncRuns`, `listTrainingRecords`, `listWorkAssignments`, `requestLeave`, `resolveSyncConflict`, `setFieldOwnership`, `setIntegrationSource`, `setJobTitle`, `setLabourBudget`, `setLeaveType`, `setShiftPattern`, `setShiftTemplate`, `setStaffingRules`, `setWorkAssignment`, `startSync`, `validateWorkforceCompliance` |
 | workstation | `getDevice`, `getOutlet`, `getWorkstation`, `registerDevice` |

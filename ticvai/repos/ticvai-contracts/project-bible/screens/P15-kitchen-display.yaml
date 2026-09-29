@@ -2284,6 +2284,11 @@ screens:
     contract: reporting
     purpose: Natural-language reporting query
     trigger: onAction
+  - operationId: recordDashboardView
+    contract: reporting
+    purpose: Record that a dashboard was opened — fired once when the dashboard renders; nothing on the
+      screen waits for it.
+    trigger: background
   entryState:
     params:
     - name: venueId

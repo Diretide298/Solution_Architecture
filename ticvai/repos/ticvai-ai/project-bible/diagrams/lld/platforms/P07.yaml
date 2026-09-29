@@ -25,7 +25,7 @@ modulesUsed:
   screens: 2
 servicesCalled:
 - service: AccessService
-  operationCalls: 56
+  operationCalls: 59
 - service: IdentityService
   operationCalls: 8
 - service: OrderService
@@ -82,9 +82,11 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - endPodiumShift
   - getAccessPoint
   - listAccessPoints
   - setTurnstileMode
+  - startPodiumShift
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -95,6 +97,8 @@ screens:
   offlineState: true
   entryParams:
   - accessPointId<-deepLink
+  - podiumId<-session
+  - shiftId<-session
   goesTo:
   - SCN-001
   - SCN-003
@@ -382,6 +386,7 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - cancelGateModeChange
   - getAccessPoint
   - listAccessPoints
   - setTurnstileMode
@@ -395,6 +400,7 @@ screens:
   offlineState: true
   entryParams:
   - accessPointId<-deepLink
+  - changeId<-navigation
   goesTo:
   - SCN-001
   - SCN-002

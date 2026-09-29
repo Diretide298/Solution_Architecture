@@ -1,10 +1,32 @@
 id: LLD-approvals
-title: approvals — 48 operations
+title: approvals — 49 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
 service: TenancyService
 operations:
+- operation: actOnWorkflowInstance
+  verb: POST
+  path: /workflow-instances/{instanceId}/actions
+  scope: venue
+  permission: APPROVAL_ACT
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.request
+  - approvals.workflow_exception
+  - approvals.workflow_instance
+  - approvals.workflow_step_execution
+  - approvals.workflow_version
+  - cache:idempotency
+  writes:
+  - approvals.request
+  - approvals.workflow_exception
+  - approvals.workflow_instance
+  - approvals.workflow_intervention
+  - approvals.workflow_step_execution
+  - cache:idempotency
 - operation: approveMatrixMultiLevel
   verb: PUT
   path: /matrix-multi-level
@@ -13,8 +35,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - approvals.matrix
+  - approvals.rule
+  - cache:idempotency
+  writes:
+  - approvals.matrix
+  - approvals.rule
+  - cache:idempotency
 - operation: approveRoleAuthorityDelegation
   verb: PUT
   path: /role-authority-delegation
@@ -23,8 +51,16 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - approvals.delegation
+  - approvals.matrix
+  - approvals.rule
+  - cache:idempotency
+  - identity.delegated_access
+  - identity.principal
+  writes:
+  - approvals.delegation
+  - cache:idempotency
 - operation: approveUnifiedDecision
   verb: PUT
   path: /unified-decision
@@ -33,8 +69,18 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - approvals.decision
+  - approvals.request
+  - approvals.rule
+  - approvals.step_up_policy
+  - cache:idempotency
+  - identity.principal
+  writes:
+  - approvals.decision
+  - approvals.request
+  - cache:idempotency
+  - platform.outbox
 - operation: approveVersioningGovernance
   verb: PUT
   path: /versioning-governance
@@ -43,8 +89,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - approvals.request
+  - approvals.workflow_definition
+  - approvals.workflow_version
+  - cache:idempotency
+  writes:
+  - approvals.request
+  - approvals.workflow_version
+  - cache:idempotency
 - operation: createApprovalDelegation
   verb: POST
   path: /delegations
@@ -99,8 +152,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - approvals.approved_action_execution
+  - approvals.automation
+  - approvals.automation_execution
+  - cache:idempotency
+  writes:
+  - approvals.automation
+  - cache:idempotency
 - operation: decideApprovalRequest
   verb: POST
   path: /approval-requests/{requestId}/decide
@@ -119,6 +178,10 @@ operations:
   - approvals.decision
   - approvals.request
   - cache:idempotency
+  - control.partner_agreement
+  - control.partner_application
+  - control.partner_change_request
+  - marketing.privacy_notice_governance
   - platform.outbox
 - operation: escalateApprovalRequest
   verb: POST
@@ -268,7 +331,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - approvals.decision_table
+  - approvals.decision_table_row
   writes: []
 - operation: listCrossModuleOrchestration
   verb: GET
@@ -278,7 +343,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - approvals.approved_action_execution
+  - approvals.workflow_instance
+  - approvals.workflow_step_execution
+  - platform.outbox
   writes: []
 - operation: listProcessAutomationOpportunity
   verb: GET
@@ -288,7 +357,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - approvals.approved_action_execution
+  - approvals.decision
+  - approvals.escalation
+  - approvals.request
+  - approvals.workflow_definition
+  - approvals.workflow_instance
+  - approvals.workflow_step_execution
   writes: []
 - operation: listRuleWorkflow
   verb: GET
@@ -298,7 +374,17 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - approvals.automation
+  - approvals.business_rule
+  - approvals.control_policy
+  - approvals.decision_table
+  - approvals.matrix
+  - approvals.rule
+  - approvals.sla_policy
+  - approvals.step_up_policy
+  - approvals.workflow_definition
+  - approvals.workflow_version
   writes: []
 - operation: listSlaEscalationBottleneck
   verb: GET
@@ -308,7 +394,16 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - approvals.decision
+  - approvals.escalation
+  - approvals.request
+  - approvals.rule
+  - approvals.sla_policy
+  - approvals.workflow_definition
+  - approvals.workflow_instance
+  - approvals.workflow_step_execution
+  - identity.principal
   writes: []
 - operation: listSlaEscalationReminder
   verb: GET
@@ -318,7 +413,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - approvals.rule
+  - approvals.sla_policy
   writes: []
 - operation: listStepUpPolicies
   verb: GET
@@ -339,7 +436,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - approvals.approved_action_execution
+  - approvals.automation_execution
+  - approvals.decision
+  - approvals.escalation
+  - approvals.request
+  - approvals.workflow_definition
+  - approvals.workflow_instance
+  - identity.principal
   writes: []
 - operation: listWorkflowAutonomouGovernance
   verb: GET
@@ -359,7 +464,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - approvals.approved_action_execution
+  - approvals.workflow_definition
+  - approvals.workflow_exception
+  - approvals.workflow_instance
+  - approvals.workflow_step_execution
   writes: []
 - operation: listWorkflowInstanceProcess
   verb: GET
@@ -369,7 +479,18 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - approvals.approved_action_execution
+  - approvals.decision
+  - approvals.decision_record
+  - approvals.escalation
+  - approvals.request
+  - approvals.workflow_definition
+  - approvals.workflow_instance
+  - approvals.workflow_intervention
+  - approvals.workflow_step_execution
+  - approvals.workflow_version
+  - identity.principal
   writes: []
 - operation: listWorkflowProcessPerformance
   verb: GET
@@ -379,7 +500,17 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - approvals.approved_action_execution
+  - approvals.automation_execution
+  - approvals.decision
+  - approvals.delegation
+  - approvals.escalation
+  - approvals.request
+  - approvals.sla_policy
+  - approvals.workflow_definition
+  - approvals.workflow_instance
+  - approvals.workflow_step_execution
   writes: []
 - operation: resolveApprovedActionExecution
   verb: POST
@@ -505,8 +636,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - approvals.workflow_definition
+  - approvals.workflow_trigger
+  - cache:idempotency
+  writes:
+  - approvals.workflow_trigger
+  - cache:idempotency
 - operation: setVisualBusinessRule
   verb: PUT
   path: /visual-business-rule
@@ -515,8 +651,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - approvals.business_rule
+  - cache:idempotency
+  writes:
+  - approvals.business_rule
+  - cache:idempotency
 - operation: setVisualWorkflow
   verb: PUT
   path: /visual-workflow
@@ -525,8 +665,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - approvals.workflow_definition
+  - approvals.workflow_version
+  - cache:idempotency
+  writes:
+  - approvals.workflow_definition
+  - approvals.workflow_version
+  - cache:idempotency
 - operation: signApprovalDecision
   verb: POST
   path: /approval-requests/{requestId}/signature
@@ -546,8 +692,24 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - approvals.business_rule
+  - approvals.decision
+  - approvals.decision_table
+  - approvals.decision_table_row
+  - approvals.delegation
+  - approvals.matrix
+  - approvals.request
+  - approvals.rule
+  - approvals.sla_policy
+  - approvals.workflow_definition
+  - approvals.workflow_instance
+  - approvals.workflow_step_execution
+  - approvals.workflow_version
+  - cache:idempotency
+  writes:
+  - approvals.workflow_version
+  - cache:idempotency
 - operation: submitApprovalRequest
   verb: POST
   path: /approval-requests/{requestId}/submit

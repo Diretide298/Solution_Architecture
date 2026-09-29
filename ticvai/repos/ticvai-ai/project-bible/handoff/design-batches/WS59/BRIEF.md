@@ -1,6 +1,6 @@
 # WS59 — Ticket Media   Credential Management board 1
 
-**10 screens · 10 operations · 11 schemas · 2 permissions**
+**10 screens · 12 operations · 11 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, SCOPE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, AUDIT_VIEW, SCOPE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,15 +60,15 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-334` | Virtual Ticket Command Center | commandCentre | 1 | 0 | — |
+| `BO-334` | Virtual Ticket Command Center | commandCentre | 3 | 0 | — |
 | `BO-335` | Virtual Ticket Identity & Master Record Configuration | configEditor | 1 | 0 | — |
 | `BO-336` | Virtual Ticket Status & Lifecycle Model | listDetail | 1 | 0 | — |
-| `BO-337` | Media Type & Credential Technology Registry | configEditor | 1 | 0 | — |
+| `BO-337` | Media Type & Credential Technology Registry | configEditor | 2 | 0 | — |
 | `BO-338` | Multi-Media Binding & Association Rules | configEditor | 1 | 0 | — |
 | `BO-339` | Credential Identity, Token & Reference Mapping | listDetail | 1 | 0 | — |
 | `BO-340` | Entitlement & Cross-Media Synchronization Rules | listDetail | 1 | 0 | — |
 | `BO-341` | Media Activation, Priority & Fallback Rules | configEditor | 1 | 0 | — |
-| `BO-342` | Media Replacement, Revocation & Rebinding Rules | configEditor | 1 | 2 | — |
+| `BO-342` | Media Replacement, Revocation & Rebinding Rules | configEditor | 2 | 2 | — |
 | `BO-343` | Virtual Ticket Architecture Testing, Governance & Audit | configEditor | 1 | 0 | — |
 
 ## Thin screens in this batch

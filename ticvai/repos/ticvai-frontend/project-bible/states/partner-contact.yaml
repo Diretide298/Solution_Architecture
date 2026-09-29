@@ -1,0 +1,66 @@
+# Partner contact — state model
+# Contract: subscription.PartnerContact.status
+# Checked by tools/check-states.py. Added 29 September (writers pass; data model DM4).
+
+entity: Partner contact
+contract: subscription
+enum: PartnerContact.status
+enumKind: inline
+enumSchema: PartnerContact
+enumProperty: status
+owner: subscription
+initial:
+- invited
+- active
+terminal:
+- revoked
+- expired
+transitions:
+- from: invited
+  to: active
+  trigger: cascade
+  guard: The invitee accepts and sets their credentials; the linked `control.partner_user` principal becomes usable
+- from: invited
+  to: expired
+  trigger: timer
+  guard: 'The invitation lapses unaccepted. **A lapsed invitation is not reopened**: the partner or venue invites
+    again, which is a new contact row'
+- from: invited
+  to: revoked
+  operation: setPartnerContact
+  trigger: operation
+  guard: '`action: revoke` before the invitation is accepted, or the partner is terminated or archived (decided 29
+    September, writers pass; DM4)'
+- from: active
+  to: disabled
+  operation: setPartnerContact
+  trigger: operation
+  guard: '`action: disable` by an administrator, or by the partner itself with `canManageUsers`; refused for the
+    last active primary contact. A partner suspended in full disables its contacts the same way. The contact
+    stays on record for finance and operations (decided 29 September, writers pass; DM4)'
+- from: disabled
+  to: active
+  operation: setPartnerContact
+  trigger: operation
+  guard: '`action: enable`, or the partner is reactivated (decided 29 September, writers pass; DM4)'
+  isReversal: true
+- from: active
+  to: revoked
+  operation: setPartnerContact
+  trigger: operation
+  guard: '`action: revoke`: access is withdrawn for good, the person has left the partner (decided 29 September,
+    writers pass; DM4)'
+- from: disabled
+  to: revoked
+  operation: setPartnerContact
+  trigger: operation
+  guard: '`action: revoke` on a disabled contact (decided 29 September, writers pass; DM4)'
+notes: '**Two kinds of contact, one lifecycle** (decided 29 September, writers pass). A contact with a B2B user
+  account is created `invited` when its `control.partner_user` is created (`createPartnerUser`) and becomes `active`
+  when the invitation is accepted; a contact with no account (a finance or emergency contact nobody logs in as)
+  is created `active` (setPartnerContact) and is only ever `active` or `disabled`, as the schema says.
+
+
+
+  **`disabled` is not terminal** because a suspended partner comes back; `revoked` is, because a person who has
+  left is not re-hired by editing a row.'

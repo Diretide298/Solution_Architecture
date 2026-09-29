@@ -1,0 +1,81 @@
+# Membership product — state model
+# Contract: subscription.MembershipProductStatus
+# Checked by tools/check-states.py.
+
+entity: Membership product
+contract: subscription
+enum: MembershipProductStatus
+enumKind: named
+enumSchema: MembershipProductStatus
+owner: subscription
+initial:
+- draft
+terminal:
+- retired
+transitions:
+- from: draft
+  to: inReview
+  operation: approveMembershipProductValidation
+  trigger: operation
+  guard: '`action: submitForReview`. **Refused while a `validationChecks` entry fails** (pack p.17)'
+- from: inReview
+  to: draft
+  operation: approveMembershipProductValidation
+  trigger: operation
+  guard: '`action: reject`, with a reason recorded in subscription.membership_product_history'
+- from: inReview
+  to: approved
+  operation: approveMembershipProductValidation
+  trigger: operation
+  guard: '`action: approveCommercial`, then `approveOperational` where required. `approvalStage` records
+    which of the two has been given; the status moves once the last required one is'
+- from: approved
+  to: scheduled
+  operation: approveMembershipProductValidation
+  trigger: operation
+  guard: '`action: schedule` with a future `effectiveFrom`'
+- from: approved
+  to: active
+  operation: approveMembershipProductValidation
+  trigger: operation
+  guard: '`action: publish`. Publication reaches the targets in `publicationTargets`'
+- from: scheduled
+  to: active
+  trigger: timer
+  guard: '`effectiveFrom` reached'
+- from: active
+  to: suspended
+  operation: approveMembershipProductValidation
+  trigger: operation
+  guard: '`action: suspend`, with a `reason` (422 without one), the Suspend quick action on BO-284. Selling
+    stops on every channel; members already holding it are unaffected. No approval: an operational stop,
+    reversible, audited in subscription.membership_product_history (decided 29 September, writers pass; DM4)'
+- from: suspended
+  to: active
+  operation: approveMembershipProductValidation
+  trigger: operation
+  guard: '`action: reinstate`. Refused (409) once `effectiveTo` has passed; the retire job takes it from there
+    (decided 29 September, writers pass; DM4)'
+  isReversal: true
+- from: active
+  to: expired
+  trigger: timer
+  guard: '`effectiveTo` passed. Members already holding the product keep it until their own expiry'
+- from: expired
+  to: retired
+  trigger: job
+  guard: No member holds this version any more
+- from: suspended
+  to: retired
+  trigger: job
+  guard: Withdrawn while suspended, once no member holds it
+notes: '**A status belongs to a version, not to the product code.** Saving a change to an active product
+  creates the next version in `draft` (setMembershipProductTier, pack p.6); the active version keeps
+  selling until the new one is published, and `migrationPolicy` says when members move to it.
+
+
+  **Every action writes an audit row** to subscription.membership_product_history (pack p.18).
+
+
+  **This is the product, not the member.** A member''s own status is identity.customer_membership
+  (states/guest-membership-status.yaml).'

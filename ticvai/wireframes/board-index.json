@@ -2466,8 +2466,8 @@
   {
    "file": "APP guest.dc.html",
    "provenance": "clientPack",
-   "bytes": 327780,
-   "sha256": "04e126ad040cefa9",
+   "bytes": 328386,
+   "sha256": "f2a737f14a363a5c",
    "frames": 143,
    "screensFramed": 143,
    "screens": [
@@ -2772,8 +2772,8 @@
   {
    "file": "APP ticvai-control.dc.html",
    "provenance": "clientPack",
-   "bytes": 2214441,
-   "sha256": "8e204c32d3bf3be0",
+   "bytes": 2246358,
+   "sha256": "373c85ec0aa5aa9f",
    "frames": 767,
    "screensFramed": 767,
    "screens": [
@@ -4328,8 +4328,8 @@
   {
    "file": "APP venue-management.dc.html",
    "provenance": "clientPack",
-   "bytes": 4098282,
-   "sha256": "2046471a09a99c40",
+   "bytes": 4131053,
+   "sha256": "5fedce7def3886aa",
    "frames": 1383,
    "screensFramed": 1383,
    "screens": [
@@ -7115,8 +7115,8 @@
   {
    "file": "APP venue-pos.dc.html",
    "provenance": "clientPack",
-   "bytes": 386810,
-   "sha256": "3784402e76242805",
+   "bytes": 386833,
+   "sha256": "e54bf898d4c8190c",
    "frames": 40,
    "screensFramed": 40,
    "screens": [
@@ -7214,8 +7214,8 @@
   {
    "file": "APP venue-staff-mobile.dc.html",
    "provenance": "clientPack",
-   "bytes": 390585,
-   "sha256": "d99aa2a31958a537",
+   "bytes": 391193,
+   "sha256": "f2706dd1c2c7d3ed",
    "frames": 107,
    "screensFramed": 107,
    "screens": [
@@ -7579,8 +7579,8 @@
   {
    "file": "P02 Guest App.dc.html",
    "provenance": "generated",
-   "bytes": 152687,
-   "sha256": "6f252266e33ebc65",
+   "bytes": 153293,
+   "sha256": "bb736a87a922efda",
    "frames": 77,
    "screensFramed": 77,
    "screens": [
@@ -8091,8 +8091,8 @@
   {
    "file": "P07 Venue Scanner.dc.html",
    "provenance": "generated",
-   "bytes": 51009,
-   "sha256": "4d1164c1b4416e24",
+   "bytes": 51617,
+   "sha256": "a179425b07f6e511",
    "frames": 11,
    "screensFramed": 11,
    "screens": [
@@ -8131,8 +8131,8 @@
   {
    "file": "P08 Venue Management.dc.html",
    "provenance": "generated",
-   "bytes": 3516232,
-   "sha256": "1a6ffe593f783d74",
+   "bytes": 3546636,
+   "sha256": "4bb552fcaeb8b8ff",
    "frames": 1186,
    "screensFramed": 1186,
    "screens": [
@@ -10522,8 +10522,8 @@
   {
    "file": "P09 TICVAI Web.dc.html",
    "provenance": "generated",
-   "bytes": 1940177,
-   "sha256": "40fbf35016cfc7f7",
+   "bytes": 1966019,
+   "sha256": "608fb6e30171ab57",
    "frames": 676,
    "screensFramed": 676,
    "screens": [
@@ -11893,8 +11893,8 @@
   {
    "file": "P10 Partner Web.dc.html",
    "provenance": "generated",
-   "bytes": 179463,
-   "sha256": "5ee8132bb1de7700",
+   "bytes": 185538,
+   "sha256": "14474a0ebf94710a",
    "frames": 51,
    "screensFramed": 51,
    "screens": [
@@ -12048,8 +12048,8 @@
   {
    "file": "P12 Venue Support.dc.html",
    "provenance": "generated",
-   "bytes": 99979,
-   "sha256": "8d10f20bcf1acd2a",
+   "bytes": 100861,
+   "sha256": "ae7103b3a00e17e7",
    "frames": 28,
    "screensFramed": 28,
    "screens": [
@@ -12123,8 +12123,8 @@
   {
    "file": "P13 Venue CMS.dc.html",
    "provenance": "generated",
-   "bytes": 303414,
-   "sha256": "20e0b2d27fbf365f",
+   "bytes": 304408,
+   "sha256": "107739238294091c",
    "frames": 100,
    "screensFramed": 100,
    "screens": [
@@ -12376,8 +12376,8 @@
   {
    "file": "P15 Kitchen Display.dc.html",
    "provenance": "generated",
-   "bytes": 58672,
-   "sha256": "d9cfbe1362833e66",
+   "bytes": 58695,
+   "sha256": "3e5c70d2a523b6d3",
    "frames": 10,
    "screensFramed": 10,
    "screens": [
@@ -12414,8 +12414,8 @@
   {
    "file": "P16 Venue Analytics.dc.html",
    "provenance": "generated",
-   "bytes": 220893,
-   "sha256": "bcb66dba86b9f60e",
+   "bytes": 221384,
+   "sha256": "e4e3186581f12650",
    "frames": 69,
    "screensFramed": 69,
    "screens": [

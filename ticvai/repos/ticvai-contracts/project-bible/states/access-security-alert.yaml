@@ -1,0 +1,50 @@
+# Access security alert — state model
+# Contract: access.AccessSecurityAlert.status
+# Checked by tools/check-states.py.
+
+entity: AccessSecurityAlert
+contract: access
+enum: AccessSecurityAlert.status
+enumKind: inline
+enumSchema: AccessSecurityAlert
+enumProperty: status
+owner: access
+description: One access security or fraud alert, including biometric anomalies and edge security events
+  (declared 29 September, writers pass). The detection jobs (fraud rules, credential-sharing detection,
+  biometric anomaly detection, edge security monitoring) raise it `open`; `updateSecurityAlert`
+  (`POST /security-alerts/{alertId}/status`, body `status` `acknowledged`, `resolved` or `dismissed`)
+  moves it.
+initial:
+- open
+terminal:
+- resolved
+- dismissed
+transitions:
+- from: open
+  to: acknowledged
+  operation: updateSecurityAlert
+  trigger: operation
+  guard: '`status` `acknowledged`; `acknowledgedAt` and `acknowledgedByPrincipalId` are set'
+- from: open
+  to: dismissed
+  operation: updateSecurityAlert
+  trigger: operation
+  guard: '`status` `dismissed`; a false positive, dismissed without acknowledging first'
+- from: open
+  to: resolved
+  operation: updateSecurityAlert
+  trigger: operation
+  guard: '`status` `resolved`; dealt with at once'
+- from: acknowledged
+  to: resolved
+  operation: updateSecurityAlert
+  trigger: operation
+  guard: '`status` `resolved`; the cause was dealt with (a lock, a blacklist entry, an investigation)'
+- from: acknowledged
+  to: dismissed
+  operation: updateSecurityAlert
+  trigger: operation
+  guard: '`status` `dismissed`; found to be a false positive after acknowledging'
+openQuestions: null
+notes: '**Created only by the detection jobs** (trigger job); no operation raises an alert. `resolved` and
+  `dismissed` are terminal: a recurrence raises a new alert.'

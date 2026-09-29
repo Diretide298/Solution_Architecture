@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 676,
-  "operations": 547,
+  "operations": 583,
   "contracts": 19,
   "modules": 14,
   "undrawn": 0,
-  "operationsWithNoScreen": 163
+  "operationsWithNoScreen": 162
  },
  "waves": {
   "wave1": 12,
@@ -131,18 +131,18 @@
  "contracts": [
   {
    "contract": "catalogue",
-   "operations": 116
+   "operations": 138
   },
   {
    "contract": "promotions",
-   "operations": 112
-  },
-  {
-   "contract": "subscription",
-   "operations": 59
+   "operations": 119
   },
   {
    "contract": "orders",
+   "operations": 64
+  },
+  {
+   "contract": "subscription",
    "operations": 59
   },
   {
@@ -151,7 +151,7 @@
   },
   {
    "contract": "approvals",
-   "operations": 34
+   "operations": 35
   },
   {
    "contract": "platform-ops",
@@ -182,7 +182,7 @@
    "operations": 5
   },
   {
-   "contract": "public-api",
+   "contract": "reporting",
    "operations": 5
   },
   {
@@ -190,8 +190,8 @@
    "operations": 5
   },
   {
-   "contract": "reporting",
-   "operations": 4
+   "contract": "public-api",
+   "operations": 5
   },
   {
    "contract": "wallet",
@@ -483,7 +483,7 @@
    "module": "Security & Compliance",
    "wave": 3,
    "route": "/general/security-and-compliance-dashboard",
-   "operations": 6,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -654,7 +654,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/price-category-rate-type-library-adm-050",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -681,7 +681,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/package-bundle-add-on-pricing-adm-053",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -690,7 +690,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/market-venue-currency-pricing-structure-adm-054",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -708,7 +708,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/price-list-templates-clone-reuse-adm-056",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -843,7 +843,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/fee-surcharge-library-adm-071",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -870,7 +870,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/price-calculation-sequence-formula-engine-adm-074",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -879,7 +879,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/currency-precision-rounding-monetary-rules-adm-075",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -978,7 +978,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/pricing-rollback-emergency-control-center-adm-086",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -996,7 +996,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/dynamic-pricing-strategy-command-center-adm-088",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1005,7 +1005,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/dynamic-pricing-strategy-builder-adm-089",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1032,7 +1032,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/seasonal-calendar-day-timeslot-dynamic-rules-adm-092",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1050,7 +1050,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/dynamic-price-bands-ladders-adjustment-matrix-adm-094",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1059,7 +1059,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/dynamic-pricing-guardrails-commercial-protection-adm-095",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1068,7 +1068,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/dynamic-pricing-automation-policy-control-adm-096",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1104,7 +1104,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/weather-intelligence-demand-impact-configuration-adm-100",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1113,7 +1113,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/nearby-event-exhibition-local-demand-intelligence-adm-101",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1122,7 +1122,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/competitor-pricing-market-position-intelligence-adm-102",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1131,7 +1131,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/market-tourism-holiday-contextual-signal-hub-adm-103",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1167,7 +1167,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/ai-signal-registry-data-quality-model-governance-adm-107",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1230,7 +1230,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/automation-policy-autonomous-pricing-orchestrator-adm-114",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1257,7 +1257,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/ai-learning-model-performance-optimization-feedback-adm-117",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1338,7 +1338,7 @@
    "module": "Catalogue",
    "wave": 3,
    "route": "/catalogue/product-duplication-template-library-adm-126",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1356,7 +1356,7 @@
    "module": "Catalogue",
    "wave": 3,
    "route": "/catalogue/product-governance-command-center-adm-128",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1401,7 +1401,7 @@
    "module": "Catalogue",
    "wave": 3,
    "route": "/catalogue/change-impact-analysis-adm-133",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1410,7 +1410,7 @@
    "module": "Catalogue",
    "wave": 3,
    "route": "/catalogue/change-propagation-dependency-control-adm-134",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1437,7 +1437,7 @@
    "module": "Catalogue",
    "wave": 3,
    "route": "/catalogue/governance-risk-ai-monitoring-control-center-adm-137",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1455,7 +1455,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/promotion-campaign-directory-adm-139",
-   "operations": 2,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -1482,7 +1482,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/campaign-calendar-timeline-adm-142",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1815,7 +1815,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/bundle-definition-setup-adm-179",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1869,7 +1869,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/partner-external-product-bundle-manager-adm-185",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -1923,7 +1923,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/capacity-pool-reservation-manager-adm-191",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -1959,7 +1959,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/bundle-availability-by-channel-venue-partner-adm-195",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -2175,7 +2175,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/campaign-budget-financial-limit-setup-adm-219",
-   "operations": 1,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -2265,7 +2265,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/campaign-promotion-performance-explorer-adm-229",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -2454,7 +2454,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/workflow-instance-monitor-process-timeline-adm-250",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2463,7 +2463,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/workflow-exception-failure-recovery-center-adm-251",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2472,7 +2472,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/sla-escalation-bottleneck-monitor-adm-252",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2571,7 +2571,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/channel-sales-schedule-availability-windows-adm-263",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2580,7 +2580,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/customer-eligibility-rules-by-channel-adm-264",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2589,7 +2589,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/channel-sales-rules-limits-restrictions-adm-265",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2625,7 +2625,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/channel-connection-integration-manager-adm-269",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -2634,7 +2634,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/product-price-availability-synchronization-adm-270",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2661,7 +2661,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/channel-exceptions-incidents-recovery-adm-273",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -2697,7 +2697,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/ai-channel-optimization-intelligence-center-adm-277",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -2706,7 +2706,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/resale-marketplace-command-center-adm-278",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -2724,7 +2724,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/resale-policy-marketplace-settings-adm-280",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -2742,7 +2742,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/resale-pricing-price-guardrails-adm-282",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -2850,7 +2850,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/seller-settlement-payout-management-adm-294",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -2859,7 +2859,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/refunds-disputes-resale-exceptions-adm-295",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -5415,7 +5415,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/split-payment-tender-allocation-manager-t94-adm-601",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -7031,12 +7031,6 @@
     "contract": "subscription",
     "verb": "POST",
     "summary": "Terminate a tenant subscription"
-   },
-   {
-    "operation": "createPartnerUser",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Add a user to a partner branch"
    },
    {
     "operation": "decommissionBurstEnvironment",

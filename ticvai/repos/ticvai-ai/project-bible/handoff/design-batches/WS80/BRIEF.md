@@ -1,6 +1,6 @@
 # WS80 — Game and Ride board 3
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 12 operations · 7 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `PRODUCT_CONFIGURE, PRODUCT_VIEW, WALLET_CONFIGURE, WALLET_OPERATE, WALLET_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-414` | Wallet & Credit Management Dashboard | commandCentre | 0 | 0 | — |
-| `BO-415` | Wallet & Credit Type Configuration | configEditor | 0 | 0 | — |
-| `BO-416` | Wallet Account & Balance View | listDetail | 0 | 0 | — |
-| `BO-417` | Top-Up Configuration | listDetail | 0 | 0 | — |
-| `BO-418` | Top-Up Bonus Rule Configuration | listDetail | 0 | 0 | — |
-| `BO-419` | Bonus Usage Restrictions | listDetail | 0 | 0 | — |
-| `BO-420` | Bonus Validity & Expiry Configuration | listDetail | 0 | 0 | — |
-| `BO-421` | Free Game & Ride Credit Management | configEditor | 0 | 0 | — |
-| `BO-422` | Refund, Adjustment & Manual Bonus Control | listDetail | 0 | 0 | — |
-| `BO-423` | Wallet Credit Transaction Ledger & Audit | listDetail | 0 | 0 | — |
+| `BO-414` | Wallet & Credit Management Dashboard | commandCentre | 2 | 0 | — |
+| `BO-415` | Wallet & Credit Type Configuration | configEditor | 2 | 0 | — |
+| `BO-416` | Wallet Account & Balance View | listDetail | 4 | 0 | — |
+| `BO-417` | Top-Up Configuration | listDetail | 1 | 0 | — |
+| `BO-418` | Top-Up Bonus Rule Configuration | listDetail | 1 | 0 | — |
+| `BO-419` | Bonus Usage Restrictions | listDetail | 1 | 0 | — |
+| `BO-420` | Bonus Validity & Expiry Configuration | listDetail | 1 | 0 | — |
+| `BO-421` | Free Game & Ride Credit Management | configEditor | 2 | 0 | — |
+| `BO-422` | Refund, Adjustment & Manual Bonus Control | listDetail | 1 | 0 | — |
+| `BO-423` | Wallet Credit Transaction Ledger & Audit | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 

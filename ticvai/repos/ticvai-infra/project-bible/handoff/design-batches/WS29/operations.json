@@ -8,9 +8,28 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "MembershipProductValidationApprovalPublicationVersioInput",
   "responds": "MembershipProductValidationApprovalPublicationVersioView"
+ },
+ "listEntitlementTemplates": {
+  "method": "GET",
+  "path": "/entitlement-templates",
+  "contract": "catalogue",
+  "summary": "List entitlement templates",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "EntitlementTemplate"
  },
  "listMembershipAnnualPass": {
   "method": "GET",
@@ -21,9 +40,50 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "membershipType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "tier",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "hasConfigurationIssues",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "MembershipAnnualPassCommandCenterView"
+  "responds": "Page"
  },
  "listMembershipCommercialPricing": {
   "method": "GET",
@@ -34,9 +94,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "membershipCode",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "salesPeriod",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "MembershipCommercialPricingChannelAssociationView"
+  "responds": "Page"
  },
  "listMembershipUsageVisit": {
   "method": "GET",
@@ -47,9 +133,78 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "membershipCode",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "tier",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "MembershipUsageVisitConsumptionRulesView"
+  "responds": "Page"
+ },
+ "listPriceLists": {
+  "method": "GET",
+  "path": "/price-lists",
+  "contract": "catalogue",
+  "summary": "List price lists",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "publishChannelAvailability": {
+  "method": "PUT",
+  "path": "/channel-availability",
+  "contract": "catalogue",
+  "summary": "Channel Publication & Availability",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ChannelPublicationAvailabilityInput",
+  "responds": "ChannelPublicationAvailabilityView"
  },
  "setFamilyHouseholdDependent": {
   "method": "PUT",
@@ -60,9 +215,34 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "FamilyHouseholdDependentMembershipConfigurationInput",
   "responds": "FamilyHouseholdDependentMembershipConfigurationView"
+ },
+ "setMembershipBenefit": {
+  "method": "PUT",
+  "path": "/membership-benefits",
+  "contract": "catalogue",
+  "summary": "Define a benefit",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CatalogueMembershipBenefit",
+  "responds": "CatalogueMembershipBenefit"
  },
  "setMembershipEligibilityQualification": {
   "method": "PUT",
@@ -73,7 +253,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "MembershipEligibilityQualificationRuleBuilderInput",
   "responds": "MembershipEligibilityQualificationRuleBuilderView"
  },
@@ -86,7 +272,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "MembershipEntitlementAdmissionBenefitBuilderInput",
   "responds": "MembershipEntitlementAdmissionBenefitBuilderView"
  },
@@ -99,9 +291,77 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "MembershipProductTierBuilderInput",
   "responds": "MembershipProductTierBuilderView"
+ },
+ "setMembershipProgramme": {
+  "method": "PUT",
+  "path": "/membership-programmes",
+  "contract": "catalogue",
+  "summary": "Define a membership programme",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CatalogueMembershipProgramme",
+  "responds": "CatalogueMembershipProgramme"
+ },
+ "setPlanBenefits": {
+  "method": "PUT",
+  "path": "/entitlement-templates/{templateId}/benefits",
+  "contract": "catalogue",
+  "summary": "Replace the benefits a plan grants",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "templateId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CataloguePlanBenefit",
+  "responds": "CataloguePlanBenefit"
+ },
+ "setPrices": {
+  "method": "PUT",
+  "path": "/price-lists/{priceListId}/prices",
+  "contract": "catalogue",
+  "summary": "Set prices in bulk",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "setRenewalAutoMembership": {
   "method": "PUT",
@@ -112,7 +372,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "RenewalAutoRenewalMembershipContinuityConfigurationInput",
   "responds": "RenewalAutoRenewalMembershipContinuityConfigurationView"
  },
@@ -125,7 +391,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ValidityActivationExpiryConfigurationInput",
   "responds": "ValidityActivationExpiryConfigurationView"
  }

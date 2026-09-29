@@ -1,0 +1,40 @@
+{
+ "rescheduleEvent": {
+  "method": "POST",
+  "path": "/events/{eventId}/reschedule",
+  "contract": "catalogue",
+  "summary": "Move or cancel, and decide what happens to the people who bought",
+  "permission": "PERFORMANCE_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EventReschedule",
+  "responds": null
+ },
+ "setEventSchedule": {
+  "method": "PUT",
+  "path": "/events/{eventId}/schedule",
+  "contract": "catalogue",
+  "summary": "Performance times, durations and turnaround",
+  "permission": "PERFORMANCE_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EventSchedule",
+  "responds": "EventSchedule"
+ }
+}

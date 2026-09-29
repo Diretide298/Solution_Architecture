@@ -1,0 +1,1518 @@
+[
+ {
+  "id": "BO-1051",
+  "name": "Seat Analytics Command Center",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "11",
+   "number": "01",
+   "page": 46
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/seat-analytics-command-center-bo-1051",
+   "component": "apps/venue-management-web/src/routes/access-venue/SeatAnalyticsCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-1052",
+    "BO-1053",
+    "BO-1054",
+    "BO-1055",
+    "BO-1056",
+    "BO-1057",
+    "BO-1058",
+    "BO-1059",
+    "BO-1060"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-1052",
+     "trigger": "Occupancy Reporting",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1053",
+     "trigger": "Zone Performance Reporting",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1054",
+     "trigger": "Revenue by Section",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1055",
+     "trigger": "Revenue by Seat Category",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1056",
+     "trigger": "Seat Utilization Analytics",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1057",
+     "trigger": "Hold Inventory Reporting",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1058",
+     "trigger": "Sales Pace & Pick Curves",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1059",
+     "trigger": "Heat Maps & Drill-Down",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1060",
+     "trigger": "Report Builder, Export & Audit",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide a consolidated view of seat commercial and operational performance. Show occupancy, revenue, utilization, average ticket price, held inventory, release yield and forecast variance. Present trend, benchmark, target and prior-period comparison by tenant, venue and event. Surface low occupancy, excessive holds, inventory conflict, price variance and data-quality alerts. Metrics shall use versioned definitions and authoritative sources; row/seat and guest-level drill-down, exports and subscriptions follow RBAC/PBAC and data-retention rules. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 46"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 46"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listSeats",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The seat analytics list.",
+   "error": "Could not load. Names which read failed and leaves the seat analytics untouched.",
+   "emptyFirstRun": "No seat analytics yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the seat analytics are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listSeats",
+    "contract": "seating",
+    "purpose": "List seats in a map",
+    "trigger": "onAction"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1051",
+   "workshopBoard": "wireframes/WS150 Seat Management Venue Mapping Reference v1.0 Board 11.dc.html#bo-1051"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 46. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "seatMapId",
+     "from": "navigation"
+    }
+   ],
+   "coldEntry": "**Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that list — never an empty form that looks configurable."
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1052",
+  "name": "Occupancy Reporting",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "11",
+   "number": "02",
+   "page": 46
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/occupancy-reporting-bo-1052",
+   "component": "apps/venue-management-web/src/routes/access-venue/OccupancyReporting.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1051"
+   ],
+   "exitTo": [
+    "BO-1051"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1051",
+     "trigger": "Back to Seat Analytics Command Center",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Report sold and attended occupancy against configured capacity. Calculate sold, issued, scanned, no-show, blocked, available and effective capacity with clear metric definitions. Analyze by event, performance, venue, section, category, channel and time. Compare events and periods and drill to approved seat-level evidence. Metrics shall use versioned definitions and authoritative sources; row/seat and guest-level drill-down, exports and subscriptions follow RBAC/PBAC and data-retention rules. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 46"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "filters",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Scope",
+       "operation": "getKpiValues",
+       "notes": "Sends `?scopePath=` (venue, event).",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      },
+      {
+       "kind": "selectField",
+       "label": "Period",
+       "operation": "getKpiValues",
+       "notes": "Sends `?period=`.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      },
+      {
+       "kind": "selectField",
+       "label": "Compare to",
+       "operation": "getKpiValues",
+       "notes": "Sends `?compareTo=`.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Sold occupancy",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.target",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ],
+       "operation": "getKpiValues",
+       "notes": "Needs a sold-occupancy KPI code; not seeded.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Scanned occupancy",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.target",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ],
+       "operation": "getKpiValues",
+       "notes": "Needs a scanned-occupancy KPI code; not seeded.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      },
+      {
+       "kind": "metricTile",
+       "label": "No-shows",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ],
+       "operation": "getKpiValues",
+       "notes": "Needs a no-show KPI code; not seeded.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Occupancy measures",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.name",
+        "KpiValue.scopePath",
+        "KpiValue.period",
+        "KpiValue.value",
+        "KpiValue.target",
+        "KpiValue.comparison",
+        "KpiValue.variancePercent",
+        "KpiValue.status",
+        "KpiValue.asOf"
+       ],
+       "operation": "getKpiValues",
+       "notes": "Sold, issued, scanned, no-show, blocked, available and effective capacity, one KPI per row.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The occupancy reporting list.",
+   "error": "Could not load. Names which read failed and leaves the occupancy reporting untouched.",
+   "emptyFirstRun": "No occupancy reporting yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the occupancy reporting are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Occupancy KPIs",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1052",
+   "workshopBoard": "wireframes/WS150 Seat Management Venue Mapping Reference v1.0 Board 11.dc.html#bo-1052"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 46. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from contract reporting.yaml GET /kpi-values. Pack labels with no schema field yet (shown as plain labels): KPI codes not seeded: sold, issued, scanned, no-show, blocked, available, effective capacity, Breakdown by section, category, channel, Seat-level evidence drill-down.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1053",
+  "name": "Zone Performance Reporting",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "11",
+   "number": "03",
+   "page": 46
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/zone-performance-reporting-bo-1053",
+   "component": "apps/venue-management-web/src/routes/access-venue/ZonePerformanceReporting.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1051"
+   ],
+   "exitTo": [
+    "BO-1051"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1051",
+     "trigger": "Back to Seat Analytics Command Center",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Compare capacity, demand and yield across venue zones. Show zone capacity, sold, occupancy, average price, revenue, utilization, holds and release conversion. Rank zones and compare target, forecast, prior period and venue benchmark. Drill from zone to section, row and seat while preserving the selected metric and filters. Metrics shall use versioned definitions and authoritative sources; row/seat and guest-level drill-down, exports and subscriptions follow RBAC/PBAC and data-retention rules. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 46",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 46"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "filters",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Scope",
+       "operation": "getKpiValues",
+       "notes": "Sends `?scopePath=`; a zone is reachable only if zones are scope paths.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      },
+      {
+       "kind": "selectField",
+       "label": "Period",
+       "operation": "getKpiValues",
+       "notes": "Sends `?period=`.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      },
+      {
+       "kind": "selectField",
+       "label": "Compare to",
+       "operation": "getKpiValues",
+       "notes": "Sends `?compareTo=`; target, benchmark or prior period.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Zone occupancy",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ],
+       "operation": "getKpiValues",
+       "notes": "Needs a zone-occupancy KPI code; not seeded.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Zone revenue",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ],
+       "operation": "getKpiValues",
+       "notes": "Needs a zone-revenue KPI code; `takings` is venue-wide.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Zone ranking",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.scopePath",
+        "KpiValue.name",
+        "KpiValue.value",
+        "KpiValue.target",
+        "KpiValue.comparison",
+        "KpiValue.variancePercent",
+        "KpiValue.direction",
+        "KpiValue.status"
+       ],
+       "operation": "getKpiValues",
+       "notes": "Ranked by value; one KPI at a time.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The zone performance reporting list.",
+   "error": "Could not load. Names which read failed and leaves the zone performance reporting untouched.",
+   "emptyFirstRun": "No zone performance reporting yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the zone performance reporting are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "By zone",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1053",
+   "workshopBoard": "wireframes/WS150 Seat Management Venue Mapping Reference v1.0 Board 11.dc.html#bo-1053"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 46. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from contract reporting.yaml GET /kpi-values. Pack labels with no schema field yet (shown as plain labels): KPI codes not seeded: zone capacity, sold, occupancy, average price, revenue, utilization, holds, release conversion, Zone as a scope level, Rank, Forecast comparison, Drill from zone to section, row, seat.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1054",
+  "name": "Revenue by Section",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "11",
+   "number": "04",
+   "page": 47
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/revenue-by-section-bo-1054",
+   "component": "apps/venue-management-web/src/routes/access-venue/RevenueBySection.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1051"
+   ],
+   "exitTo": [
+    "BO-1051"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1051",
+     "trigger": "Back to Seat Analytics Command Center",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Analyze financial contribution from each seating section. Report gross/net revenue, tax, fees, discounts, refunds, average ticket price and percentage of performance total. Compare section revenue, yield, occupancy, price band and prior-year/forecast variance. Link summarized values to governed finance/order detail and reconciliation status. Metrics shall use versioned definitions and authoritative sources; row/seat and guest-level drill-down, exports and subscriptions follow RBAC/PBAC and data-retention rules. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 47"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "filters",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Performance scope",
+       "operation": "getKpiValues",
+       "notes": "Sends `?scopePath=`.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      },
+      {
+       "kind": "selectField",
+       "label": "Period",
+       "operation": "getKpiValues",
+       "notes": "Sends `?period=`.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      },
+      {
+       "kind": "selectField",
+       "label": "Compare to",
+       "operation": "getKpiValues",
+       "notes": "Sends `?compareTo=`; samePeriodLastYear gives the pack's prior-year variance.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Net revenue",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ],
+       "operation": "getKpiValues",
+       "notes": "`takings` is the only seeded money KPI.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Average ticket price",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ],
+       "operation": "getKpiValues",
+       "notes": "Needs an average-ticket-price KPI code; not seeded.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Revenue by section",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.scopePath",
+        "KpiValue.name",
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.variancePercent",
+        "KpiValue.status",
+        "Section",
+        "Gross revenue",
+        "Tax",
+        "Fees",
+        "Discounts",
+        "Refunds",
+        "% of performance total",
+        "Reconciliation status"
+       ],
+       "operation": "getKpiValues",
+       "notes": "KpiValue has no section dimension; the section columns are pack labels.",
+       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 47"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The revenue section list.",
+   "error": "Could not load. Names which read failed and leaves the revenue section untouched.",
+   "emptyFirstRun": "No revenue section yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the revenue section are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Revenue by section",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1054",
+   "workshopBoard": "wireframes/WS150 Seat Management Venue Mapping Reference v1.0 Board 11.dc.html#bo-1054"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 47. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Seat_Management_Venue_Mapping_Reference v1.0.pdf p.47; contract reporting.yaml GET /kpi-values. Pack labels with no schema field yet (shown as plain labels): Section dimension, Gross revenue, Tax, Fees, Discounts, Refunds, % of performance total, Yield, Price band, Reconciliation status.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1055",
+  "name": "Revenue by Seat Category",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "11",
+   "number": "05",
+   "page": 47
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/revenue-by-seat-category-bo-1055",
+   "component": "apps/venue-management-web/src/routes/access-venue/RevenueBySeatCategory.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1051"
+   ],
+   "exitTo": [
+    "BO-1051"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1051",
+     "trigger": "Back to Seat Analytics Command Center",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Measure performance of Premium, Standard, Value, Accessible and configured categories. Show revenue mix, seats sold, average price, discount, refund, yield and sell-through by category. Compare venue, event, performance, channel, customer segment and days to event. Preserve accessible-category privacy and prevent misleading comparison caused by protected inventory rules. Metrics shall use versioned definitions and authoritative sources; row/seat and guest-level drill-down, exports and subscriptions follow RBAC/PBAC and data-retention rules. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 47"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 47"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listSeatCategories",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The revenue seat category list.",
+   "error": "Could not load. Names which read failed and leaves the revenue seat category untouched.",
+   "emptyFirstRun": "No revenue seat category yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the revenue seat category are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listSeatCategories",
+    "contract": "seating",
+    "purpose": "List seat categories",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1055",
+   "workshopBoard": "wireframes/WS150 Seat Management Venue Mapping Reference v1.0 Board 11.dc.html#bo-1055"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 47. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1056",
+  "name": "Seat Utilization Analytics",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "11",
+   "number": "06",
+   "page": 47
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/seat-utilization-analytics-bo-1056",
+   "component": "apps/venue-management-web/src/routes/access-venue/SeatUtilizationAnalytics.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1051"
+   ],
+   "exitTo": [
+    "BO-1051"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1051",
+     "trigger": "Back to Seat Analytics Command Center",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Measure how effectively physical and sellable seating capacity is used. Calculate booked, sold, scanned, occupied estimate, idle and unavailable hours or performances as applicable. Analyze utilization by venue, map, section, seat type, day, time and event category. Identify permanently underused areas, recurring blocks, maintenance patterns and lost-sale opportunities. Metrics shall use versioned definitions and authoritative sources; row/seat and guest-level drill-down, exports and subscriptions follow RBAC/PBAC and data-retention rules. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 47"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "filters",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Scope",
+       "operation": "getKpiValues",
+       "notes": "Sends `?scopePath=`.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      },
+      {
+       "kind": "selectField",
+       "label": "Period",
+       "operation": "getKpiValues",
+       "notes": "Sends `?period=`.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Seat utilization",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.target",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ],
+       "operation": "getKpiValues",
+       "notes": "Needs a seat-utilization KPI code; not seeded.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Idle seat-performances",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison"
+       ],
+       "operation": "getKpiValues",
+       "notes": "Needs an idle KPI code; not seeded.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Utilization measures",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.name",
+        "KpiValue.scopePath",
+        "KpiValue.period",
+        "KpiValue.value",
+        "KpiValue.target",
+        "KpiValue.variancePercent",
+        "KpiValue.status",
+        "KpiValue.stale"
+       ],
+       "operation": "getKpiValues",
+       "notes": "Booked, sold, scanned, occupied estimate, idle and unavailable.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      },
+      {
+       "kind": "chart",
+       "label": "Underused areas",
+       "columns": [
+        "Section",
+        "Seat type",
+        "Day",
+        "Time",
+        "Utilization"
+       ],
+       "notes": "Permanently underused areas, recurring blocks and maintenance patterns; KpiValue has no section, seat-type or time-of-day dimension.",
+       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 47"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The seat utilization analytics list.",
+   "error": "Could not load. Names which read failed and leaves the seat utilization analytics untouched.",
+   "emptyFirstRun": "No seat utilization analytics yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the seat utilization analytics are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Seat utilisation",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1056",
+   "workshopBoard": "wireframes/WS150 Seat Management Venue Mapping Reference v1.0 Board 11.dc.html#bo-1056"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 47. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Seat_Management_Venue_Mapping_Reference v1.0.pdf p.47; contract reporting.yaml GET /kpi-values. Pack labels with no schema field yet (shown as plain labels): KPI codes not seeded: booked, sold, scanned, occupied estimate, idle, unavailable, Breakdown by map, section, seat type, day, time, event category, Lost-sale opportunities.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1057",
+  "name": "Hold Inventory Reporting",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "11",
+   "number": "07",
+   "page": 47
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/hold-inventory-reporting-bo-1057",
+   "component": "apps/venue-management-web/src/routes/access-venue/HoldInventoryReporting.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1051"
+   ],
+   "exitTo": [
+    "BO-1051"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1051",
+     "trigger": "Back to Seat Analytics Command Center",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Report the size, age and outcome of seat holds. Show held quantity/value, capacity percentage, active age, upcoming release, conversion and expired unused. Compare VIP, Sponsor, Artist, Media, Corporate, Internal and custom types by owner/stakeholder. Measure released-to-sold outcomes and potential revenue suppressed by late or unused holds. Metrics shall use versioned definitions and authoritative sources; row/seat and guest-level drill-down, exports and subscriptions follow RBAC/PBAC and data-retention rules. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 47"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 47"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listInventoryHolds",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The hold inventory reporting list.",
+   "error": "Could not load. Names which read failed and leaves the hold inventory reporting untouched.",
+   "emptyFirstRun": "No hold inventory reporting yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the hold inventory reporting are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listInventoryHolds",
+    "contract": "catalogue",
+    "purpose": "List leases",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1057",
+   "workshopBoard": "wireframes/WS150 Seat Management Venue Mapping Reference v1.0 Board 11.dc.html#bo-1057"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 47. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1058",
+  "name": "Sales Pace & Pick Curves",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "11",
+   "number": "08",
+   "page": 47
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/sales-pace-pick-curves-bo-1058",
+   "component": "apps/venue-management-web/src/routes/access-venue/SalesPacePickCurves.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1051"
+   ],
+   "exitTo": [
+    "BO-1051"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1051",
+     "trigger": "Back to Seat Analytics Command Center",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Analyze when seats sell and which inventory customers select first. Plot cumulative sales by days/hours to event against target, forecast and comparable events. Configuration Scope of Work | Version 1.0 47 Show seat-pick sequence by section, row, price, view and channel and identify preferred inventory patterns. Support cohort comparison and expose sufficient sample and confidence information for decisions. Metrics shall use versioned definitions and authoritative sources; row/seat and guest-level drill-down, exports and subscriptions follow RBAC/PBAC and data-retention rules. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 47"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 47"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listDemandBookingCurve",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The sales pace pick list.",
+   "error": "Could not load. Names which read failed and leaves the sales pace pick untouched.",
+   "emptyFirstRun": "No sales pace pick yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the sales pace pick are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listDemandBookingCurve",
+    "contract": "catalogue",
+    "purpose": "Sales pace and pick curve",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1058",
+   "workshopBoard": "wireframes/WS150 Seat Management Venue Mapping Reference v1.0 Board 11.dc.html#bo-1058"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 47. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1059",
+  "name": "Heat Maps & Drill-Down",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "11",
+   "number": "09",
+   "page": 48
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/heat-maps-drill-down-bo-1059",
+   "component": "apps/venue-management-web/src/routes/access-venue/HeatMapsDrillDown.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1051"
+   ],
+   "exitTo": [
+    "BO-1051"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1051",
+     "trigger": "Back to Seat Analytics Command Center",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Visualize spatial performance directly on the approved seat map. Display occupancy, revenue, average price, demand, availability, holds, scan and utilization heat maps. Switch level, section, row and seat granularity and synchronize filters with tables and charts. Open the supporting transactions where authorized and show metric definition, source and refresh time. Metrics shall use versioned definitions and authoritative sources; row/seat and guest-level drill-down, exports and subscriptions follow RBAC/PBAC and data-retention rules. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 48"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 48"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "runReport",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "runReport"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The heat maps drill-down list.",
+   "error": "Could not load. Names which read failed and leaves the heat maps drill-down untouched.",
+   "emptyFirstRun": "No heat maps drill-down yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the heat maps drill-down are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getSeatInventory",
+    "contract": "seating",
+    "purpose": "The map behind the heat",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "runReport",
+    "contract": "reporting",
+    "purpose": "Drill down",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1059",
+   "workshopBoard": "wireframes/WS150 Seat Management Venue Mapping Reference v1.0 Board 11.dc.html#bo-1059"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 48. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "reportId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1060",
+  "name": "Report Builder, Export & Audit",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "11",
+   "number": "10",
+   "page": 48
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/report-builder-export-audit-bo-1060",
+   "component": "apps/venue-management-web/src/routes/access-venue/ReportBuilderExportAudit.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1051"
+   ],
+   "exitTo": [
+    "BO-1051"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1051",
+     "trigger": "Back to Seat Analytics Command Center",
+     "provenance": "structural — pack board 11 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow authorized users to assemble and distribute controlled seat reports. Select approved dimensions, measures, filters, grouping, sorting, chart/map and date context. Save personal/team views and schedule email or in-app delivery with recipient and permission validation. Export CSV, XLSX or PDF subject to policy and log report definition, recipients, downloads and sensitive access. Metrics shall use versioned definitions and authoritative sources; row/seat and guest-level drill-down, exports and subscriptions follow RBAC/PBAC and data-retention rules. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 48 Board 12 - Multi-Tenant & Venue Configuration Figure 12. High-definition configuration board with all 10 screens. Visual reference: information architecture and configuration coverage; detailed production behavior is defined in the following scope. Configuration Scope of Work | Version 1.0 49",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Report Builder, Export & Audit declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 48"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 48"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createReport",
+       "label": "Create report",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createReport"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The report export audit list.",
+   "error": "Could not load. Names which read failed and leaves the report export audit untouched.",
+   "emptyFirstRun": "No report export audit yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the report export audit are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "createReport",
+    "contract": "reporting",
+    "purpose": "Build a seat report",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "exportReportResult",
+    "contract": "reporting",
+    "purpose": "Export it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1060",
+   "workshopBoard": "wireframes/WS150 Seat Management Venue Mapping Reference v1.0 Board 11.dc.html#bo-1060"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 48. 0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "executionId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

@@ -5,7 +5,7 @@
   "access": {
    "title": "3 — Admission and Access",
    "capabilityCount": 17,
-   "unguardedOperations": 3,
+   "unguardedOperations": 4,
    "capabilities": [
     {
      "key": "ACCESS_OVERRIDE",
@@ -23,14 +23,14 @@
      "key": "ACCESS_POINT_CONFIGURE",
      "label": null,
      "group": "Access control",
-     "operationCount": 64,
+     "operationCount": 87,
      "operations": [
       "addBlacklistEntry",
       "approveMultiMediaPreview",
+      "archiveMediaTemplate",
       "createAccessPoint",
       "createAdmissionRules",
-      "publishHardwareDeployment",
-      "publishMediaCompatibilityTesting"
+      "deleteAccessPointGroup"
      ],
      "elevated": true,
      "segregationConstrained": false
@@ -69,11 +69,14 @@
      "key": "DEVICE_CONFIGURE",
      "label": null,
      "group": "Operations",
-     "operationCount": 3,
+     "operationCount": 8,
      "operations": [
+      "deletePodium",
+      "registerAccessDevice",
       "setDeviceSoftwareContent",
       "setHandheldMobileAccess",
-      "setReaderScannerPeripheral"
+      "setHardwareModel",
+      "setPodium"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -96,10 +99,12 @@
      "key": "GUEST_MANAGE",
      "label": "amend, merge, configure consent purposes",
      "group": "Guest engagement",
-     "operationCount": 3,
+     "operationCount": 5,
      "operations": [
       "enrolFacePass",
       "enrolFaceTag",
+      "releaseCredentialDevice",
+      "reviewFaceReenrolment",
       "revokeFacePass"
      ],
      "elevated": false,
@@ -121,9 +126,12 @@
      "key": "INCIDENT_MANAGE",
      "label": "investigate, close, notify an authority",
      "group": "Maintenance & safety",
-     "operationCount": 1,
+     "operationCount": 4,
      "operations": [
-      "setOperationalIncidentException"
+      "lockIdentity",
+      "releaseIdentityLock",
+      "setOperationalIncidentException",
+      "updateSecurityAlert"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -225,9 +233,12 @@
      "key": "TURNSTILE_MODE_SET",
      "label": "the podium: operating mode, and free rotation or closed within it (R221)",
      "group": "Access control",
-     "operationCount": 1,
+     "operationCount": 4,
      "operations": [
-      "setTurnstileMode"
+      "cancelGateModeChange",
+      "endPodiumShift",
+      "setTurnstileMode",
+      "startPodiumShift"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -297,10 +308,11 @@
      "key": "ACCREDITATION_MANAGE",
      "label": "amend a holder, assign access, suspend, revoke",
      "group": "Accreditation",
-     "operationCount": 5,
+     "operationCount": 6,
      "operations": [
       "importAccreditationHolders",
       "listAccreditationIdentityConflicts",
+      "resolveIdentityConflict",
       "setAccreditationStatus",
       "setHolderAccess",
       "updateAccreditationHolder"
@@ -431,8 +443,9 @@
      "key": "APPROVAL_ACT",
      "label": "approve, reject, return, request info",
      "group": "Operations",
-     "operationCount": 2,
+     "operationCount": 3,
      "operations": [
+      "actOnWorkflowInstance",
       "issueAccreditationBadge",
       "resolveApprovedActionExecution"
      ],
@@ -579,16 +592,28 @@
   },
   "catalogue": {
    "title": "1 — Ticketing Catalogue",
-   "capabilityCount": 11,
+   "capabilityCount": 12,
    "unguardedOperations": 3,
    "capabilities": [
     {
      "key": "AI_APPROVE",
      "label": null,
      "group": "Operations",
+     "operationCount": 2,
+     "operations": [
+      "decideCatalogueAiFinding",
+      "decidePricingRecommendation"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "AI_CONFIGURE",
+     "label": null,
+     "group": "Operations",
      "operationCount": 1,
      "operations": [
-      "decidePricingRecommendation"
+      "setSignalRegistryPolicy"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -669,14 +694,14 @@
      "key": "PRICE_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 6,
+     "operationCount": 18,
      "operations": [
+      "cancelPricingRollback",
       "copyPriceList",
       "createPriceList",
-      "setDynamicPriceRule",
-      "setPrepaidMinutePackage",
-      "setPrices",
-      "updatePriceList"
+      "requestPricingRollback",
+      "setCurrencyRoundingRule",
+      "setDemandSignalConfiguration"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -711,7 +736,7 @@
      "key": "PRODUCT_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 57,
+     "operationCount": 65,
      "operations": [
       "approvePricingWorkflowAuthority",
       "approveReviewDecision",
@@ -896,7 +921,7 @@
       "ingestSettlementFile",
       "resolveSettlementException"
      ],
-     "elevated": false,
+     "elevated": true,
      "segregationConstrained": false
     },
     {
@@ -1053,7 +1078,7 @@
   "games": {
    "title": "10 — Games & F&B Integration",
    "capabilityCount": 10,
-   "unguardedOperations": 3,
+   "unguardedOperations": 4,
    "capabilities": [
     {
      "key": "ACCESS_VALIDATE",
@@ -1694,7 +1719,7 @@
      "key": "CASE_MANAGE",
      "label": null,
      "group": "Guest engagement",
-     "operationCount": 23,
+     "operationCount": 25,
      "operations": [
       "addCaseMessage",
       "claimConversation",
@@ -1710,14 +1735,14 @@
      "key": "CASE_VIEW",
      "label": null,
      "group": "Guest engagement",
-     "operationCount": 22,
+     "operationCount": 24,
      "operations": [
       "getCase",
       "getCaseInvestigationResolution",
       "getConversation",
       "getLostItemMatches",
       "listAgentWorkloadAvailability",
-      "listCaseResolutionClosure"
+      "listCaseCategories"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1726,7 +1751,7 @@
      "key": "GUEST_MANAGE",
      "label": "amend, merge, configure consent purposes",
      "group": "Guest engagement",
-     "operationCount": 40,
+     "operationCount": 41,
      "operations": [
       "actOnWaiverRequirements",
       "addGuestNote",
@@ -1877,7 +1902,7 @@
   },
   "orders": {
    "title": "2 — Ticketing Sales",
-   "capabilityCount": 20,
+   "capabilityCount": 21,
    "unguardedOperations": 18,
    "capabilities": [
     {
@@ -1888,7 +1913,7 @@
      "operations": [
       "setB2bCreditLimit"
      ],
-     "elevated": false,
+     "elevated": true,
      "segregationConstrained": false
     },
     {
@@ -1967,14 +1992,14 @@
      "key": "ORDER_MODIFY",
      "label": null,
      "group": "Selling",
-     "operationCount": 22,
+     "operationCount": 25,
      "operations": [
       "addTip",
       "convertToTermProduct",
       "createMemberException",
       "holdOrder",
-      "migrateMembership",
-      "modifyOrder"
+      "mergeOrders",
+      "migrateMembership"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -2041,7 +2066,7 @@
      "key": "ORDER_VIEW",
      "label": null,
      "group": "Selling",
-     "operationCount": 92,
+     "operationCount": 95,
      "operations": [
       "getB2bCredit",
       "getGroupBooking",
@@ -2081,7 +2106,7 @@
      "key": "PRODUCT_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 8,
+     "operationCount": 9,
      "operations": [
       "cloneTicketTemplate",
       "createTicketTemplate",
@@ -2117,6 +2142,18 @@
      "segregationConstrained": false
     },
     {
+     "key": "SETTLEMENT_RECONCILE",
+     "label": null,
+     "group": "Finance",
+     "operationCount": 2,
+     "operations": [
+      "holdResaleSettlement",
+      "releaseResaleSettlementHold"
+     ],
+     "elevated": true,
+     "segregationConstrained": false
+    },
+    {
      "key": "TENANT_CONFIGURE",
      "label": "edit branding, content, navigation, modules",
      "group": "Tenant experience",
@@ -2143,7 +2180,7 @@
       "createB2bCreditAccount",
       "setB2bPaymentTerms"
      ],
-     "elevated": false,
+     "elevated": true,
      "segregationConstrained": false
     },
     {
@@ -2343,14 +2380,14 @@
      "key": "PRICE_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 30,
+     "operationCount": 32,
      "operations": [
       "approveCampaignWorkflow",
       "approveDecision",
       "assignCoupon",
+      "createCommercialCampaign",
       "createCouponCampaign",
-      "createPromotion",
-      "createVoucherBatch"
+      "createPromotion"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -2359,7 +2396,7 @@
      "key": "PRICE_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 90,
+     "operationCount": 91,
      "operations": [
       "analysePromotionConflicts",
       "evaluatePromotions",
@@ -2375,7 +2412,7 @@
      "key": "PRODUCT_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 11,
+     "operationCount": 13,
      "operations": [
       "concludeRecommendationExperiment",
       "createBundle",
@@ -2391,7 +2428,7 @@
      "key": "PRODUCT_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 12,
+     "operationCount": 14,
      "operations": [
       "explainRecommendation",
       "getBundle",
@@ -2654,7 +2691,7 @@
      "key": "REPORT_MANAGE",
      "label": "create and amend report definitions and dashboards",
      "group": "Reporting",
-     "operationCount": 11,
+     "operationCount": 12,
      "operations": [
       "createDashboard",
       "createKpi",
@@ -2684,7 +2721,7 @@
      "key": "REPORT_VIEW_TENANT",
      "label": null,
      "group": "Reporting",
-     "operationCount": 6,
+     "operationCount": 7,
      "operations": [
       "getAnalyticsBenchmark",
       "getAnalyticsUsage",
@@ -2700,7 +2737,7 @@
      "key": "REPORT_VIEW_VENUE",
      "label": null,
      "group": "Reporting",
-     "operationCount": 21,
+     "operationCount": 22,
      "operations": [
       "acknowledgeAlert",
       "askReportingQuestion",
@@ -2779,14 +2816,14 @@
      "key": "RESOURCE_MANAGE",
      "label": "define resources, set qualifications",
      "group": "Guest engagement",
-     "operationCount": 9,
+     "operationCount": 11,
      "operations": [
       "cloneResource",
       "createResource",
       "createResourceBlock",
-      "releaseResourceBlock",
-      "setResourceHierarchy",
-      "setResourceLifecycleState"
+      "createResourceCost",
+      "deleteResourceCost",
+      "releaseResourceBlock"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -2795,7 +2832,7 @@
      "key": "RESOURCE_VIEW",
      "label": null,
      "group": "Guest engagement",
-     "operationCount": 24,
+     "operationCount": 25,
      "operations": [
       "getExperienceResourceRequirements",
       "getMapResourceAvailability",
@@ -3160,9 +3197,33 @@
   },
   "subscription": {
    "title": "20 — Subscription & Licensing Management",
-   "capabilityCount": 12,
+   "capabilityCount": 16,
    "unguardedOperations": 2,
    "capabilities": [
+    {
+     "key": "CASE_MANAGE",
+     "label": null,
+     "group": "Guest engagement",
+     "operationCount": 2,
+     "operations": [
+      "actOnPartnerCase",
+      "createPartnerCase"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "CREDIT_MANAGE",
+     "label": "partner credit limits and terms",
+     "group": "Selling",
+     "operationCount": 2,
+     "operations": [
+      "setPartnerCreditProfile",
+      "setPartnerSecurity"
+     ],
+     "elevated": true,
+     "segregationConstrained": false
+    },
     {
      "key": "LEDGER_VIEW",
      "label": null,
@@ -3175,19 +3236,30 @@
      "segregationConstrained": false
     },
     {
+     "key": "ORDER_MODIFY",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 1,
+     "operations": [
+      "createPartnerChangeRequest"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
      "key": "PARTNER_MANAGE",
      "label": null,
      "group": "Operations",
-     "operationCount": 6,
+     "operationCount": 12,
      "operations": [
+      "actOnPartnerApplicationReview",
       "createPartnerAgreement",
       "createPartnerQuote",
       "createPartnerUser",
       "listPartnerAgreements",
-      "setChannelListing",
-      "updatePartnerAgreement"
+      "setChannelListing"
      ],
-     "elevated": false,
+     "elevated": true,
      "segregationConstrained": false
     },
     {
@@ -3237,7 +3309,7 @@
      "key": "PLATFORM_CELL_MANAGE",
      "label": null,
      "group": "Control Plane",
-     "operationCount": 26,
+     "operationCount": 28,
      "operations": [
       "approveBookingLimitCommercial",
       "approveMembershipProductValidation",
@@ -3322,6 +3394,19 @@
       "getUsageMetering"
      ],
      "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "SETTLEMENT_RECONCILE",
+     "label": null,
+     "group": "Finance",
+     "operationCount": 3,
+     "operations": [
+      "actOnPartnerCommissionLine",
+      "actOnPartnerReconciliationException",
+      "actOnPartnerSettlementBatch"
+     ],
+     "elevated": true,
      "segregationConstrained": false
     },
     {
@@ -3719,7 +3804,7 @@
      "key": "WORKFORCE_MANAGE",
      "label": null,
      "group": "Operations",
-     "operationCount": 13,
+     "operationCount": 14,
      "operations": [
       "amendAttendance",
       "createRotaAssignment",
@@ -3735,7 +3820,7 @@
      "key": "WORKFORCE_VIEW",
      "label": null,
      "group": "Operations",
-     "operationCount": 27,
+     "operationCount": 28,
      "operations": [
       "acknowledgeAnnouncement",
       "claimOpenShift",
@@ -3757,8 +3842,8 @@
    "ACCESS_POINT_CONFIGURE": [
     "addBlacklistEntry",
     "approveMultiMediaPreview",
-    "createAccessPoint",
-    "createAdmissionRules"
+    "archiveMediaTemplate",
+    "createAccessPoint"
    ],
    "ACCREDITATION_VIEW": [
     "getAccreditationHolder",
@@ -3767,6 +3852,7 @@
     "listAccreditationApplications"
    ],
    "AI_APPROVE": [
+    "decideCatalogueAiFinding",
     "decidePricingRecommendation"
    ],
    "AI_CONFIGURE": [
@@ -3825,10 +3911,10 @@
     "recordAttendance"
    ],
    "CASE_MANAGE": [
+    "actOnPartnerCase",
     "addCaseMessage",
     "claimConversation",
-    "closeConversation",
-    "createCase"
+    "closeConversation"
    ],
    "CASE_VIEW": [
     "getCase",
@@ -3847,9 +3933,9 @@
    ],
    "DEVICE_CONFIGURE": [
     "cloneReaderConfiguration",
+    "deletePodium",
     "deployReaderConfiguration",
-    "registerDevice",
-    "setDeviceSoftwareContent"
+    "registerAccessDevice"
    ],
    "DEVICE_VIEW": [
     "getDevice",
@@ -3942,10 +4028,10 @@
     "setParkingFacility"
    ],
    "PARTNER_MANAGE": [
+    "actOnPartnerApplicationReview",
     "createPartnerAgreement",
     "createPartnerQuote",
-    "createPartnerUser",
-    "listPartnerAgreements"
+    "createPartnerUser"
    ],
    "PARTNER_VIEW": [
     "getCommissionStatement",
@@ -4019,7 +4105,7 @@
     "approveCampaignWorkflow",
     "approveDecision",
     "assignCoupon",
-    "copyPriceList"
+    "cancelPricingRollback"
    ],
    "PRICE_VIEW": [
     "analysePromotionConflicts",
@@ -4078,8 +4164,10 @@
     "getResource"
    ],
    "SETTLEMENT_RECONCILE": [
-    "ingestSettlementFile",
-    "resolveSettlementException"
+    "actOnPartnerCommissionLine",
+    "actOnPartnerReconciliationException",
+    "actOnPartnerSettlementBatch",
+    "holdResaleSettlement"
    ],
    "SETTLEMENT_VIEW": [
     "getSettlement",

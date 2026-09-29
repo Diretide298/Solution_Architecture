@@ -1,0 +1,128 @@
+# Partner commission line — state model
+# Contract: subscription.PartnerCommissionLine.status
+# Checked by tools/check-states.py. Added 29 September (writers pass; data model DM4).
+
+entity: Partner commission line
+contract: subscription
+enum: PartnerCommissionLine.status
+enumKind: inline
+enumSchema: PartnerCommissionLine
+enumProperty: status
+owner: subscription
+initial:
+- calculated
+terminal:
+- paid
+- reversed
+transitions:
+- from: calculated
+  to: reconciled
+  trigger: job
+  guard: The reconciliation run matches the line to its order, payment and the agreement version in force at the
+    sale, with no open reconciliation exception against it
+- from: reconciled
+  to: financeReview
+  operation: actOnPartnerSettlementBatch
+  trigger: operation
+  guard: 'The line''s settlement batch is submitted for Finance review (`action: submitForReview` on the batch)
+    (decided 29 September, writers pass; DM4)'
+- from: financeReview
+  to: approved
+  operation: actOnPartnerSettlementBatch
+  trigger: operation
+  guard: 'The batch is approved (`action: approve`) (decided 29 September, writers pass; DM4)'
+- from: approved
+  to: scheduled
+  operation: actOnPartnerSettlementBatch
+  trigger: operation
+  guard: 'The batch is scheduled for payment (`action: schedule`) (decided 29 September, writers pass; DM4)'
+- from: scheduled
+  to: paid
+  trigger: cascade
+  guard: The batch is paid
+- from: calculated
+  to: onHold
+  operation: actOnPartnerCommissionLine
+  trigger: operation
+  guard: '`action: hold` with a reason: an open reconciliation exception, a credit hold, or the partner suspended
+    with `stopCreditSales` (decided 29 September, writers pass; DM4)'
+- from: reconciled
+  to: onHold
+  operation: actOnPartnerCommissionLine
+  trigger: operation
+  guard: '`action: hold`, before review (decided 29 September, writers pass; DM4)'
+- from: financeReview
+  to: onHold
+  operation: actOnPartnerCommissionLine
+  trigger: operation
+  guard: '`action: hold` by Finance during review (decided 29 September, writers pass; DM4)'
+- from: approved
+  to: onHold
+  operation: actOnPartnerCommissionLine
+  trigger: operation
+  guard: '`action: hold` after approval, before payment is scheduled (decided 29 September, writers pass; DM4)'
+- from: scheduled
+  to: onHold
+  operation: actOnPartnerCommissionLine
+  trigger: operation
+  guard: '`action: hold` before the payment run (decided 29 September, writers pass; DM4)'
+- from: onHold
+  to: reconciled
+  operation: actOnPartnerCommissionLine
+  trigger: operation
+  guard: '`action: release`: the hold is lifted and the line goes back through review (decided 29 September, writers
+    pass; DM4)'
+  isReversal: true
+- from: calculated
+  to: disputed
+  operation: actOnPartnerCommissionLine
+  trigger: operation
+  guard: '`action: dispute` against a partner case (category `commissionDispute`) (decided 29 September, writers
+    pass; DM4)'
+- from: reconciled
+  to: disputed
+  operation: actOnPartnerCommissionLine
+  trigger: operation
+  guard: '`action: dispute`, after reconciliation (decided 29 September, writers pass; DM4)'
+- from: financeReview
+  to: disputed
+  operation: actOnPartnerCommissionLine
+  trigger: operation
+  guard: '`action: dispute`, during Finance review (decided 29 September, writers pass; DM4)'
+- from: disputed
+  to: reconciled
+  operation: actOnPartnerCommissionLine
+  trigger: operation
+  guard: '`action: resolveDispute`: the amount stands, or a correcting adjustment line is added beside it (decided
+    29 September, writers pass; DM4)'
+  isReversal: true
+- from: disputed
+  to: reversed
+  operation: actOnPartnerCommissionLine
+  trigger: operation
+  guard: '`action: reverse`: the dispute is resolved against the line; where due, the calculation job writes a
+    replacement line (decided 29 September, writers pass; DM4)'
+- from: calculated
+  to: reversed
+  trigger: cascade
+  guard: The order is cancelled or refunded before settlement
+- from: reconciled
+  to: reversed
+  trigger: cascade
+  guard: Cancelled or refunded after reconciliation, before review
+- from: onHold
+  to: reversed
+  trigger: cascade
+  guard: Cancelled or refunded while held
+notes: '**A line moves with its batch** (decided 29 September, writers pass). Once a line is in a settlement batch,
+  `financeReview`, `approved`, `scheduled` and `paid` follow the batch (states/partner-settlement-batch.yaml); a
+  hold or a dispute takes the single line out of it.
+
+
+
+  **`paid` is terminal and is never reversed.** A refund after payment does not reopen the paid line: it creates
+  a new line carrying an `adjustmentReason` (`cancellation`, `refund`, `chargeback`), which settles in the next
+  batch. Lines are written by the commission calculation job when a partner order is confirmed (and reversed by it
+  when the order is cancelled or refunded before settlement); a single line is held, released, disputed or reversed
+  with actOnPartnerCommissionLine, and moves with its batch through actOnPartnerSettlementBatch (decided 29 September,
+  writers pass; DM4). `listCommissionCalculationSettlement` only reads.'

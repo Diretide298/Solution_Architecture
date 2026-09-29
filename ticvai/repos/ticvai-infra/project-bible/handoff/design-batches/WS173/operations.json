@@ -1,0 +1,91 @@
+{
+ "getAccessibleSeating": {
+  "method": "GET",
+  "path": "/accessible-seating",
+  "contract": "seating",
+  "summary": "Accessible seats, their routes and who may buy them",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "seatMapId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessibleSeating"
+ },
+ "getSeatRecommendationRules": {
+  "method": "GET",
+  "path": "/seat-recommendation-rules",
+  "contract": "seating",
+  "summary": "What \"best\" means at this venue",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SeatRecommendationRules"
+ },
+ "reassignSeats": {
+  "method": "POST",
+  "path": "/seat-reassignment",
+  "contract": "seating",
+  "summary": "Move a booked party, and tell them",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatReassignment"
+ },
+ "recommendSeats": {
+  "method": "POST",
+  "path": "/performances/{performanceId}/seat-recommendations",
+  "contract": "seating",
+  "summary": "Recommend seats for a party",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SeatRecommendationRequest",
+  "responds": null
+ },
+ "setSeatRecommendationRules": {
+  "method": "PUT",
+  "path": "/seat-recommendation-rules",
+  "contract": "seating",
+  "summary": "Scoring for best seat, best value, closest, family and accessible",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SeatRecommendationRules",
+  "responds": "SeatRecommendationRules"
+ }
+}

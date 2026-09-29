@@ -1,0 +1,77 @@
+{
+ "cloneEvent": {
+  "method": "POST",
+  "path": "/events/{eventId}/clone",
+  "contract": "catalogue",
+  "summary": "Copy an event, choosing what comes with it",
+  "permission": "EVENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listEventTypes": {
+  "method": "GET",
+  "path": "/event-types",
+  "contract": "catalogue",
+  "summary": "The kinds of event, and how each behaves",
+  "permission": "EVENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "EventType"
+ },
+ "listEvents": {
+  "method": "GET",
+  "path": "/events",
+  "contract": "catalogue",
+  "summary": "List events",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "setEventType": {
+  "method": "PUT",
+  "path": "/event-types",
+  "contract": "catalogue",
+  "summary": "Define an event kind and its behaviour",
+  "permission": "EVENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EventType",
+  "responds": "EventType"
+ }
+}

@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `catalogue`, `promotions`, `seating` |
 | Schemas owned | `catalogue`, `pricing`, `promotions`, `seating` |
-| Operations in the slice | 73 of 415 |
+| Operations in the slice | 112 of 444 |
 | Scale | Read-heavy, bundle-published to tills. The catalogue bundle is this service's output (ADR-0013). |
 | If it is down | A bad publish reaches every workstation. Versioned and rollback-able for that reason. |
 
@@ -37,6 +37,7 @@
 | bundle | [`updateBundle`](#updatebundle) | PATCH | `/bundles/{bundleId}` | setup | 2 | BO-011 |
 | capacity | [`createChannelCapacity`](#createchannelcapacity) | POST | `/channel-capacities` | setup | 1 | BO-013, BO-017, EMP-033, PTR-005 |
 | capacity | [`getAvailability`](#getavailability) | GET | `/availability` | core | 1 | GST-004, GST-007, GST-050, GST-058, KSK-004, KSK-005 … |
+| capacity | [`setChannelAllocations`](#setchannelallocations) | PUT | `/channel-capacities/{channelCapacityId}/channel-allocations` | setup | 1 | BO-013, BO-017, EMP-033, PTR-005 |
 | capacity | [`updateChannelCapacity`](#updatechannelcapacity) | PATCH | `/channel-capacities/{channelCapacityId}` | setup | 1 | BO-013, BO-017, EMP-033, PTR-005 |
 | catalogue | [`assessProductChange`](#assessproductchange) | POST | `/products/{productId}/change-impact` | setup | 1 | BO-008 |
 | catalogue | [`bulkChangePrices`](#bulkchangeprices) | POST | `/products/bulk-price` | setup | 1 | BO-009 |
@@ -49,11 +50,45 @@
 | catalogue | [`listProductCategories`](#listproductcategories) | GET | `/product-categories` | core | 1 | BO-115, CMS-101, GST-002, GST-007, GST-008, WEB-002 … |
 | catalogue | [`restoreProductVersion`](#restoreproductversion) | POST | `/products/{productId}/versions/{version}/restore` | setup | 1 | BO-008 |
 | catalogue | [`searchCatalogue`](#searchcatalogue) | GET | `/search` | core | 1 | GST-001, GST-003, GST-063, WEB-002, WEB-003 |
+| catalogue | [`setChannelConnectionConfiguration`](#setchannelconnectionconfiguration) | PUT | `/channel-connections` | setup | 1 | ADM-269 |
+| catalogue | [`setChannelSalesRule`](#setchannelsalesrule) | PUT | `/channel-sales-rules/{ruleId}` | setup | 1 | ADM-263, ADM-264, ADM-265 |
+| catalogue | [`setCurrencyRoundingRule`](#setcurrencyroundingrule) | PUT | `/rounding-profiles` | setup | 1 | ADM-075 |
+| catalogue | [`setDynamicPriceRule`](#setdynamicpricerule) | PUT | `/pricing/dynamic-rules/{ruleId}` | setup | 1 | BO-009, BO-443 |
+| catalogue | [`setDynamicPricingGuardrailPolicy`](#setdynamicpricingguardrailpolicy) | PUT | `/dynamic-pricing-controls` | setup | 1 | ADM-095, ADM-096, ADM-114 |
+| catalogue | [`setFeeDefinition`](#setfeedefinition) | PUT | `/fees` | setup | 1 | ADM-071 |
+| catalogue | [`setPriceCategoryRateType`](#setpricecategoryratetype) | PUT | `/price-categories` | setup | 1 | ADM-050 |
 | catalogue | [`setProductCategories`](#setproductcategories) | PUT | `/product-categories` | setup | 1 | BO-115 |
 | category | [`createSeatCategory`](#createseatcategory) | POST | `/seat-categories` | setup | 2 | BO-1045, BO-985 |
-| coupon | [`createCouponCampaign`](#createcouponcampaign) | POST | `/coupon-campaigns` | setup | 1 | BO-010 |
 | coupon | [`generateCouponCodes`](#generatecouponcodes) | POST | `/coupon-campaigns/{campaignId}/codes` | setup | 1 | BO-010 |
 | coupon | [`getCouponCode`](#getcouponcode) | GET | `/coupon-codes/{code}` | core | 1 | GST-037, WEB-010 |
+| drafted | [`createBulkProductCatalogue`](#createbulkproductcatalogue) | POST | `/bulk-product-catalogue` | setup | 1 | ADM-121 |
+| drafted | [`createChannelProfile`](#createchannelprofile) | POST | `/channel-profile` | setup | 1 | ADM-259 |
+| drafted | [`publishChannelAvailability`](#publishchannelavailability) | PUT | `/channel-availability` | setup | 1 | ADM-124, BO-291 |
+| drafted | [`publishChannelReadinessValidation`](#publishchannelreadinessvalidation) | PUT | `/channel-readiness-validation` | setup | 1 | ADM-267 |
+| drafted | [`setBookingVelocityTime`](#setbookingvelocitytime) | PUT | `/booking-velocity-time` | setup | 1 | ADM-091 |
+| drafted | [`setBundleComponent`](#setbundlecomponent) | PUT | `/bundle-component` | setup | 2 | ADM-180 |
+| drafted | [`setBundleDefinition`](#setbundledefinition) | PUT | `/bundle-definition` | setup | 2 | ADM-179 |
+| drafted | [`setBuyGetBogo`](#setbuygetbogo) | PUT | `/buy-get-bogo` | setup | 1 | ADM-169 |
+| drafted | [`setCampaignBudgetFinancial`](#setcampaignbudgetfinancial) | PUT | `/campaign-budget-financial` | setup | 2 | ADM-219 |
+| drafted | [`setCatalogueReview`](#setcataloguereview) | PUT | `/catalogue-review` | setup | 1 | ADM-127 |
+| drafted | [`setChannelFeePayment`](#setchannelfeepayment) | PUT | `/channel-fee-payment` | setup | 1 | ADM-266 |
+| drafted | [`setChannelPricingCommercial`](#setchannelpricingcommercial) | PUT | `/channel-pricing-commercial` | setup | 1 | ADM-261, ADM-483 |
+| drafted | [`setCodeDistributionManager`](#setcodedistributionmanager) | PUT | `/code-distribution-manager` | setup | 1 | ADM-164 |
+| drafted | [`setCouponPromoCode`](#setcouponpromocode) | PUT | `/coupon-promo-code` | setup | 1 | ADM-159 |
+| drafted | [`setCrossCategoryPromotion`](#setcrosscategorypromotion) | PUT | `/cross-category-promotion` | setup | 1 | ADM-174 |
+| drafted | [`setDemandOccupancyAvailability`](#setdemandoccupancyavailability) | PUT | `/demand-occupancy-availability` | setup | 1 | ADM-090 |
+| drafted | [`setEligibilityRule`](#seteligibilityrule) | PUT | `/eligibility-rule` | setup | 1 | ADM-199, ADM-279 |
+| drafted | [`setFixedPriceOffer`](#setfixedpriceoffer) | PUT | `/fixed-price-offer` | setup | 1 | ADM-172 |
+| drafted | [`setGiftFreeProduct`](#setgiftfreeproduct) | PUT | `/gift-free-product` | setup | 1 | ADM-173 |
+| drafted | [`setGuestChoiceBuild`](#setguestchoicebuild) | PUT | `/guest-choice-build` | setup | 2 | ADM-181 |
+| drafted | [`setPriceHierarchyInheritance`](#setpricehierarchyinheritance) | PUT | `/price-hierarchy-inheritance` | setup | 1 | ADM-055 |
+| drafted | [`setPriceListMaster`](#setpricelistmaster) | PUT | `/price-list-master` | setup | 1 | ADM-049 |
+| drafted | [`setProductCatalogue`](#setproductcatalogue) | PUT | `/product-catalogue` | setup | 1 | ADM-260 |
+| drafted | [`setProductContextOwnership`](#setproductcontextownership) | PUT | `/product-context-ownership` | setup | 1 | ADM-123 |
+| drafted | [`setProductServicePrice`](#setproductserviceprice) | PUT | `/product-service-price` | setup | 1 | ADM-052 |
+| drafted | [`setPromotionRule`](#setpromotionrule) | PUT | `/promotion-rule` | setup | 1 | ADM-148, ADM-210 |
+| drafted | [`setRateStructure`](#setratestructure) | PUT | `/rate-structure` | setup | 1 | ADM-051 |
+| drafted | [`setRulePriorityConflict`](#setrulepriorityconflict) | PUT | `/rule-priority-conflict` | setup | 1 | ADM-097, BO-441 |
 | entitlement | [`createEntitlementTemplate`](#createentitlementtemplate) | POST | `/entitlement-templates` | setup | 1 | BO-012 |
 | evaluation | [`evaluatePromotions`](#evaluatepromotions) | POST | `/promotions/evaluate` | core | 1 | BO-010, KSK-006, POS-002, POS-021, POS-023, PTR-010 … |
 | event | [`createEvent`](#createevent) | POST | `/events` | setup | 1 | BO-001, BO-015, BO-019, BO-063 |
@@ -62,6 +97,8 @@
 | event | [`listPerformances`](#listperformances) | GET | `/events/{eventId}/performances` | core | 1 | BO-001, BO-015, BO-019, BO-063, GST-003, GST-004 … |
 | event | [`updateEvent`](#updateevent) | PATCH | `/events/{eventId}` | setup | 1 | BO-001, BO-015, BO-019, BO-063 |
 | event | [`updatePerformance`](#updateperformance) | PATCH | `/performances/{performanceId}` | core | 2 | BO-002, BO-015, BO-019, BO-063, POS-004 |
+| events | [`cloneEvent`](#cloneevent) | POST | `/events/{eventId}/clone` | setup | 1 | BO-696 |
+| events | [`setEventLifecycleState`](#seteventlifecyclestate) | POST | `/events/{eventId}/lifecycle` | setup | 1 | BO-716, BO-717 |
 | hold | [`createSeatHold`](#createseathold) | POST | `/seat-holds` | core | 2 | BO-994, GST-049, POS-004, WEB-007 |
 | hold | [`extendSeatHold`](#extendseathold) | POST | `/seat-holds/{holdId}/extend` | core | 2 | BO-998, POS-004 |
 | hold | [`getSeatHold`](#getseathold) | GET | `/seat-holds/{holdId}` | core | 2 | BO-987, BO-999, POS-004 |
@@ -90,11 +127,13 @@
 | product | [`transitionProductLifecycle`](#transitionproductlifecycle) | POST | `/products/{productId}/lifecycle` | setup | 1 | BO-007, BO-012, BO-014, EMP-034, PTR-006 |
 | product | [`updateProduct`](#updateproduct) | PATCH | `/products/{productId}` | setup | 1 | BO-007, BO-008, BO-012, BO-014, PTR-006 |
 | promotion | [`analysePromotionConflicts`](#analysepromotionconflicts) | GET | `/promotions/{promotionId}/conflicts` | core | 1 | BO-010, POS-002, PTR-010 |
+| promotion | [`createCommercialCampaign`](#createcommercialcampaign) | POST | `/commercial-campaigns` | setup | 1 | ADM-139, ADM-219 |
 | promotion | [`createPromotion`](#createpromotion) | POST | `/promotions` | setup | 1 | BO-010 |
 | promotion | [`getPromotion`](#getpromotion) | GET | `/promotions/{promotionId}` | core | 1 | BO-010, GST-037, POS-002, PTR-010, WEB-032 |
 | promotion | [`getPromotionUsage`](#getpromotionusage) | GET | `/promotions/{promotionId}/usage` | core | 1 | ADM-138, BO-010, POS-002, PTR-010 |
 | promotion | [`listPromotions`](#listpromotions) | GET | `/promotions` | core | 1 | ADM-138, ADM-140, ADM-145, BO-010, GST-036, GST-037 … |
 | promotion | [`publishPromotion`](#publishpromotion) | POST | `/promotions/{promotionId}/publish` | setup | 1 | BO-010 |
+| promotion | [`updateCommercialCampaign`](#updatecommercialcampaign) | PATCH | `/commercial-campaigns/{campaignId}` | setup | 1 | ADM-139, ADM-219 |
 | promotion | [`updatePromotion`](#updatepromotion) | PATCH | `/promotions/{promotionId}` | setup | 1 | BO-010 |
 | promotions | [`setPromotionVariants`](#setpromotionvariants) | PUT | `/promotions/{promotionId}/variants` | setup | 1 | BO-010 |
 | recommendation | [`recommendSeats`](#recommendseats) | POST | `/performances/{performanceId}/seat-recommendations` | core | 2 | BO-002, BO-015, BO-019, BO-063, BO-1001, BO-1002 … |
@@ -188,6 +227,7 @@ Every seat with its current state — available, held, sold, blocked or buffered
 
 A bundle is a product whose price differs from the sum of its parts. **The allocation split is mandatory** — without it the ledger cannot divide the revenue, and each component may sit in a different venue, account, tax treatment or legal entity.
 **Allocation rule (decided 28 September, audit R101):** the bundle price is allocated to components in proportion to their list price, and **list price is the component variant's current price** when the bundle is created. Rounding is to the currency's minor unit, and **the rounding remainder goes to the first component**, so the allocated amounts always sum to the bundle price exactly. `proRataListPrice` is the default method; `percentage` and `fixedAmount` remain for an explicit split and follow the same remainder rule.
+**Writes `promotions.promotion_audit`** in the same transaction, as every promotions configuration change does (entityType `bundle`, eventType `created`). Capacity policies and partner product mappings are set afterwards by setBundleCapacityPolicy and setBundlePartnerProductMappings (decided 29 September, writers pass).
 
 |  |  |
 |---|---|
@@ -198,7 +238,7 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `promotions.allocation_component`, `promotions.bundle`, `promotions.bundle_choice_group`, `promotions.bundle_choice_option`, `promotions.bundle_component` |
-| Writes | `cache:idempotency`, `promotions.allocation_component`, `promotions.bundle`, `promotions.bundle_choice_group`, `promotions.bundle_choice_option`, `promotions.bundle_component` |
+| Writes | `cache:idempotency`, `promotions.allocation_component`, `promotions.bundle`, `promotions.bundle_choice_group`, `promotions.bundle_choice_option`, `promotions.bundle_component`, `promotions.promotion_audit` |
 | Called by | BO-011 |
 
 **Parameters**
@@ -226,6 +266,9 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 | components[].quantity | integer | yes | (min 1) |
 | components[].isOptional | boolean |  | (default False) |
 | components[].substituteVariantIds | array of string (uuid) |  | For dynamic bundles — guest chooses among these. |
+| components[].substitutionTriggers | array of enum (soldOut, capacityExhausted, productSuspended, venueClosed, externalApiUnavailable, inventoryBelowThreshold) |  | When a substitute from substituteVariantIds may replace this component (Dynamic Component Substitution Engine). (nullable) |
+| components[].substitutionPriceEffect | enum (samePrice, surcharge, reducedPrice) |  | What a substitution does to the bundle price. (default samePrice) |
+| components[].substitutionApproval | enum (none, customer, operator) |  | Who must accept a substitution before it stands. (default customer) |
 | components[].venueId | string (uuid) |  | Where this component is redeemed. (nullable) |
 | choiceGroups | array of BundleChoiceGroup |  | Dynamic bundles (3.5.10). |
 | choiceGroups[].id | string (uuid) |  | (read-only) |
@@ -251,6 +294,12 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 | allocation.components[].venueId | string (uuid) |  | (nullable) |
 | validFrom | string (date-time) |  |  |
 | validTo | string (date-time) |  |  |
+| campaignId | string (uuid) |  | The commercial campaign (promotions.campaign) the bundle is sold under. (nullable) |
+| ownerPrincipalId | string (uuid) |  | The bundle owner (Bundle Definition & Setup). (nullable) |
+| category | string |  | The bundle category the setup screen files it under. (max length 100; nullable) |
+| isStandaloneProduct | boolean |  | Whether the bundle appears as a product in its own right, or only as an offer on another product. (default True) |
+| isRecommendedAtCheckout | boolean |  | Whether checkout recommends the bundle. (default False) |
+| requiredVariantIds | array of string (uuid) |  | Products that must already be in the basket for the bundle to be sold (the setup screen's "requires another product"). (nullable) |
 
 **Response**: `Bundle`
 
@@ -271,6 +320,9 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 | components[].quantity | integer | yes | (min 1) |
 | components[].isOptional | boolean |  | (default False) |
 | components[].substituteVariantIds | array of string (uuid) |  | For dynamic bundles — guest chooses among these. |
+| components[].substitutionTriggers | array of enum (soldOut, capacityExhausted, productSuspended, venueClosed, externalApiUnavailable, inventoryBelowThreshold) |  | When a substitute from substituteVariantIds may replace this component (Dynamic Component Substitution Engine). (nullable) |
+| components[].substitutionPriceEffect | enum (samePrice, surcharge, reducedPrice) |  | What a substitution does to the bundle price. (default samePrice) |
+| components[].substitutionApproval | enum (none, customer, operator) |  | Who must accept a substitution before it stands. (default customer) |
 | components[].venueId | string (uuid) |  | Where this component is redeemed. (nullable) |
 | choiceGroups | array of BundleChoiceGroup |  | Dynamic bundles (3.5.10). |
 | choiceGroups[].id | string (uuid) |  | (read-only) |
@@ -296,6 +348,12 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 | allocation.components[].venueId | string (uuid) |  | (nullable) |
 | validFrom | string (date-time) |  |  |
 | validTo | string (date-time) |  |  |
+| campaignId | string (uuid) |  | The commercial campaign (promotions.campaign) the bundle is sold under. (nullable) |
+| ownerPrincipalId | string (uuid) |  | The bundle owner (Bundle Definition & Setup). (nullable) |
+| category | string |  | The bundle category the setup screen files it under. (max length 100; nullable) |
+| isStandaloneProduct | boolean |  | Whether the bundle appears as a product in its own right, or only as an offer on another product. (default True) |
+| isRecommendedAtCheckout | boolean |  | Whether checkout recommends the bundle. (default False) |
+| requiredVariantIds | array of string (uuid) |  | Products that must already be in the basket for the bundle to be sold (the setup screen's "requires another product"). (nullable) |
 | id | string (uuid) | yes |  |
 | savingsAmount | object | yes | Sum of component list prices less the bundle price. |
 | savingsAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -355,6 +413,9 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 | components[].quantity | integer | yes | (min 1) |
 | components[].isOptional | boolean |  | (default False) |
 | components[].substituteVariantIds | array of string (uuid) |  | For dynamic bundles — guest chooses among these. |
+| components[].substitutionTriggers | array of enum (soldOut, capacityExhausted, productSuspended, venueClosed, externalApiUnavailable, inventoryBelowThreshold) |  | When a substitute from substituteVariantIds may replace this component (Dynamic Component Substitution Engine). (nullable) |
+| components[].substitutionPriceEffect | enum (samePrice, surcharge, reducedPrice) |  | What a substitution does to the bundle price. (default samePrice) |
+| components[].substitutionApproval | enum (none, customer, operator) |  | Who must accept a substitution before it stands. (default customer) |
 | components[].venueId | string (uuid) |  | Where this component is redeemed. (nullable) |
 | choiceGroups | array of BundleChoiceGroup |  | Dynamic bundles (3.5.10). |
 | choiceGroups[].id | string (uuid) |  | (read-only) |
@@ -380,6 +441,12 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 | allocation.components[].venueId | string (uuid) |  | (nullable) |
 | validFrom | string (date-time) |  |  |
 | validTo | string (date-time) |  |  |
+| campaignId | string (uuid) |  | The commercial campaign (promotions.campaign) the bundle is sold under. (nullable) |
+| ownerPrincipalId | string (uuid) |  | The bundle owner (Bundle Definition & Setup). (nullable) |
+| category | string |  | The bundle category the setup screen files it under. (max length 100; nullable) |
+| isStandaloneProduct | boolean |  | Whether the bundle appears as a product in its own right, or only as an offer on another product. (default True) |
+| isRecommendedAtCheckout | boolean |  | Whether checkout recommends the bundle. (default False) |
+| requiredVariantIds | array of string (uuid) |  | Products that must already be in the basket for the bundle to be sold (the setup screen's "requires another product"). (nullable) |
 | id | string (uuid) | yes |  |
 | savingsAmount | object | yes | Sum of component list prices less the bundle price. |
 | savingsAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -535,6 +602,7 @@ Publishing is the act that makes a configuration change visible at point of sale
 
 Components and allocation are immutable once the bundle has been sold. Historic orders reference the split that applied when they were placed, and the ledger is append-only.
 **This body carries neither**, so it cannot change them: it amends the name, the price, the end date and whether the bundle is on sale. The one refusal it can meet is a price that breaks the split. Under a `fixedAmount` allocation the fixed amounts must sum to the bundle price (the same rule `createBundle` answers 400 for), and a new price with an unchanged split no longer does.
+**Writes `promotions.promotion_audit`** in the same transaction, as every promotions configuration change does (entityType `bundle`, eventType `modified`, the changed fields before and after) (decided 29 September, writers pass).
 
 |  |  |
 |---|---|
@@ -545,7 +613,7 @@ Components and allocation are immutable once the bundle has been sold. Historic 
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `promotions.allocation_component`, `promotions.bundle`, `promotions.bundle_choice_group`, `promotions.bundle_choice_option`, `promotions.bundle_component` |
-| Writes | `cache:idempotency`, `promotions.allocation_component`, `promotions.bundle`, `promotions.bundle_component` |
+| Writes | `cache:idempotency`, `promotions.allocation_component`, `promotions.bundle`, `promotions.bundle_component`, `promotions.promotion_audit` |
 | Called by | BO-011 |
 
 **Parameters**
@@ -586,6 +654,9 @@ Components and allocation are immutable once the bundle has been sold. Historic 
 | components[].quantity | integer | yes | (min 1) |
 | components[].isOptional | boolean |  | (default False) |
 | components[].substituteVariantIds | array of string (uuid) |  | For dynamic bundles — guest chooses among these. |
+| components[].substitutionTriggers | array of enum (soldOut, capacityExhausted, productSuspended, venueClosed, externalApiUnavailable, inventoryBelowThreshold) |  | When a substitute from substituteVariantIds may replace this component (Dynamic Component Substitution Engine). (nullable) |
+| components[].substitutionPriceEffect | enum (samePrice, surcharge, reducedPrice) |  | What a substitution does to the bundle price. (default samePrice) |
+| components[].substitutionApproval | enum (none, customer, operator) |  | Who must accept a substitution before it stands. (default customer) |
 | components[].venueId | string (uuid) |  | Where this component is redeemed. (nullable) |
 | choiceGroups | array of BundleChoiceGroup |  | Dynamic bundles (3.5.10). |
 | choiceGroups[].id | string (uuid) |  | (read-only) |
@@ -611,6 +682,12 @@ Components and allocation are immutable once the bundle has been sold. Historic 
 | allocation.components[].venueId | string (uuid) |  | (nullable) |
 | validFrom | string (date-time) |  |  |
 | validTo | string (date-time) |  |  |
+| campaignId | string (uuid) |  | The commercial campaign (promotions.campaign) the bundle is sold under. (nullable) |
+| ownerPrincipalId | string (uuid) |  | The bundle owner (Bundle Definition & Setup). (nullable) |
+| category | string |  | The bundle category the setup screen files it under. (max length 100; nullable) |
+| isStandaloneProduct | boolean |  | Whether the bundle appears as a product in its own right, or only as an offer on another product. (default True) |
+| isRecommendedAtCheckout | boolean |  | Whether checkout recommends the bundle. (default False) |
+| requiredVariantIds | array of string (uuid) |  | Products that must already be in the basket for the bundle to be sold (the setup screen's "requires another product"). (nullable) |
 | id | string (uuid) | yes |  |
 | savingsAmount | object | yes | Sum of component list prices less the bundle price. |
 | savingsAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -743,6 +820,94 @@ Display only. A terminal shows this to a guest but does not decide a sale on it 
 |---|---|---|
 | 200 |  | Availability, one row per channel capacity, by performance start |
 | 400 | BadRequest | Validation failed |
+
+### setChannelAllocations
+
+**`PUT /channel-capacities/{channelCapacityId}/channel-allocations`**: Allocate a channel capacity across sales channels
+
+Allocations may not exceed envelope capacity in total. An unallocated remainder forms a general pool any channel may draw from once its own allocation is exhausted.
+Reducing an allocation below what a channel has already sold is refused — the seats are gone. What a channel has sold includes its units under an unexpired lease; the oversell allowance does not count (decided 28 September, audit R101).
+**What the PUT does.** The body is the whole allocation set for this channel capacity, one entry per channel: a channel left out has no allocation of its own and draws only from the general pool, and leaving out a channel that has already sold is the reduction refused above. A channel sent twice is a `400`.
+
+|  |  |
+|---|---|
+| Permission | `CAPACITY_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.channel_allocation` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `catalogue.channel_allocation` |
+| Writes | `cache:idempotency`, `catalogue.channel_allocation` |
+| Called by | BO-013, BO-017, EMP-033, PTR-005 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| channelCapacityId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| allocations | array of ChannelAllocation | yes | (min items 1) |
+| allocations[].id | string (uuid) |  | Added 20 August. (read-only) |
+| allocations[].channel | Channel: enum (pos, kiosk, web, mobile, b2b, ota, callCentre) | yes |  |
+| allocations[].allocatedUnits | integer | yes | (min 0) |
+| allocations[].soldUnits | integer |  | (read-only) |
+| allocations[].leasedUnits | integer |  | Held by terminals on this channel but not yet sold. (read-only) |
+| allocations[].remainingUnits | integer |  | (read-only) |
+| allocations[].releaseAt | string (date-time) |  | Unsold units return to the general pool at this time. (nullable) |
+| allocations[].salesChannelId | string (uuid) |  | The channel profile (catalogue.sales_channel) this allocation serves (29 September, data model DM3). (nullable) |
+| allocations[].allocationType | enum (sharedPool, dedicated, percentage, dynamic) |  | How the allocation is sized (29 September, data model DM3); the allocation rule of ADM-262 lives on this row. (default dedicated) |
+| allocations[].minimumUnits | integer |  | (min 0; nullable) |
+| allocations[].maximumUnits | integer |  | (min 0; nullable) |
+| allocations[].replenishmentRule | object |  | {sourceChannelId, trigger, thresholdUnits, sharePercent, units}. (nullable) |
+| allocations[].waitlistBehavior | enum (none, joinWaitlist, notifyOnRelease) |  | (default none) |
+| allocations[].releaseThresholdUnits | integer |  | (min 0; nullable) |
+| allocations[].releaseHoursBeforeEvent | integer |  | Alternative to releaseAt, relative to the performance start. (min 0; nullable) |
+| allocations[].contractualUnits | integer |  | Units a partner agreement guarantees; rebalancing never goes below it. (min 0; nullable) |
+| allocations[].minimumGuaranteedUnits | integer |  | (min 0; nullable) |
+| allocations[].isFrozen | boolean |  | Excluded from rebalancing. (default False) |
+
+**Response**: `ChannelAllocationSet`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| channelCapacityId | string (uuid) | yes |  |
+| capacity | integer | yes |  |
+| allocations | array of ChannelAllocation | yes |  |
+| allocations[].id | string (uuid) |  | Added 20 August. (read-only) |
+| allocations[].channel | Channel: enum (pos, kiosk, web, mobile, b2b, ota, callCentre) | yes |  |
+| allocations[].allocatedUnits | integer | yes | (min 0) |
+| allocations[].soldUnits | integer |  | (read-only) |
+| allocations[].leasedUnits | integer |  | Held by terminals on this channel but not yet sold. (read-only) |
+| allocations[].remainingUnits | integer |  | (read-only) |
+| allocations[].releaseAt | string (date-time) |  | Unsold units return to the general pool at this time. (nullable) |
+| allocations[].salesChannelId | string (uuid) |  | The channel profile (catalogue.sales_channel) this allocation serves (29 September, data model DM3). (nullable) |
+| allocations[].allocationType | enum (sharedPool, dedicated, percentage, dynamic) |  | How the allocation is sized (29 September, data model DM3); the allocation rule of ADM-262 lives on this row. (default dedicated) |
+| allocations[].minimumUnits | integer |  | (min 0; nullable) |
+| allocations[].maximumUnits | integer |  | (min 0; nullable) |
+| allocations[].replenishmentRule | object |  | {sourceChannelId, trigger, thresholdUnits, sharePercent, units}. (nullable) |
+| allocations[].waitlistBehavior | enum (none, joinWaitlist, notifyOnRelease) |  | (default none) |
+| allocations[].releaseThresholdUnits | integer |  | (min 0; nullable) |
+| allocations[].releaseHoursBeforeEvent | integer |  | Alternative to releaseAt, relative to the performance start. (min 0; nullable) |
+| allocations[].contractualUnits | integer |  | Units a partner agreement guarantees; rebalancing never goes below it. (min 0; nullable) |
+| allocations[].minimumGuaranteedUnits | integer |  | (min 0; nullable) |
+| allocations[].isFrozen | boolean |  | Excluded from rebalancing. (default False) |
+| generalPoolUnits | integer | yes | Unallocated remainder. |
+| totalSold | integer |  |  |
+| totalRemaining | integer |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Applied |
+| 400 |  | Allocations exceed the channel capacity in total, or a channel appears twice |
+| 409 |  | An allocation is below what that channel has already sold plus its leased units (audit R101) |
 
 ### updateChannelCapacity
 
@@ -1011,6 +1176,16 @@ The clone starts as a draft with a new code. **Variants come with it; orders do 
 | media[].altText | object |  | (nullable) |
 | consentQuestionIds | array of string (uuid) |  | The consent questions a guest answers when booking this product, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I a… (max items 10) |
 | requiresTimeWindow | boolean |  | True for a space sold by the hour, e.g. (default False) |
+| productOwnerPrincipalId | string (uuid) |  | The product owner (29 September, data model DM3), set with setProductContextOwnership. (nullable) |
+| operationalContact | string |  | A principal id or a name, as the context screen takes it. (max length 200; nullable) |
+| businessUnitId | string (uuid) |  | (nullable) |
+| legalEntityId | string (uuid) |  | A ledger.legal_entity, read through finance. (nullable) |
+| attractionId | string (uuid) |  | (nullable) |
+| siteId | string (uuid) |  | (nullable) |
+| locationId | string (uuid) |  | (nullable) |
+| brandId | string (uuid) |  | The brand, as the context screen names it (a catalogue brand category). (nullable) |
+| marketCode | string |  | (max length 40; nullable) |
+| salesTerritory | string |  | (max length 100; nullable) |
 
 **Responses**
 
@@ -1060,6 +1235,24 @@ Refuses a job whose `outcome` is `nothingFound` or `unreadable`. **A commit that
 | findings[].severity | enum (error, warning) |  |  |
 | findings[].message | string |  |  |
 | scopePath | string |  | The partition key (ADR-0005). |
+| jobKind | enum (productImport, environmentTransfer, pricingBulkUpdate, pricingImport) |  | One job table for every catalogue bulk operation (29 September, data model DM3): product import (the original use), environment transfer (ADM-124) and bulk pricing update or import (ADM-080). (default productImport) |
+| direction | enum (export, import, None) |  | (nullable) |
+| sourceEnvironment | enum (development, sandbox, uat, staging, production, None) |  | (nullable) |
+| targetEnvironment | enum (development, sandbox, uat, staging, production, None) |  | (nullable) |
+| productIds | array of string (uuid) |  |  |
+| components | array of string |  | Transfer components, per ProductImportExportEnvironmentTransferView.components. |
+| referenceMappings | object |  | [{kind, sourceRef, targetRef}]. (nullable) |
+| missingReferences | array of string |  |  |
+| fileId | string (uuid) |  | (nullable) |
+| sourceFormat | string |  | (max length 40; nullable) |
+| columnMappings | object |  | [{sourceColumn, targetField, suggestedByAi, confirmed}]. (nullable) |
+| parameters | object |  | Bulk pricing: {selectBy, selectionValues, operation, adjustmentPercent, adjustmentAmount, targetCurrency, effectivePeriodFrom, effectivePeriodTo}. (nullable) |
+| warningCount | integer |  | (default 0) |
+| errorCount | integer |  | (default 0) |
+| changeRequestId | string (uuid) |  | (read-only; nullable) |
+| requestedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| createdAt | string (date-time) |  | (read-only) |
+| completedAt | string (date-time) |  | (read-only; nullable) |
 
 **Responses**
 
@@ -1293,6 +1486,7 @@ Retail Board 2. **`listSeatCategories` existed and a product category did not** 
 
 1.4.10. **Restoring creates a new version rather than rewinding to an old one**, following `restoreConfigVersion`. A price that was wrong for three days stays visible in the history, because a finance query run next quarter has to reproduce what was charged.
 **Orders are untouched.** They reference the variant they were sold against and always will.
+**Recorded as a rollback** (29 September, writers pass): the restore writes one `catalogue.rollback_action` (`subject: product`, `actionType: rollback`, `rollbackTarget: selectedVersion`, `fromVersion` the current version, `toVersion` the restored one, `reason` from `note`, `executionMode: immediate`), moving it `requested` -> `executing` -> `completed` (or `failed`) within the call (`states/catalogue-rollback-action.yaml`), and one `catalogue.audit_entry` (`domain: product`, `source: rollback`, `rollbackActionId` set). ADM-132 lists these rows.
 
 |  |  |
 |---|---|
@@ -1303,8 +1497,9 @@ Retail Board 2. **`listSeatCategories` existed and a product category did not** 
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `catalogue.product`, `catalogue.product_media`, `catalogue.product_version` |
-| Writes | `cache:idempotency`, `catalogue.product`, `catalogue.product_version` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.product`, `catalogue.product_version`, `catalogue.rollback_action` |
 | Called by | BO-008 |
+| State model | Catalogue rollback or emergency action ([states/catalogue-rollback-action.yaml](../../../states/catalogue-rollback-action.yaml)): moves `requested` -> `executing` |
 
 **Parameters**
 
@@ -1363,6 +1558,16 @@ Retail Board 2. **`listSeatCategories` existed and a product category did not** 
 | media[].altText | object |  | (nullable) |
 | consentQuestionIds | array of string (uuid) |  | The consent questions a guest answers when booking this product, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I a… (max items 10) |
 | requiresTimeWindow | boolean |  | True for a space sold by the hour, e.g. (default False) |
+| productOwnerPrincipalId | string (uuid) |  | The product owner (29 September, data model DM3), set with setProductContextOwnership. (nullable) |
+| operationalContact | string |  | A principal id or a name, as the context screen takes it. (max length 200; nullable) |
+| businessUnitId | string (uuid) |  | (nullable) |
+| legalEntityId | string (uuid) |  | A ledger.legal_entity, read through finance. (nullable) |
+| attractionId | string (uuid) |  | (nullable) |
+| siteId | string (uuid) |  | (nullable) |
+| locationId | string (uuid) |  | (nullable) |
+| brandId | string (uuid) |  | The brand, as the context screen names it (a catalogue brand category). (nullable) |
+| marketCode | string |  | (max length 40; nullable) |
+| salesTerritory | string |  | (max length 100; nullable) |
 
 **Responses**
 
@@ -1405,6 +1610,730 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Results |
+
+### setChannelConnectionConfiguration
+
+**`PUT /channel-connections`**: Create or update a channel connection
+
+**How TICVAI reaches one channel, per environment** (29 September, writers pass). Creates or updates a `catalogue.channel_connection`, keyed by `salesChannelId`, `connectorName` and `environment`. **Credentials are never sent or stored here**: `credentialsReference` and `certificateReference` name secrets in the vault (`422` `secretNotReference` if a value looks like a secret). A new or changed connection is saved `notTested`; `testChannelConnection` moves it to `connected` or `degraded`/`offline`. `disabled` switches it off. An existing OTA adapter is enabled for a venue by naming its `adapterId`, with no rebuild (MoM 31 Aug 2026 §4.3). Written to `catalogue.audit_entry` (`domain: channel`).
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.channel_connection` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `catalogue.channel_connection`, `catalogue.sales_channel` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.channel_connection` |
+| Called by | ADM-269 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ChannelConnection`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| scopePath | string | yes | The partition key (ADR-0005). (read-only) |
+| salesChannelId | string (uuid) | yes |  |
+| connectorName | string | yes | (max length 200) |
+| partner | string |  | (max length 200; nullable) |
+| environment | enum (sandbox, uat, production) | yes |  |
+| connectionType | enum (ticvaiNative, restApi, webhook, otaAdapter, resellerApi, partnerApi, middleware, fileSftp, …) | yes |  |
+| direction | enum (outbound, inbound, bidirectional) |  | (default outbound) |
+| endpoint | string |  | (max length 500; nullable) |
+| apiVersion | string |  | (max length 40; nullable) |
+| authenticationType | enum (none, oauth, apiKey, clientCredentials, certificate, signedRequest) |  |  |
+| credentialsReference | string |  | A vault reference, never the secret. (max length 200; nullable) |
+| certificateReference | string |  | (max length 200; nullable) |
+| certificateExpiresAt | string (date-time) |  | (nullable) |
+| timeoutMs | integer |  | (min 1; nullable) |
+| rateLimitPerMinute | integer |  | (min 1; nullable) |
+| ipRestrictions | array of string |  |  |
+| retryPolicy | object |  | {maxAttempts, backoffSeconds}. (nullable) |
+| adapterId | string |  | (max length 100; nullable) |
+| connectionStatus | enum (notTested, connected, degraded, offline, disabled) |  | (default notTested) |
+| lastTests | object |  | [{test, result, testedAt}], the latest result per test. (read-only) |
+| createdAt | string (date-time) |  | (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Response**: `ChannelConnection`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| scopePath | string | yes | The partition key (ADR-0005). (read-only) |
+| salesChannelId | string (uuid) | yes |  |
+| connectorName | string | yes | (max length 200) |
+| partner | string |  | (max length 200; nullable) |
+| environment | enum (sandbox, uat, production) | yes |  |
+| connectionType | enum (ticvaiNative, restApi, webhook, otaAdapter, resellerApi, partnerApi, middleware, fileSftp, …) | yes |  |
+| direction | enum (outbound, inbound, bidirectional) |  | (default outbound) |
+| endpoint | string |  | (max length 500; nullable) |
+| apiVersion | string |  | (max length 40; nullable) |
+| authenticationType | enum (none, oauth, apiKey, clientCredentials, certificate, signedRequest) |  |  |
+| credentialsReference | string |  | A vault reference, never the secret. (max length 200; nullable) |
+| certificateReference | string |  | (max length 200; nullable) |
+| certificateExpiresAt | string (date-time) |  | (nullable) |
+| timeoutMs | integer |  | (min 1; nullable) |
+| rateLimitPerMinute | integer |  | (min 1; nullable) |
+| ipRestrictions | array of string |  |  |
+| retryPolicy | object |  | {maxAttempts, backoffSeconds}. (nullable) |
+| adapterId | string |  | (max length 100; nullable) |
+| connectionStatus | enum (notTested, connected, degraded, offline, disabled) |  | (default notTested) |
+| lastTests | object |  | [{test, result, testedAt}], the latest result per test. (read-only) |
+| createdAt | string (date-time) |  | (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Saved |
+| 422 |  | secretNotReference. |
+
+### setChannelSalesRule
+
+**`PUT /channel-sales-rules/{ruleId}`**: Create or replace a channel sales window, limit or eligibility rule
+
+**One rule on a channel** (29 September, writers pass). Creates or replaces a `catalogue.channel_sales_rule`: a sales window (`ruleKind: salesWindow`), a sales limit or restriction (`salesLimit`) or a customer eligibility rule (`eligibility`), for the whole channel or one product (`productId`), with an effective window. Only the fields of its `ruleKind` are kept; the others are cleared. A rule is switched off with `isActive: false`, never deleted, so what applied to a past sale can be shown. Written to `catalogue.audit_entry` (`domain: channel`).
+
+Rules: `effectiveTo` before `effectiveFrom`, or `minimumQuantity` above `maximumQuantity`, is refused (`422` `invalidRange`); an `eligibility` rule needs `eligibilityDimension`, `eligibilityOperator` and `eligibilityEffect` (`422` `eligibilityIncomplete`); a product-level rule on a product that already has one for the same `ruleKind` and window needs `overridesProductRule` (`409` `ruleConflict`).
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.channel_sales_rule` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `catalogue.channel_sales_rule`, `catalogue.product`, `catalogue.sales_channel` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.channel_sales_rule` |
+| Called by | ADM-263, ADM-264, ADM-265 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| ruleId | path | yes | string (uuid) | Chosen by the caller on create, so a retried create cannot make two rules. |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ChannelSalesRule`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| scopePath | string | yes | The partition key (ADR-0005). (read-only) |
+| salesChannelId | string (uuid) | yes |  |
+| productId | string (uuid) |  | (nullable) |
+| ruleKind | enum (salesWindow, salesLimit, eligibility) | yes |  |
+| name | string |  | (max length 200; nullable) |
+| ruleLevel | enum (platform, product, channel, contractPartner) |  | (default channel) |
+| overridesProductRule | boolean |  | (default False) |
+| effectiveFrom | string (date-time) |  | (nullable) |
+| effectiveTo | string (date-time) |  | (nullable) |
+| isActive | boolean | yes | (default True) |
+| salesStartDate | string (date) |  | (nullable) |
+| salesStartTime | string (time) |  | (nullable) |
+| salesEndDate | string (date) |  | (nullable) |
+| salesEndTime | string (time) |  | (nullable) |
+| timeZone | string |  | (max length 64; nullable) |
+| daysOfWeek | array of enum (mon, tue, wed, thu, fri, sat, sun) |  |  |
+| hoursOfOperation | object |  | [{opensAt, closesAt}]. (nullable) |
+| blackoutDates | array of string |  | ISO dates. |
+| eventRelativeWindow | object |  | {anchor, opensMinutesBefore, closesMinutesBefore}. (nullable) |
+| minimumLeadDays | integer |  | (min 0; nullable) |
+| minimumQuantity | integer |  | (min 0; nullable) |
+| maximumQuantity | integer |  | (min 1; nullable) |
+| maximumPerTransaction | integer |  | (min 1; nullable) |
+| maximumPerCustomer | integer |  | (min 1; nullable) |
+| maximumPerDay | integer |  | (min 1; nullable) |
+| maximumPerEvent | integer |  | (min 1; nullable) |
+| maximumPerProduct | integer |  | (min 1; nullable) |
+| isReservationPermitted | boolean |  | (nullable) |
+| isHoldPermitted | boolean |  | (nullable) |
+| isPaymentLinkPermitted | boolean |  | (nullable) |
+| isPartialPaymentPermitted | boolean |  | (nullable) |
+| isSplitPaymentPermitted | boolean |  | (nullable) |
+| isDiscountPermitted | boolean |  | (nullable) |
+| isPromoCodePermitted | boolean |  | (nullable) |
+| isExchangePermitted | boolean |  | (nullable) |
+| isReschedulePermitted | boolean |  | (nullable) |
+| isUpgradePermitted | boolean |  | (nullable) |
+| restrictions | array of enum (noRefunds, noCashPayment, noComplimentary, noManualDiscount, noSameDaySales, noSeatChanges) |  |  |
+| eligibilityDimension | enum (customerType, membership, loyaltyTier, country, residency, age, corporateAccount, partner, …) |  | (nullable) |
+| eligibilityOperator | enum (equals, notEquals, in, notIn, greaterThanOrEqual, lessThanOrEqual, between, None) |  | (nullable) |
+| eligibilityValues | array of string |  |  |
+| eligibilityEffect | enum (allow, deny, None) |  | (nullable) |
+| isGuestAllowed | boolean |  | (nullable) |
+| isLoginRequired | boolean |  | (nullable) |
+| isMembershipRequired | boolean |  | (nullable) |
+| isCorporateAccountRequired | boolean |  | (nullable) |
+| isIdentityVerificationRequired | boolean |  | (nullable) |
+| createdAt | string (date-time) |  | (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Response**: `ChannelSalesRule`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| scopePath | string | yes | The partition key (ADR-0005). (read-only) |
+| salesChannelId | string (uuid) | yes |  |
+| productId | string (uuid) |  | (nullable) |
+| ruleKind | enum (salesWindow, salesLimit, eligibility) | yes |  |
+| name | string |  | (max length 200; nullable) |
+| ruleLevel | enum (platform, product, channel, contractPartner) |  | (default channel) |
+| overridesProductRule | boolean |  | (default False) |
+| effectiveFrom | string (date-time) |  | (nullable) |
+| effectiveTo | string (date-time) |  | (nullable) |
+| isActive | boolean | yes | (default True) |
+| salesStartDate | string (date) |  | (nullable) |
+| salesStartTime | string (time) |  | (nullable) |
+| salesEndDate | string (date) |  | (nullable) |
+| salesEndTime | string (time) |  | (nullable) |
+| timeZone | string |  | (max length 64; nullable) |
+| daysOfWeek | array of enum (mon, tue, wed, thu, fri, sat, sun) |  |  |
+| hoursOfOperation | object |  | [{opensAt, closesAt}]. (nullable) |
+| blackoutDates | array of string |  | ISO dates. |
+| eventRelativeWindow | object |  | {anchor, opensMinutesBefore, closesMinutesBefore}. (nullable) |
+| minimumLeadDays | integer |  | (min 0; nullable) |
+| minimumQuantity | integer |  | (min 0; nullable) |
+| maximumQuantity | integer |  | (min 1; nullable) |
+| maximumPerTransaction | integer |  | (min 1; nullable) |
+| maximumPerCustomer | integer |  | (min 1; nullable) |
+| maximumPerDay | integer |  | (min 1; nullable) |
+| maximumPerEvent | integer |  | (min 1; nullable) |
+| maximumPerProduct | integer |  | (min 1; nullable) |
+| isReservationPermitted | boolean |  | (nullable) |
+| isHoldPermitted | boolean |  | (nullable) |
+| isPaymentLinkPermitted | boolean |  | (nullable) |
+| isPartialPaymentPermitted | boolean |  | (nullable) |
+| isSplitPaymentPermitted | boolean |  | (nullable) |
+| isDiscountPermitted | boolean |  | (nullable) |
+| isPromoCodePermitted | boolean |  | (nullable) |
+| isExchangePermitted | boolean |  | (nullable) |
+| isReschedulePermitted | boolean |  | (nullable) |
+| isUpgradePermitted | boolean |  | (nullable) |
+| restrictions | array of enum (noRefunds, noCashPayment, noComplimentary, noManualDiscount, noSameDaySales, noSeatChanges) |  |  |
+| eligibilityDimension | enum (customerType, membership, loyaltyTier, country, residency, age, corporateAccount, partner, …) |  | (nullable) |
+| eligibilityOperator | enum (equals, notEquals, in, notIn, greaterThanOrEqual, lessThanOrEqual, between, None) |  | (nullable) |
+| eligibilityValues | array of string |  |  |
+| eligibilityEffect | enum (allow, deny, None) |  | (nullable) |
+| isGuestAllowed | boolean |  | (nullable) |
+| isLoginRequired | boolean |  | (nullable) |
+| isMembershipRequired | boolean |  | (nullable) |
+| isCorporateAccountRequired | boolean |  | (nullable) |
+| isIdentityVerificationRequired | boolean |  | (nullable) |
+| createdAt | string (date-time) |  | (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Saved |
+| 409 |  | ruleConflict. |
+| 422 |  | invalidRange or eligibilityIncomplete. |
+
+### setCurrencyRoundingRule
+
+**`PUT /rounding-profiles`**: Set precision and rounding for a currency
+
+**One rounding profile per currency the tenant sells in** (29 September, writers pass). Creates or updates the `catalogue.rounding_profile` for `currency`: decimal places (up to three, and the third is kept, not rounded away, MoM 1 Sep 2026 §4.5), calculation and display precision, method, stage and cash rounding increment. `calculationPrecision` may not be below `decimalPlaces` (`422` `precisionBelowDecimals`). A change applies to calculations from the next price publication, never to a sold order. Written to `catalogue.audit_entry` (`domain: pricing`).
+
+|  |  |
+|---|---|
+| Permission | `PRICE_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `catalogue.rounding_profile` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `catalogue.rounding_profile` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.rounding_profile` |
+| Called by | ADM-075 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `RoundingProfile`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| scopePath | string | yes | The partition key (ADR-0005). (read-only) |
+| code | string |  | (max length 40; nullable) |
+| name | string |  | (max length 200; nullable) |
+| currency | string | yes | (max length 3; pattern ^[A-Z]{3}$) |
+| decimalPlaces | integer | yes | Up to three without rounding the third away (MoM 1 Sep 2026 §4.5). (min 0; max 3) |
+| minimumMonetaryUnit | number |  | (nullable) |
+| displayPrecision | integer |  | (min 0; max 4; nullable) |
+| calculationPrecision | integer |  | (min 0; max 4; default 4) |
+| roundingMethod | enum (standard, roundUp, roundDown, bankers, nearestCurrencyUnit, customRegulatoryRule) | yes |  |
+| roundingStage | enum (perItem, perTax, perFee, perLine, atOrderTotal) | yes |  |
+| cashRoundingIncrement | number |  | (nullable) |
+| status | object | yes | (default active) |
+| createdAt | string (date-time) |  | (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Response**: `RoundingProfile`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| scopePath | string | yes | The partition key (ADR-0005). (read-only) |
+| code | string |  | (max length 40; nullable) |
+| name | string |  | (max length 200; nullable) |
+| currency | string | yes | (max length 3; pattern ^[A-Z]{3}$) |
+| decimalPlaces | integer | yes | Up to three without rounding the third away (MoM 1 Sep 2026 §4.5). (min 0; max 3) |
+| minimumMonetaryUnit | number |  | (nullable) |
+| displayPrecision | integer |  | (min 0; max 4; nullable) |
+| calculationPrecision | integer |  | (min 0; max 4; default 4) |
+| roundingMethod | enum (standard, roundUp, roundDown, bankers, nearestCurrencyUnit, customRegulatoryRule) | yes |  |
+| roundingStage | enum (perItem, perTax, perFee, perLine, atOrderTotal) | yes |  |
+| cashRoundingIncrement | number |  | (nullable) |
+| status | object | yes | (default active) |
+| createdAt | string (date-time) |  | (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Saved |
+| 422 |  | precisionBelowDecimals. |
+
+### setDynamicPriceRule
+
+**`PUT /pricing/dynamic-rules/{ruleId}`**: Replace a rule, its conditions and its actions
+
+**Applied whole.** A rule whose conditions have been updated and whose actions have not is a rule that fires on the new trigger with the old discount, and for a live price that is a loss taken silently.
+
+|  |  |
+|---|---|
+| Permission | `PRICE_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `pricing.dynamic_price_action`, `pricing.dynamic_price_condition` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Reads | `pricing.dynamic_price_action`, `pricing.dynamic_price_condition`, `pricing.dynamic_price_rule` |
+| Writes | `pricing.dynamic_price_action`, `pricing.dynamic_price_condition`, `pricing.dynamic_price_rule` |
+| Called by | BO-009, BO-443 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| ruleId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `DynamicPriceRuleDetail`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| rule | PricingDynamicPriceRule | yes | Taken from the backend workbook, 20 September. |
+| rule.id | string (uuid) |  |  |
+| rule.pricingRuleCode | string | yes | (max length 100) |
+| rule.name | string | yes | (max length 200) |
+| rule.productId | string (uuid) |  | (nullable) |
+| rule.priceListId | string (uuid) |  | (nullable) |
+| rule.scopePath | string |  | (nullable) |
+| rule.channelId | string (uuid) |  | (nullable) |
+| rule.priority | integer | yes |  |
+| rule.validFrom | string (date-time) |  | (nullable) |
+| rule.validTo | string (date-time) |  | (nullable) |
+| rule.isActive | boolean | yes |  |
+| rule.dynamicPricingStrategyId | string (uuid) |  | The catalogue.dynamic_pricing_strategy a dynamic rule belongs to (29 September, data model DM3). (nullable) |
+| rule.ruleType | string |  | Static rules: PricingRuleCommandCenterView.ruleType; dynamic rules: the builder's ruleKind. (max length 40; nullable) |
+| rule.inputMetric | string |  | (max length 40; nullable) |
+| rule.conditionLogic | enum (all, any) |  | (default all) |
+| rule.cooldownMinutes | integer |  | (min 0; nullable) |
+| rule.minimumDurationMinutes | integer |  | (min 0; nullable) |
+| rule.exitThresholdOffset | number |  | (nullable) |
+| rule.rangeMinPercent | number |  | (nullable) |
+| rule.rangeMaxPercent | number |  | (nullable) |
+| rule.isProtected | boolean |  | A protected segment or channel: dynamic adjustments never apply. (default False) |
+| conditions | array of PricingDynamicPriceCondition |  |  |
+| conditions[].actionId | string (uuid) | yes |  |
+| conditions[].dynamicPriceRuleId | string (uuid) | yes |  |
+| conditions[].type | string | yes | (max length 50) |
+| conditions[].ruleOperator | string | yes | (max length 20) |
+| conditions[].valueJson | string | yes |  |
+| conditions[].sequenceNo | integer | yes |  |
+| actions | array of PricingDynamicPriceAction |  |  |
+| actions[].id | string (uuid) |  |  |
+| actions[].dynamicPriceRuleId | string (uuid) | yes |  |
+| actions[].type | string | yes | (max length 30) |
+| actions[].value | number | yes |  |
+| actions[].minPrice | number |  | (nullable) |
+| actions[].maxPrice | number |  | (nullable) |
+
+**Response**: `DynamicPriceRuleDetail`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| rule | PricingDynamicPriceRule | yes | Taken from the backend workbook, 20 September. |
+| rule.id | string (uuid) |  |  |
+| rule.pricingRuleCode | string | yes | (max length 100) |
+| rule.name | string | yes | (max length 200) |
+| rule.productId | string (uuid) |  | (nullable) |
+| rule.priceListId | string (uuid) |  | (nullable) |
+| rule.scopePath | string |  | (nullable) |
+| rule.channelId | string (uuid) |  | (nullable) |
+| rule.priority | integer | yes |  |
+| rule.validFrom | string (date-time) |  | (nullable) |
+| rule.validTo | string (date-time) |  | (nullable) |
+| rule.isActive | boolean | yes |  |
+| rule.dynamicPricingStrategyId | string (uuid) |  | The catalogue.dynamic_pricing_strategy a dynamic rule belongs to (29 September, data model DM3). (nullable) |
+| rule.ruleType | string |  | Static rules: PricingRuleCommandCenterView.ruleType; dynamic rules: the builder's ruleKind. (max length 40; nullable) |
+| rule.inputMetric | string |  | (max length 40; nullable) |
+| rule.conditionLogic | enum (all, any) |  | (default all) |
+| rule.cooldownMinutes | integer |  | (min 0; nullable) |
+| rule.minimumDurationMinutes | integer |  | (min 0; nullable) |
+| rule.exitThresholdOffset | number |  | (nullable) |
+| rule.rangeMinPercent | number |  | (nullable) |
+| rule.rangeMaxPercent | number |  | (nullable) |
+| rule.isProtected | boolean |  | A protected segment or channel: dynamic adjustments never apply. (default False) |
+| conditions | array of PricingDynamicPriceCondition |  |  |
+| conditions[].actionId | string (uuid) | yes |  |
+| conditions[].dynamicPriceRuleId | string (uuid) | yes |  |
+| conditions[].type | string | yes | (max length 50) |
+| conditions[].ruleOperator | string | yes | (max length 20) |
+| conditions[].valueJson | string | yes |  |
+| conditions[].sequenceNo | integer | yes |  |
+| actions | array of PricingDynamicPriceAction |  |  |
+| actions[].id | string (uuid) |  |  |
+| actions[].dynamicPriceRuleId | string (uuid) | yes |  |
+| actions[].type | string | yes | (max length 30) |
+| actions[].value | number | yes |  |
+| actions[].minPrice | number |  | (nullable) |
+| actions[].maxPrice | number |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Replace a rule, its conditions and its actions |
+
+### setDynamicPricingGuardrailPolicy
+
+**`PUT /dynamic-pricing-controls`**: Set the guardrails and automation level of dynamic pricing at one scope
+
+**Guardrails and automation policy, one row per scope** (29 September, writers pass). Creates or updates the `catalogue.dynamic_pricing_control` for `scopeLevel` and `scopeId`: price floors and ceilings, rate-of-change limits, protected rate types, freeze and kill switch, `automationLevel` and its authority tiers, circuit breakers, safe failure behaviour and manual override. The most specific scope wins; every execution re-checks it (`createLiveDynamicPrice`).
+
+**Turning the kill switch on (`isKillSwitchActive`) or freezing (`isFrozen`) takes effect at once** and stops every automatic change in scope; a strategy in scope reads as `frozen` (`states/dynamic-pricing-strategy.yaml`). Raising `automationLevel` to `conditionalAutonomous` or `autonomous` opens an `approvals.ApprovalRequest` of kind `pricingChange` and applies only when approved; lowering it applies at once. Rules: `absoluteMinimumPrice` above `absoluteMaximumPrice` is refused (`422` `invalidRange`); `scopeId` is required except at `global` (`422` `scopeIdRequired`). Written to `catalogue.audit_entry` (`domain: pricing`).
+
+|  |  |
+|---|---|
+| Permission | `PRICE_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.dynamic_pricing_control` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `catalogue.dynamic_pricing_control`, `catalogue.dynamic_pricing_strategy` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.dynamic_pricing_control`, `catalogue.dynamic_pricing_strategy`, `platform.outbox` |
+| Called by | ADM-095, ADM-096, ADM-114 |
+| State model | Dynamic pricing strategy ([states/dynamic-pricing-strategy.yaml](../../../states/dynamic-pricing-strategy.yaml)): moves `active` -> `frozen`, `frozen` -> `active` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `DynamicPricingControl`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| scopePath | string | yes | The partition key (ADR-0005). (read-only) |
+| scopeLevel | enum (global, market, venue, strategy, product, event, performance, channel) | yes |  |
+| scopeId | string (uuid) |  | Null at global. (nullable) |
+| absoluteMinimumPrice | object |  | (nullable) |
+| absoluteMinimumPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| absoluteMinimumPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| absoluteMinimumPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| absoluteMaximumPrice | object |  | (nullable) |
+| absoluteMaximumPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| absoluteMaximumPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| absoluteMaximumPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| minimumMarginPercent | number |  | (nullable) |
+| maximumUpliftPercent | number |  | (min 0; nullable) |
+| maximumReductionPercent | number |  | (min 0; nullable) |
+| maximumSingleChangePercent | number |  | (min 0; nullable) |
+| maximumDailyChangePercent | number |  | (min 0; nullable) |
+| maximumWeeklyChangePercent | number |  | (min 0; nullable) |
+| minimumChangeIntervalMinutes | integer |  | (min 0; nullable) |
+| maximumChangesPerDay | integer |  | (min 0; nullable) |
+| minimumInventory | integer |  | (min 0; nullable) |
+| maximumOccupancyTriggerPercent | number |  | (min 0; max 100; nullable) |
+| protectedRateTypes | array of enum (contractRates, membershipRates, corporateRates, promotionalLockedRates, regulatoryPrices, complimentaryRates) |  |  |
+| isFrozen | boolean |  | (default False) |
+| isKillSwitchActive | boolean |  | Stops every automatic change in scope at once. (default False) |
+| automationLevel | enum (advisory, humanInTheLoop, conditionalAutonomous, autonomous) | yes | (default advisory) |
+| authorityTiers | object |  | [{maxAdjustmentPercent, action, confidenceThreshold}]. (nullable) |
+| maxAdjustmentPercent | number |  | (min 0; nullable) |
+| minAiConfidence | number |  | (min 0; max 1; nullable) |
+| minRevenueUpliftPercent | number |  | (nullable) |
+| evaluationFrequencyMinutes | integer |  | (min 1; nullable) |
+| executionFrequencyMinutes | integer |  | (min 1; nullable) |
+| quietPeriodMinutes | integer |  | (min 0; nullable) |
+| noChangeWindows | object |  | [{anchor, minutesBefore, minutesAfter, clockFrom, clockTo}]. (nullable) |
+| circuitBreakers | object |  | [{trigger, threshold, enabled, tripped}]. (nullable) |
+| requireGuardrailsPassed | boolean |  | (default True) |
+| excludeProtectedRates | boolean |  | (default True) |
+| requireHealthyForecastData | boolean |  | (default True) |
+| safeFailureBehavior | enum (holdLastPrice, returnToBase, freeze, requestReview) |  | (default holdLastPrice) |
+| activeOverride | object |  | {user, reason, overridePrice, start, expiry, returnBehavior}. (nullable) |
+| isPaused | boolean |  | (default False) |
+| effectiveFrom | string (date-time) |  | (nullable) |
+| effectiveTo | string (date-time) |  | (nullable) |
+| createdAt | string (date-time) |  | (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Response**: `DynamicPricingControl`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| scopePath | string | yes | The partition key (ADR-0005). (read-only) |
+| scopeLevel | enum (global, market, venue, strategy, product, event, performance, channel) | yes |  |
+| scopeId | string (uuid) |  | Null at global. (nullable) |
+| absoluteMinimumPrice | object |  | (nullable) |
+| absoluteMinimumPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| absoluteMinimumPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| absoluteMinimumPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| absoluteMaximumPrice | object |  | (nullable) |
+| absoluteMaximumPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| absoluteMaximumPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| absoluteMaximumPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| minimumMarginPercent | number |  | (nullable) |
+| maximumUpliftPercent | number |  | (min 0; nullable) |
+| maximumReductionPercent | number |  | (min 0; nullable) |
+| maximumSingleChangePercent | number |  | (min 0; nullable) |
+| maximumDailyChangePercent | number |  | (min 0; nullable) |
+| maximumWeeklyChangePercent | number |  | (min 0; nullable) |
+| minimumChangeIntervalMinutes | integer |  | (min 0; nullable) |
+| maximumChangesPerDay | integer |  | (min 0; nullable) |
+| minimumInventory | integer |  | (min 0; nullable) |
+| maximumOccupancyTriggerPercent | number |  | (min 0; max 100; nullable) |
+| protectedRateTypes | array of enum (contractRates, membershipRates, corporateRates, promotionalLockedRates, regulatoryPrices, complimentaryRates) |  |  |
+| isFrozen | boolean |  | (default False) |
+| isKillSwitchActive | boolean |  | Stops every automatic change in scope at once. (default False) |
+| automationLevel | enum (advisory, humanInTheLoop, conditionalAutonomous, autonomous) | yes | (default advisory) |
+| authorityTiers | object |  | [{maxAdjustmentPercent, action, confidenceThreshold}]. (nullable) |
+| maxAdjustmentPercent | number |  | (min 0; nullable) |
+| minAiConfidence | number |  | (min 0; max 1; nullable) |
+| minRevenueUpliftPercent | number |  | (nullable) |
+| evaluationFrequencyMinutes | integer |  | (min 1; nullable) |
+| executionFrequencyMinutes | integer |  | (min 1; nullable) |
+| quietPeriodMinutes | integer |  | (min 0; nullable) |
+| noChangeWindows | object |  | [{anchor, minutesBefore, minutesAfter, clockFrom, clockTo}]. (nullable) |
+| circuitBreakers | object |  | [{trigger, threshold, enabled, tripped}]. (nullable) |
+| requireGuardrailsPassed | boolean |  | (default True) |
+| excludeProtectedRates | boolean |  | (default True) |
+| requireHealthyForecastData | boolean |  | (default True) |
+| safeFailureBehavior | enum (holdLastPrice, returnToBase, freeze, requestReview) |  | (default holdLastPrice) |
+| activeOverride | object |  | {user, reason, overridePrice, start, expiry, returnBehavior}. (nullable) |
+| isPaused | boolean |  | (default False) |
+| effectiveFrom | string (date-time) |  | (nullable) |
+| effectiveTo | string (date-time) |  | (nullable) |
+| createdAt | string (date-time) |  | (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Saved (an automation raise is pending its approval) |
+| 422 |  | invalidRange or scopeIdRequired. |
+
+### setFeeDefinition
+
+**`PUT /fees`**: Create or update a fee or surcharge
+
+**The fee and surcharge library** (29 September, writers pass). Creates or updates a `catalogue.fee`, keyed by `code`: what the fee is and how it computes. When it applies is a `catalogue.fee_rule` (`setFeeApplicabilityCharging`). Distinct from a provider's processing cost (`payments.fee_rule`) and from a fee as charged on an order (`orders.order_fee`).
+
+Rules: `fixedAmount` needs `amount`, `percentage` needs `percentage`, `tiered` needs `tiers` (`422` `valueRequired`). **A `draft` fee is saved directly; changing one already `active` is refused (`409` `changeRequestRequired`)** and goes through `setPricingChangeRequest`. Written to `catalogue.audit_entry` (`domain: pricing`).
+
+|  |  |
+|---|---|
+| Permission | `PRICE_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.fee` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `catalogue.fee` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.fee` |
+| Called by | ADM-071 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `PricingFee`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| scopePath | string | yes | The partition key (ADR-0005). (read-only) |
+| code | string | yes | (max length 40) |
+| name | string | yes | (max length 200) |
+| description | string |  | (nullable) |
+| feeType | enum (bookingFee, transactionFee, serviceFee, convenienceFee, deliveryFee, handlingFee, modificationFee, reschedulingFee, …) | yes |  |
+| valueType | enum (fixedAmount, percentage, tiered) | yes |  |
+| chargeBasis | enum (perTicket, perProduct, perPerson, perOrder, perTransaction, perDay) | yes |  |
+| amount | object |  | (nullable) |
+| amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| percentage | number |  | (min 0; max 100; nullable) |
+| tiers | object |  | [{fromOrderValue, amount, percentage}] for valueType: tiered. (nullable) |
+| taxTreatment | string |  | How the fee is taxed; a catalogue.tax_rule may refine it. (max length 60; nullable) |
+| refundability | enum (refundable, nonRefundable) |  | (default nonRefundable) |
+| visibility | enum (customerVisible, includedInDisplayPrice, shownSeparately, internalOnly) |  | (default shownSeparately) |
+| effectiveFrom | string (date-time) |  | (nullable) |
+| effectiveTo | string (date-time) |  | (nullable) |
+| status | object | yes | (default draft) |
+| createdAt | string (date-time) |  | (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Response**: `PricingFee`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| scopePath | string | yes | The partition key (ADR-0005). (read-only) |
+| code | string | yes | (max length 40) |
+| name | string | yes | (max length 200) |
+| description | string |  | (nullable) |
+| feeType | enum (bookingFee, transactionFee, serviceFee, convenienceFee, deliveryFee, handlingFee, modificationFee, reschedulingFee, …) | yes |  |
+| valueType | enum (fixedAmount, percentage, tiered) | yes |  |
+| chargeBasis | enum (perTicket, perProduct, perPerson, perOrder, perTransaction, perDay) | yes |  |
+| amount | object |  | (nullable) |
+| amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| percentage | number |  | (min 0; max 100; nullable) |
+| tiers | object |  | [{fromOrderValue, amount, percentage}] for valueType: tiered. (nullable) |
+| taxTreatment | string |  | How the fee is taxed; a catalogue.tax_rule may refine it. (max length 60; nullable) |
+| refundability | enum (refundable, nonRefundable) |  | (default nonRefundable) |
+| visibility | enum (customerVisible, includedInDisplayPrice, shownSeparately, internalOnly) |  | (default shownSeparately) |
+| effectiveFrom | string (date-time) |  | (nullable) |
+| effectiveTo | string (date-time) |  | (nullable) |
+| status | object | yes | (default draft) |
+| createdAt | string (date-time) |  | (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Saved |
+| 409 |  | changeRequestRequired. |
+| 422 |  | valueRequired. |
+
+### setPriceCategoryRateType
+
+**`PUT /price-categories`**: Create or update a price category or rate type
+
+**The tenant's library of price categories and rate types** (29 September, writers pass). Creates or updates a `catalogue.price_category`, keyed by `entryKind` and `code` (unique per `entryKind` in the tenant). A price category is who is priced (Adult, Child, Resident); a rate type is how (Standard, Peak, Member). A `parentId` must be of the same `entryKind` and must not make a cycle (`422` `invalidParent`). A standard entry (`isStandard`) may be deactivated (`isActive: false`), never deleted, and one used by an active rate cannot be deactivated (`409` `inUse`). Written to `catalogue.audit_entry` (`domain: pricing`).
+
+|  |  |
+|---|---|
+| Permission | `PRICE_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `catalogue.price_category` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `catalogue.price_category`, `catalogue.rate` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.price_category` |
+| Called by | ADM-050 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `PriceCategory`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| scopePath | string | yes | The partition key (ADR-0005). (read-only) |
+| entryKind | enum (priceCategory, rateType) | yes |  |
+| code | string | yes | Unique per entryKind within the tenant. (max length 40) |
+| name | string | yes | (max length 200) |
+| description | string |  | (nullable) |
+| categoryFamily | string |  | (max length 60; nullable) |
+| displayName | string |  | (max length 200; nullable) |
+| localizedDisplayNames | object |  | (nullable) |
+| iconLabel | string |  | (max length 40; nullable) |
+| parentId | string (uuid) |  | A parent catalogue.price_category of the same entryKind. (nullable) |
+| isStandard | boolean |  | Shipped with the tenant; may be deactivated, not deleted. (default False) |
+| sortOrder | integer |  | (default 100) |
+| isActive | boolean | yes | (default True) |
+| createdAt | string (date-time) |  | (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Response**: `PriceCategory`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| scopePath | string | yes | The partition key (ADR-0005). (read-only) |
+| entryKind | enum (priceCategory, rateType) | yes |  |
+| code | string | yes | Unique per entryKind within the tenant. (max length 40) |
+| name | string | yes | (max length 200) |
+| description | string |  | (nullable) |
+| categoryFamily | string |  | (max length 60; nullable) |
+| displayName | string |  | (max length 200; nullable) |
+| localizedDisplayNames | object |  | (nullable) |
+| iconLabel | string |  | (max length 40; nullable) |
+| parentId | string (uuid) |  | A parent catalogue.price_category of the same entryKind. (nullable) |
+| isStandard | boolean |  | Shipped with the tenant; may be deactivated, not deleted. (default False) |
+| sortOrder | integer |  | (default 100) |
+| isActive | boolean | yes | (default True) |
+| createdAt | string (date-time) |  | (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Saved |
+| 409 |  | inUse. |
+| 422 |  | invalidParent. |
 
 ### setProductCategories
 
@@ -1542,150 +2471,6 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 
 ## Group: coupon
 
-### createCouponCampaign
-
-**`POST /coupon-campaigns`**: Create a coupon campaign
-
-|  |  |
-|---|---|
-| Permission | `PRICE_CONFIGURE` |
-| Scope level | venue |
-| Part of slice | setup, makes `promotions.coupon_campaign` non-empty |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `promotions.coupon_campaign` |
-| Writes | `cache:idempotency`, `promotions.coupon_campaign` |
-| Called by | BO-010 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
-
-**Request body**: `CreateCouponCampaignRequest`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| code | string | yes | (max length 64) |
-| name | string | yes | (max length 200) |
-| venueId | string (uuid) | yes |  |
-| discount | Discount | yes |  |
-| discount.kind | DiscountKind: enum (percentage, fixedAmount, fixedPrice, buyXGetY, freeItem, tieredPercentage) | yes |  |
-| discount.percentage | number |  | (min 0; max 100) |
-| discount.amount | Money |  | On the wire this is three fields; in the database it is one column. |
-| discount.amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| discount.amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| discount.amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| discount.fixedPrice | Money |  | On the wire this is three fields; in the database it is one column. |
-| discount.fixedPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| discount.fixedPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| discount.fixedPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| discount.buyQuantity | integer |  | (min 1) |
-| discount.getQuantity | integer |  | (min 1) |
-| discount.getDiscountPercentage | number |  | 100 makes the free items actually free; lower values give a partial discount. (min 0; max 100) |
-| discount.tiers | array of object |  | For tieredPercentage — more units, larger discount. |
-| discount.tiers[].minQuantity | integer | yes | (min 1) |
-| discount.tiers[].percentage | number | yes | (min 0; max 100) |
-| discount.maxDiscountAmount | object |  | Cap on a percentage discount. |
-| discount.maxDiscountAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| discount.maxDiscountAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| discount.maxDiscountAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| conditions | PromotionConditions |  | All conditions must hold. |
-| conditions.variantIds | array of string (uuid) |  |  |
-| conditions.productKinds | array of string |  |  |
-| conditions.categoryIds | array of string (uuid) |  |  |
-| conditions.minQuantity | integer |  | (min 1) |
-| conditions.minBasketValue | Money |  | On the wire this is three fields; in the database it is one column. |
-| conditions.minBasketValue.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| conditions.minBasketValue.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| conditions.minBasketValue.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| conditions.channels | array of SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) |  | Empty or absent matches every channel. |
-| conditions.purchaseGate | boolean |  | BL-037. (default False) |
-| conditions.paymentMethod | array of string |  | BL-113. (nullable) |
-| conditions.issuerBins | array of string |  | Card BIN ranges, where the campaign is issuer-specific rather than scheme-specific. (nullable) |
-| conditions.componentRedemption | enum (allTogether, independently, sequenced) |  | BL-112. (nullable) |
-| conditions.daysOfWeek | array of integer |  |  |
-| conditions.startTime | string |  | (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
-| conditions.endTime | string |  | (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
-| conditions.membershipTierIds | array of string (uuid) |  |  |
-| conditions.requiresCoupon | boolean |  | (default False) |
-| conditions.firstPurchaseOnly | boolean |  | (default False) |
-| conditions.performanceIds | array of string (uuid) |  |  |
-| conditions.advanceDaysMin | integer |  | Early-bird — booked at least this many days ahead. |
-| conditions.advanceDaysMax | integer |  | Last-minute — booked no more than this many days ahead. |
-| isSingleUse | boolean |  | True generates individually redeemable codes. (default True) |
-| maxRedemptionsPerCode | integer |  | (default 1) |
-| validFrom | string (date-time) | yes |  |
-| validTo | string (date-time) |  |  |
-
-**Response**: `CouponCampaign`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| code | string | yes | (max length 64) |
-| name | string | yes | (max length 200) |
-| venueId | string (uuid) | yes |  |
-| discount | Discount | yes |  |
-| discount.kind | DiscountKind: enum (percentage, fixedAmount, fixedPrice, buyXGetY, freeItem, tieredPercentage) | yes |  |
-| discount.percentage | number |  | (min 0; max 100) |
-| discount.amount | Money |  | On the wire this is three fields; in the database it is one column. |
-| discount.amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| discount.amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| discount.amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| discount.fixedPrice | Money |  | On the wire this is three fields; in the database it is one column. |
-| discount.fixedPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| discount.fixedPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| discount.fixedPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| discount.buyQuantity | integer |  | (min 1) |
-| discount.getQuantity | integer |  | (min 1) |
-| discount.getDiscountPercentage | number |  | 100 makes the free items actually free; lower values give a partial discount. (min 0; max 100) |
-| discount.tiers | array of object |  | For tieredPercentage — more units, larger discount. |
-| discount.tiers[].minQuantity | integer | yes | (min 1) |
-| discount.tiers[].percentage | number | yes | (min 0; max 100) |
-| discount.maxDiscountAmount | object |  | Cap on a percentage discount. |
-| discount.maxDiscountAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| discount.maxDiscountAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| discount.maxDiscountAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| conditions | PromotionConditions |  | All conditions must hold. |
-| conditions.variantIds | array of string (uuid) |  |  |
-| conditions.productKinds | array of string |  |  |
-| conditions.categoryIds | array of string (uuid) |  |  |
-| conditions.minQuantity | integer |  | (min 1) |
-| conditions.minBasketValue | Money |  | On the wire this is three fields; in the database it is one column. |
-| conditions.minBasketValue.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| conditions.minBasketValue.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| conditions.minBasketValue.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| conditions.channels | array of SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) |  | Empty or absent matches every channel. |
-| conditions.purchaseGate | boolean |  | BL-037. (default False) |
-| conditions.paymentMethod | array of string |  | BL-113. (nullable) |
-| conditions.issuerBins | array of string |  | Card BIN ranges, where the campaign is issuer-specific rather than scheme-specific. (nullable) |
-| conditions.componentRedemption | enum (allTogether, independently, sequenced) |  | BL-112. (nullable) |
-| conditions.daysOfWeek | array of integer |  |  |
-| conditions.startTime | string |  | (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
-| conditions.endTime | string |  | (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
-| conditions.membershipTierIds | array of string (uuid) |  |  |
-| conditions.requiresCoupon | boolean |  | (default False) |
-| conditions.firstPurchaseOnly | boolean |  | (default False) |
-| conditions.performanceIds | array of string (uuid) |  |  |
-| conditions.advanceDaysMin | integer |  | Early-bird — booked at least this many days ahead. |
-| conditions.advanceDaysMax | integer |  | Last-minute — booked no more than this many days ahead. |
-| isSingleUse | boolean |  | True generates individually redeemable codes. (default True) |
-| maxRedemptionsPerCode | integer |  | (default 1) |
-| validFrom | string (date-time) | yes |  |
-| validTo | string (date-time) |  |  |
-| id | string (uuid) | yes |  |
-| generatedCount | integer | yes |  |
-| redeemedCount | integer | yes |  |
-| isActive | boolean |  |  |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 201 |  | Created |
-
 ### generateCouponCodes
 
 **`POST /coupon-campaigns/{campaignId}/codes`**: Generate codes in bulk
@@ -1693,6 +2478,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 Up to fifty thousand at a time. Generation is asynchronous and the batch is exported rather than returned inline — a hundred thousand codes is a file, not a response body.
 **Poll `getCouponCodeBatch` with the returned `batchId`** for progress, the failure reason and, once `complete`, the export's download link. `listCouponCodes` filters by the same `batchId`.
 **Codes are single-use by default** (the campaign's `isSingleUse` defaults to true), and **the number of assigned guests must not exceed `quantity`**. Fewer is allowed: the codes left over are anonymous (decided 28 September, audit R101).
+**Writes `promotions.promotion_audit`** in the same transaction, as every promotions configuration change does: one row per batch, not per code (entityType `couponCampaign`, eventType `modified`, newValue the batch id and quantity) (decided 29 September, writers pass).
 
 |  |  |
 |---|---|
@@ -1703,7 +2489,7 @@ Up to fifty thousand at a time. Generation is asynchronous and the batch is expo
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `promotions.coupon_campaign` |
-| Writes | `cache:idempotency`, `promotions.coupon_code` |
+| Writes | `cache:idempotency`, `promotions.coupon_code`, `promotions.coupon_code_batch`, `promotions.promotion_audit` |
 | Called by | BO-010 |
 
 **Parameters**
@@ -1794,6 +2580,8 @@ Called at point of sale before applying. Returns whether the code is valid, why 
 | discount.maxDiscountAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | discount.maxDiscountAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | discount.maxDiscountAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| discount.rewardVariantIds | array of string (uuid) |  | The reward products, where the reward is not the qualifying product: the free gift of freeItem, the "different product" of a buyXGetY (setGiftFreeProduct, setBuyGetBogo). (nullable) |
+| discount.maxApplicationsPerBasket | integer |  | How many times the offer repeats in one basket: the "maximum repetitions" of an N-for-X offer (setFixedPriceOffer). (min 1; nullable) |
 | invalidReason | enum (expired, alreadyRedeemed, voided, notYetValid, wrongVenue, conditionsNotMet, notAssignedToGuest) |  | Why the code cannot be applied. (nullable) |
 | validFrom | string (date-time) |  | (nullable) |
 | validTo | string (date-time) |  | (nullable) |
@@ -1807,6 +2595,2233 @@ Called at point of sale before applying. Returns whether the code is valid, why 
 |---|---|---|
 | 200 |  | Code state |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+
+## Group: drafted
+
+### createBulkProductCatalogue
+
+**`POST /bulk-product-catalogue`**: Bulk Product Creation & Catalogue Import
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Product Lifecycle   Catalogue Governance, page 6. The screen says: Allow large catalogues to be created efficiently rather than configuring every product manually. This directly addresses the matrix requirement for catalogue creation through bulk-file upload.
+
+**Agreed (decided 29 September, readiness close-out).** the six supported sources became one sourceFormat enum; preview, error correction and exclusion became typed lists; job id, counts, column mapping, target venue, default template and validate/commit mode added (shape follows CatalogueImportJob). Two-phase like CatalogueImportJob: mode validate parses and returns preview and validationIssues, mode commit creates the non-excluded rows as draft products. Download template, download error report (errorReportUrl) and roll back an import where permitted are actions on ADM-121. Nothing the AI proposes becomes live: every created product is draft.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.product`, `catalogue.variant` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `catalogue.import_job`, `catalogue.product` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.import_job`, `catalogue.product`, `catalogue.variant` |
+| Called by | ADM-121 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `BulkProductCreationCatalogueImportInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| rowCorrections | array of object |  | Corrections to individual records before re-validating |
+| rowCorrections[].row | integer |  |  |
+| rowCorrections[].field | string |  |  |
+| rowCorrections[].value | string |  |  |
+| excludedRows | array of integer |  | Rows to exclude |
+| jobId | string (uuid) |  | Existing job to re-validate or commit; empty to start a new one (nullable) |
+| fileId | string |  | Uploaded source file id |
+| sourceFormat | enum (excel, csv, spreadsheetTemplate, catalogueFile, pdfBrochure, productDocument) |  | Supported source (pack p.6) |
+| targetVenueId | string (uuid) |  | Target venue/site |
+| defaultTemplateId | string (uuid) |  | Default product configuration (template) applied to every row (nullable) |
+| columnMapping | array of object |  | Source columns mapped to TICVAI fields |
+| columnMapping[].sourceColumn | string |  |  |
+| columnMapping[].targetField | string |  |  |
+| mode | enum (validate, commit) |  | validate previews without creating; commit runs the import (decided 29 September, readiness close-out) |
+
+**Response**: `BulkProductCreationCatalogueImportView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| previewProducts | array of object |  | Products that the import will create, previewed before creation; all are created in draft |
+| previewProducts[].row | integer |  |  |
+| previewProducts[].productName | string |  |  |
+| previewProducts[].productType | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) |  | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
+| previewProducts[].excluded | boolean |  |  |
+| previewProducts[].aiProposed | boolean |  |  |
+| validationIssues | array of object |  | Record errors to correct before import (decided 29 September, readiness close-out) |
+| validationIssues[].row | integer |  |  |
+| validationIssues[].field | string |  |  |
+| validationIssues[].code | enum (missingRequired, invalidValue, unknownReference, duplicate, unmappedColumn) |  |  |
+| validationIssues[].message | string |  |  |
+| excludedRows | array of integer |  | Rows excluded from the import |
+| jobId | string (uuid) |  | Import job id |
+| status | string |  | Job status: parsing, previewReady, committing, committed or failed (as CatalogueImportJob) |
+| sourceFormat | enum (excel, csv, spreadsheetTemplate, catalogueFile, pdfBrochure, productDocument) |  | Supported source (pack p.6) |
+| targetVenueId | string (uuid) |  | Target venue/site |
+| parsedCount | integer |  | Records parsed |
+| createdCount | integer |  | Products created (after commit) |
+| failedCount | integer |  | Records failed |
+| errorReportUrl | string (uri) |  | Downloadable error report (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Bulk Product Creation & Catalogue Import |
+
+### createChannelProfile
+
+**`POST /channel-profile`**: Channel Creation & Profile Configuration
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Sales Channel Management, page 5. The screen says: Create and define a sales channel before products and commercial rules are assigned.
+
+**Agreed (decided 29 September, readiness close-out).** the eight scope options became scopeLevel + scopeId; 'may require' prose and allocation rules dropped (allocation lives on ADM-262); type-specific settings typed as IDs/lists; channelType enum, currency/country/code patterns; tenant comes from context; response carries the new channelId and draft status. Save creates the channel in draft; the type-specific fields (POS: venue, workstation groups, cashier access; B2C: webstore, domain, journey; OTA: partner, API connection) are required by readiness validation, not by this call.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.sales_channel` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `catalogue.sales_channel` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.sales_channel` |
+| Called by | ADM-259 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ChannelCreationProfileConfigurationInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| channelName | string |  | Channel Name (internal) (max length 120) |
+| channelCode | string |  | Channel Code: unique within the tenant, 2-20 upper-case letters, digits or hyphens (decided 29 September, readiness close-out) (pattern ^[A-Z0-9-]{2,20}$) |
+| channelType | enum (b2cWeb, b2cMobileApp, pos, mobilePos, flyingPos, kiosk, callCentre, b2bPortal, …) |  | Channel Type (pack p.3-4 Channel Types). |
+| internalDescription | string |  | Internal Description |
+| customerFacingName | string |  | Customer-Facing Name (max length 120) |
+| brand | string |  | Brand ID |
+| businessUnit | string |  | Business Unit ID |
+| country | string |  | Country: ISO 3166-1 alpha-2 (pattern ^[A-Z]{2}$) |
+| market | string |  | Market (a configured market code) |
+| currency | string |  | Currency: ISO 4217 code (pattern ^[A-Z]{3}$) |
+| timeZone | string |  | Time Zone: IANA name, e.g. |
+| owner | string |  | Owner (user ID) |
+| responsibleDepartment | string |  | Responsible Department |
+| venue | string |  | Venue ID: required for the POS types (pack p.6) and when scopeLevel is venue (nullable) |
+| workstationGroups | array of string |  | Workstation groups (IDs) that may sell on a POS-type channel (pack p.6) |
+| cashierAccess | array of string |  | Cashier access: role IDs allowed to sell on a POS-type channel (pack p.6) |
+| webstore | string |  | Webstore ID for a B2C-type channel (pack p.6) (nullable) |
+| domainBrand | string |  | Domain/brand: the storefront domain for a B2C-type channel (pack p.6) (nullable) |
+| digitalCustomerJourney | string |  | Digital customer journey: the checkout journey template ID for a B2C-type channel (pack p.6) (nullable) |
+| partner | string |  | Partner ID for an OTA, reseller or partner channel (pack p.6); the partner record lives in B2B/OTA (nullable) |
+| apiConnection | string |  | API connection: the connector ID from ADM-269 for an OTA/API channel (pack p.6); the external platform is named as data on the connector (nullable) |
+| commercialOwner | string |  | Commercial Owner (user ID) |
+| operationalOwner | string |  | Operational Owner (user ID) |
+| technicalOwner | string |  | Technical Owner (user ID) |
+| financeOwner | string |  | Finance Owner (user ID) |
+| scopeLevel | enum (global, country, region, venue, attraction, event, location, businessUnit) |  | Operational Scope level (pack p.6) |
+| scopeId | string |  | ID of the scoped item (country code, region, venue, attraction, event, location or business unit); empty for global (nullable) |
+| salesChannel | SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) |  | Where a sale came from. |
+
+**Response**: `ChannelCreationProfileConfigurationView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| channelName | string |  | Channel Name (internal) (max length 120) |
+| channelCode | string |  | Channel Code: unique within the tenant, 2-20 upper-case letters, digits or hyphens (decided 29 September, readiness close-out) (pattern ^[A-Z0-9-]{2,20}$) |
+| channelType | enum (b2cWeb, b2cMobileApp, pos, mobilePos, flyingPos, kiosk, callCentre, b2bPortal, …) |  | Channel Type (pack p.3-4 Channel Types). |
+| internalDescription | string |  | Internal Description |
+| customerFacingName | string |  | Customer-Facing Name (max length 120) |
+| tenant | string |  | Tenant |
+| brand | string |  | Brand ID |
+| businessUnit | string |  | Business Unit ID |
+| country | string |  | Country: ISO 3166-1 alpha-2 (pattern ^[A-Z]{2}$) |
+| market | string |  | Market (a configured market code) |
+| currency | string |  | Currency: ISO 4217 code (pattern ^[A-Z]{3}$) |
+| timeZone | string |  | Time Zone: IANA name, e.g. |
+| owner | string |  | Owner (user ID) |
+| responsibleDepartment | string |  | Responsible Department |
+| venue | string |  | Venue ID: required for the POS types (pack p.6) and when scopeLevel is venue (nullable) |
+| workstationGroups | array of string |  | Workstation groups (IDs) that may sell on a POS-type channel (pack p.6) |
+| cashierAccess | array of string |  | Cashier access: role IDs allowed to sell on a POS-type channel (pack p.6) |
+| webstore | string |  | Webstore ID for a B2C-type channel (pack p.6) (nullable) |
+| domainBrand | string |  | Domain/brand: the storefront domain for a B2C-type channel (pack p.6) (nullable) |
+| digitalCustomerJourney | string |  | Digital customer journey: the checkout journey template ID for a B2C-type channel (pack p.6) (nullable) |
+| partner | string |  | Partner ID for an OTA, reseller or partner channel (pack p.6); the partner record lives in B2B/OTA (nullable) |
+| apiConnection | string |  | API connection: the connector ID from ADM-269 for an OTA/API channel (pack p.6); the external platform is named as data on the connector (nullable) |
+| commercialOwner | string |  | Commercial Owner (user ID) |
+| operationalOwner | string |  | Operational Owner (user ID) |
+| technicalOwner | string |  | Technical Owner (user ID) |
+| financeOwner | string |  | Finance Owner (user ID) |
+| scopeLevel | enum (global, country, region, venue, attraction, event, location, businessUnit) |  | Operational Scope level (pack p.6) |
+| scopeId | string |  | ID of the scoped item (country code, region, venue, attraction, event, location or business unit); empty for global (nullable) |
+| salesChannel | SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) |  | Where a sale came from. |
+| channelId | string |  | Channel ID, assigned by TICVAI (read-only) |
+| status | string |  | Status: draft, configuration, validation, approved, scheduled, active, suspended, disabled or archived (the pack's suggested lifecycle, p.5); a new channel starts in draft (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Channel Creation & Profile Configuration |
+
+### publishChannelAvailability
+
+**`PUT /channel-availability`**: Channel Publication & Availability
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Product Lifecycle   Catalogue Governance, page 9. The screen says: Control where a product may be exposed for sale.
+
+**Agreed (decided 29 September, readiness close-out).** enable/disable became a typed per-channel list ($ref Channel) with sites, POS groups, venues and effective dates; preview and missing dependencies are response-only (publicationPreview, validationIssues); productId and the count of issued entitlements that stay valid added. Removing a channel stops future sale only; previously issued tickets stay valid, and the response shows issuedEntitlementsUnaffected so ADM-124 can say so. Only approved or live products can be exposed; channel configuration itself belongs to Sales Channel Management.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.product` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `access.entitlement`, `cache:idempotency`, `catalogue.product`, `catalogue.product_channel_assignment`, `catalogue.sales_channel` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.product`, `catalogue.product_channel_assignment` |
+| Called by | ADM-124, BO-291 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ChannelPublicationAvailabilityInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| channels | array of object |  | Channels the product is published on, with channel-specific sites, POS groups, venues and effective dates |
+| channels[].channel | Channel: enum (pos, kiosk, web, mobile, b2b, ota, callCentre) |  |  |
+| channels[].enabled | boolean |  |  |
+| channels[].siteIds | array of string |  | Specific sites/webstores; empty = all |
+| channels[].posGroupIds | array of string |  | Specific POS groups; empty = all |
+| channels[].venueIds | array of string |  | Availability by venue; empty = all the product's venues |
+| channels[].effectiveFrom | string (date-time) |  | (nullable) |
+| channels[].effectiveTo | string (date-time) |  | (nullable) |
+| productId | string (uuid) |  | Product id |
+
+**Response**: `ChannelPublicationAvailabilityView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| channels | array of object |  | Channels the product is published on, with channel-specific sites, POS groups, venues and effective dates |
+| channels[].channel | Channel: enum (pos, kiosk, web, mobile, b2b, ota, callCentre) |  |  |
+| channels[].enabled | boolean |  |  |
+| channels[].siteIds | array of string |  | Specific sites/webstores; empty = all |
+| channels[].posGroupIds | array of string |  | Specific POS groups; empty = all |
+| channels[].venueIds | array of string |  | Availability by venue; empty = all the product's venues |
+| channels[].effectiveFrom | string (date-time) |  | (nullable) |
+| channels[].effectiveTo | string (date-time) |  | (nullable) |
+| publicationPreview | array of object |  | Preview of where the product will actually be on sale |
+| publicationPreview[].channel | Channel: enum (pos, kiosk, web, mobile, b2b, ota, callCentre) |  |  |
+| publicationPreview[].venueId | string |  |  |
+| publicationPreview[].exposed | boolean |  |  |
+| publicationPreview[].reason | string |  | (nullable) |
+| validationIssues | array of object |  | Missing channel dependencies (decided 29 September, readiness close-out) |
+| validationIssues[].code | enum (channelNotConfigured, noPriceForChannel, noCapacityAllocation, productNotApproved, venueNotAssigned) |  |  |
+| validationIssues[].message | string |  |  |
+| productId | string (uuid) |  | Product id |
+| issuedEntitlementsUnaffected | integer |  | Valid issued tickets/entitlements that remain valid whatever the channel change (pack p.10 Important Rule) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Channel Publication & Availability |
+
+### publishChannelReadinessValidation
+
+**`PUT /channel-readiness-validation`**: Channel Publication, Readiness & AI Validation
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Sales Channel Management, page 16. The screen says: Perform final validation before a sales channel or channel/product configuration becomes commercially active.
+
+**Agreed (decided 29 September, readiness close-out).** 17 fragments of the checklist became a request (channel, action, schedule, override reason) and a response (readiness score, per-area checklist, severity-graded issues, advisory AI findings, resulting status). Actions Validate, Preview, Submit for Approval, Schedule Activation, Activate, Return for Changes and Suspend on ADM-267 are this PUT's action; a critical issue blocks activation, warnings pass only with the override permission and a mandatory reason; preview returns the effective Product -> Channel -> Customer -> Price -> Capacity -> Payment -> Fulfillment chain without activating.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.sales_channel` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `catalogue.channel_allocation`, `catalogue.channel_capacity`, `catalogue.channel_connection`, `catalogue.channel_sales_rule`, `catalogue.price_assignment`, `catalogue.price_list`, `catalogue.product`, `catalogue.product_channel_assignment`, `catalogue.sales_channel` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.sales_channel` |
+| Called by | ADM-267 |
+| State model | Sales channel ([states/sales-channel.yaml](../../../states/sales-channel.yaml)): moves `draft` -> `pendingApproval`, `pendingApproval` -> `draft`, `pendingApproval` -> `scheduled`, `pendingApproval` -> `active`, `active` -> `suspended`, `suspended` -> `active` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ChannelPublicationReadinessAiValidationInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| channelId | string |  | Channel ID |
+| action | enum (validate, preview, submitForApproval, scheduleActivation, activate, returnForChanges, suspend) |  | Publication Action (pack p.17) |
+| scheduledAt | string (date-time) |  | Activation time for scheduleActivation (nullable) |
+| reason | string |  | Reason: mandatory when overriding warnings or returning for changes (nullable) |
+| overrideWarnings | boolean |  | Proceed despite warnings (needs the override permission and a reason); critical issues cannot be overridden |
+
+**Response**: `ChannelPublicationReadinessAiValidationView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| channelId | string |  | Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258) |
+| status | string |  | Status after the action: draft, configuration, validation, approved, scheduled, active, suspended, disabled or archived (the pack's suggested lifecycle, p.5) |
+| readinessScore | number |  | Channel Readiness % (min 0; max 100) |
+| checklist | array of object |  | Readiness Checklist (pack p.16) with each area's score (p.17) |
+| checklist[].area | enum (channelProfile, products, pricing, capacity, schedule, eligibility, salesRules, payment, …) |  |  |
+| checklist[].result | enum (passed, warning, failed, notRequired) |  |  |
+| checklist[].scorePercent | number |  |  |
+| issues | array of object |  | Issues by Issue Severity (pack p.17) |
+| issues[].severity | enum (critical, high, medium, low, recommendation) |  |  |
+| issues[].area | enum (channelProfile, products, pricing, capacity, schedule, eligibility, salesRules, payment, …) |  |  |
+| issues[].code | string |  |  |
+| issues[].message | string |  |  |
+| aiInsights | array of string |  | AI Validation findings (pack p.17, e.g. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Channel Publication, Readiness & AI Validation |
+
+### setBookingVelocityTime
+
+**`PUT /booking-velocity-time`**: Booking Velocity & Time-to-Event Rule Builder
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Pricing   Revenue Management, page 80. The screen says: Control price movement based on how quickly inventory is selling and how much time remains before the event or visit date. This is critical because occupancy alone is insufficient for effective revenue management.
+
+**Agreed (decided 29 September, readiness close-out).** the input and T-interval names and example values became a typed rule: conditions over one metric enum, a time-to-event schedule (days before + action), a condition action, and the expected-pace source; historical booking curve is a pace source rather than a field. Rules persist through the backend dynamic-rule model (PricingDynamicPriceRule/Condition/Action); results pass the price ladder and guardrails and act on unsold inventory only. Forecast-driven expected pace waits for the forecasting component (MoM 19 Aug).
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `pricing.dynamic_price_action`, `pricing.dynamic_price_condition` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `catalogue.dynamic_pricing_strategy`, `pricing.dynamic_price_action`, `pricing.dynamic_price_condition`, `pricing.dynamic_price_rule` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `pricing.dynamic_price_action`, `pricing.dynamic_price_condition`, `pricing.dynamic_price_rule` |
+| Called by | ADM-091 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `BookingVelocityTimeToEventRuleBuilderInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| ruleId | string |  | Rule ID; empty on create (nullable) |
+| strategyId | string |  | Strategy the rule belongs to |
+| ruleName | string |  | Rule name |
+| ruleKind | enum (bookingVelocity, earlyBird, lastMinute, combined, decayEscalation) |  | Rule family (pack pp.80-81) |
+| expectedPaceSource | enum (historicalBookingCurve, configuredTarget) |  | What pace variance is measured against; defaults to configuredTarget until a historical curve exists (decided 29 September, readiness close-out) |
+| expectedSalesPerDay | integer |  | Expected sales per day when expectedPaceSource is configuredTarget (nullable) |
+| conditions | array of object |  | Conditions (all must hold unless conditionLogic is any) |
+| conditions[].metric | enum (salesPerHour, salesPerDay, salesPerWeek, currentBookingPace, paceVariancePercent, remainingInventory, daysToEvent, occupancyPercent) |  | Input evaluated (pack p.80; daysToEvent 0 = same day) |
+| conditions[].operator | enum (lt, lte, gt, gte, eq, between) |  | Comparison |
+| conditions[].value | number |  | Threshold value (percent for percentages, count for counts, days for time-to-event) |
+| conditions[].valueTo | number |  | Upper value when operator is between (nullable) |
+| conditionLogic | enum (all, any) |  | How conditions combine; defaults to all (decided 29 September, readiness close-out) |
+| timeToEventSchedule | array of object |  | Time-to-event steps (early-bird, decay/escalation); empty for condition-only rules |
+| timeToEventSchedule[].daysBefore | integer |  | Days before the event/visit (T-180 ... |
+| timeToEventSchedule[].action | object |  | The price action; the result still passes through the price ladder and the guardrails |
+| timeToEventSchedule[].action.actionType | enum (percentAdjustment, fixedAmountAdjustment, moveToBand, returnToBase) |  | What the rule does to the current price |
+| timeToEventSchedule[].action.percent | number |  | Adjustment in percent (negative lowers the price) when actionType is percentAdjustment (nullable) |
+| timeToEventSchedule[].action.amount | object |  | Signed amount when actionType is fixedAmountAdjustment (nullable) |
+| timeToEventSchedule[].action.bandCode | string |  | Target band on the strategy's price ladder (listDynamicPriceBand) when actionType is moveToBand (nullable) |
+| action | object |  | Action when the conditions hold (for condition rules) (nullable) |
+| action.actionType | enum (percentAdjustment, fixedAmountAdjustment, moveToBand, returnToBase) |  | What the rule does to the current price |
+| action.percent | number |  | Adjustment in percent (negative lowers the price) when actionType is percentAdjustment (nullable) |
+| action.amount | object |  | Signed amount when actionType is fixedAmountAdjustment (nullable) |
+| action.amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| action.amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| action.amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| action.bandCode | string |  | Target band on the strategy's price ladder (listDynamicPriceBand) when actionType is moveToBand (nullable) |
+| priority | integer |  | Priority within the strategy; lower wins |
+| enabled | boolean |  | Enabled |
+
+**Response**: `BookingVelocityTimeToEventRuleBuilderView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| ruleId | string |  | Rule ID; empty on create (nullable) |
+| strategyId | string |  | Strategy the rule belongs to |
+| ruleName | string |  | Rule name |
+| ruleKind | enum (bookingVelocity, earlyBird, lastMinute, combined, decayEscalation) |  | Rule family (pack pp.80-81) |
+| expectedPaceSource | enum (historicalBookingCurve, configuredTarget) |  | What pace variance is measured against; defaults to configuredTarget until a historical curve exists (decided 29 September, readiness close-out) |
+| expectedSalesPerDay | integer |  | Expected sales per day when expectedPaceSource is configuredTarget (nullable) |
+| conditions | array of object |  | Conditions (all must hold unless conditionLogic is any) |
+| conditions[].metric | enum (salesPerHour, salesPerDay, salesPerWeek, currentBookingPace, paceVariancePercent, remainingInventory, daysToEvent, occupancyPercent) |  | Input evaluated (pack p.80; daysToEvent 0 = same day) |
+| conditions[].operator | enum (lt, lte, gt, gte, eq, between) |  | Comparison |
+| conditions[].value | number |  | Threshold value (percent for percentages, count for counts, days for time-to-event) |
+| conditions[].valueTo | number |  | Upper value when operator is between (nullable) |
+| conditionLogic | enum (all, any) |  | How conditions combine; defaults to all (decided 29 September, readiness close-out) |
+| timeToEventSchedule | array of object |  | Time-to-event steps (early-bird, decay/escalation); empty for condition-only rules |
+| timeToEventSchedule[].daysBefore | integer |  | Days before the event/visit (T-180 ... |
+| timeToEventSchedule[].action | object |  | The price action; the result still passes through the price ladder and the guardrails |
+| timeToEventSchedule[].action.actionType | enum (percentAdjustment, fixedAmountAdjustment, moveToBand, returnToBase) |  | What the rule does to the current price |
+| timeToEventSchedule[].action.percent | number |  | Adjustment in percent (negative lowers the price) when actionType is percentAdjustment (nullable) |
+| timeToEventSchedule[].action.amount | object |  | Signed amount when actionType is fixedAmountAdjustment (nullable) |
+| timeToEventSchedule[].action.bandCode | string |  | Target band on the strategy's price ladder (listDynamicPriceBand) when actionType is moveToBand (nullable) |
+| action | object |  | Action when the conditions hold (for condition rules) (nullable) |
+| action.actionType | enum (percentAdjustment, fixedAmountAdjustment, moveToBand, returnToBase) |  | What the rule does to the current price |
+| action.percent | number |  | Adjustment in percent (negative lowers the price) when actionType is percentAdjustment (nullable) |
+| action.amount | object |  | Signed amount when actionType is fixedAmountAdjustment (nullable) |
+| action.amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| action.amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| action.amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| action.bandCode | string |  | Target band on the strategy's price ladder (listDynamicPriceBand) when actionType is moveToBand (nullable) |
+| priority | integer |  | Priority within the strategy; lower wins |
+| enabled | boolean |  | Enabled |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Booking Velocity & Time-to-Event Rule Builder |
+
+### setBundleComponent
+
+**`PUT /bundle-component`**: Bundle Component Builder
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Promotions   Bundles Management, page 66. The screen says: Define exactly what products and services make up the bundle.
+
+**Every property carries the sentence it came from.** 26 were read from the screen's own bulleted directory and 2 bullets were dropped as prose, examples or hierarchy illustrations rather than bent into fields. Names and types are this package's reading of those sentences and are the part to check; the sentences themselves are the client's.
+
+**Agreed 29 September (decided 29 September, readiness close-out).** Checked against the pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan. Shape: 2 properties removed that were filters, actions, behaviour, roles, examples or prose fragments rather than fields; 18 one-value-per-field properties folded into enums (componentType).
+
+|  |  |
+|---|---|
+| Permission | `PRICE_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `promotions.bundle_component` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `promotions.bundle`, `promotions.bundle_component` |
+| Writes | `cache:idempotency`, `promotions.bundle_component`, `promotions.promotion_audit` |
+| Called by | ADM-180 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `BundleComponentBuilderInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| typesType | enum (mandatory, optional, choice, conditional, recommended) |  | Vocabulary listed under Component Types. |
+| fixedQuantity | integer |  | Fixed quantity |
+| minimum | string |  | Minimum |
+| maximum | string |  | Maximum |
+| quantityBasedOnGuestCount | integer |  | Quantity based on guest count |
+| quantityBasedOnTicketCount | integer |  | Quantity based on ticket count |
+| componentType | enum (admissionTicket, attraction, event, timeslot, experience, membership, annualPass, fBProduct, …) |  | What the component is. |
+
+**Response**: `BundleComponentBuilderView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| typesType | enum (mandatory, optional, choice, conditional, recommended) |  | Vocabulary listed under Component Types. |
+| fixedQuantity | integer |  | Fixed quantity |
+| minimum | string |  | Minimum |
+| maximum | string |  | Maximum |
+| quantityBasedOnGuestCount | integer |  | Quantity based on guest count |
+| quantityBasedOnTicketCount | integer |  | Quantity based on ticket count |
+| componentType | enum (admissionTicket, attraction, event, timeslot, experience, membership, annualPass, fBProduct, …) |  | What the component is. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Bundle Component Builder |
+
+### setBundleDefinition
+
+**`PUT /bundle-definition`**: Bundle Definition & Setup
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Promotions   Bundles Management, page 65. The screen says: Create the commercial identity and high-level behavior of a bundle.
+
+**Every property carries the sentence it came from.** 19 were read from the screen's own bulleted directory and 8 bullets were dropped as prose, examples or hierarchy illustrations rather than bent into fields. Names and types are this package's reading of those sentences and are the part to check; the sentences themselves are the client's.
+
+**Agreed 29 September (decided 29 September, readiness close-out).** Checked against the pack page and the minutes: MoM 10 Aug 4.10. Shape: 5 properties removed that were filters, actions, behaviour, roles, examples or prose fragments rather than fields; added bundleType.
+
+|  |  |
+|---|---|
+| Permission | `PRICE_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `promotions.bundle` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `promotions.bundle`, `promotions.campaign` |
+| Writes | `cache:idempotency`, `promotions.bundle`, `promotions.promotion_audit` |
+| Called by | ADM-179 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `BundleDefinitionSetupInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| bundleName | string |  | Bundle name |
+| bundleId | string |  | Bundle ID |
+| internalDescription | string |  | Internal description |
+| guestFacingDescription | string |  | Guest-facing description |
+| businessEntity | string |  | Business entity |
+| venue | string |  | Venue |
+| bundleCategory | string |  | Bundle category |
+| owner | string |  | Owner |
+| campaign | string |  | Campaign |
+| effectiveDates | string |  | Effective dates |
+| salesStatus | string |  | Sales status |
+| appearsAsStandaloneProduct | string |  | Appears as standalone product |
+| isRecommendedDuringCheckout | boolean |  | Is recommended during checkout |
+| requiresAnotherProduct | string |  | Requires another product |
+| bundleType | enum (fixed, configurable, buildYourOwn, dynamic, partner) |  | Bundle type |
+
+**Response**: `BundleDefinitionSetupView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| bundleName | string |  | Bundle name |
+| bundleId | string |  | Bundle ID |
+| internalDescription | string |  | Internal description |
+| guestFacingDescription | string |  | Guest-facing description |
+| businessEntity | string |  | Business entity |
+| venue | string |  | Venue |
+| bundleCategory | string |  | Bundle category |
+| owner | string |  | Owner |
+| campaign | string |  | Campaign |
+| effectiveDates | string |  | Effective dates |
+| salesStatus | string |  | Sales status |
+| appearsAsStandaloneProduct | string |  | Appears as standalone product |
+| isRecommendedDuringCheckout | boolean |  | Is recommended during checkout |
+| requiresAnotherProduct | string |  | Requires another product |
+| bundleType | enum (fixed, configurable, buildYourOwn, dynamic, partner) |  | Bundle type: all components predefined; required plus optional choices; guest selects from permitted categories; changes with availability or rules; contains internal and external products |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Bundle Definition & Setup |
+
+### setBuyGetBogo
+
+**`PUT /buy-get-bogo`**: Buy X Get Y / BOGO Rule Builder
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Promotions   Bundles Management, page 52. The screen says: Configure the fundamental qualifier → reward relationship.
+
+**Every property carries the sentence it came from.** 15 were read from the screen's own bulleted directory and 10 bullets were dropped as prose, examples or hierarchy illustrations rather than bent into fields. Names and types are this package's reading of those sentences and are the part to check; the sentences themselves are the client's.
+
+**Agreed 29 September (decided 29 September, readiness close-out).** Checked against the pack page and the minutes: MoM 1 Sep 4.7 (BOGO and 'buy 2, get the 3rd free'). Shape: agreed as drafted.
+
+|  |  |
+|---|---|
+| Permission | `PRICE_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `promotions.promotion` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `promotions.promotion` |
+| Writes | `cache:idempotency`, `promotions.promotion`, `promotions.promotion_audit` |
+| Called by | ADM-169 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `BuyXGetYBogoRuleBuilderInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| product | string |  | Product |
+| productCategory | string |  | Product category |
+| ticketType | string |  | Ticket type |
+| quantity | integer |  | Quantity |
+| minimumSpend | Money |  | On the wire this is three fields; in the database it is one column. |
+| minimumSpend.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| minimumSpend.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| minimumSpend.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| customerSegment | string |  | Customer segment |
+| channel | string |  | Channel |
+| venue | string |  | Venue |
+| dateTime | string (date-time) |  | Date/time |
+| sameProduct | string |  | Same product |
+| differentProduct | string |  | Different product |
+| free | string |  | Free |
+| percentageDiscount | number |  | Percentage discount |
+| fixedDiscount | Money |  | On the wire this is three fields; in the database it is one column. |
+| fixedDiscount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| fixedDiscount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| fixedDiscount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| fixedRewardPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| fixedRewardPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| fixedRewardPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| fixedRewardPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+
+**Response**: `BuyXGetYBogoRuleBuilderView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| product | string |  | Product |
+| productCategory | string |  | Product category |
+| ticketType | string |  | Ticket type |
+| quantity | integer |  | Quantity |
+| minimumSpend | Money |  | On the wire this is three fields; in the database it is one column. |
+| minimumSpend.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| minimumSpend.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| minimumSpend.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| customerSegment | string |  | Customer segment |
+| channel | string |  | Channel |
+| venue | string |  | Venue |
+| dateTime | string (date-time) |  | Date/time |
+| sameProduct | string |  | Same product |
+| differentProduct | string |  | Different product |
+| free | string |  | Free |
+| percentageDiscount | number |  | Percentage discount |
+| fixedDiscount | Money |  | On the wire this is three fields; in the database it is one column. |
+| fixedDiscount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| fixedDiscount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| fixedDiscount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| fixedRewardPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| fixedRewardPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| fixedRewardPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| fixedRewardPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Buy X Get Y / BOGO Rule Builder |
+
+### setCampaignBudgetFinancial
+
+**`PUT /campaign-budget-financial`**: Campaign Budget & Financial Limit Setup
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Promotions   Bundles Management, page 126. The screen says: Define the financial envelope within which a campaign is permitted to operate.
+
+**Every property carries the sentence it came from.** 24 were read from the screen's own bulleted directory and 8 bullets were dropped as prose, examples or hierarchy illustrations rather than bent into fields. Names and types are this package's reading of those sentences and are the part to check; the sentences themselves are the client's.
+
+**Agreed 29 September (decided 29 September, readiness close-out).** Checked against the pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan. Shape: agreed as drafted.
+
+|  |  |
+|---|---|
+| Permission | `PRICE_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `promotions.campaign` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `promotions.campaign`, `promotions.campaign_budget`, `promotions.promotion` |
+| Writes | `cache:idempotency`, `promotions.campaign`, `promotions.campaign_budget`, `promotions.promotion_audit` |
+| Called by | ADM-219 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `CampaignBudgetFinancialLimitSetupInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| totalCampaignBudget | integer |  | Total campaign budget |
+| discountBudget | Money |  | On the wire this is three fields; in the database it is one column. |
+| discountBudget.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| discountBudget.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| discountBudget.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| rewardBudget | string |  | Reward budget |
+| freeProductBudget | string |  | Free-product budget |
+| partnerFundedBudget | string |  | Partner-funded budget |
+| marketingFundedBudget | string |  | Marketing-funded budget |
+| venueBudget | string |  | Venue budget |
+| departmentBudget | string |  | Department budget |
+| campaign | string |  | Campaign |
+| budgetAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| budgetAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| budgetAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| budgetAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| currency | string |  | Currency |
+| effectiveDates | string |  | Effective dates |
+| budgetOwner | string |  | Budget owner |
+| costCenter | Money |  | On the wire this is three fields; in the database it is one column. |
+| costCenter.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| costCenter.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| costCenter.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| businessEntity | string |  | Business entity |
+| venue | string |  | Venue |
+| department | string |  | Department |
+| fundingSource | string |  | Funding source |
+| entireCampaign | string |  | Entire campaign |
+| promotion | string |  | Promotion |
+| product | string |  | Product |
+| channel | string |  | Channel |
+| partner | string |  | Partner |
+| customerSegment | string |  | Customer segment |
+
+**Response**: `CampaignBudgetFinancialLimitSetupView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| totalCampaignBudget | integer |  | Total campaign budget |
+| discountBudget | Money |  | On the wire this is three fields; in the database it is one column. |
+| discountBudget.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| discountBudget.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| discountBudget.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| rewardBudget | string |  | Reward budget |
+| freeProductBudget | string |  | Free-product budget |
+| partnerFundedBudget | string |  | Partner-funded budget |
+| marketingFundedBudget | string |  | Marketing-funded budget |
+| venueBudget | string |  | Venue budget |
+| departmentBudget | string |  | Department budget |
+| campaign | string |  | Campaign |
+| budgetAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| budgetAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| budgetAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| budgetAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| currency | string |  | Currency |
+| effectiveDates | string |  | Effective dates |
+| budgetOwner | string |  | Budget owner |
+| costCenter | Money |  | On the wire this is three fields; in the database it is one column. |
+| costCenter.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| costCenter.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| costCenter.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| businessEntity | string |  | Business entity |
+| venue | string |  | Venue |
+| department | string |  | Department |
+| fundingSource | string |  | Funding source |
+| entireCampaign | string |  | Entire campaign |
+| promotion | string |  | Promotion |
+| product | string |  | Product |
+| channel | string |  | Channel |
+| partner | string |  | Partner |
+| customerSegment | string |  | Customer segment |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Campaign Budget & Financial Limit Setup |
+
+### setCatalogueReview
+
+**`PUT /catalogue-review`**: AI Catalogue Builder & Configuration Review
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Product Lifecycle   Catalogue Governance, page 12. The screen says: Provide TICVAI's AI-first interface for accelerating product creation and configuration. This directly supports the matrix requirement allowing administrators to upload spreadsheets, brochures, PDFs or existing catalogues and use AI to generate product structures, pricing, rules, entitlements and configurations.
+
+**Agreed (decided 29 September, readiness close-out).** the draft's fields were sentence fragments; replaced by a review session: input method, prompt/file/reference product, typed recommendations with confidence and accepted/modified/rejected/requiresReview decisions, and the resulting draft product. Submitting input produces recommendations; the administrator classifies each; accepted/modified ones build a draft product that then enters the normal lifecycle. The AI never approves, publishes or bypasses validation or authorisation.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.product` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `catalogue.ai_catalogue_session`, `catalogue.product` |
+| Writes | `cache:idempotency`, `catalogue.ai_catalogue_session`, `catalogue.audit_entry`, `catalogue.product` |
+| Called by | ADM-127 |
+| State model | AI catalogue builder session ([states/ai-catalogue-session.yaml](../../../states/ai-catalogue-session.yaml)): moves `open` -> `draftCreated` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `AiCatalogueBuilderConfigurationReviewInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| prompt | string |  | Natural-language request (nullable) |
+| sessionId | string (uuid) |  | Existing session to update; empty to start one (nullable) |
+| inputMethod | enum (naturalLanguage, excel, csv, pdf, brochure, existingCatalogue, referenceProduct) |  | Input method (pack p.12) |
+| fileId | string |  | Uploaded source file id (nullable) |
+| referenceProductId | string (uuid) |  | Existing product used as reference (nullable) |
+| decisions | array of object |  | Administrator's classification of each recommendation |
+| decisions[].recommendationId | string |  |  |
+| decisions[].decision | enum (accepted, modified, rejected, requiresReview) |  |  |
+| decisions[].modifiedValue | string |  | (nullable) |
+| createDraft | boolean |  | Build the draft product from the accepted/modified recommendations |
+
+**Response**: `AiCatalogueBuilderConfigurationReviewView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| prompt | string |  | Natural-language request (nullable) |
+| sessionId | string (uuid) |  | Review session id |
+| inputMethod | enum (naturalLanguage, excel, csv, pdf, brochure, existingCatalogue, referenceProduct) |  | Input method (pack p.12) |
+| fileId | string |  | Uploaded source file id (nullable) |
+| referenceProductId | string (uuid) |  | Existing product used as reference (nullable) |
+| recommendations | array of object |  | AI recommendations: Source -> AI interpretation -> Proposed configuration, with confidence and the administrator's classification |
+| recommendations[].recommendationId | string |  |  |
+| recommendations[].area | enum (productStructure, ticketType, nameDescription, validity, pricing, entitlements, eligibility, capacity, …) |  |  |
+| recommendations[].sourceExcerpt | string |  | Source |
+| recommendations[].interpretation | string |  | AI interpretation |
+| recommendations[].proposedValue | string |  | Proposed TICVAI configuration |
+| recommendations[].confidence | enum (high, medium, low, requiresClarification, missing) |  |  |
+| recommendations[].decision | enum (accepted, modified, rejected, requiresReview) |  |  |
+| recommendations[].modifiedValue | string |  | (nullable) |
+| draftProductId | string (uuid) |  | Draft product built from the accepted recommendations (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | AI Catalogue Builder & Configuration Review |
+
+### setChannelFeePayment
+
+**`PUT /channel-fee-payment`**: Channel Fees, Payment & Fulfillment Configuration
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Sales Channel Management, page 14. The screen says: Define the commercial and fulfillment behavior associated with each channel.
+
+**Agreed (decided 29 September, readiness close-out).** six fee amounts became fee-profile references (the Fee Engine owns amounts); 7 payment and 11 fulfilment fields became two enum lists; the per-channel example fields dropped; print-at-home, voucher, API delivery and bulk CSV added as fulfilment methods; validationIssues added. Saving exposes only methods approved in Payment and Ticket Media; an incompatible combination is reported in validationIssues and blocks readiness.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.sales_channel` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `catalogue.fee`, `catalogue.sales_channel` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.sales_channel` |
+| Called by | ADM-266 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ChannelFeesPaymentFulfillmentConfigurationInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| channelId | string |  | Channel ID |
+| fees | array of object |  | Fee Associations (pack p.14-15): which approved fee profile applies for each fee type; amounts are the Pricing/Fee Engine's |
+| fees[].feeType | enum (booking, transaction, channel, service, delivery, payment) |  |  |
+| fees[].feeProfileId | string |  |  |
+| paymentMethods | array of enum (card, cash, digitalWallet, paymentLink, accountCredit, b2bCredit) |  | Payment Methods the channel may expose (pack p.15) |
+| otherPaymentMethodCodes | array of string |  | Other configured payment methods, by their Payment configuration code |
+| fulfillmentMethods | array of enum (digitalTicket, email, mobileApp, appleGoogleWallet, printAtHome, posPrint, kioskPrint, rfid, …) |  | Fulfillment Methods (pack p.15-16; bulkCsvExport is the pre-generated ticket batch for partners that do not integrate, MoM 31 Aug §4.3) |
+
+**Response**: `ChannelFeesPaymentFulfillmentConfigurationView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| channelId | string |  | Channel ID |
+| fees | array of object |  | Fee Associations (pack p.14-15): which approved fee profile applies for each fee type; amounts are the Pricing/Fee Engine's |
+| fees[].feeType | enum (booking, transaction, channel, service, delivery, payment) |  |  |
+| fees[].feeProfileId | string |  |  |
+| paymentMethods | array of enum (card, cash, digitalWallet, paymentLink, accountCredit, b2bCredit) |  | Payment Methods the channel may expose (pack p.15) |
+| otherPaymentMethodCodes | array of string |  | Other configured payment methods, by their Payment configuration code |
+| fulfillmentMethods | array of enum (digitalTicket, email, mobileApp, appleGoogleWallet, printAtHome, posPrint, kioskPrint, rfid, …) |  | Fulfillment Methods (pack p.15-16; bulkCsvExport is the pre-generated ticket batch for partners that do not integrate, MoM 31 Aug §4.3) |
+| validationIssues | array of object |  | Validation (pack p.16): incompatible combinations, e.g. |
+| validationIssues[].code | enum (paymentMethodNotApproved, feeProfileMissing, mediaProfileMissing, incompatibleCombination) |  |  |
+| validationIssues[].message | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Channel Fees, Payment & Fulfillment Configuration |
+
+### setChannelPricingCommercial
+
+**`PUT /channel-pricing-commercial`**: Channel Pricing & Commercial Profile Assignment
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Sales Channel Management, page 8. The screen says: Determine which pricing configuration a channel consumes.
+
+**Agreed (decided 29 September, readiness close-out).** the eight pricing associations became pricingSource; price profile is a reference not an amount (the Pricing Engine owns calculation); scope, priority and dates typed; override governance toggles and override permission added; price validation became validationIssues. One call assigns one pricing source to a channel for a scope; ADM-261/ADM-483 render the channel-by-variant matrix from these rows; an active product/channel pair without an applicable assignment fails readiness.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.price_assignment` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `catalogue.price_assignment`, `catalogue.price_list`, `catalogue.sales_channel` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.price_assignment` |
+| Called by | ADM-261, ADM-483 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ChannelPricingCommercialProfileAssignmentInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| priceProfile | string |  | Price Profile: the ID of the approved price list or profile consumed (the Pricing Engine calculates the price) |
+| currency | string |  | Currency: ISO 4217 code (pattern ^[A-Z]{3}$) |
+| effectiveFrom | string (date) |  | Effective From |
+| effectiveTo | string (date) |  | Effective To; empty for open-ended (nullable) |
+| venue | string |  | Venue ID (nullable) |
+| event | string |  | Event ID (nullable) |
+| product | string |  | Product ID (nullable) |
+| customerSegment | string |  | Customer Segment ID (nullable) |
+| priority | integer |  | Priority: when several assignments match, the lower number wins (min 1) |
+| channelId | string |  | Channel ID |
+| pricingSource | enum (standardPriceList, channelPriceList, b2bRate, resellerRate, otaRate, posPrice, promotionalPriceProfile, dynamicPricingProfile) |  | Pricing Association (pack p.8): which kind of approved pricing this assignment consumes |
+| overridePermission | string |  | Override Permission: the permission a user needs to override price on this channel (nullable) |
+| fixedPriceOnly | boolean |  | Price Override Governance: use fixed price only |
+| promotionAllowed | boolean |  | Price Override Governance: apply promotion |
+| discountAllowed | boolean |  | Price Override Governance: apply discount |
+| priceOverrideAllowed | boolean |  | Price Override Governance: override price |
+| overrideRequiresApproval | boolean |  | Price Override Governance: require approval for override |
+| dynamicPricingAllowed | boolean |  | Price Override Governance: use dynamic pricing |
+
+**Response**: `ChannelPricingCommercialProfileAssignmentView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| priceProfile | string |  | Price Profile: the ID of the approved price list or profile consumed (the Pricing Engine calculates the price) |
+| currency | string |  | Currency: ISO 4217 code (pattern ^[A-Z]{3}$) |
+| effectiveFrom | string (date) |  | Effective From |
+| effectiveTo | string (date) |  | Effective To; empty for open-ended (nullable) |
+| venue | string |  | Venue ID (nullable) |
+| event | string |  | Event ID (nullable) |
+| product | string |  | Product ID (nullable) |
+| customerSegment | string |  | Customer Segment ID (nullable) |
+| priority | integer |  | Priority: when several assignments match, the lower number wins (min 1) |
+| channelId | string |  | Channel ID |
+| pricingSource | enum (standardPriceList, channelPriceList, b2bRate, resellerRate, otaRate, posPrice, promotionalPriceProfile, dynamicPricingProfile) |  | Pricing Association (pack p.8): which kind of approved pricing this assignment consumes |
+| overridePermission | string |  | Override Permission: the permission a user needs to override price on this channel (nullable) |
+| fixedPriceOnly | boolean |  | Price Override Governance: use fixed price only |
+| promotionAllowed | boolean |  | Price Override Governance: apply promotion |
+| discountAllowed | boolean |  | Price Override Governance: apply discount |
+| priceOverrideAllowed | boolean |  | Price Override Governance: override price |
+| overrideRequiresApproval | boolean |  | Price Override Governance: require approval for override |
+| dynamicPricingAllowed | boolean |  | Price Override Governance: use dynamic pricing |
+| validationIssues | array of object |  | Price Validation (pack p.9) |
+| validationIssues[].code | enum (missingPrice, expiredPrice, currencyMismatch, conflictingProfiles, invalidOverride) |  |  |
+| validationIssues[].message | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Channel Pricing & Commercial Profile Assignment |
+
+### setCodeDistributionManager
+
+**`PUT /code-distribution-manager`**: Code Distribution & Assignment Manager
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Promotions   Bundles Management, page 42. The screen says: Manage how promotional codes are allocated and distributed.
+
+**Every property carries the sentence it came from.** 26 were read from the screen's own bulleted directory and 4 bullets were dropped as prose, examples or hierarchy illustrations rather than bent into fields. Names and types are this package's reading of those sentences and are the part to check; the sentences themselves are the client's.
+
+**Agreed 29 September (decided 29 September, readiness close-out).** Checked against the pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan. Shape: 6 properties removed that were filters, actions, behaviour, roles, examples or prose fragments rather than fields; 11 one-value-per-field properties folded into enums (assigneeType); added batchId, partner; renamed viewedWhereAvailable to viewed.
+
+Outbound sending runs through the CRM/marketing communication services, not a second messaging engine here.
+
+|  |  |
+|---|---|
+| Permission | `PRICE_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `promotions.coupon_code` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `promotions.coupon_code`, `promotions.coupon_code_batch` |
+| Writes | `cache:idempotency`, `promotions.coupon_code`, `promotions.promotion_audit` |
+| Called by | ADM-164 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `CodeDistributionAssignmentManagerInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| channelsType | enum (email, sms, whatsapp, mobileApp, crmJourney, guestPortal, b2bPortal, partnerPortal, …) |  | Vocabulary listed under Distribution Channels. |
+| assigneeType | enum (individualCustomer, customerSegment, membershipAccount, b2bCompany, reseller, travelAgency, school, hotel, …) |  | Who the codes are assigned to. |
+| batchId | string |  | Batch ID |
+| assigneeReference | string |  | Customer, segment, account or partner the codes go to |
+| quantity | integer |  | Codes to assign |
+
+**Response**: `CodeDistributionAssignmentManagerView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| channelsType | enum (email, sms, whatsapp, mobileApp, crmJourney, guestPortal, b2bPortal, partnerPortal, …) |  | Vocabulary listed under Distribution Channels. |
+| generated | string |  | Generated |
+| assigned | string |  | Assigned |
+| sent | string |  | Sent |
+| delivered | string |  | Delivered |
+| redeemed | string |  | Redeemed |
+| expired | integer |  | Expired |
+| cancelled | integer |  | Cancelled |
+| viewed | string |  | Viewed where available |
+| assigneeType | enum (individualCustomer, customerSegment, membershipAccount, b2bCompany, reseller, travelAgency, school, hotel, …) |  | Who the codes are assigned to. |
+| batchId | string |  | Batch ID |
+| partner | string |  | Partner, for a partner batch |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Code Distribution & Assignment Manager |
+
+### setCouponPromoCode
+
+**`PUT /coupon-promo-code`**: Coupon & Promo Code Builder
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Promotions   Bundles Management, page 37. The screen says: Create the commercial definition of a coupon or promo-code campaign.
+
+**Every property carries the sentence it came from.** 20 were read from the screen's own bulleted directory and 3 bullets were dropped as prose, examples or hierarchy illustrations rather than bent into fields. Names and types are this package's reading of those sentences and are the part to check; the sentences themselves are the client's.
+
+**Agreed 29 September (decided 29 September, readiness close-out).** Checked against the pack page and the minutes: MoM 7 Aug 17 (shared codes and batches of unique single-use codes). Shape: 1 properties removed that were filters, actions, behaviour, roles, examples or prose fragments rather than fields; 19 one-value-per-field properties folded into enums (codeType, benefitType); added benefitValue, campaign, code, maximumDiscount, eligibleProducts, channels, validFrom, validTo.
+
+|  |  |
+|---|---|
+| Permission | `PRICE_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `promotions.coupon_code` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `promotions.campaign`, `promotions.coupon_campaign` |
+| Writes | `cache:idempotency`, `promotions.coupon_campaign`, `promotions.coupon_code`, `promotions.promotion_audit` |
+| Called by | ADM-159 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `CouponPromoCodeBuilderInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| codeType | enum (commonPromoCode, uniquePromoCode, coupon, promotionalVoucher, freeTicketCode, discountVoucher, partnerCode, employeeCode, …) |  | Kind of code. |
+| benefitType | enum (percentageDiscount, fixedValueDiscount, fixedPromotionalPrice, freeProduct, freeTicket, freeAddOn, upgrade, bundleBenefit, …) |  | What the code grants; the discount itself is calculated by the promotion rule engine rather than duplicated here. |
+| benefitValue | number |  | Benefit value: the percentage, or the amount in the promotion's currency |
+| campaign | string |  | Campaign |
+| code | string |  | Code text for a common code, or the batch pattern for unique codes |
+| maximumDiscount | Money |  | On the wire this is three fields; in the database it is one column. |
+| maximumDiscount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| maximumDiscount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| maximumDiscount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| eligibleProducts | array of string |  | Eligible products |
+| channels | array of string |  | Channels the code works on |
+| validFrom | string (date-time) |  | Valid from |
+| validTo | string (date-time) |  | Valid to |
+
+**Response**: `CouponPromoCodeBuilderView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| codeType | enum (commonPromoCode, uniquePromoCode, coupon, promotionalVoucher, freeTicketCode, discountVoucher, partnerCode, employeeCode, …) |  | Kind of code. |
+| benefitType | enum (percentageDiscount, fixedValueDiscount, fixedPromotionalPrice, freeProduct, freeTicket, freeAddOn, upgrade, bundleBenefit, …) |  | What the code grants; the discount itself is calculated by the promotion rule engine rather than duplicated here. |
+| benefitValue | number |  | Benefit value: the percentage, or the amount in the promotion's currency |
+| campaign | string |  | Campaign |
+| code | string |  | Code text for a common code, or the batch pattern for unique codes |
+| maximumDiscount | Money |  | On the wire this is three fields; in the database it is one column. |
+| maximumDiscount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| maximumDiscount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| maximumDiscount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| eligibleProducts | array of string |  | Eligible products |
+| channels | array of string |  | Channels the code works on |
+| validFrom | string (date-time) |  | Valid from |
+| validTo | string (date-time) |  | Valid to |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Coupon & Promo Code Builder |
+
+### setCrossCategoryPromotion
+
+**`PUT /cross-category-promotion`**: Cross-Category Promotion Builder
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Promotions   Bundles Management, page 56. The screen says: Create promotions spanning different TICVAI commercial domains.
+
+**Every property carries the sentence it came from.** 10 were read from the screen's own bulleted directory and 7 bullets were dropped as prose, examples or hierarchy illustrations rather than bent into fields. Names and types are this package's reading of those sentences and are the part to check; the sentences themselves are the client's.
+
+**Agreed 29 September (decided 29 September, readiness close-out).** Checked against the pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan. Shape: agreed as drafted.
+
+|  |  |
+|---|---|
+| Permission | `PRICE_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `promotions.promotion` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `promotions.promotion` |
+| Writes | `cache:idempotency`, `promotions.promotion`, `promotions.promotion_audit` |
+| Called by | ADM-174 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `CrossCategoryPromotionBuilderInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| ticketing | string |  | Ticketing |
+| attractions | string |  | Attractions |
+| events | string |  | Events |
+| fB | string |  | F&B |
+| retail | string |  | Retail |
+| membership | string |  | Membership |
+| experiences | string |  | Experiences |
+| addOns | string |  | Add-ons |
+| parking | string |  | Parking |
+| services | string |  | Services |
+
+**Response**: `CrossCategoryPromotionBuilderView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| ticketing | string |  | Ticketing |
+| attractions | string |  | Attractions |
+| events | string |  | Events |
+| fB | string |  | F&B |
+| retail | string |  | Retail |
+| membership | string |  | Membership |
+| experiences | string |  | Experiences |
+| addOns | string |  | Add-ons |
+| parking | string |  | Parking |
+| services | string |  | Services |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Cross-Category Promotion Builder |
+
+### setDemandOccupancyAvailability
+
+**`PUT /demand-occupancy-availability`**: Demand, Occupancy & Availability Rule Builder
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Pricing   Revenue Management, page 78. The screen says: Configure price movements driven by actual demand and capacity consumption. This directly covers the fundamental matrix requirements for: Demand-Based Pricing Occupancy-Based Pricing Availability-Based Pricing Inventory-Based Pricing
+
+**Agreed (decided 29 September, readiness close-out).** the nine input-name fields became one inputMetric enum; the occupancy matrix is a tiers array with a typed action (percent, amount, move to band, return to base); threshold behaviour (exit offset, minimum duration, cooldown) and the demand-index definition added. Rules persist through the backend dynamic-rule model (PricingDynamicPriceRule/Condition/Action); every action result then passes the price ladder and guardrails. An early-bird quota (e.g. first 200 tickets -20%) is a ticketsSold tier rule. Rules act on unsold inventory only.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `pricing.dynamic_price_action`, `pricing.dynamic_price_condition` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `catalogue.dynamic_pricing_strategy`, `pricing.dynamic_price_action`, `pricing.dynamic_price_condition`, `pricing.dynamic_price_rule` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `pricing.dynamic_price_action`, `pricing.dynamic_price_condition`, `pricing.dynamic_price_rule` |
+| Called by | ADM-090 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `DemandOccupancyAvailabilityRuleBuilderInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| ruleId | string |  | Rule ID; empty on create (nullable) |
+| strategyId | string |  | Strategy the rule belongs to |
+| ruleName | string |  | Rule name |
+| ruleKind | enum (occupancy, inventory, availability, demand) |  | Rule family (pack p.78-79) |
+| inputMetric | enum (ticketsSold, currentDemand, occupancyPercent, remainingCapacity, remainingInventory, availableSeats, capacityUtilization, salesPace) |  | Supported Input evaluated (pack p.78) |
+| tiers | array of object |  | Threshold matrix; tiers must not overlap |
+| tiers[].fromValue | number |  | From (inclusive) |
+| tiers[].toValue | number |  | To (inclusive); empty for no upper bound (nullable) |
+| tiers[].action | object |  | The price action; the result still passes through the price ladder and the guardrails |
+| tiers[].action.actionType | enum (percentAdjustment, fixedAmountAdjustment, moveToBand, returnToBase) |  | What the rule does to the current price |
+| tiers[].action.percent | number |  | Adjustment in percent (negative lowers the price) when actionType is percentAdjustment (nullable) |
+| tiers[].action.amount | object |  | Signed amount when actionType is fixedAmountAdjustment (nullable) |
+| tiers[].action.bandCode | string |  | Target band on the strategy's price ladder (listDynamicPriceBand) when actionType is moveToBand (nullable) |
+| demandIndexDefinition | string |  | Required when inputMetric is currentDemand: how the demand index is calculated (the pack requires it to be explicitly configured and documented) (nullable) |
+| exitThresholdOffset | number |  | Exit threshold: how far the metric must fall back below a tier's entry before the price reverses; defaults to 2 (points or units of the metric) (decided 29 September, readiness close-out) |
+| minimumDurationMinutes | integer |  | Minimum duration a threshold must hold before the price moves; defaults to 15 (decided 29 September, readiness close-out) |
+| cooldownMinutes | integer |  | Cooldown after a movement before the next; defaults to 60 (decided 29 September, readiness close-out) |
+| priority | integer |  | Priority within the strategy; lower wins |
+| enabled | boolean |  | Enabled |
+
+**Response**: `DemandOccupancyAvailabilityRuleBuilderView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| ruleId | string |  | Rule ID; empty on create (nullable) |
+| strategyId | string |  | Strategy the rule belongs to |
+| ruleName | string |  | Rule name |
+| ruleKind | enum (occupancy, inventory, availability, demand) |  | Rule family (pack p.78-79) |
+| inputMetric | enum (ticketsSold, currentDemand, occupancyPercent, remainingCapacity, remainingInventory, availableSeats, capacityUtilization, salesPace) |  | Supported Input evaluated (pack p.78) |
+| tiers | array of object |  | Threshold matrix; tiers must not overlap |
+| tiers[].fromValue | number |  | From (inclusive) |
+| tiers[].toValue | number |  | To (inclusive); empty for no upper bound (nullable) |
+| tiers[].action | object |  | The price action; the result still passes through the price ladder and the guardrails |
+| tiers[].action.actionType | enum (percentAdjustment, fixedAmountAdjustment, moveToBand, returnToBase) |  | What the rule does to the current price |
+| tiers[].action.percent | number |  | Adjustment in percent (negative lowers the price) when actionType is percentAdjustment (nullable) |
+| tiers[].action.amount | object |  | Signed amount when actionType is fixedAmountAdjustment (nullable) |
+| tiers[].action.bandCode | string |  | Target band on the strategy's price ladder (listDynamicPriceBand) when actionType is moveToBand (nullable) |
+| demandIndexDefinition | string |  | Required when inputMetric is currentDemand: how the demand index is calculated (the pack requires it to be explicitly configured and documented) (nullable) |
+| exitThresholdOffset | number |  | Exit threshold: how far the metric must fall back below a tier's entry before the price reverses; defaults to 2 (points or units of the metric) (decided 29 September, readiness close-out) |
+| minimumDurationMinutes | integer |  | Minimum duration a threshold must hold before the price moves; defaults to 15 (decided 29 September, readiness close-out) |
+| cooldownMinutes | integer |  | Cooldown after a movement before the next; defaults to 60 (decided 29 September, readiness close-out) |
+| priority | integer |  | Priority within the strategy; lower wins |
+| enabled | boolean |  | Enabled |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Demand, Occupancy & Availability Rule Builder |
+
+### setEligibilityRule
+
+**`PUT /eligibility-rule`**: Eligibility Rule Builder
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Promotions   Bundles Management, page 95. The screen says: Provide a no-code rule engine for determining promotion eligibility.
+
+**Every property carries the sentence it came from.** 21 were read from the screen's own bulleted directory and 12 bullets were dropped as prose, examples or hierarchy illustrations rather than bent into fields. Names and types are this package's reading of those sentences and are the part to check; the sentences themselves are the client's.
+
+**Agreed 29 September (decided 29 September, readiness close-out).** Checked against the pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan. Shape: 2 one-value-per-field properties folded into enums (ruleEffect).
+
+|  |  |
+|---|---|
+| Permission | `PRICE_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `promotions.promotion_rule` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `promotions.promotion`, `promotions.promotion_rule` |
+| Writes | `cache:idempotency`, `promotions.promotion_audit`, `promotions.promotion_rule` |
+| Called by | ADM-199, ADM-279 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `EligibilityRuleBuilderInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| guestType | string |  | Guest type |
+| customerSegment | string |  | Customer segment |
+| ageCategory | string |  | Age/category |
+| membership | string |  | Membership |
+| loyaltyTier | string |  | Loyalty tier |
+| purchaseHistory | string |  | Purchase history |
+| visitHistory | string |  | Visit history |
+| transactionValue | string |  | Transaction value |
+| productPurchased | string |  | Product purchased |
+| channel | string |  | Channel |
+| venue | string |  | Venue |
+| location | string |  | Location |
+| partner | string |  | Partner |
+| dateTime | string (date-time) |  | Date/time |
+| paymentMethod | string |  | Payment method |
+| campaign | string |  | Campaign |
+| customerAccountAttributes | string |  | Customer/account attributes |
+| nestedGroups | string |  | Nested groups |
+| multipleConditionSets | string |  | Multiple condition sets |
+| ruleEffect | enum (include, exclude) |  | Whether matching guests are included or excluded. |
+
+**Response**: `EligibilityRuleBuilderView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| guestType | string |  | Guest type |
+| customerSegment | string |  | Customer segment |
+| ageCategory | string |  | Age/category |
+| membership | string |  | Membership |
+| loyaltyTier | string |  | Loyalty tier |
+| purchaseHistory | string |  | Purchase history |
+| visitHistory | string |  | Visit history |
+| transactionValue | string |  | Transaction value |
+| productPurchased | string |  | Product purchased |
+| channel | string |  | Channel |
+| venue | string |  | Venue |
+| location | string |  | Location |
+| partner | string |  | Partner |
+| dateTime | string (date-time) |  | Date/time |
+| paymentMethod | string |  | Payment method |
+| campaign | string |  | Campaign |
+| customerAccountAttributes | string |  | Customer/account attributes |
+| nestedGroups | string |  | Nested groups |
+| multipleConditionSets | string |  | Multiple condition sets |
+| ruleEffect | enum (include, exclude) |  | Whether matching guests are included or excluded. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Eligibility Rule Builder |
+
+### setFixedPriceOffer
+
+**`PUT /fixed-price-offer`**: Fixed-Price & “N for X” Offer Builder
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Promotions   Bundles Management, page 54. The screen says: Configure promotions where a qualifying collection of products is sold for a fixed promotional total.
+
+**Every property carries the sentence it came from.** 14 were read from the screen's own bulleted directory and 7 bullets were dropped as prose, examples or hierarchy illustrations rather than bent into fields. Names and types are this package's reading of those sentences and are the part to check; the sentences themselves are the client's.
+
+**Agreed 29 September (decided 29 September, readiness close-out).** Checked against the pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan. Shape: 6 properties removed that were filters, actions, behaviour, roles, examples or prose fragments rather than fields.
+
+The fixed promotional price is allocated back across the qualifying lines, and that allocation is what refunds, tax, revenue recognition, partner settlement and reporting use.
+
+|  |  |
+|---|---|
+| Permission | `PRICE_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `promotions.promotion` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `promotions.promotion` |
+| Writes | `cache:idempotency`, `promotions.promotion`, `promotions.promotion_audit` |
+| Called by | ADM-172 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `FixedPriceNForXOfferBuilderInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| requiredQuantity | integer |  | Required quantity |
+| requiredProducts | string |  | Required products |
+| productCategory | string |  | Product category |
+| mixAndMatchAllowed | boolean |  | Mix-and-match allowed |
+| fixedPromotionalPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| fixedPromotionalPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| fixedPromotionalPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| fixedPromotionalPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| currency | string |  | Currency |
+| maximumRepetitions | string |  | Maximum repetitions |
+| minimumMaximumProductValues | string |  | Minimum/maximum product values |
+
+**Response**: `FixedPriceNForXOfferBuilderView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| requiredQuantity | integer |  | Required quantity |
+| requiredProducts | string |  | Required products |
+| productCategory | string |  | Product category |
+| mixAndMatchAllowed | boolean |  | Mix-and-match allowed |
+| fixedPromotionalPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| fixedPromotionalPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| fixedPromotionalPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| fixedPromotionalPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| currency | string |  | Currency |
+| maximumRepetitions | string |  | Maximum repetitions |
+| minimumMaximumProductValues | string |  | Minimum/maximum product values |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Fixed-Price & “N for X” Offer Builder |
+
+### setGiftFreeProduct
+
+**`PUT /gift-free-product`**: Gift, Free Product & Added-Value Offer Builder
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Promotions   Bundles Management, page 55. The screen says: Configure promotions where a purchase generates an additional entitlement rather than simply reducing price. The matrix explicitly provides the example: “Buy for more than 200 AED and get a free pencil.”
+
+**Every property carries the sentence it came from.** 15 were read from the screen's own bulleted directory and 7 bullets were dropped as prose, examples or hierarchy illustrations rather than bent into fields. Names and types are this package's reading of those sentences and are the part to check; the sentences themselves are the client's.
+
+**Agreed 29 September (decided 29 September, readiness close-out).** Checked against the pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan. Shape: agreed as drafted.
+
+|  |  |
+|---|---|
+| Permission | `PRICE_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `promotions.promotion` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `promotions.promotion` |
+| Writes | `cache:idempotency`, `promotions.promotion`, `promotions.promotion_audit` |
+| Called by | ADM-173 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `GiftFreeProductAddedValueOfferBuilderInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| basketValue | string |  | Basket value |
+| product | string |  | Product |
+| quantity | integer |  | Quantity |
+| productCategory | string |  | Product category |
+| ticket | string |  | Ticket |
+| membership | string |  | Membership |
+| customerSegment | string |  | Customer segment |
+| typesType | enum (freeRetailProduct, freeFBProduct, freeTicket, freeAddOn, freeExperience, voucher, upgrade, service, …) |  | Vocabulary listed under Reward Types. |
+| inventoryAvailability | string |  | Inventory availability |
+| locationInventory | string |  | Location inventory |
+| eligibleFulfillmentPoint | string |  | Eligible fulfillment point |
+| substitutionRules | string |  | Substitution rules |
+| doNotOfferPromotion | string |  | Do not offer promotion |
+| provideAlternativeReward | string |  | Provide alternative reward |
+| allowLaterFulfillment | boolean |  | Allow later fulfillment |
+
+**Response**: `GiftFreeProductAddedValueOfferBuilderView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| basketValue | string |  | Basket value |
+| product | string |  | Product |
+| quantity | integer |  | Quantity |
+| productCategory | string |  | Product category |
+| ticket | string |  | Ticket |
+| membership | string |  | Membership |
+| customerSegment | string |  | Customer segment |
+| typesType | enum (freeRetailProduct, freeFBProduct, freeTicket, freeAddOn, freeExperience, voucher, upgrade, service, …) |  | Vocabulary listed under Reward Types. |
+| inventoryAvailability | string |  | Inventory availability |
+| locationInventory | string |  | Location inventory |
+| eligibleFulfillmentPoint | string |  | Eligible fulfillment point |
+| substitutionRules | string |  | Substitution rules |
+| doNotOfferPromotion | string |  | Do not offer promotion |
+| provideAlternativeReward | string |  | Provide alternative reward |
+| allowLaterFulfillment | boolean |  | Allow later fulfillment |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Gift, Free Product & Added-Value Offer Builder |
+
+### setGuestChoiceBuild
+
+**`PUT /guest-choice-build`**: Guest Choice & Build-Your-Own Bundle Designer
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Promotions   Bundles Management, page 67. The screen says: Configure bundles where the guest chooses products from predefined groups. The matrix specifically requires the guest to be able to choose attractions, experiences, F&B, retail products, or services from predefined categories while maintaining bundle pricing rules.
+
+**Every property carries the sentence it came from.** 19 were read from the screen's own bulleted directory and 5 bullets were dropped as prose, examples or hierarchy illustrations rather than bent into fields. Names and types are this package's reading of those sentences and are the part to check; the sentences themselves are the client's.
+
+**Agreed 29 September (decided 29 September, readiness close-out).** Checked against the pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan. Shape: 11 properties removed that were filters, actions, behaviour, roles, examples or prose fragments rather than fields.
+
+|  |  |
+|---|---|
+| Permission | `PRICE_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `promotions.bundle_choice_group`, `promotions.bundle_choice_option` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `promotions.bundle`, `promotions.bundle_choice_group`, `promotions.bundle_choice_option` |
+| Writes | `cache:idempotency`, `promotions.bundle_choice_group`, `promotions.bundle_choice_option`, `promotions.promotion_audit` |
+| Called by | ADM-181 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `GuestChoiceBuildYourOwnBundleDesignerInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| groupName | string |  | Group name |
+| category | string |  | Category |
+| minimumSelections | string |  | Minimum selections |
+| maximumSelections | string |  | Maximum selections |
+| requiredOptional | string |  | Required/optional |
+| eligibleProducts | string |  | Eligible products |
+| additionalCharge | Money |  | On the wire this is three fields; in the database it is one column. |
+| additionalCharge.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| additionalCharge.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| additionalCharge.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| selectionOrder | string |  | Selection order |
+
+**Response**: `GuestChoiceBuildYourOwnBundleDesignerView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| groupName | string |  | Group name |
+| category | string |  | Category |
+| minimumSelections | string |  | Minimum selections |
+| maximumSelections | string |  | Maximum selections |
+| requiredOptional | string |  | Required/optional |
+| eligibleProducts | string |  | Eligible products |
+| additionalCharge | Money |  | On the wire this is three fields; in the database it is one column. |
+| additionalCharge.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| additionalCharge.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| additionalCharge.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| selectionOrder | string |  | Selection order |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Guest Choice & Build-Your-Own Bundle Designer |
+
+### setPriceHierarchyInheritance
+
+**`PUT /price-hierarchy-inheritance`**: Price Hierarchy & Inheritance Configuration
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Pricing   Revenue Management, page 17. The screen says: Define where TICVAI should obtain a price when multiple commercial pricing layers exist. This is essential to prevent conflicting prices.
+
+**Agreed (decided 29 September, readiness close-out).** the flat fields became an ordered levels[] array saved as one hierarchy, each level with priority, inheritance, the override rules and the fallback (Use Parent / Use Default / Block Sale); typed; conflicts returned as validationIssues. Conflict Detection rejects two sources at equal priority for the same product; the Price Resolution Preview (what price would Product X use at Venue Y) is a button on ADM-055; override approval belongs to Board 4.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.price_resolution_policy` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `catalogue.price_list`, `catalogue.price_resolution_policy` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.price_resolution_policy` |
+| Called by | ADM-055 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `PriceHierarchyInheritanceConfigurationInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| hierarchyId | string |  | Price hierarchy ID; empty on create |
+| name | string |  | Hierarchy name |
+| levels | array of object |  | Hierarchy Builder (p.17): the ordered levels; saved as a whole so two sources can never be left at equal priority |
+| levels[].hierarchyLevel | enum (globalMaster, country, market, venue, product, approvedOverride) |  | Hierarchy Level (Example Hierarchy, p.17) |
+| levels[].priority | integer |  | Priority; the lower number is the more general level, the most specific existing price wins |
+| levels[].inheritance | boolean |  | Inheritance: the level takes its parent's price when it has none of its own |
+| levels[].overrideAllowed | boolean |  | Override Permission / Override Allowed |
+| levels[].overrideRequiresReason | boolean |  | Override Requires Reason |
+| levels[].maximumOverrideRangePercent | number |  | Maximum Override Range: largest allowed deviation from the parent price, in percent; empty for no limit (nullable) |
+| levels[].overrideExpiryDays | integer |  | Override Expiry: days an override stays in force; empty for no expiry (decided 29 September, readiness close-out) (nullable) |
+| levels[].returnToParentPrice | boolean |  | Return to Parent Price when an override expires |
+| levels[].fallbackBehavior | enum (useParent, useDefault, blockSale) |  | Fallback (p.18): what happens when a child rate does not exist |
+
+**Response**: `PriceHierarchyInheritanceConfigurationView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| hierarchyId | string |  | Price hierarchy ID; empty on create |
+| name | string |  | Hierarchy name |
+| levels | array of object |  | Hierarchy Builder (p.17): the ordered levels; saved as a whole so two sources can never be left at equal priority |
+| levels[].hierarchyLevel | enum (globalMaster, country, market, venue, product, approvedOverride) |  | Hierarchy Level (Example Hierarchy, p.17) |
+| levels[].priority | integer |  | Priority; the lower number is the more general level, the most specific existing price wins |
+| levels[].inheritance | boolean |  | Inheritance: the level takes its parent's price when it has none of its own |
+| levels[].overrideAllowed | boolean |  | Override Permission / Override Allowed |
+| levels[].overrideRequiresReason | boolean |  | Override Requires Reason |
+| levels[].maximumOverrideRangePercent | number |  | Maximum Override Range: largest allowed deviation from the parent price, in percent; empty for no limit (nullable) |
+| levels[].overrideExpiryDays | integer |  | Override Expiry: days an override stays in force; empty for no expiry (decided 29 September, readiness close-out) (nullable) |
+| levels[].returnToParentPrice | boolean |  | Return to Parent Price when an override expires |
+| levels[].fallbackBehavior | enum (useParent, useDefault, blockSale) |  | Fallback (p.18): what happens when a child rate does not exist |
+| validationIssues | array of object |  | Conflict Detection (p.18); read-only |
+| validationIssues[].code | enum (equalPriority, missingFallback, circularInheritance) |  |  |
+| validationIssues[].message | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Price Hierarchy & Inheritance Configuration |
+
+### setPriceListMaster
+
+**`PUT /price-list-master`**: Price List Master Configuration
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Pricing   Revenue Management, page 8. The screen says: Create the master container that holds commercial rates. A Price List should be reusable across products and channels.
+
+**Agreed (decided 29 September, readiness close-out).** the scope options (Global, Event, ...) became one scope enum; a price list id and the clone source were added; name/code/type typed as strings (they were Money); tags an array; the consuming modules of the Dependencies panel added to the response. Duplicate on ADM-049 creates a new list with clonedFromPriceListId set; approval and publication of a list belong to Board 4.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.price_list` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `catalogue.price_category`, `catalogue.price_list`, `catalogue.price_resolution_policy`, `catalogue.rounding_profile` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.price_list` |
+| Called by | ADM-049 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `PriceListMasterConfigurationInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| priceListName | string |  | Price List Name |
+| priceListCode | string |  | Price List Code; unique within the tenant |
+| description | string |  | Description |
+| priceListType | enum (standardRetail, venue, attraction, event, membership, group, corporate, b2b, …) |  | Price List Type (Commercial Types, pp.8-9, and the directory's Price List Types) |
+| legalEntity | string |  | Legal Entity |
+| brand | string |  | Brand |
+| businessUnit | string |  | Business Unit |
+| country | string |  | Country |
+| market | string |  | Market |
+| venue | string |  | Venue |
+| defaultCurrency | string |  | Default Currency: ISO 4217 code (pattern ^[A-Z]{3}$) |
+| owner | string |  | Owner |
+| tags | array of string |  | Tags |
+| status | string |  | Status: draft, configured, inactive or archived are set here; validated is set by structure validation (ADM-057) and active / expired by Board 4 publication |
+| defaultRateCategory | string |  | Default Rate Category: code of a price category from the library (ADM-050) |
+| defaultRoundingProfile | string |  | Default Rounding Profile: code of a currency rounding rule (ADM-075) |
+| defaultPriceHierarchy | string |  | Default Price Hierarchy: id of the price hierarchy (ADM-055) this list resolves against |
+| allowOverrides | boolean |  | Allow Overrides |
+| allowInheritance | boolean |  | Allow Inheritance |
+| allowMultipleCurrencies | boolean |  | Allow Multiple Currencies |
+| allowProductSpecificRates | boolean |  | Allow Product-Specific Rates |
+| priceListId | string |  | Price List ID; empty on create, the list to update otherwise |
+| scope | enum (global, country, market, brand, venue, event, businessUnit) |  | Scope: where the price list can apply (p.8) |
+| clonedFromPriceListId | string |  | The price list this one was duplicated from (Duplicate, p.9: UAE Standard 2026 into UAE Standard 2027); empty when built from scratch (nullable) |
+
+**Response**: `PriceListMasterConfigurationView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| priceListName | string |  | Price List Name |
+| priceListCode | string |  | Price List Code; unique within the tenant |
+| description | string |  | Description |
+| priceListType | enum (standardRetail, venue, attraction, event, membership, group, corporate, b2b, …) |  | Price List Type (Commercial Types, pp.8-9, and the directory's Price List Types) |
+| legalEntity | string |  | Legal Entity |
+| brand | string |  | Brand |
+| businessUnit | string |  | Business Unit |
+| country | string |  | Country |
+| market | string |  | Market |
+| venue | string |  | Venue |
+| defaultCurrency | string |  | Default Currency: ISO 4217 code (pattern ^[A-Z]{3}$) |
+| owner | string |  | Owner |
+| tags | array of string |  | Tags |
+| status | string |  | Status: draft, configured, inactive or archived are set here; validated is set by structure validation (ADM-057) and active / expired by Board 4 publication |
+| defaultRateCategory | string |  | Default Rate Category: code of a price category from the library (ADM-050) |
+| defaultRoundingProfile | string |  | Default Rounding Profile: code of a currency rounding rule (ADM-075) |
+| defaultPriceHierarchy | string |  | Default Price Hierarchy: id of the price hierarchy (ADM-055) this list resolves against |
+| allowOverrides | boolean |  | Allow Overrides |
+| allowInheritance | boolean |  | Allow Inheritance |
+| allowMultipleCurrencies | boolean |  | Allow Multiple Currencies |
+| allowProductSpecificRates | boolean |  | Allow Product-Specific Rates |
+| priceListId | string |  | Price List ID; empty on create, the list to update otherwise |
+| scope | enum (global, country, market, brand, venue, event, businessUnit) |  | Scope: where the price list can apply (p.8) |
+| clonedFromPriceListId | string |  | The price list this one was duplicated from (Duplicate, p.9: UAE Standard 2026 into UAE Standard 2027); empty when built from scratch (nullable) |
+| consumingModules | array of enum (ticketing, b2c, pos, kiosk, b2b, groupSales, membership, fnb, …) |  | Dependencies: the modules that consume this list (p.9); read-only |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Price List Master Configuration |
+
+### setProductCatalogue
+
+**`PUT /product-catalogue`**: Product & Catalogue Assignment
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Sales Channel Management, page 7. The screen says: Control exactly which products are available through each sales channel.
+
+**Agreed (decided 29 September, readiness close-out).** the eight assignment methods became assignmentMethod + targetIds; the validation checks became validationIssues; status fields typed (product status is ProductLifecycleState); channelId, enabled, exclusions and inheritance added. Bulk actions Assign Products, Remove Products, Enable, Disable, Set Effective Dates, Copy Assignment and Import Assignment are buttons on ADM-260, each a call to this PUT (remove = enabled false with effectiveTo today); publishing a draft, retired or unpriced product is blocked, the rest warn. Product definition stays in Product Catalogue.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.product` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `catalogue.price_list`, `catalogue.product`, `catalogue.product_channel_assignment`, `catalogue.sales_channel` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.product`, `catalogue.product_channel_assignment` |
+| Called by | ADM-260 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ProductCatalogueAssignmentInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| channelId | string |  | Channel ID |
+| assignmentMethod | enum (individualProduct, productFamily, productCategory, event, attraction, venueCatalogue, productCollection, entireApprovedCatalogue) |  | Assignment Method (pack p.7) |
+| targetIds | array of string |  | IDs of the products, families, categories, events, attractions, venue catalogues or collections assigned; empty for entireApprovedCatalogue |
+| excludedProductIds | array of string |  | Channel-specific overrides: products excluded from what is inherited (pack p.8, e.g. |
+| enabled | boolean |  | Enable or disable the assignment on the channel |
+| effectiveFrom | string (date) |  | Effective From |
+| effectiveTo | string (date) |  | Effective To; empty for open-ended (nullable) |
+
+**Response**: `ProductCatalogueAssignmentView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| product | string |  | Product ID |
+| productType | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) |  | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
+| venue | string |  | Venue ID |
+| status | ProductLifecycleState: enum (draft, inReview, approved, live, withdrawn, archived) |  | Status: the product's own lifecycle state in Product Catalogue |
+| validity | string |  | Validity: the product's validity period as set in Product Catalogue, shown for reference |
+| channelStatus | string |  | Channel Status: enabled, disabled or scheduled on this channel (decided 29 September, readiness close-out) |
+| pricingStatus | string |  | Pricing Status: valid, missing or expired for this channel (from ADM-261) (decided 29 September, readiness close-out) |
+| capacityStatus | string |  | Capacity Status: allocated, sharedPool or none for this channel (from ADM-262) (decided 29 September, readiness close-out) |
+| effectiveFrom | string (date) |  | Effective From |
+| effectiveTo | string (date) |  | Effective To; empty for open-ended (nullable) |
+| channelId | string |  | Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258) |
+| assignmentMethod | enum (individualProduct, productFamily, productCategory, event, attraction, venueCatalogue, productCollection, entireApprovedCatalogue) |  | Assignment Method the product came in by (pack p.7) |
+| inheritedFrom | enum (globalChannelCatalogue, venueCatalogue, channelOverride) |  | Inheritance level the assignment comes from (pack p.7-8) |
+| validationIssues | array of object |  | Validation (pack p.8): why this product should not be published on the channel |
+| validationIssues[].code | enum (draftProduct, retiredProduct, missingPricing, missingEntitlement, outsideValidity, unavailableForChannel) |  |  |
+| validationIssues[].message | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Product & Catalogue Assignment |
+
+### setProductContextOwnership
+
+**`PUT /product-context-ownership`**: Product Context, Ownership & Assignment
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Product Lifecycle   Catalogue Governance, page 8. The screen says: Define where the product belongs and who is responsible for it.
+
+**Agreed (decided 29 September, readiness close-out).** productId added; references typed as ids; customerSegment is a list; the stray 'segments' fragment dropped; creator is system-set and response-only. Editing rights inherit from the organisation and venue hierarchy; creator is recorded by the system at creation.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.product` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `catalogue.product` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.product` |
+| Called by | ADM-123 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ProductContextOwnershipAssignmentInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| businessUnit | string |  | Business unit id (nullable) |
+| legalEntity | string |  | Legal entity id (nullable) |
+| venue | string |  | Venue id |
+| attraction | string |  | Attraction id (nullable) |
+| event | string |  | Event id (nullable) |
+| site | string |  | Site id (nullable) |
+| location | string |  | Location id (nullable) |
+| productOwner | string |  | Product owner (principal id) |
+| responsibleDepartment | string |  | Responsible department |
+| operationalContact | string |  | Operational contact (principal id or name) (nullable) |
+| customerSegment | array of string |  | Applicable customer segments |
+| market | string |  | Market (nullable) |
+| salesTerritory | string |  | Sales territory (nullable) |
+| brand | string |  | Brand (catalogue brand category id) (nullable) |
+| productFamily | string |  | Product family (nullable) |
+| productId | string (uuid) |  | Product id |
+
+**Response**: `ProductContextOwnershipAssignmentView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| tenant | string |  | Tenant id (set from the caller's tenant) |
+| businessUnit | string |  | Business unit id (nullable) |
+| legalEntity | string |  | Legal entity id (nullable) |
+| venue | string |  | Venue id |
+| attraction | string |  | Attraction id (nullable) |
+| event | string |  | Event id (nullable) |
+| site | string |  | Site id (nullable) |
+| location | string |  | Location id (nullable) |
+| productOwner | string |  | Product owner (principal id) |
+| creator | string |  | Creator (principal id), recorded by the system |
+| responsibleDepartment | string |  | Responsible department |
+| operationalContact | string |  | Operational contact (principal id or name) (nullable) |
+| customerSegment | array of string |  | Applicable customer segments |
+| market | string |  | Market (nullable) |
+| salesTerritory | string |  | Sales territory (nullable) |
+| brand | string |  | Brand (catalogue brand category id) (nullable) |
+| productFamily | string |  | Product family (nullable) |
+| productId | string (uuid) |  | Product id |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Product Context, Ownership & Assignment |
+
+### setProductServicePrice
+
+**`PUT /product-service-price`**: Product & Service Price Assignment
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Pricing   Revenue Management, page 13. The screen says: Connect commercial rates to the actual products and services being sold.
+
+**Agreed (decided 29 September, readiness close-out).** the 15 commercial-object fields became objectType plus objectIds (bulk assignment); the scope options became assignmentScope plus scopeRefId; the example price list removed; the category -> rate mapping and the price source label added. Products show 'Pricing Source: <price list>' rather than holding a copy of the amount; the Dependency View (which products reference a rate) is a read on ADM-052.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.price_assignment` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `catalogue.price_assignment`, `catalogue.price_list`, `catalogue.product`, `catalogue.rate`, `catalogue.variant` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.price_assignment` |
+| Called by | ADM-052 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ProductServicePriceAssignmentInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| assignmentId | string |  | Assignment ID; empty on create |
+| objectType | enum (ticketProduct, ticketType, admission, event, performance, membership, annualPass, addOn, …) |  | Supported Commercial Objects (p.13): the kind of sellable object being priced |
+| objectIds | array of string |  | The objects assigned; more than one is a Bulk Assignment (25 attraction products -> one price list) |
+| assignmentScope | enum (productLevel, productVariant, ticketType, event, performance, venue) |  | Assignment Scope (p.14): the level at which the assignment holds |
+| scopeRefId | string |  | The variant, ticket type, event, performance or venue the assignment is limited to; empty at product level (nullable) |
+| priceListId | string |  | The price list assigned |
+| categoryRates | array of object |  | Product -> Price List -> Category -> Rate (Assignment Workspace, p.13): which rate of the list serves each category; empty uses every active rate of the list |
+| categoryRates[].priceCategory | string |  |  |
+| categoryRates[].rateId | string |  |  |
+
+**Response**: `ProductServicePriceAssignmentView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| assignmentId | string |  | Assignment ID; empty on create |
+| objectType | enum (ticketProduct, ticketType, admission, event, performance, membership, annualPass, addOn, …) |  | Supported Commercial Objects (p.13): the kind of sellable object being priced |
+| objectIds | array of string |  | The objects assigned; more than one is a Bulk Assignment (25 attraction products -> one price list) |
+| assignmentScope | enum (productLevel, productVariant, ticketType, event, performance, venue) |  | Assignment Scope (p.14): the level at which the assignment holds |
+| scopeRefId | string |  | The variant, ticket type, event, performance or venue the assignment is limited to; empty at product level (nullable) |
+| priceListId | string |  | The price list assigned |
+| categoryRates | array of object |  | Product -> Price List -> Category -> Rate (Assignment Workspace, p.13): which rate of the list serves each category; empty uses every active rate of the list |
+| categoryRates[].priceCategory | string |  |  |
+| categoryRates[].rateId | string |  |  |
+| pricingSource | string |  | Price Source Visibility (p.14): the name shown on the product, e.g. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Product & Service Price Assignment |
+
+### setPromotionRule
+
+**`PUT /promotion-rule`**: Promotion Rule Builder
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Promotions   Bundles Management, page 22. The screen says: Provide the main no-code workspace for creating the commercial logic behind a promotion.
+
+**Every property carries the sentence it came from.** 21 were read from the screen's own bulleted directory and 11 bullets were dropped as prose, examples or hierarchy illustrations rather than bent into fields. Names and types are this package's reading of those sentences and are the part to check; the sentences themselves are the client's.
+
+**Agreed 29 September (decided 29 September, readiness close-out).** Checked against the pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan. Shape: 1 properties removed that were filters, actions, behaviour, roles, examples or prose fragments rather than fields.
+
+|  |  |
+|---|---|
+| Permission | `PRICE_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `promotions.promotion_rule` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `promotions.promotion`, `promotions.promotion_rule` |
+| Writes | `cache:idempotency`, `promotions.promotion_audit`, `promotions.promotion_rule` |
+| Called by | ADM-148, ADM-210 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `PromotionRuleBuilderInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| ruleName | string |  | Rule name |
+| ruleId | string |  | Rule ID |
+| promotion | string |  | Promotion |
+| description | string |  | Description |
+| owner | string |  | Owner |
+| businessEntity | string |  | Business entity |
+| venue | string |  | Venue |
+| ruleStatus | string |  | Rule status |
+| priority | string |  | Priority |
+| percentageDiscount | number |  | Percentage discount |
+| fixedDiscount | Money |  | On the wire this is three fields; in the database it is one column. |
+| fixedDiscount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| fixedDiscount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| fixedDiscount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| fixedSellingPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| fixedSellingPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| fixedSellingPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| fixedSellingPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| freeProduct | string |  | Free product |
+| freeTicket | string |  | Free ticket |
+| addedValue | string |  | Added value |
+| voucher | string |  | Voucher |
+| rewardEntitlement | string |  | Reward entitlement |
+| nestedConditionGroups | string |  | Nested condition groups |
+| multipleOutcomes | string |  | Multiple outcomes |
+| ruleOrdering | string |  | Rule ordering |
+
+**Response**: `PromotionRuleBuilderView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| ruleName | string |  | Rule name |
+| ruleId | string |  | Rule ID |
+| promotion | string |  | Promotion |
+| description | string |  | Description |
+| owner | string |  | Owner |
+| businessEntity | string |  | Business entity |
+| venue | string |  | Venue |
+| ruleStatus | string |  | Rule status |
+| priority | string |  | Priority |
+| percentageDiscount | number |  | Percentage discount |
+| fixedDiscount | Money |  | On the wire this is three fields; in the database it is one column. |
+| fixedDiscount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| fixedDiscount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| fixedDiscount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| fixedSellingPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| fixedSellingPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| fixedSellingPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| fixedSellingPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| freeProduct | string |  | Free product |
+| freeTicket | string |  | Free ticket |
+| addedValue | string |  | Added value |
+| voucher | string |  | Voucher |
+| rewardEntitlement | string |  | Reward entitlement |
+| nestedConditionGroups | string |  | Nested condition groups |
+| multipleOutcomes | string |  | Multiple outcomes |
+| ruleOrdering | string |  | Rule ordering |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Promotion Rule Builder |
+
+### setRateStructure
+
+**`PUT /rate-structure`**: Rate Structure Builder
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Pricing   Revenue Management, page 11. The screen says: Define the actual monetary rates contained within a price list. This is the core commercial configuration screen.
+
+**Agreed (decided 29 September, readiness close-out).** example rows (Adult 250, Child 180, ...) removed; the nine unit bases became the unitBasis enum; the four validation checks became validationIssues; derived rates carry their base rate and adjustment; types corrected (names/codes strings, precision an integer, currency ISO code). Matrix editing actions Add Rate, Duplicate Rate, Edit, Disable, Sort, Copy Across Categories and Compare are buttons on ADM-051; Duplicate Rates, Missing Amounts, Unsupported Currency, Invalid Derived Rate and Circular Rate Relationship are detected on save.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.rate` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `catalogue.price`, `catalogue.price_category`, `catalogue.price_list`, `catalogue.rate`, `catalogue.rounding_profile` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.rate` |
+| Called by | ADM-051 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `RateStructureBuilderInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| rateId | string |  | Rate ID |
+| rateName | string |  | Rate Name |
+| rateCode | string |  | Rate Code |
+| priceCategory | string |  | Price Category: code of a category from the library (ADM-050) |
+| rateType | string |  | Rate Type: code of a rate type from the library (ADM-050), e.g. |
+| amount | Money |  | On the wire this is three fields; in the database it is one column. |
+| amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| currency | string |  | Currency: ISO 4217 code (pattern ^[A-Z]{3}$) |
+| unitBasis | enum (perTicket, perPerson, perUnit, perHour, perDay, perPerformance, perResource, perPackage, …) |  | Unit Basis (p.12); perPerformance is the pack's "Per Session" (a session is a Performance) |
+| precision | integer |  | Precision: decimal places, 0 to 3 (MoM 1 Sep §4.5 requires up to three) (min 0; max 3) |
+| roundingProfile | string |  | Rounding Profile: code of a currency rounding rule (ADM-075) |
+| status | string |  | Status: draft, active or disabled |
+| priceListId | string |  | The price list the rate belongs to |
+| derivedFrom | object |  | Derived Rates (p.12): this rate is another rate adjusted (Child = Adult - 25%, VIP = Standard + AED 200); a commercial relationship, not dynamic pricing. (nullable) |
+| derivedFrom.baseRateId | string |  |  |
+| derivedFrom.adjustmentType | enum (percentage, fixedAmount) |  |  |
+| derivedFrom.adjustmentValue | number |  | Percent or amount in the rate currency; negative reduces |
+
+**Response**: `RateStructureBuilderView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| rateId | string |  | Rate ID |
+| rateName | string |  | Rate Name |
+| rateCode | string |  | Rate Code |
+| priceCategory | string |  | Price Category: code of a category from the library (ADM-050) |
+| rateType | string |  | Rate Type: code of a rate type from the library (ADM-050), e.g. |
+| amount | Money |  | On the wire this is three fields; in the database it is one column. |
+| amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| currency | string |  | Currency: ISO 4217 code (pattern ^[A-Z]{3}$) |
+| unitBasis | enum (perTicket, perPerson, perUnit, perHour, perDay, perPerformance, perResource, perPackage, …) |  | Unit Basis (p.12); perPerformance is the pack's "Per Session" (a session is a Performance) |
+| precision | integer |  | Precision: decimal places, 0 to 3 (MoM 1 Sep §4.5 requires up to three) (min 0; max 3) |
+| roundingProfile | string |  | Rounding Profile: code of a currency rounding rule (ADM-075) |
+| status | string |  | Status: draft, active or disabled |
+| priceListId | string |  | The price list the rate belongs to |
+| derivedFrom | object |  | Derived Rates (p.12): this rate is another rate adjusted (Child = Adult - 25%, VIP = Standard + AED 200); a commercial relationship, not dynamic pricing. (nullable) |
+| derivedFrom.baseRateId | string |  |  |
+| derivedFrom.adjustmentType | enum (percentage, fixedAmount) |  |  |
+| derivedFrom.adjustmentValue | number |  | Percent or amount in the rate currency; negative reduces |
+| validationIssues | array of object |  | Validation (pp.12-13): problems found on this rate; read-only |
+| validationIssues[].code | enum (duplicateRate, missingAmount, unsupportedCurrency, invalidDerivedRate, circularRateRelationship) |  |  |
+| validationIssues[].message | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Rate Structure Builder |
+
+### setRulePriorityConflict
+
+**`PUT /rule-priority-conflict`**: Reorder, validate, test or save the pricing rule priority
+
+**The write half of BO-441 and ADM-097** (decided 29 September, readiness close-out). The screen only listed priorities; this reorders them, validates the order, runs a test scenario against it and saves it. One operation with a `mode`, because the four buttons send the same body:
+- `validate` returns the conflicts the order has (the seven conflict codes) and saves nothing;
+- `test` runs `testScenario` through the order and saves it as a test case, which then appears in `listRulePriorityConflict`;
+- `save` stores the order, resolution method and hierarchy, and is refused with `409` `criticalConflictOpen` while a critical conflict remains, because a strategy cannot activate on an order that contradicts itself.
+The resolution method defaults to `highestPriorityWins`; lowest-price-wins is never the default (MoM 1 Sep 2026 §4.4). The handoff's `highestPriority` / `lowestPrice` / `highestPrice` choices are `highestPriorityWins` / `minimumAdjustmentWins` / `maximumAdjustmentWins` in this vocabulary.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.price_resolution_policy` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `catalogue.dynamic_pricing_control`, `catalogue.price_resolution_policy`, `catalogue.pricing_test_case`, `pricing.dynamic_price_action`, `pricing.dynamic_price_condition`, `pricing.dynamic_price_rule` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.price_resolution_policy`, `catalogue.pricing_test_case`, `pricing.dynamic_price_rule` |
+| Called by | ADM-097, BO-441 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `RulePriorityConflictInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| orderedRuleIds | array of string |  | The rules in priority order, highest first. |
+| resolutionMethod | enum (highestPriorityWins, mostSpecificRuleWins, cumulativeAdjustment, maximumAdjustmentWins, minimumAdjustmentWins, weightedCombination, stopProcessing, customGovernedResolution) |  | How two applicable rules are resolved; the same vocabulary as RulePriorityConflictResolutionDynamicPricingTestConsSummary.resolutionMethod. (default highestPriorityWins) |
+| priorityHierarchy | array of enum (commercialProtection, contractMemberProtection, eventSpecificStrategy, inventoryOccupancy, bookingVelocity, timeToEvent, seasonDayTimeslot, basePrice) |  | The priority matrix, highest first; defaults to the pack's order. |
+| mode | enum (save, validate, test) | yes | validate checks the order and returns conflicts without saving; test runs testScenario against the order and saves it as a test case; save stores the order and method, refused with 409 while a critic… |
+| testScenario | RulePriorityTestScenario |  | A sample booking for the conflict test console (pack p.90), the same inputs as a saved test case. |
+| testScenario.caseName | string |  | (max length 120) |
+| testScenario.caseType | enum (lowDemand, highDemand, nearSellOut, earlyBird, lastMinute, weekendPeak, memberPurchase, b2bContract, …) |  |  |
+| testScenario.productId | string (uuid) |  |  |
+| testScenario.eventId | string (uuid) |  | (nullable) |
+| testScenario.performanceId | string (uuid) |  | (nullable) |
+| testScenario.date | string (date) |  |  |
+| testScenario.timeslot | string |  | (nullable) |
+| testScenario.channel | SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) |  | Where a sale came from. |
+| testScenario.customerSegment | string |  | (nullable) |
+| testScenario.basePrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| testScenario.basePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| testScenario.basePrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| testScenario.basePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| testScenario.occupancy | number |  | (min 0; max 100) |
+| testScenario.inventory | integer |  | (min 0) |
+| testScenario.bookingVelocity | number |  |  |
+| testScenario.timeToEvent | integer |  | (min 0) |
+| testScenario.expectedPrice | object |  | (nullable) |
+| testScenario.expectedPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| testScenario.expectedPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| testScenario.expectedPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+
+**Response**: `RulePriorityConflictView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| mode | enum (save, validate, test) |  |  |
+| saved | boolean |  |  |
+| orderedRuleIds | array of string |  |  |
+| resolutionMethod | string |  |  |
+| priorityHierarchy | array of string |  |  |
+| conflicts | array of object |  |  |
+| conflicts[].code | enum (contradictoryRules, samePriority, impossibleCondition, overlappingStrategy, circularDependency, missingFallback, guardrailConflict) |  |  |
+| conflicts[].severity | enum (critical, warning) |  |  |
+| conflicts[].ruleIds | array of string |  |  |
+| conflicts[].message | string |  |  |
+| testResult | object |  | The saved test case with its deterministic result, in test mode. (nullable) |
+| testResult.product | string |  | Test input: product |
+| testResult.event | string |  | Test input: event (nullable) |
+| testResult.performance | string |  | Test input: performance (nullable) |
+| testResult.date | string (date) |  | Test input: visit/event date |
+| testResult.timeslot | string |  | Test input: timeslot (nullable) |
+| testResult.channel | object |  | Test input: channel |
+| testResult.customerSegment | string |  | Test input: customer segment |
+| testResult.basePrice | object |  | Test input: base price |
+| testResult.basePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| testResult.basePrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| testResult.basePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| testResult.occupancy | number |  | Test input: occupancy percent |
+| testResult.inventory | integer |  | Test input: remaining inventory |
+| testResult.bookingVelocity | number |  | Test input: booking velocity, percent against expected pace |
+| testResult.timeToEvent | integer |  | Test input: days to event (0 = same day) |
+| testResult.calculationPath | array of string |  | Explainability: the complete calculation path, one step per line |
+| testResult.testCaseId | string |  | Test case ID |
+| testResult.caseName | string |  | Test case name |
+| testResult.caseType | enum (lowDemand, highDemand, nearSellOut, earlyBird, lastMinute, weekendPeak, memberPurchase, b2bContract, …) |  | Test case type (pack p.91) |
+| testResult.rulesMatched | array of object |  | Rules matched |
+| testResult.rulesMatched[].ruleId | string |  | Rule |
+| testResult.rulesMatched[].ruleName | string |  | Rule name |
+| testResult.rulesMatched[].priorityLevel | enum (commercialProtection, contractMemberProtection, eventSpecificStrategy, inventoryOccupancy, bookingVelocity, timeToEvent, seasonDayTimeslot, basePrice) |  | Hierarchy level |
+| testResult.rulesMatched[].adjustmentPercent | number |  | Adjustment in percent (nullable) |
+| testResult.rulesMatched[].applied | boolean |  | Applied after resolution |
+| testResult.rawCalculatedPrice | object |  | Raw calculated price |
+| testResult.rawCalculatedPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| testResult.rawCalculatedPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| testResult.rawCalculatedPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| testResult.ladderPrice | object |  | Nearest allowed band |
+| testResult.ladderPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| testResult.ladderPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| testResult.ladderPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| testResult.guardrailOutcome | enum (passed, cappedAtMaximum, raisedToMinimum, protectedRateApplied) |  | Guardrail result |
+| testResult.finalPrice | object |  | Final dynamic price |
+| testResult.finalPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| testResult.finalPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| testResult.finalPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| testResult.conflicts | array of object |  | Conflicts met while resolving this case |
+| testResult.conflicts[].code | enum (contradictoryRules, samePriority, impossibleCondition, overlappingStrategy, circularDependency, missingFallback, guardrailConflict) |  | Conflict type (pack p.90) |
+| testResult.conflicts[].message | string |  | Message |
+| testResult.conflicts[].ruleIds | array of string |  | Rules involved |
+| testResult.lastRunAt | string (date-time) |  | Last run |
+| testResult.passed | boolean |  | Final price matched the expected price saved with the case (nullable) |
+| testResult.expectedPrice | object |  | Expected final price for regression (nullable) |
+| testResult.expectedPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| testResult.expectedPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| testResult.expectedPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| savedAt | string (date-time) |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Validated, tested or saved |
+| 409 |  | save while a critical conflict is open (criticalConflictOpen); the conflicts are named in the problem. |
+| 422 |  | test without a testScenario (testScenarioRequired), or orderedRuleIds naming a rule that does not exist or is archived (unknownRule). |
 
 
 ## Group: entitlement
@@ -1957,6 +4972,8 @@ Called at point of sale before applying. Returns whether the code is valid, why 
 
 Returns the applied discount **and the working** — which rules matched, which did not, and why. A cashier facing a guest who expected a discount needs an answer, not a total.
 Terminals evaluate locally from the catalogue bundle. This endpoint serves online channels and lets the back office test a rule before publishing it.
+**Reads `promotions.promotion_rule`**: a promotion whose `conditions.eligibilityRuleIds` names reusable eligibility rules is eligible only when each named rule holds (decided 29 September, writers pass).
+**Writes `promotions.promotion_evaluation_trace` only when it prices an order being confirmed.** The order service calls it with `orderId` when it prices an order for payment (createOrder, convertReservation); that call stores one trace row for the order: which promotions were evaluated, which were eligible, which applied in what order and why the others did not. A cart, till or back-office evaluation sends no `orderId` and stores nothing (decided 29 September, writers pass).
 
 |  |  |
 |---|---|
@@ -1966,8 +4983,8 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `catalogue.price_list`, `promotions.promotion` |
-| Writes | `cache:idempotency` |
+| Reads | `cache:idempotency`, `catalogue.price_list`, `promotions.coupon_code`, `promotions.promotion`, `promotions.promotion_rule` |
+| Writes | `cache:idempotency`, `promotions.promotion_evaluation_trace` |
 | Called by | BO-010, KSK-006, POS-002, POS-021, POS-023, PTR-010, WEB-005, WEB-010 |
 | State model | Coupon code ([states/coupon.yaml](../../../states/coupon.yaml)): moves `issued` -> `redeemed`, `assigned` -> `redeemed` |
 
@@ -1987,6 +5004,7 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 | membershipTierId | string (uuid) |  |  |
 | couponCodes | array of string |  |  |
 | evaluateAt | string (date-time) |  | For back-office testing of a rule before publishing. |
+| orderId | string (uuid) |  | The order (orders.sales_order) being priced for payment. (nullable) |
 | lines | array of object | yes | (min items 1) |
 | lines[].lineId | string | yes |  |
 | lines[].variantId | string (uuid) | yes |  |
@@ -2352,6 +5370,93 @@ Moving a performance that has sold tickets is refused. Use cancellation, which n
 |---|---|---|
 | 200 |  | Updated |
 | 409 |  | A timing change on a performance with sold tickets, or a status move the state model does not allow. |
+
+
+## Group: events
+
+### cloneEvent
+
+**`POST /events/{eventId}/clone`**: Copy an event, choosing what comes with it
+
+Event board 1.3. **Most events are last year's event**, and the question is never whether to clone but what to bring: the schedule, the prices, the seat map, the resource plan, the staff roster — rarely all of them, and never the sales.
+
+|  |  |
+|---|---|
+| Permission | `EVENT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.event` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Reads | `cache:idempotency`, `catalogue.event`, `catalogue.event_capacity_profile`, `catalogue.event_registration`, `catalogue.event_resource_plan`, `catalogue.event_schedule`, `catalogue.performance` |
+| Writes | `cache:idempotency`, `catalogue.event`, `catalogue.event_capacity_profile`, `catalogue.event_registration`, `catalogue.event_resource_plan`, `catalogue.event_schedule`, `catalogue.performance` |
+| Called by | BO-696 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| eventId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| include | array of enum (schedule, pricing, seatMap, capacityProfile, resourceRequirements, staffPlan, registrationForm, accessRules) |  |  |
+| shiftDatesByDays | integer |  | (nullable) |
+| newName | string |  | (nullable) |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| eventId | string (uuid) |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Cloned as a draft |
+
+### setEventLifecycleState
+
+**`POST /events/{eventId}/lifecycle`**: Draft, planned, on sale, live, closed, cancelled
+
+Event boards 7.2 and 7.3. **The transitions are the product.** Going on sale requires a price, a capacity and a schedule; going live requires a resource plan; cancelling requires a treatment for everybody who bought.
+A change request above a configured impact routes through `approvals` — moving a sold-out performance is not a decision one person makes at a desk.
+
+|  |  |
+|---|---|
+| Permission | `EVENT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.event` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Reads | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.event`, `catalogue.event_capacity_profile`, `catalogue.event_resource_plan`, `catalogue.event_schedule`, `catalogue.performance`, `catalogue.price_list` |
+| Writes | `cache:idempotency`, `catalogue.event`, `catalogue.performance`, `platform.outbox` |
+| Called by | BO-716, BO-717 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| eventId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| state | enum (draft, planned, onSale, live, closed, cancelled, archived) | yes |  |
+| reason | string |  | (nullable) |
+| effectiveFrom | string (date-time) |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Moved |
+| 409 |  | Preconditions for the transition are not met; they are listed |
 
 
 ## Group: hold
@@ -2860,6 +5965,26 @@ Next season's prices from this season's, uplifted by a percentage. The alternati
 | priceList.validFrom | string (date-time) |  | (nullable) |
 | priceList.validTo | string (date-time) |  | (nullable) |
 | priceList.priority | integer |  | Where lists overlap, higher priority wins. |
+| priceList.description | string |  | Price list master fields (29 September, data model DM3), set with setPriceListMaster (ADM-058). (nullable) |
+| priceList.priceListType | enum (standardRetail, venue, attraction, event, membership, group, corporate, b2b, …) |  | (default standardRetail) |
+| priceList.status | object |  | (default active) |
+| priceList.ownerPrincipalId | string (uuid) |  | (nullable) |
+| priceList.tags | array of string |  |  |
+| priceList.legalEntityId | string (uuid) |  | (nullable) |
+| priceList.brand | string |  | (max length 100; nullable) |
+| priceList.businessUnit | string |  | (max length 100; nullable) |
+| priceList.countryCode | string |  | (max length 2; pattern ^[A-Z]{2}$; nullable) |
+| priceList.marketCode | string |  | (max length 40; nullable) |
+| priceList.scopeLevel | enum (global, country, market, brand, venue, event, businessUnit) |  | (default venue) |
+| priceList.defaultPriceCategoryId | string (uuid) |  | (nullable) |
+| priceList.roundingProfileId | string (uuid) |  | (nullable) |
+| priceList.priceResolutionPolicyId | string (uuid) |  | (nullable) |
+| priceList.allowOverrides | boolean |  | (default False) |
+| priceList.allowInheritance | boolean |  | (default True) |
+| priceList.allowMultipleCurrencies | boolean |  | (default False) |
+| priceList.allowProductSpecificRates | boolean |  | (default True) |
+| priceList.clonedFromPriceListId | string (uuid) |  | (nullable) |
+| priceList.currentVersion | integer |  | The active catalogue.price_list_version. (read-only; nullable) |
 | copiedPriceCount | integer |  |  |
 
 **Responses**
@@ -2916,6 +6041,26 @@ Next season's prices from this season's, uplifted by a percentage. The alternati
 | validFrom | string (date-time) |  | (nullable) |
 | validTo | string (date-time) |  | (nullable) |
 | priority | integer |  | Where lists overlap, higher priority wins. |
+| description | string |  | Price list master fields (29 September, data model DM3), set with setPriceListMaster (ADM-058). (nullable) |
+| priceListType | enum (standardRetail, venue, attraction, event, membership, group, corporate, b2b, …) |  | (default standardRetail) |
+| status | object |  | (default active) |
+| ownerPrincipalId | string (uuid) |  | (nullable) |
+| tags | array of string |  |  |
+| legalEntityId | string (uuid) |  | (nullable) |
+| brand | string |  | (max length 100; nullable) |
+| businessUnit | string |  | (max length 100; nullable) |
+| countryCode | string |  | (max length 2; pattern ^[A-Z]{2}$; nullable) |
+| marketCode | string |  | (max length 40; nullable) |
+| scopeLevel | enum (global, country, market, brand, venue, event, businessUnit) |  | (default venue) |
+| defaultPriceCategoryId | string (uuid) |  | (nullable) |
+| roundingProfileId | string (uuid) |  | (nullable) |
+| priceResolutionPolicyId | string (uuid) |  | (nullable) |
+| allowOverrides | boolean |  | (default False) |
+| allowInheritance | boolean |  | (default True) |
+| allowMultipleCurrencies | boolean |  | (default False) |
+| allowProductSpecificRates | boolean |  | (default True) |
+| clonedFromPriceListId | string (uuid) |  | (nullable) |
+| currentVersion | integer |  | The active catalogue.price_list_version. (read-only; nullable) |
 
 **Responses**
 
@@ -3023,6 +6168,26 @@ Currency must match the region's currency and scale. A price in a currency the r
 | validFrom | string (date-time) |  | (nullable) |
 | validTo | string (date-time) |  | (nullable) |
 | priority | integer |  | Where lists overlap, higher priority wins. |
+| description | string |  | Price list master fields (29 September, data model DM3), set with setPriceListMaster (ADM-058). (nullable) |
+| priceListType | enum (standardRetail, venue, attraction, event, membership, group, corporate, b2b, …) |  | (default standardRetail) |
+| status | object |  | (default active) |
+| ownerPrincipalId | string (uuid) |  | (nullable) |
+| tags | array of string |  |  |
+| legalEntityId | string (uuid) |  | (nullable) |
+| brand | string |  | (max length 100; nullable) |
+| businessUnit | string |  | (max length 100; nullable) |
+| countryCode | string |  | (max length 2; pattern ^[A-Z]{2}$; nullable) |
+| marketCode | string |  | (max length 40; nullable) |
+| scopeLevel | enum (global, country, market, brand, venue, event, businessUnit) |  | (default venue) |
+| defaultPriceCategoryId | string (uuid) |  | (nullable) |
+| roundingProfileId | string (uuid) |  | (nullable) |
+| priceResolutionPolicyId | string (uuid) |  | (nullable) |
+| allowOverrides | boolean |  | (default False) |
+| allowInheritance | boolean |  | (default True) |
+| allowMultipleCurrencies | boolean |  | (default False) |
+| allowProductSpecificRates | boolean |  | (default True) |
+| clonedFromPriceListId | string (uuid) |  | (nullable) |
+| currentVersion | integer |  | The active catalogue.price_list_version. (read-only; nullable) |
 
 **Responses**
 
@@ -3181,6 +6346,16 @@ Checks a party's declared ages and heights against every product in the booking 
 | media[].altText | object |  | (nullable) |
 | consentQuestionIds | array of string (uuid) |  | The consent questions a guest answers when booking this product, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I a… (max items 10) |
 | requiresTimeWindow | boolean |  | True for a space sold by the hour, e.g. (default False) |
+| productOwnerPrincipalId | string (uuid) |  | The product owner (29 September, data model DM3), set with setProductContextOwnership. (nullable) |
+| operationalContact | string |  | A principal id or a name, as the context screen takes it. (max length 200; nullable) |
+| businessUnitId | string (uuid) |  | (nullable) |
+| legalEntityId | string (uuid) |  | A ledger.legal_entity, read through finance. (nullable) |
+| attractionId | string (uuid) |  | (nullable) |
+| siteId | string (uuid) |  | (nullable) |
+| locationId | string (uuid) |  | (nullable) |
+| brandId | string (uuid) |  | The brand, as the context screen names it (a catalogue brand category). (nullable) |
+| marketCode | string |  | (max length 40; nullable) |
+| salesTerritory | string |  | (max length 100; nullable) |
 
 **Responses**
 
@@ -3306,6 +6481,16 @@ Checks a party's declared ages and heights against every product in the booking 
 | media[].altText | object |  | (nullable) |
 | consentQuestionIds | array of string (uuid) |  | The consent questions a guest answers when booking this product, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I a… (max items 10) |
 | requiresTimeWindow | boolean |  | True for a space sold by the hour, e.g. (default False) |
+| productOwnerPrincipalId | string (uuid) |  | The product owner (29 September, data model DM3), set with setProductContextOwnership. (nullable) |
+| operationalContact | string |  | A principal id or a name, as the context screen takes it. (max length 200; nullable) |
+| businessUnitId | string (uuid) |  | (nullable) |
+| legalEntityId | string (uuid) |  | A ledger.legal_entity, read through finance. (nullable) |
+| attractionId | string (uuid) |  | (nullable) |
+| siteId | string (uuid) |  | (nullable) |
+| locationId | string (uuid) |  | (nullable) |
+| brandId | string (uuid) |  | The brand, as the context screen names it (a catalogue brand category). (nullable) |
+| marketCode | string |  | (max length 40; nullable) |
+| salesTerritory | string |  | (max length 100; nullable) |
 
 **Responses**
 
@@ -3576,6 +6761,16 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | items[].media[].altText | object |  | (nullable) |
 | items[].consentQuestionIds | array of string (uuid) |  | The consent questions a guest answers when booking this product, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I a… (max items 10) |
 | items[].requiresTimeWindow | boolean |  | True for a space sold by the hour, e.g. (default False) |
+| items[].productOwnerPrincipalId | string (uuid) |  | The product owner (29 September, data model DM3), set with setProductContextOwnership. (nullable) |
+| items[].operationalContact | string |  | A principal id or a name, as the context screen takes it. (max length 200; nullable) |
+| items[].businessUnitId | string (uuid) |  | (nullable) |
+| items[].legalEntityId | string (uuid) |  | A ledger.legal_entity, read through finance. (nullable) |
+| items[].attractionId | string (uuid) |  | (nullable) |
+| items[].siteId | string (uuid) |  | (nullable) |
+| items[].locationId | string (uuid) |  | (nullable) |
+| items[].brandId | string (uuid) |  | The brand, as the context screen names it (a catalogue brand category). (nullable) |
+| items[].marketCode | string |  | (max length 40; nullable) |
+| items[].salesTerritory | string |  | (max length 100; nullable) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -3900,6 +7095,16 @@ Withdrawal stops new sales and leaves existing entitlements intact. Archiving is
 | media[].altText | object |  | (nullable) |
 | consentQuestionIds | array of string (uuid) |  | The consent questions a guest answers when booking this product, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I a… (max items 10) |
 | requiresTimeWindow | boolean |  | True for a space sold by the hour, e.g. (default False) |
+| productOwnerPrincipalId | string (uuid) |  | The product owner (29 September, data model DM3), set with setProductContextOwnership. (nullable) |
+| operationalContact | string |  | A principal id or a name, as the context screen takes it. (max length 200; nullable) |
+| businessUnitId | string (uuid) |  | (nullable) |
+| legalEntityId | string (uuid) |  | A ledger.legal_entity, read through finance. (nullable) |
+| attractionId | string (uuid) |  | (nullable) |
+| siteId | string (uuid) |  | (nullable) |
+| locationId | string (uuid) |  | (nullable) |
+| brandId | string (uuid) |  | The brand, as the context screen names it (a catalogue brand category). (nullable) |
+| marketCode | string |  | (max length 40; nullable) |
+| salesTerritory | string |  | (max length 100; nullable) |
 
 **Responses**
 
@@ -3999,6 +7204,16 @@ Withdrawal stops new sales and leaves existing entitlements intact. Archiving is
 | media[].altText | object |  | (nullable) |
 | consentQuestionIds | array of string (uuid) |  | The consent questions a guest answers when booking this product, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I a… (max items 10) |
 | requiresTimeWindow | boolean |  | True for a space sold by the hour, e.g. (default False) |
+| productOwnerPrincipalId | string (uuid) |  | The product owner (29 September, data model DM3), set with setProductContextOwnership. (nullable) |
+| operationalContact | string |  | A principal id or a name, as the context screen takes it. (max length 200; nullable) |
+| businessUnitId | string (uuid) |  | (nullable) |
+| legalEntityId | string (uuid) |  | A ledger.legal_entity, read through finance. (nullable) |
+| attractionId | string (uuid) |  | (nullable) |
+| siteId | string (uuid) |  | (nullable) |
+| locationId | string (uuid) |  | (nullable) |
+| brandId | string (uuid) |  | The brand, as the context screen names it (a catalogue brand category). (nullable) |
+| marketCode | string |  | (max length 40; nullable) |
+| salesTerritory | string |  | (max length 100; nullable) |
 
 **Responses**
 
@@ -4060,11 +7275,89 @@ Run before publishing. Reports promotions that overlap on product and period, an
 |---|---|---|
 | 200 |  | Analysis |
 
+### createCommercialCampaign
+
+**`POST /commercial-campaigns`**: Create a commercial campaign
+
+Creates the campaign header (`promotions.campaign`) without budget lines, so a promotion, coupon campaign or bundle can name it by `campaignId` before its budget is set. **Budget lines are set by setCampaignBudgetFinancial**, which also saves the header; this operation never writes `promotions.campaign_budget`. A campaign has no status of its own (see `CommercialCampaign`), so there is nothing to publish.
+**Writes `promotions.promotion_audit`** in the same transaction (entityType `campaign`, eventType `created`), as every promotions configuration change does (decided 29 September, writers pass).
+
+|  |  |
+|---|---|
+| Permission | `PRICE_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `promotions.campaign` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `promotions.campaign`, `promotions.campaign_budget` |
+| Writes | `cache:idempotency`, `promotions.campaign`, `promotions.promotion_audit` |
+| Called by | ADM-139, ADM-219 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `CreateCommercialCampaignRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| venueId | string (uuid) | yes |  |
+| code | string |  | Unique at the venue when given. (max length 64; nullable) |
+| name | string | yes | (max length 200) |
+| description | string |  | (max length 1000; nullable) |
+| ownerPrincipalId | string (uuid) |  | The campaign (and budget) owner. (nullable) |
+| legalEntityId | string (uuid) |  | The business entity that funds and books the campaign. (nullable) |
+| validFrom | string (date-time) |  | (nullable) |
+| validTo | string (date-time) |  | (nullable) |
+
+**Response**: `CommercialCampaign`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| venueId | string (uuid) | yes |  |
+| code | string |  | (max length 64; nullable) |
+| name | string | yes | (max length 200) |
+| description | string |  | (max length 1000; nullable) |
+| ownerPrincipalId | string (uuid) |  | The campaign (and budget) owner. (nullable) |
+| legalEntityId | string (uuid) |  | The business entity that funds and books the campaign. (nullable) |
+| validFrom | string (date-time) |  | (nullable) |
+| validTo | string (date-time) |  | (nullable) |
+| budgets | array of CampaignBudget |  | The rows of promotions.campaign_budget, one per budget line. |
+| budgets[].id | string (uuid) |  | (read-only) |
+| budgets[].budgetType | enum (total, discount, reward, freeProduct) | yes | The spend this line caps (total campaign, discount, reward or free-product budget). |
+| budgets[].fundingSource | enum (venue, department, marketing, partner) |  | Who pays for it; partner is a co-funded (e.g. (nullable) |
+| budgets[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| budgets[].amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| budgets[].amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| budgets[].amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| budgets[].scope | enum (entireCampaign, promotion, product, channel, partner, customerSegment) |  | What the line covers. (default entireCampaign) |
+| budgets[].scopeRef | string |  | The promotion, product, partner or segment id, or the SalesChannel value, that scope names. (nullable) |
+| budgets[].ownerPrincipalId | string (uuid) |  | The budget owner. (nullable) |
+| budgets[].costCentre | string |  | (max length 64; nullable) |
+| budgets[].department | string |  | (max length 100; nullable) |
+| budgets[].validFrom | string (date-time) |  | (nullable) |
+| budgets[].validTo | string (date-time) |  | (nullable) |
+| budgets[].thresholdPolicy | BudgetThresholdPolicy |  | The automatic actions as a budget line is consumed (Threshold Actions & Automatic Suspension). |
+| budgets[].thresholdPolicy.steps | array of object |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created, with an empty budgets array |
+| 400 |  | validTo at or before validFrom. |
+| 409 |  | code is already used by another campaign at the venue. |
+
 ### createPromotion
 
 **`POST /promotions`**: Create a promotion
 
 Created in `draft`. A draft promotion never evaluates — publishing is the act that makes it live, and it appears at terminals with the next catalogue bundle.
+**Writes `promotions.promotion` and `promotions.promotion_audit`** in the same transaction, as every promotions configuration change does (entityType `promotion`, eventType `promotionCreated`, promotionVersion 1). No channel publication row exists until publishPromotion (decided 29 September, writers pass).
 
 |  |  |
 |---|---|
@@ -4075,7 +7368,7 @@ Created in `draft`. A draft promotion never evaluates — publishing is the act 
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `promotions.promotion` |
-| Writes | `cache:idempotency`, `promotions.promotion` |
+| Writes | `cache:idempotency`, `promotions.promotion`, `promotions.promotion_audit` |
 | Called by | BO-010 |
 | State model | Promotion ([states/promotion.yaml](../../../states/promotion.yaml)): created as `draft` |
 
@@ -4114,6 +7407,8 @@ Created in `draft`. A draft promotion never evaluates — publishing is the act 
 | discount.maxDiscountAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | discount.maxDiscountAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | discount.maxDiscountAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| discount.rewardVariantIds | array of string (uuid) |  | The reward products, where the reward is not the qualifying product: the free gift of freeItem, the "different product" of a buyXGetY (setGiftFreeProduct, setBuyGetBogo). (nullable) |
+| discount.maxApplicationsPerBasket | integer |  | How many times the offer repeats in one basket: the "maximum repetitions" of an N-for-X offer (setFixedPriceOffer). (min 1; nullable) |
 | conditions | PromotionConditions |  | All conditions must hold. |
 | conditions.variantIds | array of string (uuid) |  |  |
 | conditions.productKinds | array of string |  |  |
@@ -4137,6 +7432,7 @@ Created in `draft`. A draft promotion never evaluates — publishing is the act 
 | conditions.performanceIds | array of string (uuid) |  |  |
 | conditions.advanceDaysMin | integer |  | Early-bird — booked at least this many days ahead. |
 | conditions.advanceDaysMax | integer |  | Last-minute — booked no more than this many days ahead. |
+| conditions.eligibilityRuleIds | array of string (uuid) |  | Reusable eligibility rules (promotions.promotion_rule rows of ruleType: eligibility with no promotion of their own, saved by setEligibilityRule) that must also hold. (nullable) |
 | stackingMode | object |  | (default bestOnly) |
 | stackingGroup | string |  | (max length 64) |
 | precedence | integer |  | Higher evaluates first where several could apply. (default 0) |
@@ -4148,6 +7444,7 @@ Created in `draft`. A draft promotion never evaluates — publishing is the act 
 | budgetCap.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | budgetCap.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | budgetCap.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| campaignId | string (uuid) |  | The commercial campaign (promotions.campaign) this promotion belongs to; null for a promotion run on its own. (nullable) |
 
 **Response**: `Promotion`
 
@@ -4178,6 +7475,8 @@ Created in `draft`. A draft promotion never evaluates — publishing is the act 
 | discount.maxDiscountAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | discount.maxDiscountAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | discount.maxDiscountAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| discount.rewardVariantIds | array of string (uuid) |  | The reward products, where the reward is not the qualifying product: the free gift of freeItem, the "different product" of a buyXGetY (setGiftFreeProduct, setBuyGetBogo). (nullable) |
+| discount.maxApplicationsPerBasket | integer |  | How many times the offer repeats in one basket: the "maximum repetitions" of an N-for-X offer (setFixedPriceOffer). (min 1; nullable) |
 | conditions | PromotionConditions |  | All conditions must hold. |
 | conditions.variantIds | array of string (uuid) |  |  |
 | conditions.productKinds | array of string |  |  |
@@ -4201,6 +7500,7 @@ Created in `draft`. A draft promotion never evaluates — publishing is the act 
 | conditions.performanceIds | array of string (uuid) |  |  |
 | conditions.advanceDaysMin | integer |  | Early-bird — booked at least this many days ahead. |
 | conditions.advanceDaysMax | integer |  | Last-minute — booked no more than this many days ahead. |
+| conditions.eligibilityRuleIds | array of string (uuid) |  | Reusable eligibility rules (promotions.promotion_rule rows of ruleType: eligibility with no promotion of their own, saved by setEligibilityRule) that must also hold. (nullable) |
 | stackingMode | object |  | (default bestOnly) |
 | stackingGroup | string |  | (max length 64) |
 | precedence | integer |  | Higher evaluates first where several could apply. (default 0) |
@@ -4212,6 +7512,7 @@ Created in `draft`. A draft promotion never evaluates — publishing is the act 
 | budgetCap.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | budgetCap.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | budgetCap.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| campaignId | string (uuid) |  | The commercial campaign (promotions.campaign) this promotion belongs to; null for a promotion run on its own. (nullable) |
 | id | string (uuid) | yes |  |
 | status | PromotionStatus: enum (draft, scheduled, live, paused, expired, ended) | yes |  |
 | isPaused | boolean |  |  |
@@ -4221,6 +7522,7 @@ Created in `draft`. A draft promotion never evaluates — publishing is the act 
 | discountGiven.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | discountGiven.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | publishedAt | string (date-time) |  | (nullable) |
+| version | integer |  | Starts at 1 and goes up by one on every saved change. (min 1; read-only) |
 
 **Responses**
 
@@ -4368,6 +7670,7 @@ Also the enforcement surface for budget caps — a promotion may be configured t
 
 Runs conflict analysis first. A promotion that stacks with an existing one to produce a negative or near-zero line price is refused — that combination is discovered at a till otherwise, usually by a guest.
 **The floor is zero: a combined line price of zero or below is refused** (decided 28 September, audit R101). A line that stays above zero, however small, publishes. One that falls below the near-zero minimum (`ConflictAnalysis`, audit R096 (5)) publishes too, flagged rather than refused.
+**Writes `promotions.promotion_channel_publication` and `promotions.promotion_audit`.** One row per sales channel the promotion runs on goes to `pendingPublication` (created there when the channel has none, resumed from `suspended` when it has), for the channel sync job to take up (states/promotion-channel-publication.yaml); the audit row is eventType `promotionActivated` with the published promotionVersion. The conflicts found here are recorded in `promotions.promotion_conflict` by the conflict detection job, not by this operation (decided 29 September, writers pass).
 
 |  |  |
 |---|---|
@@ -4377,10 +7680,10 @@ Runs conflict analysis first. A promotion that stacks with an existing one to pr
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `promotions.promotion` |
-| Writes | `cache:idempotency`, `promotions.promotion` |
+| Reads | `cache:idempotency`, `promotions.promotion`, `promotions.promotion_channel_publication` |
+| Writes | `cache:idempotency`, `promotions.promotion`, `promotions.promotion_audit`, `promotions.promotion_channel_publication` |
 | Called by | BO-010 |
-| State model | Promotion ([states/promotion.yaml](../../../states/promotion.yaml)): moves `draft` -> `scheduled`, `paused` -> `live` |
+| State model | Promotion channel publication ([states/promotion-channel-publication.yaml](../../../states/promotion-channel-publication.yaml)): moves `notAssigned` -> `pendingPublication`, `suspended` -> `pendingPublication`<br/>Promotion ([states/promotion.yaml](../../../states/promotion.yaml)): moves `draft` -> `scheduled`, `paused` -> `live` |
 
 **Parameters**
 
@@ -4418,6 +7721,8 @@ Runs conflict analysis first. A promotion that stacks with an existing one to pr
 | discount.maxDiscountAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | discount.maxDiscountAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | discount.maxDiscountAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| discount.rewardVariantIds | array of string (uuid) |  | The reward products, where the reward is not the qualifying product: the free gift of freeItem, the "different product" of a buyXGetY (setGiftFreeProduct, setBuyGetBogo). (nullable) |
+| discount.maxApplicationsPerBasket | integer |  | How many times the offer repeats in one basket: the "maximum repetitions" of an N-for-X offer (setFixedPriceOffer). (min 1; nullable) |
 | conditions | PromotionConditions |  | All conditions must hold. |
 | conditions.variantIds | array of string (uuid) |  |  |
 | conditions.productKinds | array of string |  |  |
@@ -4441,6 +7746,7 @@ Runs conflict analysis first. A promotion that stacks with an existing one to pr
 | conditions.performanceIds | array of string (uuid) |  |  |
 | conditions.advanceDaysMin | integer |  | Early-bird — booked at least this many days ahead. |
 | conditions.advanceDaysMax | integer |  | Last-minute — booked no more than this many days ahead. |
+| conditions.eligibilityRuleIds | array of string (uuid) |  | Reusable eligibility rules (promotions.promotion_rule rows of ruleType: eligibility with no promotion of their own, saved by setEligibilityRule) that must also hold. (nullable) |
 | stackingMode | object |  | (default bestOnly) |
 | stackingGroup | string |  | (max length 64) |
 | precedence | integer |  | Higher evaluates first where several could apply. (default 0) |
@@ -4452,6 +7758,7 @@ Runs conflict analysis first. A promotion that stacks with an existing one to pr
 | budgetCap.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | budgetCap.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | budgetCap.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| campaignId | string (uuid) |  | The commercial campaign (promotions.campaign) this promotion belongs to; null for a promotion run on its own. (nullable) |
 | id | string (uuid) | yes |  |
 | status | PromotionStatus: enum (draft, scheduled, live, paused, expired, ended) | yes |  |
 | isPaused | boolean |  |  |
@@ -4461,6 +7768,7 @@ Runs conflict analysis first. A promotion that stacks with an existing one to pr
 | discountGiven.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | discountGiven.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | publishedAt | string (date-time) |  | (nullable) |
+| version | integer |  | Starts at 1 and goes up by one on every saved change. (min 1; read-only) |
 
 **Responses**
 
@@ -4469,11 +7777,91 @@ Runs conflict analysis first. A promotion that stacks with an existing one to pr
 | 200 |  | Published |
 | 409 |  | Conflict analysis failed. |
 
+### updateCommercialCampaign
+
+**`PATCH /commercial-campaigns/{campaignId}`**: Amend a commercial campaign
+
+Amends the campaign header (`promotions.campaign`): name, code, description, owner, business entity and dates. **Budget lines are not in this body**; setCampaignBudgetFinancial changes them.
+**Narrowing the dates is refused while it would strand something** (decided 29 September, writers pass): a scheduled or live promotion, a coupon campaign or an active bundle of the campaign whose own validity would fall outside the new window answers 409, naming each one.
+**Writes `promotions.promotion_audit`** in the same transaction (entityType `campaign`, eventType `modified`, previous and new values of the changed fields).
+
+|  |  |
+|---|---|
+| Permission | `PRICE_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `promotions.campaign` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `promotions.bundle`, `promotions.campaign`, `promotions.campaign_budget`, `promotions.coupon_campaign`, `promotions.promotion` |
+| Writes | `cache:idempotency`, `promotions.campaign`, `promotions.promotion_audit` |
+| Called by | ADM-139, ADM-219 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| campaignId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| code | string |  | (max length 64; nullable) |
+| name | string |  | (max length 200) |
+| description | string |  | (max length 1000; nullable) |
+| ownerPrincipalId | string (uuid) |  | (nullable) |
+| legalEntityId | string (uuid) |  | (nullable) |
+| validFrom | string (date-time) |  | (nullable) |
+| validTo | string (date-time) |  | (nullable) |
+
+**Response**: `CommercialCampaign`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| venueId | string (uuid) | yes |  |
+| code | string |  | (max length 64; nullable) |
+| name | string | yes | (max length 200) |
+| description | string |  | (max length 1000; nullable) |
+| ownerPrincipalId | string (uuid) |  | The campaign (and budget) owner. (nullable) |
+| legalEntityId | string (uuid) |  | The business entity that funds and books the campaign. (nullable) |
+| validFrom | string (date-time) |  | (nullable) |
+| validTo | string (date-time) |  | (nullable) |
+| budgets | array of CampaignBudget |  | The rows of promotions.campaign_budget, one per budget line. |
+| budgets[].id | string (uuid) |  | (read-only) |
+| budgets[].budgetType | enum (total, discount, reward, freeProduct) | yes | The spend this line caps (total campaign, discount, reward or free-product budget). |
+| budgets[].fundingSource | enum (venue, department, marketing, partner) |  | Who pays for it; partner is a co-funded (e.g. (nullable) |
+| budgets[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| budgets[].amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| budgets[].amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| budgets[].amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| budgets[].scope | enum (entireCampaign, promotion, product, channel, partner, customerSegment) |  | What the line covers. (default entireCampaign) |
+| budgets[].scopeRef | string |  | The promotion, product, partner or segment id, or the SalesChannel value, that scope names. (nullable) |
+| budgets[].ownerPrincipalId | string (uuid) |  | The budget owner. (nullable) |
+| budgets[].costCentre | string |  | (max length 64; nullable) |
+| budgets[].department | string |  | (max length 100; nullable) |
+| budgets[].validFrom | string (date-time) |  | (nullable) |
+| budgets[].validTo | string (date-time) |  | (nullable) |
+| budgets[].thresholdPolicy | BudgetThresholdPolicy |  | The automatic actions as a budget line is consumed (Threshold Actions & Automatic Suspension). |
+| budgets[].thresholdPolicy.steps | array of object |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Updated |
+| 400 |  | validTo at or before validFrom. |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The new code is already used at the venue, or the new dates would leave a scheduled or live promotion, coupon campaign or active bundle of the campaign outside them. |
+
 ### updatePromotion
 
 **`PATCH /promotions/{promotionId}`**: Amend a promotion
 
 Amending a live promotion changes behaviour mid-sale. Conditions and discount are editable only in draft; a live promotion may be paused, extended or ended, nothing more.
+**Writes `promotions.promotion_channel_publication` and `promotions.promotion_audit`.** Each channel row of the promotion that is `published` moves to `outOfSync` (states/promotion-channel-publication.yaml) and the sync job pushes the new `version`; the audit row records the changed fields before and after (eventType `promotionEdited`, or `discountChanged`, `eligibilityChanged`, `datesChanged` where only that changed) with the new promotionVersion (decided 29 September, writers pass).
 
 |  |  |
 |---|---|
@@ -4483,9 +7871,10 @@ Amending a live promotion changes behaviour mid-sale. Conditions and discount ar
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `promotions.promotion` |
-| Writes | `cache:idempotency`, `promotions.promotion` |
+| Reads | `cache:idempotency`, `promotions.promotion`, `promotions.promotion_channel_publication` |
+| Writes | `cache:idempotency`, `promotions.promotion`, `promotions.promotion_audit`, `promotions.promotion_channel_publication` |
 | Called by | BO-010 |
+| State model | Promotion channel publication ([states/promotion-channel-publication.yaml](../../../states/promotion-channel-publication.yaml)): moves `published` -> `outOfSync` |
 
 **Parameters**
 
@@ -4524,6 +7913,7 @@ Amending a live promotion changes behaviour mid-sale. Conditions and discount ar
 | conditions.performanceIds | array of string (uuid) |  |  |
 | conditions.advanceDaysMin | integer |  | Early-bird — booked at least this many days ahead. |
 | conditions.advanceDaysMax | integer |  | Last-minute — booked no more than this many days ahead. |
+| conditions.eligibilityRuleIds | array of string (uuid) |  | Reusable eligibility rules (promotions.promotion_rule rows of ruleType: eligibility with no promotion of their own, saved by setEligibilityRule) that must also hold. (nullable) |
 | discount | Discount |  |  |
 | discount.kind | DiscountKind: enum (percentage, fixedAmount, fixedPrice, buyXGetY, freeItem, tieredPercentage) | yes |  |
 | discount.percentage | number |  | (min 0; max 100) |
@@ -4545,6 +7935,8 @@ Amending a live promotion changes behaviour mid-sale. Conditions and discount ar
 | discount.maxDiscountAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | discount.maxDiscountAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | discount.maxDiscountAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| discount.rewardVariantIds | array of string (uuid) |  | The reward products, where the reward is not the qualifying product: the free gift of freeItem, the "different product" of a buyXGetY (setGiftFreeProduct, setBuyGetBogo). (nullable) |
+| discount.maxApplicationsPerBasket | integer |  | How many times the offer repeats in one basket: the "maximum repetitions" of an N-for-X offer (setFixedPriceOffer). (min 1; nullable) |
 
 **Response**: `Promotion`
 
@@ -4575,6 +7967,8 @@ Amending a live promotion changes behaviour mid-sale. Conditions and discount ar
 | discount.maxDiscountAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | discount.maxDiscountAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | discount.maxDiscountAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| discount.rewardVariantIds | array of string (uuid) |  | The reward products, where the reward is not the qualifying product: the free gift of freeItem, the "different product" of a buyXGetY (setGiftFreeProduct, setBuyGetBogo). (nullable) |
+| discount.maxApplicationsPerBasket | integer |  | How many times the offer repeats in one basket: the "maximum repetitions" of an N-for-X offer (setFixedPriceOffer). (min 1; nullable) |
 | conditions | PromotionConditions |  | All conditions must hold. |
 | conditions.variantIds | array of string (uuid) |  |  |
 | conditions.productKinds | array of string |  |  |
@@ -4598,6 +7992,7 @@ Amending a live promotion changes behaviour mid-sale. Conditions and discount ar
 | conditions.performanceIds | array of string (uuid) |  |  |
 | conditions.advanceDaysMin | integer |  | Early-bird — booked at least this many days ahead. |
 | conditions.advanceDaysMax | integer |  | Last-minute — booked no more than this many days ahead. |
+| conditions.eligibilityRuleIds | array of string (uuid) |  | Reusable eligibility rules (promotions.promotion_rule rows of ruleType: eligibility with no promotion of their own, saved by setEligibilityRule) that must also hold. (nullable) |
 | stackingMode | object |  | (default bestOnly) |
 | stackingGroup | string |  | (max length 64) |
 | precedence | integer |  | Higher evaluates first where several could apply. (default 0) |
@@ -4609,6 +8004,7 @@ Amending a live promotion changes behaviour mid-sale. Conditions and discount ar
 | budgetCap.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | budgetCap.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | budgetCap.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| campaignId | string (uuid) |  | The commercial campaign (promotions.campaign) this promotion belongs to; null for a promotion run on its own. (nullable) |
 | id | string (uuid) | yes |  |
 | status | PromotionStatus: enum (draft, scheduled, live, paused, expired, ended) | yes |  |
 | isPaused | boolean |  |  |
@@ -4618,6 +8014,7 @@ Amending a live promotion changes behaviour mid-sale. Conditions and discount ar
 | discountGiven.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | discountGiven.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | publishedAt | string (date-time) |  | (nullable) |
+| version | integer |  | Starts at 1 and goes up by one on every saved change. (min 1; read-only) |
 
 **Responses**
 
@@ -4635,6 +8032,7 @@ Amending a live promotion changes behaviour mid-sale. Conditions and discount ar
 
 BL-114. **Split by a stable hash of the subject, not at random per request** — a guest who sees 10% on Monday and 15% on Tuesday has learned to wait.
 **The `trafficPercent` of all variants must sum to exactly 100; there is no minimum per variant** (decided 28 September, audit R101). A variant at 0 is kept but receives no traffic.
+**Writes `promotions.promotion_variant` and `promotions.promotion_audit`** in the same transaction, as every promotions configuration change does (entityType `promotion`, eventType `promotionEdited`) (decided 29 September, writers pass).
 
 |  |  |
 |---|---|
@@ -4645,7 +8043,7 @@ BL-114. **Split by a stable hash of the subject, not at random per request** —
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `promotions.promotion`, `promotions.promotion_variant` |
-| Writes | `cache:idempotency`, `promotions.promotion`, `promotions.promotion_variant` |
+| Writes | `cache:idempotency`, `promotions.promotion`, `promotions.promotion_audit`, `promotions.promotion_variant` |
 | Called by | BO-010 |
 
 **Parameters**
@@ -4920,6 +8318,24 @@ Rule-based today. Where the recommendation engine is enabled it augments this ra
 
 Every table this service owns that the slice reads or writes, with its columns as derived into `backend/tenant/*.sql`.
 
+### `catalogue.ai_catalogue_session`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| scope_path | text | yes | The partition key (ADR-0005). |
+| venue_id | uuid | no |  |
+| input_method | text | yes |  |
+| prompt | text | no |  |
+| file_id | uuid | no |  |
+| reference_product_id | uuid | no |  |
+| recommendations | jsonb | no | [{recommendationId, area, sourceExcerpt, interpretation, proposedValue, confidence, decision, modifiedValue}]. |
+| draft_product_id | uuid | no |  |
+| status | text | yes |  |
+| created_by_principal_id | uuid | no |  |
+| created_at | timestamptz | no |  |
+| updated_at | timestamptz | no |  |
+
 ### `catalogue.alternative_code`
 
 | Column | Type | Required | Notes |
@@ -4931,6 +8347,63 @@ Every table this service owns that the slice reads or writes, with its columns a
 | note | text | no |  |
 | id | uuid | yes | Synthesised key. |
 | product_id | uuid | no | Points at catalogue.product. |
+
+### `catalogue.audit_entry`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| scope_path | text | yes | The partition key (ADR-0005). |
+| domain | text | yes |  |
+| occurred_at | timestamptz | yes |  |
+| actor_principal_id | uuid | no | Null for a system actor. |
+| actor_role | text | no |  |
+| actor_system | text | no | The system or partner, where no person acted. |
+| action | text | yes | Product: ProductAuditTrailChangeHistoryView.action; channel: free action label. |
+| category | text | no | Product configuration area, pricing auditType, or channel category. |
+| entity_type | text | yes |  |
+| entity_id | uuid | yes |  |
+| product_id | uuid | no |  |
+| sales_channel_id | uuid | no |  |
+| version | integer | no |  |
+| field | text | no |  |
+| previous_value | text | no |  |
+| new_value | text | no |  |
+| reason | text | no |  |
+| result | text | no |  |
+| source | text | no |  |
+| environment | text | no |  |
+| change_request_id | uuid | no |  |
+| approval_request_id | uuid | no |  |
+| rollback_action_id | uuid | no |  |
+| pricing_publication_id | uuid | no |  |
+| reference | text | no | An order, transaction or partner request reference (channel trace). |
+| device_metadata | jsonb | no | {ipAddress, userAgent, deviceId}. |
+| trace | jsonb | no | Channel transactions: the step trace [{step, at, result}]. |
+
+### `catalogue.channel_allocation`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no | Added 20 August. |
+| channel | text | yes |  |
+| allocated_units | integer | yes |  |
+| sold_units | integer | no |  |
+| leased_units | integer | no | Held by terminals on this channel but not yet sold. |
+| remaining_units | integer | no |  |
+| release_at | timestamptz | no | Unsold units return to the general pool at this time. |
+| sales_channel_id | uuid | no | The channel profile (catalogue.sales_channel) this allocation serves (29 September, data model DM3). |
+| allocation_type | text | no | How the allocation is sized (29 September, data model DM3); the allocation rule of ADM-262 lives on this row. |
+| minimum_units | integer | no |  |
+| maximum_units | integer | no |  |
+| replenishment_rule | jsonb | no | {sourceChannelId, trigger, thresholdUnits, sharePercent, units}. |
+| waitlist_behavior | text | no |  |
+| release_threshold_units | integer | no |  |
+| release_hours_before_event | integer | no | Alternative to releaseAt, relative to the performance start. |
+| contractual_units | integer | no | Units a partner agreement guarantees; rebalancing never goes below it. |
+| minimum_guaranteed_units | integer | no |  |
+| is_frozen | boolean | no | Excluded from rebalancing. |
+| envelope_id | uuid | yes | Points at catalogue.channel_capacity. |
 
 ### `catalogue.channel_capacity`
 
@@ -4948,6 +8421,164 @@ Every table this service owns that the slice reads or writes, with its columns a
 | remaining | integer | yes |  |
 | has_channel_allocations | boolean | no | True where capacity is divided across channels. |
 | is_seated | boolean | yes | Seated envelopes cannot be leased and are blocked offline. |
+
+### `catalogue.channel_connection`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| scope_path | text | yes | The partition key (ADR-0005). |
+| sales_channel_id | uuid | yes |  |
+| connector_name | text | yes |  |
+| partner | text | no |  |
+| environment | text | yes |  |
+| connection_type | text | yes |  |
+| direction | text | no |  |
+| endpoint | text | no |  |
+| api_version | text | no |  |
+| authentication_type | text | no |  |
+| credentials_reference | text | no | A vault reference, never the secret. |
+| certificate_reference | text | no |  |
+| certificate_expires_at | timestamptz | no |  |
+| timeout_ms | integer | no |  |
+| rate_limit_per_minute | integer | no |  |
+| ip_restrictions | text[] | no |  |
+| retry_policy | jsonb | no | {maxAttempts, backoffSeconds}. |
+| adapter_id | text | no |  |
+| connection_status | text | no |  |
+| last_tests | jsonb | no | [{test, result, testedAt}], the latest result per test. |
+| created_at | timestamptz | no |  |
+| updated_at | timestamptz | no |  |
+
+### `catalogue.channel_sales_rule`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| scope_path | text | yes | The partition key (ADR-0005). |
+| sales_channel_id | uuid | yes |  |
+| product_id | uuid | no |  |
+| rule_kind | text | yes |  |
+| name | text | no |  |
+| rule_level | text | no |  |
+| overrides_product_rule | boolean | no |  |
+| effective_from | timestamptz | no |  |
+| effective_to | timestamptz | no |  |
+| is_active | boolean | yes |  |
+| sales_start_date | date | no |  |
+| sales_start_time | time | no |  |
+| sales_end_date | date | no |  |
+| sales_end_time | time | no |  |
+| time_zone | text | no |  |
+| days_of_week | text[] | no |  |
+| hours_of_operation | jsonb | no | [{opensAt, closesAt}]. |
+| blackout_dates | text[] | no | ISO dates. |
+| event_relative_window | jsonb | no | {anchor, opensMinutesBefore, closesMinutesBefore}. |
+| minimum_lead_days | integer | no |  |
+| minimum_quantity | integer | no |  |
+| maximum_quantity | integer | no |  |
+| maximum_per_transaction | integer | no |  |
+| maximum_per_customer | integer | no |  |
+| maximum_per_day | integer | no |  |
+| maximum_per_event | integer | no |  |
+| maximum_per_product | integer | no |  |
+| is_reservation_permitted | boolean | no |  |
+| is_hold_permitted | boolean | no |  |
+| is_payment_link_permitted | boolean | no |  |
+| is_partial_payment_permitted | boolean | no |  |
+| is_split_payment_permitted | boolean | no |  |
+| is_discount_permitted | boolean | no |  |
+| is_promo_code_permitted | boolean | no |  |
+| is_exchange_permitted | boolean | no |  |
+| is_reschedule_permitted | boolean | no |  |
+| is_upgrade_permitted | boolean | no |  |
+| restrictions | text[] | no |  |
+| eligibility_dimension | text | no |  |
+| eligibility_operator | text | no |  |
+| eligibility_values | text[] | no |  |
+| eligibility_effect | text | no |  |
+| is_guest_allowed | boolean | no |  |
+| is_login_required | boolean | no |  |
+| is_membership_required | boolean | no |  |
+| is_corporate_account_required | boolean | no |  |
+| is_identity_verification_required | boolean | no |  |
+| created_at | timestamptz | no |  |
+| updated_at | timestamptz | no |  |
+
+### `catalogue.dynamic_pricing_control`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| scope_path | text | yes | The partition key (ADR-0005). |
+| scope_level | text | yes |  |
+| scope_id | uuid | no | Null at global. |
+| absolute_minimum_price | numeric(18,4) | no |  |
+| absolute_maximum_price | numeric(18,4) | no |  |
+| minimum_margin_percent | numeric | no |  |
+| maximum_uplift_percent | numeric | no |  |
+| maximum_reduction_percent | numeric | no |  |
+| maximum_single_change_percent | numeric | no |  |
+| maximum_daily_change_percent | numeric | no |  |
+| maximum_weekly_change_percent | numeric | no |  |
+| minimum_change_interval_minutes | integer | no |  |
+| maximum_changes_per_day | integer | no |  |
+| minimum_inventory | integer | no |  |
+| maximum_occupancy_trigger_percent | numeric | no |  |
+| protected_rate_types | text[] | no |  |
+| is_frozen | boolean | no |  |
+| is_kill_switch_active | boolean | no | Stops every automatic change in scope at once. |
+| automation_level | text | yes |  |
+| authority_tiers | jsonb | no | [{maxAdjustmentPercent, action, confidenceThreshold}]. |
+| max_adjustment_percent | numeric | no |  |
+| min_ai_confidence | numeric | no |  |
+| min_revenue_uplift_percent | numeric | no |  |
+| evaluation_frequency_minutes | integer | no |  |
+| execution_frequency_minutes | integer | no |  |
+| quiet_period_minutes | integer | no |  |
+| no_change_windows | jsonb | no | [{anchor, minutesBefore, minutesAfter, clockFrom, clockTo}]. |
+| circuit_breakers | jsonb | no | [{trigger, threshold, enabled, tripped}]. |
+| require_guardrails_passed | boolean | no |  |
+| exclude_protected_rates | boolean | no |  |
+| require_healthy_forecast_data | boolean | no |  |
+| safe_failure_behavior | text | no |  |
+| active_override | jsonb | no | {user, reason, overridePrice, start, expiry, returnBehavior}. |
+| is_paused | boolean | no |  |
+| effective_from | timestamptz | no |  |
+| effective_to | timestamptz | no |  |
+| created_at | timestamptz | no |  |
+| updated_at | timestamptz | no |  |
+
+### `catalogue.dynamic_pricing_strategy`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| scope_path | text | yes | The partition key (ADR-0005). |
+| code | text | yes |  |
+| name | text | yes |  |
+| description | text | no |  |
+| strategy_type | text | yes |  |
+| scope_type | text | yes |  |
+| venue_id | uuid | no |  |
+| product_id | uuid | no |  |
+| product_family | text | no |  |
+| event_id | uuid | no |  |
+| performance_ids | text[] | no |  |
+| timeslot_ids | text[] | no |  |
+| price_category_ids | text[] | no |  |
+| business_unit | text | no |  |
+| market_code | text | no |  |
+| base_price_source | text | no | The price list or rate the adjustments start from. |
+| evaluation_frequency | text | no |  |
+| combination_mode | text | no |  |
+| effective_from | timestamptz | no |  |
+| effective_to | timestamptz | no |  |
+| cloned_from_strategy_id | uuid | no |  |
+| owner_principal_id | uuid | no |  |
+| status | text | yes |  |
+| created_at | timestamptz | no |  |
+| updated_at | timestamptz | no |  |
 
 ### `catalogue.entitlement_template`
 
@@ -4998,6 +8629,79 @@ Every table this service owns that the slice reads or writes, with its columns a
 | performance_count | integer | no | How many performances the event has. |
 | is_active | boolean | no |  |
 
+### `catalogue.event_capacity_profile`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| event_id | uuid | no |  |
+| performance_id | uuid | no |  |
+| mode | text | no | The same hall is seated on Friday and standing on Saturday, so the mode is per performance. |
+| safe_maximum | integer | no |  |
+| sellable | integer | no |  |
+| held | integer | no |  |
+| accessible_provision | integer | no |  |
+| companion_seats | integer | no |  |
+| overbook_percent | numeric | no |  |
+| seat_map_id | uuid | no |  |
+| scope_path | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
+### `catalogue.event_registration`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| event_id | uuid | no |  |
+| is_required | boolean | no |  |
+| form_id | uuid | no |  |
+| capture_per_attendee | boolean | no |  |
+| admission_policy | jsonb | no |  |
+| scope_path | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
+### `catalogue.event_resource_plan`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| event_id | uuid | no |  |
+| readiness | text | no |  |
+| scope_path | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
+### `catalogue.event_schedule`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| event_id | uuid | no |  |
+| duration_is_dynamic | boolean | no |  |
+| maximum_overrun_minutes | integer | no |  |
+| cascade_overrun | boolean | no | Whether a late finish moves everything after it, which is the honest behaviour and the one venues forget to ask for until the first time it happens. |
+| scope_path | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
+### `catalogue.fee`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| scope_path | text | yes | The partition key (ADR-0005). |
+| code | text | yes |  |
+| name | text | yes |  |
+| description | text | no |  |
+| fee_type | text | yes |  |
+| value_type | text | yes |  |
+| charge_basis | text | yes |  |
+| amount | numeric(18,4) | no |  |
+| percentage | numeric | no |  |
+| tiers | jsonb | no | [{fromOrderValue, amount, percentage}] for valueType: tiered. |
+| tax_treatment | text | no | How the fee is taxed; a catalogue.tax_rule may refine it. |
+| refundability | text | no |  |
+| visibility | text | no |  |
+| effective_from | timestamptz | no |  |
+| effective_to | timestamptz | no |  |
+| status | text | yes |  |
+| created_at | timestamptz | no |  |
+| updated_at | timestamptz | no |  |
+
 ### `catalogue.group_package`
 
 | Column | Type | Required | Notes |
@@ -5025,6 +8729,24 @@ Every table this service owns that the slice reads or writes, with its columns a
 | create_count | integer | no |  |
 | update_count | integer | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
+| job_kind | text | no | One job table for every catalogue bulk operation (29 September, data model DM3): product import (the original use), environment transfer (ADM-124) and bulk pricing update or import (ADM-080). |
+| direction | text | no |  |
+| source_environment | text | no |  |
+| target_environment | text | no |  |
+| product_ids | text[] | no |  |
+| components | text[] | no | Transfer components, per ProductImportExportEnvironmentTransferView.components. |
+| reference_mappings | jsonb | no | [{kind, sourceRef, targetRef}]. |
+| missing_references | text[] | no |  |
+| file_id | uuid | no |  |
+| source_format | text | no |  |
+| column_mappings | jsonb | no | [{sourceColumn, targetField, suggestedByAi, confirmed}]. |
+| parameters | jsonb | no | Bulk pricing: {selectBy, selectionValues, operation, adjustmentPercent, adjustmentAmount, targetCurrency, effectivePeriodFrom, effectivePeriodTo}. |
+| warning_count | integer | no |  |
+| error_count | integer | no |  |
+| change_request_id | uuid | no |  |
+| requested_by_principal_id | uuid | no |  |
+| created_at | timestamptz | no |  |
+| completed_at | timestamptz | no |  |
 
 ### `catalogue.inventory_hold`
 
@@ -5061,6 +8783,68 @@ Every table this service owns that the slice reads or writes, with its columns a
 | language | text | no | The language the performance is given in, as a BCP 47 tag (en, ar, fr, de, zh, ru, ar-AE). |
 | format | text | no | How it is presented, free text the venue chooses, e.g. |
 
+### `catalogue.price`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no | Added 20 August. |
+| price_list_id | uuid | yes |  |
+| variant_id | uuid | yes |  |
+| amount | numeric(18,4) | yes |  |
+| tax_code_id | uuid | no |  |
+
+### `catalogue.price_assignment`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| scope_path | text | yes | The partition key (ADR-0005). |
+| price_list_id | uuid | yes |  |
+| object_type | text | no |  |
+| object_ids | text[] | no |  |
+| assignment_scope | text | no |  |
+| scope_ref_id | uuid | no |  |
+| category_rates | jsonb | no | [{priceCategory, rateId}]: the rate each price category uses. |
+| sales_channel_id | uuid | no | Channel rows. |
+| pricing_source | text | no |  |
+| venue_id | uuid | no |  |
+| event_id | uuid | no |  |
+| product_id | uuid | no |  |
+| customer_segment | text | no |  |
+| priority | integer | yes |  |
+| effective_from | timestamptz | no |  |
+| effective_to | timestamptz | no |  |
+| override_permission | text | no | The permission a staff override needs on this channel. |
+| is_fixed_price_only | boolean | no |  |
+| is_promotion_allowed | boolean | no |  |
+| is_discount_allowed | boolean | no |  |
+| is_price_override_allowed | boolean | no |  |
+| override_requires_approval | boolean | no |  |
+| is_dynamic_pricing_allowed | boolean | no |  |
+| created_at | timestamptz | no |  |
+| updated_at | timestamptz | no |  |
+
+### `catalogue.price_category`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| scope_path | text | yes | The partition key (ADR-0005). |
+| entry_kind | text | yes |  |
+| code | text | yes | Unique per entryKind within the tenant. |
+| name | text | yes |  |
+| description | text | no |  |
+| category_family | text | no |  |
+| display_name | text | no |  |
+| localized_display_names | jsonb | no |  |
+| icon_label | text | no |  |
+| parent_id | uuid | no | A parent catalogue.price_category of the same entryKind. |
+| is_standard | boolean | no | Shipped with the tenant; may be deactivated, not deleted. |
+| sort_order | integer | no |  |
+| is_active | boolean | yes |  |
+| created_at | timestamptz | no |  |
+| updated_at | timestamptz | no |  |
+
 ### `catalogue.price_list`
 
 | Column | Type | Required | Notes |
@@ -5073,6 +8857,61 @@ Every table this service owns that the slice reads or writes, with its columns a
 | valid_from | timestamptz | no |  |
 | valid_to | timestamptz | no |  |
 | priority | integer | no | Where lists overlap, higher priority wins. |
+| description | text | no | Price list master fields (29 September, data model DM3), set with setPriceListMaster (ADM-058). |
+| price_list_type | text | no |  |
+| status | text | no |  |
+| owner_principal_id | uuid | no |  |
+| tags | text[] | no |  |
+| legal_entity_id | uuid | no |  |
+| brand | text | no |  |
+| business_unit | text | no |  |
+| country_code | text | no |  |
+| market_code | text | no |  |
+| scope_level | text | no |  |
+| default_price_category_id | uuid | no |  |
+| rounding_profile_id | uuid | no |  |
+| price_resolution_policy_id | uuid | no |  |
+| allow_overrides | boolean | no |  |
+| allow_inheritance | boolean | no |  |
+| allow_multiple_currencies | boolean | no |  |
+| allow_product_specific_rates | boolean | no |  |
+| cloned_from_price_list_id | uuid | no |  |
+| current_version | integer | no | The active catalogue.price_list_version. |
+
+### `catalogue.price_resolution_policy`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| scope_path | text | yes | The partition key (ADR-0005). |
+| policy_kind | text | yes |  |
+| name | text | yes |  |
+| levels | jsonb | no | Static hierarchy: [{hierarchyLevel, priority, inheritance, overrideAllowed, overrideRequiresReason, maximumOverrideRangePercent, overrideExpiryDays, returnToParentPrice, fallbackBehavior}]; prioritie… |
+| resolution_method | text | no |  |
+| priority_hierarchy | text[] | no |  |
+| is_default | boolean | no |  |
+| updated_by_principal_id | uuid | no |  |
+| created_at | timestamptz | no |  |
+| updated_at | timestamptz | no |  |
+
+### `catalogue.pricing_test_case`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| scope_path | text | yes | The partition key (ADR-0005). |
+| case_kind | text | yes |  |
+| name | text | yes |  |
+| case_type | text | no | Calculation scenarioType or dynamic caseType. |
+| inputs | jsonb | no | The scenario: product, event, performance, date, channel, segment, base price, occupancy ... |
+| expected_price | numeric(18,4) | no |  |
+| last_result | jsonb | no | Rules matched, ladder and guardrail outcome, final price, reconciliation totals. |
+| is_passed | boolean | no |  |
+| calculation_version | text | no |  |
+| last_run_at | timestamptz | no |  |
+| created_by_principal_id | uuid | no |  |
+| created_at | timestamptz | no |  |
+| updated_at | timestamptz | no |  |
 
 ### `catalogue.product`
 
@@ -5107,6 +8946,16 @@ Every table this service owns that the slice reads or writes, with its columns a
 | not_bookable_label | jsonb | no | The label a guest reads on an infoOnly product, e.g. |
 | consent_question_ids | text[] | no | The consent questions a guest answers when booking this product, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I a… |
 | requires_time_window | boolean | no | True for a space sold by the hour, e.g. |
+| product_owner_principal_id | uuid | no | The product owner (29 September, data model DM3), set with setProductContextOwnership. |
+| operational_contact | text | no | A principal id or a name, as the context screen takes it. |
+| business_unit_id | uuid | no |  |
+| legal_entity_id | uuid | no | A ledger.legal_entity, read through finance. |
+| attraction_id | uuid | no |  |
+| site_id | uuid | no |  |
+| location_id | uuid | no |  |
+| brand_id | uuid | no | The brand, as the context screen names it (a catalogue brand category). |
+| market_code | text | no |  |
+| sales_territory | text | no |  |
 
 ### `catalogue.product_category`
 
@@ -5123,6 +8972,28 @@ Every table this service owns that the slice reads or writes, with its columns a
 | image_asset_id | uuid | no |  |
 | description | jsonb | no | The short line a guest reads under a category option, e.g. |
 | is_active | boolean | no | Deactivated rather than deleted. |
+
+### `catalogue.product_channel_assignment`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| scope_path | text | yes | The partition key (ADR-0005). |
+| product_id | uuid | yes |  |
+| sales_channel_id | uuid | no | The channel profile (catalogue.sales_channel), where the channel is a named one. |
+| channel | text | yes |  |
+| is_enabled | boolean | yes |  |
+| site_ids | text[] | no |  |
+| pos_group_ids | text[] | no |  |
+| venue_ids | text[] | no |  |
+| assignment_method | text | no |  |
+| assignment_target_id | uuid | no | The family, category, event or collection the row was expanded from. |
+| inherited_from | text | no |  |
+| is_excluded | boolean | no | An explicit exclusion inside an otherwise assigned set. |
+| effective_from | timestamptz | no |  |
+| effective_to | timestamptz | no |  |
+| created_at | timestamptz | no |  |
+| updated_at | timestamptz | no |  |
 
 ### `catalogue.product_eligibility_rule`
 
@@ -5183,6 +9054,129 @@ Every table this service owns that the slice reads or writes, with its columns a
 | payload | jsonb | yes | Products, variants, price lists, prices, tax codes, events, performances, envelope definitions, data mask field definitions and the venue's sale boards. |
 | id | uuid | yes | Synthesised key. |
 
+### `catalogue.rate`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| scope_path | text | yes | The partition key (ADR-0005). |
+| price_list_id | uuid | yes |  |
+| price_category_id | uuid | yes |  |
+| rate_type_id | uuid | no | A catalogue.price_category row with entryKind: rateType. |
+| code | text | yes |  |
+| name | text | yes |  |
+| amount | numeric(18,4) | no | Null only while the rate is derived and not yet computed. |
+| unit_basis | text | yes |  |
+| precision | integer | no |  |
+| rounding_profile_id | uuid | no |  |
+| base_rate_id | uuid | no | The catalogue.rate this one is derived from. |
+| adjustment_type | text | no |  |
+| adjustment_value | numeric | no |  |
+| status | text | yes |  |
+| created_at | timestamptz | no |  |
+| updated_at | timestamptz | no |  |
+
+### `catalogue.rollback_action`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| scope_path | text | yes | The partition key (ADR-0005). |
+| subject | text | yes |  |
+| action_type | text | yes | Product rollbacks are rollback. |
+| product_id | uuid | no |  |
+| price_list_id | uuid | no |  |
+| from_version | integer | no |  |
+| to_version | integer | no |  |
+| product_scope | text[] | no | Product rollbacks: which parts are restored. |
+| rollback_target | text | no |  |
+| rollback_scope | text | no |  |
+| scope_ids | text[] | no |  |
+| dependencies | text[] | no | Product rollbacks: the dependent objects reviewed before executing. |
+| reason | text | yes |  |
+| execution_mode | text | no |  |
+| is_emergency | boolean | no |  |
+| scheduled_at | timestamptz | no |  |
+| incident_reference | text | no |  |
+| authorised_role | text | no |  |
+| is_retrospective_approval_required | boolean | no |  |
+| approval_request_id | uuid | no |  |
+| change_request_id | uuid | no | The change request whose publication is being rolled back. |
+| status | text | yes |  |
+| requested_by_principal_id | uuid | yes |  |
+| requested_at | timestamptz | yes |  |
+| completed_at | timestamptz | no |  |
+
+### `catalogue.rounding_profile`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| scope_path | text | yes | The partition key (ADR-0005). |
+| code | text | no |  |
+| name | text | no |  |
+| currency | text | yes |  |
+| decimal_places | integer | yes | Up to three without rounding the third away (MoM 1 Sep 2026 §4.5). |
+| minimum_monetary_unit | numeric | no |  |
+| display_precision | integer | no |  |
+| calculation_precision | integer | no |  |
+| rounding_method | text | yes |  |
+| rounding_stage | text | yes |  |
+| cash_rounding_increment | numeric | no |  |
+| status | text | yes |  |
+| created_at | timestamptz | no |  |
+| updated_at | timestamptz | no |  |
+
+### `catalogue.sales_channel`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| scope_path | text | yes | The partition key (ADR-0005). |
+| code | text | yes | Unique within the tenant. |
+| name | text | yes |  |
+| customer_facing_name | text | no |  |
+| internal_description | text | no |  |
+| channel_type | text | yes |  |
+| sales_channel | text | yes |  |
+| scope_level | text | no |  |
+| scope_id | uuid | no |  |
+| venue_id | uuid | no |  |
+| brand | text | no |  |
+| business_unit | text | no |  |
+| country_code | text | no |  |
+| market_code | text | no |  |
+| time_zone | text | no |  |
+| owner_principal_id | uuid | no |  |
+| responsible_department_id | uuid | no |  |
+| commercial_owner_principal_id | uuid | no |  |
+| operational_owner_principal_id | uuid | no |  |
+| technical_owner_principal_id | uuid | no |  |
+| finance_owner_principal_id | uuid | no |  |
+| settings | jsonb | no | Type-specific: POS {workstationGroups, cashierAccess}, B2C {webstore, domainBrand, digitalCustomerJourney}, OTA/API {partner, apiConnection}. |
+| fee_profiles | jsonb | no | [{feeType, feeProfileId}]; each feeProfileId is a catalogue.fee. |
+| payment_methods | text[] | no |  |
+| other_payment_method_codes | text[] | no |  |
+| fulfillment_methods | text[] | no |  |
+| partner_owner | text | no |  |
+| commercial_agreement_reference | text | no | A control.partner_agreement or B2B agreement reference. |
+| sla_targets | jsonb | no | {availabilityPercent, responseTimeMs, resolutionHours}. |
+| transaction_limit | integer | no |  |
+| rate_limit | integer | no |  |
+| contract_start | date | no |  |
+| contract_end | date | no |  |
+| renewal_date | date | no |  |
+| support_contacts | text[] | no |  |
+| escalation_contacts | text[] | no |  |
+| review_frequency | text | no |  |
+| compliance_flags | text[] | no | Recomputed by the governance job. |
+| readiness_score | numeric | no |  |
+| readiness_checked_at | timestamptz | no |  |
+| activation_scheduled_at | timestamptz | no |  |
+| status | text | yes |  |
+| created_at | timestamptz | no |  |
+| updated_at | timestamptz | no |  |
+
 ### `catalogue.variant`
 
 | Column | Type | Required | Notes |
@@ -5213,6 +9207,57 @@ Every table this service owns that the slice reads or writes, with its columns a
 | offer_expires_at | timestamptz | no | The offer moves on when this passes. |
 | joined_at | timestamptz | no |  |
 
+### `pricing.dynamic_price_action`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| dynamic_price_rule_id | uuid | yes |  |
+| type | text | yes |  |
+| value | numeric | yes |  |
+| min_price | numeric | no |  |
+| max_price | numeric | no |  |
+| rule_id | uuid | no | Points at approvals.rule. |
+
+### `pricing.dynamic_price_condition`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| action_id | uuid | yes |  |
+| dynamic_price_rule_id | uuid | yes |  |
+| type | text | yes |  |
+| rule_operator | text | yes |  |
+| value_json | text | yes |  |
+| sequence_no | integer | yes |  |
+| id | uuid | yes | Synthesised key. |
+| rule_id | uuid | no | Points at approvals.rule. |
+
+### `pricing.dynamic_price_rule`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| pricing_rule_code | text | yes |  |
+| name | text | yes |  |
+| product_id | uuid | no |  |
+| price_list_id | uuid | no |  |
+| scope_path | text | no |  |
+| channel_id | uuid | no |  |
+| priority | integer | yes |  |
+| valid_from | timestamptz | no |  |
+| valid_to | timestamptz | no |  |
+| is_active | boolean | yes |  |
+| dynamic_pricing_strategy_id | uuid | no | The catalogue.dynamic_pricing_strategy a dynamic rule belongs to (29 September, data model DM3). |
+| rule_type | text | no | Static rules: PricingRuleCommandCenterView.ruleType; dynamic rules: the builder's ruleKind. |
+| input_metric | text | no |  |
+| condition_logic | text | no |  |
+| cooldown_minutes | integer | no |  |
+| minimum_duration_minutes | integer | no |  |
+| exit_threshold_offset | numeric | no |  |
+| range_min_percent | numeric | no |  |
+| range_max_percent | numeric | no |  |
+| is_protected | boolean | no | A protected segment or channel: dynamic adjustments never apply. |
+
 ### `promotions.allocation_component`
 
 | Column | Type | Required | Notes |
@@ -5240,6 +9285,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 | allocation | jsonb | yes |  |
 | valid_from | timestamptz | no |  |
 | valid_to | timestamptz | no |  |
+| campaign_id | uuid | no | The commercial campaign (promotions.campaign) the bundle is sold under. |
+| owner_principal_id | uuid | no | The bundle owner (Bundle Definition & Setup). |
+| category | text | no | The bundle category the setup screen files it under. |
+| is_standalone_product | boolean | no | Whether the bundle appears as a product in its own right, or only as an offer on another product. |
+| is_recommended_at_checkout | boolean | no | Whether checkout recommends the bundle. |
+| required_variant_ids | text[] | no | Products that must already be in the basket for the bundle to be sold (the setup screen's "requires another product"). |
 | id | uuid | yes |  |
 | savings_amount | numeric(18,4) | yes | Sum of component list prices less the bundle price. |
 | savings_percentage | numeric | no |  |
@@ -5277,7 +9328,42 @@ Every table this service owns that the slice reads or writes, with its columns a
 | quantity | integer | yes |  |
 | is_optional | boolean | no |  |
 | substitute_variant_ids | text[] | no | For dynamic bundles — guest chooses among these. |
+| substitution_triggers | text[] | no | When a substitute from substituteVariantIds may replace this component (Dynamic Component Substitution Engine). |
+| substitution_price_effect | text | no | What a substitution does to the bundle price. |
+| substitution_approval | text | no | Who must accept a substitution before it stands. |
 | venue_id | uuid | no | Where this component is redeemed. |
+
+### `promotions.campaign`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| venue_id | uuid | yes |  |
+| code | text | no |  |
+| name | text | yes |  |
+| description | text | no |  |
+| owner_principal_id | uuid | no | The campaign (and budget) owner. |
+| legal_entity_id | uuid | no | The business entity that funds and books the campaign. |
+| valid_from | timestamptz | no |  |
+| valid_to | timestamptz | no |  |
+
+### `promotions.campaign_budget`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| campaign_id | uuid | yes | The parent row. |
+| id | uuid | no |  |
+| budget_type | text | yes | The spend this line caps (total campaign, discount, reward or free-product budget). |
+| funding_source | text | no | Who pays for it; partner is a co-funded (e.g. |
+| amount | numeric(18,4) | yes |  |
+| scope | text | no | What the line covers. |
+| scope_ref | text | no | The promotion, product, partner or segment id, or the SalesChannel value, that scope names. |
+| owner_principal_id | uuid | no | The budget owner. |
+| cost_centre | text | no |  |
+| department | text | no |  |
+| valid_from | timestamptz | no |  |
+| valid_to | timestamptz | no |  |
+| threshold_policy | jsonb | no |  |
 
 ### `promotions.coupon_campaign`
 
@@ -5292,6 +9378,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | max_redemptions_per_code | integer | no |  |
 | valid_from | timestamptz | yes |  |
 | valid_to | timestamptz | no |  |
+| campaign_id | uuid | no | The commercial campaign (promotions.campaign) the codes are issued under, as the Coupon & Promo Code Builder names it. |
 | id | uuid | yes |  |
 | generated_count | integer | yes |  |
 | redeemed_count | integer | yes |  |
@@ -5317,6 +9404,22 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scope_path | text | no | The partition key (ADR-0005). |
 | id | uuid | yes | Synthesised key. |
 
+### `promotions.coupon_code_batch`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | The batchId that generateCouponCodes returned. |
+| campaign_id | uuid | yes |  |
+| quantity | integer | yes | Codes requested. |
+| generated_count | integer | no | Codes generated so far. |
+| prefix | text | no |  |
+| length | integer | no |  |
+| status | text | yes |  |
+| failure_reason | text | no | Present only where status is failed. |
+| requested_by_principal_id | uuid | no |  |
+| requested_at | timestamptz | no |  |
+| completed_at | timestamptz | no |  |
+
 ### `promotions.promotion`
 
 | Column | Type | Required | Notes |
@@ -5335,12 +9438,79 @@ Every table this service owns that the slice reads or writes, with its columns a
 | max_redemptions | integer | no |  |
 | max_redemptions_per_guest | integer | no |  |
 | budget_cap | numeric(18,4) | no | Total discount value after which the promotion stops automatically. |
+| campaign_id | uuid | no | The commercial campaign (promotions.campaign) this promotion belongs to; null for a promotion run on its own. |
 | id | uuid | yes |  |
 | status | text | yes |  |
 | is_paused | boolean | no |  |
 | redemption_count | integer | no |  |
 | discount_given | numeric(18,4) | no |  |
 | published_at | timestamptz | no |  |
+| version | integer | no | Starts at 1 and goes up by one on every saved change. |
+
+### `promotions.promotion_audit`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| venue_id | uuid | yes |  |
+| entity_type | text | yes |  |
+| entity_id | text | yes | The changed row's id (a coupon code's code). |
+| promotion_id | uuid | no | The promotion the change belongs to, for the promotion version history. |
+| promotion_version | integer | no | The promotion's version after the change. |
+| event_type | text | yes |  |
+| previous_value | jsonb | no | The changed fields before the change. |
+| new_value | jsonb | no | The changed fields after the change. |
+| reason | text | no |  |
+| approval_reference | text | no | The approvals-engine request that authorised the change. |
+| actor_principal_id | uuid | no |  |
+| actor_role | text | no |  |
+| occurred_at | timestamptz | yes |  |
+
+### `promotions.promotion_channel_publication`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| venue_id | uuid | yes |  |
+| promotion_id | uuid | no |  |
+| coupon_campaign_id | uuid | no |  |
+| channel | text | yes |  |
+| status | text | yes | State model states/promotion-channel-publication.yaml. |
+| published_version | integer | no | The promotion version live on the channel. |
+| last_synchronized_at | timestamptz | no |  |
+| last_error | text | no | The channel's last rejection, while status is publicationFailed or outOfSync. |
+
+### `promotions.promotion_evaluation_trace`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| venue_id | uuid | yes |  |
+| order_id | uuid | yes | The order (orders.sales_order) in the order service. |
+| evaluated_at | timestamptz | yes |  |
+| evaluated_promotion_ids | text[] | no |  |
+| eligible_promotion_ids | text[] | no |  |
+| applied_promotion_ids | text[] | no | In application order. |
+| total_saving | numeric(18,4) | no |  |
+| decision | jsonb | no | The rejections (promotion id and a PromotionEvaluation reason: conditionsNotMet, supersededByBetterOffer, exclusivePromotionApplied, redemptionLimitReached, budgetExhausted, outsideValidPeriod, wrong… |
+
+### `promotions.promotion_rule`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| venue_id | uuid | yes |  |
+| promotion_id | uuid | no | The promotion the rule belongs to; null for a reusable library rule. |
+| campaign_id | uuid | no | The commercial campaign an eligibility rule is limited to, where the builder names one. |
+| rule_type | text | yes |  |
+| name | text | yes |  |
+| description | text | no |  |
+| owner_principal_id | uuid | no |  |
+| priority | integer | no | Evaluation order among the rules of one promotion; higher first (the builder's priority and rule ordering). |
+| conditions | jsonb | yes |  |
+| effect | text | no | Eligibility rules only. |
+| outcomes | jsonb | no |  |
+| is_active | boolean | no | False while the rule is a draft or switched off; only active rules are evaluated. |
 
 ### `promotions.promotion_variant`
 
@@ -5431,26 +9601,26 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-342 operations, added to this service in later releases without changing any of the above.
+332 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | allocation | `listAllocationSplits`, `previewAllocationSplit` |
 | block | `allocateBlockedSeats`, `createSeatBlock`, `listSeatBlocks`, `relinquishSeatBlock` |
-| bundle | `listBundles`, `reportBundleApplied` |
-| capacity | `getChannelAllocations`, `listChannelCapacities`, `relinquishChannelAllocation`, `setChannelAllocations` |
-| catalogue | `createDonationCampaign`, `freezeEntitlement`, `getCatalogueImportJob`, `getDynamicPriceRule`, `getPlanBenefits`, `importProductCatalogue`, `listDonationCampaigns`, `listDynamicPriceRules`, `listMembershipBenefits`, `listMembershipProgrammes`, `listProductVersions`, `listWaitlistEntries`, `offerWaitlistCapacity`, `reinstateEntitlement`, `setDynamicPriceRule`, `setMembershipBenefit`, `setMembershipProgramme`, `setPlanBenefits`, `updateDonationCampaign` |
+| bundle | `listBundleCapacityPolicies`, `listBundlePartnerProductMappings`, `listBundles`, `reportBundleApplied`, `setBundleCapacityPolicy`, `setBundlePartnerProductMappings` |
+| capacity | `getChannelAllocations`, `listChannelCapacities`, `relinquishChannelAllocation` |
+| catalogue | `cancelPricingRollback`, `createDonationCampaign`, `decideCatalogueAiFinding`, `freezeEntitlement`, `getCatalogueImportJob`, `getDynamicPriceRule`, `getPlanBenefits`, `importProductCatalogue`, `listDonationCampaigns`, `listDynamicPriceRules`, `listMembershipBenefits`, `listMembershipProgrammes`, `listProductVersions`, `listWaitlistEntries`, `offerWaitlistCapacity`, `reinstateEntitlement`, `requestPricingRollback`, `retryChannelIncident`, `setChannelSyncSetting`, `setConfigurationTemplate`, `setDemandSignalConfiguration`, `setMarketPricingConfiguration`, `setMembershipBenefit`, `setMembershipProgramme`, `setPackagePricingDefinition`, `setPlanBenefits`, `setPriceCalculationPolicy`, `setPriceLadderMatrix`, `setProductLinks`, `setSignalRegistryPolicy`, `testChannelConnection`, `transitionDynamicPricingStrategy`, `updateChannelIncident`, `updateDonationCampaign` |
 | category | `listSeatCategories`, `updateSeatCategory` |
-| coupon | `assignCoupon`, `getCouponCodeBatch`, `listCouponCampaigns`, `listCouponCodes`, `voidCouponCode` |
-| drafted | `approveCampaignWorkflow`, `approveDecision`, `approvePricingWorkflowAuthority`, `approveReviewDecision`, `approveWorkflow`, `createBulkProductCatalogue`, `createChannelProfile`, `createLiveDynamicPrice`, `decidePricingChangeRequest`, `decidePricingRecommendation`, `listAdvancedOffer`, `listAdvancedOfferGuardrail`, `listAudienceDiscoveryTargeting`, `listAudiencePreviewReach`, `listAutomationPolicyAutonomous`, `listBehavioralTransactionTargeting`, `listBestOfferCustomer`, `listBudgetConsumptionForecast`, `listBulkPricingUpdate`, `listBundleAvailabilityCapacity`, `listBundleAvailabilityChannel`, `listBundleAvailabilityForecast`, `listBundleBogoAdvanced`, `listBundleCombo`, `listBundlePricingCommercial`, `listBundleSellabilityDependency`, `listBundleValidityScheduling`, `listCalculationValidationReconciliation`, `listCampaignCalendarTimeline`, `listCampaignExperimentTest`, `listCampaignFinancialCommercial`, `listCampaignGovernanceBudget`, `listCampaignPromotionPerformance`, `listCapacityPoolReservation`, `listCartTransactionThreshold`, `listChangeImpactAnalysis`, `listChangePropagationDependency`, `listChannel`, `listChannel2`, `listChannelAllocationRebalancing`, `listChannelBasedPricing`, `listChannelConnectionIntegration`, `listChannelCustomerSegment`, `listChannelExceptionIncident`, `listChannelGovernanceSla`, `listChannelLogTransaction`, `listChannelPerformanceCommercial`, `listChannelSaleRule`, `listChannelSaleSchedule`, `listCheapestLowestValue`, `listCodeEligibilityRestriction`, `listCodeSecurityFraud`, `listCommercialPricing`, `listCommercialPricingStructure`, `listCompetitorPricingMarket`, `listComponentInventoryAvailability`, `listConflict`, `listConflictDetectionResolution`, `listContextLocationChannel`, `listCrmCustomerSegment`, `listCurrencyPrecisionRounding`, `listCustomerEligibilityRule`, `listCustomerMembershipSegment`, `listCustomerSegmentChannel`, `listCustomerSegmentProfile`, `listDemandBookingCurve`, `listDiscountCalculationApplication`, `listDiscountCapMaximum`, `listDiscountLimitGuardrail`, `listDiscountMarginProfitability`, `listDynamicBundle`, `listDynamicBundle2`, `listDynamicBundleRule`, `listDynamicComponentSubstitution`, `listDynamicPriceBand`, `listDynamicPricingAutomation`, `listDynamicPricingGuardrail`, `listDynamicPricingPerformance`, `listDynamicPricingStrategy`, `listEffectiveDateSeason`, `listExecutivePromotionReporting`, `listFeeSurcharge`, `listFeeWaiverTax`, `listGovernanceRiskLaunch`, `listGovernanceRiskMonitoring`, `listIncrementalityAttributionCannibalization`, `listInternalDemandBooking`, `listInventoryCapacityChannel`, `listLearningModelPerformance`, `listLocationVenueEvent`, `listMarketTourismHoliday`, `listMarketVenueCurrency`, `listMembershipLoyaltyGuest`, `listMembershipLoyaltyPricing`, `listMultiBuyQuantity`, `listNearbyEventExhibition`, `listNextBestAction`, `listOfferBasketTrace`, `listPackageBundleAdd`, `listPartnerExternalProduct`, `listPartnerPaymentEligibility`, `listPaymentMethodBank`, `listPercentageFixedDiscount`, `listPriceCalculationSequence`, `listPriceCategoryRate`, `listPriceElasticityRevenue`, `listPriceListTemplate`, `listPricing`, `listPricingChangeImpact`, `listPricingCompliance`, `listPricingDistributionSynchronization`, `listPricingGovernance`, `listPricingRecommendationExplainability`, `listPricingRollbackEmergency`, `listPricingRule`, `listPricingRulePriority`, `listPricingVersionBaseline`, `listProductDuplicationTemplate`, `listProductGovernance`, `listProductImportExport`, `listProductLifecycle`, `listProductPriceAvailability`, `listProductRetirementSuspension`, `listProductTrailChange`, `listPromotionActivityVersion`, `listPromotionAlertException`, `listPromotionCampaign`, `listPromotionChannel`, `listPromotionDecisionTrace`, `listPromotionExclusionCompatibility`, `listPromotionHealthPerformance`, `listPromotionLifecycleStatus`, `listPromotionPerformance`, `listPromotionPriorityHierarchy`, `listQuantityGroupVolume`, `listRealTimeAvailability`, `listRealTimeChannel`, `listRecommendationReviewDecision`, `listRedemption`, `listRedemptionCodeLookup`, `listRedemptionConversionFunnel`, `listRedemptionDiscountExposure`, `listResidencyNationalityMarket`, `listRevenue`, `listRevenueAllocationCost`, `listRevenueDemandImpact`, `listRewardSelectionSubstitution`, `listRollbackRecovery`, `listRulePriorityConflict`, `listSaleChannel`, `listScenarioModelingWhat`, `listScheduledLifecycleActions`, `listSeasonalCalendarDay`, `listSignalDataQuality`, `listSpecialPriceGuest`, `listStackingConflict`, `listTargetingConflictFrequency`, `listTargetingEligibility`, `listTaxFeeCalculation`, `listThresholdActionAutomatic`, `listTimeBasedSeasonal`, `listTimeslotPerformanceTime`, `listUniqueCodeGeneration`, `listUpsellCrossSell`, `listUsageCapacityFrequency`, `listValidityDateTime`, `listVolumeBulkTier`, `listWeatherDemandImpact`, `publishActivationScheduler`, `publishChannelAvailability`, `publishChannelReadinessValidation`, `publishPricingEffectiveDate`, `setBookingVelocityTime`, `setBundleComponent`, `setBundleDefinition`, `setBuyGetBogo`, `setCampaignBudgetFinancial`, `setCatalogueReview`, `setChannelFeePayment`, `setChannelPricingCommercial`, `setCodeDistributionManager`, `setCouponPromoCode`, `setCrossCategoryPromotion`, `setDemandOccupancyAvailability`, `setDynamicPricingStrategy`, `setEligibilityRule`, `setFeeApplicabilityCharging`, `setFixedPriceOffer`, `setGiftFreeProduct`, `setGuestChoiceBuild`, `setLifecycleStatuWorkflow`, `setPriceHierarchyInheritance`, `setPriceListMaster`, `setPricing`, `setPricingChangeRequest`, `setPricingExperiment`, `setProductCatalogue`, `setProductContextOwnership`, `setProductServicePrice`, `setPromotionRule`, `setPromotionStackingRule`, `setRateStructure`, `setRulePriorityConflict`, `setRuleTestRecommendation`, `setTaxProfileJurisdiction`, `setTaxRuleTreatment`, `simulateBundlePreviewRecommendation`, `simulatePriceBreakdownCalculation`, `submitPricingChangeRequest`, `testPricingRule` |
+| coupon | `assignCoupon`, `createCouponCampaign`, `getCouponCodeBatch`, `listCouponCampaigns`, `listCouponCodes`, `voidCouponCode` |
+| drafted | `approveCampaignWorkflow`, `approveDecision`, `approvePricingWorkflowAuthority`, `approveReviewDecision`, `approveWorkflow`, `createLiveDynamicPrice`, `decidePricingChangeRequest`, `decidePricingRecommendation`, `listAdvancedOffer`, `listAdvancedOfferGuardrail`, `listAudienceDiscoveryTargeting`, `listAudiencePreviewReach`, `listAutomationPolicyAutonomous`, `listBehavioralTransactionTargeting`, `listBestOfferCustomer`, `listBudgetConsumptionForecast`, `listBulkPricingUpdate`, `listBundleAvailabilityCapacity`, `listBundleAvailabilityChannel`, `listBundleAvailabilityForecast`, `listBundleBogoAdvanced`, `listBundleCombo`, `listBundlePricingCommercial`, `listBundleSellabilityDependency`, `listBundleValidityScheduling`, `listCalculationValidationReconciliation`, `listCampaignCalendarTimeline`, `listCampaignExperimentTest`, `listCampaignFinancialCommercial`, `listCampaignGovernanceBudget`, `listCampaignPromotionPerformance`, `listCapacityPoolReservation`, `listCartTransactionThreshold`, `listChangeImpactAnalysis`, `listChangePropagationDependency`, `listChannel`, `listChannel2`, `listChannelAllocationRebalancing`, `listChannelBasedPricing`, `listChannelConnectionIntegration`, `listChannelCustomerSegment`, `listChannelExceptionIncident`, `listChannelGovernanceSla`, `listChannelLogTransaction`, `listChannelPerformanceCommercial`, `listChannelSaleRule`, `listChannelSaleSchedule`, `listCheapestLowestValue`, `listCodeEligibilityRestriction`, `listCodeSecurityFraud`, `listCommercialPricing`, `listCommercialPricingStructure`, `listCompetitorPricingMarket`, `listComponentInventoryAvailability`, `listConflict`, `listConflictDetectionResolution`, `listContextLocationChannel`, `listCrmCustomerSegment`, `listCurrencyPrecisionRounding`, `listCustomerEligibilityRule`, `listCustomerMembershipSegment`, `listCustomerSegmentChannel`, `listCustomerSegmentProfile`, `listDemandBookingCurve`, `listDiscountCalculationApplication`, `listDiscountCapMaximum`, `listDiscountLimitGuardrail`, `listDiscountMarginProfitability`, `listDynamicBundle`, `listDynamicBundle2`, `listDynamicBundleRule`, `listDynamicComponentSubstitution`, `listDynamicPriceBand`, `listDynamicPricingAutomation`, `listDynamicPricingGuardrail`, `listDynamicPricingPerformance`, `listDynamicPricingStrategy`, `listEffectiveDateSeason`, `listExecutivePromotionReporting`, `listFeeSurcharge`, `listFeeWaiverTax`, `listGovernanceRiskLaunch`, `listGovernanceRiskMonitoring`, `listIncrementalityAttributionCannibalization`, `listInternalDemandBooking`, `listInventoryCapacityChannel`, `listLearningModelPerformance`, `listLocationVenueEvent`, `listMarketTourismHoliday`, `listMarketVenueCurrency`, `listMembershipLoyaltyGuest`, `listMembershipLoyaltyPricing`, `listMultiBuyQuantity`, `listNearbyEventExhibition`, `listNextBestAction`, `listOfferBasketTrace`, `listPackageBundleAdd`, `listPartnerExternalProduct`, `listPartnerPaymentEligibility`, `listPaymentMethodBank`, `listPercentageFixedDiscount`, `listPriceCalculationSequence`, `listPriceCategoryRate`, `listPriceElasticityRevenue`, `listPriceListTemplate`, `listPricing`, `listPricingChangeImpact`, `listPricingCompliance`, `listPricingDistributionSynchronization`, `listPricingGovernance`, `listPricingRecommendationExplainability`, `listPricingRollbackEmergency`, `listPricingRule`, `listPricingRulePriority`, `listPricingVersionBaseline`, `listProductDuplicationTemplate`, `listProductGovernance`, `listProductImportExport`, `listProductLifecycle`, `listProductPriceAvailability`, `listProductRetirementSuspension`, `listProductTrailChange`, `listPromotionActivityVersion`, `listPromotionAlertException`, `listPromotionCampaign`, `listPromotionChannel`, `listPromotionDecisionTrace`, `listPromotionExclusionCompatibility`, `listPromotionHealthPerformance`, `listPromotionLifecycleStatus`, `listPromotionPerformance`, `listPromotionPriorityHierarchy`, `listQuantityGroupVolume`, `listRealTimeAvailability`, `listRealTimeChannel`, `listRecommendationReviewDecision`, `listRedemption`, `listRedemptionCodeLookup`, `listRedemptionConversionFunnel`, `listRedemptionDiscountExposure`, `listResidencyNationalityMarket`, `listRevenue`, `listRevenueAllocationCost`, `listRevenueDemandImpact`, `listRewardSelectionSubstitution`, `listRollbackRecovery`, `listRulePriorityConflict`, `listSaleChannel`, `listScenarioModelingWhat`, `listScheduledLifecycleActions`, `listSeasonalCalendarDay`, `listSignalDataQuality`, `listSpecialPriceGuest`, `listStackingConflict`, `listTargetingConflictFrequency`, `listTargetingEligibility`, `listTaxFeeCalculation`, `listThresholdActionAutomatic`, `listTimeBasedSeasonal`, `listTimeslotPerformanceTime`, `listUniqueCodeGeneration`, `listUpsellCrossSell`, `listUsageCapacityFrequency`, `listValidityDateTime`, `listVolumeBulkTier`, `listWeatherDemandImpact`, `publishActivationScheduler`, `publishPricingEffectiveDate`, `setDynamicPricingStrategy`, `setFeeApplicabilityCharging`, `setLifecycleStatuWorkflow`, `setPricing`, `setPricingChangeRequest`, `setPricingExperiment`, `setPromotionStackingRule`, `setRuleTestRecommendation`, `setTaxProfileJurisdiction`, `setTaxRuleTreatment`, `simulateBundlePreviewRecommendation`, `simulatePriceBreakdownCalculation`, `submitPricingChangeRequest`, `testPricingRule` |
 | entitlement | `listEntitlementTemplates`, `suspendEntitlement` |
 | event | `cancelPerformance`, `createPerformances`, `getEvent` |
-| events | `assignPerformanceMedia`, `cloneEvent`, `estimateEventResourceCost`, `getEventResourcePlan`, `listEventTypes`, `listPerformanceTemplates`, `listSpaces`, `rescheduleEvent`, `setEventCapacityProfile`, `setEventLifecycleState`, `setEventRegistration`, `setEventResourcePlan`, `setEventSchedule`, `setEventType`, `setPerformanceTemplate`, `setPrepaidMinutePackage`, `setSpace` |
+| events | `assignPerformanceMedia`, `estimateEventResourceCost`, `getEventResourcePlan`, `listEventTypes`, `listPerformanceTemplates`, `listSpaces`, `rescheduleEvent`, `setEventCapacityProfile`, `setEventRegistration`, `setEventResourcePlan`, `setEventSchedule`, `setEventType`, `setPerformanceTemplate`, `setPrepaidMinutePackage`, `setSpace` |
 | import | `commitImportJob`, `getImportJob`, `importSeatGeometry`, `importSeatManifest` |
 | lease | `forceReleaseInventoryHold` |
 | pricing | `getPriceList`, `listPriceLists`, `listPrices` |
 | product | `setProductAttributes`, `updateProductVariant` |
-| promotion | `endPromotion`, `pausePromotion`, `unschedulePromotion` |
+| promotion | `endPromotion`, `listCommercialCampaigns`, `pausePromotion`, `unschedulePromotion` |
 | promotions | `getRecommendations`, `simulatePromotion`, `voidVoucher` |
 | recommendations | `concludeRecommendationExperiment`, `createRecommendationExperiment`, `createRecommendationStrategy`, `explainRecommendation`, `getProductAffinity`, `getRecommendationPerformance`, `listProductRelationships`, `listRecommendationExperiments`, `listRecommendationStrategies`, `recordRecommendationOutcome`, `setProductRelationships`, `setRecommendationSuppression`, `simulateRecommendationStrategy`, `updateRecommendationStrategy` |
 | rules | `getSeatingRules`, `setSeatingRules` |

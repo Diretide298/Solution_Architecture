@@ -1,0 +1,265 @@
+{
+ "createSeatBlock": {
+  "method": "POST",
+  "path": "/seat-blocks",
+  "contract": "seating",
+  "summary": "Block seats from sale",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateSeatBlockRequest",
+  "responds": "SeatBlock"
+ },
+ "createSeatCategory": {
+  "method": "POST",
+  "path": "/seat-categories",
+  "contract": "seating",
+  "summary": "Create a seat category",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatCategory"
+ },
+ "createWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders",
+  "contract": "maintenance",
+  "summary": "Raise a work order",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateWorkOrderRequest",
+  "responds": "WorkOrder"
+ },
+ "getSeatAvailability": {
+  "method": "GET",
+  "path": "/performances/{performanceId}/seat-availability",
+  "contract": "seating",
+  "summary": "Seat status for a performance",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "sectionCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "availableOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "mode",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatAvailability"
+ },
+ "getSeatHold": {
+  "method": "GET",
+  "path": "/seat-holds/{holdId}",
+  "contract": "seating",
+  "summary": "Read a hold",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SeatHold"
+ },
+ "getSeatInventory": {
+  "method": "GET",
+  "path": "/seat-inventory",
+  "contract": "seating",
+  "summary": "Every seat's state for a performance, in one read",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "performanceId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "sectionId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatInventory"
+ },
+ "getSeatReconciliation": {
+  "method": "GET",
+  "path": "/seat-reconciliation",
+  "contract": "seating",
+  "summary": "The map against the orders, seat by seat",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "performanceId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatDiscrepancy"
+ },
+ "listSeatBlocks": {
+  "method": "GET",
+  "path": "/seat-blocks",
+  "contract": "seating",
+  "summary": "List seat blocks",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "performanceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "reason",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSeatCategories": {
+  "method": "GET",
+  "path": "/seat-categories",
+  "contract": "seating",
+  "summary": "List seat categories",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatCategory"
+ },
+ "listSeatHoldPools": {
+  "method": "GET",
+  "path": "/seat-hold-pools",
+  "contract": "seating",
+  "summary": "Held seats, by pool, with what is left and when it releases",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "performanceId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatHoldPool"
+ },
+ "listSeats": {
+  "method": "GET",
+  "path": "/seat-maps/{seatMapId}/seats",
+  "contract": "seating",
+  "summary": "List seats in a map",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "sectionCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "rowLabel",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "attribute",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ }
+}

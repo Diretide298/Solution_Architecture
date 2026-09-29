@@ -1,0 +1,2121 @@
+[
+ {
+  "id": "BO-1123",
+  "name": "Gift Card & Digital Benefit Command Center",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "5",
+   "number": "01",
+   "page": 49
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/gift-card-digital-benefit-command-center-bo-1123",
+   "component": "apps/venue-management-web/src/routes/orders-money/GiftCardDigitalBenefitCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-1124",
+    "BO-1125",
+    "BO-1126",
+    "BO-1127",
+    "BO-1128",
+    "BO-1129",
+    "BO-1130",
+    "BO-1131",
+    "BO-1132"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-1124",
+     "trigger": "Gift Card Product Configuration",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1125",
+     "trigger": "Gift Card Issuance, Activation & Distribution",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1126",
+     "trigger": "Voucher & Coupon Type Configuration",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1127",
+     "trigger": "Voucher Eligibility & Redemption Rule Studio",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1128",
+     "trigger": "Membership Benefits & Entitlement Mapping",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1129",
+     "trigger": "Benefit Packaging & Digital Wallet Presentation",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1130",
+     "trigger": "Gift Card & Voucher Expiry Management",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1131",
+     "trigger": "Gift Card Balance, Liability & Breakage Control",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1132",
+     "trigger": "Gift Card & Voucher Simulator, Validation & Publication",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Provide administrators with a consolidated operational view of gift cards, vouchers and digital benefits across all tenants and venues. Dashboard KPIs",
+  "purposeNote": "Authorized users can monitor all gift-card, voucher and digital-benefit programs and drill into their balances, issuance and redemption activity.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every gift card digital",
+       "columns": [
+        "Active Gift Cards",
+        "Outstanding Gift Card Value",
+        "Gift Cards Sold",
+        "Gift Cards Redeemed",
+        "Partial Balances",
+        "Expiring Gift Cards",
+        "Active Vouchers",
+        "Vouchers Redeemed",
+        "Expiring Vouchers",
+        "Membership Benefits Issued",
+        "Membership Benefits Redeemed",
+        "Promotional Credits Outstanding",
+        "Breakdown By",
+        "Gift card type",
+        "Voucher type",
+        "Benefit type",
+        "Tenant",
+        "Venue",
+        "Currency",
+        "Channel",
+        "Campaign",
+        "Membership tier",
+        "Status",
+        "Operational Alerts"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected gift card digital",
+       "bindsTo": null,
+       "columns": [
+        "Active Gift Cards",
+        "Outstanding Gift Card Value",
+        "Gift Cards Sold",
+        "Gift Cards Redeemed",
+        "Partial Balances",
+        "Expiring Gift Cards",
+        "Active Vouchers",
+        "Vouchers Redeemed",
+        "Expiring Vouchers",
+        "Membership Benefits Issued",
+        "Membership Benefits Redeemed",
+        "Promotional Credits Outstanding",
+        "Breakdown By",
+        "Gift card type",
+        "Voucher type",
+        "Benefit type",
+        "Tenant",
+        "Venue",
+        "Currency",
+        "Channel",
+        "Campaign",
+        "Membership tier",
+        "Status",
+        "Operational Alerts"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Highlight”.",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create Gift Card",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create Voucher",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create Benefit",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Issue Value",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Search Instrument",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Check Balance",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Investigate Redemption",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "View Liability",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Quick Actions"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The gift card digital list.",
+   "error": "Could not load. Names which read failed and leaves the gift card digital untouched.",
+   "emptyFirstRun": "No gift card digital yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the gift card digital are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getWalletLiability",
+    "contract": "wallet",
+    "purpose": "Gift card liability",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setGiftCardProduct",
+    "contract": "wallet",
+    "purpose": "Create a gift-card product",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Create Gift Card; Create Voucher, Create Benefit; Issue Value; Search Instrument, Check Balance",
+    "invalidates": [
+     "getWalletLiability"
+    ]
+   },
+   {
+    "operationId": "createVoucherType",
+    "contract": "wallet",
+    "purpose": "Create a voucher or digital benefit",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Create Gift Card; Create Voucher, Create Benefit; Issue Value; Search Instrument, Check Balance",
+    "invalidates": [
+     "getWalletLiability"
+    ]
+   },
+   {
+    "operationId": "issueGiftCard",
+    "contract": "wallet",
+    "purpose": "Issue value on a gift card",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Create Gift Card; Create Voucher, Create Benefit; Issue Value; Search Instrument, Check Balance",
+    "invalidates": [
+     "getWalletLiability"
+    ]
+   },
+   {
+    "operationId": "getGiftCard",
+    "contract": "wallet",
+    "purpose": "Find an instrument by code and show its balance",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Create Gift Card; Create Voucher, Create Benefit; Issue Value; Search Instrument, Check Balance"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Active Gift Cards",
+    "Outstanding Gift Card Value",
+    "Gift Cards Sold",
+    "Gift Cards Redeemed",
+    "Partial Balances",
+    "Expiring Gift Cards"
+   ],
+   "params": [
+    {
+     "name": "cardCode",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1123",
+   "workshopBoard": "wireframes/WS190 Wallet Configuration Backend Structure v1.0 Board 5.dc.html#bo-1123"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 49. 0 of 24 labels bound to a contract property; 32 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Create Gift Card: `setGiftCardProduct`; Create Voucher, Create Benefit: `createVoucherType`; Issue Value: `issueGiftCard`; Search Instrument, Check Balance: `getGiftCard`; Investigate Redemption, View Liability dropped (navigation).",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1124",
+  "name": "Gift Card Product Configuration",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "5",
+   "number": "02",
+   "page": 50
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/gift-card-product-configuration-bo-1124",
+   "component": "apps/venue-management-web/src/routes/orders-money/GiftCardProductConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1123"
+   ],
+   "exitTo": [
+    "BO-1123"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1123",
+     "trigger": "Back to Gift Card & Digital Benefit Command Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§For each gift card define) and no metric row",
+  "purpose": "Create reusable gift-card products that can be sold or issued across TICVAI. The source specifically requires gift-card balances including activation, redemption, partial usage, expiry, balance inquiry and transaction history. Gift Card Types",
+  "purposeNote": "Administrators can create and maintain gift-card products entirely through backend configuration.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 50 §For each gift card define"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every gift card product",
+       "columns": [
+        "Product name",
+        "Internal code",
+        "Description",
+        "Fixed / variable value",
+        "Minimum value",
+        "Maximum value",
+        "Currency",
+        "Reloadable",
+        "Partial redemption allowed",
+        "Multiple redemption allowed",
+        "Transferable",
+        "Refundable",
+        "Cash-out permitted",
+        "Expiry policy",
+        "Applicable tenant",
+        "Applicable venues",
+        "Applicable channels",
+        "Applicable products",
+        "Activation method",
+        "Wallet storage allowed",
+        "Customer registration required",
+        "Gift recipient details required",
+        "Effective dates",
+        "Status",
+        "Lifecycle"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 50 §For each gift card define"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected gift card product",
+       "bindsTo": null,
+       "columns": [
+        "Product name",
+        "Internal code",
+        "Description",
+        "Fixed / variable value",
+        "Minimum value",
+        "Maximum value",
+        "Currency",
+        "Reloadable",
+        "Partial redemption allowed",
+        "Multiple redemption allowed",
+        "Transferable",
+        "Refundable",
+        "Cash-out permitted",
+        "Expiry policy",
+        "Applicable tenant",
+        "Applicable venues",
+        "Applicable channels",
+        "Applicable products",
+        "Activation method",
+        "Wallet storage allowed",
+        "Customer registration required",
+        "Gift recipient details required",
+        "Effective dates",
+        "Status",
+        "Lifecycle"
+       ],
+       "notes": null,
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 50 §For each gift card define"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Fixed Value",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 50 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Variable Value",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 50 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Promotional Gift Card",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 50 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Corporate Gift Card",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 50 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Digital Gift Card",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 50 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Physical Gift Card",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 50 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Event Gift Card",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 50 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Venue Gift Card",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 50 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The gift card product list.",
+   "error": "Could not load. Names which read failed and leaves the gift card product untouched.",
+   "emptyFirstRun": "No gift card product yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the gift card product are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setGiftCardProduct",
+    "contract": "wallet",
+    "purpose": "Denominations and validity",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listVoucherTypes"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Product name",
+    "Internal code",
+    "Description",
+    "Fixed / variable value",
+    "Minimum value",
+    "Maximum value"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1124",
+   "workshopBoard": "wireframes/WS190 Wallet Configuration Backend Structure v1.0 Board 5.dc.html#bo-1124"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 50. 0 of 25 labels bound to a contract property; 35 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Fixed Value, Variable Value, Digital Gift Card, Physical Gift Card are choices sent by `setGiftCardProduct` (denominations / openAmountAllowed / physical); Promotional Gift Card, Corporate Gift Card, Event Gift Card, Venue Gift Card … are choices sent by `setGiftCardProduct` (field gap: add productKind promotional|corporate|event|venue (scopePath gives venue/event scope)).",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1125",
+  "name": "Gift Card Issuance, Activation & Distribution",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "5",
+   "number": "03",
+   "page": 51
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/gift-card-issuance-activation-distribution-bo-1125",
+   "component": "apps/venue-management-web/src/routes/orders-money/GiftCardIssuanceActivationDistribution.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1123"
+   ],
+   "exitTo": [
+    "BO-1123"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1123",
+     "trigger": "Back to Gift Card & Digital Benefit Command Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "cardCode"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Configure how gift cards are created, sold, activated and delivered. Issuance Sources B2C Website Mobile App POS Kiosk Customer Service Corporate Portal B2B/Reseller Campaign Administrative issuance API Activation Methods Activate on sale Activate on payment confirmation Manual activation Scheduled activation API activation Bulk activation Distribution",
+  "purposeNote": "Every issued gift card has a unique identity, activation state, value, distribution record and complete audit history.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Card number format",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 51 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "PIN/security code",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 51 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Activation trigger",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 51 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Recipient",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 51 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Sender",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 51 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Personal message",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 51 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Delivery date",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 51 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Delivery channel",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 51 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Activation validity",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 51 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Resend rules",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 51 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Replacement rules",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 51 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Corporate Bulk Issuance",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 51 §Configure"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
+       "provenance": "authored — required by check-screens, 19 September 2026"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Digital delivery",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 51 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Physical card",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 51 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "RFID/NFC card",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 51 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Wallet",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 51 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Printable voucher",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 51 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Distribution",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 51 §Allow organizations to create"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Expiry",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 51 §Allow organizations to create"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cost center",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 51 §Allow organizations to create"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The gift card issuance configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the gift card issuance untouched.",
+   "emptyFirstRun": "No gift card issuance configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "issueGiftCard",
+    "contract": "wallet",
+    "purpose": "Issue",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "activateGiftCard",
+    "contract": "wallet",
+    "purpose": "Activate",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "redeemGiftCard",
+    "contract": "wallet",
+    "purpose": "Spend against a card",
+    "trigger": "onAction",
+    "provenance": "wiring gap, 19 September 2026 — the screen showed the noun and could not act on it",
+    "invalidates": [
+     "getGiftCard"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1125",
+   "workshopBoard": "wireframes/WS190 Wallet Configuration Backend Structure v1.0 Board 5.dc.html#bo-1125"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 51. 0 of 0 labels bound to a contract property; 20 of 51 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Digital delivery, Physical card, Printable voucher, Distribution, Expiry are choices sent by `issueGiftCard` (kind physical|digital, recipientEmail/Phone, validMonths); RFID/NFC card, Wallet are choices sent by `issueGiftCard` (field gap: add carrier rfid|nfc|wallet (or link via linkWalletCredential after issue)); Cost center are choices sent by `issueGiftCard` (field gap: add costCenterId for administrative issuance).",
+  "entryState": {
+   "params": [
+    {
+     "name": "giftCardId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1126",
+  "name": "Voucher & Coupon Type Configuration",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "5",
+   "number": "04",
+   "page": 53
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/voucher-coupon-type-configuration-bo-1126",
+   "component": "apps/venue-management-web/src/routes/orders-money/VoucherCouponTypeConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1123"
+   ],
+   "exitTo": [
+    "BO-1123"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1123",
+     "trigger": "Back to Gift Card & Digital Benefit Command Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Create and manage digital vouchers and non-cash redemption instruments. The source requires the wallet to store and manage digital vouchers, coupons, meal vouchers, parking vouchers, attraction credits and campaign rewards. Voucher Types Monetary Voucher Percentage Voucher Complimentary Ticket Meal Voucher F&B Voucher Retail Voucher Parking Voucher Attraction Voucher Ride Voucher Rental Voucher Upgrade Voucher Campaign Reward Service Recovery Voucher Custom Voucher",
+  "purposeNote": "New voucher types and redemption behaviors can be introduced without development changes.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Voucher name",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 53 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Voucher code",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 53 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Voucher category",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 53 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Monetary/non-monetary",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 53 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Fixed value",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 53 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Percentage value",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 53 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Quantity entitlement",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 53 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Applicable products",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 53 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Applicable categories",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 53 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Applicable venues",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 53 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Applicable channels",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 53 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Minimum spend",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 53 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum benefit",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 53 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Validity",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 53 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Single-use/multi-use",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 53 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Partial redemption",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 53 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Stackable",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 53 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Transferable",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 53 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer-specific",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 53 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Wallet storage",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 53 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Barcode / QR",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 53 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Status",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 53 §Configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The voucher coupon type configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the voucher coupon type untouched.",
+   "emptyFirstRun": "No voucher coupon type configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "listVoucherTypes",
+    "contract": "wallet",
+    "purpose": "Voucher and coupon types",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createVoucherType",
+    "contract": "wallet",
+    "purpose": "Define one",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listVoucherTypes"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1126",
+   "workshopBoard": "wireframes/WS190 Wallet Configuration Backend Structure v1.0 Board 5.dc.html#bo-1126"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 53. 0 of 0 labels bound to a contract property; 22 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1127",
+  "name": "Voucher Eligibility & Redemption Rule Studio",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "5",
+   "number": "05",
+   "page": 54
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/voucher-eligibility-redemption-rule-studio-bo-1127",
+   "component": "apps/venue-management-web/src/routes/orders-money/VoucherEligibilityRedemptionRuleStudio.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1123"
+   ],
+   "exitTo": [
+    "BO-1123"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1123",
+     "trigger": "Back to Gift Card & Digital Benefit Command Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure by; Configure) and no display directory — it is settings, not a population",
+  "purpose": "Define precisely when, where and by whom a voucher may be redeemed. Eligibility Rules",
+  "purposeNote": "Every voucher redemption is validated in real time against the currently published eligibility and redemption policy.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Voucher Eligibility & Redemption Rule Studio declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Customer",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer segment",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Membership tier",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Age",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Family role",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Corporate account",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Product",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Ticket",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Attraction",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Ride",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "F&B",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Retail",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Rental",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Parking",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Add-on",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Location",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tenant",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Outlet",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Channel",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "POS",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "B2C",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Mobile App",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Kiosk",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "API",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Time",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Valid dates",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Days of week",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Time window",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Season",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The voucher eligibility redemption configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the voucher eligibility redemption untouched.",
+   "emptyFirstRun": "No voucher eligibility redemption configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "createVoucherType",
+    "contract": "wallet",
+    "purpose": "Eligibility and redemption rules",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listVoucherTypes"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1127",
+   "workshopBoard": "wireframes/WS190 Wallet Configuration Backend Structure v1.0 Board 5.dc.html#bo-1127"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 54. 0 of 0 labels bound to a contract property; 43 of 55 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1128",
+  "name": "Membership Benefits & Entitlement Mapping",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "5",
+   "number": "06",
+   "page": 55
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/membership-benefits-entitlement-mapping-bo-1128",
+   "component": "apps/venue-management-web/src/routes/orders-money/MembershipBenefitsEntitlementMapping.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1123"
+   ],
+   "exitTo": [
+    "BO-1123"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1123",
+     "trigger": "Back to Gift Card & Digital Benefit Command Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Connect Membership & Loyalty benefits into the Wallet without making Wallet responsible for membership logic. Requirement 4.3.25 requires membership-related benefits, credits, entitlements, guest passes, reservation quotas and included benefits to be available within the guest wallet. Membership Benefit Examples Gold Membership → AED 200 F&B Credit → 5 Guest Passes → 2 Parking Credits → 3 Complimentary Ride Credits → 1 Birthday Voucher Configure Mapping Membership Product → Membership Tier → Benefit Type → Wallet Credit/Voucher/Entitlement",
+  "purposeNote": "Membership-generated benefits are automatically represented in the customer's wallet according to their configured entitlement rules while Membership remains the authoritative source.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Membership tier",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Benefit",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Quantity/value",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Issuance timing",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Renewal behavior",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Validity",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Usage frequency",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Applicable venue",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Applicable product",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Carry-forward",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Transferability",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Family sharing",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Replacement rules",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Issuance Triggers",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Membership activation",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Membership renewal",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tier upgrade",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Anniversary",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Birthday",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Visit milestone",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Campaign",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Manual award",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 55 §Configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The membership benefits entitlement configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the membership benefits entitlement untouched.",
+   "emptyFirstRun": "No membership benefits entitlement configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "listVoucherTypes",
+    "contract": "wallet",
+    "purpose": "Benefits mapped to memberships",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1128",
+   "workshopBoard": "wireframes/WS190 Wallet Configuration Backend Structure v1.0 Board 5.dc.html#bo-1128"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 55. 0 of 0 labels bound to a contract property; 22 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1129",
+  "name": "Benefit Packaging & Digital Wallet Presentation",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "5",
+   "number": "07",
+   "page": 56
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/benefit-packaging-digital-wallet-presentation-bo-1129",
+   "component": "apps/venue-management-web/src/routes/orders-money/BenefitPackagingDigitalWalletPresentation.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1123"
+   ],
+   "exitTo": [
+    "BO-1123"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1123",
+     "trigger": "Back to Gift Card & Digital Benefit Command Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure; Configure states) and no display directory — it is settings, not a population",
+  "purpose": "Configure how different instruments appear to customers in B2C and mobile wallet experiences. Wallet Sections Administrators can define presentation categories: Money Cash Balance Refund Credit Gift Cards Gift Card Balance Vouchers Meal Voucher Parking Voucher Attraction Voucher Membership Guest Passes Complimentary Tickets Member Credits Rewards Promotional Credits Campaign Rewards",
+  "purposeNote": "Backend administrators can determine how wallet instruments and benefits are categorized and presented consistently across supported customer channels.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Display name",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 56 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer description",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 56 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Icon",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 56 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Category",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 56 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Balance visibility",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 56 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Expiry visibility",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 56 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Terms link",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 56 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "QR visibility",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 56 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Barcode visibility",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 56 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Redeem button",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 56 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Transfer button",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 56 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Gift button",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 56 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Applicable channels",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 56 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Display priority",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 56 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Available",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 56 §Configure states"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reserved",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 56 §Configure states"
+      },
+      {
+       "kind": "selectField",
+       "label": "Partially Used",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 56 §Configure states"
+      },
+      {
+       "kind": "selectField",
+       "label": "Used",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 56 §Configure states"
+      },
+      {
+       "kind": "selectField",
+       "label": "Expiring Soon",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 56 §Configure states"
+      },
+      {
+       "kind": "selectField",
+       "label": "Expired",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 56 §Configure states"
+      },
+      {
+       "kind": "selectField",
+       "label": "Suspended",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 56 §Configure states"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The benefit packaging digital configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the benefit packaging digital untouched.",
+   "emptyFirstRun": "No benefit packaging digital configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "listVoucherTypes",
+    "contract": "wallet",
+    "purpose": "How benefits are presented",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1129",
+   "workshopBoard": "wireframes/WS190 Wallet Configuration Backend Structure v1.0 Board 5.dc.html#bo-1129"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 56. 0 of 0 labels bound to a contract property; 21 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1130",
+  "name": "Gift Card & Voucher Expiry Management",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "5",
+   "number": "08",
+   "page": 57
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/gift-card-voucher-expiry-management-bo-1130",
+   "component": "apps/venue-management-web/src/routes/orders-money/GiftCardVoucherExpiryManagement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1123"
+   ],
+   "exitTo": [
+    "BO-1123"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1123",
+     "trigger": "Back to Gift Card & Digital Benefit Command Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Control validity, expiration, extension and customer notification. Expiry Models Never expires Fixed date X days after purchase X days after activation X days after issuance End of campaign End of event Membership expiry",
+  "purposeNote": "Gift cards and vouchers follow configurable validity policies and customers receive applicable expiry notifications.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Valid-from",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 57 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Valid-until",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 57 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Grace period",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 57 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Extension allowed",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 57 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum extension",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 57 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Manual extension",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 57 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Renewal",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 57 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Remaining-balance behavior",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 57 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Expired-value treatment",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 57 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Notification Schedule",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 57 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "banner",
+       "label": "Permissions this screen separates",
+       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Extend, Reinstate, Suspend, Cancel, Replace, Reissue. Each needs attaching to the control it gates, or the screen needs the control.",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 57 §Authorized users can"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The gift card voucher configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the gift card voucher untouched.",
+   "emptyFirstRun": "No gift card voucher configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "expireCreditLots",
+    "contract": "wallet",
+    "purpose": "Gift card and voucher expiry",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listCreditLots",
+     "getWalletLiability"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1130",
+   "workshopBoard": "wireframes/WS190 Wallet Configuration Backend Structure v1.0 Board 5.dc.html#bo-1130"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 57. 0 of 0 labels bound to a contract property; 16 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1131",
+  "name": "Gift Card Balance, Liability & Breakage Control",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "5",
+   "number": "09",
+   "page": 58
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/gift-card-balance-liability-breakage-control-bo-1131",
+   "component": "apps/venue-management-web/src/routes/orders-money/GiftCardBalanceLiabilityBreakageControl.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1123"
+   ],
+   "exitTo": [
+    "BO-1123"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1123",
+     "trigger": "Back to Gift Card & Digital Benefit Command Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Connect gift-card operations to financial liability management without duplicating the Finance module. The source explicitly requires Gift Card Liability Reporting and Gift Card Breakage & Revenue Recognition. Liability Dashboard",
+  "purposeNote": "Outstanding gift-card balances can be reconciled to financial liability, and configured expiry/breakage events produce traceable finance integration events.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 58 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every gift card balance",
+       "columns": [
+        "Gift cards sold",
+        "Original issued value",
+        "Outstanding balance",
+        "Redeemed balance",
+        "Expired balance",
+        "Suspended balance",
+        "Unredeemed balance",
+        "Breakage amount",
+        "Recognized revenue",
+        "Deferred liability"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 58 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected gift card balance",
+       "bindsTo": null,
+       "columns": [
+        "Gift cards sold",
+        "Original issued value",
+        "Outstanding balance",
+        "Redeemed balance",
+        "Expired balance",
+        "Suspended balance",
+        "Unredeemed balance",
+        "Breakage amount",
+        "Recognized revenue",
+        "Deferred liability"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Break down by”.",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 58 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The gift card balance list.",
+   "error": "Could not load. Names which read failed and leaves the gift card balance untouched.",
+   "emptyFirstRun": "No gift card balance yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the gift card balance are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getWalletLiability",
+    "contract": "wallet",
+    "purpose": "Balance, liability and breakage",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Gift cards sold",
+    "Original issued value",
+    "Outstanding balance",
+    "Redeemed balance",
+    "Expired balance",
+    "Suspended balance"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1131",
+   "workshopBoard": "wireframes/WS190 Wallet Configuration Backend Structure v1.0 Board 5.dc.html#bo-1131"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 58. 0 of 10 labels bound to a contract property; 22 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1132",
+  "name": "Gift Card & Voucher Simulator, Validation & Publication",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "5",
+   "number": "10",
+   "page": 59
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/gift-card-voucher-simulator-validation-publication-bo-1132",
+   "component": "apps/venue-management-web/src/routes/orders-money/GiftCardVoucherSimulatorValidationPublication.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1123"
+   ],
+   "exitTo": [
+    "BO-1123"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1123",
+     "trigger": "Back to Gift Card & Digital Benefit Command Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow administrators to test complete gift-card, voucher and benefit configurations before activation. Scenario Example Customer: Gold Member Venue: Theme Park Configure how customers actually use TICVAI Wallet value across every sales and venue touchpoint—POS, mobile app, B2C website, kiosk, RFID/NFC wristbands, QR credentials, attractions, F&B, Retail, Parking, Rental and integrated third-party systems. This board primarily covers requirements 4.3.7, 4.3.8, 4.3.10, 4.3.12, 4.3.13 and 4.3.20, including cross-channel wallet usage, wearables, NFC/RFID/QR, Digital Key authentication and integration-based wallet usage.",
+  "purposeNote": "No new gift-card, voucher or benefit configuration becomes operational until it passes system validation and applicable approval/publication controls. Board 5 — Backend Architecture Flow The backend should operate approximately as: Gift Card / Voucher / Benefit Definition → Issuance Rule → Activation → Wallet Association → Eligibility → Validity & Expiry → Redemption → Partial Balance / Remaining Entitlement → Wallet Ledger → Liability / Finance Event → Audit",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 59"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 59"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "publishWalletConfiguration",
+       "label": "Publish wallet configuration",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "publishWalletConfiguration"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Takes effect at every till and reader immediately.** Credit types, consumption order and funding rules change for balances that already exist, not only for new ones.",
+       "provenance": "authored — required by check-screens, 19 September 2026"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The gift card voucher list.",
+   "error": "Could not load. Names which read failed and leaves the gift card voucher untouched.",
+   "emptyFirstRun": "No gift card voucher yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the gift card voucher are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "publishWalletConfiguration",
+    "contract": "wallet",
+    "purpose": "Validate and publish",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listWalletTypes",
+     "listCreditTypes"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1132",
+   "workshopBoard": "wireframes/WS190 Wallet Configuration Backend Structure v1.0 Board 5.dc.html#bo-1132"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 59. 0 of 0 labels bound to a contract property; 0 of 82 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

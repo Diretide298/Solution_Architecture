@@ -39,10 +39,7 @@
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-264 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-265",
@@ -101,10 +98,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "The Group Sales team can manage its complete direct-sales pipeline and immediately identify opportunities requiring commercial action.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display; Show) and a per-row directory (§Each opportunity should display) — counts over a population, then the population",
   "purpose": "Provide the Group Sales team with a centralized commercial workspace showing the entire group-sales pipeline.",
-  "purposeNote": "The Group Sales team can manage its complete direct-sales pipeline and immediately identify opportunities requiring commercial action.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -280,6 +277,12 @@
   },
   "apis": [
    {
+    "operationId": "listGroupSale2",
+    "contract": "orders",
+    "purpose": "Group Sales Analytics & AI Intelligence Center",
+    "trigger": "onLoad"
+   },
+   {
     "operationId": "listGroupSale",
     "contract": "orders",
     "purpose": "Group Sales Command Center",
@@ -289,7 +292,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-264"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-264",
+   "workshopBoard": "wireframes/WS68 Group Sales   Corporate Booking Management Board 1.dc.html#bo-264"
   },
   "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 4. 28 of 28 labels bound to a contract property; 29 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -352,17 +356,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every group-sales request can be captured as a structured, owned and trackable opportunity without requiring a booking to exist yet.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture; Configure) and no display directory — it is settings, not a population",
   "purpose": "Capture a new group-sales enquiry and convert it into a structured sales opportunity.",
-  "purposeNote": "Every group-sales request can be captured as a structured, owned and trackable opportunity without requiring a booking to exist yet.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Sales Team, Campaign, Existing Customer. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 5 §Support"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -520,6 +517,17 @@
        "kind": "secondaryButton",
        "label": "Existing Customer",
        "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 5 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Manual Entry",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 5 §Support"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Capture enquiry",
+       "operation": "createGroupEnquiry",
+       "provenance": "contract orders.yaml POST /group-enquiry-opportunity (decided 29 September, VM close-out)"
       }
      ]
     }
@@ -537,14 +545,21 @@
     "contract": "orders",
     "purpose": "Group Enquiry & Opportunity Capture",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "createGroupEnquiry",
+    "contract": "orders",
+    "purpose": "Capture enquiry",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-265"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-265",
+   "workshopBoard": "wireframes/WS68 Group Sales   Corporate Booking Management Board 1.dc.html#bo-265"
   },
-  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 5. 0 of 0 labels bound to a contract property; 29 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 5. 0 of 0 labels bound to a contract property; 30 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `createGroupEnquiry`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -605,10 +620,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Sales teams can see the complete relationship with a group customer while maintaining one governed customer record across TICVAI.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Maintain the customer or organization buying directly from TICVAI.",
-  "purposeNote": "Sales teams can see the complete relationship with a group customer while maintaining one governed customer record across TICVAI.",
   "layout": {
    "template": "split",
    "regions": [
@@ -657,6 +672,23 @@
        "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 6 §Show"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Event Organizer",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 6 §Support"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save organisation profile",
+       "operation": "setGroupCustomerOrganization",
+       "provenance": "contract orders.yaml PUT /group-customer-organization (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -673,6 +705,12 @@
     "contract": "orders",
     "purpose": "Group Customer & Organization Profile",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setGroupCustomerOrganization",
+    "contract": "orders",
+    "purpose": "Save organisation profile",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -688,9 +726,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-266"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-266",
+   "workshopBoard": "wireframes/WS68 Group Sales   Corporate Booking Management Board 1.dc.html#bo-266"
   },
-  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 6. 8 of 8 labels bound to a contract property; 19 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 6. 8 of 8 labels bound to a contract property; 20 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `setGroupCustomerOrganization`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -751,10 +790,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Sales teams can validate admission, schedule and required resource availability before making a commercial commitment to the customer.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Determine whether TICVAI can accommodate the requested group before preparing a quotation.",
-  "purposeNote": "Sales teams can validate admission, schedule and required resource availability before making a commercial commitment to the customer.",
   "layout": {
    "template": "split",
    "regions": [
@@ -832,7 +871,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-267"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-267",
+   "workshopBoard": "wireframes/WS68 Group Sales   Corporate Booking Management Board 1.dc.html#bo-267"
   },
   "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 8. 7 of 7 labels bound to a contract property; 22 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -895,10 +935,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Sales teams can build a multi-product group package while consuming approved TICVAI products, pricing and resources rather than manually calculating the offer outside the platform.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Build a complete commercial package tailored to the group's requirements.",
-  "purposeNote": "Sales teams can build a multi-product group package while consuming approved TICVAI products, pricing and resources rather than manually calculating the offer outside the platform.",
   "layout": {
    "template": "split",
    "regions": [
@@ -958,6 +998,16 @@
        "kind": "primaryButton",
        "label": "Group Ticket",
        "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 9 §Allow combinations of"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Meal Voucher",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 9 §Allow combinations of"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "VIP Experience",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 9 §Allow combinations of"
       }
      ]
     }
@@ -975,10 +1025,7 @@
     "operationId": "setGroupPackageExperience",
     "contract": "orders",
     "purpose": "Group Package & Experience Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setGroupPackageExperience"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -994,9 +1041,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-268"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-268",
+   "workshopBoard": "wireframes/WS68 Group Sales   Corporate Booking Management Board 1.dc.html#bo-268"
   },
-  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 9. 9 of 9 labels bound to a contract property; 10 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 9. 9 of 9 labels bound to a contract property; 12 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Meal Voucher, VIP Experience are choices sent by `setGroupPackageExperience`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1057,10 +1105,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Sales teams can generate a controlled, branded and auditable group quotation directly from the approved package configuration.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture; Where configured, customer can) and no display directory — it is settings, not a population",
   "purpose": "Turn the configured group package into a professional customer quotation.",
-  "purposeNote": "Sales teams can generate a controlled, branded and auditable group quotation directly from the approved package configuration.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1149,16 +1197,14 @@
     "operationId": "setGroupQuotationProposal",
     "contract": "orders",
     "purpose": "Group Quotation Builder & Proposal Generation",
-    "trigger": "onAction",
-    "invalidates": [
-     "setGroupQuotationProposal"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-269"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-269",
+   "workshopBoard": "wireframes/WS68 Group Sales   Corporate Booking Management Board 1.dc.html#bo-269"
   },
   "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 11 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1221,10 +1267,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every quotation revision and negotiation decision is retained with complete commercial history and impact visibility.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Manage the commercial negotiation process without losing historical versions.",
-  "purposeNote": "Every quotation revision and negotiation decision is retained with complete commercial history and impact visibility.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1293,7 +1339,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-270"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-270",
+   "workshopBoard": "wireframes/WS68 Group Sales   Corporate Booking Management Board 1.dc.html#bo-270"
   },
   "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 12. 0 of 0 labels bound to a contract property; 8 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1356,10 +1403,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "No quotation containing a controlled commercial exception can be issued or accepted without the appropriate approval.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Govern non-standard group pricing and commercial exceptions before a quote is committed.",
-  "purposeNote": "No quotation containing a controlled commercial exception can be issued or accepted without the appropriate approval.",
   "gaps": [
    {
     "operation": null,
@@ -1412,16 +1459,14 @@
     "operationId": "approveGroupDiscountException",
     "contract": "orders",
     "purpose": "Group Discount, Exception & Approval Workflow",
-    "trigger": "onAction",
-    "invalidates": [
-     "approveGroupDiscountException"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-271"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-271",
+   "workshopBoard": "wireframes/WS68 Group Sales   Corporate Booking Management Board 1.dc.html#bo-271"
   },
   "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 13. 0 of 0 labels bound to a contract property; 0 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1484,10 +1529,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "An approved and accepted quotation can become a confirmed group booking while preserving the exact commercial agreement and without duplicate data entry.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Convert an accepted quotation into a confirmed TICVAI group booking without re-entering the commercial configuration.",
-  "purposeNote": "An approved and accepted quotation can become a confirmed group booking while preserving the exact commercial agreement and without duplicate data entry.",
   "gaps": [
    {
     "operation": null,
@@ -1511,6 +1556,20 @@
        "derived": true,
        "impliedBy": "listQuoteBookingConversion",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createGroupBooking",
+       "label": "Create group booking",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createGroupBooking"
       }
      ]
     }
@@ -1529,21 +1588,42 @@
     "contract": "orders",
     "purpose": "Quote-to-Booking Conversion & Confirmation",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "createGroupBooking",
+    "contract": "orders",
+    "purpose": "Convert the accepted quote into a group booking",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listQuoteBookingConversion"
+    ]
+   },
+   {
+    "operationId": "updateGroupBooking",
+    "contract": "orders",
+    "purpose": "Confirm numbers or the leader on the converted booking",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listQuoteBookingConversion"
+    ]
    }
   ],
   "entryState": {
-   "preloaded": [
-    "QuoteToBookingConversionConfirmationView.quoteRemainsValid",
-    "QuoteToBookingConversionConfirmationView.capacityRemainsAvailable",
-    "QuoteToBookingConversionConfirmationView.resourcesRemainAvailable",
-    "QuoteToBookingConversionConfirmationView.priceRemainsApproved",
-    "QuoteToBookingConversionConfirmationView.approvalRemainsValid"
+   "preloaded": [],
+   "params": [
+    {
+     "name": "groupBookingId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-272"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-272",
+   "workshopBoard": "wireframes/WS68 Group Sales   Corporate Booking Management Board 1.dc.html#bo-272"
   },
   "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 0 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1598,10 +1678,10 @@
    "notes": "**Reached from BO-264, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Once a group sale is confirmed, Sales can hand over a complete and structured booking to Operations without relying on emails, spreadsheets or manual re-entry. Board 1 — Final Screen Register",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Show) and no metric row",
   "purpose": "Provide a consolidated view of the completed sales journey and hand the confirmed group cleanly from Sales to Operations. 360° Header Board 1 ended when the quotation was accepted and converted into a confirmed group booking. Board 2 takes over from confirmation until the group visit is completed and financially closed.",
-  "purposeNote": "Once a group sale is confirmed, Sales can hand over a complete and structured booking to Operations without relying on emails, spreadsheets or manual re-entry. Board 1 — Final Screen Register",
   "layout": {
    "template": "split",
    "regions": [
@@ -1634,7 +1714,7 @@
         "GroupBooking360HandoverWorkspaceView.tickets",
         "GroupBooking360HandoverWorkspaceView.dateTime",
         "GroupBooking360HandoverWorkspaceView.capacity",
-        "GroupBooking360HandoverWorkspaceView.seatingWhereApplicable",
+        "GroupBooking360HandoverWorkspaceView.seating",
         "GroupBooking360HandoverWorkspaceView.packageComponents",
         "GroupBooking360HandoverWorkspaceView.organization",
         "GroupBooking360HandoverWorkspaceView.mainContact",
@@ -1677,7 +1757,7 @@
         "GroupBooking360HandoverWorkspaceView.tickets",
         "GroupBooking360HandoverWorkspaceView.dateTime",
         "GroupBooking360HandoverWorkspaceView.capacity",
-        "GroupBooking360HandoverWorkspaceView.seatingWhereApplicable",
+        "GroupBooking360HandoverWorkspaceView.seating",
         "GroupBooking360HandoverWorkspaceView.packageComponents",
         "GroupBooking360HandoverWorkspaceView.organization",
         "GroupBooking360HandoverWorkspaceView.mainContact",
@@ -1714,10 +1794,7 @@
     "operationId": "setGroupBookingHandover",
     "contract": "orders",
     "purpose": "Group Booking 360° & Handover Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setGroupBookingHandover"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1733,7 +1810,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-273"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-273",
+   "workshopBoard": "wireframes/WS68 Group Sales   Corporate Booking Management Board 1.dc.html#bo-273"
   },
   "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 16. 27 of 27 labels bound to a contract property; 27 of 90 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

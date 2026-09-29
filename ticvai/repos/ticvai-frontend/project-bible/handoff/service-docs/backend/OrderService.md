@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `orders`, `shift`, `payments` |
 | Schemas owned | `orders`, `payments` |
-| Operations in the slice | 79 of 268 |
+| Operations in the slice | 80 of 277 |
 | Scale | Write-heavy, spiky, latency-critical. The one that autoscales. |
 | If it is down | Down means no sales. Highest availability target in the platform. |
 
@@ -89,6 +89,7 @@
 | payment | [`capturePayment`](#capturepayment) | POST | `/payments/{paymentId}/capture` | core | 1 | BO-024, EMP-035, POS-005, PTR-012 |
 | payment | [`createPayment`](#createpayment) | POST | `/payments` | core | 1 | BO-024, EMP-035, EMP-059, GST-009, GST-026, GST-027 … |
 | payment | [`inquirePaymentStatus`](#inquirepaymentstatus) | POST | `/payments/{paymentId}/inquiry` | core | 1 | ADM-595, ADM-597, ADM-615, BO-024, EMP-035, GST-009 … |
+| payments | [`createPaymentProviderConnection`](#createpaymentproviderconnection) | POST | `/payment-providers` | setup | 1 | ADM-570, ADM-571 |
 | policy | [`setRefundPolicy`](#setrefundpolicy) | PUT | `/venues/{venueId}/refund-policy` | setup | 1 | ADM-611, BO-062, BO-065, BO-1146, BO-318 |
 | refund | [`createRefund`](#createrefund) | POST | `/orders/{orderId}/refunds` | core | 1 | ADM-616, BO-022, BO-023, BO-026, BO-047, BO-1147 … |
 | refund | [`createRefundRequest`](#createrefundrequest) | POST | `/refund-requests` | core | 1 | ADM-610, BO-028, GST-067, WEB-019 |
@@ -2013,6 +2014,7 @@ Where they differ the order is still accepted at the quoted price and `priceVari
 **A line carrying `resourceHoldId` converts the hold** (decided 29 September, rev 3 REV3-15). The order service calls `resources` to write a `ResourceBooking` in `reserved` for the hold's resource and window, with `holdId` and this order's id, and sets the hold to `converted`, **without releasing it first**, as seat holds are converted: nobody takes the cabana between the two calls. A hold that is expired, already converted or released, or is not the caller's refuses the order 409 `resourceHoldInvalid`. Not offline: a hold is a live reservation.
 **Seat limits** (decided 29 September, rev 3 REV3-7): on a guest channel the seats of one performance may not exceed `VenueSettings.seating.maxSeatsPerGuestOrder` (default 10, bounds 1 to 50); on staff and POS channels, 10 per sale (audit R080 (c)). Over the limit is 422 `seatLimitExceeded` (problem type `seat-limit-exceeded`, as `seating.createSeatHold`), no longer 400.
 Offline-capable. The client writes to its local journal, acknowledges the cashier, and replays through `/sync/orders` on reconnect.
+**Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state change it makes, with the previous and new state, the actor and the correlation id. **When it prices the order it also writes `promotions.promotion_evaluation_trace`**: which promotions were evaluated, which applied and why the others did not, so a disputed discount can be explained later (decided 29 September, writers pass).
 
 |  |  |
 |---|---|
@@ -2023,7 +2025,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | Offline | yes |
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
+| Writes | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `promotions.promotion_evaluation_trace` |
 | Called by | BO-022, BO-023, BO-026, BO-047, BO-130, EMP-014, EMP-034, GST-009, POS-002, POS-004, POS-005, POS-006, POS-013, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-012 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): created as `pending`<br/>Resource hold ([states/resource-hold.yaml](../../../states/resource-hold.yaml)): moves `held` -> `converted`<br/>Seat hold ([states/seat-hold.yaml](../../../states/seat-hold.yaml)): moves `held` -> `converted` |
 
@@ -2208,6 +2210,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 A date change, a tier upgrade, a different performance. **Settles only the difference** — modelled as separate refund and sale, a guest exchanging a date can end up refunded and then unable to rebook when the new date turns out to be full.
 The replacement is held before the original is released, never the other way round.
 **The exchange window is a venue setting with a tenant default**, `exchangeCutoffHours`: an exchange is refused with `outsideExchangeWindow` once the original performance is fewer than that many hours away (decided 28 September, audit R094). **Proposed default, client to correct (audit R094): 24 hours.**
+**Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state change it makes, with the previous and new state, the actor and the correlation id (decided 29 September, writers pass).
 
 |  |  |
 |---|---|
@@ -2218,7 +2221,7 @@ The replacement is held before the original is released, never the other way rou
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.sales_order` |
+| Writes | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_event`, `orders.sales_order` |
 | Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, POS-010, POS-011, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 
 **Parameters**
@@ -2656,6 +2659,7 @@ Returns the reminder, or one with `enabled` false when the guest has never set o
 The guest has gone to fetch a wallet, or wants to add something after checking with someone. The cashier parks the sale and serves the next person.
 **Not a reservation.** Parking holds nothing against inventory: it takes no lease and extends none — a parked sale that reserved capacity would let a queue of parked sales exhaust a session. **A seated line that already carries a lease keeps that lease only until the lease's own expiry**, and parking does not stop the clock; a lease that lapses while the sale is parked comes back from `resumeOrder` as `seatHoldExpired`. Prices are re-evaluated on resume, and a price that moved is surfaced rather than silently applied.
 Held orders expire. A till that accumulates parked sales across a shift cannot be closed, and the cashier who parked them has gone home. `label` and `holdUntil` are kept on the order (`Order.holdLabel`, `Order.heldUntil`) so the held-orders list can show and sort them.
+**Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state change it makes, with the previous and new state, the actor and the correlation id (decided 29 September, writers pass).
 
 |  |  |
 |---|---|
@@ -2666,7 +2670,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | Offline | yes |
 | Conflict policy | lastWriterWins |
 | Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
+| Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
 | Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `pending` -> `held` |
 
@@ -2882,6 +2886,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 
 Adding a line charges the difference; removing one refunds it under the venue's refund policy. **A modification is not a void and re-sale** — the order number, the guest's booking reference and the entitlements already issued all survive.
 Lines whose entitlement has been redeemed cannot be removed. The guest has used it.
+**Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state change it makes, with the previous and new state, the actor and the correlation id (decided 29 September, writers pass).
 
 |  |  |
 |---|---|
@@ -2892,7 +2897,7 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
+| Writes | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
 | Called by | BO-022, BO-023, BO-026, BO-047, BO-281, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 
 **Parameters**
@@ -3104,6 +3109,7 @@ Offline-capable, so it carries `recordedAt`: the moment the till reprinted, kept
 The common case of an exchange, and worth its own operation because it is what a call centre agent does forty times a day. Same product, different date or time.
 Where the new performance is priced differently, the balance settles as for an exchange. Where the venue charges a rescheduling fee, it appears as a line.
 **A transport trip moves to another departure of the same route** (decided 29 September, rev 3 REV3-21): the prototype's "Change your trip free up to two hours before departure" is the proposed value of a transport venue's `rescheduleCutoffHours` (2, with no rescheduling fee), client to correct.
+**Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state change it makes, with the previous and new state, the actor and the correlation id (decided 29 September, writers pass).
 
 |  |  |
 |---|---|
@@ -3114,7 +3120,7 @@ Where the new performance is priced differently, the balance settles as for an e
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `orders.sales_order` |
+| Writes | `cache:idempotency`, `orders.order_event`, `orders.sales_order` |
 | Called by | BO-022, BO-023, BO-026, BO-047, BO-281, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 
 **Parameters**
@@ -3173,6 +3179,7 @@ Where the new performance is priced differently, the balance settles as for an e
 Any till, not only the one that parked it — the cashier who took it may be on a break.
 Prices are re-evaluated. Where a price, a promotion or an availability has moved since the hold, the response says so and the cashier decides. Silently charging the old price loses money; silently charging the new one loses the guest.
 **The cashier has two choices, keep prices or discard** (decided 28 September, audit R123 (5)). Keeping continues the sale at the prices it was parked at; the re-evaluation is reported in `changes` and never applied. Discarding voids the sale (`voidOrder`). There is no reprice in place: a cashier who wants current prices discards and rings the sale again. A line that cannot be kept at all (`soldOut`, `seatHoldExpired`, `productWithdrawn`) is removed whichever is chosen.
+**Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state change it makes, with the previous and new state, the actor and the correlation id (decided 29 September, writers pass).
 
 |  |  |
 |---|---|
@@ -3183,7 +3190,7 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
+| Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
 | Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `held` -> `pending` |
 
@@ -3427,6 +3434,7 @@ The recipient receives a claim link. **Ownership moves only when they claim it**
 Only before settlement and only within the same shift. After that it is a refund — the money has moved.
 **Voids the whole order**, never one line: a single F&B line removed after preparation is voided by voiding its order (`fnb.amendFnbOrder`, `fnb.cancelFnbOrder` point here).
 **The reason comes from the void reason list** (`VoidReason`; decided 28 September, audit R125 (4)), the one list every void takes, F&B included. `other` requires a `note` (audit R222); the notes are reviewed quarterly to add real reasons.
+**Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state change it makes, with the previous and new state, the actor and the correlation id (decided 29 September, writers pass).
 
 |  |  |
 |---|---|
@@ -3437,7 +3445,7 @@ Only before settlement and only within the same shift. After that it is a refund
 | Offline | yes |
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
+| Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
 | Called by | BO-022, BO-023, BO-026, BO-047, BO-319, EMP-014, EMP-034, POS-002, POS-006, POS-014, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `pending` -> `voided` |
 
@@ -3607,7 +3615,7 @@ Refuses where the entitlement is partly consumed, name-bound, or past its resale
 | Reads | `access.entitlement`, `cache:idempotency`, `catalogue.entitlement_template`, `orders.resale_listing`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.resale_listing` |
 | Called by | GST-067, WEB-030 |
-| State model | Resale listing ([states/resale-listing.yaml](../../../states/resale-listing.yaml)): created as `listed`; moves `listed` -> `reserved`, `reserved` -> `sold`, `reserved` -> `listed`, `listed` -> `withdrawn` **(not settled: see the Gaps sheet)** |
+| State model | Resale listing ([states/resale-listing.yaml](../../../states/resale-listing.yaml)): created as `listed` or `pendingReview`; moves `pendingReview` -> `withdrawn`, `listed` -> `reserved`, `reserved` -> `sold`, `reserved` -> `listed`, `listed` -> `withdrawn` **(not settled: see the Gaps sheet)** |
 
 **Parameters**
 
@@ -3640,9 +3648,13 @@ Refuses where the entitlement is partly consumed, name-bound, or past its resale
 | priceCapPercent | number |  | A ceiling as a percentage of face value, because uncapped resale is a venue watching its own tickets sold at four times the price with its name on them. (read-only; nullable) |
 | sellerFeePercent | number |  | Snapshotted from ResaleFeePolicy at listing. (read-only) |
 | buyerFeePercent | number |  | Snapshotted from ResaleFeePolicy at listing. (read-only) |
-| status | enum (listed, reserved, sold, withdrawn, expired) | yes | (read-only) |
+| status | enum (pendingReview, listed, reserved, sold, withdrawn, expired, rejected) | yes | pendingReview and rejected added 29 September (DM5): a listing the marketplace's moderationMode sends to review waits there until approveListingModeration lists or rejects it. (read-only) |
 | listedAt | string (date-time) |  | (read-only) |
 | soldToSubjectId | string (uuid) |  | (read-only; nullable) |
+| reviewReasons | array of enum (highResalePrice, unusualDiscount, highValueTicket, vipTicket, sellerRisk, newSeller, multipleListings, identityIssue, …) |  | Why the listing was sent to review (DM5, 29 September). (read-only) |
+| moderatedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| moderatedAt | string (date-time) |  | (read-only; nullable) |
+| moderationReason | string |  | (max length 1000; read-only; nullable) |
 | payoutStatus | enum (pending, held, paid, failed) |  | The seller is paid after the buyer is admitted, not after they pay. (read-only) |
 | scopePath | string |  | The partition key (ADR-0005). (read-only) |
 
@@ -4756,6 +4768,8 @@ Where the terminal captured the tip, this records what it reported. Where the gu
 
 **`POST /payments/{paymentId}/capture`**: Capture a previously authorised payment
 
+Captures an authorised payment. **Writes one `payments.payment_attempt` row for the capture call**, whatever its outcome, and appends to `orders.order_event` when the order's payment state changes (decided 29 September, writers pass; DM6).
+
 |  |  |
 |---|---|
 | Permission | `ORDER_CREATE` |
@@ -4764,8 +4778,8 @@ Where the terminal captured the tip, this records what it reported. Where the gu
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `ledger.fx_rate`, `orders.payment` |
-| Writes | `cache:idempotency`, `orders.payment`, `platform.outbox` |
+| Reads | `cache:idempotency`, `ledger.fx_rate`, `orders.payment`, `payments.provider_connection` |
+| Writes | `cache:idempotency`, `orders.order_event`, `orders.payment`, `payments.payment_attempt`, `platform.outbox` |
 | Called by | BO-024, EMP-035, POS-005, PTR-012 |
 | State model | Payment ([states/payment.yaml](../../../states/payment.yaml)): moves `authorised` -> `captured` |
 
@@ -4831,6 +4845,7 @@ Cash is offline-capable. Card, wallet and voucher are not — they need the gate
 A card payment returns `pendingConfirmation` when the terminal has been instructed but no result has arrived. **Do not assume failure.** Poll `/payments/{id}/inquiry`.
 **Which tenders each channel takes** (decided 28 September, audit R080 (a) and (d)). **In the guest app and on the guest web, card or wallet** (`card`, `wallet`): any other `tender` from a guest caller is refused with 409 `tenderNotAllowedOnChannel`. **At the till, all five the payment screen offers**: card, cash, digital wallet (`wallet`), gift card or voucher (`giftCard`, `voucher`), and online payment, which is a payment link the guest pays on their own device (`createPaymentLink`) rather than a tender on this call.
 **Posts to the ledger through the account mappings** (decided 28 September, audit R191): a captured `cash` payment posts `cashReceived`, `card` posts `cardReceived` and `wallet` posts `walletReceived`, each to the accounts `finance.setAccountMappings` holds for the venue, and to the fiscal period that is open for the payment date. An offline cash payment replayed through `syncOrders` posts the same event, dated by its `recordedAt`.
+**Writes one `payments.payment_attempt` row per provider call**, including a declined, errored or abandoned attempt that never becomes a payment: `orders.payment` records what was taken, the attempt records what was tried, and the provider health and payment performance reads count them. Also appends to `orders.order_event` when the order's payment state changes (decided 29 September, writers pass; DM6).
 
 |  |  |
 |---|---|
@@ -4840,8 +4855,8 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
-| Reads | `cache:idempotency`, `ledger.fx_rate`, `orders.payment`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `ledger.journal_entry`, `ledger.posting`, `orders.payment`, `platform.outbox` |
+| Reads | `cache:idempotency`, `ledger.fx_rate`, `orders.payment`, `orders.sales_order`, `payments.provider_connection` |
+| Writes | `cache:idempotency`, `ledger.journal_entry`, `ledger.posting`, `orders.order_event`, `orders.payment`, `payments.payment_attempt`, `platform.outbox` |
 | Called by | BO-024, EMP-035, EMP-059, GST-009, GST-026, GST-027, KSK-007, POS-002, POS-004, POS-005, PTR-012, WEB-012, WEB-033, WEB-041, WEB-042 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `pending` -> `paid`, `pending` -> `partiallyPaid`, `partiallyPaid` -> `paid`, `pending` -> `failed`<br/>PaymentLink ([states/payment-link.yaml](../../../states/payment-link.yaml)): moves `issued` -> `paid`, `viewed` -> `paid`<br/>Payment ([states/payment.yaml](../../../states/payment.yaml)): created as `authorised` or `pendingConfirmation`<br/>Seat ([states/seat.yaml](../../../states/seat.yaml)): moves `held` -> `sold`<br/>SubBill ([states/sub-bill.yaml](../../../states/sub-bill.yaml)): moves `open` -> `paid`<br/>Table ([states/table.yaml](../../../states/table.yaml)): moves `billRequested` -> `needsClearing` |
 
@@ -4976,6 +4991,87 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | 503 |  | Provider unreachable (providerUnreachable). |
 
 
+## Group: payments
+
+### createPaymentProviderConnection
+
+**`POST /payment-providers`**: Connect a provider
+
+**Credentials are written and never read back.** The response carries a fingerprint so somebody can confirm which key is in use without the key being retrievable from a screen.
+
+|  |  |
+|---|---|
+| Permission | `PAYMENT_PROVIDER_MANAGE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `payments.provider_connection` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Reads | `payments.provider_connection` |
+| Writes | `payments.provider_connection` |
+| Called by | ADM-570, ADM-571 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `PaymentProviderConnection`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  |  |
+| code | string | yes |  |
+| name | string |  |  |
+| providerKind | enum (gateway, psp, acquirer, walletProvider, bnplProvider) | yes |  |
+| environment | enum (sandbox, production) |  |  |
+| credentialFingerprint | string |  | Written, never read back. (read-only) |
+| capabilities | object |  |  |
+| capabilities.methods | array of string |  |  |
+| capabilities.currencies | array of string |  |  |
+| capabilities.partialCapture | boolean |  | (default False) |
+| capabilities.multipleCapture | boolean |  | (default False) |
+| capabilities.refundWindowDays | integer |  | (nullable) |
+| capabilities.tokenisation | boolean |  | (default False) |
+| capabilities.threeDSecure | boolean |  | (default False) |
+| capabilities.cardPresent | boolean |  | (default False) |
+| merchantAccountId | string (uuid) |  | (nullable) |
+| status | enum (draft, testing, active, degraded, disabled) |  |  |
+| lastTestedAt | string (date-time) |  | (nullable) |
+| scopePath | string |  |  |
+
+**Response**: `PaymentProviderConnection`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  |  |
+| code | string | yes |  |
+| name | string |  |  |
+| providerKind | enum (gateway, psp, acquirer, walletProvider, bnplProvider) | yes |  |
+| environment | enum (sandbox, production) |  |  |
+| credentialFingerprint | string |  | Written, never read back. (read-only) |
+| capabilities | object |  |  |
+| capabilities.methods | array of string |  |  |
+| capabilities.currencies | array of string |  |  |
+| capabilities.partialCapture | boolean |  | (default False) |
+| capabilities.multipleCapture | boolean |  | (default False) |
+| capabilities.refundWindowDays | integer |  | (nullable) |
+| capabilities.tokenisation | boolean |  | (default False) |
+| capabilities.threeDSecure | boolean |  | (default False) |
+| capabilities.cardPresent | boolean |  | (default False) |
+| merchantAccountId | string (uuid) |  | (nullable) |
+| status | enum (draft, testing, active, degraded, disabled) |  |  |
+| lastTestedAt | string (date-time) |  | (nullable) |
+| scopePath | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Connected |
+
+
 ## Group: policy
 
 ### setRefundPolicy
@@ -5076,6 +5172,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 The venue's refund policy determines whether a second authoriser is required. Call `/venues/{venueId}/refund-policy` first, or submit without `secondaryAuthorisation` and handle the 409 that names the threshold.
 Sequencing is ledger-first: the ledger entry is written, then the gateway is called, then the outcome is reconciled. A gateway call that succeeds against an unwritten ledger entry is money that left with no record.
 **The ledger entry is a `refundIssued` posting** to the accounts `finance.setAccountMappings` holds for the venue, in the fiscal period open for the refund date (decided 28 September, audit R191).
+**Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state change it makes, with the previous and new state, the actor and the correlation id (decided 29 September, writers pass).
 
 |  |  |
 |---|---|
@@ -5086,7 +5183,7 @@ Sequencing is ledger-first: the ledger entry is written, then the gateway is cal
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.payment`, `orders.refund`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `ledger.journal_entry`, `ledger.posting`, `orders.refund`, `platform.outbox` |
+| Writes | `cache:idempotency`, `ledger.journal_entry`, `ledger.posting`, `orders.order_event`, `orders.refund`, `platform.outbox` |
 | Called by | ADM-616, BO-022, BO-023, BO-026, BO-047, BO-1147, EMP-014, EMP-034, POS-002, POS-006, POS-011, PTR-008, PTR-015 |
 | State model | Coupon code ([states/coupon.yaml](../../../states/coupon.yaml)): moves `redeemed` -> `issued`<br/>Entitlement ([states/entitlement-status.yaml](../../../states/entitlement-status.yaml)): moves `issued` -> `cancelled`, `partiallyConsumed` -> `cancelled`<br/>F&B order ([states/fnb-order.yaml](../../../states/fnb-order.yaml)): moves `served` -> `refunded`, `collected` -> `refunded`, `delivered` -> `refunded`<br/>Order ([states/order.yaml](../../../states/order.yaml)): moves `paid` -> `refunded`, `completed` -> `refunded`, `paid` -> `partiallyRefunded`, `completed` -> `partiallyRefunded`, `partiallyRefunded` -> `refunded`<br/>Payment ([states/payment.yaml](../../../states/payment.yaml)): moves `captured` -> `refunded`<br/>Refund ([states/refund.yaml](../../../states/refund.yaml)): moves `failed` -> `pendingGateway`<br/>Seat ([states/seat.yaml](../../../states/seat.yaml)): moves `sold` -> `available` |
 
@@ -5274,6 +5371,7 @@ An unknown order, or one outside the caller's scope, is the shared 404; an order
 **`DELETE /reservations/{reservationId}`**: Cancel a reservation
 
 Releases held capacity immediately rather than waiting for expiry. A guest cancels only a reservation held for them.
+**Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state change it makes, with the previous and new state, the actor and the correlation id (decided 29 September, writers pass).
 
 |  |  |
 |---|---|
@@ -5284,7 +5382,7 @@ Releases held capacity immediately rather than waiting for expiry. A guest cance
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.reservation` |
-| Writes | `cache:idempotency`, `orders.reservation` |
+| Writes | `cache:idempotency`, `orders.order_event`, `orders.reservation` |
 | Called by | GST-016, GST-017, WEB-031 |
 | State model | Reservation ([states/reservation.yaml](../../../states/reservation.yaml)): moves `held` -> `cancelled` |
 
@@ -7411,6 +7509,27 @@ Every table this service owns that the slice reads or writes, with its columns a
 | recorded_at | timestamptz | yes |  |
 | count_this_shift | integer | no | Running count. |
 
+### `orders.order_event`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| order_id | text | yes |  |
+| reservation_id | uuid | no |  |
+| event_type | text | yes |  |
+| previous_state | text | no |  |
+| new_state | text | no |  |
+| channel | text | no |  |
+| actor_principal_id | uuid | no |  |
+| actor_system | text | no | The integration or job, when no person acted. |
+| related_entity_type | text | no |  |
+| related_entity_id | text | no |  |
+| correlation_id | text | no |  |
+| result | text | no |  |
+| exception_type | text | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+| occurred_at | timestamptz | yes |  |
+
 ### `orders.order_line`
 
 | Column | Type | Required | Notes |
@@ -7601,9 +7720,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 | price_cap_percent | numeric | no | A ceiling as a percentage of face value, because uncapped resale is a venue watching its own tickets sold at four times the price with its name on them. |
 | seller_fee_percent | numeric | no | Snapshotted from ResaleFeePolicy at listing. |
 | buyer_fee_percent | numeric | no | Snapshotted from ResaleFeePolicy at listing. |
-| status | text | yes |  |
+| status | text | yes | pendingReview and rejected added 29 September (DM5): a listing the marketplace's moderationMode sends to review waits there until approveListingModeration lists or rejects it. |
 | listed_at | timestamptz | no |  |
 | sold_to_subject_id | uuid | no |  |
+| review_reasons | text[] | no | Why the listing was sent to review (DM5, 29 September). |
+| moderated_by_principal_id | uuid | no |  |
+| moderated_at | timestamptz | no |  |
+| moderation_reason | text | no |  |
 | payout_status | text | no | The seller is paid after the buyer is admitted, not after they pay. |
 | scope_path | text | no | The partition key (ADR-0005). |
 
@@ -7749,6 +7872,27 @@ Every table this service owns that the slice reads or writes, with its columns a
 | resolved_by_principal_id | uuid | no | Who closed it. |
 | scope_path | text | no | The partition key (ADR-0005). |
 
+### `payments.payment_attempt`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| payment_id | text | no | The orders.payment this attempt produced or belongs to. |
+| order_id | text | no | The order being paid for, so an abandoned attempt still counts against the order's conversion. |
+| provider_connection_id | uuid | yes |  |
+| payment_method_id | uuid | no |  |
+| card_type | text | no | Scheme and funding type as the provider reported it (for example visa-credit). |
+| channel | text | no |  |
+| outcome | text | yes | The four outcomes PaymentPerformanceRow counts. |
+| decline_class | text | no |  |
+| decline_code | text | no | The provider's own code, kept verbatim. |
+| decline_reason | text | no |  |
+| latency_ms | integer | no | Request to provider response. |
+| authentication_outcome | text | no | The 3-D Secure result, the authenticationOutcome dimension of getPaymentPerformance. |
+| amount | numeric(18,4) | no |  |
+| attempted_at | timestamptz | yes |  |
+| scope_path | text | yes |  |
+
 ### `payments.provider`
 
 | Column | Type | Required | Notes |
@@ -7768,6 +7912,22 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scope_level | text | no |  |
 | scope_path | text | no |  |
 | is_active | boolean | yes |  |
+
+### `payments.provider_connection`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| code | text | yes |  |
+| name | text | no |  |
+| provider_kind | text | yes |  |
+| environment | text | no |  |
+| credential_fingerprint | text | no | Written, never read back. |
+| capabilities | jsonb | no |  |
+| merchant_account_id | uuid | no |  |
+| status | text | no |  |
+| last_tested_at | timestamptz | no |  |
+| scope_path | text | no |  |
 
 ### `payments.routing_rule`
 
@@ -7799,7 +7959,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-189 operations, added to this service in later releases without changing any of the above.
+197 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -7807,8 +7967,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | cart | `listAbandonedCarts` |
 | drafted | `approveExceptionServiceRecovery`, `approveGroupDiscountException`, `approveListingModeration`, `createListingSeller`, `createOrderSourceChannel`, `createUpgradeCredentialRegeneration`, `listAmendmentAfterSale`, `listAmendmentAfterSale2`, `listBulkGroupAssisted`, `listBuyerCheckoutInventory`, `listBuyerPurchaseResale`, `listCapacityInventoryReconciliation`, `listCapacityReservationInventory`, `listCreateListingResale`, `listCredentialRevocationRegeneration`, `listDepositPartialPayment`, `listExternalPaymentPartner`, `listFeeSellerProceed`, `listFinancialTraceability`, `listGroupAmendmentCancellation`, `listGroupArrivalCheck`, `listGroupBooking`, `listGroupBookingReconciliation`, `listGroupCustomerOrganization`, `listGroupEnquiryOpportunity`, `listGroupPaymentDeposit`, `listGroupRequirementAvailability`, `listGroupSale`, `listGroupSale2`, `listGroupTicketFulfillment`, `listGroupTicketSeat`, `listListingLifecycleExpiry`, `listOfficialResaleMarketplace`, `listOrderFinancialReconciliation`, `listOrderLifecycleTimeline`, `listOrderLineProduct`, `listOrderPaymentDetail`, `listOrderReservation`, `listOrderSplitMerge`, `listParticipantGuestList`, `listPaymentOrderFinancial`, `listPaymentReconciliationException`, `listPersonTypeProduct`, `listQuoteBookingConversion`, `listQuoteRevisionNegotiation`, `listRefundDisputeResale`, `listRelatedOrderTransaction`, `listResale`, `listResale2`, `listResaleConfirmationOwnership`, `listResaleEligibilityTicket`, `listResaleFeeCommission`, `listResaleFraudDuplicate`, `listResaleInventoryAvailability`, `listResaleListingSeller`, `listResaleMarketplace`, `listResaleOwnership`, `listResalePolicyMarketplace`, `listResalePricingPrice`, `listResaleTicketDetail`, `listReservationConfirmationExpiry`, `listSellerSettlementPayout`, `listTicketOwnershipTransfer`, `listTicketReissueFulfillment`, `listTicketResaleMarketplace`, `listUpgradeConversion`, `listUpgradeEligibilityQualification`, `listUpgradeException`, `listUpgradeFinancialTreatment`, `listUpgradeTimingUsage`, `listVoidReversalSame`, `listWhiteLabelMarketplace`, `setAfterSaleFinancial`, `setAmendmentEligibilityPolicy`, `setCancellationPartialPolicy`, `setCustomerGuestAccount`, `setGroupBookingHandover`, `setGroupOperationalPlanning`, `setGroupPackageExperience`, `setGroupQuotationProposal`, `setMultiPaymentSplit`, `setOrderAmendment`, `setOrderDetailTransaction`, `setOrderReservationStatus`, `setProRataResidual`, `setResaleEligibilityRule`, `setResaleMarketplaceRecommendation`, `setReservationHoldPolicy`, `setUpgradeConversionPath` |
 | order | `getDepositPolicy`, `listTicketTransfers`, `setDepositPolicy` |
-| orders | `authoriseStoredValue`, `captureStoredValue`, `cleanupFailedPayment`, `cloneTicketTemplate`, `convertToTermProduct`, `createGroupBooking`, `createGroupEnquiry`, `createMemberException`, `createPaymentLink`, `getResaleFeePolicy`, `importTicketTemplate`, `issueInvitation`, `listChargebacks`, `listDeposits`, `listFraudRules`, `listInvitationAllowances`, `listMembershipRenewals`, `listOrderDiscounts`, `listOrderFees`, `listPaymentProviders`, `listTicketTemplates`, `listUpgrades`, `migrateMembership`, `openGuestCreditAccount`, `printTicketProof`, `pushWalletPassUpdate`, `quoteUpgrade`, `relinquishStoredValue`, `renewMembership`, `resendPaymentLink`, `resolveMembershipActivation`, `respondToChargeback`, `revokeEntitlementShare`, `setFraudRules`, `setGroupCustomerOrganization`, `setGroupPaymentSchedule`, `setGroupTicketAllocation`, `setGroupTicketFulfillment`, `setParticipantGuestList`, `setResaleFeePolicy`, `splitOrder`, `updateGroupBooking`, `voidEntitlement`, `voidPayment` |
-| payments | `createB2bCreditAccount`, `createPaymentMethod`, `createPaymentProviderConnection`, `getDunningPolicy`, `getMixedTenderRules`, `getPaymentPerformance`, `getPaymentProviderEconomics`, `getPaymentProviderHealth`, `getPaymentRules`, `listB2bCreditAccounts`, `listDepositActivity`, `listDunningCases`, `listMerchantAccounts`, `listPaymentMethods`, `listPaymentProviderConnections`, `listPaymentRoutingRules`, `listPaymentTerminals`, `listReconciliationSources`, `listStoredForwardTransactions`, `recordDepositActivity`, `resolveDunningCase`, `setB2bPaymentTerms`, `setDunningPolicy`, `setHostedCheckoutConfiguration`, `setMerchantAccount`, `setMixedTenderRules`, `setPaymentAuthenticationPolicy`, `setPaymentFailoverPolicy`, `setPaymentRiskRules`, `setPaymentRoutingRules`, `setPaymentRules`, `setPaymentTerminalConfiguration`, `setReconciliationMatchingRules`, `setReconciliationSource`, `simulatePaymentConfiguration`, `simulatePaymentRouting`, `submitChargebackEvidence`, `testPaymentProviderConnection`, `updatePaymentMethod` |
+| orders | `authoriseStoredValue`, `captureStoredValue`, `cleanupFailedPayment`, `cloneTicketTemplate`, `convertToTermProduct`, `createGroupBooking`, `createGroupEnquiry`, `createMemberException`, `createPaymentLink`, `getResaleFeePolicy`, `getResaleMarketplaceConfig`, `holdResaleSettlement`, `importTicketTemplate`, `issueInvitation`, `listChargebacks`, `listDeposits`, `listExternalReferenceMappings`, `listFraudRules`, `listInvitationAllowances`, `listMembershipRenewals`, `listOrderDiscounts`, `listOrderFees`, `listPaymentAllocationRules`, `listPaymentProviders`, `listTicketTemplates`, `listUpgrades`, `mergeOrders`, `migrateMembership`, `openGuestCreditAccount`, `printTicketProof`, `pushWalletPassUpdate`, `quoteUpgrade`, `recordExternalReference`, `recordGroupCheckIn`, `releaseResaleSettlementHold`, `relinquishStoredValue`, `renewMembership`, `resendPaymentLink`, `resolveMembershipActivation`, `respondToChargeback`, `revokeEntitlementShare`, `setFraudRules`, `setGroupCustomerOrganization`, `setGroupPaymentSchedule`, `setGroupTicketAllocation`, `setGroupTicketFulfillment`, `setParticipantGuestList`, `setResaleFeePolicy`, `setResaleMarketplaceConfig`, `splitOrder`, `updateGroupBooking`, `voidEntitlement`, `voidPayment` |
+| payments | `createB2bCreditAccount`, `createPaymentMethod`, `getDunningPolicy`, `getMixedTenderRules`, `getPaymentPerformance`, `getPaymentProviderEconomics`, `getPaymentProviderHealth`, `getPaymentRules`, `listB2bCreditAccounts`, `listDepositActivity`, `listDunningCases`, `listMerchantAccounts`, `listPaymentMethods`, `listPaymentProviderConnections`, `listPaymentRoutingRules`, `listPaymentTerminals`, `listReconciliationSources`, `listStoredForwardTransactions`, `recordDepositActivity`, `resolveDunningCase`, `setB2bPaymentTerms`, `setDunningPolicy`, `setHostedCheckoutConfiguration`, `setMerchantAccount`, `setMixedTenderRules`, `setPaymentAuthenticationPolicy`, `setPaymentFailoverPolicy`, `setPaymentRiskRules`, `setPaymentRoutingRules`, `setPaymentRules`, `setPaymentTerminalConfiguration`, `setReconciliationMatchingRules`, `setReconciliationSource`, `simulatePaymentConfiguration`, `simulatePaymentRouting`, `submitChargebackEvidence`, `testPaymentProviderConnection`, `updatePaymentMethod` |
 | policy | `getRefundPolicy`, `setRefundCalculationPolicy` |
 | refund | `approveRefund`, `createBulkRefund` |
 | reservation | `convertReservation`, `createReservation`, `extendReservation` |

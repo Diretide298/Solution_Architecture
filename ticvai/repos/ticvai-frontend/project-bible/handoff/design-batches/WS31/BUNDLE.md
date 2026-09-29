@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 2 permissions apply here:
   `ORDER_CREATE, ORDER_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-304 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-305",
@@ -186,10 +182,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can locate and monitor any TICVAI order/reservation across all channels from one centralized operational workspace.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide the central operational workspace for searching, monitoring, opening, and managing every order and reservation across TICVAI.",
-  "purposeNote": "Authorized users can locate and monitor any TICVAI order/reservation across all channels from one centralized operational workspace.",
   "layout": {
    "template": "split",
    "regions": [
@@ -215,10 +211,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "OrderReservationCommandCenterView.grossOrderValue",
         "OrderReservationCommandCenterView.orderId",
         "OrderReservationCommandCenterView.reservationId",
-        "OrderReservationCommandCenterView.customer",
         "OrderReservationCommandCenterView.channel",
         "OrderReservationCommandCenterView.venue",
-        "OrderReservationCommandCenterView.productEvent",
         "OrderReservationCommandCenterView.orderValue",
         "OrderReservationCommandCenterView.paymentStatus",
         "OrderReservationCommandCenterView.reservationStatus",
@@ -256,10 +250,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "OrderReservationCommandCenterView.grossOrderValue",
         "OrderReservationCommandCenterView.orderId",
         "OrderReservationCommandCenterView.reservationId",
-        "OrderReservationCommandCenterView.customer",
         "OrderReservationCommandCenterView.channel",
         "OrderReservationCommandCenterView.venue",
-        "OrderReservationCommandCenterView.productEvent",
         "OrderReservationCommandCenterView.orderValue",
         "OrderReservationCommandCenterView.paymentStatus",
         "OrderReservationCommandCenterView.reservationStatus",
@@ -315,7 +307,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-304"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-304",
+   "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-304"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 3. 25 of 25 labels bound to a contract property; 32 of 57 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -378,10 +371,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "The complete commercial, operational, customer, payment, ticket and fulfillment context of an order can be understood from one screen.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display; Show) and a per-row directory (§Each line should display) — counts over a population, then the population",
   "purpose": "Provide the authoritative 360-degree view of a single order. This should become one of the most important operational screens in TICVAI.",
-  "purposeNote": "The complete commercial, operational, customer, payment, ticket and fulfillment context of an order can be understood from one screen.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -524,21 +517,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every order detail transaction",
        "columns": [
-        "OrderDetailTransactionWorkspaceView.product",
-        "OrderDetailTransactionWorkspaceView.ticketType",
-        "OrderDetailTransactionWorkspaceView.event",
-        "OrderDetailTransactionWorkspaceView.performance",
+        "OrderDetailTransactionWorkspaceView.lines[].product",
+        "OrderDetailTransactionWorkspaceView.lines[].ticketType",
+        "OrderDetailTransactionWorkspaceView.lines[].event",
+        "OrderDetailTransactionWorkspaceView.lines[].performance",
         "OrderDetailTransactionWorkspaceView.date",
-        "OrderDetailTransactionWorkspaceView.timeslot",
-        "OrderDetailTransactionWorkspaceView.quantity",
-        "OrderDetailTransactionWorkspaceView.personType",
-        "OrderDetailTransactionWorkspaceView.seat",
-        "OrderDetailTransactionWorkspaceView.unitPrice",
-        "OrderDetailTransactionWorkspaceView.discount",
-        "OrderDetailTransactionWorkspaceView.tax",
-        "OrderDetailTransactionWorkspaceView.fee",
+        "OrderDetailTransactionWorkspaceView.lines[].timeslot",
+        "OrderDetailTransactionWorkspaceView.lines[].quantity",
+        "OrderDetailTransactionWorkspaceView.lines[].personType",
+        "OrderDetailTransactionWorkspaceView.lines[].seat",
+        "OrderDetailTransactionWorkspaceView.lines[].unitPrice",
+        "OrderDetailTransactionWorkspaceView.lines[].discount",
+        "OrderDetailTransactionWorkspaceView.lines[].tax",
+        "OrderDetailTransactionWorkspaceView.lines[].fee",
         "OrderDetailTransactionWorkspaceView.total",
-        "OrderDetailTransactionWorkspaceView.ticketStatus"
+        "OrderDetailTransactionWorkspaceView.lines[].ticketStatus"
        ],
        "bindsTo": "OrderDetailTransactionWorkspaceView",
        "operation": "setOrderDetailTransaction",
@@ -555,21 +548,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected order detail transaction",
        "bindsTo": "OrderDetailTransactionWorkspaceView",
        "columns": [
-        "OrderDetailTransactionWorkspaceView.product",
-        "OrderDetailTransactionWorkspaceView.ticketType",
-        "OrderDetailTransactionWorkspaceView.event",
-        "OrderDetailTransactionWorkspaceView.performance",
+        "OrderDetailTransactionWorkspaceView.lines[].product",
+        "OrderDetailTransactionWorkspaceView.lines[].ticketType",
+        "OrderDetailTransactionWorkspaceView.lines[].event",
+        "OrderDetailTransactionWorkspaceView.lines[].performance",
         "OrderDetailTransactionWorkspaceView.date",
-        "OrderDetailTransactionWorkspaceView.timeslot",
-        "OrderDetailTransactionWorkspaceView.quantity",
-        "OrderDetailTransactionWorkspaceView.personType",
-        "OrderDetailTransactionWorkspaceView.seat",
-        "OrderDetailTransactionWorkspaceView.unitPrice",
-        "OrderDetailTransactionWorkspaceView.discount",
-        "OrderDetailTransactionWorkspaceView.tax",
-        "OrderDetailTransactionWorkspaceView.fee",
+        "OrderDetailTransactionWorkspaceView.lines[].timeslot",
+        "OrderDetailTransactionWorkspaceView.lines[].quantity",
+        "OrderDetailTransactionWorkspaceView.lines[].personType",
+        "OrderDetailTransactionWorkspaceView.lines[].seat",
+        "OrderDetailTransactionWorkspaceView.lines[].unitPrice",
+        "OrderDetailTransactionWorkspaceView.lines[].discount",
+        "OrderDetailTransactionWorkspaceView.lines[].tax",
+        "OrderDetailTransactionWorkspaceView.lines[].fee",
         "OrderDetailTransactionWorkspaceView.total",
-        "OrderDetailTransactionWorkspaceView.ticketStatus"
+        "OrderDetailTransactionWorkspaceView.lines[].ticketStatus"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Order Total”, “Internal Notes”.",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Each line should display"
@@ -601,16 +594,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setOrderDetailTransaction",
     "contract": "orders",
     "purpose": "Order Detail & Transaction Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setOrderDetailTransaction"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-305"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-305",
+   "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-305"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 5. 35 of 35 labels bound to a contract property; 36 of 51 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -673,17 +664,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "overselling or orphaning inventory.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure by; Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure how TICVAI temporarily reserves inventory before an order is fully confirmed.",
-  "purposeNote": "overselling or orphaning inventory.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Cart Hold, Checkout Hold, Manual Hold, Payment Hold, Seat Hold, Inventory Hold. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -769,22 +753,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       },
       {
        "kind": "secondaryButton",
+       "label": "Agent Reservation",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Group Reservation",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "B2B Reservation",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Corporate Reservation",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Manual Hold",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
       },
       {
        "kind": "secondaryButton",
        "label": "Payment Hold",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Seat Hold",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Inventory Hold",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
       }
      ]
@@ -802,18 +796,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setReservationHoldPolicy",
     "contract": "orders",
     "purpose": "Reservation & Hold Policy Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setReservationHoldPolicy"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-306"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-306",
+   "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-306"
   },
-  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 18 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 22 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Cart Hold, Checkout Hold, Agent Reservation, Group Reservation, B2B Reservation, Corporate Reservation, Manual Hold, Payment Hold … are choices sent by `setReservationHoldPolicy`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -874,10 +866,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every order and reservation follows a centralized, controlled and auditable lifecycle regardless of originating sales channel.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§For each transition define) and no display directory — it is settings, not a population",
   "purpose": "Define the governed state machine for orders and reservations. SoftLab should not hard-code status transitions independently in every channel.",
-  "purposeNote": "Every order and reservation follows a centralized, controlled and auditable lifecycle regardless of originating sales channel.",
   "layout": {
    "template": "form",
    "regions": [
@@ -951,16 +943,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setOrderReservationStatus",
     "contract": "orders",
     "purpose": "Order & Reservation Status Lifecycle Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setOrderReservationStatus"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-307"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-307",
+   "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-307"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 8 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1023,17 +1013,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Orders from all TICVAI and external sales channels are created consistently while preserving complete source and attribution metadata.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture; Configure numbering rules; Configure whether a channel may) and no display directory — it is settings, not a population",
   "purpose": "Configure how orders can originate from different TICVAI sales channels while using one common transaction engine.",
-  "purposeNote": "Orders from all TICVAI and external sales channels are created consistently while preserving complete source and attribution metadata.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: OTA Booking Reference, Reseller Order ID. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Order___Reservation_Management_Reference.pdf, page 10 §Support partner identifiers such as"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1176,6 +1159,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "Reseller Order ID",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Support partner identifiers such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "External CRM Reference",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Support partner identifiers such as"
       }
      ]
     }
@@ -1192,18 +1180,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "createOrderSourceChannel",
     "contract": "orders",
     "purpose": "Order Creation & Source/Channel Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "createOrderSourceChannel"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-308"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-308",
+   "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-308"
   },
-  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 26 of 46 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 27 of 46 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** OTA Booking Reference, Reseller Order ID, External CRM Reference are choices sent by `createOrderSourceChannel`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1264,17 +1250,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every order can correctly identify purchaser, attendee, member, corporate or partner relationships without creating unnecessary duplicate customer records.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Depending on configuration) and no display directory — it is settings, not a population",
   "purpose": "Define how customers are identified and associated with orders/reservations.",
-  "purposeNote": "Every order can correctly identify purchaser, attendee, member, corporate or partner relationships without creating unnecessary duplicate customer records.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Registered Customer, Anonymous Sale where permitted, Link Existing, Continue Guest, Review Match. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Order___Reservation_Management_Reference.pdf, page 11 §Support"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1383,18 +1362,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setCustomerGuestAccount",
     "contract": "orders",
     "purpose": "Customer, Guest & Account Assignment",
-    "trigger": "onAction",
-    "invalidates": [
-     "setCustomerGuestAccount"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-309"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-309",
+   "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-309"
   },
-  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 16 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 16 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Registered Customer, Anonymous Sale where permitted, Link Existing, Continue Guest, Review Match are choices sent by `setCustomerGuestAccount`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1455,10 +1432,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "entitlements, commercial calculations and fulfillment requirements.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Each line captures) and no display directory — it is settings, not a population",
   "purpose": "Manage the products and commercial components contained within an order.",
-  "purposeNote": "entitlements, commercial calculations and fulfillment requirements.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1562,7 +1539,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-310"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-310",
+   "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-310"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 13. 0 of 0 labels bound to a contract property; 15 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1625,10 +1603,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Order and reservation activity commits and releases capacity consistently without double- selling, lost inventory, or inconsistent transaction states.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Control when and how order activity consumes real capacity/inventory. This is the transactional bridge between the Order Engine and the Capacity/Inventory Engines.",
-  "purposeNote": "Order and reservation activity commits and releases capacity consistently without double- selling, lost inventory, or inconsistent transaction states.",
   "gaps": [
    {
     "operation": null,
@@ -1674,17 +1652,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "CapacityReservationInventoryCommitmentView.temporaryAvailabilityProtection",
-    "CapacityReservationInventoryCommitmentView.confirmedInventoryConsumption",
-    "CapacityReservationInventoryCommitmentView.generalAdmissionCapacity",
-    "CapacityReservationInventoryCommitmentView.seatInventory",
-    "CapacityReservationInventoryCommitmentView.timeslotCapacity"
+    "CapacityReservationInventoryCommitmentView.inventoryType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-311"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-311",
+   "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-311"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1747,10 +1722,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "and compliance conditions have been satisfied.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure combinations of) and no display directory — it is settings, not a population",
   "purpose": "Determine when a reservation becomes a confirmed order and when it is ready for ticket/media fulfillment.",
-  "purposeNote": "and compliance conditions have been satisfied.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1824,7 +1799,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-312"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-312",
+   "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-312"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 9 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1879,10 +1855,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from BO-304, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Operations teams can reconstruct the complete lifecycle of an order, identify abnormal transactions and safely recover exceptions through controlled actions. Board 1 — Final Screen Register # Backend Screen Core Responsibility 12.1. Central order/reservation",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Detect) and no metric row",
   "purpose": "Provide complete lifecycle visibility and proactively identify orders/reservations that require operational intervention.",
-  "purposeNote": "Operations teams can reconstruct the complete lifecycle of an order, identify abnormal transactions and safely recover exceptions through controlled actions. Board 1 — Final Screen Register # Backend Screen Core Responsibility 12.1. Central order/reservation",
   "layout": {
    "template": "split",
    "regions": [
@@ -1894,13 +1870,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every order lifecycle timeline",
        "columns": [
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.stuckOrder",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.orphanReservation",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.paymentOrderMismatch",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.capacityMismatch",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.missingCustomerData",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.fulfillmentFailure",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.externalSynchronizationFailure",
+        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.exceptionType",
         "Duplicate Transaction Risk"
        ],
        "bindsTo": "OrderLifecycleTimelineSlaExceptionsAiOperationsView",
@@ -1918,13 +1888,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected order lifecycle timeline",
        "bindsTo": "OrderLifecycleTimelineSlaExceptionsAiOperationsView",
        "columns": [
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.stuckOrder",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.orphanReservation",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.paymentOrderMismatch",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.capacityMismatch",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.missingCustomerData",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.fulfillmentFailure",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.externalSynchronizationFailure",
+        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.exceptionType",
         "Duplicate Transaction Risk"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Prioritize by”, “Depending on exception”, “Order & Reservation Command Center”, “Transaction state machine”, “Omnichannel order creation”, “Customer, Guest & Account Assignment”.",
@@ -1951,18 +1915,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "OrderLifecycleTimelineSlaExceptionsAiOperationsView.stuckOrder",
-    "OrderLifecycleTimelineSlaExceptionsAiOperationsView.orphanReservation",
-    "OrderLifecycleTimelineSlaExceptionsAiOperationsView.paymentOrderMismatch",
-    "OrderLifecycleTimelineSlaExceptionsAiOperationsView.capacityMismatch",
-    "OrderLifecycleTimelineSlaExceptionsAiOperationsView.missingCustomerData",
-    "OrderLifecycleTimelineSlaExceptionsAiOperationsView.fulfillmentFailure"
+    "OrderLifecycleTimelineSlaExceptionsAiOperationsView.exceptionType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-313"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-313",
+   "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-313"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 17. 7 of 8 labels bound to a contract property; 17 of 93 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -2006,7 +1966,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "OrderCreationSourceChannelConfigurationInput",
   "responds": "OrderCreationSourceChannelConfigurationView"
  },
@@ -2098,6 +2064,41 @@ Method, path, parameters, request and response for every operation these screens
     "name": "transactionReference",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "paymentReference",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "externalPartnerReference",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "barcodeQr",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customer",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productEvent",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -2125,7 +2126,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "CustomerGuestAccountAssignmentInput",
   "responds": "CustomerGuestAccountAssignmentView"
  },
@@ -2138,7 +2145,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "OrderDetailTransactionWorkspaceInput",
   "responds": "OrderDetailTransactionWorkspaceView"
  },
@@ -2151,7 +2164,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "OrderReservationStatusLifecycleConfigurationInput",
   "responds": "OrderReservationStatusLifecycleConfigurationView"
  },
@@ -2164,7 +2183,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ReservationHoldPolicyConfigurationInput",
   "responds": "ReservationHoldPolicyConfigurationView"
  }
@@ -2183,66 +2208,54 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Capacity Reservation & Inventory Commitment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "temporaryAvailabilityProtection": {
+   "inventoryType": {
     "type": "string",
-    "description": "Temporary availability protection"
+    "enum": [
+     "generalAdmissionCapacity",
+     "seatInventory",
+     "timeslotCapacity",
+     "eventCapacity",
+     "productInventory",
+     "rentalInventory",
+     "fBRetailInventoryWhereApplicable"
+    ],
+    "description": "Inventory the commitment is against."
    },
-   "confirmedInventoryConsumption": {
+   "releaseReason": {
     "type": "string",
-    "description": "Confirmed inventory consumption"
+    "enum": [
+     "holdExpires",
+     "reservationCancels",
+     "paymentFailsAccordingToPolicy",
+     "orderFails",
+     "authorizedAmendmentRemovesProduct"
+    ],
+    "description": "Why the inventory was released."
    },
-   "generalAdmissionCapacity": {
+   "commitmentType": {
+    "type": "string",
+    "enum": [
+     "temporaryHold",
+     "confirmedConsumption"
+    ],
+    "description": "Temporary availability protection or confirmed consumption"
+   },
+   "orderId": {
+    "type": "string",
+    "description": "Order ID"
+   },
+   "reservationId": {
+    "type": "string",
+    "description": "Reservation ID"
+   },
+   "quantity": {
     "type": "integer",
-    "description": "General Admission Capacity"
+    "description": "Quantity committed"
    },
-   "seatInventory": {
-    "type": "string",
-    "description": "Seat Inventory"
-   },
-   "timeslotCapacity": {
-    "type": "integer",
-    "description": "Timeslot Capacity"
-   },
-   "eventCapacity": {
-    "type": "integer",
-    "description": "Event Capacity"
-   },
-   "productInventory": {
-    "type": "string",
-    "description": "Product Inventory"
-   },
-   "rentalInventory": {
-    "type": "string",
-    "description": "Rental Inventory"
-   },
-   "fBRetailInventoryWhereApplicable": {
-    "type": "string",
-    "description": "F&B/Retail inventory where applicable"
-   },
-   "returnAControlledException": {
-    "type": "string",
-    "description": "return a controlled exception"
-   },
-   "holdExpires": {
+   "expiresAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Hold Expires"
-   },
-   "reservationCancels": {
-    "type": "string",
-    "description": "Reservation Cancels"
-   },
-   "paymentFailsAccordingToPolicy": {
-    "type": "string",
-    "description": "Payment Fails according to policy"
-   },
-   "orderFails": {
-    "type": "string",
-    "description": "Order Fails"
-   },
-   "authorizedAmendmentRemovesProduct": {
-    "type": "string",
-    "description": "Authorized amendment removes product"
+    "description": "When a temporary hold ends"
    }
   }
  },
@@ -2252,34 +2265,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Customer, Guest & Account Assignment submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "guestCheckout": {
-    "type": "string",
-    "description": "Guest Checkout"
-   },
-   "registeredCustomer": {
-    "type": "string",
-    "description": "Registered Customer"
-   },
-   "member": {
-    "type": "string",
-    "description": "Member"
-   },
-   "corporateAccount": {
-    "type": "string",
-    "description": "Corporate Account"
-   },
-   "b2bAccount": {
-    "type": "string",
-    "description": "B2B Account"
-   },
-   "groupOrganizer": {
-    "type": "string",
-    "description": "Group Organizer"
-   },
-   "anonymousSaleWherePermitted": {
-    "type": "string",
-    "description": "Anonymous Sale where permitted"
-   },
    "name": {
     "type": "string",
     "description": "Name"
@@ -2321,18 +2306,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Tax Details"
    },
-   "from": {
-    "type": "string",
-    "description": "from"
-   },
-   "continueGuest": {
-    "type": "string",
-    "description": "Continue Guest"
-   },
-   "dependingOnPolicy": {
-    "type": "string",
-    "description": "depending on policy"
-   },
    "partner": {
     "type": "string",
     "description": "Partner"
@@ -2345,9 +2318,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Agent"
    },
-   "costCenterWhereApplicable": {
+   "anonymousSale": {
+    "type": "string",
+    "description": "Anonymous Sale where permitted"
+   },
+   "costCenter": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Cost Center where applicable"
+   },
+   "customerType": {
+    "type": "string",
+    "enum": [
+     "guestCheckout",
+     "registeredCustomer",
+     "member",
+     "corporateAccount",
+     "b2bAccount",
+     "groupOrganizer",
+     "anonymousSale"
+    ],
+    "description": "How the order is attributed."
    }
   }
  },
@@ -2357,34 +2347,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Customer, Guest & Account Assignment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "guestCheckout": {
-    "type": "string",
-    "description": "Guest Checkout"
-   },
-   "registeredCustomer": {
-    "type": "string",
-    "description": "Registered Customer"
-   },
-   "member": {
-    "type": "string",
-    "description": "Member"
-   },
-   "corporateAccount": {
-    "type": "string",
-    "description": "Corporate Account"
-   },
-   "b2bAccount": {
-    "type": "string",
-    "description": "B2B Account"
-   },
-   "groupOrganizer": {
-    "type": "string",
-    "description": "Group Organizer"
-   },
-   "anonymousSaleWherePermitted": {
-    "type": "string",
-    "description": "Anonymous Sale where permitted"
-   },
    "name": {
     "type": "string",
     "description": "Name"
@@ -2426,18 +2388,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Tax Details"
    },
-   "from": {
-    "type": "string",
-    "description": "from"
-   },
-   "continueGuest": {
-    "type": "string",
-    "description": "Continue Guest"
-   },
-   "dependingOnPolicy": {
-    "type": "string",
-    "description": "depending on policy"
-   },
    "partner": {
     "type": "string",
     "description": "Partner"
@@ -2450,9 +2400,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Agent"
    },
-   "costCenterWhereApplicable": {
+   "anonymousSale": {
+    "type": "string",
+    "description": "Anonymous Sale where permitted"
+   },
+   "costCenter": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Cost Center where applicable"
+   },
+   "customerType": {
+    "type": "string",
+    "enum": [
+     "guestCheckout",
+     "registeredCustomer",
+     "member",
+     "corporateAccount",
+     "b2bAccount",
+     "groupOrganizer",
+     "anonymousSale"
+    ],
+    "description": "How the order is attributed."
    }
   }
  },
@@ -2462,58 +2429,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.channel_allocation at 3%, so this is not an update to anything the package stores today and no new table has been decided",
   "description": "**What Order Creation & Source/Channel Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "b2cWeb": {
-    "type": "string",
-    "description": "B2C Web"
-   },
-   "mobileApp": {
-    "type": "string",
-    "description": "Mobile App"
-   },
-   "pos": {
-    "type": "string",
-    "description": "POS"
-   },
-   "mobileFlyingPos": {
-    "type": "string",
-    "description": "Mobile/Flying POS"
-   },
-   "kiosk": {
-    "type": "string",
-    "description": "Kiosk"
-   },
-   "callCenter": {
-    "type": "string",
-    "description": "Call Center"
-   },
-   "boxOffice": {
-    "type": "string",
-    "description": "Box Office"
-   },
-   "b2bPortal": {
-    "type": "string",
-    "description": "B2B Portal"
-   },
-   "reseller": {
-    "type": "string",
-    "description": "Reseller"
-   },
-   "ota": {
-    "type": "string",
-    "description": "OTA"
-   },
-   "api": {
-    "type": "string",
-    "description": "API"
-   },
-   "administrativeBackend": {
-    "type": "string",
-    "description": "Administrative Backend"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
    "subChannel": {
     "type": "string",
     "description": "Sub-Channel"
@@ -2554,53 +2469,52 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "External Reference"
    },
-   "globalSequence": {
-    "type": "string",
-    "description": "Global Sequence"
-   },
-   "tenantSequence": {
-    "type": "string",
-    "description": "Tenant Sequence"
-   },
-   "venueSequence": {
-    "type": "string",
-    "description": "Venue Sequence"
-   },
-   "channelPrefix": {
-    "type": "string",
-    "description": "Channel Prefix"
-   },
-   "yearMonthPrefix": {
-    "type": "string",
-    "description": "Year/Month Prefix"
-   },
-   "customPattern": {
-    "type": "string",
-    "description": "Custom Pattern"
-   },
-   "otaBookingReference": {
-    "type": "string",
-    "description": "OTA Booking Reference"
-   },
-   "resellerOrderId": {
-    "type": "string",
-    "description": "Reseller Order ID"
-   },
-   "erpReference": {
-    "type": "string",
-    "description": "ERP Reference"
-   },
-   "externalCrmReference": {
-    "type": "string",
-    "description": "External CRM Reference"
-   },
    "holdInventory": {
     "type": "string",
     "description": "Hold Inventory"
    },
-   "repeatedRequests": {
+   "source": {
     "type": "string",
-    "description": "repeated requests"
+    "enum": [
+     "b2cWeb",
+     "mobileApp",
+     "pos",
+     "mobileFlyingPos",
+     "kiosk",
+     "callCenter",
+     "boxOffice",
+     "b2bPortal",
+     "reseller",
+     "ota",
+     "api",
+     "administrativeBackend"
+    ],
+    "description": "Order source."
+   },
+   "numberingRule": {
+    "type": "string",
+    "enum": [
+     "globalSequence",
+     "tenantSequence",
+     "venueSequence",
+     "yearMonthPrefix",
+     "customPattern"
+    ],
+    "description": "Order numbering rule."
+   },
+   "channelPrefix": {
+    "type": "string",
+    "description": "Channel prefix for the order number"
+   },
+   "partnerReferenceType": {
+    "type": "string",
+    "enum": [
+     "otaBookingReference",
+     "resellerOrderId",
+     "erpReference",
+     "externalCrmReference"
+    ],
+    "description": "Kind of partner identifier held in externalReference"
    }
   }
  },
@@ -2610,58 +2524,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Order Creation & Source/Channel Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "b2cWeb": {
-    "type": "string",
-    "description": "B2C Web"
-   },
-   "mobileApp": {
-    "type": "string",
-    "description": "Mobile App"
-   },
-   "pos": {
-    "type": "string",
-    "description": "POS"
-   },
-   "mobileFlyingPos": {
-    "type": "string",
-    "description": "Mobile/Flying POS"
-   },
-   "kiosk": {
-    "type": "string",
-    "description": "Kiosk"
-   },
-   "callCenter": {
-    "type": "string",
-    "description": "Call Center"
-   },
-   "boxOffice": {
-    "type": "string",
-    "description": "Box Office"
-   },
-   "b2bPortal": {
-    "type": "string",
-    "description": "B2B Portal"
-   },
-   "reseller": {
-    "type": "string",
-    "description": "Reseller"
-   },
-   "ota": {
-    "type": "string",
-    "description": "OTA"
-   },
-   "api": {
-    "type": "string",
-    "description": "API"
-   },
-   "administrativeBackend": {
-    "type": "string",
-    "description": "Administrative Backend"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
    "subChannel": {
     "type": "string",
     "description": "Sub-Channel"
@@ -2702,53 +2564,52 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "External Reference"
    },
-   "globalSequence": {
-    "type": "string",
-    "description": "Global Sequence"
-   },
-   "tenantSequence": {
-    "type": "string",
-    "description": "Tenant Sequence"
-   },
-   "venueSequence": {
-    "type": "string",
-    "description": "Venue Sequence"
-   },
-   "channelPrefix": {
-    "type": "string",
-    "description": "Channel Prefix"
-   },
-   "yearMonthPrefix": {
-    "type": "string",
-    "description": "Year/Month Prefix"
-   },
-   "customPattern": {
-    "type": "string",
-    "description": "Custom Pattern"
-   },
-   "otaBookingReference": {
-    "type": "string",
-    "description": "OTA Booking Reference"
-   },
-   "resellerOrderId": {
-    "type": "string",
-    "description": "Reseller Order ID"
-   },
-   "erpReference": {
-    "type": "string",
-    "description": "ERP Reference"
-   },
-   "externalCrmReference": {
-    "type": "string",
-    "description": "External CRM Reference"
-   },
    "holdInventory": {
     "type": "string",
     "description": "Hold Inventory"
    },
-   "repeatedRequests": {
+   "source": {
     "type": "string",
-    "description": "repeated requests"
+    "enum": [
+     "b2cWeb",
+     "mobileApp",
+     "pos",
+     "mobileFlyingPos",
+     "kiosk",
+     "callCenter",
+     "boxOffice",
+     "b2bPortal",
+     "reseller",
+     "ota",
+     "api",
+     "administrativeBackend"
+    ],
+    "description": "Order source."
+   },
+   "numberingRule": {
+    "type": "string",
+    "enum": [
+     "globalSequence",
+     "tenantSequence",
+     "venueSequence",
+     "yearMonthPrefix",
+     "customPattern"
+    ],
+    "description": "Order numbering rule."
+   },
+   "channelPrefix": {
+    "type": "string",
+    "description": "Channel prefix for the order number"
+   },
+   "partnerReferenceType": {
+    "type": "string",
+    "enum": [
+     "otaBookingReference",
+     "resellerOrderId",
+     "erpReference",
+     "externalCrmReference"
+    ],
+    "description": "Kind of partner identifier held in externalReference"
    }
   }
  },
@@ -2758,62 +2619,70 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is orders.cart_line at 14%, so this is not an update to anything the package stores today and no new table has been decided",
   "description": "**What Order Detail & Transaction Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *Each line should display* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
   "properties": {
-   "product": {
+   "orderNumber": {
     "type": "string",
-    "description": "Product"
+    "description": "Order number"
    },
-   "ticketType": {
-    "type": "string",
-    "description": "Ticket Type"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "performance": {
-    "type": "string",
-    "description": "Performance"
-   },
-   "date": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date"
-   },
-   "timeslot": {
-    "type": "string",
-    "description": "Timeslot"
-   },
-   "quantity": {
-    "type": "integer",
-    "description": "Quantity"
-   },
-   "personType": {
-    "type": "string",
-    "description": "Person Type"
-   },
-   "seat": {
-    "type": "string",
-    "description": "Seat"
-   },
-   "unitPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Unit Price"
-   },
-   "discount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount"
-   },
-   "tax": {
-    "type": "string",
-    "description": "Tax"
-   },
-   "fee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fee"
-   },
-   "ticketStatus": {
-    "type": "string",
-    "description": "Ticket Status"
+   "lines": {
+    "type": "array",
+    "description": "Order lines",
+    "items": {
+     "type": "object",
+     "properties": {
+      "product": {
+       "type": "string",
+       "description": "Product"
+      },
+      "ticketType": {
+       "type": "string",
+       "description": "Ticket type"
+      },
+      "event": {
+       "type": "string",
+       "description": "Event"
+      },
+      "performance": {
+       "type": "string",
+       "description": "Performance"
+      },
+      "timeslot": {
+       "type": "string",
+       "description": "Timeslot"
+      },
+      "quantity": {
+       "type": "integer",
+       "description": "Quantity"
+      },
+      "personType": {
+       "type": "string",
+       "description": "Person type"
+      },
+      "seat": {
+       "type": "string",
+       "description": "Seat"
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Unit price"
+      },
+      "discount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Discount"
+      },
+      "tax": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Tax"
+      },
+      "fee": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Fee"
+      },
+      "ticketStatus": {
+       "type": "string",
+       "description": "Ticket status"
+      }
+     }
+    }
    }
   },
   "x-ticvai-record-definition": "Each line should display"
@@ -2878,62 +2747,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "Fulfillment Status"
    },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "ticketType": {
-    "type": "string",
-    "description": "Ticket Type"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "performance": {
-    "type": "string",
-    "description": "Performance"
-   },
    "date": {
     "type": "string",
     "format": "date-time",
     "description": "Date"
-   },
-   "timeslot": {
-    "type": "string",
-    "description": "Timeslot"
-   },
-   "quantity": {
-    "type": "integer",
-    "description": "Quantity"
-   },
-   "personType": {
-    "type": "string",
-    "description": "Person Type"
-   },
-   "seat": {
-    "type": "string",
-    "description": "Seat"
-   },
-   "unitPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Unit Price"
-   },
-   "discount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount"
-   },
-   "tax": {
-    "type": "string",
-    "description": "Tax"
-   },
-   "fee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fee"
-   },
-   "ticketStatus": {
-    "type": "string",
-    "description": "Ticket Status"
    },
    "tickets": {
     "type": "integer",
@@ -2970,6 +2787,67 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "relatedOrders": {
     "type": "integer",
     "description": "Related Orders"
+   },
+   "lines": {
+    "type": "array",
+    "description": "Order lines",
+    "items": {
+     "type": "object",
+     "properties": {
+      "product": {
+       "type": "string",
+       "description": "Product"
+      },
+      "ticketType": {
+       "type": "string",
+       "description": "Ticket type"
+      },
+      "event": {
+       "type": "string",
+       "description": "Event"
+      },
+      "performance": {
+       "type": "string",
+       "description": "Performance"
+      },
+      "timeslot": {
+       "type": "string",
+       "description": "Timeslot"
+      },
+      "quantity": {
+       "type": "integer",
+       "description": "Quantity"
+      },
+      "personType": {
+       "type": "string",
+       "description": "Person type"
+      },
+      "seat": {
+       "type": "string",
+       "description": "Seat"
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Unit price"
+      },
+      "discount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Discount"
+      },
+      "tax": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Tax"
+      },
+      "fee": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Fee"
+      },
+      "ticketStatus": {
+       "type": "string",
+       "description": "Ticket status"
+      }
+     }
+    }
    }
   }
  },
@@ -3016,58 +2894,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Result"
    },
-   "stuckOrder": {
+   "exceptionType": {
     "type": "string",
-    "description": "Stuck Order"
-   },
-   "orphanReservation": {
-    "type": "string",
-    "description": "Orphan Reservation"
-   },
-   "paymentOrderMismatch": {
-    "type": "string",
-    "description": "Payment/Order Mismatch"
-   },
-   "capacityMismatch": {
-    "type": "integer",
-    "description": "Capacity Mismatch"
-   },
-   "missingCustomerData": {
-    "type": "string",
-    "description": "Missing Customer Data"
-   },
-   "fulfillmentFailure": {
-    "type": "string",
-    "description": "Fulfillment Failure"
-   },
-   "externalSynchronizationFailure": {
-    "type": "string",
-    "description": "External Synchronization Failure"
-   },
-   "revalidate": {
-    "type": "string",
-    "description": "Revalidate"
-   },
-   "reprocessFulfillment": {
-    "type": "string",
-    "description": "Reprocess Fulfillment"
-   },
-   "importantArchitectureDecisionsToFreeze": {
-    "type": "string",
-    "description": "Important Architecture Decisions to Freeze"
-   },
-   "governedCommercialTransaction": {
-    "type": "string",
-    "description": "governed commercial transaction"
-   },
-   "board2AmendmentsCancellations": {
-    "type": "string",
-    "description": "Board 2 — Amendments, Cancellations"
-   },
-   "created": {
-    "type": "string",
-    "format": "date-time",
-    "description": "created"
+    "enum": [
+     "stuckOrder",
+     "orphanReservation",
+     "paymentOrderMismatch",
+     "capacityMismatch",
+     "missingCustomerData",
+     "fulfillmentFailure",
+     "externalSynchronizationFailure"
+    ],
+    "description": "Exception detected."
    }
   }
  },
@@ -3077,50 +2915,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Order Line, Product & Entitlement Composition displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "tickets": {
-    "type": "string",
-    "description": "Tickets"
-   },
-   "memberships": {
-    "type": "string",
-    "description": "Memberships"
-   },
-   "addOns": {
-    "type": "string",
-    "description": "Add-Ons"
-   },
-   "fB": {
-    "type": "string",
-    "description": "F&B"
-   },
-   "retail": {
-    "type": "string",
-    "description": "Retail"
-   },
-   "rental": {
-    "type": "string",
-    "description": "Rental"
-   },
-   "parking": {
-    "type": "string",
-    "description": "Parking"
-   },
-   "experiences": {
-    "type": "string",
-    "description": "Experiences"
-   },
-   "packages": {
-    "type": "string",
-    "description": "Packages"
-   },
-   "vouchers": {
-    "type": "string",
-    "description": "Vouchers"
-   },
-   "otherConfiguredProducts": {
-    "type": "string",
-    "description": "Other configured products"
-   },
    "product": {
     "type": "string",
     "description": "Product"
@@ -3171,7 +2965,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Discount"
    },
    "tax": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Tax"
    },
    "fee": {
@@ -3182,29 +2976,22 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Fulfillment Method"
    },
-   "productLimits": {
+   "lineType": {
     "type": "string",
-    "description": "Product Limits"
-   },
-   "channelLimits": {
-    "type": "string",
-    "description": "Channel Limits"
-   },
-   "customerLimits": {
-    "type": "string",
-    "description": "Customer Limits"
-   },
-   "eventLimits": {
-    "type": "string",
-    "description": "Event Limits"
-   },
-   "capacity": {
-    "type": "integer",
-    "description": "Capacity"
-   },
-   "moment": {
-    "type": "string",
-    "description": "moment"
+    "enum": [
+     "tickets",
+     "memberships",
+     "addOns",
+     "fB",
+     "retail",
+     "rental",
+     "parking",
+     "experiences",
+     "packages",
+     "vouchers",
+     "otherConfiguredProducts"
+    ],
+    "description": "What the line sells."
    }
   }
  },
@@ -3270,10 +3057,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Reservation ID"
    },
-   "customer": {
-    "type": "string",
-    "description": "Customer"
-   },
    "channel": {
     "type": "string",
     "description": "Channel"
@@ -3281,10 +3064,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "venue": {
     "type": "string",
     "description": "Venue"
-   },
-   "productEvent": {
-    "type": "string",
-    "description": "Product/Event"
    },
    "orderValue": {
     "type": "string",
@@ -3315,10 +3094,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "ownerAgent": {
     "type": "string",
     "description": "Owner/Agent"
-   },
-   "collectPayment": {
-    "type": "string",
-    "description": "Collect Payment"
    }
   }
  },
@@ -3433,106 +3208,55 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Reservation Confirmation, Expiry & Fulfillment Readiness displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "paymentComplete": {
+   "confirmationConditions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "paymentComplete",
+      "depositReceived",
+      "creditApproved",
+      "capacityConfirmed",
+      "customerDataComplete",
+      "requiredWaiverComplete",
+      "requiredApprovalComplete",
+      "partnerConfirmationReceived"
+     ]
+    },
+    "description": "Conditions that confirm the reservation."
+   },
+   "failedIssueChecks": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "orderConfirmed",
+      "paymentConditionMet",
+      "requiredCustomerData",
+      "entitlementValid",
+      "waiverRequirement",
+      "credentialConfiguration",
+      "deliveryMethod"
+     ]
+    },
+    "description": "Checks before issuing ticket/media that fail."
+   },
+   "reservationId": {
     "type": "string",
-    "description": "Payment Complete"
+    "description": "Reservation ID"
    },
-   "depositReceived": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Deposit Received"
-   },
-   "creditApproved": {
+   "orderId": {
     "type": "string",
-    "description": "Credit Approved"
+    "description": "Order ID"
    },
-   "capacityConfirmed": {
-    "type": "integer",
-    "description": "Capacity Confirmed"
-   },
-   "customerDataComplete": {
+   "status": {
     "type": "string",
-    "description": "Customer Data Complete"
+    "description": "Reservation status (states/reservation.yaml)"
    },
-   "requiredWaiverComplete": {
-    "type": "string",
-    "description": "Required Waiver Complete"
-   },
-   "requiredApprovalComplete": {
-    "type": "string",
-    "description": "Required Approval Complete"
-   },
-   "partnerConfirmationReceived": {
-    "type": "string",
-    "description": "Partner Confirmation Received"
-   },
-   "exampleB2c": {
-    "type": "string",
-    "description": "Example — B2C"
-   },
-   "exampleB2b": {
-    "type": "string",
-    "description": "Example — B2B"
-   },
-   "partnerAuthorized": {
-    "type": "string",
-    "description": "Partner Authorized"
-   },
-   "orderConfirmed": {
-    "type": "string",
-    "description": "Order Confirmed"
-   },
-   "paymentConditionMet": {
-    "type": "string",
-    "description": "Payment Condition Met"
-   },
-   "requiredCustomerData": {
-    "type": "string",
-    "description": "Required Customer Data"
-   },
-   "entitlementValid": {
-    "type": "string",
-    "description": "Entitlement Valid"
-   },
-   "waiverRequirement": {
-    "type": "string",
-    "description": "Waiver Requirement"
-   },
-   "credentialConfiguration": {
-    "type": "string",
-    "description": "Credential Configuration"
-   },
-   "deliveryMethod": {
-    "type": "string",
-    "description": "Delivery Method"
-   },
-   "expire": {
+   "expiresAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Expire"
-   },
-   "preserveHistory": {
-    "type": "string",
-    "description": "Preserve history"
-   },
-   "ticketMedia": {
-    "type": "string",
-    "description": "Ticket Media"
-   },
-   "walletPass": {
-    "type": "string",
-    "description": "Wallet Pass"
-   },
-   "rfidNfc": {
-    "type": "string",
-    "description": "RFID/NFC"
-   },
-   "emailDelivery": {
-    "type": "string",
-    "description": "Email Delivery"
-   },
-   "otherCredentialServices": {
-    "type": "string",
-    "description": "Other credential services"
+    "description": "Expiry"
    }
   }
  },
@@ -3542,46 +3266,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.channel_allocation at 3%, so this is not an update to anything the package stores today and no new table has been decided",
   "description": "**What Reservation & Hold Policy Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "cartHold": {
-    "type": "string",
-    "description": "Cart Hold"
-   },
-   "checkoutHold": {
-    "type": "string",
-    "description": "Checkout Hold"
-   },
-   "agentReservation": {
-    "type": "string",
-    "description": "Agent Reservation"
-   },
-   "groupReservation": {
-    "type": "string",
-    "description": "Group Reservation"
-   },
-   "b2bReservation": {
-    "type": "string",
-    "description": "B2B Reservation"
-   },
-   "corporateReservation": {
-    "type": "string",
-    "description": "Corporate Reservation"
-   },
-   "manualHold": {
-    "type": "string",
-    "description": "Manual Hold"
-   },
-   "paymentHold": {
-    "type": "string",
-    "description": "Payment Hold"
-   },
-   "seatHold": {
-    "type": "string",
-    "description": "Seat Hold"
-   },
-   "inventoryHold": {
-    "type": "string",
-    "description": "Inventory Hold"
-   },
    "channel": {
     "type": "string",
     "description": "Channel"
@@ -3610,10 +3294,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Reservation Type"
    },
-   "maintainAuditRecord": {
-    "type": "string",
-    "description": "Maintain Audit Record"
-   },
    "extensionAllowed": {
     "type": "boolean",
     "description": "Extension Allowed"
@@ -3635,29 +3315,53 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Approval Requirement"
    },
-   "admissionCapacity": {
-    "type": "integer",
-    "description": "Admission Capacity"
-   },
-   "seat": {
+   "holdType": {
     "type": "string",
-    "description": "Seat"
+    "enum": [
+     "cartHold",
+     "checkoutHold",
+     "agentReservation",
+     "groupReservation",
+     "b2bReservation",
+     "corporateReservation",
+     "manualHold",
+     "paymentHold",
+     "seatHold",
+     "inventoryHold"
+    ],
+    "description": "Kind of hold."
    },
-   "inventory": {
-    "type": "string",
-    "description": "Inventory"
+   "lockedCapacity": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "admissionCapacity",
+      "seat",
+      "inventory",
+      "timeslotCapacity",
+      "entitlementCapacity"
+     ]
+    },
+    "description": "What the reservation locks through the central capacity services."
    },
-   "timeslotCapacity": {
+   "holdDurationMinutes": {
     "type": "integer",
-    "description": "Timeslot Capacity"
+    "description": "Hold duration in minutes"
    },
-   "entitlementCapacity": {
-    "type": "integer",
-    "description": "Entitlement Capacity"
-   },
-   "throughTheCentralCapacityInventoryServices": {
-    "type": "integer",
-    "description": "through the central capacity/inventory services"
+   "onExpiry": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "releaseInventory",
+      "releaseSeats",
+      "cancelReservation",
+      "notifyCustomer",
+      "notifyAgent"
+     ]
+    },
+    "description": "What happens on expiry"
    }
   }
  },
@@ -3667,46 +3371,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Reservation & Hold Policy Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "cartHold": {
-    "type": "string",
-    "description": "Cart Hold"
-   },
-   "checkoutHold": {
-    "type": "string",
-    "description": "Checkout Hold"
-   },
-   "agentReservation": {
-    "type": "string",
-    "description": "Agent Reservation"
-   },
-   "groupReservation": {
-    "type": "string",
-    "description": "Group Reservation"
-   },
-   "b2bReservation": {
-    "type": "string",
-    "description": "B2B Reservation"
-   },
-   "corporateReservation": {
-    "type": "string",
-    "description": "Corporate Reservation"
-   },
-   "manualHold": {
-    "type": "string",
-    "description": "Manual Hold"
-   },
-   "paymentHold": {
-    "type": "string",
-    "description": "Payment Hold"
-   },
-   "seatHold": {
-    "type": "string",
-    "description": "Seat Hold"
-   },
-   "inventoryHold": {
-    "type": "string",
-    "description": "Inventory Hold"
-   },
    "channel": {
     "type": "string",
     "description": "Channel"
@@ -3735,10 +3399,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Reservation Type"
    },
-   "maintainAuditRecord": {
-    "type": "string",
-    "description": "Maintain Audit Record"
-   },
    "extensionAllowed": {
     "type": "boolean",
     "description": "Extension Allowed"
@@ -3760,29 +3420,53 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Approval Requirement"
    },
-   "admissionCapacity": {
-    "type": "integer",
-    "description": "Admission Capacity"
-   },
-   "seat": {
+   "holdType": {
     "type": "string",
-    "description": "Seat"
+    "enum": [
+     "cartHold",
+     "checkoutHold",
+     "agentReservation",
+     "groupReservation",
+     "b2bReservation",
+     "corporateReservation",
+     "manualHold",
+     "paymentHold",
+     "seatHold",
+     "inventoryHold"
+    ],
+    "description": "Kind of hold."
    },
-   "inventory": {
-    "type": "string",
-    "description": "Inventory"
+   "lockedCapacity": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "admissionCapacity",
+      "seat",
+      "inventory",
+      "timeslotCapacity",
+      "entitlementCapacity"
+     ]
+    },
+    "description": "What the reservation locks through the central capacity services."
    },
-   "timeslotCapacity": {
+   "holdDurationMinutes": {
     "type": "integer",
-    "description": "Timeslot Capacity"
+    "description": "Hold duration in minutes (e.g. B2C checkout 10, call centre 20, B2B group 2,880)"
    },
-   "entitlementCapacity": {
-    "type": "integer",
-    "description": "Entitlement Capacity"
-   },
-   "throughTheCentralCapacityInventoryServices": {
-    "type": "integer",
-    "description": "through the central capacity/inventory services"
+   "onExpiry": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "releaseInventory",
+      "releaseSeats",
+      "cancelReservation",
+      "notifyCustomer",
+      "notifyAgent"
+     ]
+    },
+    "description": "What happens on expiry; an audit record is always kept"
    }
   }
  }

@@ -848,12 +848,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPartnerOnboardingApplication</div>
+          <div><b>OPERATIONS</b> &middot; listPartnerOnboardingApplication · actOnPartnerApplicationReview</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; applicationId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#ptr-022">PTR-022</a>  &mdash; <i>Returns to the command centre</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formActOnPartnerApplicationReview &middot; <i>Act on partner application review</i> &middot; <b>Act on partner application review</b> &middot; Cancel <span class="dis">discards action · department · assigneePrincipalId · note · documentIds</span></div></div>
         </div>
       </div>
       <div id="ptr-025" class="scr" data-ws="WS21">
@@ -878,12 +878,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPartnerContactUser</div>
+          <div><b>OPERATIONS</b> &middot; listPartnerContactUser · setPartnerContact · createPartnerUser</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; partnerId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#ptr-022">PTR-022</a>  &mdash; <i>Returns to the command centre</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetPartnerContact &middot; <i>Save partner contact</i> &middot; <b>Save partner contact</b> &middot; Cancel <span class="dis">discards partnerId · contactId · action · name · position · department · email · mobile · telephone · language · timeZone · contactType</span></div><div class="ov"><b>modal</b> formCreatePartnerUser &middot; <i>Create partner user</i> &middot; <b>Create partner user</b> &middot; Cancel <span class="dis">discards id · partnerId · principalId · branchScopePath · role · salesLocation · currency · accountExpiresAt · allocationQuota · creditLimitOverride · canManageUsers</span></div></div>
         </div>
       </div>
       <div id="ptr-026" class="scr" data-ws="WS21">
@@ -908,12 +908,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listTerritoryMarketDistribution</div>
+          <div><b>OPERATIONS</b> &middot; listTerritoryMarketDistribution · setPartnerDistributionRights</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; partnerId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#ptr-022">PTR-022</a> </div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetPartnerDistributionRights &middot; <i>Save partner distribution rights</i> &middot; <b>Save partner distribution rights</b> &middot; Cancel <span class="dis">discards rights</span></div></div>
         </div>
       </div>
       <div id="ptr-027" class="scr" data-ws="WS21">
@@ -998,12 +998,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPartnerAccessRole</div>
+          <div><b>OPERATIONS</b> &middot; listPartnerAccessRole · setPartnerCapabilityGrants</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; partnerId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#ptr-022">PTR-022</a>  &mdash; <i>Returns to the command centre</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetPartnerCapabilityGrants &middot; <i>Save partner capability grants</i> &middot; <b>Save partner capability grants</b> &middot; Cancel <span class="dis">discards grants</span></div></div>
         </div>
       </div>
       <div id="ptr-030" class="scr" data-ws="WS21">
@@ -1091,7 +1091,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listCommercialAgreement · listCommercialAgreementHealth</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#ptr-033">PTR-033</a>  &mdash; <i>Works in Agreement &amp; Contract Terms Builder</i><br><a href="#ptr-034">PTR-034</a>  &mdash; <i>Works in Partner Rate &amp; Net Pricing Configur</i><br><a href="#ptr-035">PTR-035</a>  &mdash; <i>Works in Commission, Margin &amp; Incentive Mana</i><br><a href="#ptr-036">PTR-036</a>  &mdash; <i>Works in Credit Limit &amp; Exposure Management</i><br><a href="#ptr-037">PTR-037</a>  &mdash; <i>Works in Deposit, Guarantee &amp; Financial Secu</i><br><a href="#ptr-038">PTR-038</a>  &mdash; <i>Works in Payment Terms, Billing &amp; Account Co</i><br><a href="#ptr-039">PTR-039</a>  &mdash; <i>Works in Commercial Allocation, Quota &amp; Comm</i><br><a href="#ptr-040">PTR-040</a>  &mdash; <i>Works in Booking Limits, Commercial Exceptio</i><br><a href="#ptr-041">PTR-041</a>  &mdash; <i>Works in Commercial Agreement 360°, Health &amp;</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#ptr-033">PTR-033</a>  &mdash; <i>Works in Agreement &amp; Contract Terms Builder</i><br><a href="#ptr-034">PTR-034</a>  &mdash; <i>Works in Partner Rate &amp; Net Pricing Configur</i><br><a href="#ptr-035">PTR-035</a>  &mdash; <i>Works in Commission, Margin &amp; Incentive Mana</i> <span class="car">agreementId</span><br><a href="#ptr-036">PTR-036</a>  &mdash; <i>Works in Credit Limit &amp; Exposure Management</i> <span class="car">agreementId</span><br><a href="#ptr-037">PTR-037</a>  &mdash; <i>Works in Deposit, Guarantee &amp; Financial Secu</i><br><a href="#ptr-038">PTR-038</a>  &mdash; <i>Works in Payment Terms, Billing &amp; Account Co</i><br><a href="#ptr-039">PTR-039</a>  &mdash; <i>Works in Commercial Allocation, Quota &amp; Comm</i> <span class="car">agreementId</span><br><a href="#ptr-040">PTR-040</a>  &mdash; <i>Works in Booking Limits, Commercial Exceptio</i><br><a href="#ptr-041">PTR-041</a>  &mdash; <i>Works in Commercial Agreement 360°, Health &amp;</i></div>
           
           
         </div>
@@ -1178,12 +1178,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listCommissionMarginIncentive</div>
+          <div><b>OPERATIONS</b> &middot; listCommissionMarginIncentive · setPartnerCommissionRules</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; agreementId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#ptr-032">PTR-032</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetPartnerCommissionRules &middot; <i>Save partner commission rules</i> &middot; <b>Save partner commission rules</b> &middot; Cancel <span class="dis">discards rules</span></div></div>
         </div>
       </div>
       <div id="ptr-036" class="scr" data-ws="WS22">
@@ -1208,12 +1208,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listCreditLimitExposure</div>
+          <div><b>OPERATIONS</b> &middot; listCreditLimitExposure · setPartnerCreditProfile</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; agreementId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#ptr-032">PTR-032</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetPartnerCreditProfile &middot; <i>Save partner credit profile</i> &middot; <b>Save partner credit profile</b> &middot; Cancel <span class="dis">discards id · partnerId · agreementId · creditEnabled · creditStatus · temporaryCreditLimit · temporaryLimitUntil · creditOwnerPrincipalId · approvalAuthority · riskClassification · warningThresholdPercent · highRiskThresholdPercent · blockThresholdPercent · effectiveFrom · effectiveTo · approvalRequestId · scopePath</span></div></div>
         </div>
       </div>
       <div id="ptr-037" class="scr" data-ws="WS22">
@@ -1238,12 +1238,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listDepositGuaranteeFinancial</div>
+          <div><b>OPERATIONS</b> &middot; listDepositGuaranteeFinancial · setPartnerSecurity</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; partnerId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#ptr-032">PTR-032</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetPartnerSecurity &middot; <i>Save partner security</i> &middot; <b>Save partner security</b> &middot; Cancel <span class="dis">discards id · partnerId · securityType · amount · currency · effectiveDate · verificationStatus · agreementId · issuingInstitution · reference · expiryDate · documentId · expiryAction · scopePath</span></div></div>
         </div>
       </div>
       <div id="ptr-038" class="scr" data-ws="WS22">
@@ -1298,12 +1298,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listCommercialAllocationQuota</div>
+          <div><b>OPERATIONS</b> &middot; listCommercialAllocationQuota · setPartnerAllocations</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; agreementId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#ptr-032">PTR-032</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetPartnerAllocations &middot; <i>Save partner allocations</i> &middot; <b>Save partner allocations</b> &middot; Cancel <span class="dis">discards allocations</span></div></div>
         </div>
       </div>
       <div id="ptr-040" class="scr" data-ws="WS22">
@@ -1478,12 +1478,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPartnerCancellationRefund</div>
+          <div><b>OPERATIONS</b> &middot; listPartnerCancellationRefund · createPartnerChangeRequest</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#ptr-042">PTR-042</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreatePartnerChangeRequest &middot; <i>Create partner change request</i> &middot; <b>Create partner change request</b> &middot; Cancel <span class="dis">discards orderId · requestType · quantity · targetPerformanceId · targetProductId · newCustomerName · feeWaiverRequested · reason</span></div></div>
         </div>
       </div>
       <div id="ptr-046" class="scr" data-ws="WS23">
@@ -1538,12 +1538,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPartnerReconciliationException</div>
+          <div><b>OPERATIONS</b> &middot; listPartnerReconciliationException · actOnPartnerReconciliationException</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; exceptionId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#ptr-042">PTR-042</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formActOnPartnerReconciliationException &middot; <i>Act on partner reconciliation exception</i> &middot; <b>Act on partner reconciliation exception</b> &middot; Cancel <span class="dis">discards action · assigneePrincipalId · adjustmentRef · note</span></div></div>
         </div>
       </div>
       <div id="ptr-048" class="scr" data-ws="WS23">
@@ -1568,12 +1568,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listCommissionCalculationSettlement</div>
+          <div><b>OPERATIONS</b> &middot; listCommissionCalculationSettlement · actOnPartnerCommissionLine · actOnPartnerSettlementBatch</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; lineId&larr;navigation, batchId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#ptr-042">PTR-042</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formActOnPartnerCommissionLine &middot; <i>Act on partner commission line</i> &middot; <b>Act on partner commission line</b> &middot; Cancel <span class="dis">discards action · reason · caseId</span></div><div class="ov"><b>modal</b> formActOnPartnerSettlementBatch &middot; <i>Act on partner settlement batch</i> &middot; <b>Act on partner settlement batch</b> &middot; Cancel <span class="dis">discards action · scheduledDate · reason · caseId</span></div></div>
         </div>
       </div>
       <div id="ptr-049" class="scr" data-ws="WS23">
@@ -1598,12 +1598,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPartnerDisputeCase</div>
+          <div><b>OPERATIONS</b> &middot; listPartnerDisputeCase · createPartnerCase · actOnPartnerCase</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; caseId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#ptr-042">PTR-042</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreatePartnerCase &middot; <i>Create partner case</i> &middot; <b>Create partner case</b> &middot; Cancel <span class="dis">discards id · partnerId · category · priority · description · status · resolutionTargetAt · contactId · orderId · invoiceReference · settlementBatchId · amountInDispute · evidence · ownerPrincipalId · slaPolicyId · firstResponseAt · resolvedAt · scopePath</span></div><div class="ov"><b>modal</b> formActOnPartnerCase &middot; <i>Act on partner case</i> &middot; <b>Act on partner case</b> &middot; Cancel <span class="dis">discards action · ownerPrincipalId · resolution · reason · note</span></div></div>
         </div>
       </div>
       <div id="ptr-050" class="scr" data-ws="WS23">

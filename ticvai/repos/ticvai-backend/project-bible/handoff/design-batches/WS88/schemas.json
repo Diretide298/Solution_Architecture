@@ -1,1 +1,753 @@
-{}
+{
+ "MembershipProductValidationApprovalPublicationVersioInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; stored as subscription.membership_product (status, approvalStage) with an audit row in subscription.membership_product_history (decided 29 September, data model DM4)",
+  "description": "**What Membership Product Validation, Approval, Publication & Versioning submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "migrationPolicy": {
+    "type": "string",
+    "enum": [
+     "remainOnCurrentVersion",
+     "moveAtNextRenewal",
+     "moveOnEffectiveDate"
+    ],
+    "description": "Migration policy for existing member contracts (pack p.18). Default moveAtNextRenewal (decided 29 September, readiness close-out)"
+   },
+   "membershipCode": {
+    "type": "string",
+    "description": "Membership code"
+   },
+   "version": {
+    "type": "integer",
+    "description": "Configuration version the decision applies to"
+   },
+   "action": {
+    "type": "string",
+    "enum": [
+     "validate",
+     "submitForReview",
+     "approveCommercial",
+     "approveOperational",
+     "reject",
+     "schedule",
+     "publish"
+    ],
+    "description": "Decision taken on BO-293"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective date for schedule/publish",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason, recorded in the audit",
+    "nullable": true
+   }
+  }
+ },
+ "MembershipProductValidationApprovalPublicationVersioView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Product Validation, Approval, Publication & Versioning displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "migrationPolicy": {
+    "type": "string",
+    "enum": [
+     "remainOnCurrentVersion",
+     "moveAtNextRenewal",
+     "moveOnEffectiveDate"
+    ],
+    "description": "Migration policy for existing member contracts (pack p.18). Default moveAtNextRenewal (decided 29 September, readiness close-out)"
+   },
+   "activeMembersAffected": {
+    "type": "integer",
+    "description": "Active Members Affected"
+   },
+   "futureRenewals": {
+    "type": "integer",
+    "description": "Future Renewals affected by the change"
+   },
+   "entitlementsAffected": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Entitlements Affected"
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+    },
+    "description": "Channels affected"
+   },
+   "pricingDependencies": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Pricing Dependencies: pricing profiles and rules referenced"
+   },
+   "accessDependencies": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Access Dependencies: access-control rules and credentials referenced"
+   },
+   "membershipCode": {
+    "type": "string",
+    "description": "Membership code"
+   },
+   "version": {
+    "type": "integer",
+    "description": "Configuration version under approval"
+   },
+   "approvalStage": {
+    "type": "string",
+    "description": "Approval stage: draft, review, commercialApproval, operationalApproval, approved, scheduled or published (pack p.17)"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective Dating: date this version takes effect"
+   },
+   "validationChecks": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "check": {
+       "type": "string",
+       "enum": [
+        "productDefinitionComplete",
+        "catalogueAssociation",
+        "eligibilityRules",
+        "validity",
+        "activation",
+        "entitlements",
+        "usageRules",
+        "pricingAssociation",
+        "taxFeeAssociation",
+        "channelAvailability",
+        "renewalPolicy",
+        "requiredCredentialConfiguration"
+       ]
+      },
+      "passed": {
+       "type": "boolean"
+      },
+      "message": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    },
+    "description": "Configuration Validation (pack p.17)"
+   },
+   "validationIssues": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "inactivePricingProfile",
+        "missingDependentEligibility",
+        "autoRenewWithoutConsentConfiguration",
+        "missingCancellationPolicy",
+        "other"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    },
+    "description": "Dependency Health (pack p.17 examples); missingCancellationPolicy is a warning (decided 29 September, readiness close-out)"
+   },
+   "publicationTargets": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "target": {
+       "type": "string",
+       "enum": [
+        "b2c",
+        "pos",
+        "mobileApp",
+        "callCenter",
+        "b2b",
+        "accessControl",
+        "ticketing",
+        "otherDependentServices"
+       ]
+      },
+      "synchronisedAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    },
+    "description": "Publication (pack p.18): services the configuration is synchronised to"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI Assistance: advisory observations only; never applied automatically (pack AI sections)"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "RentalAgreementRules": {
+  "type": "object",
+  "x-ticvai-persistence": "rental.agreement_rules",
+  "description": "Board 1.9. **The version is part of the rule**, because a signature against text nobody kept is not a defence.\n",
+  "properties": {
+   "customerFields": {
+    "type": "object",
+    "additionalProperties": {
+     "$ref": "#/components/schemas/RuleRequirement"
+    }
+   },
+   "agreementRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "liabilityWaiverRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "termsDocumentAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "agreementVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "eSignatureRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "guardianSignatureForMinor": {
+    "type": "boolean",
+    "default": true
+   },
+   "groupWaiverMode": {
+    "type": "string",
+    "enum": [
+     "perParticipant",
+     "singleGroupWaiver"
+    ],
+    "default": "perParticipant"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "RentalCategory": {
+  "type": "object",
+  "x-ticvai-persistence": "maintenance.asset_category",
+  "description": "Board 1.4. **Defaults cascade and products override within a permitted set.**",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "parentCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "iconAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "defaultTrackingModel": {
+    "type": "string",
+    "nullable": true
+   },
+   "defaultDurationMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "defaultTurnaroundMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "defaultWaiverRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "defaultDepositPolicyId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "overridableFields": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "**Which defaults a product may override.** An empty list means the category is binding, which is the whole point of a category for a venue that wants consistency.\n"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "RentalConfigurationFinding": {
+  "type": "object",
+  "description": "Boards 1.10 and 4.10. **Severity travels with the finding**, so the publish gate can distinguish a missing turnaround buffer from a missing price.\n",
+  "properties": {
+   "code": {
+    "type": "string"
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "blocking",
+     "warning",
+     "advisory"
+    ]
+   },
+   "message": {
+    "type": "string"
+   },
+   "field": {
+    "type": "string",
+    "nullable": true
+   },
+   "source": {
+    "type": "string",
+    "enum": [
+     "validation",
+     "ai"
+    ],
+    "default": "validation",
+    "description": "**AI findings are advisory unless the client configures otherwise** (board 1.10), so the origin is on the record rather than assumed by the reader.\n"
+   }
+  }
+ },
+ "RentalDurationRules": {
+  "type": "object",
+  "x-ticvai-persistence": "rental.duration_rules",
+  "description": "Board 1.7. **Turnaround feeds availability automatically.** *10:00–11:00 rental, 11:00–11:15 turnaround, next available 11:15.*\n",
+  "properties": {
+   "minimumMinutes": {
+    "type": "integer"
+   },
+   "maximumMinutes": {
+    "type": "integer"
+   },
+   "incrementMinutes": {
+    "type": "integer",
+    "default": 15
+   },
+   "defaultMinutes": {
+    "type": "integer"
+   },
+   "turnaroundMinutes": {
+    "type": "integer",
+    "default": 0
+   },
+   "extensionAllowed": {
+    "type": "boolean",
+    "default": true
+   },
+   "maximumExtensionMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "sameDayReturnRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "overnightAllowed": {
+    "type": "boolean",
+    "default": false
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "RentalImportResult": {
+  "type": "object",
+  "description": "26 August onboarding load. **Validated whole, written whole.**",
+  "properties": {
+   "rowsRead": {
+    "type": "integer"
+   },
+   "productsCreated": {
+    "type": "integer"
+   },
+   "assetsCreated": {
+    "type": "integer"
+   },
+   "rowsRejected": {
+    "type": "integer"
+   },
+   "findings": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/RentalConfigurationFinding"
+    }
+   },
+   "committed": {
+    "type": "boolean"
+   }
+  }
+ },
+ "RentalInventoryModel": {
+  "type": "object",
+  "x-ticvai-persistence": "rental.inventory_model",
+  "description": "Board 1.5. **Pooled, serialised or hybrid**, and the switches the counter obeys.",
+  "required": [
+   "trackingModel"
+  ],
+  "properties": {
+   "trackingModel": {
+    "type": "string",
+    "enum": [
+     "pooled",
+     "serialised",
+     "hybrid"
+    ]
+   },
+   "inventoryUnit": {
+    "type": "string",
+    "nullable": true
+   },
+   "totalQuantity": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Pooled only. *150 lockers.*"
+   },
+   "components": {
+    "type": "array",
+    "description": "**Hybrid only** — *one serialised kayak, two pooled paddles, two pooled life jackets.* One booking, two mechanisms.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "resourceTypeId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "label": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "integer"
+      },
+      "serialised": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "assignmentRequiredAtCheckout": {
+    "type": "boolean",
+    "default": false
+   },
+   "scanRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "allowManualAssignment": {
+    "type": "boolean",
+    "default": true
+   },
+   "allowSubstitution": {
+    "type": "boolean",
+    "default": true
+   },
+   "allowEquipmentSwap": {
+    "type": "boolean",
+    "default": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "RentalLocationRule": {
+  "type": "object",
+  "x-ticvai-persistence": "rental.location_rule",
+  "description": "Board 1.6. **Pickup and return are separate flags**, because a station that hands out kayaks and cannot receive them is a real shape.\n",
+  "required": [
+   "locationId"
+  ],
+  "properties": {
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "enabled": {
+    "type": "boolean",
+    "default": true
+   },
+   "pickupAllowed": {
+    "type": "boolean",
+    "default": true
+   },
+   "returnAllowed": {
+    "type": "boolean",
+    "default": true
+   },
+   "crossLocationReturnAllowed": {
+    "type": "boolean",
+    "default": false
+   },
+   "inventoryAllocation": {
+    "type": "integer",
+    "nullable": true
+   },
+   "inventoryBuffer": {
+    "type": "integer",
+    "default": 0,
+    "description": "**Held back from online sale**, so the counter always has something to give the guest standing in front of it.\n"
+   },
+   "operatingHours": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "RentalOperationalRules": {
+  "type": "object",
+  "x-ticvai-persistence": "rental.operational_rules",
+  "description": "Board 1.8. **Three states per rule — required, optional, not applicable.** *Optional* and *not applicable* look identical at the counter and are entirely different in an audit.\n",
+  "properties": {
+   "minimumAge": {
+    "type": "integer",
+    "nullable": true
+   },
+   "maximumAge": {
+    "type": "integer",
+    "nullable": true
+   },
+   "minimumHeightCm": {
+    "type": "integer",
+    "nullable": true
+   },
+   "maximumWeightKg": {
+    "type": "integer",
+    "nullable": true
+   },
+   "idRequired": {
+    "$ref": "#/components/schemas/RuleRequirement"
+   },
+   "guardianRequired": {
+    "$ref": "#/components/schemas/RuleRequirement"
+   },
+   "membershipRequired": {
+    "$ref": "#/components/schemas/RuleRequirement"
+   },
+   "drivingLicenceRequired": {
+    "$ref": "#/components/schemas/RuleRequirement"
+   },
+   "safetyBriefingRequired": {
+    "$ref": "#/components/schemas/RuleRequirement"
+   },
+   "checkoutScanRequired": {
+    "$ref": "#/components/schemas/RuleRequirement"
+   },
+   "returnScanRequired": {
+    "$ref": "#/components/schemas/RuleRequirement"
+   },
+   "conditionInspectionRequired": {
+    "$ref": "#/components/schemas/RuleRequirement"
+   },
+   "photoAtCheckoutRequired": {
+    "$ref": "#/components/schemas/RuleRequirement"
+   },
+   "photoAtReturnRequired": {
+    "$ref": "#/components/schemas/RuleRequirement"
+   },
+   "maximumQuantityPerCustomer": {
+    "type": "integer",
+    "nullable": true
+   },
+   "returnLocationRestricted": {
+    "type": "boolean",
+    "default": false
+   },
+   "partialReturnAllowed": {
+    "type": "boolean",
+    "default": true
+   },
+   "staffApprovalRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "RentalProduct": {
+  "type": "object",
+  "x-ticvai-persistence": "rental.product",
+  "description": "Board 1.3. **The master reference every later board resolves against.**",
+  "required": [
+   "code",
+   "name",
+   "venueId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "internalName": {
+    "type": "string",
+    "nullable": true
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "imageAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "trackingModel": {
+    "type": "string",
+    "enum": [
+     "pooled",
+     "serialised",
+     "hybrid"
+    ]
+   },
+   "catalogueProductId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The thing the guest actually buys.** `catalogue` sells it and this configures how it behaves once sold; the link is here so a rental is never sold twice through two different product records.\n"
+   },
+   "resourceTypeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**For serialised products, the `resources` type its assets belong to.** The individual bikes are resources and maintenance assets — this contract does not keep a third register of them.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "configurationReview",
+     "approved",
+     "active",
+     "suspended",
+     "archived"
+    ]
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "version": {
+    "type": "integer",
+    "default": 1
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "RuleRequirement": {
+  "type": "string",
+  "enum": [
+   "required",
+   "optional",
+   "notApplicable"
+  ],
+  "default": "notApplicable"
+ }
+}

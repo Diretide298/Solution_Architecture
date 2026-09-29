@@ -1,0 +1,173 @@
+# Workflow instance — state model
+# Contract: approvals.WorkflowInstanceStatus
+# Checked by tools/check-states.py.
+
+entity: Workflow instance
+contract: approvals
+enum: WorkflowInstanceStatus
+enumKind: named
+enumSchema: WorkflowInstanceStatus
+owner: approvals
+description: '**One running workflow of the Rules, Workflow, Approval & Automation engine** (pack 13.2.1,
+  13.2.3, 13.2.4 and 13.2.5; data model for the agreed operations, 29 September). Started by a trigger on
+  the version in force and kept on that version to the end (audit R129). The engine orchestrates and does
+  not own the business transaction: an approval node waits on an `approvals.request`, a system action waits
+  on the owning module, and each wait is its own state so the command centre can say what an instance is
+  waiting for.'
+initial:
+- running
+terminal:
+- completed
+- cancelled
+transitions:
+- from: running
+  to: waitingApproval
+  trigger: job
+  guard: The instance reached an approval node and raised an `approvals.request` (recorded on the step as
+    `approvalRequestId`). The approval is decided by the approvals engine, never by the workflow
+- from: waitingApproval
+  to: running
+  trigger: externalEvent
+  guard: The request it raised was decided, withdrawn or expired; the instance follows the branch for that
+    outcome
+- from: running
+  to: waitingTask
+  trigger: job
+  guard: The instance reached a human task node and assigned it
+- from: waitingTask
+  to: running
+  trigger: externalEvent
+  guard: The assignee completed the task
+- from: running
+  to: waitingSystem
+  trigger: job
+  guard: The instance called a module's action (one of its trigger's `allowedActions`) and waits for the
+    reply, or sits on a wait or timer node
+- from: waitingSystem
+  to: running
+  trigger: externalEvent
+  guard: The module replied successfully, or the timer elapsed
+- from: waitingApproval
+  to: escalated
+  trigger: timer
+  guard: The SLA reached `escalateAtPercent` of target (or breached) and the policy escalates; the escalation
+    time is recorded on the instance
+- from: waitingTask
+  to: escalated
+  trigger: timer
+  guard: The task's SLA reached its escalation point
+- from: escalated
+  to: running
+  trigger: externalEvent
+  guard: The escalated approval or task was completed at the higher level
+- from: running
+  to: failed
+  trigger: job
+  guard: A step failed and the trigger's `onFailure` is `exceptionQueue` or `humanIntervention`, or `retry`
+    ran out of `maxRetries`; a `WorkflowException` is raised
+- from: waitingSystem
+  to: failed
+  trigger: job
+  guard: The module call failed or timed out beyond its retries; a `WorkflowException` is raised
+- from: failed
+  to: running
+  trigger: job
+  guard: The engine's own scheduled retry of the failed step succeeded; the instance continues from the recorded
+    step. An operator's retry, resume or skip is the `actOnWorkflowInstance` transition below
+- from: running
+  to: completed
+  trigger: job
+  guard: The instance reached an end node; `completedAt` and `slaOutcome` are set
+- from: running
+  to: cancelled
+  trigger: cascade
+  guard: The source business object was cancelled in its own module, or the workflow's automation was kill-switched
+- from: waitingApproval
+  to: cancelled
+  trigger: cascade
+  guard: The source business object was cancelled; the open approval request is withdrawn with it
+- from: waitingTask
+  to: cancelled
+  trigger: cascade
+  guard: The source business object was cancelled
+- from: waitingSystem
+  to: cancelled
+  trigger: cascade
+  guard: The source business object was cancelled; a partial execution is compensated
+- from: escalated
+  to: cancelled
+  trigger: cascade
+  guard: The source business object was cancelled
+- from: failed
+  to: cancelled
+  trigger: cascade
+  guard: The source business object was cancelled; partial executions are compensated where the trigger
+    says `compensate`
+- from: failed
+  to: running
+  operation: actOnWorkflowInstance
+  trigger: operation
+  guard: '`retryStep`, `resume` (with or without `correctedInput`) or `skipStep` to the next node or an allowed
+    `alternativeNodeId`, with a reason; the open `WorkflowException` goes to `retrying`, then `resolved` when
+    the instance continues (decided 29 September, writers pass)'
+- from: waitingTask
+  to: running
+  operation: actOnWorkflowInstance
+  trigger: operation
+  guard: '`skipStep` on a task node the published version marks skippable, with a reason (pack 13.2.3 "where
+    explicitly allowed")'
+- from: waitingSystem
+  to: running
+  operation: actOnWorkflowInstance
+  trigger: operation
+  guard: '`skipStep` on a system action or wait node the published version marks skippable, with a reason.
+    **An approval node is never skipped**, so there is no `waitingApproval` to `running` by operation'
+- from: running
+  to: cancelled
+  operation: actOnWorkflowInstance
+  trigger: operation
+  guard: '`cancel` by an operator, with a reason; an open approval request is withdrawn and partial executions
+    are compensated where the trigger says `compensate`'
+- from: waitingApproval
+  to: cancelled
+  operation: actOnWorkflowInstance
+  trigger: operation
+  guard: '`cancel` by an operator, with a reason; an open approval request is withdrawn and partial executions
+    are compensated where the trigger says `compensate`'
+- from: waitingTask
+  to: cancelled
+  operation: actOnWorkflowInstance
+  trigger: operation
+  guard: '`cancel` by an operator, with a reason; an open approval request is withdrawn and partial executions
+    are compensated where the trigger says `compensate`'
+- from: waitingSystem
+  to: cancelled
+  operation: actOnWorkflowInstance
+  trigger: operation
+  guard: '`cancel` by an operator, with a reason; an open approval request is withdrawn and partial executions
+    are compensated where the trigger says `compensate`'
+- from: escalated
+  to: cancelled
+  operation: actOnWorkflowInstance
+  trigger: operation
+  guard: '`cancel` by an operator, with a reason; an open approval request is withdrawn and partial executions
+    are compensated where the trigger says `compensate`'
+- from: failed
+  to: cancelled
+  operation: actOnWorkflowInstance
+  trigger: operation
+  guard: '`cancel` by an operator, with a reason; an open approval request is withdrawn and partial executions
+    are compensated where the trigger says `compensate`'
+notes: '**Operator actions are `actOnWorkflowInstance`** (decided 29 September, writers pass), each kept
+  as an `approvals.workflow_intervention` row. `reassign`, `extendSla`, `addBackupApprover`, `changePriority`
+  and `escalateException` change who, when or how urgent, never the status, so they have no transition here.
+
+
+  **There is no transition out of `completed` or `cancelled`.** A finished instance is evidence of
+  what the workflow did; running it again is a new instance with its own correlation id.
+
+
+  `failed` is not terminal on purpose: a failure lands in the controlled exception queue and is either
+  recovered (back to `running`) or closed by cancelling the instance. An instance that fails and is never
+  looked at stays visible in the Exception, Failure & Recovery Center rather than disappearing into a
+  terminal state.'

@@ -1,0 +1,1559 @@
+{
+ "LeaveRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.leave_request",
+  "description": "Resource board 3.8. **Approving leave without seeing the gap is how four supervisors book the same week.**\n",
+  "required": [
+   "principalId",
+   "from",
+   "to",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "annual",
+     "sick",
+     "unpaid",
+     "parental",
+     "compassionate",
+     "training",
+     "timeOffInLieu"
+    ]
+   },
+   "from": {
+    "type": "string",
+    "format": "date"
+   },
+   "to": {
+    "type": "string",
+    "format": "date"
+   },
+   "halfDay": {
+    "type": "boolean",
+    "default": false
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "requested",
+     "approved",
+     "rejected",
+     "cancelled",
+     "taken"
+    ]
+   },
+   "coverageImpact": {
+    "type": "array",
+    "readOnly": true,
+    "items": {
+     "$ref": "#/components/schemas/StaffingCoverage"
+    }
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Principal": {
+  "x-ticvai-persistence": "identity.principal",
+  "type": "object",
+  "required": [
+   "id",
+   "username",
+   "displayName",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "username": {
+    "type": "string"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Past this, resolution returns DENY regardless of grants."
+   },
+   "primaryRoleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Determines the landing screen when the principal holds several roles and picks one at login.\n"
+   },
+   "roles": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/RoleSummary"
+    }
+   },
+   "lastLoginAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "Qualification": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.qualification",
+  "description": "1.2.36. **A role is not a skill**, and the check happens before assignment rather than after.\n",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "resourceId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**The resource that holds this qualification.** Set from the path of `setResourceQualifications`; without it a stored qualification belongs to nobody and the check before assignment has nothing to check against. One row per resource and `code`.\n"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "**The field that makes this worth having.** A certification with no expiry is one nobody renews, and a lifeguard certificate that lapsed last month is a safety failure rather than a data-quality one.\n"
+   },
+   "issuer": {
+    "type": "string",
+    "nullable": true
+   },
+   "documentAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "ResolveSyncConflictRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — writes sync_conflict",
+  "required": [
+   "conflictId",
+   "resolution"
+  ],
+  "properties": {
+   "conflictId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "acceptExternal",
+     "keepTicvai",
+     "retry",
+     "ignore",
+     "escalate"
+    ]
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "releaseAffectedAssignments": {
+    "type": "boolean",
+    "default": false,
+    "description": "**For a termination conflict, what happens to the shifts already rostered.** Board 3 requires the downstream consequence to be acted on rather than reported: releasing them puts the shifts back on the marketplace, and leaving them means a manager has decided to cover them another way.\n"
+   }
+  }
+ },
+ "Resource": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.resource",
+  "description": "**A specific object, not a quantity of interchangeable ones.** A venue with forty identical strollers has forty resources, because guest number twelve returned stroller number twelve.\n",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "kind",
+   "venueId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ResourceKind"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "parentResourceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**A pool cabana belongs to the pool area; a seat belongs to an auditorium.** Booking a parent takes its children with it, which is the behaviour a venue expects and would otherwise have to enforce by hand.\n"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a resource of kind `instructor` or `staff`. **`workforce` still owns their rota** — this says whether they are qualified and whether they are already committed.\n"
+   },
+   "attributes": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Configurable per kind — capacity, size, shade, power, poolside."
+   },
+   "setupMinutes": {
+    "type": "integer",
+    "default": 0,
+    "description": "**Before the booking, not inside it.** An auditorium booked 14:00–16:00 is unavailable from 13:30 with a 30-minute setup, and a calendar that cannot express that double-books every time.\n"
+   },
+   "teardownMinutes": {
+    "type": "integer",
+    "default": 0
+   },
+   "requiresQualification": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Qualification codes a person must hold to be assigned to this."
+   },
+   "depositAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "available",
+     "booked",
+     "checkedOut",
+     "maintenance",
+     "retired"
+    ]
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "ResourceBlock": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.resource_block",
+  "description": "Board 2.07. **A block is not a booking**, and the reason travels with it so an operator knows whether to wait or to look elsewhere.\n",
+  "required": [
+   "resourceId",
+   "from",
+   "to",
+   "reason"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "resourceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "from": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "to": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "reason": {
+    "type": "string",
+    "enum": [
+     "setup",
+     "teardown",
+     "maintenance",
+     "blackout",
+     "closed",
+     "operational",
+     "training"
+    ]
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   },
+   "createdBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "ResourceKind": {
+  "type": "string",
+  "description": "BL-135. **`locker` was an entitlement kind in `orders` and nothing issued, assigned or released one.** A locker is a specific object checked out to a named guest and returned — which is this context exactly, and modelling it as an entitlement would have needed a second check-out mechanism.\nA seed for `ResourceType` rather than the law (board 1.02): a customer adding a class does it with `createResourceType`, not by waiting for this list to grow.\n**`table` is a non-dining spot** (decided 29 September, rev 3 GAP-C2, confirmed by Chinmay): a beach or event table placed on a venue map, picked and sold like a cabana (`createResourceHold`, then the order). **A dining table is not this**: restaurant tables stay `fnb` tables, booked with `fnb.createTableReservation` and the waitlist (audit R073 (d)).\n",
+  "enum": [
+   "cabana",
+   "lounger",
+   "locker",
+   "wheelchair",
+   "stroller",
+   "equipment",
+   "room",
+   "auditorium",
+   "vehicle",
+   "instructor",
+   "staff",
+   "table",
+   "pitch",
+   "studio",
+   "other"
+  ],
+  "x-ticvai-refuses": {
+   "mealPlan": "**Listed by 5.5.8b and deliberately not a kind.** 5.5.8b groups meal plans with lockers and parking, but a meal plan is a balance rather than an object. It resolves to `retail.Wallet` with a `mealPlan` credit kind (CF-126), not to a resource — so it is not offered here, and a form built from this enum cannot offer it either."
+  }
+ },
+ "ResourceRequirement": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.resource_requirement",
+  "description": "**A type and a quantity, never a named resource.** This is what makes the 26 August rule enforceable — the product states what it needs and the platform decides which one.\nFor resources placed on a published venue map the rule is superseded (decided 29 September, rev 3 REV3-15): the guest names the resource through a `ResourceHold`, and no requirement is needed.\n",
+  "required": [
+   "quantity"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "resourceTypeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "resourceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**A fixed component, and the exception rather than the rule.** Meeting Room A really is Meeting Room A; the technician is not.\n"
+   },
+   "quantity": {
+    "type": "integer",
+    "default": 1
+   },
+   "mandatory": {
+    "type": "boolean",
+    "default": true
+   },
+   "requiredQualifications": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "requiredAttributes": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "substituteResourceIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "ResourceSchedule": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.resource_schedule",
+  "description": "Boards 2.03 and 2.04. **A recurring pattern with exceptions, not a list of dates.** A schedule written as concrete dates silently expires.\n",
+  "properties": {
+   "resourceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "availabilityMode": {
+    "type": "string",
+    "enum": [
+     "alwaysAvailable",
+     "scheduled",
+     "onRequest"
+    ]
+   },
+   "windows": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "daysOfWeek": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "from": {
+       "type": "string",
+       "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+       "description": "Local time of day, HH:MM."
+      },
+      "to": {
+       "type": "string",
+       "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+       "description": "Local time of day, HH:MM."
+      },
+      "effectiveFrom": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      },
+      "effectiveTo": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "slotMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**How finely this resource's time can be cut**, which is a property of the resource and not of the product sold against it.\n"
+   },
+   "minimumBookingMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "maximumBookingMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "advanceBookingDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "exceptions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "date": {
+       "type": "string",
+       "format": "date"
+      },
+      "closed": {
+       "type": "boolean"
+      },
+      "from": {
+       "type": "string",
+       "nullable": true,
+       "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+       "description": "Local time of day, HH:MM."
+      },
+      "to": {
+       "type": "string",
+       "nullable": true,
+       "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+       "description": "Local time of day, HH:MM."
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "RoleSummary": {
+  "x-ticvai-persistence": "none — projection over role",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "isPrimary": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ShiftTemplate": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.shift_template",
+  "description": "Resource board 3.7. **The unit a manager actually thinks in.**",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "early",
+     "late",
+     "middle",
+     "split",
+     "double",
+     "night",
+     "onCall",
+     "overtime"
+    ]
+   },
+   "startsAt": {
+    "type": "string"
+   },
+   "endsAt": {
+    "type": "string"
+   },
+   "breaks": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "afterMinutes": {
+       "type": "integer"
+      },
+      "minutes": {
+       "type": "integer"
+      },
+      "paid": {
+       "type": "boolean",
+       "default": false
+      }
+     }
+    }
+   },
+   "requiredQualifications": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "roleCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "costCentre": {
+    "type": "string",
+    "nullable": true
+   },
+   "hourlyRate": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "StaffingCoverage": {
+  "type": "object",
+  "description": "Resource board 4.4. **The gap is the product.**",
+  "properties": {
+   "date": {
+    "type": "string",
+    "format": "date"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "positionCode": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "from": {
+    "type": "string"
+   },
+   "to": {
+    "type": "string"
+   },
+   "required": {
+    "type": "integer"
+   },
+   "rostered": {
+    "type": "integer"
+   },
+   "qualified": {
+    "type": "integer",
+    "description": "**A position filled by somebody not qualified for it is still a gap.**"
+   },
+   "gap": {
+    "type": "integer"
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "covered",
+     "tight",
+     "short",
+     "blocking"
+    ]
+   },
+   "openShiftIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   }
+  }
+ },
+ "StaffingRules": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.staffing_rules + workforce.position_requirement",
+  "description": "Resource board 4.3. **A safety rule before it is a cost rule.**",
+  "properties": {
+   "minimumCover": {
+    "type": "array",
+    "description": "**Minimum staffing per position, venue and time window, with the qualifications it requires**: the rows of `workforce.position_requirement` (data model for the agreed operations, 29 September). `getStaffingCoverage` measures the rota against them; before this they were an array with no table, so no minimum was stored.",
+    "items": {
+     "type": "object",
+     "required": [
+      "id",
+      "positionCode",
+      "minimumHeadcount"
+     ],
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "positionCode": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string"
+      },
+      "venueId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "attractionId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "minimumHeadcount": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "daysOfWeek": {
+       "type": "array",
+       "nullable": true,
+       "description": "Days the minimum applies; absent means every day the venue is open",
+       "items": {
+        "type": "string",
+        "enum": [
+         "monday",
+         "tuesday",
+         "wednesday",
+         "thursday",
+         "friday",
+         "saturday",
+         "sunday"
+        ]
+       }
+      },
+      "startsAt": {
+       "type": "string",
+       "nullable": true,
+       "description": "Start of the time window, local time (HH:MM) as `ShiftTemplate.startsAt`; absent means opening"
+      },
+      "endsAt": {
+       "type": "string",
+       "nullable": true,
+       "description": "End of the time window, local time (HH:MM); absent means closing"
+      },
+      "requiredQualifications": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "appliesWhenOpen": {
+       "type": "boolean",
+       "default": true
+      },
+      "blocksOperation": {
+       "type": "boolean",
+       "default": true,
+       "description": "**A ride requiring two operators cannot run with one.** Where this is true the attraction closes rather than running short.\n"
+      }
+     }
+    }
+   },
+   "maximumHoursPerDay": {
+    "type": "integer",
+    "nullable": true
+   },
+   "maximumHoursPerWeek": {
+    "type": "integer",
+    "nullable": true
+   },
+   "minimumRestHours": {
+    "type": "integer",
+    "nullable": true
+   },
+   "maximumConsecutiveDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "overtime": {
+    "type": "object",
+    "properties": {
+     "allowed": {
+      "type": "boolean",
+      "default": true
+     },
+     "afterHoursPerWeek": {
+      "type": "integer",
+      "nullable": true
+     },
+     "rateMultiplier": {
+      "type": "number",
+      "nullable": true
+     },
+     "requiresApproval": {
+      "type": "boolean",
+      "default": true
+     }
+    }
+   },
+   "minimumAgeForNightShift": {
+    "type": "integer",
+    "nullable": true
+   },
+   "defaultIncentiveRateMultiplier": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 1,
+    "description": "**What an open shift pays above base when it is released.** Added 22 September: `workforce.open_shift.incentive_rate_multiplier` was set per shift with nothing behind it, so two identical shifts could price differently and record no reason. The shift still carries its own value — **as the snapshot**, the rule-and-record split `payments.fee_rule` and `orders.order_fee` use — and this is where it comes from.\n**Top-level rather than beside `overtime`** so the value is its own column. Nested in an object it would be a key inside a JSON blob, which nothing can index, constrain or pair to the shift that uses it.\n"
+   },
+   "maximumIncentiveRateMultiplier": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 1,
+    "description": "**The ceiling on an incentive.** A shift nobody claims is the moment somebody raises the multiplier in a hurry — the same reason `maximumDailyCharge` bounds a late fee."
+   },
+   "incentiveApprovalAbove": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 1,
+    "description": "**Above this multiplier a second person approves the release.** Routed as an approval, not a boolean — `overtime.requiresApproval` beside it is one of 26 approval flags across the contracts that no approval kind, matrix row or SLA reaches."
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WorkforceComplianceFinding": {
+  "type": "object",
+  "description": "Resource board 4.8. **Checked before the rota is published, not in an inspection.**",
+  "properties": {
+   "code": {
+    "type": "string",
+    "enum": [
+     "expiredQualification",
+     "missingQualification",
+     "exceededDailyHours",
+     "exceededWeeklyHours",
+     "insufficientRest",
+     "missedBreak",
+     "consecutiveDaysExceeded",
+     "underAgeNightShift",
+     "belowMinimumCover"
+    ]
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "breach",
+     "warning"
+    ]
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "principalName": {
+    "type": "string",
+    "nullable": true
+   },
+   "date": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "detail": {
+    "type": "string"
+   },
+   "rotaAssignmentIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   }
+  }
+ },
+ "WorkforceEmployee": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.employee",
+  "description": "**Taken from the backend workbook, 20 September.** Stores the main employee/staff master record.",
+  "required": [
+   "tenantId",
+   "code",
+   "firstName",
+   "lastName",
+   "dateOfJoining",
+   "employmentType",
+   "employmentStatus",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 50
+   },
+   "firstName": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "lastName": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "email": {
+    "type": "string",
+    "maxLength": 254,
+    "nullable": true
+   },
+   "mobile": {
+    "type": "string",
+    "maxLength": 30,
+    "nullable": true
+   },
+   "dateOfJoining": {
+    "type": "string",
+    "format": "date"
+   },
+   "dateOfBirth": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "**What the under-age check needs** (data model for the agreed operations, 29 September): `validateWorkforceCompliance` reports `underAgeNightShift` against `StaffingRules.minimumAgeForNightShift`, and that rule has nothing to compare with unless the employee's age is on file. **An employee with no date of birth is reported as a warning**, not assumed to be of age."
+   },
+   "employmentType": {
+    "type": "string",
+    "maxLength": 30
+   },
+   "employmentStatus": {
+    "type": "string",
+    "maxLength": 30
+   },
+   "managerEmployeeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "WorkforceEmployeeProfile": {
+  "type": "object",
+  "x-ticvai-persistence": "none — composed from employee and four related tables",
+  "description": "**One person and everything a profile screen asks about them.** The employment record, the postings and the leave balances are separate tables and one question, so fanning out across four endpoints is four round trips and four chances to render a half-loaded person.\n",
+  "required": [
+   "employee"
+  ],
+  "properties": {
+   "employee": {
+    "$ref": "#/components/schemas/WorkforceEmployee"
+   },
+   "employments": {
+    "type": "array",
+    "description": "Most recent first. **More than one is normal** — a seasonal worker rehired each summer has several, and collapsing them to the current one loses the service history that leave accrual is calculated from.\n",
+    "items": {
+     "$ref": "#/components/schemas/WorkforceEmployment"
+    }
+   },
+   "assignments": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/WorkforceWorkAssignment"
+    }
+   },
+   "leaveBalances": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/WorkforceLeaveBalance"
+    }
+   },
+   "jobTitles": {
+    "type": "array",
+    "description": "The titles the postings name, so a client does not have to resolve them one by one.\n",
+    "items": {
+     "$ref": "#/components/schemas/WorkforceJobTitle"
+    }
+   },
+   "externallyMasteredFields": {
+    "type": "array",
+    "description": "**Which fields on this record the venue may not edit**, resolved from `field_ownership` for whichever source masters this employee. A screen that shows an editable input over a field the HRMS owns has promised something it cannot keep.\n",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "WorkforceEmployment": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.employment",
+  "description": "**Taken from the backend workbook, 20 September.** Stores employment terms and contract validity.",
+  "required": [
+   "employeeId",
+   "contractType",
+   "startDate",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "employeeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "contractType": {
+    "type": "string",
+    "maxLength": 30
+   },
+   "startDate": {
+    "type": "string",
+    "format": "date"
+   },
+   "endDate": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "standardHoursPerWeek": {
+    "type": "number",
+    "nullable": true
+   },
+   "probationEndDate": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "maxLength": 30
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "WorkforceFieldOwnership": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.field_ownership",
+  "description": "**Which system owns a field, which is what prevents conflicting updates.** Board 3: *\"For every field, administrators shall determine ... External System Master.\"* Without this, an employee record mastered in HRMS and edited here disagrees with its source and nothing can say which answer is right.\nOne row per table and column. Absent means ours, so nothing has to be enumerated before it is decided.\n",
+  "required": [
+   "tableName",
+   "columnName",
+   "master"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "tableName": {
+    "type": "string",
+    "maxLength": 120
+   },
+   "columnName": {
+    "type": "string",
+    "maxLength": 120
+   },
+   "master": {
+    "type": "string",
+    "enum": [
+     "ticvai",
+     "external"
+    ]
+   },
+   "sourceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The integration source that masters it, when `master` is `external`."
+   },
+   "onConflict": {
+    "type": "string",
+    "enum": [
+     "externalWins",
+     "ticvaiWins",
+     "flagForReview"
+    ]
+   },
+   "scopePath": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "WorkforceIntegrationSource": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.integration_source",
+  "description": "**An external system that masters some of our workforce data.** Board 3 names HRMS, Workforce Management, Payroll, Time & Attendance, Identity Management and external staffing agencies. The six-state display Board 10 asks for lives on this row: what is connected, when it last synchronised, and whether its credentials still work.\n",
+  "required": [
+   "code",
+   "name",
+   "kind",
+   "transport",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 60
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "hrms",
+     "workforceManagement",
+     "payroll",
+     "timeAndAttendance",
+     "identity",
+     "staffingAgency"
+    ]
+   },
+   "transport": {
+    "type": "string",
+    "enum": [
+     "api",
+     "webhook",
+     "scheduled",
+     "manual",
+     "fileImport"
+    ],
+    "description": "Board 3, Support. **`manual` and `fileImport` are in the list on purpose** — a staffing agency that sends a spreadsheet is still a system of record, and modelling only the API cases would leave the messiest source unmanaged.\n"
+   },
+   "authenticationStatus": {
+    "type": "string",
+    "enum": [
+     "healthy",
+     "expiring",
+     "expired",
+     "failed",
+     "notConfigured"
+    ]
+   },
+   "lastSynchronisedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "degraded",
+     "suspended"
+    ]
+   },
+   "scopePath": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "WorkforceJobTitle": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.job_title",
+  "description": "**Taken from the backend workbook, 20 September.** Stores job/designation definitions such as Cashier, Manager, Chef or Technician.",
+  "required": [
+   "tenantId",
+   "code",
+   "name",
+   "isActive",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 50
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "WorkforceLeaveBalance": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.leave_balance",
+  "description": "**Taken from the backend workbook, 20 September.** Stores leave entitlement, used amount and remaining balance per employee/period.",
+  "required": [
+   "employeeId",
+   "typeId",
+   "periodYear",
+   "entitledDays",
+   "usedDays",
+   "pendingDays",
+   "availableDays",
+   "updatedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "employeeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "typeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "periodYear": {
+    "type": "integer"
+   },
+   "entitledDays": {
+    "type": "number"
+   },
+   "usedDays": {
+    "type": "number"
+   },
+   "pendingDays": {
+    "type": "number"
+   },
+   "availableDays": {
+    "type": "number"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "WorkforceLeaveType": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.leave_type",
+  "description": "**Taken from the backend workbook, 20 September.** Defines leave categories and basic leave behavior.",
+  "required": [
+   "tenantId",
+   "code",
+   "name",
+   "isPaid",
+   "requiresApproval",
+   "isActive",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 50
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "isPaid": {
+    "type": "boolean"
+   },
+   "requiresApproval": {
+    "type": "boolean"
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "WorkforceShift": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.shift",
+  "description": "**Taken from the backend workbook, 20 September.** Defines reusable shifts such as Morning, Evening or Night.",
+  "required": [
+   "tenantId",
+   "code",
+   "name",
+   "startTime",
+   "endTime",
+   "breakMinutes",
+   "crossesMidnight",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 50
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "startTime": {
+    "type": "string",
+    "maxLength": 0
+   },
+   "endTime": {
+    "type": "string",
+    "maxLength": 0
+   },
+   "breakMinutes": {
+    "type": "integer"
+   },
+   "crossesMidnight": {
+    "type": "boolean"
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "WorkforceSyncConflict": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.sync_conflict",
+  "description": "**A disagreement a person has to settle, and the assignments it puts at risk.** Board 3 lists the cases by name: an employee in HR and not here, a venue changed externally, a certification expired, and *\"employee terminated externally but has future TICVAI assignments\"* — where *\"the system shall flag affected downstream assignments\"*.\n`affectedAssignmentIds` is deliberately an array and deliberately an exception: it is a snapshot of what was at risk when the conflict was raised, not a live relationship, and it must not change when a roster does.\n",
+  "required": [
+   "sourceId",
+   "kind",
+   "status",
+   "raisedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sourceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "syncRunId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "missingInTicvai",
+     "missingExternally",
+     "venueChangedExternally",
+     "certificationExpired",
+     "terminatedExternally",
+     "fieldDisagreement"
+    ]
+   },
+   "employeeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "externalReference": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "detail": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "affectedAssignmentIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "retried",
+     "reprocessed",
+     "escalated",
+     "resolved",
+     "ignored"
+    ]
+   },
+   "raisedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "resolvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "WorkforceWorkAssignment": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.work_assignment",
+  "description": "**Taken from the backend workbook, 20 September.** Assigns an employee to a job and operational location/scope for an effective period.",
+  "required": [
+   "employeeId",
+   "jobTitleId",
+   "effectiveFrom",
+   "isPrimary",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "employeeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "jobTitleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "departmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "isPrimary": {
+    "type": "boolean"
+   },
+   "status": {
+    "type": "string",
+    "maxLength": 30
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ }
+}

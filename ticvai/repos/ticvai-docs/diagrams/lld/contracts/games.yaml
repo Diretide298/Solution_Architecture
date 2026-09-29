@@ -1,5 +1,5 @@
 id: LLD-games
-title: games — 39 operations
+title: games — 40 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -110,7 +110,15 @@ operations:
   - staff
   - guest
   offline: false
-  reads: []
+  reads:
+  - games.card
+  - games.entitlement
+  - games.game
+  - games.gameplay_transaction
+  - games.operational_config
+  - games.pricing
+  - games.pricing_exception
+  - games.validation_rules
   writes: []
 - operation: getGamePricing
   verb: GET
@@ -120,7 +128,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - games.game
+  - games.pricing
+  - games.pricing_exception
+  - games.reader
+  - games.reader_profile
   writes: []
 - operation: getGameplaySyncStatus
   verb: GET
@@ -130,7 +143,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - games.gameplay_transaction
+  - games.play
+  - games.reader
+  - games.reader_deployment
+  - games.reader_sync_status
   writes: []
 - operation: getGameplayValidationRules
   verb: GET
@@ -264,6 +282,21 @@ operations:
   - cache:idempotency
   - games.redemption
   - games.redemption_line
+- operation: reportReaderQueue
+  verb: PUT
+  path: /readers/{readerId}/offline-queue
+  scope: venue
+  permission: null
+  audience:
+  - device
+  offline: false
+  reads:
+  - cache:idempotency
+  - games.reader
+  - games.reader_sync_status
+  writes:
+  - cache:idempotency
+  - games.reader_sync_status
 - operation: setAttractionType
   verb: PUT
   path: /attraction-types
@@ -332,9 +365,13 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - games.pricing
+  - games.pricing_exception
   writes:
+  - cache:idempotency
   - games.pricing
+  - games.pricing_exception
 - operation: setGameplayValidationRules
   verb: PUT
   path: /gameplay-validation-rules
@@ -423,6 +460,7 @@ operations:
   writes:
   - games.credit_ledger
   - games.play
+  - games.reader_sync_status
   - sync.rejection
 - operation: testReader
   verb: POST
@@ -432,8 +470,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - games.card
+  - games.reader
+  - games.reader_deployment
+  - games.reader_profile
+  writes:
+  - cache:idempotency
 - operation: transferGameCard
   verb: POST
   path: /game-cards/{cardCode}/transfer
@@ -470,5 +514,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - games.entitlement
+  - games.game
+  - games.pricing
+  - games.reader
+  - games.reader_deployment
+  - games.redemption_rules
+  writes:
+  - cache:idempotency

@@ -1,23 +1,4 @@
 {
- "adjustLoyaltyPoints": {
-  "method": "POST",
-  "path": "/guests/{subjectId}/loyalty/adjust",
-  "contract": "marketing-crm",
-  "summary": "Manually adjust points",
-  "permission": "LEDGER_POST",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "LoyaltyPosition"
- },
  "claimCustomDomain": {
   "method": "POST",
   "path": "/tenant-domains",
@@ -36,6 +17,63 @@
   ],
   "requestBody": null,
   "responds": "CustomDomain"
+ },
+ "createConsentQuestion": {
+  "method": "POST",
+  "path": "/consent-questions",
+  "contract": "marketing-crm",
+  "summary": "Define a consent question",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ConsentQuestion",
+  "responds": "ConsentQuestion"
+ },
+ "createGuidedChoice": {
+  "method": "POST",
+  "path": "/venues/{venueId}/guided-choices",
+  "contract": "white-label",
+  "summary": "Set up Help me choose for a venue",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GuidedChoice",
+  "responds": "GuidedChoice"
+ },
+ "deleteGuidedChoice": {
+  "method": "DELETE",
+  "path": "/guided-choices/{guidedChoiceId}",
+  "contract": "white-label",
+  "summary": "Delete a Help me choose set-up, or dismiss a suggestion",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "diffConfigVersion": {
   "method": "GET",
@@ -56,68 +94,24 @@
   "requestBody": null,
   "responds": "ConfigDiff"
  },
- "getConsentHistory": {
+ "getBookingFlowConfig": {
   "method": "GET",
-  "path": "/guests/{subjectId}/consents/history",
-  "contract": "marketing-crm",
-  "summary": "Full consent history",
-  "permission": "GUEST_VIEW",
+  "path": "/tenant-config/booking-flow",
+  "contract": "white-label",
+  "summary": "How the guest booking flow looks and steps",
+  "permission": "TENANT_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
    {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
+    "name": "effectiveForVenueId",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
-  "responds": "Page"
- },
- "getGuestConsents": {
-  "method": "GET",
-  "path": "/guests/{subjectId}/consents",
-  "contract": "marketing-crm",
-  "summary": "Read a guest's consent state",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "ConsentState"
- },
- "getGuestLoyalty": {
-  "method": "GET",
-  "path": "/guests/{subjectId}/loyalty",
-  "contract": "marketing-crm",
-  "summary": "A guest's loyalty position",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "LoyaltyPosition"
- },
- "getGuestProfile": {
-  "method": "GET",
-  "path": "/guests/{subjectId}",
-  "contract": "marketing-crm",
-  "summary": "Read a guest profile",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "GuestProfileDetail"
+  "responds": "BookingFlowConfig"
  },
  "getTenantAppStatus": {
   "method": "GET",
@@ -151,19 +145,6 @@
   "requestBody": null,
   "responds": "TenantConfig"
  },
- "getWishlist": {
-  "method": "GET",
-  "path": "/guests/{subjectId}/wishlist",
-  "contract": "marketing-crm",
-  "summary": "Read a guest's saved items",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "Wishlist"
- },
  "listConfigVersions": {
   "method": "GET",
   "path": "/tenant-config/versions",
@@ -174,6 +155,103 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listConsentAnswers": {
+  "method": "GET",
+  "path": "/consent-answers",
+  "contract": "marketing-crm",
+  "summary": "The consent records given at booking",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "questionId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listConsentPurposes": {
+  "method": "GET",
+  "path": "/consent-purposes",
+  "contract": "marketing-crm",
+  "summary": "Configured consent purposes",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listConsentQuestions": {
+  "method": "GET",
+  "path": "/consent-questions",
+  "contract": "marketing-crm",
+  "summary": "The consent questions a venue asks at booking",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -201,15 +279,15 @@
   "requestBody": null,
   "responds": "CustomDomain"
  },
- "listGuestDevices": {
+ "listEvents": {
   "method": "GET",
-  "path": "/guests/{subjectId}/devices",
-  "contract": "marketing-crm",
-  "summary": "A guest's registered devices",
-  "permission": null,
+  "path": "/events",
+  "contract": "catalogue",
+  "summary": "List events",
+  "permission": "PRODUCT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
+  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
@@ -223,7 +301,104 @@
    }
   ],
   "requestBody": null,
-  "responds": "GuestDevice"
+  "responds": "Page"
+ },
+ "listGuidedChoices": {
+  "method": "GET",
+  "path": "/venues/{venueId}/guided-choices",
+  "contract": "white-label",
+  "summary": "List a venue's Help me choose set-ups",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "source",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listOrgUnits": {
+  "method": "GET",
+  "path": "/org-units",
+  "contract": "tenancy",
+  "summary": "List scope nodes visible to the session",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "under",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "level",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeInactive",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPolicies": {
+  "method": "GET",
+  "path": "/tenant-config/policies",
+  "contract": "white-label",
+  "summary": "List legal policies",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "includeHistory",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Policy"
  },
  "listPrincipals": {
   "method": "GET",
@@ -242,6 +417,68 @@
    },
    {
     "name": "isActive",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listProductCategories": {
+  "method": "GET",
+  "path": "/product-categories",
+  "contract": "catalogue",
+  "summary": "The merchandise hierarchy — categories, brands, collections",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ProductCategoryNode"
+ },
+ "listProducts": {
+  "method": "GET",
+  "path": "/products",
+  "contract": "catalogue",
+  "summary": "List products",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isSellable",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "segmentTag",
     "in": "query",
     "required": null
    },
@@ -283,12 +520,12 @@
   "requestBody": null,
   "responds": "Page"
  },
- "mergeGuestProfiles": {
+ "publishGuidedChoice": {
   "method": "POST",
-  "path": "/guests/{subjectId}/merge",
-  "contract": "marketing-crm",
-  "summary": "Merge a duplicate profile into this one",
-  "permission": "GUEST_MANAGE",
+  "path": "/guided-choices/{guidedChoiceId}/publish",
+  "contract": "white-label",
+  "summary": "Publish a Help me choose set-up to guests",
+  "permission": "TENANT_PUBLISH",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -300,7 +537,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "MergeResult"
+  "responds": "GuidedChoice"
  },
  "publishTenantConfig": {
   "method": "POST",
@@ -321,25 +558,6 @@
   "requestBody": null,
   "responds": "ConfigVersion"
  },
- "recordConsent": {
-  "method": "POST",
-  "path": "/guests/{subjectId}/consents",
-  "contract": "marketing-crm",
-  "summary": "Record a consent decision",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "append",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RecordConsentRequest",
-  "responds": "ConsentState"
- },
  "relinquishCustomDomain": {
   "method": "DELETE",
   "path": "/tenant-domains/{domainId}",
@@ -349,7 +567,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": null
  },
@@ -372,36 +596,35 @@
   "requestBody": null,
   "responds": "TenantConfig"
  },
- "searchGuests": {
-  "method": "GET",
-  "path": "/guests",
-  "contract": "marketing-crm",
-  "summary": "Search guest profiles",
-  "permission": "GUEST_VIEW",
+ "setBookingFlowConfig": {
+  "method": "PUT",
+  "path": "/tenant-config/booking-flow",
+  "contract": "white-label",
+  "summary": "Set how the guest booking flow looks and steps",
+  "permission": "TENANT_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
-   {
-    "name": "search",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "segmentId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "hasConsentFor",
-    "in": "query",
-    "required": null
-   },
    {
     "name": null,
     "in": null,
     "required": null
-   },
+   }
+  ],
+  "requestBody": "BookingFlowConfig",
+  "responds": "BookingFlowConfig"
+ },
+ "setConsentPurposes": {
+  "method": "PUT",
+  "path": "/consent-purposes",
+  "contract": "marketing-crm",
+  "summary": "Configure consent purposes",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
    {
     "name": null,
     "in": null,
@@ -409,7 +632,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "Page"
+  "responds": "ConsentPurposeConfig"
  },
  "setLanguages": {
   "method": "PUT",
@@ -430,6 +653,25 @@
   "requestBody": null,
   "responds": "LanguageConfig"
  },
+ "setPolicy": {
+  "method": "PUT",
+  "path": "/tenant-config/policies/{policyKind}",
+  "contract": "white-label",
+  "summary": "Publish a policy version",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Policy"
+ },
  "setSeoMetadata": {
   "method": "PUT",
   "path": "/seo-metadata",
@@ -449,12 +691,12 @@
   "requestBody": "SeoMetadata",
   "responds": "SeoMetadata"
  },
- "updateGuestProfile": {
-  "method": "PATCH",
-  "path": "/guests/{subjectId}",
-  "contract": "marketing-crm",
-  "summary": "Amend a guest profile",
-  "permission": "GUEST_MANAGE",
+ "unpublishGuidedChoice": {
+  "method": "POST",
+  "path": "/guided-choices/{guidedChoiceId}/unpublish",
+  "contract": "white-label",
+  "summary": "Take a Help me choose set-up off the guest app",
+  "permission": "TENANT_PUBLISH",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -466,7 +708,45 @@
    }
   ],
   "requestBody": null,
-  "responds": "GuestProfileDetail"
+  "responds": "GuidedChoice"
+ },
+ "updateConsentQuestion": {
+  "method": "PATCH",
+  "path": "/consent-questions/{questionId}",
+  "contract": "marketing-crm",
+  "summary": "Reword, re-scope or retire a consent question",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ConsentQuestion",
+  "responds": "ConsentQuestion"
+ },
+ "updateGuidedChoice": {
+  "method": "PATCH",
+  "path": "/guided-choices/{guidedChoiceId}",
+  "contract": "white-label",
+  "summary": "Edit a Help me choose set-up, or review a suggestion",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuidedChoice"
  },
  "validateTenantConfig": {
   "method": "POST",

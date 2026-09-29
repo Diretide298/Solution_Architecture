@@ -33,13 +33,13 @@ modulesUsed:
   screens: 19
 servicesCalled:
 - service: CatalogueService
-  operationCalls: 320
+  operationCalls: 371
 - service: PlatformService
   operationCalls: 296
 - service: OrderService
-  operationCalls: 147
+  operationCalls: 157
 - service: TenancyService
-  operationCalls: 92
+  operationCalls: 95
 - service: IdentityService
   operationCalls: 45
 - service: WhiteLabelService
@@ -53,7 +53,7 @@ servicesCalled:
 - service: AiService
   operationCalls: 5
 - service: ReportingService
-  operationCalls: 4
+  operationCalls: 5
 - service: WalletService
   operationCalls: 2
 - service: VenueOpsService
@@ -1150,6 +1150,7 @@ screens:
   - listDashboards
   - listTenants
   - openPlatformStaffGrant
+  - recordDashboardView
   - updateDashboard
   states:
   - emptyFirstRun
@@ -1631,6 +1632,7 @@ screens:
   density: compact
   operations:
   - listPriceCategoryRate
+  - setPriceCategoryRateType
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1697,6 +1699,7 @@ screens:
   density: compact
   operations:
   - listPackageBundleAdd
+  - setPackagePricingDefinition
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1718,6 +1721,7 @@ screens:
   density: compact
   operations:
   - listMarketVenueCurrency
+  - setMarketPricingConfiguration
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1760,6 +1764,7 @@ screens:
   density: compact
   operations:
   - listPriceListTemplate
+  - setConfigurationTemplate
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2107,6 +2112,7 @@ screens:
   density: compact
   operations:
   - listFeeSurcharge
+  - setFeeDefinition
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2170,6 +2176,7 @@ screens:
   density: compact
   operations:
   - listPriceCalculationSequence
+  - setPriceCalculationPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2191,6 +2198,7 @@ screens:
   density: compact
   operations:
   - listCurrencyPrecisionRounding
+  - setCurrencyRoundingRule
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2443,7 +2451,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - cancelPricingRollback
   - listPricingRollbackEmergency
+  - requestPricingRollback
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2451,7 +2461,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - actionId<-navigation
   goesTo:
   - ADM-078
   boardFrames: null
@@ -2488,6 +2499,7 @@ screens:
   density: compact
   operations:
   - listDynamicPricingStrategy
+  - transitionDynamicPricingStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2495,7 +2507,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-002
   - ADM-089
@@ -2519,13 +2532,15 @@ screens:
   density: compact
   operations:
   - setDynamicPricingStrategy
+  - transitionDynamicPricingStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-088
   boardFrames: null
@@ -2584,6 +2599,7 @@ screens:
   density: compact
   operations:
   - listSeasonalCalendarDay
+  - setDemandSignalConfiguration
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2591,7 +2607,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - signalId<-navigation
   goesTo:
   - ADM-088
   boardFrames: null
@@ -2628,13 +2645,15 @@ screens:
   density: compact
   operations:
   - listDynamicPriceBand
+  - setPriceLadderMatrix
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-088
   boardFrames: null
@@ -2649,6 +2668,7 @@ screens:
   density: compact
   operations:
   - listDynamicPricingGuardrail
+  - setDynamicPricingGuardrailPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2670,6 +2690,7 @@ screens:
   density: compact
   operations:
   - listDynamicPricingAutomation
+  - setDynamicPricingGuardrailPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2767,6 +2788,7 @@ screens:
   density: compact
   operations:
   - listWeatherDemandImpact
+  - setDemandSignalConfiguration
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2774,7 +2796,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - signalId<-navigation
   goesTo:
   - ADM-098
   boardFrames: null
@@ -2789,13 +2812,15 @@ screens:
   density: compact
   operations:
   - listNearbyEventExhibition
+  - setDemandSignalConfiguration
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - signalId<-navigation
   goesTo:
   - ADM-098
   boardFrames: null
@@ -2810,6 +2835,7 @@ screens:
   density: compact
   operations:
   - listCompetitorPricingMarket
+  - setDemandSignalConfiguration
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2817,7 +2843,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - signalId<-navigation
   goesTo:
   - ADM-098
   boardFrames: null
@@ -2832,6 +2859,7 @@ screens:
   density: compact
   operations:
   - listMarketTourismHoliday
+  - setDemandSignalConfiguration
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2839,7 +2867,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - signalId<-navigation
   goesTo:
   - ADM-098
   boardFrames: null
@@ -2920,6 +2949,7 @@ screens:
   density: compact
   operations:
   - listSignalDataQuality
+  - setSignalRegistryPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -3085,6 +3115,7 @@ screens:
   density: compact
   operations:
   - listAutomationPolicyAutonomous
+  - setDynamicPricingGuardrailPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -3150,6 +3181,7 @@ screens:
   density: compact
   operations:
   - listLearningModelPerformance
+  - setSignalRegistryPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -3358,6 +3390,7 @@ screens:
   density: compact
   operations:
   - listProductDuplicationTemplate
+  - setConfigurationTemplate
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -3400,6 +3433,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - decideCatalogueAiFinding
   - listProductGovernance
   states:
   - emptyFirstRun
@@ -3408,7 +3442,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - findingId<-navigation
   goesTo:
   - ADM-002
   - ADM-129
@@ -3520,6 +3555,7 @@ screens:
   density: compact
   operations:
   - listChangeImpactAnalysis
+  - setProductLinks
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -3527,7 +3563,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - productId<-navigation
   goesTo:
   - ADM-128
   boardFrames: null
@@ -3542,6 +3579,7 @@ screens:
   density: compact
   operations:
   - listChangePropagationDependency
+  - setProductLinks
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -3549,7 +3587,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - productId<-navigation
   goesTo:
   - ADM-128
   boardFrames: null
@@ -3606,6 +3645,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - decideCatalogueAiFinding
   - listGovernanceRiskMonitoring
   states:
   - emptyFirstRun
@@ -3614,7 +3654,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - findingId<-navigation
   goesTo:
   - ADM-128
   boardFrames: null
@@ -3661,8 +3702,11 @@ screens:
   wave: 3
   density: compact
   operations:
+  - createCommercialCampaign
   - listCampaignPromotionPerformance
+  - listCommercialCampaigns
   - listPromotionCampaign
+  - updateCommercialCampaign
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -3670,7 +3714,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - campaignId<-navigation
   goesTo:
   - ADM-138
   boardFrames: null
@@ -3729,6 +3774,7 @@ screens:
   density: compact
   operations:
   - listCampaignCalendarTimeline
+  - listCommercialCampaigns
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -4572,6 +4618,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listCommercialCampaigns
   - setBundleDefinition
   states:
   - emptyFirstRun
@@ -4700,7 +4747,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listBundlePartnerProductMappings
   - listPartnerExternalProduct
+  - setBundlePartnerProductMappings
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -4708,7 +4757,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - bundleId<-navigation
   goesTo:
   - ADM-178
   boardFrames: null
@@ -4842,14 +4892,17 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listBundleCapacityPolicies
   - listCapacityPoolReservation
+  - setBundleCapacityPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - bundleId<-navigation
   goesTo:
   - ADM-188
   boardFrames: null
@@ -4928,13 +4981,16 @@ screens:
   density: compact
   operations:
   - listBundleAvailabilityChannel
+  - listBundleCapacityPolicies
+  - setBundleCapacityPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - bundleId<-navigation
   goesTo:
   - ADM-188
   boardFrames: null
@@ -5481,14 +5537,18 @@ screens:
   wave: 3
   density: compact
   operations:
+  - createCommercialCampaign
+  - listCommercialCampaigns
   - setCampaignBudgetFinancial
+  - updateCommercialCampaign
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - campaignId<-navigation
   goesTo:
   - ADM-218
   boardFrames: null
@@ -5710,6 +5770,7 @@ screens:
   density: compact
   operations:
   - listCampaignPromotionPerformance
+  - listCommercialCampaigns
   - listPromotionCampaign
   - listPromotionPerformance
   states:
@@ -6192,6 +6253,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - actOnWorkflowInstance
   - listWorkflowInstanceProcess
   states:
   - emptyFirstRun
@@ -6200,7 +6262,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - instanceId<-navigation
   goesTo:
   - ADM-248
   boardFrames: null
@@ -6214,6 +6277,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - actOnWorkflowInstance
   - listWorkflowExceptionFailure
   states:
   - emptyFirstRun
@@ -6222,7 +6286,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - instanceId<-navigation
   goesTo:
   - ADM-248
   boardFrames: null
@@ -6236,6 +6301,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - actOnWorkflowInstance
   - listSlaEscalationBottleneck
   states:
   - emptyFirstRun
@@ -6244,7 +6310,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - instanceId<-navigation
   goesTo:
   - ADM-248
   boardFrames: null
@@ -6489,6 +6556,7 @@ screens:
   density: compact
   operations:
   - listChannelSaleSchedule
+  - setChannelSalesRule
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -6496,7 +6564,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - ruleId<-navigation
   goesTo:
   - ADM-258
   boardFrames: null
@@ -6511,13 +6580,15 @@ screens:
   density: compact
   operations:
   - listCustomerEligibilityRule
+  - setChannelSalesRule
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - ruleId<-navigation
   goesTo:
   - ADM-258
   boardFrames: null
@@ -6532,13 +6603,15 @@ screens:
   density: compact
   operations:
   - listChannelSaleRule
+  - setChannelSalesRule
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - ruleId<-navigation
   goesTo:
   - ADM-258
   boardFrames: null
@@ -6627,13 +6700,16 @@ screens:
   density: compact
   operations:
   - listChannelConnectionIntegration
+  - setChannelConnectionConfiguration
+  - testChannelConnection
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - connectionId<-navigation
   goesTo:
   - ADM-268
   boardFrames: null
@@ -6648,6 +6724,7 @@ screens:
   density: compact
   operations:
   - listProductPriceAvailability
+  - setChannelSyncSetting
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -6715,13 +6792,16 @@ screens:
   density: compact
   operations:
   - listChannelExceptionIncident
+  - retryChannelIncident
+  - updateChannelIncident
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - incidentId<-navigation
   goesTo:
   - ADM-268
   boardFrames: null
@@ -6800,6 +6880,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - decideCatalogueAiFinding
   - listChannel
   - listChannel2
   states:
@@ -6809,7 +6890,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - findingId<-navigation
   goesTo:
   - ADM-268
   boardFrames: null
@@ -6823,6 +6905,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getResaleMarketplaceConfig
   - listOfficialResaleMarketplace
   - listResaleMarketplace
   - listResalePolicyMarketplace
@@ -6879,7 +6962,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getResaleMarketplaceConfig
   - listResalePolicyMarketplace
+  - setResaleMarketplaceConfig
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -6921,7 +7006,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getResaleMarketplaceConfig
   - listResalePricingPrice
+  - setResaleMarketplaceConfig
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7192,7 +7279,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - holdResaleSettlement
   - listSellerSettlementPayout
+  - releaseResaleSettlementHold
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7200,7 +7289,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - resaleSettlementId<-navigation
   goesTo:
   - ADM-288
   boardFrames: null
@@ -7214,7 +7304,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - holdResaleSettlement
   - listRefundDisputeResale
+  - releaseResaleSettlementHold
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7222,7 +7314,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - resaleSettlementId<-navigation
   goesTo:
   - ADM-288
   boardFrames: null
@@ -13708,6 +13801,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listPaymentAllocationRules
   - setMixedTenderRules
   - setMultiPaymentSplit
   states:

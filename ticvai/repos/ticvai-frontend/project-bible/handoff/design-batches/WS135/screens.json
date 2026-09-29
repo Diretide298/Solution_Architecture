@@ -1,0 +1,1540 @@
+[
+ {
+  "id": "BO-734",
+  "name": "CRM Command Center",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "1",
+   "number": "01",
+   "page": 6
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/crm-command-center-bo-734",
+   "component": "apps/venue-management-web/src/routes/engagement-support/CrmCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-735",
+    "BO-736",
+    "BO-737",
+    "BO-738",
+    "BO-739",
+    "BO-740",
+    "BO-741",
+    "BO-742",
+    "BO-743"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-735",
+     "trigger": "Guest Directory",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "subjectId"
+     ]
+    },
+    {
+     "to": "BO-736",
+     "trigger": "Guest Master Configuration",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-737",
+     "trigger": "Customer 360 Profile",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-738",
+     "trigger": "Activity Timeline",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "subjectId"
+     ]
+    },
+    {
+     "to": "BO-739",
+     "trigger": "Contact & Preferences",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-740",
+     "trigger": "Family & Guardians",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "subjectId"
+     ]
+    },
+    {
+     "to": "BO-741",
+     "trigger": "Corporate & Groups",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-742",
+     "trigger": "Commerce & Documents",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-743",
+     "trigger": "AI Guest Intelligence",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Give authorized users an operational and analytical overview of the customer base. Display total, new, active, inactive, registered and guest-checkout customers with tenant, brand, venue, region and date filters. Show VIP, high-value, family, corporate, group, churn-risk, duplicate and incomplete-profile indicators. Present LTV, engagement, growth, consent health and source-synchronization trends with drill- down to the underlying guests. Surface explainable AI insights and prioritized actions without bypassing consent, eligibility or access policies. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 6"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 6"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "searchField",
+       "derived": true,
+       "impliedBy": "searchGuests",
+       "label": "Search",
+       "notes": "A search that returns nothing must say so differently from a search not yet run."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listSegments",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The crm list.",
+   "error": "Could not load. Names which read failed and leaves the crm untouched.",
+   "emptyFirstRun": "No crm yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the crm are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "searchGuests",
+    "contract": "marketing-crm",
+    "purpose": "Find a guest",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listSegments",
+    "contract": "marketing-crm",
+    "purpose": "Segment indicators",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-734",
+   "workshopBoard": "wireframes/WS70 Marketing CRM Configuration Reference v1.0 Board 1.dc.html#bo-734"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 6. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-735",
+  "name": "Guest Directory",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "1",
+   "number": "02",
+   "page": 6
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/guest-directory-bo-735",
+   "component": "apps/venue-management-web/src/routes/engagement-support/GuestDirectory.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-734"
+   ],
+   "exitTo": [
+    "BO-734"
+   ],
+   "transitions": [
+    {
+     "to": "BO-734",
+     "trigger": "Back to CRM Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide a permission-controlled directory for locating and managing every guest record. Search by name, email, mobile, guest ID, external ID, ticket, booking, membership or loyalty identifier. Filter by profile status, segment, language, geography, membership, loyalty tier, wallet, LTV, engagement and churn risk. Support saved views, configurable columns, sorting, pagination, controlled export and auditable bulk actions. Open Customer 360 directly from a result while masking restricted personal or financial data by policy. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "notes": "**Guest record operations moved here from BO-036 Device Registry on 28 September (audit R254)** — `updateGuestProfile`, `mergeGuestProfiles`, `getGuestLoyalty`, `adjustLoyaltyPoints` and `getConsentHistory`, with their panels and forms. They had been attached to the device registry by module resemblance; managing a guest record is this screen's purpose.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 6"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 6"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "searchField",
+       "derived": true,
+       "impliedBy": "searchGuests",
+       "label": "Search",
+       "notes": "A search that returns nothing must say so differently from a search not yet run."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getGuestProfile",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The loyalty position",
+       "bindsTo": "LoyaltyPosition",
+       "columns": [
+        "LoyaltyPosition.leaderboardNickname",
+        "LoyaltyPosition.subjectId",
+        "LoyaltyPosition.programmeId",
+        "LoyaltyPosition.pointsBalance",
+        "LoyaltyPosition.lifetimePoints",
+        "LoyaltyPosition.tierId",
+        "LoyaltyPosition.tierCode",
+        "LoyaltyPosition.tierName",
+        "LoyaltyPosition.pointsToNextTier",
+        "LoyaltyPosition.nextExpiryPoints",
+        "LoyaltyPosition.nextExpiryAt"
+       ],
+       "operation": "getGuestLoyalty",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/loyalty"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The consent",
+       "bindsTo": "ConsentRecord",
+       "columns": [
+        "ConsentRecord.purpose",
+        "ConsentRecord.decision",
+        "ConsentRecord.channels",
+        "ConsentRecord.noticeVersion",
+        "ConsentRecord.source",
+        "ConsentRecord.recordedAt",
+        "ConsentRecord.id",
+        "ConsentRecord.subjectId",
+        "ConsentRecord.recordedByPrincipalId",
+        "ConsentRecord.supersededAt"
+       ],
+       "operation": "getConsentHistory",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/consents/history"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Adjust loyalty points",
+       "operation": "adjustLoyaltyPoints",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/loyalty/adjust"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Merge guest profiles",
+       "operation": "mergeGuestProfiles",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/merge"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save guest profile",
+       "operation": "updateGuestProfile",
+       "provenance": "contract marketing-crm.yaml PATCH /guests/{subjectId}"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The guest list.",
+   "error": "Could not load. Names which read failed and leaves the guest untouched.",
+   "emptyFirstRun": "No guest yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the guest are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "searchGuests",
+    "contract": "marketing-crm",
+    "purpose": "The directory",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getGuestProfile",
+    "contract": "marketing-crm",
+    "purpose": "Open one",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "adjustLoyaltyPoints",
+    "contract": "marketing-crm",
+    "purpose": "Manually adjust points",
+    "trigger": "onAction",
+    "invalidates": [
+     "searchGuests"
+    ]
+   },
+   {
+    "operationId": "getConsentHistory",
+    "contract": "marketing-crm",
+    "purpose": "Full consent history",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getGuestLoyalty",
+    "contract": "marketing-crm",
+    "purpose": "A guest's loyalty position",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "mergeGuestProfiles",
+    "contract": "marketing-crm",
+    "purpose": "Merge a duplicate profile into this one",
+    "trigger": "onAction",
+    "invalidates": [
+     "searchGuests"
+    ]
+   },
+   {
+    "operationId": "updateGuestProfile",
+    "contract": "marketing-crm",
+    "purpose": "Amend a guest profile",
+    "trigger": "onAction",
+    "invalidates": [
+     "searchGuests"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-735",
+   "workshopBoard": "wireframes/WS70 Marketing CRM Configuration Reference v1.0 Board 1.dc.html#bo-735"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 6. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmMergeGuestProfiles",
+    "component": "confirmDialog",
+    "trigger": "Merge guest profiles",
+    "body": "**Names what `mergeGuestProfiles` changes and what it leaves alone**, in the consequence rather than the verb. A guest profile this affects should be identified in the dialog, not just counted. **Collects what `mergeGuestProfiles` sends before it is called.** Required: `duplicateSubjectId`, `reason`.",
+    "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/merge"
+   },
+   {
+    "id": "formAdjustLoyaltyPoints",
+    "component": "modal",
+    "trigger": "Adjust loyalty points",
+    "body": "**Collects what `adjustLoyaltyPoints` sends before it is called.** Required: `programmeId`, `points`, `reason`. Optional: `reversedLoyaltyPointsId`, `notes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AdjustLoyaltyPointsRequest",
+    "confirm": {
+     "label": "Adjust loyalty points",
+     "operation": "adjustLoyaltyPoints"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "programmeId",
+      "points",
+      "reason",
+      "reversedLoyaltyPointsId",
+      "notes"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/loyalty/adjust"
+   },
+   {
+    "id": "formUpdateGuestProfile",
+    "component": "modal",
+    "trigger": "Save guest profile",
+    "body": "**Collects what `updateGuestProfile` sends before it is called.** Nothing in the body is required. Optional: `displayName`, `preferredLanguage`, `preferredChannel`, `tags`, `notes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save guest profile",
+     "operation": "updateGuestProfile"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "displayName",
+      "preferredLanguage",
+      "preferredChannel",
+      "tags",
+      "notes"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml PATCH /guests/{subjectId}"
+   }
+  ],
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-736",
+  "name": "Guest Master Configuration",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "1",
+   "number": "03",
+   "page": 6
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/guest-master-configuration-bo-736",
+   "component": "apps/venue-management-web/src/routes/engagement-support/GuestMasterConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-734"
+   ],
+   "exitTo": [
+    "BO-734"
+   ],
+   "transitions": [
+    {
+     "to": "BO-734",
+     "trigger": "Back to CRM Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure the shared guest data model without software changes. Configuration Scope of Work | Version 1.0 6 Maintain standard and custom attributes, field groups, labels, data types, defaults, required flags and validation rules. Define primary and external identifiers, source-system priority, survivorship rules and profile- completeness scoring. Configure field visibility and editability by role, tenant, brand, venue, region and jurisdiction. Version and audit schema changes and expose approved attributes consistently through UI, API and events. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 6"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 6"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setGuestAttributeModel",
+       "label": "Save guest attribute model",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setGuestAttributeModel"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The guest master list.",
+   "error": "Could not load. Names which read failed and leaves the guest master untouched.",
+   "emptyFirstRun": "No guest master yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the guest master are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getGuestAttributeModel",
+    "contract": "marketing-crm",
+    "purpose": "The shared data model",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setGuestAttributeModel",
+    "contract": "marketing-crm",
+    "purpose": "Change it, as a version",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGuestAttributeModel"
+    ]
+   },
+   {
+    "operationId": "setGuestExtraFields",
+    "contract": "marketing-crm",
+    "purpose": "Define the extra guest fields",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "getGuestAttributeModel"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-736",
+   "workshopBoard": "wireframes/WS70 Marketing CRM Configuration Reference v1.0 Board 1.dc.html#bo-736"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 6. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-737",
+  "name": "Customer 360 Profile",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "1",
+   "number": "04",
+   "page": 7
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/customer-360-profile-bo-737",
+   "component": "apps/venue-management-web/src/routes/engagement-support/Customer360Profile.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-734"
+   ],
+   "exitTo": [
+    "BO-734"
+   ],
+   "transitions": [
+    {
+     "to": "BO-734",
+     "trigger": "Back to CRM Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Present a consolidated, actionable view of one guest. Display identity, contacts, preferences, household, organization, membership, loyalty, wallet, tickets, bookings and visits. Show LTV, engagement, churn risk, communication eligibility, open cases, pending waivers and recent activity. Provide permission-controlled quick actions for communication, booking, case creation, campaign enrollment and profile maintenance. Allow role-based widget configuration while keeping the Customer Master Service as the system of record. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 7"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 7"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listCustomerServiceProfile",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The customer 360 profile list.",
+   "error": "Could not load. Names which read failed and leaves the customer 360 profile untouched.",
+   "emptyFirstRun": "No customer 360 profile yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the customer 360 profile are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCustomerServiceProfile",
+    "contract": "marketing-crm",
+    "purpose": "Customer 360° Service Profile",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCustomerSegmentProfile",
+    "contract": "catalogue",
+    "purpose": "Customer Segment & Profile Pricing Rules",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-737",
+   "workshopBoard": "wireframes/WS70 Marketing CRM Configuration Reference v1.0 Board 1.dc.html#bo-737"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 7. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-738",
+  "name": "Activity Timeline",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "1",
+   "number": "05",
+   "page": 7
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/activity-timeline-bo-738",
+   "component": "apps/venue-management-web/src/routes/engagement-support/ActivityTimeline.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-734"
+   ],
+   "exitTo": [
+    "BO-734"
+   ],
+   "transitions": [
+    {
+     "to": "BO-734",
+     "trigger": "Back to CRM Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide a chronological record of guest activity across the connected platform. Ingest purchases, ticket usage, reservations, visits, membership changes, loyalty, wallet, campaigns, messages, cases, surveys and waivers. Filter by date, channel, venue, event type, source system and outcome and open the related source transaction. Distinguish operational facts from user notes and AI-derived events and preserve event timestamps and source identifiers. Support reliable ordering, pagination and audit evidence without allowing historical events to be silently altered. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 7"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 7"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getGuestProfile",
+       "notes": "One record, read-only."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The activity timeline list.",
+   "error": "Could not load. Names which read failed and leaves the activity timeline untouched.",
+   "emptyFirstRun": "No activity timeline yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the activity timeline are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getGuestProfile",
+    "contract": "marketing-crm",
+    "purpose": "The consolidated record",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getGuestIntelligence",
+    "contract": "marketing-crm",
+    "purpose": "Value, engagement and risk",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getGuestRelationships",
+    "contract": "marketing-crm",
+    "purpose": "Household and organisation",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-738",
+   "workshopBoard": "wireframes/WS70 Marketing CRM Configuration Reference v1.0 Board 1.dc.html#bo-738"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 7. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "guestId",
+     "from": "navigation"
+    },
+    {
+     "name": "subjectId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-739",
+  "name": "Contact & Preferences",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "1",
+   "number": "06",
+   "page": 7
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/contact-preferences-bo-739",
+   "component": "apps/venue-management-web/src/routes/engagement-support/ContactPreferences.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-734"
+   ],
+   "exitTo": [
+    "BO-734"
+   ],
+   "transitions": [
+    {
+     "to": "BO-734",
+     "trigger": "Back to CRM Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Maintain verified contact information and service preferences for each guest. Manage multiple email addresses, phone numbers, physical addresses, emergency contacts and social identifiers. Record preferred language, channel, contact time, frequency, interests, favorite attractions and visit preferences. Store accessibility and dietary requirements with suitable sensitivity and role restrictions. Configuration Scope of Work | Version 1.0 7 Show verification, suppression and consent status while delegating legal enforcement to the shared Consent Service. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 7"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 7"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getGuestTimeline",
+       "notes": "One record, read-only."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The contact preferences list.",
+   "error": "Could not load. Names which read failed and leaves the contact preferences untouched.",
+   "emptyFirstRun": "No contact preferences yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the contact preferences are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getGuestTimeline",
+    "contract": "marketing-crm",
+    "purpose": "Everything they did, in order",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-739",
+   "workshopBoard": "wireframes/WS70 Marketing CRM Configuration Reference v1.0 Board 1.dc.html#bo-739"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 7. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "guestId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-740",
+  "name": "Family & Guardians",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "1",
+   "number": "07",
+   "page": 8
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/family-guardians-bo-740",
+   "component": "apps/venue-management-web/src/routes/engagement-support/FamilyGuardians.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-734"
+   ],
+   "exitTo": [
+    "BO-734"
+   ],
+   "transitions": [
+    {
+     "to": "BO-734",
+     "trigger": "Back to CRM Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Model households, dependants and guardians while preserving each person's individual identity. Create family groups and link parent, guardian, spouse and dependant relationships with effective dates. Configure purchasing, booking, profile-management and waiver-signing authority for minors and dependants. Support shared or separate benefits, memberships, bookings and communications without merging individual profiles. Record additions, removals, authority changes and exceptions in a complete relationship audit trail. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 8"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 8"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateGuestPreferences",
+       "label": "Save guest preferences",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getGuestProfile",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateGuestPreferences"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The family guardians list.",
+   "error": "Could not load. Names which read failed and leaves the family guardians untouched.",
+   "emptyFirstRun": "No family guardians yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the family guardians are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "updateGuestPreferences",
+    "contract": "marketing-crm",
+    "purpose": "Contact and service preferences",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGuestConsents"
+    ]
+   },
+   {
+    "operationId": "getGuestProfile",
+    "contract": "marketing-crm",
+    "purpose": "Verified contacts",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-740",
+   "workshopBoard": "wireframes/WS70 Marketing CRM Configuration Reference v1.0 Board 1.dc.html#bo-740"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 8. 0 of 0 labels bound to a contract property; 0 of 12 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-741",
+  "name": "Corporate & Groups",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "1",
+   "number": "08",
+   "page": 8
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/corporate-groups-bo-741",
+   "component": "apps/venue-management-web/src/routes/engagement-support/CorporateGroups.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-734"
+   ],
+   "exitTo": [
+    "BO-734"
+   ],
+   "transitions": [
+    {
+     "to": "BO-734",
+     "trigger": "Back to CRM Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Link guests to corporate, school, travel and group structures. Support corporate accounts, schools, tour operators, travel agencies, resellers, clubs, teams and event groups. Define contacts, participant roles, billing relationships, booking authority and relationship validity periods. Display associated bookings, memberships, agreements and activity while respecting organizational access boundaries. Expose relationships to B2B, reservations, cases and reporting through secured services and APIs. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 8"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 8"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getGuestRelationships",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setGuestRelationships",
+       "label": "Save guest relationships",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setGuestRelationships"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The corporate groups list.",
+   "error": "Could not load. Names which read failed and leaves the corporate groups untouched.",
+   "emptyFirstRun": "No corporate groups yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the corporate groups are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getGuestRelationships",
+    "contract": "marketing-crm",
+    "purpose": "Family and guardians",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setGuestRelationships",
+    "contract": "marketing-crm",
+    "purpose": "Link without merging",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGuestRelationships",
+     "getGuestProfile"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-741",
+   "workshopBoard": "wireframes/WS70 Marketing CRM Configuration Reference v1.0 Board 1.dc.html#bo-741"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 8. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "guestId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-742",
+  "name": "Commerce & Documents",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "1",
+   "number": "09",
+   "page": 8
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/commerce-documents-bo-742",
+   "component": "apps/venue-management-web/src/routes/engagement-support/CommerceDocuments.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-734"
+   ],
+   "exitTo": [
+    "BO-734"
+   ],
+   "transitions": [
+    {
+     "to": "BO-734",
+     "trigger": "Back to CRM Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Consolidate the guest's commercial, service and document history. Provide tabs for tickets, reservations, memberships, loyalty, wallet, refunds, exchanges, transfers, upgrades and attendance. Display communications, cases, survey responses, ratings, reviews, waivers, identification documents and signed agreements. Link every item to its source transaction and show status, value, channel, venue, timestamps and authorized actions. Apply RBAC/PBAC, masking, retention, download and audit policies to financial, identity and legal records. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history. Configuration Scope of Work | Version 1.0 8",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 8"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 8"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setGuestRelationships",
+       "label": "Save guest relationships",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setGuestRelationships"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The commerce documents list.",
+   "error": "Could not load. Names which read failed and leaves the commerce documents untouched.",
+   "emptyFirstRun": "No commerce documents yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the commerce documents are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setGuestRelationships",
+    "contract": "marketing-crm",
+    "purpose": "Corporate, school and group links",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGuestRelationships",
+     "getGuestProfile"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-742",
+   "workshopBoard": "wireframes/WS70 Marketing CRM Configuration Reference v1.0 Board 1.dc.html#bo-742"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 8. 0 of 0 labels bound to a contract property; 0 of 12 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "guestId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-743",
+  "name": "AI Guest Intelligence",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "1",
+   "number": "10",
+   "page": 9
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/ai-guest-intelligence-bo-743",
+   "component": "apps/venue-management-web/src/routes/engagement-support/AiGuestIntelligence.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-734"
+   ],
+   "exitTo": [
+    "BO-734"
+   ],
+   "transitions": [
+    {
+     "to": "BO-734",
+     "trigger": "Back to CRM Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Turn the unified record into explainable customer insight and recommended actions. Calculate historical and predicted LTV, engagement, churn, inactivity, cancellation, affinity and upgrade propensity. Classify audiences and recommend the next campaign, offer, product, membership, reward, channel and next best action. Display contributing factors, confidence, model/version, expected impact and policy or data limitations. Require consent and eligibility checks, support accept/reject/feedback actions and audit all human and AI decisions. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history. Configuration Scope of Work | Version 1.0 9 Board 2 - Identity Resolution, Consent & Data Privacy Figure 2. High-definition configuration board with all 10 screens. Configuration Scope of Work | Version 1.0 10",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 9"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 9"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getGuestTimeline",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "uploadGuestDocument",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "uploadGuestDocument"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The guest intelligence list.",
+   "error": "Could not load. Names which read failed and leaves the guest intelligence untouched.",
+   "emptyFirstRun": "No guest intelligence yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the guest intelligence are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getGuestTimeline",
+    "contract": "marketing-crm",
+    "purpose": "Commercial and document history",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "uploadGuestDocument",
+    "contract": "marketing-crm",
+    "purpose": "Attach a document",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-743",
+   "workshopBoard": "wireframes/WS70 Marketing CRM Configuration Reference v1.0 Board 1.dc.html#bo-743"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 9. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "guestId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

@@ -1,6 +1,6 @@
 # WS81 — Game and Ride board 4
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 7 operations · 5 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `ACCESS_VALIDATE, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-424` | Gameplay Validation Command Center | commandCentre | 0 | 0 | — |
-| `BO-425` | Gameplay Validation Rule Configuration | listDetail | 0 | 0 | — |
-| `BO-426` | Deduction Priority & Funding Source Rules | listDetail | 0 | 0 | — |
-| `BO-427` | All Games & Rides Pass Configuration | configEditor | 0 | 0 | — |
-| `BO-428` | Specific Game/Ride Unlimited Entitlement | configEditor | 0 | 0 | — |
-| `BO-429` | Specific Game/Ride Limited Entitlement | configEditor | 0 | 0 | — |
-| `BO-430` | Game Package Builder | listDetail | 0 | 0 | — |
-| `BO-431` | Entitlement Validity & Activation Rules | listDetail | 0 | 0 | — |
-| `BO-432` | Real-Time Gameplay Authorization | listDetail | 0 | 0 | — |
-| `BO-433` | Validation Simulator & Exception Analysis | listDetail | 0 | 0 | — |
+| `BO-424` | Gameplay Validation Command Center | commandCentre | 2 | 0 | — |
+| `BO-425` | Gameplay Validation Rule Configuration | listDetail | 1 | 0 | — |
+| `BO-426` | Deduction Priority & Funding Source Rules | listDetail | 1 | 0 | — |
+| `BO-427` | All Games & Rides Pass Configuration | configEditor | 1 | 0 | — |
+| `BO-428` | Specific Game/Ride Unlimited Entitlement | configEditor | 1 | 0 | — |
+| `BO-429` | Specific Game/Ride Limited Entitlement | configEditor | 1 | 0 | — |
+| `BO-430` | Game Package Builder | listDetail | 2 | 0 | — |
+| `BO-431` | Entitlement Validity & Activation Rules | listDetail | 1 | 0 | — |
+| `BO-432` | Real-Time Gameplay Authorization | listDetail | 1 | 0 | — |
+| `BO-433` | Validation Simulator & Exception Analysis | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -260,7 +259,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the gameplay validation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getGameplayValidationRules",
+    "contract": "games",
+    "purpose": "Rules in force",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listGameplayTransactions",
+    "contract": "games",
+    "purpose": "What they produced",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Gameplay Requests Today",
@@ -273,7 +287,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-424"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-424",
+   "workshopBoard": "wireframes/WS61 Game and Ride Board 4.dc.html#bo-424"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 33. 0 of 6 labels bound to a contract property; 14 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -352,7 +367,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setGameplayValidationRules",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setGameplayValidationRules"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The gameplay validation rule list.",
@@ -361,10 +396,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the gameplay validation rule are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setGameplayValidationRules",
+    "contract": "games",
+    "purpose": "What a tap is checked against",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGameplayValidationRules"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-425"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-425",
+   "workshopBoard": "wireframes/WS61 Game and Ride Board 4.dc.html#bo-425"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 34. 0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -443,7 +490,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setGameplayValidationRules",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setGameplayValidationRules"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The deduction priority funding list.",
@@ -452,10 +519,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the deduction priority funding are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setGameplayValidationRules",
+    "contract": "games",
+    "purpose": "Deduction priority",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGameplayValidationRules"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-426"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-426",
+   "workshopBoard": "wireframes/WS61 Game and Ride Board 4.dc.html#bo-426"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 35. 0 of 0 labels bound to a contract property; 0 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -593,10 +672,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createGameEntitlement",
+    "contract": "games",
+    "purpose": "An all-games pass",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listGameEntitlements"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-427"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-427",
+   "workshopBoard": "wireframes/WS61 Game and Ride Board 4.dc.html#bo-427"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 36. 0 of 0 labels bound to a contract property; 11 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -724,10 +815,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createGameEntitlement",
+    "contract": "games",
+    "purpose": "Unlimited on one game",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listGameEntitlements"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-428"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-428",
+   "workshopBoard": "wireframes/WS61 Game and Ride Board 4.dc.html#bo-428"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 37. 0 of 0 labels bound to a contract property; 9 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -803,6 +906,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "selectField",
        "label": "Entitlement Name",
        "provenance": "pack Game_and_Ride_Module.pdf, page 37 §Configuration"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createGameEntitlement",
+       "label": "Create game entitlement",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createGameEntitlement"
       }
      ]
     }
@@ -815,10 +932,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createGameEntitlement",
+    "contract": "games",
+    "purpose": "A limited number of plays",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listGameEntitlements"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-429"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-429",
+   "workshopBoard": "wireframes/WS61 Game and Ride Board 4.dc.html#bo-429"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 37. 0 of 0 labels bound to a contract property; 1 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -902,7 +1031,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createGameEntitlement",
+       "label": "Create game entitlement",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listGameEntitlements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createGameEntitlement"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The game package list.",
@@ -911,10 +1066,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the game package are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createGameEntitlement",
+    "contract": "games",
+    "purpose": "Build a package",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listGameEntitlements"
+    ]
+   },
+   {
+    "operationId": "listGameEntitlements",
+    "contract": "games",
+    "purpose": "Existing packages",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-430"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-430",
+   "workshopBoard": "wireframes/WS61 Game and Ride Board 4.dc.html#bo-430"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 38. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -993,7 +1167,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createGameEntitlement",
+       "label": "Create game entitlement",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createGameEntitlement"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The entitlement validity activation list.",
@@ -1002,10 +1196,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the entitlement validity activation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createGameEntitlement",
+    "contract": "games",
+    "purpose": "Validity and activation",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listGameEntitlements"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-431"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-431",
+   "workshopBoard": "wireframes/WS61 Game and Ride Board 4.dc.html#bo-431"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 39. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1084,7 +1290,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "authoriseGameplay",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "authoriseGameplay"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The real-time gameplay authorization list.",
@@ -1093,10 +1318,23 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the real-time gameplay authorization are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "authoriseGameplay",
+    "contract": "games",
+    "purpose": "Authorise a tap",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listGameplayTransactions",
+     "getGameCard"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-432"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-432",
+   "workshopBoard": "wireframes/WS61 Game and Ride Board 4.dc.html#bo-432"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 40. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1175,7 +1413,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "simulateGameplayAuthorisation",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "simulateGameplayAuthorisation"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The validation simulator exception list.",
@@ -1184,10 +1441,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the validation simulator exception are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "simulateGameplayAuthorisation",
+    "contract": "games",
+    "purpose": "Simulate and analyse exceptions",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-433"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-433",
+   "workshopBoard": "wireframes/WS61 Game and Ride Board 4.dc.html#bo-433"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 41. 0 of 0 labels bound to a contract property; 0 of 75 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1221,7 +1487,139 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
-{}
+{
+ "authoriseGameplay": {
+  "method": "POST",
+  "path": "/gameplay-authorisations",
+  "contract": "games",
+  "summary": "Decide a tap, now",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GameplayAuthorisationRequest",
+  "responds": "GameplayAuthorisation"
+ },
+ "createGameEntitlement": {
+  "method": "POST",
+  "path": "/game-entitlements",
+  "contract": "games",
+  "summary": "Define a pass, package or per-game entitlement",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GameEntitlement",
+  "responds": "GameEntitlement"
+ },
+ "getGameplayValidationRules": {
+  "method": "GET",
+  "path": "/gameplay-validation-rules",
+  "contract": "games",
+  "summary": "What a tap is checked against, and in what order",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GameplayValidationRules"
+ },
+ "listGameEntitlements": {
+  "method": "GET",
+  "path": "/game-entitlements",
+  "contract": "games",
+  "summary": "Passes, packages and per-game entitlements",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GameEntitlement"
+ },
+ "listGameplayTransactions": {
+  "method": "GET",
+  "path": "/gameplay-transactions",
+  "contract": "games",
+  "summary": "Taps, decisions and what they cost",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "readerId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outcome",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GameplayTransaction"
+ },
+ "setGameplayValidationRules": {
+  "method": "PUT",
+  "path": "/gameplay-validation-rules",
+  "contract": "games",
+  "summary": "Deduction priority and the order of checks",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GameplayValidationRules",
+  "responds": "GameplayValidationRules"
+ },
+ "simulateGameplayAuthorisation": {
+  "method": "POST",
+  "path": "/gameplay-authorisations/simulate",
+  "contract": "games",
+  "summary": "What would happen if this card tapped this reader",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GameplayAuthorisationRequest",
+  "responds": "GameplayAuthorisation"
+ }
+}
 ```
 
 ## `schemas.json`
@@ -1229,5 +1627,350 @@ Method, path, parameters, request and response for every operation these screens
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
-{}
+{
+ "GameEntitlement": {
+  "type": "object",
+  "x-ticvai-persistence": "games.entitlement",
+  "description": "Board 4. **A right to play, not money** — consumed before money is.",
+  "required": [
+   "code",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "allGamesPass",
+     "unlimitedSingleGame",
+     "limitedSingleGame",
+     "package",
+     "freePlay"
+    ]
+   },
+   "gameIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "attractionTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "playCount": {
+    "type": "integer",
+    "nullable": true,
+    "description": "For `limitedSingleGame` and `package`. Null means unlimited."
+   },
+   "validityKind": {
+    "type": "string",
+    "enum": [
+     "sameDay",
+     "days",
+     "untilDate",
+     "untilUsed"
+    ]
+   },
+   "validityDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "activationKind": {
+    "type": "string",
+    "enum": [
+     "onPurchase",
+     "onFirstUse",
+     "onDate"
+    ],
+    "default": "onFirstUse",
+    "description": "**On first use is what a guest expects from a day pass bought the night before.** On purchase is what a venue defaults to by accident, and it costs them a day.\n"
+   },
+   "dailyPlayCap": {
+    "type": "integer",
+    "nullable": true
+   },
+   "cooldownMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**Unlimited does not mean continuous.** A cooldown is how one child does not hold a popular ride all afternoon.\n"
+   },
+   "linkedProductId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "GameplayAuthorisation": {
+  "type": "object",
+  "x-ticvai-persistence": "games.authorisation",
+  "description": "Board 4.9. **The refusal reason is the product.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "decision": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "refuse"
+    ]
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "ok",
+     "cardNotFound",
+     "cardExpired",
+     "cardBlocked",
+     "retapTooSoon",
+     "heightRestriction",
+     "ageRestriction",
+     "insufficientFunds",
+     "entitlementExhausted",
+     "entitlementNotValidHere",
+     "cooldownActive",
+     "dailyCapReached",
+     "readerNotConfigured",
+     "gameUnavailable"
+    ]
+   },
+   "guestMessage": {
+    "type": "string",
+    "nullable": true,
+    "description": "***\"No plays left on your pass\"* rather than *\"Declined\"*.** One is a guest who understands; the other is a member of staff walking over.\n"
+   },
+   "chargedFrom": {
+    "type": "string",
+    "nullable": true
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "entitlementId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "remainingBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "remainingPlays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "trace": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "check": {
+       "type": "string"
+      },
+      "passed": {
+       "type": "boolean"
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "decidedOffline": {
+    "type": "boolean",
+    "default": false
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "GameplayAuthorisationRequest": {
+  "type": "object",
+  "required": [
+   "readerId"
+  ],
+  "properties": {
+   "readerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "cardId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "credentialIdentifier": {
+    "type": "string",
+    "nullable": true
+   },
+   "gameId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "guestHeightCm": {
+    "type": "integer",
+    "nullable": true
+   },
+   "offline": {
+    "type": "boolean",
+    "default": false
+   }
+  }
+ },
+ "GameplayTransaction": {
+  "type": "object",
+  "x-ticvai-persistence": "games.gameplay_transaction",
+  "description": "Boards 8.2 and 8.5. **The refused ones are the valuable half.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "readerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "gameId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "cardId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "allowed",
+     "refused",
+     "reversed"
+    ]
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "chargedFrom": {
+    "type": "string",
+    "nullable": true
+   },
+   "entitlementId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "ticketsEarned": {
+    "type": "integer",
+    "nullable": true
+   },
+   "decidedOffline": {
+    "type": "boolean",
+    "default": false
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "GameplayValidationRules": {
+  "type": "object",
+  "x-ticvai-persistence": "games.validation_rules",
+  "description": "Boards 4.2 and 4.3. **Must be an answer, stated once**, rather than whatever the firmware happens to do.\n",
+  "properties": {
+   "deductionOrder": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "entitlement",
+      "freePlay",
+      "bonusCredit",
+      "promotionalCredit",
+      "gameCredit",
+      "cashCredit",
+      "directPay"
+     ]
+    }
+   },
+   "checkOrder": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "cardValid",
+      "cardNotExpired",
+      "cardNotBlocked",
+      "restrictionsMet",
+      "retapWindow",
+      "entitlementAvailable",
+      "fundsSufficient"
+     ]
+    }
+   },
+   "allowPartialEntitlement": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Whether an entitlement covering part of the price may be topped up with credit.** Usually no, because a guest who thinks they have a pass does not expect a charge.\n"
+   },
+   "refuseBelowBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "offlineDecisionAllowed": {
+    "type": "boolean",
+    "default": true
+   },
+   "offlineMaximumValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ }
+}
 ```

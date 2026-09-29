@@ -1,6 +1,6 @@
 # WS04 — Access Control board 4
 
-**10 screens · 10 operations · 12 schemas · 2 permissions**
+**10 screens · 15 operations · 16 schemas · 2 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 2 permissions apply here:
   `ACCESS_POINT_CONFIGURE, SCOPE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,15 +60,15 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-174` | Media & Credential Command Center | listDetail | 1 | 0 | — |
-| `BO-175` | Media Type & Technology Library | configEditor | 1 | 0 | — |
+| `BO-174` | Media & Credential Command Center | listDetail | 3 | 0 | — |
+| `BO-175` | Media Type & Technology Library | configEditor | 2 | 0 | — |
 | `BO-176` | Virtual Credential & Media Association | listDetail | 1 | 0 | — |
 | `BO-177` | Verification Method Selection & Locking | listDetail | 1 | 0 | — |
-| `BO-178` | Media Issuance & Encoding Profile | listDetail | 1 | 0 | — |
+| `BO-178` | Media Issuance & Encoding Profile | listDetail | 2 | 0 | — |
 | `BO-179` | Media Swap & Replacement | listDetail | 1 | 0 | — |
-| `BO-180` | RFID & NFC Configuration | configEditor | 1 | 0 | — |
+| `BO-180` | RFID & NFC Configuration | configEditor | 2 | 0 | — |
 | `BO-181` | External & Partner Credential Mapping | configEditor | 1 | 0 | — |
-| `BO-182` | Hotel, Wallet & External Media Integration | listDetail | 1 | 0 | — |
+| `BO-182` | Hotel, Wallet & External Media Integration | listDetail | 2 | 0 | — |
 | `BO-183` | Media Compatibility, Testing & Publication | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-174 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-175",
@@ -186,10 +182,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrator has one central view of all access credential and media technologies.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Central management page for every media and verification technology supported by Access Control.",
-  "purposeNote": "Administrator has one central view of all access credential and media technologies.",
   "layout": {
    "template": "split",
    "regions": [
@@ -206,10 +202,93 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "multiSelect",
        "label": "Filter by",
        "columns": [
-        "MediaCredentialCommandCenterView.ai"
+        "MediaCredentialCommandCenterViewSummary.ai"
        ],
        "notes": "The pack filters this screen by ai — which are present is a decision the pack already made.",
        "provenance": "pack Access Control Module_Reference.pdf, page 44 §Filters"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active Media Profiles",
+       "bindsTo": "MediaCredentialCommandCenterViewSummary.activeMediaProfiles",
+       "operation": "listMediaCredential",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "QR Credentials",
+       "bindsTo": "MediaCredentialCommandCenterViewSummary.qrCredentials",
+       "operation": "listMediaCredential",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "RFID Credentials",
+       "bindsTo": "MediaCredentialCommandCenterViewSummary.rfidCredentials",
+       "operation": "listMediaCredential",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "NFC Credentials",
+       "bindsTo": "MediaCredentialCommandCenterViewSummary.nfcCredentials",
+       "operation": "listMediaCredential",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Wallet Credentials",
+       "bindsTo": "MediaCredentialCommandCenterViewSummary.walletCredentials",
+       "operation": "listMediaCredential",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Biometric Credentials",
+       "bindsTo": "MediaCredentialCommandCenterViewSummary.biometricCredentials",
+       "operation": "listMediaCredential",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "External Credentials",
+       "bindsTo": "MediaCredentialCommandCenterViewSummary.externalCredentials",
+       "operation": "listMediaCredential",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Media Swaps Today",
+       "bindsTo": "MediaCredentialCommandCenterViewSummary.mediaSwapsToday",
+       "operation": "listMediaCredential",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Failed Media Reads",
+       "bindsTo": "MediaCredentialCommandCenterViewSummary.failedMediaReads",
+       "operation": "listMediaCredential",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Unknown Credentials",
+       "bindsTo": "MediaCredentialCommandCenterViewSummary.unknownCredentials",
+       "operation": "listMediaCredential",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Verification Exceptions",
+       "bindsTo": "MediaCredentialCommandCenterViewSummary.verificationExceptions",
+       "operation": "listMediaCredential",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
       }
      ]
     },
@@ -220,19 +299,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "dataTable",
        "label": "Every media credential",
-       "columns": [
-        "MediaCredentialCommandCenterView.activeMediaProfiles",
-        "MediaCredentialCommandCenterView.qrCredentials",
-        "MediaCredentialCommandCenterView.rfidCredentials",
-        "MediaCredentialCommandCenterView.nfcCredentials",
-        "MediaCredentialCommandCenterView.walletCredentials",
-        "MediaCredentialCommandCenterView.biometricCredentials",
-        "MediaCredentialCommandCenterView.externalCredentials",
-        "MediaCredentialCommandCenterView.mediaSwapsToday",
-        "MediaCredentialCommandCenterView.failedMediaReads",
-        "MediaCredentialCommandCenterView.unknownCredentials",
-        "MediaCredentialCommandCenterView.verificationExceptions"
-       ],
        "bindsTo": "MediaCredentialCommandCenterView",
        "operation": "listMediaCredential",
        "provenance": "pack Access Control Module_Reference.pdf, page 44 §Show"
@@ -247,19 +313,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "detailPanel",
        "label": "The selected media credential",
        "bindsTo": "MediaCredentialCommandCenterView",
-       "columns": [
-        "MediaCredentialCommandCenterView.activeMediaProfiles",
-        "MediaCredentialCommandCenterView.qrCredentials",
-        "MediaCredentialCommandCenterView.rfidCredentials",
-        "MediaCredentialCommandCenterView.nfcCredentials",
-        "MediaCredentialCommandCenterView.walletCredentials",
-        "MediaCredentialCommandCenterView.biometricCredentials",
-        "MediaCredentialCommandCenterView.externalCredentials",
-        "MediaCredentialCommandCenterView.mediaSwapsToday",
-        "MediaCredentialCommandCenterView.failedMediaReads",
-        "MediaCredentialCommandCenterView.unknownCredentials",
-        "MediaCredentialCommandCenterView.verificationExceptions"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “Media Directory”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 44 §Show"
       }
@@ -280,22 +333,35 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Media & Credential Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listVirtualCredentialMedia",
+    "contract": "access",
+    "purpose": "Virtual Credential & Media Association",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listMediaTypeCredential",
+    "contract": "access",
+    "purpose": "Media Type & Credential Technology Registry",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
    "preloaded": [
-    "MediaCredentialCommandCenterView.activeMediaProfiles",
-    "MediaCredentialCommandCenterView.qrCredentials",
-    "MediaCredentialCommandCenterView.rfidCredentials",
-    "MediaCredentialCommandCenterView.nfcCredentials",
-    "MediaCredentialCommandCenterView.walletCredentials",
-    "MediaCredentialCommandCenterView.biometricCredentials"
+    "MediaCredentialCommandCenterViewSummary.activeMediaProfiles",
+    "MediaCredentialCommandCenterViewSummary.qrCredentials",
+    "MediaCredentialCommandCenterViewSummary.rfidCredentials",
+    "MediaCredentialCommandCenterViewSummary.nfcCredentials",
+    "MediaCredentialCommandCenterViewSummary.walletCredentials",
+    "MediaCredentialCommandCenterViewSummary.biometricCredentials"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-174"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-174",
+   "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-174"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 44. 12 of 12 labels bound to a contract property; 12 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -358,10 +424,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "New media technologies can be added through configuration/integration rather than changing ticketing business logic.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Each profile defines) and no display directory — it is settings, not a population",
   "purpose": "Define reusable media technologies. The matrix expects support for linear barcode, two-dimensional codes, magnetic strips, contact/proximity RFID, NFC and biometric readers.",
-  "purposeNote": "New media technologies can be added through configuration/integration rather than changing ticketing business logic.",
   "layout": {
    "template": "form",
    "regions": [
@@ -405,6 +471,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 45 §Each profile defines"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save media type",
+       "operation": "setMediaTypeTechnology",
+       "provenance": "contract access.yaml PUT /media-type-technology (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -420,12 +498,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Media Type & Technology Library",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setMediaTypeTechnology",
+    "contract": "access",
+    "purpose": "Save media type",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-175"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-175",
+   "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-175"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 45. 0 of 0 labels bound to a contract property; 7 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -488,10 +573,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Different media representations resolve consistently to a single virtual credential and access state.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Associate one virtual ticket identity with its permitted media representations.",
-  "purposeNote": "Different media representations resolve consistently to a single virtual credential and access state.",
   "gaps": [
    {
     "operation": null,
@@ -537,17 +622,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "VirtualCredentialMediaAssociationView.andThereforeToTheSame",
-    "VirtualCredentialMediaAssociationView.ticket",
-    "VirtualCredentialMediaAssociationView.guest",
-    "VirtualCredentialMediaAssociationView.entitlements",
-    "VirtualCredentialMediaAssociationView.accessHistory"
+    "VirtualCredentialMediaAssociationView.ticketId",
+    "VirtualCredentialMediaAssociationView.guestId",
+    "VirtualCredentialMediaAssociationView.entitlements"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-176"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-176",
+   "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-176"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 46. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -610,10 +694,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "The selected verification method follows configurable locking and authorized-override policies.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Control which verification method the guest chooses and when it becomes locked. The matrix specifies that although a ticket may technically support physical card, Dynamic QR, Face Pass and Face Tag, the customer should select one verification method. It may be changed before first successful verification, but after that the guest cannot change it; authorized venue operations may do so when necessary.",
-  "purposeNote": "The selected verification method follows configurable locking and authorized-override policies.",
   "gaps": [
    {
     "operation": null,
@@ -659,17 +743,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "VerificationMethodSelectionLockingView.dynamicQr",
-    "VerificationMethodSelectionLockingView.physicalCard",
-    "VerificationMethodSelectionLockingView.rfid",
-    "VerificationMethodSelectionLockingView.facePass",
-    "VerificationMethodSelectionLockingView.faceTag"
+    "VerificationMethodSelectionLockingView.availableMethods"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-177"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-177",
+   "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-177"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 47. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -732,10 +813,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every issued medium receives a unique and traceable credential identifier using its configured encoding profile.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Configure how ticket identity is written or encoded onto each medium. The source requires ticket IDs to be generated as 2D barcode, QR or RFID and requires randomized, always- unique identifiers to reduce fraud.",
-  "purposeNote": "Every issued medium receives a unique and traceable credential identifier using its configured encoding profile.",
   "layout": {
    "template": "split",
    "regions": [
@@ -774,6 +855,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 48 §Display"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save issuance and encoding profile",
+       "operation": "setMediaIssuanceEncoding",
+       "provenance": "contract access.yaml PUT /media-issuance-encoding (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -790,6 +883,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Media Issuance & Encoding Profile",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setMediaIssuanceEncoding",
+    "contract": "access",
+    "purpose": "Save issuance and encoding profile",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -802,7 +901,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-178"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-178",
+   "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-178"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 48. 2 of 3 labels bound to a contract property; 9 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -865,10 +965,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Media can be replaced without changing or duplicating the underlying ticket entitlement.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Transfer a ticket from one medium to another without changing the underlying virtual ticket. This directly covers the matrix requirement to swap RFID to barcode/QR or vice versa while transferring the attached information.",
-  "purposeNote": "Media can be replaced without changing or duplicating the underlying ticket entitlement.",
   "gaps": [
    {
     "operation": null,
@@ -913,18 +1013,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    }
   ],
   "entryState": {
-   "preloaded": [
-    "MediaSwapReplacementView.to",
-    "MediaSwapReplacementView.ticket",
-    "MediaSwapReplacementView.guest",
-    "MediaSwapReplacementView.remainingEntitlements",
-    "MediaSwapReplacementView.entryHistory"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-179"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-179",
+   "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-179"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 49. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -987,10 +1082,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "RFID/NFC technologies can be configured according to operational range, reader capability and access journey.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Provide dedicated configuration for proximity credentials. The matrix requires RFID—including ISO 15693—and NFC, as well as multi-range RFID scanning at near, medium and far ranges.",
-  "purposeNote": "RFID/NFC technologies can be configured according to operational range, reader capability and access journey.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1079,16 +1174,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setRfidNfc",
     "contract": "access",
     "purpose": "RFID & NFC Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setRfidNfc"
-    ]
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "setRfidNfcCard",
+    "contract": "access",
+    "purpose": "RFID, NFC, Card & Wristband Media Designer",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-180"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-180",
+   "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-180"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 50. 0 of 0 labels bound to a contract property; 11 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1151,10 +1250,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Approved external ticket formats can be recognized and normalized into TICVAI's standard access transaction model.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Allow TICVAI Access Control to understand credentials generated by other systems. The matrix explicitly requires reading reseller/external partner ticket formats and barcodes generated by other systems.",
-  "purposeNote": "Approved external ticket formats can be recognized and normalized into TICVAI's standard access transaction model.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1208,7 +1307,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-181"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-181",
+   "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-181"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 51. 0 of 0 labels bound to a contract property; 5 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1271,10 +1371,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Hotel cards, supported wallet credentials and specialized external media can participate in standard TICVAI access journeys.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure specialized external credential ecosystems. The source specifically requires hotel room-card integration at access points and an interface to the hotel's property-management system for room billing.",
-  "purposeNote": "Hotel cards, supported wallet credentials and specialized external media can participate in standard TICVAI access journeys.",
   "gaps": [
    {
     "operation": null,
@@ -1300,6 +1400,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save integration",
+       "operation": "setHotelWalletExternal",
+       "provenance": "contract access.yaml PUT /hotel-wallet-external (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -1316,17 +1428,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Hotel, Wallet & External Media Integration",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setHotelWalletExternal",
+    "contract": "access",
+    "purpose": "Save integration",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
-   "preloaded": [
-    "HotelWalletExternalMediaIntegrationView.accessDecisionProceedsNormally"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-182"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-182",
+   "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-182"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 53. 0 of 0 labels bound to a contract property; 0 of 12 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1381,10 +1498,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from BO-174, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Media profiles cannot be deployed to incompatible access devices without an explicit warning/authorized exception. Board 4 — Final 10 Screens # Backend Screen Main Responsibility 4.1 Media & Credential Command Center Overall media estate 4.2 Media Type & Technology Library Barcode, QR, RFID, NFC, wallet, biometric, etc. 4.3 Virtual Credential & Media Association Connect multiple media to one ticket identity 4.4 Verification Method Selection & Locking Guest method selection and first-use lock 4.5 Media Issuance & Encoding Profile Unique identifier and encoding configuration 4.6 Media Swap & Rep",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Ensure that every configured medium works with the intended access-control hardware before deployment. This is particularly important because the matrix says the solution should operate with hardware selected by the venue, while hardware limitations must be highlighted and recommended equipment exposed for procurement decisions.",
-  "purposeNote": "Media profiles cannot be deployed to incompatible access devices without an explicit warning/authorized exception. Board 4 — Final 10 Screens # Backend Screen Main Responsibility 4.1 Media & Credential Command Center Overall media estate 4.2 Media Type & Technology Library Barcode, QR, RFID, NFC, wallet, biometric, etc. 4.3 Virtual Credential & Media Association Connect multiple media to one ticket identity 4.4 Verification Method Selection & Locking Guest method selection and first-use lock 4.5 Media Issuance & Encoding Profile Unique identifier and encoding configuration 4.6 Media Swap & Rep",
   "gaps": [
    {
     "operation": null,
@@ -1435,16 +1552,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "publishMediaCompatibilityTesting",
     "contract": "access",
     "purpose": "Media Compatibility, Testing & Publication",
-    "trigger": "onAction",
-    "invalidates": [
-     "publishMediaCompatibilityTesting"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-183"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-183",
+   "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-183"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 54. 0 of 0 labels bound to a contract property; 0 of 62 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1514,9 +1629,55 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "tenantId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "media",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "credentialType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "integration",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "MediaCredentialCommandCenterView"
+  "responds": "Page"
  },
  "listMediaIssuanceEncoding": {
   "method": "GET",
@@ -1540,9 +1701,33 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMediaTypeCredential": {
+  "method": "GET",
+  "path": "/media-type-credential",
+  "contract": "access",
+  "summary": "Media Type & Credential Technology Registry",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "MediaSwapReplacementView"
+  "responds": "MediaTypeCredentialTechnologyRegistryView"
  },
  "listMediaTypeTechnology": {
   "method": "GET",
@@ -1579,9 +1764,20 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "VirtualCredentialMediaAssociationView"
+  "responds": "Page"
  },
  "publishMediaCompatibilityTesting": {
   "method": "PUT",
@@ -1592,9 +1788,72 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "MediaCompatibilityTestingPublicationInput",
   "responds": "MediaCompatibilityTestingPublicationView"
+ },
+ "setHotelWalletExternal": {
+  "method": "PUT",
+  "path": "/hotel-wallet-external",
+  "contract": "access",
+  "summary": "Save a hotel, wallet or external media integration",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "HotelWalletExternalMediaIntegrationInput",
+  "responds": "HotelWalletExternalMediaIntegrationView"
+ },
+ "setMediaIssuanceEncoding": {
+  "method": "PUT",
+  "path": "/media-issuance-encoding",
+  "contract": "access",
+  "summary": "Save a media issuance and encoding profile",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MediaIssuanceEncodingProfileInput",
+  "responds": "MediaIssuanceEncodingProfileView"
+ },
+ "setMediaTypeTechnology": {
+  "method": "PUT",
+  "path": "/media-type-technology",
+  "contract": "access",
+  "summary": "Add, amend or retire a media type",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MediaTypeTechnologyLibraryInput",
+  "responds": "MediaTypeTechnologyLibraryView"
  },
  "setRfidNfc": {
   "method": "PUT",
@@ -1605,9 +1864,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "RfidNfcConfigurationInput",
   "responds": "RfidNfcConfigurationView"
+ },
+ "setRfidNfcCard": {
+  "method": "PUT",
+  "path": "/rfid-nfc-card",
+  "contract": "access",
+  "summary": "RFID, NFC, Card & Wristband Media Designer",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RfidNfcCardWristbandMediaDesignerInput",
+  "responds": "RfidNfcCardWristbandMediaDesignerView"
  }
 }
 ```
@@ -1624,33 +1908,108 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What External & Partner Credential Mapping displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "localMapping": {
+   "validationMode": {
     "type": "string",
-    "description": "Local Mapping"
+    "enum": [
+     "localMapping",
+     "apiValidation",
+     "tokenValidation",
+     "cachedValidation",
+     "offlineMapping",
+     "hybrid"
+    ],
+    "description": "How the partner credential is validated"
    },
-   "apiValidation": {
+   "mappingId": {
+    "type": "string"
+   },
+   "partnerName": {
     "type": "string",
-    "description": "API Validation"
+    "description": "e.g. Hotel Package Provider"
    },
-   "tokenValidation": {
+   "credentialFormat": {
     "type": "string",
-    "description": "Token Validation"
+    "description": "Partner barcode/QR format"
    },
-   "cachedValidation": {
+   "fieldMappings": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Partner field to TICVAI field pairs, e.g. ProductCode, VisitDate, GuestType, Entitlement"
+   },
+   "unrecognisedOutcome": {
     "type": "string",
-    "description": "Cached Validation"
+    "enum": [
+     "deny",
+     "referToOperator"
+    ],
+    "description": "What happens when a partner credential cannot be resolved"
    },
-   "offlineMapping": {
-    "type": "integer",
-    "description": "Offline Mapping"
-   },
-   "hybrid": {
+   "status": {
     "type": "string",
-    "description": "Hybrid"
-   },
-   "dependingOnPolicy": {
+    "enum": [
+     "draft",
+     "active",
+     "inactive"
+    ]
+   }
+  }
+ },
+ "HotelWalletExternalMediaIntegrationInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; the write configures the rules the matching View reads back (decided 29 September, VM close-out)",
+  "description": "**What Hotel, Wallet & External Media Integration submits** (decided 29 September, VM close-out). The writable fields of its View; the figures the screen computes are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "required": [
+   "name",
+   "integrationType",
+   "externalSystem"
+  ],
+  "properties": {
+   "integrationId": {
     "type": "string",
-    "description": "depending on policy"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Absent creates an integration"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "integrationType": {
+    "type": "string",
+    "enum": [
+     "hotelRoomCard",
+     "hotelPms",
+     "digitalWallet",
+     "otherExternal"
+    ]
+   },
+   "externalSystem": {
+    "type": "string",
+    "maxLength": 200,
+    "description": "The external system, e.g. the hotel PMS product"
+   },
+   "connectionSecretRef": {
+    "type": "string",
+    "description": "Reference to the stored credentials of the external system. **Never the secret itself.** The client supplies the account and keys (vendor credential); the reference is set once they are stored"
+   },
+   "roomChargeEnabled": {
+    "type": "boolean",
+    "default": false
+   },
+   "mapsToVirtualCredential": {
+    "type": "boolean",
+    "default": true,
+    "description": "The external card maps to a TICVAI Virtual Ticket rather than being validated by the external system"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "active",
+     "inactive"
+    ],
+    "default": "draft"
    }
   }
  },
@@ -1660,9 +2019,44 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Hotel, Wallet & External Media Integration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "accessDecisionProceedsNormally": {
+   "connectionSecretRef": {
     "type": "string",
-    "description": "Access decision proceeds normally"
+    "description": "Reference to the stored credentials of the external system, never the secret itself (decided 29 September, VM close-out)"
+   },
+   "integrationId": {
+    "type": "string"
+   },
+   "integrationType": {
+    "type": "string",
+    "enum": [
+     "hotelRoomCard",
+     "hotelPms",
+     "digitalWallet",
+     "otherExternal"
+    ]
+   },
+   "name": {
+    "type": "string"
+   },
+   "externalSystem": {
+    "type": "string",
+    "description": "External system name, e.g. the hotel PMS or wallet provider"
+   },
+   "roomChargeEnabled": {
+    "type": "boolean",
+    "description": "Attraction/service may be charged to the guest room via the PMS"
+   },
+   "mapsToVirtualCredential": {
+    "type": "boolean",
+    "description": "Credential resolves to a TICVAI virtual credential and follows the normal access decision"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "active",
+     "inactive"
+    ]
    }
   }
  },
@@ -1672,47 +2066,56 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Media Compatibility, Testing & Publication submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "rfid": {
+   "mediaProfileId": {
     "type": "string",
-    "description": "RFID ✓ ✓ ✓ ✓"
+    "description": "Media profile being published"
    },
-   "nfc": {
-    "type": "string",
-    "description": "NFC ✓ ✓ ✓ ✓"
-   },
-   "tenant": {
+   "tenantId": {
     "type": "string",
     "description": "Tenant"
    },
-   "venue": {
+   "venueId": {
     "type": "string",
     "description": "Venue"
    },
-   "park": {
+   "parkId": {
     "type": "string",
     "description": "Park"
    },
-   "gate": {
+   "gateId": {
     "type": "string",
     "description": "Gate"
    },
-   "deviceGroup": {
+   "deviceGroupId": {
     "type": "string",
     "description": "Device group"
    },
-   "communicate": {
+   "stage": {
     "type": "string",
-    "description": "communicate"
+    "enum": [
+     "draft",
+     "compatibilityTest",
+     "validate",
+     "approval",
+     "published"
+    ]
    },
-   "theTicketIsFullyRedeemed": {
-    "type": "string",
-    "description": "the ticket is fully redeemed"
+   "compatibilityWarnings": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Warnings from the compatibility test, e.g. a reader that cannot validate NFC offline"
    },
-   "retentionDeletionAudit": {
+   "exceptionReason": {
     "type": "string",
-    "description": "Retention/Deletion → Audit"
+    "description": "Required when publishing to a device with a compatibility warning"
    }
-  }
+  },
+  "required": [
+   "mediaProfileId",
+   "venueId"
+  ]
  },
  "MediaCompatibilityTestingPublicationView": {
   "type": "object",
@@ -1720,101 +2123,104 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Media Compatibility, Testing & Publication displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "rfid": {
+   "mediaProfileId": {
     "type": "string",
-    "description": "RFID ✓ ✓ ✓ ✓"
+    "description": "Media profile being published"
    },
-   "nfc": {
-    "type": "string",
-    "description": "NFC ✓ ✓ ✓ ✓"
-   },
-   "tenant": {
+   "tenantId": {
     "type": "string",
     "description": "Tenant"
    },
-   "venue": {
+   "venueId": {
     "type": "string",
     "description": "Venue"
    },
-   "park": {
+   "parkId": {
     "type": "string",
     "description": "Park"
    },
-   "gate": {
+   "gateId": {
     "type": "string",
     "description": "Gate"
    },
-   "deviceGroup": {
+   "deviceGroupId": {
     "type": "string",
     "description": "Device group"
    },
-   "communicate": {
+   "stage": {
     "type": "string",
-    "description": "communicate"
+    "enum": [
+     "draft",
+     "compatibilityTest",
+     "validate",
+     "approval",
+     "published"
+    ]
    },
-   "theTicketIsFullyRedeemed": {
-    "type": "string",
-    "description": "the ticket is fully redeemed"
+   "compatibilityWarnings": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Warnings from the compatibility test, e.g. a reader that cannot validate NFC offline"
    },
-   "retentionDeletionAudit": {
+   "exceptionReason": {
     "type": "string",
-    "description": "Retention/Deletion → Audit"
+    "description": "Required when publishing to a device with a compatibility warning"
    }
-  }
+  },
+  "required": [
+   "mediaProfileId",
+   "venueId"
+  ]
  },
- "MediaCredentialCommandCenterView": {
+ "MediaIssuanceEncodingProfileInput": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Media & Credential Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — request only; the write configures the rules the matching View reads back (decided 29 September, VM close-out)",
+  "description": "**What Media Issuance & Encoding Profile submits** (decided 29 September, VM close-out). The writable fields of its View; the figures the screen computes are deliberately absent, because a figure the system computed is not a figure a client may send back. The per-credential identifiers the View shows (credential identifier, randomised media identifier, ticket reference, secure token and reference) are generated at issue and are not writable.",
+  "required": [
+   "name",
+   "mediaTypeId",
+   "encodingFormat"
+  ],
   "properties": {
-   "activeMediaProfiles": {
-    "type": "integer",
-    "description": "Active Media Profiles"
-   },
-   "qrCredentials": {
-    "type": "integer",
-    "description": "QR Credentials"
-   },
-   "rfidCredentials": {
-    "type": "integer",
-    "description": "RFID Credentials"
-   },
-   "nfcCredentials": {
-    "type": "integer",
-    "description": "NFC Credentials"
-   },
-   "walletCredentials": {
-    "type": "integer",
-    "description": "Wallet Credentials"
-   },
-   "biometricCredentials": {
-    "type": "integer",
-    "description": "Biometric Credentials"
-   },
-   "externalCredentials": {
-    "type": "integer",
-    "description": "External Credentials"
-   },
-   "mediaSwapsToday": {
+   "encodingProfileId": {
     "type": "string",
-    "description": "Media Swaps Today"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Absent creates a profile"
    },
-   "failedMediaReads": {
-    "type": "integer",
-    "description": "Failed Media Reads"
-   },
-   "unknownCredentials": {
-    "type": "integer",
-    "description": "Unknown Credentials"
-   },
-   "verificationExceptions": {
-    "type": "integer",
-    "description": "Verification Exceptions"
-   },
-   "ai": {
+   "name": {
     "type": "string",
-    "description": "AI"
+    "maxLength": 200
+   },
+   "mediaTypeId": {
+    "type": "string",
+    "description": "The media type this profile encodes (`MediaTypeTechnologyLibraryView.mediaTypeId`)"
+   },
+   "encodingFormat": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "offlinePayloadProfile": {
+    "type": "string",
+    "description": "Which entitlement data is embedded for offline validation"
+   },
+   "checksumSignatureWhereApplicable": {
+    "type": "string",
+    "description": "Checksum or signature scheme, where the media carries one"
+   },
+   "randomizationEnabled": {
+    "type": "boolean",
+    "default": true,
+    "description": "Media identifiers are random rather than sequential"
+   },
+   "identifierCollisionCheckEnabled": {
+    "type": "boolean",
+    "default": true
+   },
+   "duplicatePreventionEnabled": {
+    "type": "boolean",
+    "default": true
    }
   }
  },
@@ -1849,12 +2255,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Encoding format"
    },
    "offlinePayloadProfile": {
-    "type": "integer",
-    "description": "offline payload profile"
+    "type": "string",
+    "description": "Offline payload profile reference"
    },
    "checksumSignatureWhereApplicable": {
     "type": "string",
-    "description": "checksum/signature where applicable"
+    "description": "Reference to the signing profile managed by the secure platform layer; no key material"
    },
    "identifierCollisionCheckEnabled": {
     "type": "boolean",
@@ -1864,67 +2270,231 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "boolean",
     "description": "Randomization — ENABLED"
    },
-   "insteadAdministratorsSelectAControlled": {
+   "encodingProfileId": {
     "type": "string",
-    "description": "Instead administrators select a controlled"
+    "description": "Encoding profile identifier"
+   },
+   "name": {
+    "type": "string",
+    "description": "Profile name, e.g. RFID Wristband, Adventure Park"
+   },
+   "mediaTypeId": {
+    "type": "string",
+    "description": "Media type this profile encodes"
+   },
+   "duplicatePreventionEnabled": {
+    "type": "boolean",
+    "description": "Duplicate prevention"
    }
   }
  },
- "MediaSwapReplacementView": {
+ "MediaTypeCredentialTechnologyRegistryView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Media Swap & Replacement displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "description": "**What Media Type & Credential Technology Registry displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "to": {
+   "mediaTypeId": {
     "type": "string",
-    "description": "To"
+    "description": "Media Type ID"
    },
-   "ticket": {
+   "name": {
     "type": "string",
-    "description": "✓ Ticket"
+    "description": "Name"
    },
-   "guest": {
-    "type": "string",
-    "description": "✓ Guest"
-   },
-   "remainingEntitlements": {
-    "type": "string",
-    "description": "✓ Remaining entitlements"
-   },
-   "entryHistory": {
-    "type": "string",
-    "description": "✓ Entry history"
-   },
-   "reEntryStatus": {
-    "type": "string",
-    "description": "✓ Re-entry status"
-   },
-   "fastPassBalance": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "✓ Fast Pass balance"
-   },
-   "reservations": {
-    "type": "string",
-    "description": "✓ Reservations"
-   },
-   "membershipAssociation": {
-    "type": "string",
-    "description": "✓ Membership association"
-   },
-   "reasonsType": {
+   "category": {
     "type": "string",
     "enum": [
-     "lost",
-     "damaged",
-     "deviceChange",
-     "upgrade",
-     "guestRequest",
-     "operationalReplacement",
-     "fraudSecurity",
-     "accessibility"
+     "digital",
+     "physical",
+     "biometric",
+     "future"
     ],
-    "description": "Vocabulary listed under Swap Reasons."
+    "description": "Media category"
+   },
+   "provider": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Provider integrations that implement this media type (media type is not the vendor)"
+   },
+   "technology": {
+    "type": "string",
+    "description": "Technology"
+   },
+   "tokenFormat": {
+    "type": "string",
+    "description": "Token format"
+   },
+   "generationMethod": {
+    "type": "string",
+    "description": "Generation method"
+   },
+   "validationMechanism": {
+    "type": "string",
+    "description": "Validation mechanism"
+   },
+   "supportsVisualDesign": {
+    "type": "boolean",
+    "description": "Supports visual design"
+   },
+   "supportsDynamicUpdate": {
+    "type": "boolean",
+    "description": "Supports dynamic update"
+   },
+   "supportsRevocation": {
+    "type": "boolean",
+    "description": "Supports revocation"
+   },
+   "supportsExpiration": {
+    "type": "boolean",
+    "description": "Supports expiration"
+   },
+   "supportsOfflineReference": {
+    "type": "boolean",
+    "description": "Supports offline reference"
+   },
+   "supportsReplacement": {
+    "type": "boolean",
+    "description": "Supports replacement"
+   },
+   "supportsEncryption": {
+    "type": "boolean",
+    "description": "Supports encryption"
+   },
+   "supportsSigning": {
+    "type": "boolean",
+    "description": "Supports signing"
+   },
+   "supportedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Supported channels"
+   },
+   "supportedDevices": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Supported devices"
+   },
+   "integrationAdapter": {
+    "type": "string",
+    "description": "Integration adapter"
+   }
+  },
+  "required": [
+   "mediaTypeId",
+   "name",
+   "category"
+  ]
+ },
+ "MediaTypeTechnologyLibraryInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; the write configures the rules the matching View reads back (decided 29 September, VM close-out)",
+  "description": "**What Media Type & Technology Library submits** (decided 29 September, VM close-out). The writable fields of its View; the figures the screen computes are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "required": [
+   "name",
+   "mediaType",
+   "technology",
+   "onlineOfflineCapability"
+  ],
+  "properties": {
+   "mediaTypeId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Absent adds a media type"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "mediaType": {
+    "type": "string",
+    "enum": [
+     "linearBarcode",
+     "twoDimensionalBarcode",
+     "qr",
+     "rfidContact",
+     "rfidProximity",
+     "rfidIso15693",
+     "rfidOtherStandard",
+     "appCredential",
+     "mobileWallet",
+     "paperTicket",
+     "wristband",
+     "plasticCard",
+     "hotelCard",
+     "facePass",
+     "faceTag",
+     "partnerQr",
+     "externalBarcode",
+     "thirdPartyCredential"
+    ]
+   },
+   "technology": {
+    "type": "string",
+    "enum": [
+     "barcode",
+     "rfid",
+     "nfc",
+     "magneticStripe",
+     "mobile",
+     "physical",
+     "biometric",
+     "external"
+    ]
+   },
+   "encodingFormat": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "supportedReaderTypes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "onlineOfflineCapability": {
+    "type": "string",
+    "enum": [
+     "onlineOnly",
+     "offlineOnly",
+     "onlineAndOffline"
+    ]
+   },
+   "writableReadOnly": {
+    "type": "string",
+    "enum": [
+     "writable",
+     "readOnly"
+    ]
+   },
+   "securityClassification": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "applicableVenues": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Empty means every venue of the tenant"
+   },
+   "applicableProducts": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Empty means every product"
+   },
+   "active": {
+    "type": "boolean",
+    "default": true,
+    "description": "False retires the media type: no new credential is issued on it; credentials already issued stay valid until they expire"
    }
   }
  },
@@ -1934,88 +2504,74 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Media Type & Technology Library displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "qr": {
-    "type": "string",
-    "description": "QR"
+   "active": {
+    "type": "boolean",
+    "description": "False once retired through `setMediaTypeTechnology`; issued credentials stay valid (decided 29 September, VM close-out)"
    },
-   "contact": {
+   "mediaType": {
     "type": "string",
-    "description": "Contact"
-   },
-   "proximity": {
-    "type": "string",
-    "description": "Proximity"
-   },
-   "iso15693": {
-    "type": "string",
-    "description": "ISO 15693"
-   },
-   "otherSupportedStandards": {
-    "type": "string",
-    "description": "Other supported standards"
-   },
-   "appCredential": {
-    "type": "string",
-    "description": "App Credential"
-   },
-   "mobileWallet": {
-    "type": "string",
-    "description": "Mobile Wallet"
-   },
-   "paperTicket": {
-    "type": "string",
-    "description": "Paper Ticket"
-   },
-   "wristband": {
-    "type": "string",
-    "description": "Wristband"
-   },
-   "plasticCard": {
-    "type": "string",
-    "description": "Plastic Card"
-   },
-   "hotelCard": {
-    "type": "string",
-    "description": "Hotel Card"
-   },
-   "facePass": {
-    "type": "string",
-    "description": "Face Pass"
-   },
-   "faceTag": {
-    "type": "string",
-    "description": "Face Tag"
-   },
-   "partnerQr": {
-    "type": "string",
-    "description": "Partner QR"
-   },
-   "externalBarcode": {
-    "type": "string",
-    "description": "External Barcode"
-   },
-   "thirdPartyCredential": {
-    "type": "string",
-    "description": "Third-party Credential"
+    "enum": [
+     "linearBarcode",
+     "twoDimensionalBarcode",
+     "qr",
+     "rfidContact",
+     "rfidProximity",
+     "rfidIso15693",
+     "rfidOtherStandard",
+     "appCredential",
+     "mobileWallet",
+     "paperTicket",
+     "wristband",
+     "plasticCard",
+     "hotelCard",
+     "facePass",
+     "faceTag",
+     "partnerQr",
+     "externalBarcode",
+     "thirdPartyCredential"
+    ],
+    "description": "The kind of medium this profile defines"
    },
    "technology": {
     "type": "string",
-    "description": "technology"
+    "enum": [
+     "barcode",
+     "rfid",
+     "nfc",
+     "magneticStripe",
+     "mobile",
+     "physical",
+     "biometric",
+     "external"
+    ],
+    "description": "Technology family"
    },
    "encodingFormat": {
     "type": "string",
     "description": "encoding format"
    },
    "supportedReaderTypes": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "supported reader types"
    },
    "onlineOfflineCapability": {
-    "type": "integer",
+    "type": "string",
+    "enum": [
+     "onlineOnly",
+     "offlineOnly",
+     "onlineAndOffline"
+    ],
     "description": "online/offline capability"
    },
    "writableReadOnly": {
     "type": "string",
+    "enum": [
+     "writable",
+     "readOnly"
+    ],
     "description": "writable/read-only"
    },
    "securityClassification": {
@@ -2023,14 +2579,317 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "security classification"
    },
    "applicableVenues": {
-    "type": "string",
-    "description": "applicable venues"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Venue ids"
    },
    "applicableProducts": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Product ids"
+   },
+   "mediaTypeId": {
     "type": "string",
-    "description": "applicable products"
+    "description": "Media type profile identifier"
+   },
+   "name": {
+    "type": "string",
+    "description": "Profile name"
    }
   }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "RfidNfcCardWristbandMediaDesignerInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What RFID, NFC, Card & Wristband Media Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "templateId": {
+    "type": "string",
+    "description": "Media template being designed"
+   },
+   "mediaKind": {
+    "type": "string",
+    "enum": [
+     "rfidCard",
+     "rfidWristband",
+     "nfcCard",
+     "nfcWristband",
+     "membershipCard",
+     "staffGuestCard",
+     "customWearable"
+    ],
+    "description": "Physical medium"
+   },
+   "reusability": {
+    "type": "string",
+    "enum": [
+     "disposable",
+     "reusable"
+    ],
+    "description": "Disposable or reusable medium"
+   },
+   "printed": {
+    "type": "boolean",
+    "description": "Printed"
+   },
+   "encoded": {
+    "type": "boolean",
+    "description": "Encoded"
+   },
+   "colorCategory": {
+    "type": "string",
+    "description": "Color/category"
+   },
+   "sizeWhereApplicable": {
+    "type": "string",
+    "description": "Size where applicable"
+   },
+   "activationAtCollection": {
+    "type": "boolean",
+    "description": "Activation at collection"
+   },
+   "depositReferenceWhereApplicable": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Deposit/reference where applicable"
+   },
+   "mediaDimensions": {
+    "type": "string",
+    "description": "Media dimensions"
+   },
+   "front": {
+    "type": "string",
+    "description": "Front"
+   },
+   "back": {
+    "type": "string",
+    "description": "Back"
+   },
+   "printableArea": {
+    "type": "string",
+    "description": "Printable area"
+   },
+   "logo": {
+    "type": "string",
+    "description": "Logo"
+   },
+   "printedFields": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "customerName",
+      "photo",
+      "membershipTier",
+      "expiry",
+      "serialNumber",
+      "qrBarcode"
+     ]
+    },
+    "description": "Personal and reference fields printed on the medium"
+   },
+   "customArtwork": {
+    "type": "string",
+    "description": "Custom artwork"
+   },
+   "sponsorVenueBranding": {
+    "type": "string",
+    "description": "Sponsor/venue branding"
+   },
+   "rfidNfcTechnology": {
+    "type": "string",
+    "description": "RFID/NFC technology"
+   },
+   "chipProfile": {
+    "type": "string",
+    "description": "Chip/profile"
+   },
+   "uidReferenceHandling": {
+    "type": "string",
+    "description": "UID/reference handling"
+   },
+   "encodingProfile": {
+    "type": "string",
+    "description": "Encoding profile"
+   },
+   "provider": {
+    "type": "string",
+    "description": "Provider"
+   },
+   "readerCompatibility": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Reader compatibility"
+   },
+   "printerEncoderIntegration": {
+    "type": "string",
+    "description": "Printer/encoder integration"
+   }
+  },
+  "required": [
+   "templateId",
+   "mediaKind"
+  ]
+ },
+ "RfidNfcCardWristbandMediaDesignerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What RFID, NFC, Card & Wristband Media Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "templateId": {
+    "type": "string",
+    "description": "Media template being designed"
+   },
+   "mediaKind": {
+    "type": "string",
+    "enum": [
+     "rfidCard",
+     "rfidWristband",
+     "nfcCard",
+     "nfcWristband",
+     "membershipCard",
+     "staffGuestCard",
+     "customWearable"
+    ],
+    "description": "Physical medium"
+   },
+   "reusability": {
+    "type": "string",
+    "enum": [
+     "disposable",
+     "reusable"
+    ],
+    "description": "Disposable or reusable medium"
+   },
+   "printed": {
+    "type": "boolean",
+    "description": "Printed"
+   },
+   "encoded": {
+    "type": "boolean",
+    "description": "Encoded"
+   },
+   "colorCategory": {
+    "type": "string",
+    "description": "Color/category"
+   },
+   "sizeWhereApplicable": {
+    "type": "string",
+    "description": "Size where applicable"
+   },
+   "activationAtCollection": {
+    "type": "boolean",
+    "description": "Activation at collection"
+   },
+   "depositReferenceWhereApplicable": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Deposit/reference where applicable"
+   },
+   "mediaDimensions": {
+    "type": "string",
+    "description": "Media dimensions"
+   },
+   "front": {
+    "type": "string",
+    "description": "Front"
+   },
+   "back": {
+    "type": "string",
+    "description": "Back"
+   },
+   "printableArea": {
+    "type": "string",
+    "description": "Printable area"
+   },
+   "logo": {
+    "type": "string",
+    "description": "Logo"
+   },
+   "printedFields": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "customerName",
+      "photo",
+      "membershipTier",
+      "expiry",
+      "serialNumber",
+      "qrBarcode"
+     ]
+    },
+    "description": "Personal and reference fields printed on the medium"
+   },
+   "customArtwork": {
+    "type": "string",
+    "description": "Custom artwork"
+   },
+   "sponsorVenueBranding": {
+    "type": "string",
+    "description": "Sponsor/venue branding"
+   },
+   "rfidNfcTechnology": {
+    "type": "string",
+    "description": "RFID/NFC technology"
+   },
+   "chipProfile": {
+    "type": "string",
+    "description": "Chip/profile"
+   },
+   "uidReferenceHandling": {
+    "type": "string",
+    "description": "UID/reference handling"
+   },
+   "encodingProfile": {
+    "type": "string",
+    "description": "Encoding profile"
+   },
+   "provider": {
+    "type": "string",
+    "description": "Provider"
+   },
+   "readerCompatibility": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Reader compatibility"
+   },
+   "printerEncoderIntegration": {
+    "type": "string",
+    "description": "Printer/encoder integration"
+   }
+  },
+  "required": [
+   "templateId",
+   "mediaKind"
+  ]
  },
  "RfidNfcConfigurationInput": {
   "type": "object",
@@ -2038,6 +2897,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What RFID & NFC Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
+   "name": {
+    "type": "string"
+   },
+   "rfidNfcProfileId": {
+    "type": "string",
+    "description": "RFID/NFC profile identifier"
+   },
    "rfidStandard": {
     "type": "string",
     "description": "RFID standard"
@@ -2051,7 +2917,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "frequency/interface profile"
    },
    "readerCompatibility": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "reader compatibility"
    },
    "readWriteBehavior": {
@@ -2066,51 +2935,65 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "security profile"
    },
-   "nfcTicket": {
-    "type": "string",
-    "description": "NFC ticket"
-   },
-   "membership": {
-    "type": "string",
-    "description": "membership"
-   },
-   "mobileDevice": {
-    "type": "string",
-    "description": "mobile device"
-   },
-   "walletCredential": {
-    "type": "string",
-    "description": "wallet credential"
+   "nfcUses": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "nfcTicket",
+      "membership",
+      "mobileDevice",
+      "walletCredential"
+     ]
+    },
+    "description": "NFC credential uses enabled by this profile"
    },
    "supportedReaders": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "supported readers"
    },
    "offlineCapability": {
-    "type": "integer",
+    "type": "boolean",
     "description": "offline capability"
    },
-   "venue": {
+   "venueId": {
     "type": "string",
     "description": "Venue"
    },
-   "zone": {
+   "zoneId": {
     "type": "string",
     "description": "Zone"
    },
-   "gate": {
+   "gateId": {
     "type": "string",
     "description": "Gate"
    },
-   "credential": {
+   "credentialType": {
     "type": "string",
     "description": "Credential"
    },
    "journey": {
     "type": "string",
     "description": "Journey"
+   },
+   "readRange": {
+    "type": "string",
+    "enum": [
+     "near",
+     "medium",
+     "far"
+    ],
+    "description": "Read range associated with the venue, zone, gate, credential or journey"
    }
-  }
+  },
+  "required": [
+   "rfidNfcProfileId",
+   "venueId",
+   "name"
+  ]
  },
  "RfidNfcConfigurationView": {
   "type": "object",
@@ -2118,6 +3001,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What RFID & NFC Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
+   "name": {
+    "type": "string"
+   },
+   "rfidNfcProfileId": {
+    "type": "string",
+    "description": "RFID/NFC profile identifier"
+   },
    "rfidStandard": {
     "type": "string",
     "description": "RFID standard"
@@ -2131,7 +3021,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "frequency/interface profile"
    },
    "readerCompatibility": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "reader compatibility"
    },
    "readWriteBehavior": {
@@ -2146,51 +3039,65 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "security profile"
    },
-   "nfcTicket": {
-    "type": "string",
-    "description": "NFC ticket"
-   },
-   "membership": {
-    "type": "string",
-    "description": "membership"
-   },
-   "mobileDevice": {
-    "type": "string",
-    "description": "mobile device"
-   },
-   "walletCredential": {
-    "type": "string",
-    "description": "wallet credential"
+   "nfcUses": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "nfcTicket",
+      "membership",
+      "mobileDevice",
+      "walletCredential"
+     ]
+    },
+    "description": "NFC credential uses enabled by this profile"
    },
    "supportedReaders": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "supported readers"
    },
    "offlineCapability": {
-    "type": "integer",
+    "type": "boolean",
     "description": "offline capability"
    },
-   "venue": {
+   "venueId": {
     "type": "string",
     "description": "Venue"
    },
-   "zone": {
+   "zoneId": {
     "type": "string",
     "description": "Zone"
    },
-   "gate": {
+   "gateId": {
     "type": "string",
     "description": "Gate"
    },
-   "credential": {
+   "credentialType": {
     "type": "string",
     "description": "Credential"
    },
    "journey": {
     "type": "string",
     "description": "Journey"
+   },
+   "readRange": {
+    "type": "string",
+    "enum": [
+     "near",
+     "medium",
+     "far"
+    ],
+    "description": "Read range associated with the venue, zone, gate, credential or journey"
    }
-  }
+  },
+  "required": [
+   "rfidNfcProfileId",
+   "venueId",
+   "name"
+  ]
  },
  "VerificationMethodSelectionLockingView": {
   "type": "object",
@@ -2198,37 +3105,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Verification Method Selection & Locking displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "dynamicQr": {
-    "type": "string",
-    "description": "☑ Dynamic QR"
-   },
-   "physicalCard": {
-    "type": "string",
-    "description": "☑ Physical Card"
-   },
-   "rfid": {
-    "type": "string",
-    "description": "☑ RFID"
-   },
-   "facePass": {
-    "type": "string",
-    "description": "☑ Face Pass"
-   },
-   "faceTag": {
-    "type": "string",
-    "description": "☑ Face Tag"
-   },
-   "guestNotAllowed": {
-    "type": "boolean",
-    "description": "Guest — Not Allowed"
-   },
-   "operationsSupervisorApproval": {
-    "type": "string",
-    "description": "Operations — Supervisor Approval"
-   },
-   "verificationMethodLocked": {
-    "type": "string",
-    "description": "🔒 VERIFICATION METHOD LOCKED"
+   "availableMethods": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "dynamicQr",
+      "physicalCard",
+      "rfid",
+      "facePass",
+      "faceTag"
+     ]
+    },
+    "description": "Verification methods the guest may choose from"
    },
    "reason": {
     "type": "string",
@@ -2238,61 +3127,29 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "accessibility",
      "deviceFailure",
      "guestService",
-     "everyChangeIsAudited"
+     "other"
     ],
-    "description": "Vocabulary listed under Reason."
-   }
-  }
- },
- "VirtualCredentialMediaAssociationView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Virtual Credential & Media Association displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "andThereforeToTheSame": {
-    "type": "string",
-    "description": "and therefore to the same"
+    "description": "Reason code vocabulary for a method change; every change is audited"
    },
-   "ticket": {
+   "policyId": {
     "type": "string",
-    "description": "Ticket"
+    "description": "Verification method policy identifier"
    },
-   "guest": {
+   "productId": {
     "type": "string",
-    "description": "Guest"
+    "description": "Product the policy applies to"
    },
-   "entitlements": {
-    "type": "string",
-    "description": "Entitlements"
+   "lockOnFirstSuccessfulAccess": {
+    "type": "boolean",
+    "description": "The chosen method locks at the first successful access"
    },
-   "accessHistory": {
+   "changeAfterLock": {
     "type": "string",
-    "description": "Access history"
-   },
-   "consumptionState": {
-    "type": "string",
-    "description": "Consumption state"
-   },
-   "simultaneously": {
-    "type": "string",
-    "description": "simultaneously"
-   },
-   "qr8x72": {
-    "type": "string",
-    "description": "QR 8X72"
-   },
-   "rfid298173": {
-    "type": "string",
-    "description": "RFID 298173"
-   },
-   "walletCredential827": {
-    "type": "string",
-    "description": "Wallet Credential 827"
-   },
-   "resolvesTo": {
-    "type": "string",
-    "description": "resolves to"
+    "enum": [
+     "notAllowed",
+     "supervisorApproval"
+    ],
+    "description": "Who may change the method once locked; guests may not"
    }
   }
  }

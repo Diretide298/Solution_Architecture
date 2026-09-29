@@ -1,6 +1,6 @@
 # WS97 — Rental Management board 10
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 8 operations · 12 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `ASSET_VIEW, PRODUCT_VIEW, RENTAL_VIEW, REPORT_VIEW_TENANT, REPORT_VIEW_VENUE, RESOURCE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-584` | Rental Executive Command Center | listDetail | 0 | 0 | — |
-| `BO-585` | Rental Revenue & Commercial Analytics | commandCentre | 0 | 0 | — |
-| `BO-586` | Utilization & Capacity Analytics | commandCentre | 0 | 0 | — |
-| `BO-587` | Inventory & Equipment Performance Analytics | commandCentre | 0 | 0 | — |
-| `BO-588` | Rental Duration, Extension & Return Analytics | commandCentre | 0 | 0 | — |
-| `BO-589` | Damage, Loss, Deposit & Exception Analytics | commandCentre | 0 | 0 | — |
-| `BO-590` | Location & Channel Performance | listDetail | 0 | 0 | — |
-| `BO-591` | Rental Forecasting & Demand Intelligence | commandCentre | 0 | 0 | — |
-| `BO-592` | Audit, Governance & Operational Control | listDetail | 0 | 0 | — |
-| `BO-593` | AI Rental Management Copilot & Action Center | commandCentre | 0 | 0 | — |
+| `BO-584` | Rental Executive Command Center | listDetail | 1 | 0 | — |
+| `BO-585` | Rental Revenue & Commercial Analytics | commandCentre | 1 | 0 | — |
+| `BO-586` | Utilization & Capacity Analytics | commandCentre | 1 | 0 | — |
+| `BO-587` | Inventory & Equipment Performance Analytics | commandCentre | 1 | 0 | — |
+| `BO-588` | Rental Duration, Extension & Return Analytics | commandCentre | 1 | 0 | — |
+| `BO-589` | Damage, Loss, Deposit & Exception Analytics | commandCentre | 1 | 0 | — |
+| `BO-590` | Location & Channel Performance | listDetail | 1 | 0 | — |
+| `BO-591` | Rental Forecasting & Demand Intelligence | commandCentre | 1 | 0 | — |
+| `BO-592` | Audit, Governance & Operational Control | listDetail | 1 | 0 | — |
+| `BO-593` | AI Rental Management Copilot & Action Center | commandCentre | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-584, BO-590, BO-592, BO-593 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-584, BO-592, BO-593 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

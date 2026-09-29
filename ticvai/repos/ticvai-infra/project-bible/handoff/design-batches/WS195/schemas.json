@@ -1,0 +1,1316 @@
+{
+ "AccessCondition": {
+  "type": "object",
+  "description": "**One attribute, one operator, one value** — and the attribute names are an enum rather than free text, because a policy that reads `venu.type` silently never matches.\nThe enum is the matrix, row by row: user (3.3.7), employee (3.3.8), membership (3.3.9), accreditation (3.3.10), customer segment (3.3.11), resource classification (3.3.12), venue (3.3.13), attraction (3.3.14), device (3.3.15), day of week (3.3.16), season (3.3.17), event (3.3.18), capacity (3.3.19), occupancy (3.3.20), risk score (3.3.21), location (3.3.2) and time (3.3.3).\n",
+  "required": [
+   "attribute",
+   "operator"
+  ],
+  "properties": {
+   "attribute": {
+    "type": "string",
+    "enum": [
+     "user.attribute",
+     "employee.attribute",
+     "employee.onShift",
+     "membership.tier",
+     "membership.status",
+     "accreditation.type",
+     "accreditation.status",
+     "customer.segment",
+     "resource.classification",
+     "venue.attribute",
+     "venue.id",
+     "attraction.attribute",
+     "device.kind",
+     "device.id",
+     "device.trusted",
+     "time.ofDay",
+     "time.dayOfWeek",
+     "time.season",
+     "time.withinOperatingHours",
+     "event.id",
+     "event.status",
+     "capacity.utilisationPercent",
+     "occupancy.level",
+     "risk.score",
+     "ticket.status",
+     "location.scopePath"
+    ]
+   },
+   "key": {
+    "type": "string",
+    "nullable": true,
+    "description": "For the `*.attribute` forms — which attribute, by code."
+   },
+   "operator": {
+    "type": "string",
+    "enum": [
+     "equals",
+     "notEquals",
+     "in",
+     "notIn",
+     "greaterThan",
+     "lessThan",
+     "between",
+     "contains",
+     "startsWith",
+     "exists"
+    ]
+   },
+   "value": {
+    "nullable": true,
+    "description": "The single comparand for `equals`, `notEquals`, `greaterThan`, `lessThan`, `contains` and `startsWith` — a string, number or boolean, by the attribute. Null for `exists`; `in`, `notIn` and `between` use `values`.\n"
+   },
+   "values": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "AccessPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "identity.access_policy",
+  "description": "3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n",
+  "required": [
+   "code",
+   "name",
+   "effect"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "Assigned by the server on `createAccessPolicy`; the path names the policy on update."
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "isTemplate": {
+    "type": "boolean",
+    "default": false
+   },
+   "permissions": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "**Which permissions this policy speaks to.** A policy with an empty list speaks to all of them, which is powerful enough that it is worth being explicit about.\n"
+   },
+   "conditions": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AccessCondition"
+    }
+   },
+   "combining": {
+    "type": "string",
+    "enum": [
+     "allMustMatch",
+     "anyMayMatch"
+    ],
+    "default": "allMustMatch"
+   },
+   "effect": {
+    "type": "string",
+    "enum": [
+     "permit",
+     "deny"
+    ],
+    "description": "**Deny wins over permit when two policies disagree.** 3.3.32 asks for least-privilege, and a permit that can override a deny is not least-privilege by any reading — it is the union of every mistake anybody has made.\n"
+   },
+   "priority": {
+    "type": "integer",
+    "default": 0
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "3.3.40 to 3.3.43. **Tenant, venue and cross-venue policies are one mechanism**, because `scope_path` is prefix-comparable — `uae.dubai` contains `uae.dubai.marina` — and inheritance is the prefix walk rather than a second table.\n"
+   },
+   "appliesToRoleIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Moved only by `setAccessPolicyState`.** A policy is created as a `draft`, and a status sent in a create or update body is ignored — otherwise a write could skip the approval 3.3.26 requires.\n",
+    "enum": [
+     "draft",
+     "pendingApproval",
+     "active",
+     "suspended",
+     "retired"
+    ]
+   },
+   "version": {
+    "type": "integer",
+    "default": 1,
+    "readOnly": true,
+    "description": "Set by the server; every `updateAccessPolicy` writes a new version."
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "delegatedAdminRoleIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "3.3.35. **Who may edit this policy without being a platform administrator.** A venue manager tuning their own opening-hours rule should not need someone who can edit every tenant's.\n"
+   }
+  }
+ },
+ "ApiClient": {
+  "type": "object",
+  "x-ticvai-persistence": "control.api_client",
+  "description": "CF-135a. **The one credential model.** 2.7.52, 7.1.25 and 7.1.30 each asserted their own, so a partner API key, a POS integration credential and a webstore credential were three unrelated things with three lifecycles.\n",
+  "required": [
+   "id",
+   "developerId",
+   "name",
+   "environment",
+   "scopes",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "developerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "clientId": {
+    "type": "string",
+    "readOnly": true
+   },
+   "environment": {
+    "type": "string",
+    "enum": [
+     "sandbox",
+     "production"
+    ],
+    "description": "**Bound to one, stated on the object rather than by naming convention.** A key that works in both is a key somebody will use in the wrong one.\n"
+   },
+   "scopes": {
+    "type": "array",
+    "description": "**Resolved against the tenant's licence at token issue** (13.3.24). A scope granted here and not licensed there produces no token — and the refusal is at issue rather than at call time, so an integrator finds out in testing.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "allowedTenantIds": {
+    "type": "array",
+    "description": "13.1.46. **Which tenants this client may act for.** A developer integrating for one venue must not reach another, and a client with an empty list reaches none.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "ipAllowList": {
+    "type": "array",
+    "description": "13.1.38. Optional, and the strongest control available where an integrator has fixed egress.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "suspended",
+     "revoked"
+    ],
+    "readOnly": true
+   },
+   "lastUsedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**A credential unused for a year is a credential nobody will notice being stolen.**\n"
+   }
+  }
+ },
+ "ApprovalDecision": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.decision",
+  "required": [
+   "level",
+   "principalId",
+   "decision",
+   "decidedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "level": {
+    "type": "integer"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "isDelegate": {
+    "type": "boolean"
+   },
+   "delegatedFrom": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "decision": {
+    "type": "string",
+    "enum": [
+     "approve",
+     "reject"
+    ]
+   },
+   "comment": {
+    "type": "string",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "usedMfa": {
+    "type": "boolean"
+   },
+   "signatureRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "ApprovalKind": {
+  "type": "string",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n",
+  "enum": [
+   "refund",
+   "priceOverride",
+   "discountOverride",
+   "complimentaryTicket",
+   "membershipCancellation",
+   "accessPermissionChange",
+   "configurationChange",
+   "aiRecommendation",
+   "releasePromotion",
+   "requisition",
+   "stockWriteOff",
+   "journalEntry",
+   "periodClose",
+   "periodReopen",
+   "purchaseOrderCancel",
+   "purchaseOrderShortClose",
+   "tenantMigration"
+  ]
+ },
+ "ApprovalMode": {
+  "type": "string",
+  "description": "11.1.43–11.1.46. **Sequential** asks one at a time, **parallel** asks everyone at once, **consensus** needs all of them, **majority** needs more than half.\nParallel and consensus differ in when it completes: parallel completes on the first approval, consensus waits for all. Conflating them is how a four-eyes rule turns into a one-eye rule.\n",
+  "enum": [
+   "sequential",
+   "parallel",
+   "consensus",
+   "majority"
+  ]
+ },
+ "ApprovalRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.request",
+  "required": [
+   "id",
+   "kind",
+   "status",
+   "requestedByPrincipalId",
+   "requestedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ApprovalKind"
+   },
+   "rerouteOnNoApprover": {
+    "type": "boolean",
+    "default": true,
+    "description": "BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"
+   },
+   "outOfOfficeDelegateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "allowEmailApproval": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"
+   },
+   "reopenedFrom": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"
+   },
+   "status": {
+    "$ref": "#/components/schemas/ApprovalStatus"
+   },
+   "subjectContract": {
+    "type": "string"
+   },
+   "subjectType": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "summary": {
+    "type": "string"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "justification": {
+    "type": "string",
+    "nullable": true
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "matrixVersion": {
+    "type": "integer"
+   },
+   "mode": {
+    "$ref": "#/components/schemas/ApprovalMode"
+   },
+   "currentLevel": {
+    "type": "integer"
+   },
+   "totalLevels": {
+    "type": "integer"
+   },
+   "pendingApprovers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "principalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "displayName": {
+       "type": "string"
+      },
+      "isDelegate": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "decisions": {
+    "type": "array",
+    "description": "Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n",
+    "items": {
+     "$ref": "#/components/schemas/ApprovalDecision"
+    }
+   },
+   "escalations": {
+    "type": "array",
+    "description": "11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "reason": {
+       "type": "string"
+      },
+      "fromLevel": {
+       "type": "integer"
+      },
+      "toLevel": {
+       "type": "integer"
+      },
+      "wasAutomatic": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "resubmittedFromId": {
+    "type": "string",
+    "nullable": true
+   },
+   "reopenedFromId": {
+    "type": "string",
+    "nullable": true
+   },
+   "slaDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "slaBreached": {
+    "type": "boolean"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "requestedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "ApprovalStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "pending",
+   "escalated",
+   "returned",
+   "informationRequested",
+   "approved",
+   "rejected",
+   "withdrawn",
+   "expired",
+   "cancelled"
+  ]
+ },
+ "CreateApprovalRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only",
+  "required": [
+   "id",
+   "kind",
+   "subjectContract",
+   "subjectType",
+   "subjectId",
+   "scopePath",
+   "summary"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ApprovalKind"
+   },
+   "subjectContract": {
+    "type": "string",
+    "description": "Which contract owns the thing being approved."
+   },
+   "subjectType": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string",
+    "description": "**A reference, never a copy.** A copy goes stale between raising and deciding, and an approver reading a stale copy approves something that no longer exists.\n"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "summary": {
+    "type": "string",
+    "maxLength": 300,
+    "description": "What the approver sees in their queue before opening it."
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "attributes": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "justification": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "isDraft": {
+    "type": "boolean",
+    "default": false,
+    "description": "True saves the request at `draft` without routing it; `submitApprovalRequest` sends it later (decided 28 September, audit R129).\n"
+   }
+  }
+ },
+ "WalletChannelRules": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.channel_rules",
+  "description": "Board 6. **The offline rule is stated once, not per device.**",
+  "properties": {
+   "allowedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "allowedCredentialKinds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "card",
+      "wristband",
+      "nfc",
+      "rfid",
+      "qr",
+      "mobileApp",
+      "digitalKey"
+     ]
+    }
+   },
+   "requiresPin": {
+    "type": "boolean",
+    "default": false
+   },
+   "pinAboveAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "offlineAllowed": {
+    "type": "boolean",
+    "default": false
+   },
+   "offlineFloorLimit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "offlineMaximumAgeMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**How stale a cached balance may be before the device refuses.** Without a ceiling an offline terminal spends a balance that ran out yesterday.\n"
+   },
+   "acceptancePointIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletConfigurationVersion": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.configuration_version",
+  "description": "Boards 1.10 and 10.8. **Ten boards of configuration that interact.**",
+  "properties": {
+   "version": {
+    "type": "integer"
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "publishedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   },
+   "findings": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "severity": {
+       "type": "string",
+       "enum": [
+        "blocking",
+        "warning"
+       ]
+      },
+      "code": {
+       "type": "string"
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletDispute": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.dispute",
+  "description": "Board 7.9. **Internal, and the venue decides it** — unlike a card chargeback.",
+  "required": [
+   "walletId",
+   "description"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "walletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "transactionIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "description": {
+    "type": "string"
+   },
+   "raisedBy": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "raisedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "investigating",
+     "escalated",
+     "upheld",
+     "rejected",
+     "withdrawn"
+    ],
+    "description": "`escalated` added with `resolveWalletDispute` (VM close-out, 29 September). `upheld`, `rejected` and `withdrawn` are closed."
+   },
+   "resolution": {
+    "type": "string",
+    "nullable": true
+   },
+   "escalatedToRoleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "reprocessedTransactionIds": {
+    "type": "array",
+    "readOnly": true,
+    "description": "Transactions created by a `reprocess` action.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "resolvedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "adjustmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletIntegrationMapping": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.integration_mapping",
+  "description": "Board 10, pp.118 and 122. **One per integration**, keyed by the `public-api` client. An unmapped inbound value is parked as an exception, never guessed.",
+  "required": [
+   "apiClientId"
+  ],
+  "properties": {
+   "apiClientId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The `public-api` ApiClient the integration authenticates as."
+   },
+   "fieldMappings": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "externalField",
+      "walletField"
+     ],
+     "properties": {
+      "externalField": {
+       "type": "string"
+      },
+      "walletField": {
+       "type": "string"
+      },
+      "transform": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "currencyMappings": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "externalCode",
+      "currency"
+     ],
+     "properties": {
+      "externalCode": {
+       "type": "string"
+      },
+      "currency": {
+       "type": "string",
+       "pattern": "^[A-Z]{3}$"
+      }
+     }
+    }
+   },
+   "statusMappings": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "externalStatus",
+      "walletStatus"
+     ],
+     "properties": {
+      "externalStatus": {
+       "type": "string"
+      },
+      "walletStatus": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "creditTypeMappings": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "externalCode",
+      "creditTypeId"
+     ],
+     "properties": {
+      "externalCode": {
+       "type": "string"
+      },
+      "creditTypeId": {
+       "type": "string",
+       "format": "uuid"
+      }
+     }
+    }
+   },
+   "dateTimeFormat": {
+    "type": "string",
+    "default": "ISO-8601",
+    "description": "The format the integration sends, e.g. ISO-8601 or a pattern such as dd/MM/yyyy HH:mm."
+   },
+   "timeZone": {
+    "type": "string",
+    "nullable": true,
+    "description": "IANA zone the integration's local times are in. Null means UTC offsets are sent."
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletLiabilityRow": {
+  "type": "object",
+  "description": "Boards 9.5 and 9.6. **The number the finance director asks for.**",
+  "properties": {
+   "key": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "outstanding": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "expiringThisPeriod": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "breakageRecognised": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "walletCount": {
+    "type": "integer"
+   },
+   "oldestLotAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   }
+  }
+ },
+ "WalletReconciliation": {
+  "type": "object",
+  "description": "Board 9.4. **Three sources, and the exception names which pair disagrees.**",
+  "properties": {
+   "from": {
+    "type": "string",
+    "format": "date"
+   },
+   "to": {
+    "type": "string",
+    "format": "date"
+   },
+   "subLedgerTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "generalLedgerTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "acquirerTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "exceptions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "pair": {
+       "type": "string",
+       "enum": [
+        "subLedgerVsGeneralLedger",
+        "subLedgerVsAcquirer",
+        "generalLedgerVsAcquirer"
+       ]
+      },
+      "difference": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "transactionIds": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       }
+      },
+      "likelyCause": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "WalletRiskRules": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.risk_rules",
+  "description": "Boards 8.2 to 8.7. **A risk rule with no action is a report.**",
+  "properties": {
+   "rules": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string"
+      },
+      "signal": {
+       "type": "string",
+       "enum": [
+        "velocityCount",
+        "velocityAmount",
+        "newCredential",
+        "geographyJump",
+        "deviceChange",
+        "dormantThenLarge",
+        "repeatedFailure",
+        "refundPattern"
+       ]
+      },
+      "threshold": {
+       "type": "number"
+      },
+      "windowMinutes": {
+       "type": "integer"
+      },
+      "action": {
+       "type": "string",
+       "enum": [
+        "scoreOnly",
+        "challenge",
+        "holdTransaction",
+        "freezeWallet",
+        "raiseCase"
+       ]
+      },
+      "minimumConfidence": {
+       "type": "number",
+       "nullable": true,
+       "description": "**Required before an automated freeze.** A rule that freezes on a false positive will eventually freeze a family in a queue.\n"
+      },
+      "alertOnAction": {
+       "type": "boolean",
+       "default": true
+      },
+      "status": {
+       "type": "string",
+       "readOnly": true,
+       "enum": [
+        "active",
+        "suspended",
+        "emergencyDisabled"
+       ],
+       "default": "active",
+       "description": "Set by `setWalletRiskRuleStatus`, not by publishing the rule set. A rule not `active` is evaluated for nothing (VM close-out, 29 September)."
+      },
+      "statusReason": {
+       "type": "string",
+       "nullable": true,
+       "readOnly": true
+      },
+      "statusUntil": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true,
+       "readOnly": true,
+       "description": "When a `suspended` rule returns to `active` by itself."
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletType": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.wallet_type",
+  "description": "Board 1.2. **Who owns a wallet** — the first of the two vocabularies.",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "ownerKind": {
+    "type": "string",
+    "enum": [
+     "guest",
+     "registeredCustomer",
+     "family",
+     "parent",
+     "child",
+     "corporate",
+     "school",
+     "employee"
+    ]
+   },
+   "storedValueCapability": {
+    "type": "boolean",
+    "default": true,
+    "description": "Board 1.2. Whether this wallet holds a balance at all. A pure entitlement wallet — passes and vouchers, no money — does not.\n"
+   },
+   "topUpCapability": {
+    "type": "boolean",
+    "default": false
+   },
+   "transferCapability": {
+    "type": "boolean",
+    "default": false
+   },
+   "refundCapability": {
+    "type": "boolean",
+    "default": false
+   },
+   "giftCardSupport": {
+    "type": "boolean",
+    "default": false
+   },
+   "voucherSupport": {
+    "type": "boolean",
+    "default": false
+   },
+   "membershipCreditSupport": {
+    "type": "boolean",
+    "default": false
+   },
+   "wearableSupport": {
+    "type": "boolean",
+    "default": false
+   },
+   "usageChannels": {
+    "type": "array",
+    "description": "**Where this wallet may be used, declared on the type itself.** Board 1.2 configures online, POS, mobile-app and API usage per wallet type, and this is what lets one `topUpWallet` serve every caller: the operation is shared and the type says which channel may reach it. `WalletChannelRules` still governs the per-credential detail — PIN thresholds, offline floor limits — and this governs whether the channel is open at all.\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "online",
+      "pos",
+      "mobileApp",
+      "api",
+      "kiosk",
+      "reader"
+     ]
+    }
+   },
+   "presetName": {
+    "type": "string",
+    "description": "**The client's own name for this composition** — \"Resort Wallet\", \"Cashless Venue Wallet\", \"Closed-Loop Wallet\". Board 1.2 lists thirteen such names as examples, not as kinds: they are combinations of `ownerKind`, `allowedCreditTypeIds` and `scopePath`. Naming the preset keeps the client's vocabulary without hard-coding it into an enum.\n"
+   },
+   "holderMayDifferFromOwner": {
+    "type": "boolean",
+    "default": false,
+    "description": "**A child wallet's owner is the parent.** Without this the model has to pretend a seven-year-old holds an account.\n"
+   },
+   "requiresIdentification": {
+    "type": "boolean",
+    "default": false
+   },
+   "maximumBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "allowedCreditTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "allowNegativeBalance": {
+    "type": "boolean",
+    "default": false
+   },
+   "sharedStructureAllowed": {
+    "type": "boolean",
+    "default": false
+   },
+   "lifecycleStates": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "numberingPattern": {
+    "type": "string",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "WebhookDelivery": {
+  "type": "object",
+  "x-ticvai-persistence": "control.webhook_delivery",
+  "description": "13.1.30. **The log a developer needs most**, and without it every question becomes a support ticket.\n",
+  "required": [
+   "id",
+   "subscriptionId",
+   "eventType",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subscriptionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "eventType": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "delivered",
+     "failed",
+     "retrying",
+     "abandoned"
+    ]
+   },
+   "attemptCount": {
+    "type": "integer"
+   },
+   "responseCode": {
+    "type": "integer",
+    "nullable": true
+   },
+   "responseBodyExcerpt": {
+    "type": "string",
+    "nullable": true,
+    "description": "**Truncated, and it is what makes the log useful** — a 500 with the receiver's own error message in it answers the question without a conversation.\n"
+   },
+   "isReplay": {
+    "type": "boolean",
+    "default": false
+   },
+   "isTest": {
+    "type": "boolean",
+    "default": false,
+    "description": "Sent by `testWebhookSubscription` (VM close-out, 29 September). Marked in the payload so a receiver never books it, and never counted towards `consecutiveFailures`.\n"
+   },
+   "deliveredAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "WebhookSubscription": {
+  "type": "object",
+  "x-ticvai-persistence": "control.webhook_subscription",
+  "description": "13.1.26, 13.3.18 and 13.3.22. **The 29 events already exist and nothing outside could receive one.**\n",
+  "required": [
+   "id",
+   "clientId",
+   "endpointUrl",
+   "eventTypes",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "clientId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "endpointUrl": {
+    "type": "string"
+   },
+   "eventTypes": {
+    "type": "array",
+    "description": "**Filtered at subscription, not at delivery.** A subscriber taking every event and discarding 99% is a subscriber the platform pays to talk to.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "filters": {
+    "type": "object",
+    "nullable": true,
+    "description": "13.3.22. Tenant, venue, or a business condition on the payload.",
+    "additionalProperties": true
+   },
+   "signingSecret": {
+    "type": "string",
+    "format": "password",
+    "writeOnly": true,
+    "description": "**How the receiver knows it was TICVAI.** Without a signature an endpoint accepts a ticket-sale event from anybody who learns the URL.\n**Write-only: accepted on create, never returned.** The same rule as `clientSecret` — a system that can show you a secret later is a system that hands it to whoever reads the subscription.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pendingVerification",
+     "active",
+     "paused",
+     "failing",
+     "disabled"
+    ],
+    "readOnly": true
+   },
+   "consecutiveFailures": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "disabledReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "13.1.29. **An endpoint failing for days is disabled rather than retried forever**, and the developer is told — a queue growing against a dead endpoint is a cost the platform carries silently.\n"
+   }
+  }
+ }
+}

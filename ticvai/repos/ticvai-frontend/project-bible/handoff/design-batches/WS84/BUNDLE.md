@@ -1,6 +1,6 @@
 # WS84 — Game and Ride board 7
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 6 operations · 6 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `ACCESS_VALIDATE, PRODUCT_CONFIGURE, PRODUCT_VIEW, WALLET_OPERATE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-454` | Card Lifecycle Command Center | commandCentre | 0 | 0 | — |
-| `BO-455` | Card / Credential Profile | listDetail | 0 | 0 | — |
-| `BO-456` | Card Expiry Rule Configuration | configEditor | 0 | 0 | — |
-| `BO-457` | Last Recharge & Last Activity Tracking | listDetail | 0 | 0 | — |
-| `BO-458` | Expiry Monitoring & Upcoming Expiration | listDetail | 0 | 0 | — |
-| `BO-459` | Card Expiry Runtime Validation | listDetail | 0 | 0 | — |
-| `BO-460` | Card Block, Suspend & Reactivation Control | listDetail | 0 | 1 | — |
-| `BO-461` | Card Replacement & Wallet Relinking | listDetail | 0 | 0 | — |
-| `BO-462` | Customer Balance & Credential Status View | listDetail | 0 | 0 | — |
-| `BO-463` | Card Lifecycle Audit & History | listDetail | 0 | 0 | — |
+| `BO-454` | Card Lifecycle Command Center | commandCentre | 1 | 0 | — |
+| `BO-455` | Card / Credential Profile | listDetail | 1 | 0 | — |
+| `BO-456` | Card Expiry Rule Configuration | configEditor | 1 | 0 | — |
+| `BO-457` | Last Recharge & Last Activity Tracking | listDetail | 1 | 0 | — |
+| `BO-458` | Expiry Monitoring & Upcoming Expiration | listDetail | 1 | 0 | — |
+| `BO-459` | Card Expiry Runtime Validation | listDetail | 1 | 0 | — |
+| `BO-460` | Card Block, Suspend & Reactivation Control | listDetail | 1 | 1 | — |
+| `BO-461` | Card Replacement & Wallet Relinking | listDetail | 2 | 0 | — |
+| `BO-462` | Customer Balance & Credential Status View | listDetail | 1 | 0 | — |
+| `BO-463` | Card Lifecycle Audit & History | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -128,7 +127,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-455",
      "trigger": "Card / Credential Profile",
-     "provenance": "structural — pack board 7 wiring, 11 September 2026"
+     "provenance": "structural — pack board 7 wiring, 11 September 2026",
+     "carries": [
+      "cardCode"
+     ]
     },
     {
      "to": "BO-456",
@@ -138,7 +140,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-457",
      "trigger": "Last Recharge & Last Activity Tracking",
-     "provenance": "structural — pack board 7 wiring, 11 September 2026"
+     "provenance": "structural — pack board 7 wiring, 11 September 2026",
+     "carries": [
+      "cardCode"
+     ]
     },
     {
      "to": "BO-458",
@@ -163,7 +168,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-462",
      "trigger": "Customer Balance & Credential Status View",
-     "provenance": "structural — pack board 7 wiring, 11 September 2026"
+     "provenance": "structural — pack board 7 wiring, 11 September 2026",
+     "carries": [
+      "cardCode"
+     ]
     },
     {
      "to": "BO-463",
@@ -175,7 +183,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "density": "compact",
   "purposeNote": "Authorized users can identify cards approaching expiry, expired cards, blocked cards and currently active cards from a single screen.",
   "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen a metric directory (§KPI Cards; Show; Card Activity Table) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "patternReason": "the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Give operations and management a central view of all active game cards / RFID credentials and their lifecycle status.",
   "layout": {
    "template": "dashboard",
@@ -260,7 +268,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the card lifecycle are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getGameCard",
+    "contract": "games",
+    "purpose": "Cards in circulation",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Total Active Cards",
@@ -269,11 +285,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "Expiring in 30 Days",
     "Expired Cards",
     "Blocked Cards"
+   ],
+   "params": [
+    {
+     "name": "cardCode",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-454"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-454",
+   "workshopBoard": "wireframes/WS64 Game and Ride Board 7.dc.html#bo-454"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 64. 0 of 6 labels bound to a contract property; 14 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -329,7 +352,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-454",
      "trigger": "Back to Card Lifecycle Command Center",
      "provenance": "structural — pack board 7 wiring, 11 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "cardCode"
+     ]
     }
    ]
   },
@@ -405,7 +431,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the card credential profile are still there. The pack's own statuses are Last Recharge — the state names which is selected.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getGameCard",
+    "contract": "games",
+    "purpose": "The card profile",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Card ID",
@@ -414,11 +448,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "Customer",
     "Wallet ID",
     "Issue Date"
+   ],
+   "params": [
+    {
+     "name": "cardCode",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-455"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-455",
+   "workshopBoard": "wireframes/WS64 Game and Ride Board 7.dc.html#bo-455"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 65. 0 of 9 labels bound to a contract property; 18 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -520,10 +561,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setGameCardExpiryRules",
+    "contract": "games",
+    "purpose": "When a card lapses",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGameCard"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-456"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-456",
+   "workshopBoard": "wireframes/WS64 Game and Ride Board 7.dc.html#bo-456"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 66. 0 of 0 labels bound to a contract property; 4 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -579,7 +632,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-454",
      "trigger": "Back to Card Lifecycle Command Center",
      "provenance": "structural — pack board 7 wiring, 11 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "cardCode"
+     ]
     }
    ]
   },
@@ -602,7 +658,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getGameCard",
+       "notes": "One record, read-only."
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The last recharge last list.",
@@ -611,12 +679,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the last recharge last are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getGameCard",
+    "contract": "games",
+    "purpose": "Last recharge and activity",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-457"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-457",
+   "workshopBoard": "wireframes/WS64 Game and Ride Board 7.dc.html#bo-457"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 67. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "cardCode",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -682,11 +767,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: View Card | View Wallet | Export. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Game_and_Ride_Module.pdf, page 68 §Actions"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 68"
    }
@@ -739,12 +819,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the expiry monitoring upcoming are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setGameCardExpiryRules",
+    "contract": "games",
+    "purpose": "Warnings before expiry",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGameCard"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-458"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-458",
+   "workshopBoard": "wireframes/WS64 Game and Ride Board 7.dc.html#bo-458"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 68. 0 of 6 labels bound to a contract property; 7 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 68. 0 of 6 labels bound to a contract property; 7 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** View Card | View Wallet | Export dropped (navigation (View Card / View Wallet) and a generic export already on the reporting screens).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -858,7 +950,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the card expiry runtime are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "authoriseGameplay",
+    "contract": "games",
+    "purpose": "Expiry checked at the reader",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listGameplayTransactions",
+     "getGameCard"
+    ]
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Expires: 08 Mar 2027"
@@ -866,7 +970,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-459"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-459",
+   "workshopBoard": "wireframes/WS64 Game and Ride Board 7.dc.html#bo-459"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 68. 0 of 1 labels bound to a contract property; 1 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -922,7 +1027,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-454",
      "trigger": "Back to Card Lifecycle Command Center",
      "provenance": "structural — pack board 7 wiring, 11 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "cardCode"
+     ]
     }
    ]
   },
@@ -932,11 +1040,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "patternReason": "the pack gives this screen a display directory (§Blocked Card Tap) and no metric row",
   "purpose": "Allow authorized operators to disable a lost, suspicious or invalid card without affecting the underlying wallet record.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: Block, Suspend, Reactivate, Replace Card. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Game_and_Ride_Module.pdf, page 69 §Actions"
-   },
    {
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
@@ -1028,20 +1131,38 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the card block suspend are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setGameCardLifecycle",
+    "contract": "games",
+    "purpose": "Block, suspend or reactivate",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGameCard"
+    ]
+   }
+  ],
   "entryState": {
    "preloaded": [
     "→ Reader sends credential",
     "→ TICVAI recognizes blocked status",
     "→ Transaction rejected",
     "→ Wallet remains protected"
+   ],
+   "params": [
+    {
+     "name": "cardId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-460"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-460",
+   "workshopBoard": "wireframes/WS64 Game and Ride Board 7.dc.html#bo-460"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 69. 0 of 4 labels bound to a contract property; 8 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 69. 0 of 4 labels bound to a contract property; 8 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Block, Suspend, Reactivate, Replace Card are choices sent by `setGameCardLifecycle` (action enum block|suspend|reactivate|replace).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1095,7 +1216,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-454",
      "trigger": "Back to Card Lifecycle Command Center",
      "provenance": "structural — pack board 7 wiring, 11 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "cardCode"
+     ]
     }
    ]
   },
@@ -1157,16 +1281,41 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the card replacement wallet are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setGameCardLifecycle",
+    "contract": "games",
+    "purpose": "Replace and relink",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGameCard"
+    ]
+   },
+   {
+    "operationId": "linkWalletCredential",
+    "contract": "wallet",
+    "purpose": "Bind the new credential",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "4321",
     "↓"
+   ],
+   "params": [
+    {
+     "name": "cardId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-461"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-461",
+   "workshopBoard": "wireframes/WS64 Game and Ride Board 7.dc.html#bo-461"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 70. 0 of 2 labels bound to a contract property; 8 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1222,7 +1371,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-454",
      "trigger": "Back to Card Lifecycle Command Center",
      "provenance": "structural — pack board 7 wiring, 11 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "cardCode"
+     ]
     }
    ]
   },
@@ -1286,17 +1438,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the customer balance credential are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getGameCard",
+    "contract": "games",
+    "purpose": "Balance and credential status",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Status: Active",
     "Card Expiry: 08 Mar 2027",
     "Bonus Expiry: 30 Sep 2026"
+   ],
+   "params": [
+    {
+     "name": "cardCode",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-462"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-462",
+   "workshopBoard": "wireframes/WS64 Game and Ride Board 7.dc.html#bo-462"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 71. 0 of 3 labels bound to a contract property; 6 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1414,7 +1581,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the card lifecycle audit are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listGameplayTransactions",
+    "contract": "games",
+    "purpose": "Card lifecycle history",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "05 Mar 2026",
@@ -1423,7 +1598,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-463"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-463",
+   "workshopBoard": "wireframes/WS64 Game and Ride Board 7.dc.html#bo-463"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 72. 0 of 2 labels bound to a contract property; 12 of 65 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1457,7 +1633,126 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
-{}
+{
+ "authoriseGameplay": {
+  "method": "POST",
+  "path": "/gameplay-authorisations",
+  "contract": "games",
+  "summary": "Decide a tap, now",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GameplayAuthorisationRequest",
+  "responds": "GameplayAuthorisation"
+ },
+ "getGameCard": {
+  "method": "GET",
+  "path": "/game-cards/{cardCode}",
+  "contract": "games",
+  "summary": "Read a card's balances",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GameCard"
+ },
+ "linkWalletCredential": {
+  "method": "POST",
+  "path": "/wallet-credentials",
+  "contract": "wallet",
+  "summary": "Bind a wristband, card or device to a wallet",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": true,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletCredential",
+  "responds": "WalletCredential"
+ },
+ "listGameplayTransactions": {
+  "method": "GET",
+  "path": "/gameplay-transactions",
+  "contract": "games",
+  "summary": "Taps, decisions and what they cost",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "readerId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outcome",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GameplayTransaction"
+ },
+ "setGameCardExpiryRules": {
+  "method": "PUT",
+  "path": "/game-card-expiry-rules",
+  "contract": "games",
+  "summary": "When a card lapses, and what warns the guest first",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GameCardExpiryRules",
+  "responds": "GameCardExpiryRules"
+ },
+ "setGameCardLifecycle": {
+  "method": "POST",
+  "path": "/game-cards/{cardId}/lifecycle",
+  "contract": "games",
+  "summary": "Block, suspend, reactivate, replace or expire a card",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GameCard"
+ }
+}
 ```
 
 ## `schemas.json`
@@ -1465,5 +1760,389 @@ Method, path, parameters, request and response for every operation these screens
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
-{}
+{
+ "GameCard": {
+  "x-ticvai-persistence": "games.card",
+  "type": "object",
+  "required": [
+   "cardCode",
+   "venueId",
+   "credits",
+   "bonusCredits",
+   "points",
+   "status",
+   "issuedAt"
+  ],
+  "properties": {
+   "cardCode": {
+    "type": "string",
+    "description": "**A pre-printed card keeps the code printed on it. A generated code** (a digital card, or a card issued with no printed code) **is the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Each till holds a reserved range of that sequence, so a card issued offline takes its code at once. Not gapless; only tax invoices are gapless, per legal entity.\n"
+   },
+   "kind": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "credits": {
+    "type": "integer",
+    "description": "Bought with money. Buys plays."
+   },
+   "bonusCredits": {
+    "type": "integer",
+    "description": "From a promotion. Typically non-refundable and spent before paid credits.\n"
+   },
+   "points": {
+    "type": "integer",
+    "description": "Won by playing. Buys prizes. **Not interchangeable with credits** — a guest who wins should not simply be able to play more.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "blocked",
+     "expired",
+     "transferred"
+    ]
+   },
+   "blockedReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "transferredToCardCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "lastPlayedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "GameCardExpiryRules": {
+  "type": "object",
+  "x-ticvai-persistence": "games.card_expiry_rules",
+  "description": "Boards 7.3 to 7.6. **Measured from last activity, and the warning is part of the rule.**\n",
+  "properties": {
+   "basis": {
+    "type": "string",
+    "enum": [
+     "fromIssue",
+     "fromLastActivity",
+     "fromLastRecharge"
+    ],
+    "default": "fromLastActivity"
+   },
+   "validityMonths": {
+    "type": "integer"
+   },
+   "warnBeforeDays": {
+    "type": "array",
+    "items": {
+     "type": "integer"
+    },
+    "description": "**Expiring a balance with no notice is what ends up on social media.**"
+   },
+   "warningChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "extendOnRecharge": {
+    "type": "boolean",
+    "default": true
+   },
+   "onExpiry": {
+    "type": "string",
+    "enum": [
+     "forfeit",
+     "holdForClaim",
+     "transferToBreakage"
+    ],
+    "default": "holdForClaim"
+   },
+   "holdForClaimDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "GameplayAuthorisation": {
+  "type": "object",
+  "x-ticvai-persistence": "games.authorisation",
+  "description": "Board 4.9. **The refusal reason is the product.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "decision": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "refuse"
+    ]
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "ok",
+     "cardNotFound",
+     "cardExpired",
+     "cardBlocked",
+     "retapTooSoon",
+     "heightRestriction",
+     "ageRestriction",
+     "insufficientFunds",
+     "entitlementExhausted",
+     "entitlementNotValidHere",
+     "cooldownActive",
+     "dailyCapReached",
+     "readerNotConfigured",
+     "gameUnavailable"
+    ]
+   },
+   "guestMessage": {
+    "type": "string",
+    "nullable": true,
+    "description": "***\"No plays left on your pass\"* rather than *\"Declined\"*.** One is a guest who understands; the other is a member of staff walking over.\n"
+   },
+   "chargedFrom": {
+    "type": "string",
+    "nullable": true
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "entitlementId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "remainingBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "remainingPlays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "trace": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "check": {
+       "type": "string"
+      },
+      "passed": {
+       "type": "boolean"
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "decidedOffline": {
+    "type": "boolean",
+    "default": false
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "GameplayAuthorisationRequest": {
+  "type": "object",
+  "required": [
+   "readerId"
+  ],
+  "properties": {
+   "readerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "cardId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "credentialIdentifier": {
+    "type": "string",
+    "nullable": true
+   },
+   "gameId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "guestHeightCm": {
+    "type": "integer",
+    "nullable": true
+   },
+   "offline": {
+    "type": "boolean",
+    "default": false
+   }
+  }
+ },
+ "GameplayTransaction": {
+  "type": "object",
+  "x-ticvai-persistence": "games.gameplay_transaction",
+  "description": "Boards 8.2 and 8.5. **The refused ones are the valuable half.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "readerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "gameId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "cardId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "allowed",
+     "refused",
+     "reversed"
+    ]
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "chargedFrom": {
+    "type": "string",
+    "nullable": true
+   },
+   "entitlementId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "ticketsEarned": {
+    "type": "integer",
+    "nullable": true
+   },
+   "decidedOffline": {
+    "type": "boolean",
+    "default": false
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletCredential": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.credential",
+  "description": "Boards 6.4 and 6.5. **A credential is not the wallet** — a lost wristband is relinked, not refunded.\n",
+  "required": [
+   "walletId",
+   "kind",
+   "identifier"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "walletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "card",
+     "wristband",
+     "nfc",
+     "rfid",
+     "qr",
+     "mobileApp",
+     "digitalKey"
+    ]
+   },
+   "identifier": {
+    "type": "string"
+   },
+   "linkedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "unlinkedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "lost",
+     "replaced",
+     "blocked",
+     "expired"
+    ]
+   },
+   "replacedByCredentialId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ }
+}
 ```

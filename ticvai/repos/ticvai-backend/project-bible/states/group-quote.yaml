@@ -1,0 +1,58 @@
+# Group quote — state model
+# Contract: orders.GroupQuote.status
+# Checked by tools/check-states.py. Added 29 September (DM5: data model for the agreed operations).
+
+entity: Group quote
+contract: orders
+enum: GroupQuote.status
+enumKind: inline
+enumSchema: GroupQuote
+enumProperty: status
+owner: orders
+initial:
+- draft
+terminal:
+- superseded
+- accepted
+- rejected
+- expired
+transitions:
+- from: draft
+  to: sent
+  operation: setGroupQuotationProposal
+  trigger: operation
+  guard: '**Not while `discountApproval` is `pending`, `rejected` or `returnedForChange`** (MoM 31 Aug 4.7:
+    configurable approval for additional discounts)'
+- from: draft
+  to: superseded
+  operation: setGroupQuotationProposal
+  trigger: operation
+  guard: A newer version of the same `quoteNumber` was saved before this one was sent
+- from: sent
+  to: superseded
+  operation: setGroupQuotationProposal
+  trigger: operation
+  guard: '**A revision is a new row.** The customer asked for a change; the new version is created as
+    `draft` and this one is kept as it was sent'
+- from: sent
+  to: accepted
+  trigger: externalEvent
+  guard: The customer accepted through the secure link or portal, or sales recorded their acceptance.
+    Conversion then sets `groupBookingId`
+- from: sent
+  to: accepted
+  operation: createGroupBooking
+  trigger: operation
+  guard: '**Converting the quote accepts it** (BO-272): `groupQuoteId` names this quote, the current
+    version of its `quoteNumber`; `groupBookingId` is set in the same step. An `accepted` quote is
+    converted without a status change (decided 29 September, writers pass)'
+- from: sent
+  to: rejected
+  trigger: externalEvent
+  guard: The customer declined
+- from: sent
+  to: expired
+  trigger: timer
+  guard: '`validUntil` passed without an answer'
+notes: '**Versions are rows, not edits** — the negotiation history is the set of rows sharing a
+  `quoteNumber`, and only one of them is ever `draft` or `sent`.'

@@ -54,7 +54,26 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "MenuActionResult"
+ },
+ "attachModifierGroup": {
+  "method": "PUT",
+  "path": "/menu-items/{menuItemId}/modifier-groups",
+  "contract": "fnb",
+  "summary": "Give an item its choices",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MenuItem"
  },
  "buildProductionPlan": {
   "method": "POST",
@@ -132,6 +151,25 @@
   "requestBody": "CreateMenuRequest",
   "responds": "Menu"
  },
+ "createModifierGroup": {
+  "method": "POST",
+  "path": "/modifier-groups",
+  "contract": "fnb",
+  "summary": "Create a modifier group",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ModifierGroup",
+  "responds": "ModifierGroup"
+ },
  "getFnbOrder": {
   "method": "GET",
   "path": "/fnb-orders/{orderId}",
@@ -158,6 +196,45 @@
   "requestBody": null,
   "responds": "GuestOrderStatus"
  },
+ "getKpiValues": {
+  "method": "GET",
+  "path": "/kpi-values",
+  "contract": "reporting",
+  "summary": "Current values, against target, with movement",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kpiIds",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kpiCodes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "compareTo",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KpiValue"
+ },
  "getMenu": {
   "method": "GET",
   "path": "/menus/{menuId}",
@@ -176,7 +253,7 @@
   "path": "/venues/{venueId}/settings",
   "contract": "tenancy",
   "summary": "Operational settings for this venue",
-  "permission": "TENANT_CONFIGURE",
+  "permission": "TENANT_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -234,6 +311,11 @@
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": "outletId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -245,7 +327,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "KitchenStation"
+  "responds": "Page"
  },
  "listKitchenTickets": {
   "method": "GET",
@@ -268,6 +350,11 @@
     "required": null
    },
    {
+    "name": "course",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -279,7 +366,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "KitchenTicket"
+  "responds": "Page"
  },
  "listMenus": {
   "method": "GET",
@@ -314,6 +401,30 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "listOutlets": {
+  "method": "GET",
+  "path": "/outlets",
+  "contract": "tenancy",
+  "summary": "List outlets",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Outlet"
  },
  "listProductionRuns": {
   "method": "GET",
@@ -352,7 +463,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "ProductionRun"
+  "responds": "Page"
  },
  "listWorkstations": {
   "method": "GET",
@@ -424,7 +535,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "MenuVersion"
  },
  "recordOrderHandover": {
   "method": "POST",
@@ -481,7 +592,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "MenuVersion"
  },
  "scheduleMenuPublish": {
   "method": "POST",
@@ -500,7 +611,26 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "MenuSchedule"
+ },
+ "setKitchenSla": {
+  "method": "PUT",
+  "path": "/outlets/{outletId}/kitchen-sla",
+  "contract": "fnb",
+  "summary": "How long a ticket may sit before it is late",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "KitchenSla",
+  "responds": "KitchenSla"
  },
  "setKitchenStations": {
   "method": "PUT",
@@ -512,6 +642,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -614,6 +749,6 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "AllergenVerdict"
  }
 }

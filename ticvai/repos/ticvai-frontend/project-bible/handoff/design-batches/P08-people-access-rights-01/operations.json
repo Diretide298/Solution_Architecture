@@ -117,7 +117,7 @@
   "method": "POST",
   "path": "/approval-requests/{requestId}/decide",
   "contract": "approvals",
-  "summary": "Approve or reject",
+  "summary": "Approve, reject, return or ask for information",
   "permission": "APPROVAL_DECIDE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -330,6 +330,19 @@
   "requestBody": null,
   "responds": "AttendanceRecord"
  },
+ "listJobTitles": {
+  "method": "GET",
+  "path": "/job-titles",
+  "contract": "workforce",
+  "summary": "The job titles a posting can name",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WorkforceJobTitle"
+ },
  "listPrincipals": {
   "method": "GET",
   "path": "/principals",
@@ -430,7 +443,36 @@
    }
   ],
   "requestBody": null,
-  "responds": "RotaAssignment"
+  "responds": "Page"
+ },
+ "listWorkAssignments": {
+  "method": "GET",
+  "path": "/work-assignments",
+  "contract": "workforce",
+  "summary": "Where each person is posted, and from when",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "employeeId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "activeOn",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkforceWorkAssignment"
  },
  "publishAnnouncement": {
   "method": "POST",
@@ -489,6 +531,25 @@
   "requestBody": null,
   "responds": null
  },
+ "resetPrincipalCredential": {
+  "method": "POST",
+  "path": "/principals/{principalId}/credential-reset",
+  "contract": "identity",
+  "summary": "Reset a member of staff's password or PIN",
+  "permission": "USER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResetCredentialRequest",
+  "responds": null
+ },
  "resubmitApprovalRequest": {
   "method": "POST",
   "path": "/approval-requests/{requestId}/resubmit",
@@ -545,6 +606,63 @@
   ],
   "requestBody": "ApprovalMatrix",
   "responds": "ApprovalMatrix"
+ },
+ "setCapabilityTemplate": {
+  "method": "PUT",
+  "path": "/capability-templates",
+  "contract": "identity",
+  "summary": "Save a tick-set under a name",
+  "permission": "ROLE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CapabilityTemplate",
+  "responds": "CapabilityTemplate"
+ },
+ "setJobTitle": {
+  "method": "PUT",
+  "path": "/job-titles",
+  "contract": "workforce",
+  "summary": "Define a job title",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WorkforceJobTitle",
+  "responds": "WorkforceJobTitle"
+ },
+ "setWorkAssignment": {
+  "method": "PUT",
+  "path": "/work-assignments",
+  "contract": "workforce",
+  "summary": "Post a person to a job title at a venue",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WorkforceWorkAssignment",
+  "responds": "WorkforceWorkAssignment"
  },
  "updatePrincipal": {
   "method": "PATCH",

@@ -1,6 +1,6 @@
 # P13-white-label-01 — P13 · White Label (1 of 2)
 
-**10 screens · 60 operations · 76 schemas · 18 permissions**
+**10 screens · 54 operations · 54 schemas · 8 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 18 permissions apply here:
-  `ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW, ASSET_MANAGE, ASSET_VIEW, ORDER_CREATE, ORDER_VIEW, PLATFORM_BILLING_MANAGE, PLATFORM_BILLING_VIEW, PLATFORM_CELL_MANAGE, PLATFORM_CELL_VIEW, PLATFORM_TENANT_MANAGE, PLATFORM_TENANT_TERMINATE`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 8 permissions apply here:
+  `ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW, ORDER_CREATE, ORDER_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, TENANT_CONFIGURE, TENANT_PUBLISH`. A control nobody can use must say so,
   not sit enabled and fail.
-- **7 of these operations work offline**: getAsset, getMediaAsset, getMediaEntitlements, getTenantLicences, listAssets, lookupAsset, setAssetStatus
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,13 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `CMS-001` | Tenant Workspace | listDetail | 21 | 3 | — |
-| `CMS-002` | Brand Kit | statusTracker | 4 | 0 | — |
-| `CMS-003` | Typography | statusTracker | 4 | 0 | — |
-| `CMS-004` | Logo & Assets | listDetail | 7 | 0 | — |
-| `CMS-005` | Theme Editor | statusTracker | 2 | 0 | — |
-| `CMS-006` | Component Preview | listDetail | 5 | 0 | — |
-| `CMS-007` | Page Builder | statusTracker | 2 | 0 | — |
-| `CMS-008` | Content Blocks | listDetail | 2 | 0 | — |
-| `CMS-009` | Navigation & Menus | listDetail | 5 | 0 | — |
-| `CMS-010` | Media Library | listDetail | 12 | 1 | — |
+| `CMS-001` | Tenant Workspace | statusTracker | 7 | 3 | — |
+| `CMS-002` | Brand Kit | statusTracker | 4 | 3 | — |
+| `CMS-003` | Typography | statusTracker | 4 | 2 | — |
+| `CMS-004` | Logo & Assets | statusTracker | 4 | 2 | — |
+| `CMS-005` | Theme Editor | statusTracker | 2 | 1 | — |
+| `CMS-006` | Component Preview | listDetail | 5 | 2 | — |
+| `CMS-007` | Page Builder | statusTracker | 9 | 4 | — |
+| `CMS-008` | Content Blocks | listDetail | 8 | 5 | — |
+| `CMS-009` | Navigation & Menus | listDetail | 6 | 3 | — |
+| `CMS-010` | Media Library | listDetail | 12 | 9 | — |
+
+## Thin screens in this batch
+
+**CMS-005 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

@@ -1,0 +1,1411 @@
+[
+ {
+  "id": "BO-1033",
+  "name": "Recommendation Command Center",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "9",
+   "number": "01",
+   "page": 38
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/recommendation-command-center-bo-1033",
+   "component": "apps/venue-management-web/src/routes/access-venue/RecommendationCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-1034",
+    "BO-1035",
+    "BO-1036",
+    "BO-1037",
+    "BO-1038",
+    "BO-1039",
+    "BO-1040",
+    "BO-1041",
+    "BO-1042"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-1034",
+     "trigger": "Best Seat Recommendations",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1035",
+     "trigger": "Best Value Recommendations",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1036",
+     "trigger": "Closest-to-Stage Recommendations",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1037",
+     "trigger": "Family Seating Recommendations",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1038",
+     "trigger": "Accessibility Recommendations",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1039",
+     "trigger": "Seat Upgrade Recommendations",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "carries": [
+      "performanceId"
+     ]
+    },
+    {
+     "to": "BO-1040",
+     "trigger": "Alternatives & Reseating",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1041",
+     "trigger": "Scoring Rules & Model Governance",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1042",
+     "trigger": "Performance, Feedback & Audit",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Monitor recommendation demand, quality, conversion and risk. Show recommendations served, accepted, locked, purchased, revenue uplift, fallback and no-result rates. Compare use case, channel, venue, performance, model/version, guest type and time period. Surface data gaps, drift, declining acceptance, accessibility mismatch and model/service incidents. Recommendations must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 38"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Recommendations served",
+       "columns": [
+        "Recommendations served"
+       ],
+       "notes": "The pack asks for recommendations served; the contract has no field for it.",
+       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 38"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Accepted",
+       "columns": [
+        "Accepted"
+       ],
+       "notes": "The pack asks for accepted; the contract has no field for it.",
+       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 38"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Purchased",
+       "columns": [
+        "Purchased"
+       ],
+       "notes": "The pack asks for purchased; the contract has no field for it.",
+       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 38"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Revenue uplift",
+       "columns": [
+        "Revenue uplift"
+       ],
+       "notes": "The pack asks for revenue uplift; the contract has no field for it.",
+       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 38"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Fallback / no-result rate",
+       "columns": [
+        "Fallback / no-result rate"
+       ],
+       "notes": "The pack asks for fallback / no-result rate; the contract has no field for it.",
+       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 38"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Recommendation profiles",
+       "bindsTo": "SeatRecommendationRules.profiles",
+       "columns": [
+        "SeatRecommendationRules.profiles[].kind",
+        "SeatRecommendationRules.profiles[].weights",
+        "SeatRecommendationRules.profiles[].preferredSectionIds",
+        "SeatRecommendationRules.profiles[].avoidSectionIds",
+        "SeatRecommendationRules.profiles[].contiguityWeight"
+       ],
+       "operation": "getSeatRecommendationRules",
+       "notes": "The only thing the bound read returns is configuration; the pack's metrics are all unbound.",
+       "provenance": "contract seating.yaml GET /seat-recommendation-rules"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Configuration in force",
+       "bindsTo": "SeatRecommendationRules",
+       "columns": [
+        "SeatRecommendationRules.seatMapId",
+        "SeatRecommendationRules.performanceId",
+        "SeatRecommendationRules.reverseRowOrder",
+        "SeatRecommendationRules.explainToGuest",
+        "SeatRecommendationRules.scopePath"
+       ],
+       "operation": "getSeatRecommendationRules",
+       "provenance": "contract seating.yaml GET /seat-recommendation-rules"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The recommendation list.",
+   "error": "Could not load. Names which read failed and leaves the recommendation untouched.",
+   "emptyFirstRun": "No recommendation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the recommendation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getSeatRecommendationRules",
+    "contract": "seating",
+    "purpose": "Scoring in force",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1033",
+   "workshopBoard": "wireframes/WS148 Seat Management Venue Mapping Reference v1.0 Board 9.dc.html#bo-1033"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 38. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Seat_Management_Venue_Mapping_Reference v1.0.pdf p.38; contract seating.yaml GET /seat-recommendation-rules. Pack labels with no schema field yet (shown as plain labels): Recommendations served, Accepted, Purchased, Revenue uplift, Fallback / no-result rate, Locked, Data gaps / drift / declining acceptance alerts, Model / version, Breakdown by use case, channel, venue, guest type.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1034",
+  "name": "Best Seat Recommendations",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "9",
+   "number": "02",
+   "page": 38
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/best-seat-recommendations-bo-1034",
+   "component": "apps/venue-management-web/src/routes/access-venue/BestSeatRecommendations.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1033"
+   ],
+   "exitTo": [
+    "BO-1033"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1033",
+     "trigger": "Back to Recommendation Command Center",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Rank the strongest overall options for the requested quantity. Score view, distance, orientation, row, aisle, obstruction, amenities, demand and customer preference. Return valid seat groups with match score, total price, view summary, rationale and trade-offs. Support rule-based fallback when AI is unavailable or confidence falls below the configured threshold. Recommendations must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 38"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 38"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setSeatRecommendationRules",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setSeatRecommendationRules"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The best seat recommendations list.",
+   "error": "Could not load. Names which read failed and leaves the best seat recommendations untouched.",
+   "emptyFirstRun": "No best seat recommendations yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the best seat recommendations are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setSeatRecommendationRules",
+    "contract": "seating",
+    "purpose": "What \"best seat\" means here",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getSeatRecommendationRules"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1034",
+   "workshopBoard": "wireframes/WS148 Seat Management Venue Mapping Reference v1.0 Board 9.dc.html#bo-1034"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 38. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1035",
+  "name": "Best Value Recommendations",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "9",
+   "number": "03",
+   "page": 38
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/best-value-recommendations-bo-1035",
+   "component": "apps/venue-management-web/src/routes/access-venue/BestValueRecommendations.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1033"
+   ],
+   "exitTo": [
+    "BO-1033"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1033",
+     "trigger": "Back to Recommendation Command Center",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Balance quality and price to identify strong value options. Calculate value from price, view, distance, category, demand, historical preference and comparable inventory. Present a price-versus-quality matrix and explain why each option represents better value. Respect minimum/maximum budget, promotion eligibility, fee transparency and price-lock policy. Recommendations must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 38",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 38"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 38"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setSeatRecommendationRules",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setSeatRecommendationRules"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The best value recommendations list.",
+   "error": "Could not load. Names which read failed and leaves the best value recommendations untouched.",
+   "emptyFirstRun": "No best value recommendations yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the best value recommendations are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setSeatRecommendationRules",
+    "contract": "seating",
+    "purpose": "Best value weighting",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getSeatRecommendationRules"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1035",
+   "workshopBoard": "wireframes/WS148 Seat Management Venue Mapping Reference v1.0 Board 9.dc.html#bo-1035"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 38. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1036",
+  "name": "Closest-to-Stage Recommendations",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "9",
+   "number": "04",
+   "page": 39
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/closest-to-stage-recommendations-bo-1036",
+   "component": "apps/venue-management-web/src/routes/access-venue/ClosestToStageRecommendations.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1033"
+   ],
+   "exitTo": [
+    "BO-1033"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1033",
+     "trigger": "Back to Recommendation Command Center",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Rank seats by meaningful proximity to the event focal point. Use configured stage/field/focal point, seat coordinates, orientation, level and route rather than row number alone. Show distance, section, row, elevation, obstruction and route information for each option. Support multiple focal points and event-specific stage layouts with the correct layout version. Recommendations must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 39"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 39"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setSeatRecommendationRules",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setSeatRecommendationRules"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The closest-to-stage recommendations list.",
+   "error": "Could not load. Names which read failed and leaves the closest-to-stage recommendations untouched.",
+   "emptyFirstRun": "No closest-to-stage recommendations yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the closest-to-stage recommendations are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setSeatRecommendationRules",
+    "contract": "seating",
+    "purpose": "Closest to stage",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getSeatRecommendationRules"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1036",
+   "workshopBoard": "wireframes/WS148 Seat Management Venue Mapping Reference v1.0 Board 9.dc.html#bo-1036"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 39. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1037",
+  "name": "Family Seating Recommendations",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "9",
+   "number": "05",
+   "page": 39
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/family-seating-recommendations-bo-1037",
+   "component": "apps/venue-management-web/src/routes/access-venue/FamilySeatingRecommendations.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1033"
+   ],
+   "exitTo": [
+    "BO-1033"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1033",
+     "trigger": "Back to Recommendation Command Center",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Find safe and practical seat groups for families. Prioritize contiguity, aisle preference, child-friendly areas, short routes and proximity to approved facilities. Consider adult/child ratio, age policy, stroller/service needs, family membership and budget. Explain splits or compromises and never separate minors contrary to configured policy. Recommendations must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 39"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 39"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setSeatRecommendationRules",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setSeatRecommendationRules"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The family seating recommendations list.",
+   "error": "Could not load. Names which read failed and leaves the family seating recommendations untouched.",
+   "emptyFirstRun": "No family seating recommendations yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the family seating recommendations are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setSeatRecommendationRules",
+    "contract": "seating",
+    "purpose": "Family together",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getSeatRecommendationRules"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1037",
+   "workshopBoard": "wireframes/WS148 Seat Management Venue Mapping Reference v1.0 Board 9.dc.html#bo-1037"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 39. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1038",
+  "name": "Accessibility Recommendations",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "9",
+   "number": "06",
+   "page": 39
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/accessibility-recommendations-bo-1038",
+   "component": "apps/venue-management-web/src/routes/access-venue/AccessibilityRecommendations.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1033"
+   ],
+   "exitTo": [
+    "BO-1033"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1033",
+     "trigger": "Back to Recommendation Command Center",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Match stated access needs to verified accessible inventory and routes. Use wheelchair, companion, transfer, aisle, step-free, hearing, vision and service-animal attributes. Show companion pairing, accessible route, distance to entrance/facilities and any assistance requirement. Protect sensitive preference data, allow human-assisted review and prevent inappropriate release of protected inventory. Recommendations must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 39"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 39"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setSeatRecommendationRules",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setSeatRecommendationRules"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The accessibility recommendations list.",
+   "error": "Could not load. Names which read failed and leaves the accessibility recommendations untouched.",
+   "emptyFirstRun": "No accessibility recommendations yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the accessibility recommendations are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setSeatRecommendationRules",
+    "contract": "seating",
+    "purpose": "Accessible recommendations",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getSeatRecommendationRules"
+    ]
+   },
+   {
+    "operationId": "getAccessibleSeating",
+    "contract": "seating",
+    "purpose": "The accessible inventory",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1038",
+   "workshopBoard": "wireframes/WS148 Seat Management Venue Mapping Reference v1.0 Board 9.dc.html#bo-1038"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 39. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1039",
+  "name": "Seat Upgrade Recommendations",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "9",
+   "number": "07",
+   "page": 39
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/seat-upgrade-recommendations-bo-1039",
+   "component": "apps/venue-management-web/src/routes/access-venue/SeatUpgradeRecommendations.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1033"
+   ],
+   "exitTo": [
+    "BO-1033"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1033",
+     "trigger": "Back to Recommendation Command Center",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Offer an eligible higher-value alternative before or after purchase. Compare current and candidate seat on view, distance, level, amenities, accessibility and price difference. Apply membership, loyalty, promotion, exchange, refund, fee and event cutoff rules. Show expected value and acquire new inventory before releasing the original seat through a safe exchange flow. Recommendations must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 39",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 39"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 39"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "recommendSeats",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "recommendSeats"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The seat upgrade recommendations list.",
+   "error": "Could not load. Names which read failed and leaves the seat upgrade recommendations untouched.",
+   "emptyFirstRun": "No seat upgrade recommendations yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the seat upgrade recommendations are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "recommendSeats",
+    "contract": "seating",
+    "purpose": "Upgrade options",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1039",
+   "workshopBoard": "wireframes/WS148 Seat Management Venue Mapping Reference v1.0 Board 9.dc.html#bo-1039"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 39. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "performanceId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1040",
+  "name": "Alternatives & Reseating",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "9",
+   "number": "08",
+   "page": 40
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/alternatives-reseating-bo-1040",
+   "component": "apps/venue-management-web/src/routes/access-venue/AlternativesReseating.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1033"
+   ],
+   "exitTo": [
+    "BO-1033"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1033",
+     "trigger": "Back to Recommendation Command Center",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide comparable options when selected or issued seats become unavailable. Rank same-price, better-price, better-view, same-section, accessible and adjacent alternatives. Support operational reseating for layout changes, maintenance, production blocks and customer requests. Explain impact, require approval/acceptance where applicable and preserve original-to-new seat lineage. Recommendations must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 40"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 40"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "reassignSeats",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "reassignSeats"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The alternatives reseating list.",
+   "error": "Could not load. Names which read failed and leaves the alternatives reseating untouched.",
+   "emptyFirstRun": "No alternatives reseating yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the alternatives reseating are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "reassignSeats",
+    "contract": "seating",
+    "purpose": "Move a party, and tell them",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getSeatInventory",
+     "getSeatReconciliation"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1040",
+   "workshopBoard": "wireframes/WS148 Seat Management Venue Mapping Reference v1.0 Board 9.dc.html#bo-1040"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 40. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1041",
+  "name": "Scoring Rules & Model Governance",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "9",
+   "number": "09",
+   "page": 40
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/scoring-rules-model-governance-bo-1041",
+   "component": "apps/venue-management-web/src/routes/access-venue/ScoringRulesModelGovernance.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1033"
+   ],
+   "exitTo": [
+    "BO-1033"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1033",
+     "trigger": "Back to Recommendation Command Center",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure recommendation objectives, constraints and AI controls. Set weighted factors, hard constraints, tie-breakers, minimum score, fallback, audience and use-case priority. Manage model/version, training/evaluation metadata, approval, effective dates and rollback. Run test personas, backtests, bias/accessibility checks and scenario comparison before publication. Recommendations must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 40"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 40"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setSeatRecommendationRules",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setSeatRecommendationRules"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The scoring rules model list.",
+   "error": "Could not load. Names which read failed and leaves the scoring rules model untouched.",
+   "emptyFirstRun": "No scoring rules model yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the scoring rules model are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setSeatRecommendationRules",
+    "contract": "seating",
+    "purpose": "Scoring and governance",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getSeatRecommendationRules"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1041",
+   "workshopBoard": "wireframes/WS148 Seat Management Venue Mapping Reference v1.0 Board 9.dc.html#bo-1041"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 40. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1042",
+  "name": "Performance, Feedback & Audit",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "9",
+   "number": "10",
+   "page": 40
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/performance-feedback-audit-bo-1042",
+   "component": "apps/venue-management-web/src/routes/access-venue/PerformanceFeedbackAudit.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1033"
+   ],
+   "exitTo": [
+    "BO-1033"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1033",
+     "trigger": "Back to Recommendation Command Center",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Measure realized recommendation quality and accountability. Report acceptance, conversion, revenue, upgrade, abandonment, no-result and downstream satisfaction. Capture accept/reject, reason, user feedback, actual purchase and post-event outcome for learning. Monitor drift and disparity and retain inputs, candidates, scores, explanation, model/version and human decisions. Recommendations must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 40 Board 10 - Seat Revenue Management & Forecasting Figure 10. High-definition configuration board with all 10 screens. Visual reference: information architecture and configuration coverage; detailed production behavior is defined in the following scope. Configuration Scope of Work | Version 1.0 41",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 40"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Acceptance rate",
+       "columns": [
+        "Acceptance rate"
+       ],
+       "notes": "The pack asks for acceptance rate; the contract has no field for it.",
+       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 40"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Conversion",
+       "columns": [
+        "Conversion"
+       ],
+       "notes": "The pack asks for conversion; the contract has no field for it.",
+       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 40"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Upgrade rate",
+       "columns": [
+        "Upgrade rate"
+       ],
+       "notes": "The pack asks for upgrade rate; the contract has no field for it.",
+       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 40"
+      },
+      {
+       "kind": "metricTile",
+       "label": "No-result rate",
+       "columns": [
+        "No-result rate"
+       ],
+       "notes": "The pack asks for no-result rate; the contract has no field for it.",
+       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 40"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Recommendation decisions",
+       "columns": [
+        "Recommendation",
+        "Guest action (accept / reject)",
+        "Reason",
+        "User feedback",
+        "Actual purchase",
+        "Model / version",
+        "Score"
+       ],
+       "notes": "The retained inputs, candidates, scores, explanation and human decision; no operation returns them.",
+       "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 40"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Scoring configuration at the time",
+       "bindsTo": "SeatRecommendationRules",
+       "columns": [
+        "SeatRecommendationRules.profiles",
+        "SeatRecommendationRules.reverseRowOrder",
+        "SeatRecommendationRules.explainToGuest",
+        "SeatRecommendationRules.scopePath"
+       ],
+       "operation": "getSeatRecommendationRules",
+       "notes": "Current configuration only; the contract keeps no history of it.",
+       "provenance": "contract seating.yaml GET /seat-recommendation-rules"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The performance feedback audit list.",
+   "error": "Could not load. Names which read failed and leaves the performance feedback audit untouched.",
+   "emptyFirstRun": "No performance feedback audit yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the performance feedback audit are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getSeatRecommendationRules",
+    "contract": "seating",
+    "purpose": "Performance and feedback",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1042",
+   "workshopBoard": "wireframes/WS148 Seat Management Venue Mapping Reference v1.0 Board 9.dc.html#bo-1042"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 40. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Seat_Management_Venue_Mapping_Reference v1.0.pdf p.40; contract seating.yaml GET /seat-recommendation-rules. Pack labels with no schema field yet (shown as plain labels): Acceptance rate, Conversion, Upgrade rate, No-result rate, Revenue, Abandonment, Downstream satisfaction, Drift / disparity, Accept / reject, Reason, User feedback, Actual purchase, Model / version, Candidates and scores, Explanation.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

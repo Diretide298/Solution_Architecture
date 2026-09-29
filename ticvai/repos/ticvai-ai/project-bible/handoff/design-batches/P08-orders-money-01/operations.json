@@ -113,6 +113,25 @@
   "requestBody": null,
   "responds": "NaturalLanguageAnswer"
  },
+ "assessProductChange": {
+  "method": "POST",
+  "path": "/products/{productId}/change-impact",
+  "contract": "catalogue",
+  "summary": "What a change would touch, before making it",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductChangeImpact"
+ },
  "capturePayment": {
   "method": "POST",
   "path": "/payments/{paymentId}/capture",
@@ -131,6 +150,25 @@
   ],
   "requestBody": null,
   "responds": "Payment"
+ },
+ "cloneProduct": {
+  "method": "POST",
+  "path": "/products/{productId}/clone",
+  "contract": "catalogue",
+  "summary": "Copy a product as a new draft",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Product"
  },
  "closeDepositBoxes": {
   "method": "POST",
@@ -157,7 +195,7 @@
   "contract": "shift",
   "summary": "Blind close-out",
   "permission": "SHIFT_CLOSE",
-  "offlineCapable": true,
+  "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
   "parameters": [
@@ -188,6 +226,25 @@
   ],
   "requestBody": "CreateCashMovementRequest",
   "responds": "CashMovement"
+ },
+ "createGroupBooking": {
+  "method": "POST",
+  "path": "/group-bookings",
+  "contract": "orders",
+  "summary": "Turn an order into a group booking",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateGroupBookingRequest",
+  "responds": "GroupBooking"
  },
  "createOrder": {
   "method": "POST",
@@ -339,7 +396,7 @@
   "method": "GET",
   "path": "/reports/financial",
   "contract": "finance",
-  "summary": "P&L, balance sheet or cash flow",
+  "summary": "Financial statements, revenue and tax summaries",
   "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -373,6 +430,19 @@
   ],
   "requestBody": null,
   "responds": "FinancialReport"
+ },
+ "getGroupBooking": {
+  "method": "GET",
+  "path": "/group-bookings/{groupBookingId}",
+  "contract": "orders",
+  "summary": "A group, its leader and its name-capture duty",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GroupBooking"
  },
  "getMediaAsset": {
   "method": "GET",
@@ -570,7 +640,54 @@
    }
   ],
   "requestBody": null,
-  "responds": "CashMovement"
+  "responds": "Page"
+ },
+ "listConsentQuestions": {
+  "method": "GET",
+  "path": "/consent-questions",
+  "contract": "marketing-crm",
+  "summary": "The consent questions a venue asks at booking",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listCredentialReplacementReissue": {
+  "method": "GET",
+  "path": "/credential-replacement-reissue",
+  "contract": "access",
+  "summary": "Credential Replacement, Reissue, Revocation & Recovery",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CredentialReplacementReissueRevocationRecoveryView"
  },
  "listOrderRefunds": {
   "method": "GET",
@@ -594,7 +711,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "Refund"
+  "responds": "Page"
  },
  "listOrders": {
   "method": "GET",
@@ -674,6 +791,19 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listProductVersions": {
+  "method": "GET",
+  "path": "/products/{productId}/versions",
+  "contract": "catalogue",
+  "summary": "What this product used to be",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ProductVersion"
+ },
  "listReports": {
   "method": "GET",
   "path": "/reports",
@@ -748,6 +878,11 @@
     "required": null
    },
    {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": "status",
     "in": "query",
     "required": null
@@ -810,6 +945,19 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listTicketReissueFulfillment": {
+  "method": "GET",
+  "path": "/ticket-reissue-fulfillment",
+  "contract": "orders",
+  "summary": "Ticket Reissue & Fulfillment Regeneration",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TicketReissueFulfillmentRegenerationView"
+ },
  "modifyOrder": {
   "method": "POST",
   "path": "/orders/{orderId}/modify",
@@ -835,7 +983,7 @@
   "contract": "shift",
   "summary": "Open a shift",
   "permission": "SHIFT_OPEN",
-  "offlineCapable": true,
+  "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
   "parameters": [
@@ -852,8 +1000,8 @@
   "method": "POST",
   "path": "/shifts/{shiftId}/no-sale",
   "contract": "shift",
-  "summary": "Open the drawer without a sale",
-  "permission": "SHIFT_SUSPEND",
+  "summary": "Open the Deposit Box without a sale",
+  "permission": "CASH_NO_SALE",
   "offlineCapable": true,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
@@ -962,6 +1110,25 @@
   "requestBody": null,
   "responds": "SettlementException"
  },
+ "restoreProductVersion": {
+  "method": "POST",
+  "path": "/products/{productId}/versions/{version}/restore",
+  "contract": "catalogue",
+  "summary": "Put a previous version back",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Product"
+ },
  "resumeOrder": {
   "method": "POST",
   "path": "/orders/{orderId}/resume",
@@ -1038,6 +1205,65 @@
   "requestBody": null,
   "responds": "ReportDefinition"
  },
+ "searchMedia": {
+  "method": "GET",
+  "path": "/media",
+  "contract": "assets",
+  "summary": "Search the asset library",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "tag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "collectionId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "unusedOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "rightsExpiringWithinDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "setProductAttributes": {
   "method": "PUT",
   "path": "/products/{productId}/attributes",
@@ -1095,6 +1321,25 @@
   "requestBody": null,
   "responds": "Shift"
  },
+ "updateGroupBooking": {
+  "method": "PATCH",
+  "path": "/group-bookings/{groupBookingId}",
+  "contract": "orders",
+  "summary": "Confirm numbers, change the leader or cancel a group",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "UpdateGroupBookingRequest",
+  "responds": "GroupBooking"
+ },
  "updateProduct": {
   "method": "PATCH",
   "path": "/products/{productId}",
@@ -1113,6 +1358,25 @@
   ],
   "requestBody": "UpdateProductRequest",
   "responds": "Product"
+ },
+ "updateProductVariant": {
+  "method": "PATCH",
+  "path": "/products/{productId}/variants/{variantId}",
+  "contract": "catalogue",
+  "summary": "Describe a variant",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductVariant"
  },
  "updateReport": {
   "method": "PUT",

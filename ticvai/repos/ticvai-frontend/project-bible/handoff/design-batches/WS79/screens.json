@@ -175,10 +175,19 @@
    "emptyNoResults": "The filter narrowed it and the reader are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listReaders",
+    "contract": "games",
+    "purpose": "Readers and their health",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-404"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-404",
+   "workshopBoard": "wireframes/WS59 Game and Ride Board 2.dc.html#bo-404"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 13. 0 of 6 labels bound to a contract property; 14 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -244,11 +253,6 @@
   "patternReason": "the pack gives this screen a display directory (§Directory Columns) and no metric row",
   "purpose": "Maintain the master inventory of physical readers connected to TICVAI. The source requires the ability to define a minimum of three reader types.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 8 actions on this screen and the screen declares 0 operations.** Unserved: Add Reader, Edit, Clone Configuration, Assign, Unassign, Disable, Search, Export. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Game_and_Ride_Module.pdf, page 14 §Actions"
-   },
    {
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
@@ -327,6 +331,7 @@
       {
        "kind": "secondaryButton",
        "label": "Clone Configuration",
+       "operation": "cloneReaderConfiguration",
        "provenance": "pack Game_and_Ride_Module.pdf, page 14 §Actions"
       },
       {
@@ -374,7 +379,38 @@
    "emptyNoResults": "The filter narrowed it and the reader are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listReaders",
+    "contract": "games",
+    "purpose": "The directory",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "registerDevice",
+    "contract": "tenancy",
+    "purpose": "Register a new reader device",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Add Reader; Edit, Assign, Unassign, Disable"
+   },
+   {
+    "operationId": "setReaderConfiguration",
+    "contract": "games",
+    "purpose": "Edit the reader, assign/unassign it to a game (gameId) or disable it (status)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Add Reader; Edit, Assign, Unassign, Disable",
+    "invalidates": [
+     "listReaders"
+    ]
+   },
+   {
+    "operationId": "cloneReaderConfiguration",
+    "contract": "games",
+    "purpose": "Clone configuration",
+    "trigger": "onAction"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Reader ID",
@@ -383,13 +419,20 @@
     "Serial Number",
     "Venue",
     "Zone"
+   ],
+   "params": [
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-405"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-405",
+   "workshopBoard": "wireframes/WS59 Game and Ride Board 2.dc.html#bo-405"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 14. 0 of 11 labels bound to a contract property; 19 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 14. 0 of 11 labels bound to a contract property; 19 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Search are choices sent by `listReaders`; Add Reader: `registerDevice`; Edit, Assign, Unassign, Disable: `setReaderConfiguration`; Export dropped (export is served by reporting exportReportResult); still owed by a contract change: `cloneReaderConfiguration`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -497,10 +540,18 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setReaderProfile",
+    "contract": "games",
+    "purpose": "How a reader behaves and what it shows",
+    "trigger": "onAction"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-406"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-406",
+   "workshopBoard": "wireframes/WS59 Game and Ride Board 2.dc.html#bo-406"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 15. 0 of 0 labels bound to a contract property; 4 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -603,12 +654,43 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setReaderConfiguration",
+    "contract": "games",
+    "purpose": "Profile and device setup",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listReaders"
+    ]
+   },
+   {
+    "operationId": "enrolDevice",
+    "contract": "tenancy",
+    "purpose": "Enrol the device behind it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-407"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-407",
+   "workshopBoard": "wireframes/WS59 Game and Ride Board 2.dc.html#bo-407"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 16. 0 of 0 labels bound to a contract property; 4 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "session"
+    },
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -685,7 +767,27 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setReaderConfiguration",
+       "label": "Save reader configuration",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setReaderConfiguration"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The reader attraction list.",
@@ -694,12 +796,32 @@
    "emptyNoResults": "The filter narrowed it and the reader attraction are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setReaderConfiguration",
+    "contract": "games",
+    "purpose": "Credit and payment acceptance",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listReaders"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-408"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-408",
+   "workshopBoard": "wireframes/WS59 Game and Ride Board 2.dc.html#bo-408"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 17. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -773,6 +895,20 @@
        "kind": "selectField",
        "label": "Retap Protection: ON/OFF",
        "provenance": "pack Game_and_Ride_Module.pdf, page 17 §Configuration"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setReaderConfiguration",
+       "label": "Save reader configuration",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setReaderConfiguration"
       }
      ]
     }
@@ -785,12 +921,32 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setReaderConfiguration",
+    "contract": "games",
+    "purpose": "Which attraction it opens",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listReaders"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-409"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-409",
+   "workshopBoard": "wireframes/WS59 Game and Ride Board 2.dc.html#bo-409"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 17. 0 of 0 labels bound to a contract property; 1 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -901,12 +1057,32 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setReaderConfiguration",
+    "contract": "games",
+    "purpose": "Retap delay",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listReaders"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-410"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-410",
+   "workshopBoard": "wireframes/WS59 Game and Ride Board 2.dc.html#bo-410"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 18. 0 of 0 labels bound to a contract property; 6 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1042,12 +1218,32 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setReaderConfiguration",
+    "contract": "games",
+    "purpose": "Free-game glow and display",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listReaders"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-411"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-411",
+   "workshopBoard": "wireframes/WS59 Game and Ride Board 2.dc.html#bo-411"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 19. 0 of 0 labels bound to a contract property; 11 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1161,15 +1357,33 @@
    "emptyNoResults": "The filter narrowed it and the real-time tap validation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setReaderConfiguration",
+    "contract": "games",
+    "purpose": "Theme and experience",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listReaders"
+    ]
+   }
+  ],
   "entryState": {
    "preloaded": [
     "↓"
+   ],
+   "params": [
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-412"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-412",
+   "workshopBoard": "wireframes/WS59 Game and Ride Board 2.dc.html#bo-412"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 20. 0 of 1 labels bound to a contract property; 1 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1287,16 +1501,31 @@
    "emptyNoResults": "The filter narrowed it and the balance check reader are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "testReader",
+    "contract": "games",
+    "purpose": "Balance check and device test",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Validation result",
     "Deduction source"
+   ],
+   "params": [
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-413"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-413",
+   "workshopBoard": "wireframes/WS59 Game and Ride Board 2.dc.html#bo-413"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 21. 0 of 2 labels bound to a contract property; 8 of 61 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

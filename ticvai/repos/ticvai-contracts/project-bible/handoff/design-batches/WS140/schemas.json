@@ -1,0 +1,940 @@
+{
+ "CommunicationServiceCommandCenterView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.message_dispatch, marketing.message_dispatch_attempt (new), marketing.communication_provider (new)",
+  "description": "Platform KPIs and breakdowns for the communication service over the requested window. Counts are messages (one dispatch = one message on one channel), not recipients.\n",
+  "required": [
+   "windowFrom",
+   "windowTo",
+   "messagesProcessed",
+   "byChannel",
+   "byModule"
+  ],
+  "properties": {
+   "windowFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "windowTo": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "messagesProcessed": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Messages accepted by the service in the window (the pack's \"Messages Processed Today\")."
+   },
+   "delivered": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "failed": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "pending": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "retrying": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "averageDeliverySeconds": {
+    "type": "number",
+    "minimum": 0,
+    "description": "Mean time from acceptance to provider-confirmed delivery, in (fractional) seconds."
+   },
+   "providerAvailabilityRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "description": "Share of the window the active providers were reachable, weighted by volume."
+   },
+   "byChannel": {
+    "type": "array",
+    "description": "Sent volume and health per channel, one row per provider on it (the pack's channel tiles and Channel Health table).",
+    "items": {
+     "type": "object",
+     "required": [
+      "channel",
+      "sent"
+     ],
+     "properties": {
+      "channel": {
+       "$ref": "#/components/schemas/MessageChannel"
+      },
+      "providerId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "providerName": {
+       "type": "string"
+      },
+      "sent": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "successRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      },
+      "averageLatencySeconds": {
+       "type": "number",
+       "minimum": 0
+      },
+      "health": {
+       "type": "string",
+       "enum": [
+        "healthy",
+        "warning",
+        "critical"
+       ]
+      }
+     }
+    }
+   },
+   "byModule": {
+    "type": "array",
+    "description": "Volume originating from each TICVAI module.",
+    "items": {
+     "type": "object",
+     "required": [
+      "module",
+      "volume"
+     ],
+     "properties": {
+      "module": {
+       "type": "string",
+       "enum": [
+        "crm",
+        "ticketing",
+        "membership",
+        "waiver",
+        "groupSales",
+        "customerService",
+        "finance",
+        "wallet",
+        "resourceManagement",
+        "accessControl",
+        "other"
+       ]
+      },
+      "volume": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "successRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      },
+      "averageLatencySeconds": {
+       "type": "number",
+       "minimum": 0
+      },
+      "health": {
+       "type": "string",
+       "enum": [
+        "healthy",
+        "warning",
+        "critical"
+       ]
+      }
+     }
+    }
+   },
+   "alerts": {
+    "type": "array",
+    "description": "Live operational alerts (failure-rate spikes, queued backlogs, providers near their rate limit).",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "severity",
+      "message",
+      "raisedAt"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "failureRateSpike",
+        "queueBacklog",
+        "rateLimitApproaching",
+        "providerDegraded",
+        "other"
+       ]
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "info",
+        "warning",
+        "critical"
+       ]
+      },
+      "message": {
+       "type": "string"
+      },
+      "channel": {
+       "$ref": "#/components/schemas/MessageChannel"
+      },
+      "providerId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "raisedAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
+   },
+   "aiHealthSummary": {
+    "type": "string",
+    "description": "AI-written plain-language summary of platform health; absent when AI processing is off for the tenant."
+   }
+  }
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "LocalizationBrandingCustomerExperienceConfigurationInput": {
+  "description": "The request body of `setLocalizationBrandingCustomer`, the record itself; read-only properties are ignored.",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/LocalizationBrandingCustomerExperienceConfigurationView"
+   }
+  ]
+ },
+ "LocalizationBrandingCustomerExperienceConfigurationView": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.waiver_localisation",
+  "description": "Languages, branding and channels of one waiver version (pack 11.1.9), keyed on `formId` + `formVersion`.",
+  "required": [
+   "formId",
+   "formVersion",
+   "sourceLanguage",
+   "languages"
+  ],
+  "properties": {
+   "formId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "formVersion": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "sourceLanguage": {
+    "type": "string",
+    "maxLength": 10,
+    "description": "The language the legal text is written and reviewed in."
+   },
+   "languages": {
+    "type": "array",
+    "minItems": 1,
+    "description": "Every language the version is offered in, the source language included. Arabic renders right to left.",
+    "items": {
+     "type": "object",
+     "required": [
+      "language",
+      "required",
+      "translationStatus",
+      "approvalStatus"
+     ],
+     "properties": {
+      "language": {
+       "type": "string",
+       "maxLength": 10
+      },
+      "required": {
+       "type": "boolean",
+       "description": "Publication waits for this language's approval."
+      },
+      "translationStatus": {
+       "type": "string",
+       "enum": [
+        "notStarted",
+        "aiDrafted",
+        "inTranslation",
+        "inReview",
+        "complete"
+       ]
+      },
+      "translatorUserId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "reviewerUserId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "approvalStatus": {
+       "type": "string",
+       "enum": [
+        "pending",
+        "approved",
+        "rejected"
+       ]
+      },
+      "lastUpdated": {
+       "type": "string",
+       "format": "date-time",
+       "readOnly": true
+      }
+     }
+    }
+   },
+   "branding": {
+    "type": "object",
+    "properties": {
+     "brandLogoAssetId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "venueLogoAssetId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "themeId": {
+      "type": "string",
+      "nullable": true,
+      "description": "The white-label theme it takes colours and typography from."
+     },
+     "header": {
+      "$ref": "#/components/schemas/LocalisedText"
+     },
+     "footer": {
+      "$ref": "#/components/schemas/LocalisedText"
+     },
+     "customerInstructions": {
+      "$ref": "#/components/schemas/LocalisedText"
+     },
+     "confirmationMessage": {
+      "$ref": "#/components/schemas/LocalisedText"
+     },
+     "supportEmail": {
+      "type": "string",
+      "format": "email",
+      "nullable": true
+     },
+     "supportPhone": {
+      "type": "string",
+      "maxLength": 30,
+      "nullable": true
+     }
+    }
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "b2cWeb",
+      "mobileApp",
+      "emailLink",
+      "qrLink",
+      "kiosk",
+      "posFrontDesk",
+      "groupPortal"
+     ]
+    },
+    "description": "Where the waiver is offered; every channel renders the same version and rules."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "MarketingSubscription": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.subscription",
+  "x-ticvai-retired-columns": [
+   "guest_id",
+   "subscribed"
+  ],
+  "description": "**Drafted 4 September.** What a guest asked to receive. **Deliberately separate from `marketing.consent`** - consent is what the law allows, a subscription is what the person wants, and a system that stores one and reports the other is the reason unsubscribe links stop working.",
+  "required": [
+   "id",
+   "subjectId",
+   "channel",
+   "listName",
+   "isSubscribed"
+  ],
+  "properties": {
+   "id": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The guest — from the guest session, or from `unsubscribeToken` when there is no session."
+   },
+   "channel": {
+    "type": "string",
+    "enum": [
+     "email",
+     "sms",
+     "push"
+    ]
+   },
+   "listName": {
+    "type": "string"
+   },
+   "isSubscribed": {
+    "type": "boolean"
+   },
+   "source": {
+    "type": "string",
+    "description": "Where the opt-in happened, because a regulator asks."
+   },
+   "unsubscribeToken": {
+    "writeOnly": true,
+    "type": "string",
+    "description": "**Unsubscribe must work without a login.** The link in a message carries the token and `setMarketingSubscription` accepts it in place of a session. **Write-only: never returned**, so a `MARKETING_VIEW` holder reading subscriptions cannot act as the guest."
+   },
+   "updatedAt": {
+    "readOnly": true,
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
+ "MessageDispatch": {
+  "x-ticvai-persistence": "marketing.message_dispatch",
+  "type": "object",
+  "required": [
+   "id",
+   "subjectId",
+   "channel",
+   "status",
+   "queuedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "campaignId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "templateId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "messageTriggerId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `MessageTrigger` that fired it, and through its `event` the `BusinessEvent` and source module; null for a campaign or a direct send. Attempts are in `MessageDispatchAttempt`. (decided 29 September, data model for the agreed operations)"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "queued",
+     "sent",
+     "delivered",
+     "opened",
+     "clicked",
+     "bounced",
+     "failed",
+     "suppressed"
+    ]
+   },
+   "failureReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "providerReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "queuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "deliveredAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isTest": {
+    "type": "boolean",
+    "default": false,
+    "description": "A `testSendCampaign` message. Excluded from `CampaignPerformance` and `Campaign.sentCount`."
+   },
+   "openedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "From the provider's engagement events. `CampaignPerformance.opened` counts these."
+   },
+   "clickedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "complainedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "unsubscribedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "MessageTemplate": {
+  "x-ticvai-persistence": "marketing.message_template",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "channel",
+   "bodies"
+  ],
+  "properties": {
+   "id": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "subjects": {
+    "type": "object",
+    "description": "Per language. Email only.",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "bodies": {
+    "type": "object",
+    "description": "Per language, keyed by ISO 639-1 code.",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "mergeFields": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "missingLanguages": {
+    "type": "array",
+    "readOnly": true,
+    "description": "Enabled languages without a body. Flagged rather than silently falling back — a guest receiving English when they chose Arabic is a defect.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "providerTemplateId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Required for WhatsApp, where templates are pre-approved by the provider."
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The brand whose identity the template carries; null for the tenant default."
+   },
+   "ownership": {
+    "type": "string",
+    "enum": [
+     "platform",
+     "crm"
+    ],
+    "default": "crm",
+    "description": "`platform` = a transactional template owned by the communication service; `crm` = a marketing template owned by CRM (`listSystemTransactionalTemplate`). Content by language and version is in `MessageTemplateVersion`. (decided 29 September, data model for the agreed operations)"
+   }
+  }
+ },
+ "MessageTrigger": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.message_trigger",
+  "description": "**What fires a message.** Before, during and after a visit are one mechanism with a different sign on the offset.\n",
+  "required": [
+   "id",
+   "event",
+   "templateId",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid"
+   },
+   "event": {
+    "type": "string",
+    "description": "The platform event that fires it — `order.completed`, `access.validated`, `queue.turnApproaching`. **Named from the event catalogue** (`BusinessEvent.eventType`), so a trigger cannot bind to something nothing publishes. Its conditions are `MessageTriggerCondition` rows.\n"
+   },
+   "templateId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "offsetMinutes": {
+    "type": "integer",
+    "default": 0,
+    "description": "Negative fires before the anchor, positive after. **A reminder the day before a visit is -1440 against the performance**, not a separate concept.\n"
+   },
+   "anchor": {
+    "type": "string",
+    "enum": [
+     "eventTime",
+     "performanceStart",
+     "visitEnd"
+    ],
+    "default": "eventTime"
+   },
+   "priority": {
+    "type": "string",
+    "enum": [
+     "operational",
+     "transactional",
+     "marketing"
+    ],
+    "default": "transactional",
+    "description": "**A queue-turn alert and a monthly newsletter are not the same urgency and were the same dispatch.** `operational` bypasses batching and quiet hours; `marketing` never does.\n"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   },
+   "scopePath": {
+    "readOnly": true,
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ProviderHealthUsageCostMonitoringView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.message_dispatch, marketing.message_dispatch_attempt (new), marketing.communication_provider (new)",
+  "description": "Provider reliability, usage and cost for the window and filters.",
+  "required": [
+   "windowFrom",
+   "windowTo",
+   "volume",
+   "providers"
+  ],
+  "properties": {
+   "windowFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "windowTo": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "volume": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "successRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1
+   },
+   "failureRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1
+   },
+   "averageDeliverySeconds": {
+    "type": "number",
+    "minimum": 0
+   },
+   "averageApiLatencySeconds": {
+    "type": "number",
+    "minimum": 0
+   },
+   "availabilityRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1
+   },
+   "retries": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "fallbackCount": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Messages delivered through a fallback provider or channel."
+   },
+   "cost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "costPerMessage": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "providers": {
+    "type": "array",
+    "description": "Provider comparison.",
+    "items": {
+     "type": "object",
+     "required": [
+      "providerId",
+      "channel",
+      "volume"
+     ],
+     "properties": {
+      "providerId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "providerName": {
+       "type": "string"
+      },
+      "channel": {
+       "$ref": "#/components/schemas/MessageChannel"
+      },
+      "volume": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "successRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      },
+      "averageDeliverySeconds": {
+       "type": "number",
+       "minimum": 0
+      },
+      "costPerThousand": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "health": {
+       "type": "string",
+       "enum": [
+        "healthy",
+        "warning",
+        "critical"
+       ]
+      }
+     }
+    }
+   },
+   "breakdown": {
+    "type": "array",
+    "description": "Usage and cost per value of the groupBy dimension.",
+    "items": {
+     "type": "object",
+     "required": [
+      "key",
+      "volume"
+     ],
+     "properties": {
+      "key": {
+       "type": "string",
+       "description": "The dimension value's id or code."
+      },
+      "label": {
+       "type": "string"
+      },
+      "volume": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "cost": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "alerts": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "message",
+      "raisedAt"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "budgetThreshold",
+        "successRateBelowTarget",
+        "latencyAboveTarget",
+        "slaBreach"
+       ]
+      },
+      "message": {
+       "type": "string"
+      },
+      "channel": {
+       "$ref": "#/components/schemas/MessageChannel"
+      },
+      "providerId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "raisedAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
+   },
+   "slaTargets": {
+    "type": "array",
+    "description": "Contractual provider targets, only where configured.",
+    "items": {
+     "type": "object",
+     "required": [
+      "providerId",
+      "metric",
+      "target"
+     ],
+     "properties": {
+      "providerId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "metric": {
+       "type": "string",
+       "enum": [
+        "successRate",
+        "availabilityRate",
+        "averageDeliverySeconds"
+       ]
+      },
+      "target": {
+       "type": "number"
+      },
+      "observed": {
+       "type": "number"
+      },
+      "met": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "aiRecommendations": {
+    "type": "array",
+    "description": "Advisory provider changes on cost/performance trade-offs.",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "Suppression": {
+  "x-ticvai-persistence": "marketing.suppression",
+  "type": "object",
+  "required": [
+   "channel",
+   "address",
+   "reason",
+   "suppressedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "address": {
+    "type": "string"
+   },
+   "reason": {
+    "type": "string"
+   },
+   "suppressedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "suppressedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+   }
+  }
+ }
+}

@@ -1,0 +1,64 @@
+id: LLD-AccessSecurityInvestigation
+title: AccessSecurityInvestigation — 7 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/access-security-investigation.yaml
+entity: AccessSecurityInvestigation
+contract: access
+enum: AccessSecurityInvestigation.status
+enumKind: inline
+enumSchema: AccessSecurityInvestigation
+enumProperty: status
+owner: access
+description: One security investigation of a credential, with the evidence sources correlated, risk
+  score and level, notes and the linked incident (declared 29 September, writers pass). `setSecurityInvestigationEvidence`
+  carries `status` and is the only write, so every move is that write, along the pack's Open to Closed
+  lifecycle.
+initial:
+- open
+terminal:
+- closed
+transitions:
+- from: open
+  to: investigating
+  operation: setSecurityInvestigationEvidence
+  trigger: operation
+  guard: '`status` `investigating`; an investigator has taken it and evidence is being correlated'
+- from: open
+  to: closed
+  operation: setSecurityInvestigationEvidence
+  trigger: operation
+  guard: '`status` `closed`; opened in error or a duplicate'
+- from: investigating
+  to: actionTaken
+  operation: setSecurityInvestigationEvidence
+  trigger: operation
+  guard: '`status` `actionTaken`; an action was taken on the credential or identity (lock, blacklist,
+    revocation)'
+- from: investigating
+  to: resolved
+  operation: setSecurityInvestigationEvidence
+  trigger: operation
+  guard: '`status` `resolved`; the risk was cleared with no action needed'
+- from: actionTaken
+  to: investigating
+  operation: setSecurityInvestigationEvidence
+  trigger: operation
+  guard: '`status` `investigating`; new evidence after the action reopened the inquiry'
+- from: actionTaken
+  to: resolved
+  operation: setSecurityInvestigationEvidence
+  trigger: operation
+  guard: '`status` `resolved`; the action dealt with the risk'
+- from: resolved
+  to: closed
+  operation: setSecurityInvestigationEvidence
+  trigger: operation
+  guard: '`status` `closed`; reviewed and closed. An `untilInvestigationComplete` identity lock linked
+    to it is released'
+openQuestions:
+- The screen's investigator actions Clear Risk, Escalate and Close Investigation have no operations
+  of their own (Lock Identity is `lockIdentity`, which does not move the investigation); until they
+  do, every move goes through this one write.
+notes: '**Only `closed` is terminal.** Reaching `resolved` or `closed` releases any `untilInvestigationComplete`
+  identity lock waiting for it (see `access-identity-lock.yaml`).'

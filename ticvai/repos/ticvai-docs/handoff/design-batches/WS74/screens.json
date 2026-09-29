@@ -182,7 +182,22 @@
    "emptyNoResults": "The filter narrowed it and the digital asset are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "searchMedia",
+    "contract": "assets",
+    "purpose": "The estate, counted and charted",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getMediaUsageAnalytics",
+    "contract": "assets",
+    "purpose": "Storage, uploads and library health",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Total Digital Assets",
@@ -195,7 +210,8 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-061"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-061",
+   "workshopBoard": "wireframes/WS44 Digital Asset Management DAM Board 1.dc.html#cms-061"
   },
   "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 3. 0 of 8 labels bound to a contract property; 11 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -402,7 +418,22 @@
    "emptyNoResults": "The filter narrowed it and the central digital asset are still there. The pack's own statuses are 🟢 Active — the state names which is selected.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "searchMedia",
+    "contract": "assets",
+    "purpose": "Browse and filter the library",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listCollections",
+    "contract": "assets",
+    "purpose": "Collections to file into",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Thumbnail",
@@ -415,7 +446,8 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-062"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-062",
+   "workshopBoard": "wireframes/WS44 Digital Asset Management DAM Board 1.dc.html#cms-062"
   },
   "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 5. 0 of 20 labels bound to a contract property; 28 of 50 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -519,6 +551,10 @@
        "provenance": "pack Digital Asset Management DAM.pdf, page 6 §Support"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -529,12 +565,57 @@
    "emptyNoResults": "The filter narrowed it and the upload asset ingestion are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createUpload",
+    "contract": "assets",
+    "purpose": "Start an upload",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "searchMedia"
+    ]
+   },
+   {
+    "operationId": "completeUpload",
+    "contract": "assets",
+    "purpose": "Finish it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "searchMedia",
+     "getMediaUsageAnalytics"
+    ]
+   },
+   {
+    "operationId": "analyseMediaAsset",
+    "contract": "assets",
+    "purpose": "Auto-tag on ingest",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getMediaAsset"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-063"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-063",
+   "workshopBoard": "wireframes/WS44 Digital Asset Management DAM Board 1.dc.html#cms-063"
   },
   "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 6. 0 of 0 labels bound to a contract property; 3 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "assetId",
+     "from": "navigation"
+    },
+    {
+     "name": "uploadId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -661,6 +742,10 @@
        "provenance": "pack Digital Asset Management DAM.pdf, page 8 §Actions"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -671,10 +756,29 @@
    "emptyNoResults": "The filter narrowed it and the folder collection are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listCollections",
+    "contract": "assets",
+    "purpose": "Folders and collections",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createCollection",
+    "contract": "assets",
+    "purpose": "Create one",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listCollections"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-064"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-064",
+   "workshopBoard": "wireframes/WS44 Digital Asset Management DAM Board 1.dc.html#cms-064"
   },
   "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 8. 0 of 0 labels bound to a contract property; 12 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -741,7 +845,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 7 actions on this screen and the screen declares 0 operations.** Unserved: Asset Name, Asset Type, Campaign, Event, Attraction, Owner, Upload Date. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 9 actions on this screen and the screen declares 0 operations.** Unserved: Asset Name, Asset Type, Venue, Campaign, Event, Attraction, Owner, Source …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Digital Asset Management DAM.pdf, page 9 §Support"
    },
    {
@@ -774,6 +878,11 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Venue",
+       "provenance": "pack Digital Asset Management DAM.pdf, page 9 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Campaign",
        "provenance": "pack Digital Asset Management DAM.pdf, page 9 §Support"
       },
@@ -794,10 +903,14 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Upload Date",
+       "label": "Source",
        "provenance": "pack Digital Asset Management DAM.pdf, page 9 §Support"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -808,12 +921,31 @@
    "emptyNoResults": "The filter narrowed it and the metadata taxonomy are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getMediaTaxonomy",
+    "contract": "assets",
+    "purpose": "Categories and metadata fields",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setMediaTaxonomy",
+    "contract": "assets",
+    "purpose": "Define them",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getMediaTaxonomy"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-065"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-065",
+   "workshopBoard": "wireframes/WS44 Digital Asset Management DAM Board 1.dc.html#cms-065"
   },
-  "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 9. 0 of 0 labels bound to a contract property; 7 of 51 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 9. 0 of 0 labels bound to a contract property; 9 of 51 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -913,12 +1045,40 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setMediaAssetTags",
+    "contract": "assets",
+    "purpose": "Tags and keywords, with their origin",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "searchMedia",
+     "getMediaAsset"
+    ]
+   },
+   {
+    "operationId": "getMediaTaxonomy",
+    "contract": "assets",
+    "purpose": "The controlled vocabularies",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-066"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-066",
+   "workshopBoard": "wireframes/WS44 Digital Asset Management DAM Board 1.dc.html#cms-066"
   },
   "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 11. 0 of 0 labels bound to a contract property; 4 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "assetId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -983,7 +1143,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: Asset Type, File Format, Collection, Owner. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Asset Type, File Format, Venue, Collection, Owner. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Digital Asset Management DAM.pdf, page 12 §Support"
    },
    {
@@ -1016,6 +1176,11 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Venue",
+       "provenance": "pack Digital Asset Management DAM.pdf, page 12 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Collection",
        "provenance": "pack Digital Asset Management DAM.pdf, page 12 §Support"
       },
@@ -1025,6 +1190,10 @@
        "provenance": "pack Digital Asset Management DAM.pdf, page 12 §Support"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -1035,12 +1204,21 @@
    "emptyNoResults": "The filter narrowed it and the advanced search discovery are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "searchMedia",
+    "contract": "assets",
+    "purpose": "Advanced search",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-067"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-067",
+   "workshopBoard": "wireframes/WS44 Digital Asset Management DAM Board 1.dc.html#cms-067"
   },
-  "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 12. 0 of 0 labels bound to a contract property; 4 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 12. 0 of 0 labels bound to a contract property; 5 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1187,7 +1365,29 @@
    "emptyNoResults": "The filter narrowed it and the digital asset 360° are still there. The pack's own statuses are 🟢 Active — the state names which is selected.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getMediaAsset",
+    "contract": "assets",
+    "purpose": "The asset, in full",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listMediaAssetVersions",
+    "contract": "assets",
+    "purpose": "Its revisions",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getMediaDistribution",
+    "contract": "assets",
+    "purpose": "Where it is used",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Asset ID",
@@ -1196,11 +1396,22 @@
     "type",
     "format",
     "category"
+   ],
+   "params": [
+    {
+     "name": "assetId",
+     "from": "navigation"
+    },
+    {
+     "name": "mediaId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-068"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-068",
+   "workshopBoard": "wireframes/WS44 Digital Asset Management DAM Board 1.dc.html#cms-068"
   },
   "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 13. 0 of 18 labels bound to a contract property; 19 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1304,6 +1515,10 @@
        "provenance": "pack Digital Asset Management DAM.pdf, page 15 §Support"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -1314,10 +1529,23 @@
    "emptyNoResults": "The filter narrowed it and the bulk asset are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "bulkUpdateMediaAssets",
+    "contract": "assets",
+    "purpose": "Retag, reclassify or archive many",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "searchMedia",
+     "getMediaUsageAnalytics"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-069"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-069",
+   "workshopBoard": "wireframes/WS44 Digital Asset Management DAM Board 1.dc.html#cms-069"
   },
   "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 15. 0 of 0 labels bound to a contract property; 3 of 12 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1495,7 +1723,15 @@
    "emptyNoResults": "The filter narrowed it and the asset activity recent are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getMediaUsageAnalytics",
+    "contract": "assets",
+    "purpose": "Activity and library health",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Assets Added",
@@ -1508,7 +1744,8 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-070"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-070",
+   "workshopBoard": "wireframes/WS44 Digital Asset Management DAM Board 1.dc.html#cms-070"
   },
   "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 16. 0 of 7 labels bound to a contract property; 16 of 136 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

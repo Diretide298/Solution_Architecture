@@ -1,0 +1,1696 @@
+[
+ {
+  "id": "BO-864",
+  "name": "Resource Calendar Command Center",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "2",
+   "number": "01",
+   "page": 20
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/resource-calendar-command-center-bo-864",
+   "component": "apps/venue-management-web/src/routes/rentals/ResourceCalendarCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-865",
+    "BO-866",
+    "BO-867",
+    "BO-868",
+    "BO-869",
+    "BO-870",
+    "BO-871",
+    "BO-872"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-865",
+     "trigger": "Calendar Filters, Search & Smart Discovery",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-866",
+     "trigger": "Resource Availability Schedule Configuration",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "resourceId"
+     ]
+    },
+    {
+     "to": "BO-867",
+     "trigger": "Resource Time-Slot Configuration",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "resourceId"
+     ]
+    },
+    {
+     "to": "BO-868",
+     "trigger": "Advance Reservation Management",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "bookingId"
+     ]
+    },
+    {
+     "to": "BO-869",
+     "trigger": "Recurring Reservation Configuration",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "bookingId"
+     ]
+    },
+    {
+     "to": "BO-870",
+     "trigger": "Operational Time & Resource Blocking",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-871",
+     "trigger": "Multi-Event Resource Planning",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-872",
+     "trigger": "Smart Assignment & Drag-and-Drop Reallocation",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "bookingId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide the main operational calendar from which users can see and manage resource availability, reservations, assignments and operational blocks.",
+  "purposeNote": "Authorized users can view the real-time operational status of permitted resources and initiate resource-management actions directly from the calendar.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 20"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 20"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "bookResource",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "bookResource"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resource calendar list.",
+   "error": "Could not load. Names which read failed and leaves the resource calendar untouched.",
+   "emptyFirstRun": "No resource calendar yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the resource calendar are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getResourceCalendar",
+    "contract": "resources",
+    "purpose": "Every resource against time",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "bookResource",
+    "contract": "resources",
+    "purpose": "Create a reservation from a free slot",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getResourceCalendar",
+     "listResourceBookings",
+     "getResourceAvailability"
+    ]
+   },
+   {
+    "operationId": "createResourceBlock",
+    "contract": "resources",
+    "purpose": "Block a period",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listResourceBlocks",
+     "getResourceCalendar"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-864",
+   "workshopBoard": "wireframes/WS127 Resource Management Configuration Board 2.dc.html#bo-864"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 20. 0 of 0 labels bound to a contract property; 0 of 54 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-865",
+  "name": "Calendar Filters, Search & Smart Discovery",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "2",
+   "number": "02",
+   "page": 21
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/calendar-filters-search-smart-discovery-bo-865",
+   "component": "apps/venue-management-web/src/routes/rentals/CalendarFiltersSearchSmartDiscovery.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-864"
+   ],
+   "exitTo": [
+    "BO-864"
+   ],
+   "transitions": [
+    {
+     "to": "BO-864",
+     "trigger": "Back to Resource Calendar Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow users to quickly locate the correct resource instead of manually searching through hundreds or thousands of resources.",
+  "purposeNote": "Users can identify suitable resources through structured filters or conversational AI without manually reviewing the entire resource inventory.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 21"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search calendar filters search",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 21 §Users shall filter by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Date range",
+        "Time range",
+        "Resource type",
+        "Resource category",
+        "Resource name",
+        "Venue",
+        "Department",
+        "Availability",
+        "Capacity",
+        "Skill",
+        "Certification",
+        "Status",
+        "Assignment status"
+       ],
+       "notes": "The pack filters this screen by date range, time range, resource type, resource category, resource name, venue and 7 more — which are present is a decision the pack already made.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 21 §Users shall filter by"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The calendar filters search list.",
+   "error": "Could not load. Names which read failed and leaves the calendar filters search untouched.",
+   "emptyFirstRun": "No calendar filters search yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the calendar filters search are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getResourceCalendar",
+    "contract": "resources",
+    "purpose": "The filtered grid",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "suggestResources",
+    "contract": "resources",
+    "purpose": "Find one that matches",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-865",
+   "workshopBoard": "wireframes/WS127 Resource Management Configuration Board 2.dc.html#bo-865"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 21. 0 of 13 labels bound to a contract property; 13 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-866",
+  "name": "Resource Availability Schedule Configuration",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "2",
+   "number": "03",
+   "page": 22
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/resource-availability-schedule-configuration-bo-866",
+   "component": "apps/venue-management-web/src/routes/rentals/ResourceAvailabilityScheduleConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-864"
+   ],
+   "exitTo": [
+    "BO-864"
+   ],
+   "transitions": [
+    {
+     "to": "BO-864",
+     "trigger": "Back to Resource Calendar Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Administrators shall configure; Availability may be configured using) and no display directory — it is settings, not a population",
+  "purpose": "Define the baseline schedule controlling when each resource can be used.",
+  "purposeNote": "Every resource has an effective availability calendar derived from configured schedules, inherited operating rules and approved exceptions.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Available days",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Opening time",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Closing time",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Effective date",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Expiry date",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Time zone",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Seasonal availability",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue operating hours",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Resource-specific operating hours",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Public holidays",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue closures",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maintenance periods",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Staff leave",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Training",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Private blocks",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Operational shutdowns",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Special events",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Inheritance",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Standard weekly schedules",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Availability may be configured using"
+      },
+      {
+       "kind": "selectField",
+       "label": "Specific dates",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Availability may be configured using"
+      },
+      {
+       "kind": "selectField",
+       "label": "Seasonal schedules",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Availability may be configured using"
+      },
+      {
+       "kind": "selectField",
+       "label": "Exception dates",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Availability may be configured using"
+      },
+      {
+       "kind": "selectField",
+       "label": "Imported schedules",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Availability may be configured using"
+      },
+      {
+       "kind": "selectField",
+       "label": "External workforce schedules",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Availability may be configured using"
+      },
+      {
+       "kind": "selectField",
+       "label": "Availability Exceptions",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Availability may be configured using"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resource availability schedule configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the resource availability schedule untouched.",
+   "emptyFirstRun": "No resource availability schedule configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "getResourceSchedule",
+    "contract": "resources",
+    "purpose": "The pattern as configured",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setResourceSchedule",
+    "contract": "resources",
+    "purpose": "Operating hours and working pattern",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getResourceSchedule",
+     "getResourceAvailability"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-866",
+   "workshopBoard": "wireframes/WS127 Resource Management Configuration Board 2.dc.html#bo-866"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 22. 0 of 0 labels bound to a contract property; 25 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "resourceId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-867",
+  "name": "Resource Time-Slot Configuration",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "2",
+   "number": "04",
+   "page": 23
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/resource-time-slot-configuration-bo-867",
+   "component": "apps/venue-management-web/src/routes/rentals/ResourceTimeSlotConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-864"
+   ],
+   "exitTo": [
+    "BO-864"
+   ],
+   "transitions": [
+    {
+     "to": "BO-864",
+     "trigger": "Back to Resource Calendar Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Administrators shall configure) and no display directory — it is settings, not a population",
+  "purpose": "Control how available resource time is converted into reservable or assignable time slots.",
+  "purposeNote": "Administrators can determine precisely how resource availability is converted into customer-facing or operational booking slots.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Slot duration",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 23 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Slot interval",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 23 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Start time",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 23 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "End time",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 23 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Minimum duration",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 23 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum duration",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 23 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Booking increments",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 23 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Buffer before",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 23 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Buffer after",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 23 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Capacity per slot",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 23 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Concurrent reservations",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 23 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Minimum notice",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 23 §Administrators shall configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Maximum advance booking period",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 23 §Administrators shall configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resource time-slot configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the resource time-slot untouched.",
+   "emptyFirstRun": "No resource time-slot configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "setResourceSchedule",
+    "contract": "resources",
+    "purpose": "Slot length and booking limits",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getResourceSchedule",
+     "getResourceAvailability"
+    ]
+   },
+   {
+    "operationId": "getResourceSchedule",
+    "contract": "resources",
+    "purpose": "The current slots",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-867",
+   "workshopBoard": "wireframes/WS127 Resource Management Configuration Board 2.dc.html#bo-867"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 23. 0 of 0 labels bound to a contract property; 13 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "resourceId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-868",
+  "name": "Advance Reservation Management",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "2",
+   "number": "05",
+   "page": 24
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/advance-reservation-management-bo-868",
+   "component": "apps/venue-management-web/src/routes/rentals/AdvanceReservationManagement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-864"
+   ],
+   "exitTo": [
+    "BO-864"
+   ],
+   "transitions": [
+    {
+     "to": "BO-864",
+     "trigger": "Back to Resource Calendar Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Users shall configure; Administrators shall configure) and no display directory — it is settings, not a population",
+  "purpose": "Allow resources to be reserved before final operational assignment or ticket transaction.",
+  "purposeNote": "Authorized users can reserve resources in advance while TICVAI prevents invalid or conflicting reservations.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Reservation reference",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Resource",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Resource type",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Date",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Start time",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "End time",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer/event/experience",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Quantity",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Capacity",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Priority",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reservation status",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Expiry",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Notes",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Owner",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reservation States",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Hold duration",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Automatic expiry",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Extension permissions",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Release rules",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Smart Availability",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Availability",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Existing bookings",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Dependencies",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue restrictions",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Resource status",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Operational blocks",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 24 §Administrators shall configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The advance reservation configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the advance reservation untouched.",
+   "emptyFirstRun": "No advance reservation configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "listResourceBookings",
+    "contract": "resources",
+    "purpose": "Reservations ahead",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "bookResource",
+    "contract": "resources",
+    "purpose": "Reserve in advance",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getResourceCalendar",
+     "listResourceBookings",
+     "getResourceAvailability"
+    ]
+   },
+   {
+    "operationId": "updateResourceBooking",
+    "contract": "resources",
+    "purpose": "Move or resize it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getResourceCalendar",
+     "listResourceBookings"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-868",
+   "workshopBoard": "wireframes/WS127 Resource Management Configuration Board 2.dc.html#bo-868"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 24. 0 of 0 labels bound to a contract property; 26 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "bookingId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-869",
+  "name": "Recurring Reservation Configuration",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "2",
+   "number": "06",
+   "page": 26
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/recurring-reservation-configuration-bo-869",
+   "component": "apps/venue-management-web/src/routes/rentals/RecurringReservationConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-864"
+   ],
+   "exitTo": [
+    "BO-864"
+   ],
+   "transitions": [
+    {
+     "to": "BO-864",
+     "trigger": "Back to Resource Calendar Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Users shall configure) and no display directory — it is settings, not a population",
+  "purpose": "Allow resources to be reserved repeatedly without creating each reservation individually.",
+  "purposeNote": "Users can create and manage recurring resource reservations while TICVAI validates every occurrence and clearly identifies exceptions.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Start date",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 26 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "End date",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 26 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Frequency",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 26 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Days",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 26 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Times",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 26 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Number of occurrences",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 26 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Resource",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 26 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 26 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Exceptions",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 26 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Conflict Handling",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 26 §Users shall configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Selected weekdays",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 26 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected dates",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 26 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The recurring reservation configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the recurring reservation untouched.",
+   "emptyFirstRun": "No recurring reservation configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "bookResource",
+    "contract": "resources",
+    "purpose": "Create the series",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getResourceCalendar",
+     "listResourceBookings",
+     "getResourceAvailability"
+    ]
+   },
+   {
+    "operationId": "cancelResourceBooking",
+    "contract": "resources",
+    "purpose": "Cancel an occurrence or the series",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getResourceCalendar",
+     "listResourceBookings"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-869",
+   "workshopBoard": "wireframes/WS127 Resource Management Configuration Board 2.dc.html#bo-869"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 26. 0 of 0 labels bound to a contract property; 12 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Selected weekdays are choices sent by `bookResource` (recurrence.daysOfWeek); Selected dates are choices sent by `bookResource` (one booking per selected date; field gap: recurrence has no explicit dates[]).",
+  "entryState": {
+   "params": [
+    {
+     "name": "bookingId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-870",
+  "name": "Operational Time & Resource Blocking",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "2",
+   "number": "08",
+   "page": 28
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/operational-time-resource-blocking-bo-870",
+   "component": "apps/venue-management-web/src/routes/rentals/OperationalTimeResourceBlocking.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-864"
+   ],
+   "exitTo": [
+    "BO-864"
+   ],
+   "transitions": [
+    {
+     "to": "BO-864",
+     "trigger": "Back to Resource Calendar Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Users shall configure) and no display directory — it is settings, not a population",
+  "purpose": "Protect non-customer-facing time required for preparation, movement, maintenance and operational activities.",
+  "purposeNote": "Operational time blocks automatically affect resource availability and prevent reservations that would interfere with required operational activities.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Setup",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Teardown",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Cleaning",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maintenance",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Inspection",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Travel",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Break",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Training",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Private use",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue closure",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Operational hold",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Custom block",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
+       "provenance": "authored — required by check-screens, 19 September 2026"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The operational time resource configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the operational time resource untouched.",
+   "emptyFirstRun": "No operational time resource configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "listResourceBlocks",
+    "contract": "resources",
+    "purpose": "Blocks in force",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createResourceBlock",
+    "contract": "resources",
+    "purpose": "Block a window",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listResourceBlocks",
+     "getResourceCalendar"
+    ]
+   },
+   {
+    "operationId": "releaseResourceBlock",
+    "contract": "resources",
+    "purpose": "Put it back into service",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listResourceBlocks",
+     "getResourceCalendar"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-870",
+   "workshopBoard": "wireframes/WS127 Resource Management Configuration Board 2.dc.html#bo-870"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 28. 0 of 0 labels bound to a contract property; 12 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "blockId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-871",
+  "name": "Multi-Event Resource Planning",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "2",
+   "number": "09",
+   "page": 29
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/multi-event-resource-planning-bo-871",
+   "component": "apps/venue-management-web/src/routes/rentals/MultiEventResourcePlanning.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-864"
+   ],
+   "exitTo": [
+    "BO-864"
+   ],
+   "transitions": [
+    {
+     "to": "BO-864",
+     "trigger": "Back to Resource Calendar Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§The screen shall display) and no metric row",
+  "purpose": "Allow operations teams to manage shared resources across multiple simultaneous events, experiences and operational activities.",
+  "purposeNote": "Operations teams can understand resource demand across parallel events and identify shortages or allocation conflicts before operations begin.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 29 §The screen shall display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every multi-event resource planning",
+       "columns": [
+        "Events",
+        "Experiences",
+        "Resources",
+        "Venues",
+        "Time periods",
+        "Assignments",
+        "Conflicts",
+        "Capacity",
+        "Resource gaps"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 29 §The screen shall display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected multi-event resource planning",
+       "bindsTo": null,
+       "columns": [
+        "Events",
+        "Experiences",
+        "Resources",
+        "Venues",
+        "Time periods",
+        "Assignments",
+        "Conflicts",
+        "Capacity",
+        "Resource gaps"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Event A”, “Event B”, “Events may be assigned”, “Resource allocation can consider”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 29 §The screen shall display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The multi-event resource planning list.",
+   "error": "Could not load. Names which read failed and leaves the multi-event resource planning untouched.",
+   "emptyFirstRun": "No multi-event resource planning yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the multi-event resource planning are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getResourceCalendar",
+    "contract": "resources",
+    "purpose": "Several events at once",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "allocateResources",
+    "contract": "resources",
+    "purpose": "Fill each requirement",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getResourceCalendar",
+     "listResourceBookings"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Events",
+    "Experiences",
+    "Resources",
+    "Venues",
+    "Time periods",
+    "Assignments"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-871",
+   "workshopBoard": "wireframes/WS127 Resource Management Configuration Board 2.dc.html#bo-871"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 29. 0 of 9 labels bound to a contract property; 9 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-872",
+  "name": "Smart Assignment & Drag-and-Drop Reallocation",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "2",
+   "number": "10",
+   "page": 30
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/smart-assignment-drag-and-drop-reallocation-bo-872",
+   "component": "apps/venue-management-web/src/routes/rentals/SmartAssignmentDragAndDropReallocation.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-864"
+   ],
+   "exitTo": [
+    "BO-864"
+   ],
+   "transitions": [
+    {
+     "to": "BO-864",
+     "trigger": "Back to Resource Calendar Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide the fast, visual assignment experience that operational users and cashiers can use when assigning or changing resources. This should become one of the signature TICVAI Resource Management experiences. Provide TICVAI with a centralized backend configuration environment for treating employees, instructors, contractors, technicians, security personnel, event staff, and other personnel as intelligent operational resources.",
+  "purposeNote": "Authorized users can assign or reassign resources visually through drag-and-drop or AI Smart Assign, with real-time validation preventing invalid allocations and all changes recorded in audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 30"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 30"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateResourceBooking",
+       "label": "Save resource booking",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateResourceBooking"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The smart drag-and-drop reallocation list.",
+   "error": "Could not load. Names which read failed and leaves the smart drag-and-drop reallocation untouched.",
+   "emptyFirstRun": "No smart drag-and-drop reallocation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the smart drag-and-drop reallocation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "updateResourceBooking",
+    "contract": "resources",
+    "purpose": "Drag to reassign, extend or shorten",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getResourceCalendar",
+     "listResourceBookings"
+    ]
+   },
+   {
+    "operationId": "getResourceCalendar",
+    "contract": "resources",
+    "purpose": "The grid being dragged on",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-872",
+   "workshopBoard": "wireframes/WS127 Resource Management Configuration Board 2.dc.html#bo-872"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 30. 0 of 0 labels bound to a contract property; 0 of 101 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "bookingId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

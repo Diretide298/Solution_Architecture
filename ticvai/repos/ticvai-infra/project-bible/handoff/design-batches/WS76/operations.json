@@ -1,1 +1,195 @@
-{}
+{
+ "createAccessPolicy": {
+  "method": "POST",
+  "path": "/access-policies",
+  "contract": "identity",
+  "summary": "Write a policy without writing code",
+  "permission": "PERMISSION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessPolicy",
+  "responds": "AccessPolicy"
+ },
+ "createMediaShare": {
+  "method": "POST",
+  "path": "/media-shares",
+  "contract": "assets",
+  "summary": "Share assets with somebody outside the platform, on terms",
+  "permission": "ASSET_LIBRARY_SHARE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MediaShare",
+  "responds": "MediaShare"
+ },
+ "getExpiringRights": {
+  "method": "GET",
+  "path": "/media/rights-expiring",
+  "contract": "assets",
+  "summary": "Assets whose licence is expiring or expired",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "withinDays",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ExpiringMedia"
+ },
+ "getMediaAsset": {
+  "method": "GET",
+  "path": "/media/{mediaId}",
+  "contract": "assets",
+  "summary": "Read an asset with derivatives and usage",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MediaAssetDetail"
+ },
+ "getMediaUsageAnalytics": {
+  "method": "GET",
+  "path": "/media-usage",
+  "contract": "assets",
+  "summary": "Downloads, views, shares and library health",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaUsageRow"
+ },
+ "listAccessPolicies": {
+  "method": "GET",
+  "path": "/access-policies",
+  "contract": "identity",
+  "summary": "Attribute-based access policies",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessPolicy"
+ },
+ "listMediaAssetAudit": {
+  "method": "GET",
+  "path": "/media-assets/{assetId}/audit",
+  "contract": "assets",
+  "summary": "Who did what to this asset, and who received it",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MediaAuditRecord"
+ },
+ "setMediaAssetApproval": {
+  "method": "POST",
+  "path": "/media-assets/{assetId}/approval",
+  "contract": "assets",
+  "summary": "Submit, approve, reject or publish an asset",
+  "permission": "ASSET_LIBRARY_APPROVE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaAssetApproval"
+ },
+ "setMediaAssetRights": {
+  "method": "PUT",
+  "path": "/media-assets/{assetId}/rights",
+  "contract": "assets",
+  "summary": "Licence, permitted use and expiry",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MediaRights",
+  "responds": "MediaRights"
+ },
+ "updateMediaAsset": {
+  "method": "PATCH",
+  "path": "/media/{mediaId}",
+  "contract": "assets",
+  "summary": "Amend metadata, tags or rights",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaAsset"
+ }
+}

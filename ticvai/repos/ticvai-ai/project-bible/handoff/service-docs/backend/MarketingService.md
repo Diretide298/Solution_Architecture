@@ -7,7 +7,7 @@
 | Tier | engagement: Guests and intelligence. Nothing that takes money depends on these. |
 | Contracts | `marketing-crm` |
 | Schemas owned | `marketing` |
-| Operations in the slice | 47 of 248 |
+| Operations in the slice | 47 of 253 |
 | Scale | Bursty on send, read-heavy otherwise. The one to watch for a split. |
 | If it is down | Down stops campaigns and guest lookup. Neither stops trading. |
 
@@ -116,6 +116,7 @@ Staff, partner or guest raise it; `channel` records how the guest reached the ve
 | subject | string | yes | (max length 200) |
 | description | string | yes | (max length 10000) |
 | categoryId | string (uuid) |  |  |
+| membershipId | string (uuid) |  | The identity membership this case concerns (identity.customer_membership); member case notes are cases with this set. (nullable) |
 | priority | object |  | (default normal) |
 | kind | CaseKind: enum (lostProperty, complaint, question, accessibility, refundRequest, other) |  | What the guest says the case is about, in their words rather than the venue's taxonomy — raiseMyCase asks for it and categoryId is what staff file it under. |
 | channel | MessageChannel: enum (email, sms, whatsapp, push, inApp, post) | yes |  |
@@ -138,6 +139,8 @@ Staff, partner or guest raise it; `channel` records how the guest reached the ve
 | recordedAt | string (date-time) |  | Device time the case was raised — the start of the SLA clock. |
 | syncedAt | string (date-time) |  | Server time the case arrived. (read-only) |
 | categoryId | string (uuid) |  | (nullable) |
+| queueId | string (uuid) |  | The ServiceQueue the case waits in, set by routing (CaseRoutingRule.queueId). (nullable) |
+| membershipId | string (uuid) |  | The identity membership this case concerns (identity.customer_membership); member case notes are cases with this set. (nullable) |
 | status | CaseStatus: enum (open, inProgress, awaitingGuest, escalated, resolved, closed) | yes |  |
 | priority | CasePriority: enum (low, normal, high, urgent) | yes |  |
 | assignedToPrincipalId | string (uuid) |  | (nullable) |
@@ -181,6 +184,7 @@ Staff, partner or guest raise it; `channel` records how the guest reached the ve
 | assignedToPrincipalId | query |  | string (uuid) |  |
 | breachedSla | query |  | boolean | Filters on Case.isSlaBreached, computed at query time the same way it is on read. |
 | priority | query |  | CasePriority: enum (low, normal, high, urgent) |  |
+| membershipId | query |  | string (uuid) | The cases about one membership, which is how the membership screens list a member's case notes (decided 29 September, coordinator decision DM4, writers pass). |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
@@ -199,6 +203,8 @@ Staff, partner or guest raise it; `channel` records how the guest reached the ve
 | items[].recordedAt | string (date-time) |  | Device time the case was raised — the start of the SLA clock. |
 | items[].syncedAt | string (date-time) |  | Server time the case arrived. (read-only) |
 | items[].categoryId | string (uuid) |  | (nullable) |
+| items[].queueId | string (uuid) |  | The ServiceQueue the case waits in, set by routing (CaseRoutingRule.queueId). (nullable) |
+| items[].membershipId | string (uuid) |  | The identity membership this case concerns (identity.customer_membership); member case notes are cases with this set. (nullable) |
 | items[].status | CaseStatus: enum (open, inProgress, awaitingGuest, escalated, resolved, closed) | yes |  |
 | items[].priority | CasePriority: enum (low, normal, high, urgent) | yes |  |
 | items[].assignedToPrincipalId | string (uuid) |  | (nullable) |
@@ -512,8 +518,8 @@ Every record captures the notice version, the channel, the purpose, the source a
 | Offline | no |
 | Config scope | subject |
 | Conflict policy | append |
-| Reads | `cache:idempotency`, `marketing.guest_profile` |
-| Writes | `cache:idempotency`, `marketing.guest_profile` |
+| Reads | `cache:idempotency`, `marketing.consent_record`, `marketing.guest_profile` |
+| Writes | `cache:idempotency`, `marketing.consent_propagation`, `marketing.consent_record`, `marketing.guest_profile` |
 | Called by | BO-748, GST-039, GST-065, WEB-011, WEB-017, WEB-020, WEB-024, WEB-027 |
 | State model | JourneyEntrant ([states/journey-entrant.yaml](../../../states/journey-entrant.yaml)): moves `active` -> `suppressed`, `paused` -> `suppressed` |
 
@@ -2177,6 +2183,8 @@ Found writing F54: `GST-034 Lost & Found` declared exactly one operation and it 
 | items[].recordedAt | string (date-time) |  | Device time the case was raised — the start of the SLA clock. |
 | items[].syncedAt | string (date-time) |  | Server time the case arrived. (read-only) |
 | items[].categoryId | string (uuid) |  | (nullable) |
+| items[].queueId | string (uuid) |  | The ServiceQueue the case waits in, set by routing (CaseRoutingRule.queueId). (nullable) |
+| items[].membershipId | string (uuid) |  | The identity membership this case concerns (identity.customer_membership); member case notes are cases with this set. (nullable) |
 | items[].status | CaseStatus: enum (open, inProgress, awaitingGuest, escalated, resolved, closed) | yes |  |
 | items[].priority | CasePriority: enum (low, normal, high, urgent) | yes |  |
 | items[].assignedToPrincipalId | string (uuid) |  | (nullable) |
@@ -2250,6 +2258,8 @@ Found writing F54: `GST-034 Lost & Found` declared exactly one operation and it 
 | recordedAt | string (date-time) |  | Device time the case was raised — the start of the SLA clock. |
 | syncedAt | string (date-time) |  | Server time the case arrived. (read-only) |
 | categoryId | string (uuid) |  | (nullable) |
+| queueId | string (uuid) |  | The ServiceQueue the case waits in, set by routing (CaseRoutingRule.queueId). (nullable) |
+| membershipId | string (uuid) |  | The identity membership this case concerns (identity.customer_membership); member case notes are cases with this set. (nullable) |
 | status | CaseStatus: enum (open, inProgress, awaitingGuest, escalated, resolved, closed) | yes |  |
 | priority | CasePriority: enum (low, normal, high, urgent) | yes |  |
 | assignedToPrincipalId | string (uuid) |  | (nullable) |
@@ -2377,6 +2387,8 @@ The reply is written as a `CaseMessage` with `authorKind: guest` and `isInternal
 | recordedAt | string (date-time) |  | Device time the case was raised — the start of the SLA clock. |
 | syncedAt | string (date-time) |  | Server time the case arrived. (read-only) |
 | categoryId | string (uuid) |  | (nullable) |
+| queueId | string (uuid) |  | The ServiceQueue the case waits in, set by routing (CaseRoutingRule.queueId). (nullable) |
+| membershipId | string (uuid) |  | The identity membership this case concerns (identity.customer_membership); member case notes are cases with this set. (nullable) |
 | status | CaseStatus: enum (open, inProgress, awaitingGuest, escalated, resolved, closed) | yes |  |
 | priority | CasePriority: enum (low, normal, high, urgent) | yes |  |
 | assignedToPrincipalId | string (uuid) |  | (nullable) |
@@ -2911,7 +2923,7 @@ BL-133. **Deliberately not `assets`.** A guest's passport scan is not a marketin
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Guest callable | True |
-| Reads | - |
+| Reads | `marketing.message_dispatch` |
 | Writes | - |
 | Called by | GST-030, WEB-046 |
 
@@ -2960,10 +2972,10 @@ Marks the given notifications, or all of them when `all` is true, as opened. Onl
 | Part of slice | core |
 | Wave | 2 |
 | Offline | yes |
-| Conflict policy | lastWriteWins |
+| Conflict policy | lastWriterWins |
 | Guest callable | True |
-| Reads | - |
-| Writes | - |
+| Reads | `cache:idempotency`, `marketing.message_dispatch` |
+| Writes | `cache:idempotency`, `marketing.message_dispatch` |
 | Called by | GST-030, WEB-046 |
 
 **Parameters**
@@ -3045,6 +3057,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | recorded_at | timestamptz | no | Device time the case was raised — the start of the SLA clock. |
 | synced_at | timestamptz | no | Server time the case arrived. |
 | category_id | uuid | no |  |
+| queue_id | uuid | no | The ServiceQueue the case waits in, set by routing (CaseRoutingRule.queueId). |
+| membership_id | uuid | no | The identity membership this case concerns (identity.customer_membership); member case notes are cases with this set. |
 | status | text | yes |  |
 | priority | text | yes |  |
 | assigned_to_principal_id | uuid | no |  |
@@ -3107,6 +3121,20 @@ Every table this service owns that the slice reads or writes, with its columns a
 | completed_at | timestamptz | no |  |
 | reward_issued_at | timestamptz | no |  |
 
+### `marketing.consent_propagation`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| consent_record_id | text | yes | The withdrawal's ConsentRecord.id. |
+| target | text | yes |  |
+| target_name | text | no |  |
+| status | text | yes |  |
+| attempts | integer | no |  |
+| error | text | no |  |
+| created_at | timestamptz | no |  |
+| updated_at | timestamptz | no |  |
+
 ### `marketing.consent_purpose`
 
 | Column | Type | Required | Notes |
@@ -3148,12 +3176,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes | Synthesised key. |
 | question_id | text | yes |  |
 | version | integer | yes |  |
 | text | jsonb | yes |  |
 | published_at | timestamptz | yes |  |
 | published_by | uuid | no |  |
+| id | uuid | yes | Synthesised key. |
 
 ### `marketing.consent_record`
 
@@ -3432,6 +3460,27 @@ Every table this service owns that the slice reads or writes, with its columns a
 | conditions_json | text | no |  |
 | is_active | boolean | yes |  |
 
+### `marketing.message_dispatch`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | text | yes |  |
+| subject_id | uuid | yes |  |
+| campaign_id | uuid | no |  |
+| channel | text | yes |  |
+| template_id | uuid | no |  |
+| message_trigger_id | uuid | no | The MessageTrigger that fired it, and through its event the BusinessEvent and source module; null for a campaign or a direct send. |
+| status | text | yes |  |
+| failure_reason | text | no |  |
+| provider_reference | text | no |  |
+| queued_at | timestamptz | yes |  |
+| delivered_at | timestamptz | no |  |
+| is_test | boolean | no | A testSendCampaign message. |
+| opened_at | timestamptz | no | From the provider's engagement events. |
+| clicked_at | timestamptz | no |  |
+| complained_at | timestamptz | no |  |
+| unsubscribed_at | timestamptz | no |  |
+
 ### `marketing.points_earning_rule`
 
 | Column | Type | Required | Notes |
@@ -3542,13 +3591,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-201 operations, added to this service in later releases without changing any of the above.
+206 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | campaign | `createCampaign`, `getCampaign`, `getCampaignPerformance`, `launchCampaign`, `listCampaigns`, `pauseCampaign`, `stopCampaign`, `testSendCampaign`, `unscheduleCampaign`, `updateCampaign` |
-| case | `addCaseMessage`, `createCaseClassificationIntelligent`, `escalateCase`, `getCase`, `getCaseInvestigationResolution`, `listAgentWorkloadAvailability`, `listCaseResolutionClosure`, `listContact`, `listContactAutomation`, `listCustomerService`, `listCustomerServiceProfile`, `listEscalationCollaborationInternal`, `listEscalationCriticalCase`, `listIntelligentRoutingSkills`, `listQualityAgentEvaluation`, `listServiceRootCause`, `listSlaPolicyService`, `listUnifiedInteractionCommunication`, `reopenCase`, `setAgentServiceProfile`, `setCaseInternalRequest`, `setCaseInvestigationResolution`, `setCaseResolution`, `setContactAutomation`, `setCustomerServiceCopilot`, `setIntelligentRoutingSkill`, `setOrderBookingTicket`, `setQualityEvaluation`, `setRefundCompensationService`, `updateCase` |
-| consent | `actOnWaiverRequirements`, `addSuppression`, `approvePrivacyTesting`, `approveWaiverTesting`, `getConsentHistory`, `getDigitalWaiverForm`, `getLocalizationBrandingCustomer`, `getSignatorySignatureGuardian`, `getSuppressionList`, `getWaiverTesting`, `listComplianceEvidenceWaiver`, `listConsentEvidenceWithdrawal`, `listConsentPreferenceCommunication`, `listCookieBannerPreference`, `listCookieTrackingDigital`, `listCustomerPrivacyConsent`, `listDataProcessingPurpose`, `listDataRetentionExpiry`, `listDataSubjectCustomer`, `listDeletionAnonymizationRestriction`, `listDigitalSigningCollection`, `listDynamicFieldQuestion`, `listMinorGuardianGroup`, `listMissingExpiredInvalid`, `listParticipantWaiverStatus`, `listPrivacy`, `listPrivacyCompliance`, `listPrivacyComplianceExceptions`, `listPrivacyConsent`, `listPrivacyEvidenceCompliance`, `listPrivacyNoticePolicy`, `listProductEventExperience`, `listSiteWaiverException`, `listVersioningEffectiveDate`, `listWaiver`, `listWaiverComplianceOperational`, `listWaiverComplianceRisk`, `listWaiverConsent`, `listWaiverTemplateMaster`, `listWaiverTriggerEligibility`, `listWaiverVerificationQueue`, `setCommunicationPreferenceMarketing`, `setConsentCapturePoint`, `setCookieBannerDesign`, `setDataDiscoveryAccess`, `setDataProcessingPurpose`, `setDigitalWaiverForm`, `setDynamicFieldQuestion`, `setLegalHold`, `setLocalizationBrandingCustomer`, `setMinorGuardianAge`, `setPrivacyAction`, `setPrivacyComplianceException`, `setPrivacyRequest`, `setPrivacyRequestTypes`, `setSignatorySignatureGuardian`, `setTrackingTechnology`, `setWaiverAssociation`, `setWaiverException`, `setWaiverTemplateMaster`, `setWaiverTriggerRule`, `setWaiverVerificationValidation` |
+| case | `addCaseMessage`, `createCaseClassificationIntelligent`, `escalateCase`, `getCase`, `getCaseInvestigationResolution`, `listAgentWorkloadAvailability`, `listCaseCategories`, `listCaseResolutionClosure`, `listContact`, `listContactAutomation`, `listCustomerService`, `listCustomerServiceProfile`, `listEscalationCollaborationInternal`, `listEscalationCriticalCase`, `listIntelligentRoutingSkills`, `listQualityAgentEvaluation`, `listServiceQueues`, `listServiceRootCause`, `listSlaPolicyService`, `listUnifiedInteractionCommunication`, `reopenCase`, `setAgentServiceProfile`, `setCaseCategoryDefinition`, `setCaseInternalRequest`, `setCaseInvestigationResolution`, `setCaseResolution`, `setContactAutomation`, `setCustomerServiceCopilot`, `setIntelligentRoutingSkill`, `setOrderBookingTicket`, `setQualityEvaluation`, `setRefundCompensationService`, `setServiceQueueDefinition`, `updateCase` |
+| consent | `actOnWaiverRequirements`, `addSuppression`, `approvePrivacyTesting`, `approveWaiverTesting`, `getConsentHistory`, `getDigitalWaiverForm`, `getLocalizationBrandingCustomer`, `getSignatorySignatureGuardian`, `getSuppressionList`, `getWaiverTesting`, `listComplianceEvidenceWaiver`, `listConsentEvidenceWithdrawal`, `listConsentPreferenceCommunication`, `listCookieBannerPreference`, `listCookieTrackingDigital`, `listCustomerPrivacyConsent`, `listDataProcessingPurpose`, `listDataRetentionExpiry`, `listDataSubjectCustomer`, `listDeletionAnonymizationRestriction`, `listDigitalSigningCollection`, `listDynamicFieldQuestion`, `listMinorGuardianGroup`, `listMissingExpiredInvalid`, `listParticipantWaiverStatus`, `listPrivacy`, `listPrivacyCompliance`, `listPrivacyComplianceExceptions`, `listPrivacyConsent`, `listPrivacyEvidenceCompliance`, `listPrivacyNoticePolicy`, `listProductEventExperience`, `listSiteWaiverException`, `listVersioningEffectiveDate`, `listWaiver`, `listWaiverComplianceOperational`, `listWaiverComplianceRisk`, `listWaiverConsent`, `listWaiverTemplateMaster`, `listWaiverTriggerEligibility`, `listWaiverVerificationQueue`, `setCommunicationPreferenceMarketing`, `setConsentCapturePoint`, `setCookieBannerDesign`, `setDataDiscoveryAccess`, `setDataProcessingPurpose`, `setDigitalWaiverForm`, `setDynamicFieldQuestion`, `setLegalHold`, `setLocalizationBrandingCustomer`, `setMinorGuardianAge`, `setPrivacyAction`, `setPrivacyComplianceException`, `setPrivacyNoticePolicyGovernance`, `setPrivacyRequest`, `setPrivacyRequestTypes`, `setSignatorySignatureGuardian`, `setTrackingTechnology`, `setWaiverAssociation`, `setWaiverException`, `setWaiverTemplateMaster`, `setWaiverTriggerRule`, `setWaiverVerificationValidation` |
 | feedback | `listCustomerSatisfactionFeedback`, `listReviews`, `respondToReview` |
 | guest | `mergeGuestProfiles`, `updateGuestProfile` |
 | guests | `activateAudience`, `checkGuestCheckoutMatch`, `decideDuplicateCandidate`, `decideGuestCheckoutMatch`, `getAudienceOverlap`, `getGuestAttributeModel`, `getGuestIntelligence`, `getGuestMatchPolicy`, `getGuestRelationships`, `getGuestTimeline`, `getIdentityResolutionRules`, `importAudienceList`, `listAudienceActivations`, `listAudienceLists`, `listDuplicateCandidates`, `runDataRetention`, `setDataRetentionPolicy`, `setGuestAttributeModel`, `setGuestMatchPolicy`, `setGuestRelationships`, `setIdentityResolutionRules` |

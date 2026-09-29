@@ -1,0 +1,1365 @@
+{
+ "CreatePassTypeRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "venueId",
+   "code",
+   "name",
+   "kind",
+   "fareMultiplier",
+   "referenceTrips",
+   "validityDays"
+  ],
+  "properties": {
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 32,
+    "x-ticvai-unique": "venue"
+   },
+   "name": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "description": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "multiTrip",
+     "unlimited"
+    ]
+   },
+   "trips": {
+    "type": "integer",
+    "minimum": 2,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Journeys included. Required for `multiTrip`; null for `unlimited`."
+   },
+   "fareMultiplier": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1000,
+    "description": "The pass price as a multiple of the single adult fare between its two stations."
+   },
+   "referenceTrips": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 1000,
+    "description": "The single trips the saving is measured against — `trips` for a multi-trip card, an number the venue sets for unlimited (14 a week, 60 a month in the demo seed data).\n"
+   },
+   "validityDays": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 366
+   },
+   "routeIds": {
+    "type": "array",
+    "description": "Routes it is sold on. Empty means every active route in the venue.",
+    "items": {
+     "$ref": "#/components/schemas/Ulid"
+    }
+   },
+   "sortOrder": {
+    "type": "integer",
+    "minimum": 0,
+    "default": 0
+   }
+  }
+ },
+ "CreateStationRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "venueId",
+   "code",
+   "name"
+  ],
+  "properties": {
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 32,
+    "x-ticvai-unique": "venue",
+    "description": "Short operator code, e.g. `SHJ-JUB`. Unique in the venue."
+   },
+   "name": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "shortName": {
+    "$ref": "#/components/schemas/LocalisedText",
+    "description": "The label on the route diagram and the map pin (`Union Sq`, `MoE`)."
+   },
+   "latitude": {
+    "type": "number",
+    "minimum": -90,
+    "maximum": 90,
+    "nullable": true
+   },
+   "longitude": {
+    "type": "number",
+    "minimum": -180,
+    "maximum": 180,
+    "nullable": true
+   }
+  }
+ },
+ "CreateTimetableRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "name",
+   "validFrom",
+   "seatCapacity",
+   "runs"
+  ],
+  "properties": {
+   "name": {
+    "type": "string",
+    "maxLength": 120
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "releaseHorizonDays": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 365,
+    "default": 30,
+    "description": "How many days ahead departures go on sale. Proposed default 30, from the prototype, client to correct (rev 3 REV3-21).\n"
+   },
+   "seatCapacity": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 200,
+    "description": "Seats per departure, unless a departure overrides it."
+   },
+   "seatMapId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The coach seat map for Seat Selection (`seating`). Null sells unallocated seats."
+   },
+   "runs": {
+    "type": "array",
+    "minItems": 1,
+    "maxItems": 500,
+    "items": {
+     "$ref": "#/components/schemas/TimetableRun"
+    }
+   }
+  }
+ },
+ "CreateTransportRouteRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "venueId",
+   "code",
+   "name",
+   "stops"
+  ],
+  "properties": {
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 32,
+    "x-ticvai-unique": "venue",
+    "description": "The line and direction, e.g. `E101-Out`. Unique in the venue."
+   },
+   "lineCode": {
+    "type": "string",
+    "maxLength": 16,
+    "description": "The public line number shared by both directions, e.g. `E101`."
+   },
+   "name": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "colour": {
+    "type": "string",
+    "pattern": "^#[0-9a-fA-F]{6}$"
+   },
+   "pairedRouteId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The same line run the other way. The swap button lands on it."
+   },
+   "bookingCutoffMinutes": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 1440,
+    "default": 5,
+    "description": "How long before a departure leaves the boarding stop that online sale stops. Proposed default 5, from the prototype's \"Boarding closes five minutes before departure\", client to correct (rev 3 REV3-21).\n"
+   },
+   "stops": {
+    "type": "array",
+    "minItems": 2,
+    "maxItems": 100,
+    "items": {
+     "$ref": "#/components/schemas/RouteStopInput"
+    }
+   }
+  }
+ },
+ "Departure": {
+  "x-ticvai-persistence": "transport.departure",
+  "type": "object",
+  "required": [
+   "id",
+   "routeId",
+   "timetableId",
+   "performanceId",
+   "serviceDate",
+   "departsAt",
+   "status",
+   "seatCapacity"
+  ],
+  "properties": {
+   "id": {
+    "$ref": "#/components/schemas/Ulid"
+   },
+   "routeId": {
+    "$ref": "#/components/schemas/Ulid"
+   },
+   "timetableId": {
+    "$ref": "#/components/schemas/Ulid"
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The catalogue performance this departure is sold as. Cart lines carry it."
+   },
+   "serviceDate": {
+    "type": "string",
+    "format": "date"
+   },
+   "departsAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "At the route's first stop."
+   },
+   "status": {
+    "$ref": "#/components/schemas/TransportDepartureStatus"
+   },
+   "seatCapacity": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "seatsSold": {
+    "type": "integer",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "From catalogue availability on read; not stored here."
+   },
+   "vehicleResourceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "FareModel": {
+  "type": "string",
+  "description": "`stopCount`: base plus an amount per stop travelled — the prototype's rule. `matrix`: a fare for each pair of stops, for a network whose fares are zonal or negotiated. Which one a route uses is the venue's choice in `setTransportFareTable` (rev 3 REV3-21).\n",
+  "enum": [
+   "stopCount",
+   "matrix"
+  ]
+ },
+ "FareQuote": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "routeId",
+   "stopsTravelled",
+   "adultFare",
+   "total"
+  ],
+  "properties": {
+   "routeId": {
+    "$ref": "#/components/schemas/Ulid"
+   },
+   "stopsTravelled": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "adultFare": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "code",
+      "count",
+      "unitPrice",
+      "lineTotal"
+     ],
+     "properties": {
+      "code": {
+       "type": "string"
+      },
+      "catalogueVariantId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "count": {
+       "type": "integer"
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "lineTotal": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "passTypeId": {
+    "$ref": "#/components/schemas/Ulid"
+   },
+   "saving": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "With `passTypeId`, single adult fare × `referenceTrips` minus the pass price."
+   },
+   "total": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  }
+ },
+ "FareQuoteRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "fromStationId",
+   "toStationId"
+  ],
+  "properties": {
+   "routeId": {
+    "$ref": "#/components/schemas/Ulid",
+    "description": "Omitted, the active route serving the two stations in this order."
+   },
+   "fromStationId": {
+    "$ref": "#/components/schemas/Ulid"
+   },
+   "toStationId": {
+    "$ref": "#/components/schemas/Ulid"
+   },
+   "passengers": {
+    "type": "array",
+    "maxItems": 10,
+    "description": "Omitted, one of the default type. Ignored with `passTypeId`.",
+    "items": {
+     "type": "object",
+     "required": [
+      "code",
+      "count"
+     ],
+     "properties": {
+      "code": {
+       "type": "string"
+      },
+      "count": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 99
+      }
+     }
+    }
+   },
+   "passTypeId": {
+    "$ref": "#/components/schemas/Ulid"
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time",
+    "description": "The sale instant the fare table is read at. Default now."
+   }
+  }
+ },
+ "FareTable": {
+  "x-ticvai-persistence": "transport.fare_table + transport.fare_passenger_type + transport.fare_matrix_cell",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/SetFareTableRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "routeId"
+    ],
+    "properties": {
+     "id": {
+      "$ref": "#/components/schemas/Ulid"
+     },
+     "routeId": {
+      "$ref": "#/components/schemas/Ulid"
+     }
+    }
+   }
+  ]
+ },
+ "ImportTransportNetworkRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "format",
+   "sourceRef"
+  ],
+  "properties": {
+   "format": {
+    "type": "string",
+    "enum": [
+     "csvBundle",
+     "gtfs"
+    ],
+    "description": "A zip of the four CSV files described on `importTransportNetwork`, or a GTFS static feed."
+   },
+   "sourceRef": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The uploaded file, as the `MediaAsset.id` from `assets.completeUpload`. Never a URL.",
+    "x-ticvai-references": "assets.MediaAsset"
+   },
+   "include": {
+    "type": "array",
+    "uniqueItems": true,
+    "description": "Which parts of the file to read. Absent reads all three.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "stations",
+      "routes",
+      "timetables"
+     ]
+    }
+   }
+  }
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "MediaAsset": {
+  "x-ticvai-persistence": "assets.media_asset",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "status",
+   "filename",
+   "contentType",
+   "sizeBytes",
+   "referenceCount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MediaKind"
+   },
+   "status": {
+    "$ref": "#/components/schemas/MediaStatus"
+   },
+   "filename": {
+    "type": "string"
+   },
+   "contentType": {
+    "type": "string"
+   },
+   "sizeBytes": {
+    "type": "integer"
+   },
+   "title": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "description": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"
+   },
+   "altText": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "Required before use in a guest-facing surface. WCAG 2.2 AA."
+   },
+   "width": {
+    "type": "integer",
+    "nullable": true
+   },
+   "height": {
+    "type": "integer",
+    "nullable": true
+   },
+   "durationSeconds": {
+    "type": "number",
+    "nullable": true
+   },
+   "customMetadata": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": true,
+    "description": "BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"
+   },
+   "sharedWithTenantIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"
+   },
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "url": {
+    "type": "string",
+    "description": "Signed and expiring for private assets; stable CDN URL for public ones."
+   },
+   "thumbnailUrl": {
+    "type": "string",
+    "nullable": true
+   },
+   "referenceCount": {
+    "type": "integer",
+    "description": "How many surfaces reference this asset. Non-zero refuses deletion.\n"
+   },
+   "rights": {
+    "$ref": "#/components/schemas/MediaRights"
+   },
+   "isRightsExpired": {
+    "type": "boolean"
+   },
+   "version": {
+    "type": "integer"
+   },
+   "uploadedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "MediaKind": {
+  "type": "string",
+  "enum": [
+   "image",
+   "video",
+   "audio",
+   "document",
+   "vector",
+   "font",
+   "archive"
+  ]
+ },
+ "MediaRights": {
+  "x-ticvai-persistence": "none — embedded in asset",
+  "type": "object",
+  "description": "Licensing terms. Tracked because an expired licence on a live surface is a legal exposure, not a housekeeping item.\n",
+  "properties": {
+   "licenceKind": {
+    "type": "string",
+    "enum": [
+     "owned",
+     "royaltyFree",
+     "rightsManaged",
+     "creativeCommons",
+     "editorialOnly",
+     "unknown"
+    ]
+   },
+   "licensor": {
+    "type": "string",
+    "nullable": true
+   },
+   "licenceReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "permittedUses": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "web",
+      "print",
+      "socialMedia",
+      "inVenue",
+      "advertising",
+      "internal"
+     ]
+    }
+   },
+   "attributionRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "attributionText": {
+    "type": "string",
+    "nullable": true
+   },
+   "permittedTerritories": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "ISO country or region codes. **Empty means unrestricted, which is a claim rather than an absence** — an unknown territory and a worldwide licence are not the same thing, and `licenceKind: unknown` is how the second is said.\n"
+   },
+   "permittedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Distribution channel codes, checked by `setMediaDistributionChannels`. Narrower than `permittedUses`, which describes the medium rather than the route.\n"
+   },
+   "modelReleaseHeld": {
+    "type": "boolean",
+    "default": false
+   },
+   "renewalOwner": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
+ "MediaStatus": {
+  "type": "string",
+  "enum": [
+   "processing",
+   "ready",
+   "quarantined",
+   "failed",
+   "archived"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PassType": {
+  "x-ticvai-persistence": "transport.pass_type",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreatePassTypeRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "active"
+    ],
+    "properties": {
+     "id": {
+      "$ref": "#/components/schemas/Ulid"
+     },
+     "active": {
+      "type": "boolean",
+      "default": true
+     },
+     "catalogueProductId": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "The catalogue `openDated` product this pass is sold as."
+     }
+    }
+   }
+  ]
+ },
+ "PassengerType": {
+  "x-ticvai-persistence": "transport.fare_passenger_type",
+  "type": "object",
+  "required": [
+   "code",
+   "name",
+   "fareMultiplier"
+  ],
+  "properties": {
+   "code": {
+    "type": "string",
+    "pattern": "^[a-z][a-zA-Z0-9]{0,31}$",
+    "description": "`adult`, `child`, `student`, `determination`. Unique in the fare table."
+   },
+   "name": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "description": {
+    "$ref": "#/components/schemas/LocalisedText",
+    "description": "What the picker shows under the name (\"Age 5–11 · half fare\")."
+   },
+   "fareMultiplier": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "description": "Share of the adult fare, set by the venue. The demo tenant's seed is 1 adult, 0.5 child and student, 0 person of determination (seed data, not a default)."
+   },
+   "minAge": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "maxAge": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "proofRequired": {
+    "$ref": "#/components/schemas/LocalisedText",
+    "nullable": true,
+    "description": "Checked by the driver at boarding (\"Valid student card\", \"Sanad card\")."
+   },
+   "isDefault": {
+    "type": "boolean",
+    "default": false,
+    "description": "The type a new search starts with, one of it. Exactly one per table."
+   },
+   "catalogueVariantId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The variant of the route's trip product this type is sold as."
+   }
+  }
+ },
+ "PerformanceCancellationResult": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "performanceId",
+   "dryRun",
+   "affectedOrders",
+   "refundExposure"
+  ],
+  "properties": {
+   "performanceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "dryRun": {
+    "type": "boolean"
+   },
+   "affectedOrders": {
+    "type": "integer"
+   },
+   "affectedGuests": {
+    "type": "integer"
+   },
+   "refundExposure": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "What the cancellation costs. Returned before committing, so the person cancelling sees the number at the moment they decide.\n"
+   },
+   "bulkRefundBatchId": {
+    "type": "string",
+    "nullable": true,
+    "description": "**Null on this response.** The refund batch is created by `orders` when it consumes `performance.cancelled` (F09), after this call has returned, and is queued there for approval — refunds are not issued automatically. Read it from orders, not from here.\n"
+   },
+   "notificationsQueued": {
+    "type": "integer"
+   }
+  }
+ },
+ "RouteStop": {
+  "x-ticvai-persistence": "transport.route_stop",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/RouteStopInput"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "sequence"
+    ],
+    "properties": {
+     "id": {
+      "$ref": "#/components/schemas/Ulid"
+     },
+     "sequence": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "1 for the origin."
+     },
+     "station": {
+      "$ref": "#/components/schemas/Station"
+     }
+    }
+   }
+  ]
+ },
+ "RouteStopInput": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "stationId",
+   "offsetMinutes"
+  ],
+  "properties": {
+   "stationId": {
+    "$ref": "#/components/schemas/Ulid"
+   },
+   "offsetMinutes": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 1440,
+    "description": "Minutes after the departure from the first stop that the coach leaves this one. 0 on the first stop; strictly increasing along the route.\n"
+   },
+   "boardingAllowed": {
+    "type": "boolean",
+    "default": true
+   },
+   "alightingAllowed": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "SetFareTableRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "model",
+   "passengerTypes",
+   "effectiveFrom"
+  ],
+  "properties": {
+   "model": {
+    "$ref": "#/components/schemas/FareModel"
+   },
+   "baseFare": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "`stopCount` only. Set by the venue; AED 5 in the demo tenant's seed data, not a default (rev 3 REV3-21)."
+   },
+   "perStopFare": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "`stopCount` only. Set by the venue; AED 2.50 in the demo tenant's seed data, not a default (rev 3 REV3-21)."
+   },
+   "matrix": {
+    "type": "array",
+    "description": "`matrix` only. One adult fare per ordered pair of stops the route serves; the reverse pair is its own row.",
+    "items": {
+     "type": "object",
+     "required": [
+      "fromStationId",
+      "toStationId",
+      "fare"
+     ],
+     "properties": {
+      "fromStationId": {
+       "$ref": "#/components/schemas/Ulid"
+      },
+      "toStationId": {
+       "$ref": "#/components/schemas/Ulid"
+      },
+      "fare": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "passengerTypes": {
+    "type": "array",
+    "minItems": 1,
+    "maxItems": 10,
+    "items": {
+     "$ref": "#/components/schemas/PassengerType"
+    }
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "Station": {
+  "x-ticvai-persistence": "transport.station",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateStationRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "active"
+    ],
+    "properties": {
+     "id": {
+      "$ref": "#/components/schemas/Ulid"
+     },
+     "active": {
+      "type": "boolean",
+      "default": true
+     }
+    }
+   }
+  ]
+ },
+ "Timetable": {
+  "x-ticvai-persistence": "transport.timetable + transport.timetable_run",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateTimetableRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "routeId",
+     "status"
+    ],
+    "properties": {
+     "id": {
+      "$ref": "#/components/schemas/Ulid"
+     },
+     "routeId": {
+      "$ref": "#/components/schemas/Ulid"
+     },
+     "status": {
+      "$ref": "#/components/schemas/TransportTimetableStatus"
+     },
+     "publishedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true
+     },
+     "releasedThrough": {
+      "type": "string",
+      "format": "date",
+      "nullable": true,
+      "readOnly": true,
+      "description": "The last date whose departures have been generated."
+     },
+     "supersededById": {
+      "type": "string",
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "nullable": true,
+      "readOnly": true
+     }
+    }
+   }
+  ]
+ },
+ "TimetableRun": {
+  "x-ticvai-persistence": "transport.timetable_run",
+  "type": "object",
+  "required": [
+   "departsAt",
+   "days"
+  ],
+  "properties": {
+   "departsAt": {
+    "type": "string",
+    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+    "description": "Venue local time, 24-hour `HH:MM`, at the route's first stop."
+   },
+   "days": {
+    "type": "array",
+    "minItems": 1,
+    "uniqueItems": true,
+    "items": {
+     "type": "string",
+     "enum": [
+      "mon",
+      "tue",
+      "wed",
+      "thu",
+      "fri",
+      "sat",
+      "sun"
+     ]
+    }
+   }
+  }
+ },
+ "TransportDepartureStatus": {
+  "type": "string",
+  "description": "Mirrors the catalogue performance behind the departure, in the words a coach operator uses. `soldOut` is computed from availability, never set.\n",
+  "enum": [
+   "scheduled",
+   "onSale",
+   "soldOut",
+   "departed",
+   "cancelled"
+  ]
+ },
+ "TransportNetworkImport": {
+  "x-ticvai-persistence": "transport.network_import",
+  "type": "object",
+  "required": [
+   "id",
+   "venueId",
+   "format",
+   "sourceRef",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "$ref": "#/components/schemas/Ulid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "format": {
+    "type": "string",
+    "enum": [
+     "csvBundle",
+     "gtfs"
+    ]
+   },
+   "sourceRef": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "assets.MediaAsset"
+   },
+   "status": {
+    "$ref": "#/components/schemas/TransportNetworkImportStatus"
+   },
+   "preview": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "description": "What applying would write. Null until `previewReady`.",
+    "properties": {
+     "stationsToCreate": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "stationsToUpdate": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "routesToCreate": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "routesToUpdate": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "stopsToWrite": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "timetablesToCreate": {
+      "type": "integer",
+      "minimum": 0
+     }
+    }
+   },
+   "findings": {
+    "type": "array",
+    "readOnly": true,
+    "maxItems": 1000,
+    "items": {
+     "$ref": "#/components/schemas/TransportNetworkImportFinding"
+    }
+   },
+   "createdBy": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "appliedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "appliedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   }
+  }
+ },
+ "TransportNetworkImportFinding": {
+  "x-ticvai-persistence": "none — stored as jsonb on transport.network_import.findings",
+  "type": "object",
+  "required": [
+   "code",
+   "severity",
+   "message"
+  ],
+  "properties": {
+   "code": {
+    "type": "string",
+    "enum": [
+     "nothingFound",
+     "fileMissing",
+     "headerMismatch",
+     "stationCodeDuplicate",
+     "stationCoordinatesMissing",
+     "routeCodeDuplicate",
+     "routeStopUnknownStation",
+     "routeOffsetsNotIncreasing",
+     "routePairUnknown",
+     "routeActiveStopsChanged",
+     "timetableRouteUnknown",
+     "timetableTimeInvalid",
+     "timetableDatesInvalid",
+     "gtfsCalendarUnsupported"
+    ],
+    "description": "`stationCoordinatesMissing` is a warning (the station is listed and left off the map); `routeActiveStopsChanged` is a warning (those stops are skipped); every other code is an error and blocks the apply.\n"
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "error",
+     "warning"
+    ]
+   },
+   "file": {
+    "type": "string",
+    "nullable": true,
+    "description": "e.g. `route_stops.csv` or `stop_times.txt`."
+   },
+   "row": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true
+   },
+   "reference": {
+    "type": "string",
+    "nullable": true,
+    "description": "The station",
+    "route or timetable code concerned.": null
+   },
+   "message": {
+    "type": "string",
+    "maxLength": 500
+   }
+  }
+ },
+ "TransportNetworkImportStatus": {
+  "type": "string",
+  "description": "`validating` → `previewReady` or `failed`; `previewReady` → `applied`, or `expired` after 7 days unapplied (proposed, client to correct). States in `states/transport-network-import.yaml` (rev 3 REV3-21).\n",
+  "enum": [
+   "validating",
+   "previewReady",
+   "failed",
+   "applied",
+   "expired"
+  ]
+ },
+ "TransportRoute": {
+  "x-ticvai-persistence": "transport.route + transport.route_stop",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateTransportRouteRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "status"
+    ],
+    "properties": {
+     "id": {
+      "$ref": "#/components/schemas/Ulid"
+     },
+     "status": {
+      "$ref": "#/components/schemas/TransportRouteStatus"
+     },
+     "stops": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/RouteStop"
+      }
+     },
+     "totalMinutes": {
+      "type": "integer",
+      "readOnly": true,
+      "description": "The last stop's offset."
+     },
+     "catalogueEventId": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "The catalogue event its departures are performances of. Created with the route."
+     },
+     "catalogueProductId": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "The one-way trip product (kind `timedAdmission`); one variant per passenger type. Created with the route.\n"
+     }
+    }
+   }
+  ]
+ },
+ "TransportRouteStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "active",
+   "suspended",
+   "retired"
+  ]
+ },
+ "TransportTimetableStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "published",
+   "superseded",
+   "withdrawn"
+  ]
+ },
+ "Ulid": {
+  "type": "string",
+  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+ },
+ "UploadTicket": {
+  "x-ticvai-persistence": "assets.media_upload",
+  "type": "object",
+  "required": [
+   "uploadId",
+   "uploadUrl",
+   "method",
+   "expiresAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "uploadId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "uploadUrl": {
+    "type": "string",
+    "description": "Signed. PUT the file here, then confirm with `/complete`."
+   },
+   "method": {
+    "type": "string",
+    "enum": [
+     "PUT",
+     "POST"
+    ]
+   },
+   "headers": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "maxSizeBytes": {
+    "type": "integer"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "filename": {
+    "type": "string"
+   },
+   "contentType": {
+    "type": "string"
+   },
+   "sizeBytes": {
+    "type": "integer"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The asset this upload became — created by `completeUpload`, or the asset whose file `replaceMediaAsset` swapped. Null while the transfer is outstanding.\n"
+   }
+  }
+ }
+}

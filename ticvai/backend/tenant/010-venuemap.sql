@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS venuemap.path (
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS venuemap.placed_resource (
     id                                uuid PRIMARY KEY NOT NULL,
     map_id                            uuid NOT NULL,
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS venuemap.placed_resource (
 
 -- What a venue places on the map (19.2.57–19.2.60) — rides, restaurants, toilets, exits.
 -- emergencyExit is separate from exit on purpose. Hangs off: reaches venuemap.map through its
--- keys; references access.access_point, catalogue.product, platform.outlet. Reached by: 14
+-- keys; references access.access_point, catalogue.product, platform.outlet. Reached by: 16
 -- operations read it and 4 write it; 3 tables reference it.
 CREATE TABLE IF NOT EXISTS venuemap.point (
     id                                uuid PRIMARY KEY NOT NULL,

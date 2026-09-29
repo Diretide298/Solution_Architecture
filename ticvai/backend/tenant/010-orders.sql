@@ -1,5 +1,89 @@
--- orders — 59 tables
+-- orders — 78 tables
 -- **Derived. Do not hand-edit.**
+
+-- Holds 33 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.after_sale_policy (
+    id                                uuid PRIMARY KEY NOT NULL,
+    name                              text CONSTRAINT after_sale_policy_name_chk CHECK (char_length(name) <= 150),
+    product_id                        uuid,
+    event_id                          uuid,
+    performance_id                    uuid,
+    channel                           text CONSTRAINT after_sale_policy_channel_chk CHECK (char_length(channel) <= 40),
+    customer_segment_id               uuid,
+    permitted_modifications           text[],
+    eligible_ticket_statuses          text[],
+    maximum_amendments_per_order      integer,
+    maximum_amendments_per_ticket     integer,
+    maximum_date_changes              integer,
+    cooling_period_hours              integer,
+    permitted_cancellation_scopes     text[],
+    evaluated_conditions              text[],
+    cancellation_reason_codes         text[],
+    void_types                        text[],
+    void_same_business_day_only       boolean DEFAULT true,
+    void_before_settlement_only       boolean DEFAULT true,
+    void_before_ticket_use_only       boolean DEFAULT true,
+    void_before_fiscal_closure_only   boolean DEFAULT true,
+    is_void_supervisor_required       boolean DEFAULT true,
+    void_dual_authorisation           boolean DEFAULT false,
+    void_channels                     text[],
+    void_reason_codes                 text[],
+    maximum_reissues                  integer,
+    free_reissue_count                integer DEFAULT 0,
+    reissue_supervisor_threshold      integer,
+    default_reissue_option            text DEFAULT 'regenerateNew' CONSTRAINT after_sale_policy_default_reissue_option_chk CHECK (default_reissue_option IN ('regenerateNew', 'resendExisting')),
+    is_active                         boolean NOT NULL,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.after_sale_policy_window (
+    after_sale_policy_id              uuid NOT NULL,
+    min_hours_before                  integer NOT NULL,
+    max_hours_before                  integer,
+    outcome                           text NOT NULL,
+    fee_percent                       numeric(18,4),
+    fee_amount                        numeric(18,4),
+    is_supervisor_exception_allowed   boolean,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 28 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.after_sale_request (
+    id                                uuid PRIMARY KEY NOT NULL,
+    number                            text CONSTRAINT after_sale_request_number_chk CHECK (char_length(number) <= 50),
+    order_id                          text NOT NULL,
+    order_line_id                     text,
+    reservation_id                    uuid,
+    group_booking_id                  uuid,
+    request_type                      text NOT NULL CONSTRAINT after_sale_request_request_type_chk CHECK (request_type IN ('orderAmendment', 'reservationAmendment', 'dateChange', 'timeslotChange', 'performanceChange', 'quantityChange', 'attendeeChange', 'seatChange', 'deliveryChange', 'cancellation', 'partialCancellation', 'void', 'reissue', 'serviceRecoveryException')),
+    channel                           text CONSTRAINT after_sale_request_channel_chk CHECK (char_length(channel) <= 40),
+    reason_code                       text CONSTRAINT after_sale_request_reason_code_chk CHECK (char_length(reason_code) <= 40),
+    reason                            text CONSTRAINT after_sale_request_reason_chk CHECK (char_length(reason) <= 1000),
+    before                            jsonb,
+    after                             jsonb,
+    after_sale_policy_id              uuid,
+    policy_result                     text CONSTRAINT after_sale_request_policy_result_chk CHECK (char_length(policy_result) <= 200),
+    requested_exception               text CONSTRAINT after_sale_request_requested_exception_chk CHECK (char_length(requested_exception) <= 1000),
+    remedy                            text CONSTRAINT after_sale_request_remedy_chk CHECK (remedy IN ('complimentaryReissue', 'feeWaiver', 'partialRefund', 'voucher', 'walletCredit', 'alternativeDate', 'alternativeEvent', 'complimentaryAddOn')),
+    financial_impact                  numeric(18,4),
+    refund_id                         uuid,
+    status                            text NOT NULL CONSTRAINT after_sale_request_status_chk CHECK (status IN ('requested', 'pendingApproval', 'approved', 'rejected', 'completed', 'failed')),
+    escalated_at                      timestamptz,
+    requested_by_principal_id         uuid,
+    decided_by_principal_id           uuid,
+    decided_at                        timestamptz,
+    decision_comment                  text CONSTRAINT after_sale_request_decision_comment_chk CHECK (char_length(decision_comment) <= 1000),
+    failure_reason                    text CONSTRAINT after_sale_request_failure_reason_chk CHECK (char_length(failure_reason) <= 500),
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    completed_at                      timestamptz
+);
 
 -- A partner’s credit line, drawn against and settled periodically
 CREATE TABLE IF NOT EXISTS orders.b2b_credit (
@@ -19,7 +103,7 @@ CREATE TABLE IF NOT EXISTS orders.b2b_credit (
 
 -- A cart holds leases; an order holds money. Retained after expiry so a recovery link lands on
 -- something Hangs off: reaches orders.sales_order through its keys; references pii.subject,
--- platform.scope. Reached by: 16 operations read it and 7 write it; 4 tables reference it; written
+-- platform.scope. Reached by: 23 operations read it and 7 write it; 4 tables reference it; written
 -- by 2 contracts — marketing-crm, orders.
 CREATE TABLE IF NOT EXISTS orders.cart (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -44,8 +128,8 @@ CREATE TABLE IF NOT EXISTS orders.cart (
 
 -- One line, with the lease that holds its capacity. Null lease for a product with no capacity
 -- Hangs off: a child of orders.cart; reaches orders.sales_order through its keys; references
--- catalogue.inventory_hold, catalogue.performance, catalogue.variant. Reached by: 10 operations
--- read it and 4 write it; 3 tables reference it.
+-- catalogue.inventory_hold, catalogue.performance, catalogue.variant. Reached by: 11 operations
+-- read it and 4 write it; 4 tables reference it.
 CREATE TABLE IF NOT EXISTS orders.cart_line (
     id                                uuid PRIMARY KEY NOT NULL,
     variant_id                        uuid NOT NULL,
@@ -217,7 +301,7 @@ CREATE TABLE IF NOT EXISTS orders.deposit_policy (
 );
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it; 1 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS orders.deposit_policy (dining_* columns) (
     is_enabled                        boolean DEFAULT false,
     basis                             text DEFAULT 'fixedPerGuest' CONSTRAINT deposit_policy (dining_* columns)_basis_chk CHECK (basis IN ('fixedPerGuest', 'fixedPerTable', 'percentOfMinimumSpend')),
@@ -245,6 +329,31 @@ CREATE TABLE IF NOT EXISTS orders.discount (
     value                             numeric(18,4),
     applied_amount                    numeric(18,4) NOT NULL,
     reason                            text CONSTRAINT discount_reason_chk CHECK (char_length(reason) <= 500),
+    created_at                        timestamptz NOT NULL
+);
+
+-- Holds 20 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.external_reference_mapping (
+    id                                uuid PRIMARY KEY NOT NULL,
+    order_id                          text NOT NULL,
+    payment_id                        uuid,
+    refund_id                         uuid,
+    source_system                     text NOT NULL CONSTRAINT external_reference_mapping_source_system_chk CHECK (source_system IN ('paymentGateways', 'acquirers', 'banks', 'posTerminals', 'b2bPartners', 'resellers', 'otas', 'erp', 'financeSystems', 'walletProviders')),
+    provider                          text CONSTRAINT external_reference_mapping_provider_chk CHECK (char_length(provider) <= 60),
+    merchant_id                       text CONSTRAINT external_reference_mapping_merchant_id_chk CHECK (char_length(merchant_id) <= 60),
+    external_transaction_id           text CONSTRAINT external_reference_mapping_external_transaction_id_chk CHECK (char_length(external_transaction_id) <= 100),
+    authorization_code                text CONSTRAINT external_reference_mapping_authorization_code_chk CHECK (char_length(authorization_code) <= 40),
+    partner_order_id                  text CONSTRAINT external_reference_mapping_partner_order_id_chk CHECK (char_length(partner_order_id) <= 100),
+    settlement_batch                  text CONSTRAINT external_reference_mapping_settlement_batch_chk CHECK (char_length(settlement_batch) <= 100),
+    settlement_date                   date,
+    erp_reference                     text CONSTRAINT external_reference_mapping_erp_reference_chk CHECK (char_length(erp_reference) <= 100),
+    amount                            numeric(18,4),
+    is_manual                         boolean DEFAULT false,
+    reason                            text CONSTRAINT external_reference_mapping_reason_chk CHECK (char_length(reason) <= 500),
+    approval_reference                text CONSTRAINT external_reference_mapping_approval_reference_chk CHECK (char_length(approval_reference) <= 100),
+    created_by_principal_id           uuid,
+    scope_path                        ltree NOT NULL,
     created_at                        timestamptz NOT NULL
 );
 
@@ -287,7 +396,7 @@ CREATE TABLE IF NOT EXISTS orders.group_booking (
 );
 
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 0 write it; 1 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS orders.group_customer_organization (
     id                                uuid PRIMARY KEY NOT NULL,
     name                              text NOT NULL CONSTRAINT group_customer_organization_name_chk CHECK (char_length(name) <= 200),
@@ -309,7 +418,7 @@ CREATE TABLE IF NOT EXISTS orders.group_customer_organization_contact (
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 0 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS orders.group_enquiry (
     id                                uuid PRIMARY KEY NOT NULL,
     source                            text NOT NULL CONSTRAINT group_enquiry_source_chk CHECK (source IN ('website', 'salesTeam', 'campaign', 'existingCustomer', 'partner', 'manualEntry')),
@@ -318,6 +427,12 @@ CREATE TABLE IF NOT EXISTS orders.group_enquiry (
     group_size                        integer NOT NULL,
     preferred_dates                   text[],
     requirements                      text CONSTRAINT group_enquiry_requirements_chk CHECK (char_length(requirements) <= 2000),
+    sales_owner_principal_id          uuid,
+    priority                          text CONSTRAINT group_enquiry_priority_chk CHECK (priority IN ('low', 'normal', 'high')),
+    expected_value                    numeric(18,4),
+    probability                       integer,
+    expected_close_date               date,
+    next_action_at                    timestamptz,
     created_by                        uuid,
     created_at                        timestamptz NOT NULL
 );
@@ -335,7 +450,7 @@ CREATE TABLE IF NOT EXISTS orders.group_participant (
 );
 
 -- Holds 5 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 0 write it; 1 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS orders.group_participant_list (
     group_booking_id                  uuid NOT NULL,
     source                            text NOT NULL CONSTRAINT group_participant_list_source_chk CHECK (source IN ('manualEntry', 'csvExcelImport', 'customerUpload', 'api')),
@@ -356,7 +471,7 @@ CREATE TABLE IF NOT EXISTS orders.group_payment_milestone (
 );
 
 -- Holds 5 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 0 write it; 1 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS orders.group_payment_schedule (
     group_booking_id                  uuid NOT NULL,
     schedule_type                     text NOT NULL CONSTRAINT group_payment_schedule_schedule_type_chk CHECK (schedule_type IN ('depositThenBalance', 'milestonePayment', 'finalBalance', 'customSchedule')),
@@ -365,8 +480,89 @@ CREATE TABLE IF NOT EXISTS orders.group_payment_schedule (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
+-- Holds 40 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.group_quote (
+    id                                uuid PRIMARY KEY NOT NULL,
+    quote_number                      text NOT NULL CONSTRAINT group_quote_quote_number_chk CHECK (char_length(quote_number) <= 50),
+    version                           integer NOT NULL,
+    enquiry_id                        uuid NOT NULL,
+    organisation_id                   uuid,
+    contact_id                        uuid,
+    sales_owner_principal_id          uuid,
+    package_name                      text CONSTRAINT group_quote_package_name_chk CHECK (char_length(package_name) <= 150),
+    template                          text CONSTRAINT group_quote_template_chk CHECK (template IN ('schoolPackage', 'corporatePackage', 'birthdayPackage', 'vipGroupPackage', 'conferencePackage')),
+    group_package_id                  uuid,
+    component_types                   text[],
+    quote_date                        date,
+    valid_until                       date,
+    visit_date                        date,
+    guest_count                       integer NOT NULL,
+    guest_count_deadline              timestamptz,
+    standard_total                    numeric(18,4),
+    total                             numeric(18,4),
+    deposit_requirement               numeric(18,4),
+    payment_schedule_type             text CONSTRAINT group_quote_payment_schedule_type_chk CHECK (payment_schedule_type IN ('depositThenBalance', 'milestonePayment', 'finalBalance', 'customSchedule')),
+    cancellation_policy               text CONSTRAINT group_quote_cancellation_policy_chk CHECK (char_length(cancellation_policy) <= 2000),
+    amendment_conditions              text CONSTRAINT group_quote_amendment_conditions_chk CHECK (char_length(amendment_conditions) <= 2000),
+    operational_terms                 text CONSTRAINT group_quote_operational_terms_chk CHECK (char_length(operational_terms) <= 2000),
+    delivery_formats                  text[],
+    customer_request                  text CONSTRAINT group_quote_customer_request_chk CHECK (char_length(customer_request) <= 2000),
+    internal_response                 text CONSTRAINT group_quote_internal_response_chk CHECK (char_length(internal_response) <= 2000),
+    status                            text NOT NULL CONSTRAINT group_quote_status_chk CHECK (status IN ('draft', 'sent', 'superseded', 'accepted', 'rejected', 'expired')),
+    discount_approval                 text NOT NULL DEFAULT 'notRequired' CONSTRAINT group_quote_discount_approval_chk CHECK (discount_approval IN ('notRequired', 'pending', 'approved', 'rejected', 'returnedForChange')),
+    discount_percent                  numeric(18,4),
+    discount_reason                   text CONSTRAINT group_quote_discount_reason_chk CHECK (char_length(discount_reason) <= 1000),
+    discount_decided_by_principal_id  uuid,
+    discount_decided_at               timestamptz,
+    discount_decision_comment         text CONSTRAINT group_quote_discount_decision_comment_chk CHECK (char_length(discount_decision_comment) <= 1000),
+    group_booking_id                  uuid,
+    sent_at                           timestamptz,
+    responded_at                      timestamptz,
+    created_by_principal_id           uuid,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
+-- Holds 13 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.group_quote_line (
+    group_quote_id                    uuid NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
+    product_id                        uuid,
+    component_type                    text,
+    description                       text NOT NULL,
+    quantity                          integer NOT NULL,
+    is_complimentary                  boolean,
+    standard_rate                     numeric(18,4) NOT NULL,
+    group_rate                        numeric(18,4) NOT NULL,
+    discount                          numeric(18,4),
+    tax                               numeric(18,4),
+    fee                               numeric(18,4),
+    total                             numeric(18,4)
+);
+
+-- Holds 13 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.group_task (
+    id                                uuid PRIMARY KEY NOT NULL,
+    group_booking_id                  uuid NOT NULL,
+    department                        text NOT NULL CONSTRAINT group_task_department_chk CHECK (char_length(department) <= 60),
+    task                              text NOT NULL CONSTRAINT group_task_task_chk CHECK (char_length(task) <= 300),
+    owner_principal_id                uuid,
+    due_at                            timestamptz,
+    priority                          text DEFAULT 'normal' CONSTRAINT group_task_priority_chk CHECK (priority IN ('low', 'normal', 'high', 'critical')),
+    depends_on_task_id                uuid,
+    status                            text NOT NULL CONSTRAINT group_task_status_chk CHECK (status IN ('open', 'inProgress', 'done', 'cancelled')),
+    notes                             text CONSTRAINT group_task_notes_chk CHECK (char_length(notes) <= 2000),
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 1 write it; 1 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS orders.group_ticket_allocation (
     group_booking_id                  uuid NOT NULL,
     allocation_mode                   text NOT NULL CONSTRAINT group_ticket_allocation_allocation_mode_chk CHECK (allocation_mode IN ('individualTicket', 'bulkTicket', 'namedTicket', 'quantityBasedTicket', 'zoneAllocation')),
@@ -388,7 +584,7 @@ CREATE TABLE IF NOT EXISTS orders.group_ticket_allocation_line (
 );
 
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 0 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS orders.group_ticket_fulfillment (
     group_booking_id                  uuid NOT NULL,
     method                            text NOT NULL CONSTRAINT group_ticket_fulfillment_method_chk CHECK (method IN ('email', 'sms', 'wallet', 'bulkPdf', 'posPrint', 'physicalCollection')),
@@ -397,6 +593,38 @@ CREATE TABLE IF NOT EXISTS orders.group_ticket_fulfillment (
     released_at                       timestamptz,
     updated_at                        timestamptz,
     id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 27 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.group_visit_plan (
+    id                                uuid PRIMARY KEY NOT NULL,
+    group_booking_id                  uuid NOT NULL,
+    arrival_at                        timestamptz,
+    arrival_location                  text CONSTRAINT group_visit_plan_arrival_location_chk CHECK (char_length(arrival_location) <= 200),
+    meeting_point                     text CONSTRAINT group_visit_plan_meeting_point_chk CHECK (char_length(meeting_point) <= 200),
+    entry_gate_id                     uuid,
+    departure_at                      timestamptz,
+    group_leaders                     text CONSTRAINT group_visit_plan_group_leaders_chk CHECK (char_length(group_leaders) <= 500),
+    contact_id                        uuid,
+    ticketing_method                  text CONSTRAINT group_visit_plan_ticketing_method_chk CHECK (char_length(ticketing_method) <= 60),
+    requirements                      jsonb,
+    operational_owner_principal_id    uuid,
+    handover_notes                    text CONSTRAINT group_visit_plan_handover_notes_chk CHECK (char_length(handover_notes) <= 4000),
+    handover_attachment_ids           text[],
+    handover_acknowledged_by_principal_id uuid,
+    handover_acknowledged_at          timestamptz,
+    check_in_status                   text NOT NULL DEFAULT 'expected' CONSTRAINT group_visit_plan_check_in_status_chk CHECK (check_in_status IN ('expected', 'partiallyArrived', 'arrived', 'noShow')),
+    actual_arrival_at                 timestamptz,
+    arrival_gate_id                   uuid,
+    arrived_count                     integer DEFAULT 0,
+    additional_guests                 integer DEFAULT 0,
+    staff_leaders_count               integer DEFAULT 0,
+    check_in_issues                   text[],
+    checked_in_by_principal_id        uuid,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
 );
 
 -- A complimentary entitlement issued outside the order path (8.1.3–8.1.5). No payment is expected,
@@ -433,7 +661,7 @@ CREATE TABLE IF NOT EXISTS orders.invitation_allowance (
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 0 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS orders.member_exception (
     id                                uuid PRIMARY KEY NOT NULL,
     membership_id                     uuid NOT NULL,
@@ -449,7 +677,7 @@ CREATE TABLE IF NOT EXISTS orders.member_exception (
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 0 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS orders.membership_activation_action (
     id                                uuid PRIMARY KEY NOT NULL,
     membership_id                     uuid NOT NULL,
@@ -464,7 +692,7 @@ CREATE TABLE IF NOT EXISTS orders.membership_activation_action (
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 0 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS orders.membership_migration (
     id                                uuid PRIMARY KEY NOT NULL,
     membership_id                     uuid NOT NULL,
@@ -508,6 +736,27 @@ CREATE TABLE IF NOT EXISTS orders.no_sale_event (
     principal_id                      uuid NOT NULL,
     recorded_at                       timestamptz NOT NULL,
     count_this_shift                  integer
+);
+
+-- Holds 16 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.order_event (
+    id                                uuid PRIMARY KEY NOT NULL,
+    order_id                          text NOT NULL,
+    reservation_id                    uuid,
+    event_type                        text NOT NULL CONSTRAINT order_event_event_type_chk CHECK (char_length(event_type) <= 60),
+    previous_state                    text CONSTRAINT order_event_previous_state_chk CHECK (char_length(previous_state) <= 40),
+    new_state                         text CONSTRAINT order_event_new_state_chk CHECK (char_length(new_state) <= 40),
+    channel                           text CONSTRAINT order_event_channel_chk CHECK (char_length(channel) <= 40),
+    actor_principal_id                uuid,
+    actor_system                      text CONSTRAINT order_event_actor_system_chk CHECK (char_length(actor_system) <= 60),
+    related_entity_type               text CONSTRAINT order_event_related_entity_type_chk CHECK (char_length(related_entity_type) <= 40),
+    related_entity_id                 text CONSTRAINT order_event_related_entity_id_chk CHECK (char_length(related_entity_id) <= 40),
+    correlation_id                    text CONSTRAINT order_event_correlation_id_chk CHECK (char_length(correlation_id) <= 100),
+    result                            text CONSTRAINT order_event_result_chk CHECK (char_length(result) <= 200),
+    exception_type                    text CONSTRAINT order_event_exception_type_chk CHECK (exception_type IN ('stuckOrder', 'orphanReservation', 'paymentOrderMismatch', 'capacityMismatch', 'missingCustomerData', 'fulfillmentFailure', 'externalSynchronizationFailure')),
+    scope_path                        ltree NOT NULL,
+    occurred_at                       timestamptz NOT NULL
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
@@ -569,6 +818,38 @@ CREATE TABLE IF NOT EXISTS orders.order_line_eligibility (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.order_relationship (
+    id                                uuid PRIMARY KEY NOT NULL,
+    order_id                          text NOT NULL,
+    related_order_id                  text NOT NULL,
+    relationship_type                 text NOT NULL CONSTRAINT order_relationship_relationship_type_chk CHECK (relationship_type IN ('parentOrder', 'childOrder', 'mergedInto', 'replacementOrder', 'amendedFrom', 'convertedFrom', 'reissuedFrom')),
+    split_basis                       text CONSTRAINT order_relationship_split_basis_chk CHECK (split_basis IN ('ticket', 'attendee', 'product', 'orderLine', 'paymentResponsibility', 'department', 'corporateCostCenter', 'customer')),
+    amount                            numeric(18,4),
+    after_sale_request_id             uuid,
+    created_by_principal_id           uuid,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz NOT NULL
+);
+
+-- Holds 12 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.order_source_channel (
+    id                                uuid PRIMARY KEY NOT NULL,
+    source                            text NOT NULL CONSTRAINT order_source_channel_source_chk CHECK (source IN ('b2cWeb', 'mobileApp', 'pos', 'mobileFlyingPos', 'kiosk', 'callCenter', 'boxOffice', 'b2bPortal', 'reseller', 'ota', 'api', 'administrativeBackend')),
+    sub_channel                       text CONSTRAINT order_source_channel_sub_channel_chk CHECK (char_length(sub_channel) <= 60),
+    channel_prefix                    text CONSTRAINT order_source_channel_channel_prefix_chk CHECK (char_length(channel_prefix) <= 10),
+    numbering_rule                    text NOT NULL CONSTRAINT order_source_channel_numbering_rule_chk CHECK (numbering_rule IN ('globalSequence', 'tenantSequence', 'venueSequence', 'yearMonthPrefix', 'customPattern')),
+    numbering_pattern                 text CONSTRAINT order_source_channel_numbering_pattern_chk CHECK (char_length(numbering_pattern) <= 60),
+    partner_reference_type            text CONSTRAINT order_source_channel_partner_reference_type_chk CHECK (partner_reference_type IN ('otaBookingReference', 'resellerOrderId', 'erpReference', 'externalCrmReference')),
+    holds_inventory                   boolean DEFAULT true,
+    is_active                         boolean NOT NULL,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
 -- A tender against an order, with the rate it converted at fixed on the row (CF-37). A payment
 -- reconciled next month is reconciled at the rate of the day it was taken
 CREATE TABLE IF NOT EXISTS orders.payment (
@@ -590,11 +871,27 @@ CREATE TABLE IF NOT EXISTS orders.payment (
     synced_at                         timestamptz
 );
 
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.payment_allocation_rule (
+    id                                uuid PRIMARY KEY NOT NULL,
+    channel                           text CONSTRAINT payment_allocation_rule_channel_chk CHECK (char_length(channel) <= 40),
+    terminal_id                       uuid,
+    product_id                        uuid,
+    order_type                        text CONSTRAINT payment_allocation_rule_order_type_chk CHECK (char_length(order_type) <= 40),
+    customer_type                     text CONSTRAINT payment_allocation_rule_customer_type_chk CHECK (char_length(customer_type) <= 40),
+    allocation_level                  text NOT NULL CONSTRAINT payment_allocation_rule_allocation_level_chk CHECK (allocation_level IN ('orderLevel', 'orderLineLevel', 'productLevel', 'taxFeeComponent', 'specificTicket', 'deposit')),
+    is_active                         boolean NOT NULL,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
 -- A link a guest opens to pay for a booking taken at a till (BL-072). The link is the credential —
 -- a guest holding one is anonymous, and a phone booking is exactly the case where they have not
 -- registered. The expiry releases the hold, not just the link. Hangs off: reaches
 -- orders.sales_order through its keys; references identity.principal, orders.reservation,
--- orders.sales_order. Reached by: 4 operati
+-- orders.sales_order. Reached by: 9 operati
 CREATE TABLE IF NOT EXISTS orders.payment_link (
     id                                uuid PRIMARY KEY NOT NULL,
     order_id                          text NOT NULL,
@@ -613,7 +910,8 @@ CREATE TABLE IF NOT EXISTS orders.payment_link (
 );
 
 -- tips post to a liability, not to sales Hangs off: a child of orders.payment; reaches
--- orders.sales_order through its keys; references orders.payment.
+-- orders.sales_order through its keys; references orders.payment. Reached by: 1 operations read it
+-- and 0 write it.
 CREATE TABLE IF NOT EXISTS orders.payment_tip (
     id                                uuid PRIMARY KEY NOT NULL,
     payment_id                        text NOT NULL
@@ -712,7 +1010,7 @@ CREATE TABLE IF NOT EXISTS orders.refund_batch (
 );
 
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 0 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS orders.refund_calculation_policy (
     id                                uuid PRIMARY KEY,
     refund_types                      text[] NOT NULL,
@@ -742,6 +1040,34 @@ CREATE TABLE IF NOT EXISTS orders.refund_policy_time_band (
     hours_before                      integer NOT NULL,
     percentage                        numeric(18,4) NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 23 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.resale_eligibility_rule (
+    id                                uuid PRIMARY KEY NOT NULL,
+    product_id                        uuid,
+    event_id                          uuid,
+    performance_id                    uuid,
+    ticket_type                       text CONSTRAINT resale_eligibility_rule_ticket_type_chk CHECK (char_length(ticket_type) <= 40),
+    sales_channel                     text CONSTRAINT resale_eligibility_rule_sales_channel_chk CHECK (char_length(sales_channel) <= 40),
+    customer_segment_id               uuid,
+    is_resale_allowed                 boolean NOT NULL,
+    required_conditions               text[],
+    resale_opens_at                   timestamptz,
+    resale_closes_at                  timestamptz,
+    blackout_from                     timestamptz,
+    blackout_to                       timestamptz,
+    minimum_ownership_hours           integer,
+    resale_immediately_after_purchase boolean DEFAULT false,
+    maximum_resale_attempts           integer,
+    maximum_listings_per_customer     integer,
+    is_identity_verification_required boolean DEFAULT false,
+    original_purchaser_only           boolean DEFAULT false,
+    is_active                         boolean NOT NULL,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
 );
 
 -- What a resale costs and how high it may be priced. orders.resale_listing stored
@@ -775,11 +1101,96 @@ CREATE TABLE IF NOT EXISTS orders.resale_listing (
     price_cap_percent                 numeric(18,4),
     seller_fee_percent                numeric(18,4),
     buyer_fee_percent                 numeric(18,4),
-    status                            text NOT NULL CONSTRAINT resale_listing_status_chk CHECK (status IN ('listed', 'reserved', 'sold', 'withdrawn', 'expired')),
+    status                            text NOT NULL CONSTRAINT resale_listing_status_chk CHECK (status IN ('pendingReview', 'listed', 'reserved', 'sold', 'withdrawn', 'expired', 'rejected')),
     listed_at                         timestamptz,
     sold_to_subject_id                uuid,
+    review_reasons                    text[],
+    moderated_by_principal_id         uuid,
+    moderated_at                      timestamptz,
+    moderation_reason                 text CONSTRAINT resale_listing_moderation_reason_chk CHECK (char_length(moderation_reason) <= 1000),
     payout_status                     text CONSTRAINT resale_listing_payout_status_chk CHECK (payout_status IN ('pending', 'held', 'paid', 'failed')),
     scope_path                        ltree NOT NULL
+);
+
+-- Holds 35 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.resale_marketplace_config (
+    id                                uuid PRIMARY KEY NOT NULL,
+    marketplace_name                  text NOT NULL CONSTRAINT resale_marketplace_config_marketplace_name_chk CHECK (char_length(marketplace_name) <= 150),
+    pricing_mode                      text NOT NULL CONSTRAINT resale_marketplace_config_pricing_mode_chk CHECK (pricing_mode IN ('faceValueOnly', 'fixedPrice', 'sellerSelectedPrice', 'cappedPrice', 'operatorControlled', 'aiRecommendedPrice')),
+    maximum_discount_percent          numeric(18,4),
+    seller_can_edit_price             boolean DEFAULT true,
+    maximum_price_changes             integer,
+    minimum_minutes_between_price_changes integer,
+    moderation_mode                   text NOT NULL DEFAULT 'automatic' CONSTRAINT resale_marketplace_config_moderation_mode_chk CHECK (moderation_mode IN ('automatic', 'riskBased', 'manual')),
+    review_triggers                   text[],
+    expiry_rule                       text DEFAULT 'atEventStart' CONSTRAINT resale_marketplace_config_expiry_rule_chk CHECK (expiry_rule IN ('xMinutesBeforeEvent', 'xHoursBeforeEvent', 'atEventStart', 'atConfiguredDate')),
+    expiry_offset                     integer,
+    withdrawal_policy                 text DEFAULT 'sellerCannotWithdrawWhileReserved' CONSTRAINT resale_marketplace_config_withdrawal_policy_chk CHECK (withdrawal_policy IN ('sellerCanWithdrawAnytime', 'sellerCannotWithdrawWhileReserved')),
+    maximum_withdrawals               integer,
+    cancellation_fee                  numeric(18,4),
+    checkout_hold_minutes             integer DEFAULT 10,
+    is_buyer_identity_verification_required boolean DEFAULT false,
+    settlement_timing                 text DEFAULT 'afterAccessValidation' CONSTRAINT resale_marketplace_config_settlement_timing_chk CHECK (settlement_timing IN ('immediatelyAfterResale', 'xDaysAfterResale', 'afterEventCompletion', 'xDaysAfterEvent', 'afterAccessValidation', 'operatorDefinedSettlementCycle')),
+    settlement_delay_days             integer,
+    minimum_payout_threshold          numeric(18,4),
+    customer_terms                    text CONSTRAINT resale_marketplace_config_customer_terms_chk CHECK (char_length(customer_terms) <= 20000),
+    seller_terms                      text CONSTRAINT resale_marketplace_config_seller_terms_chk CHECK (char_length(seller_terms) <= 20000),
+    buyer_terms                       text CONSTRAINT resale_marketplace_config_buyer_terms_chk CHECK (char_length(buyer_terms) <= 20000),
+    terms_version                     text CONSTRAINT resale_marketplace_config_terms_version_chk CHECK (char_length(terms_version) <= 20),
+    disclosures                       text CONSTRAINT resale_marketplace_config_disclosures_chk CHECK (char_length(disclosures) <= 4000),
+    resale_ticket_label               text CONSTRAINT resale_marketplace_config_resale_ticket_label_chk CHECK (char_length(resale_ticket_label) <= 60),
+    deployment_model                  text DEFAULT 'ticvaiHostedWhiteLabel' CONSTRAINT resale_marketplace_config_deployment_model_chk CHECK (deployment_model IN ('embeddedWhiteLabel', 'ticvaiHostedWhiteLabel', 'headlessApi')),
+    navigation                        text[],
+    authentication_method             text DEFAULT 'customerAccount' CONSTRAINT resale_marketplace_config_authentication_method_chk CHECK (authentication_method IN ('customerAccount', 'sso', 'passwordlessLogin', 'otp', 'appAuthentication')),
+    branding                          jsonb,
+    domain                            text CONSTRAINT resale_marketplace_config_domain_chk CHECK (char_length(domain) <= 253),
+    languages                         text[],
+    is_active                         boolean NOT NULL,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
+-- Holds 12 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.resale_recommendation (
+    id                                uuid PRIMARY KEY NOT NULL,
+    recommendation_type               text NOT NULL CONSTRAINT resale_recommendation_recommendation_type_chk CHECK (recommendation_type IN ('pricing', 'demandPrediction', 'listing', 'sellerRisk', 'expiry', 'marketplaceOptimisation', 'anomaly')),
+    event_id                          uuid,
+    resale_listing_id                 uuid,
+    recommendation                    text NOT NULL CONSTRAINT resale_recommendation_recommendation_chk CHECK (char_length(recommendation) <= 2000),
+    recommended_value                 jsonb,
+    decision                          text CONSTRAINT resale_recommendation_decision_chk CHECK (decision IN ('accept', 'modify', 'ignore')),
+    applied_value                     jsonb,
+    decided_by_principal_id           uuid,
+    decided_at                        timestamptz,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz NOT NULL
+);
+
+-- Holds 19 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.resale_settlement (
+    id                                uuid PRIMARY KEY NOT NULL,
+    resale_listing_id                 uuid NOT NULL,
+    seller_subject_id                 uuid NOT NULL,
+    listing_price                     numeric(18,4) NOT NULL,
+    seller_fee                        numeric(18,4) NOT NULL,
+    processing_fee                    numeric(18,4),
+    tax                               numeric(18,4),
+    adjustments                       numeric(18,4),
+    seller_proceeds                   numeric(18,4) NOT NULL,
+    payout_method                     text CONSTRAINT resale_settlement_payout_method_chk CHECK (payout_method IN ('originalPaymentMethod', 'bankTransfer', 'wallet')),
+    settlement_batch                  text CONSTRAINT resale_settlement_settlement_batch_chk CHECK (char_length(settlement_batch) <= 100),
+    expected_payout_date              date,
+    status                            text NOT NULL CONSTRAINT resale_settlement_status_chk CHECK (status IN ('pending', 'scheduled', 'onHold', 'paid', 'failed', 'reversed')),
+    hold_reason                       text CONSTRAINT resale_settlement_hold_reason_chk CHECK (hold_reason IN ('manualHold', 'complianceHold', 'refundDisputeHold')),
+    paid_at                           timestamptz,
+    failure_reason                    text CONSTRAINT resale_settlement_failure_reason_chk CHECK (char_length(failure_reason) <= 500),
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
 );
 
 -- A held place that is not yet a sale — a table, a cabana, a slot
@@ -791,6 +1202,31 @@ CREATE TABLE IF NOT EXISTS orders.reservation (
     expires_at                        timestamptz NOT NULL,
     created_at                        timestamptz NOT NULL,
     converted_order_id                text
+);
+
+-- Holds 20 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.reservation_hold_policy (
+    id                                uuid PRIMARY KEY NOT NULL,
+    hold_type                         text NOT NULL CONSTRAINT reservation_hold_policy_hold_type_chk CHECK (hold_type IN ('cartHold', 'checkoutHold', 'agentReservation', 'groupReservation', 'b2bReservation', 'corporateReservation', 'manualHold', 'paymentHold', 'seatHold', 'inventoryHold')),
+    channel                           text CONSTRAINT reservation_hold_policy_channel_chk CHECK (char_length(channel) <= 40),
+    product_id                        uuid,
+    event_id                          uuid,
+    performance_id                    uuid,
+    ticket_type                       text CONSTRAINT reservation_hold_policy_ticket_type_chk CHECK (char_length(ticket_type) <= 40),
+    customer_segment_id               uuid,
+    hold_duration_minutes             integer NOT NULL,
+    locked_capacity                   text[],
+    on_expiry                         text[],
+    is_extension_allowed              boolean DEFAULT false,
+    maximum_extensions                integer,
+    extension_duration_minutes        integer,
+    extension_permission              text CONSTRAINT reservation_hold_policy_extension_permission_chk CHECK (char_length(extension_permission) <= 60),
+    extension_requires_approval       boolean DEFAULT false,
+    is_active                         boolean NOT NULL,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
@@ -838,9 +1274,28 @@ CREATE TABLE IF NOT EXISTS orders.sales_order (
     synced_at                         timestamptz
 );
 
+-- Holds 14 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.status_transition_rule (
+    id                                uuid PRIMARY KEY NOT NULL,
+    entity                            text NOT NULL CONSTRAINT status_transition_rule_entity_chk CHECK (entity IN ('order', 'reservation')),
+    from_status                       text NOT NULL CONSTRAINT status_transition_rule_from_status_chk CHECK (char_length(from_status) <= 40),
+    to_status                         text NOT NULL CONSTRAINT status_transition_rule_to_status_chk CHECK (char_length(to_status) <= 40),
+    required_conditions               text CONSTRAINT status_transition_rule_required_conditions_chk CHECK (char_length(required_conditions) <= 1000),
+    allowed_permission                text CONSTRAINT status_transition_rule_allowed_permission_chk CHECK (char_length(allowed_permission) <= 60),
+    is_system_controlled              boolean DEFAULT false,
+    integration_requirement           text CONSTRAINT status_transition_rule_integration_requirement_chk CHECK (char_length(integration_requirement) <= 200),
+    notification                      text CONSTRAINT status_transition_rule_notification_chk CHECK (char_length(notification) <= 200),
+    audit_requirement                 text CONSTRAINT status_transition_rule_audit_requirement_chk CHECK (char_length(audit_requirement) <= 200),
+    is_active                         boolean NOT NULL,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
 -- A hold against any stored-value instrument (CF-126). Two-phase spend for all six, where only the
 -- retail wallet had it — a guest with 200 game credits starting a play the machine then failed had
--- no held balance Hangs off: reaches orders.sales_order through its keys. Reached by: 3 operations
+-- no held balance Hangs off: reaches orders.sales_order through its keys. Reached by: 4 operations
 -- read it and 5 write it; written by 3 contracts — marketing-crm, orders, resources.
 CREATE TABLE IF NOT EXISTS orders.stored_value_authorisation (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -912,6 +1367,58 @@ CREATE TABLE IF NOT EXISTS orders.upgrade (
     created_at                        timestamptz NOT NULL,
     completed_at                      timestamptz,
     cancelled_at                      timestamptz
+);
+
+-- Holds 47 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.upgrade_rule (
+    id                                uuid PRIMARY KEY NOT NULL,
+    name                              text NOT NULL CONSTRAINT upgrade_rule_name_chk CHECK (char_length(name) <= 150),
+    code                              text NOT NULL CONSTRAINT upgrade_rule_code_chk CHECK (char_length(code) <= 50),
+    transaction_type                  text NOT NULL CONSTRAINT upgrade_rule_transaction_type_chk CHECK (transaction_type IN ('upgrade', 'downgrade', 'exchange', 'conversion', 'personTypeConversion', 'productConversion')),
+    from_product_id                   uuid NOT NULL,
+    from_variant_id                   uuid,
+    to_product_id                     uuid NOT NULL,
+    to_variant_id                     uuid,
+    event_id                          uuid,
+    performance_id                    uuid,
+    direction                         text NOT NULL CONSTRAINT upgrade_rule_direction_chk CHECK (direction IN ('oneWay', 'bidirectional')),
+    is_chained_upgrade_allowed        boolean DEFAULT false,
+    allowed_channels                  text[],
+    customer_segment_id               uuid,
+    priority                          integer DEFAULT 0,
+    eligible_ticket_statuses          text[],
+    permitted_windows                 text[],
+    is_supervisor_exception_allowed   boolean DEFAULT false,
+    original_ticket_treatment         text DEFAULT 'supersede' CONSTRAINT upgrade_rule_original_ticket_treatment_chk CHECK (original_ticket_treatment IN ('invalidate', 'supersede', 'retainForHistory', 'partiallyRetainEntitlement')),
+    conversion_type                   text CONSTRAINT upgrade_rule_conversion_type_chk CHECK (conversion_type IN ('childAdult', 'juniorAdult', 'seniorAdult', 'residentTourist', 'standardMember', 'customPersonTypes')),
+    entitlement_treatment             text CONSTRAINT upgrade_rule_entitlement_treatment_chk CHECK (entitlement_treatment IN ('retained', 'replaced', 'added', 'removed', 'alreadyConsumed')),
+    target_requirements               text[],
+    financial_method                  text NOT NULL CONSTRAINT upgrade_rule_financial_method_chk CHECK (financial_method IN ('fullDifference', 'fixedUpgradeFee', 'percentageUpgrade', 'proRata', 'creditBased', 'noCredit', 'complimentary')),
+    price_source                      text DEFAULT 'currentSellingPrice' CONSTRAINT upgrade_rule_price_source_chk CHECK (price_source IN ('currentSellingPrice', 'originalDatePrice', 'upgradeSpecificRate', 'contractedRate', 'membershipRate', 'fixedUpgradePrice')),
+    dynamic_price_treatment           text CONSTRAINT upgrade_rule_dynamic_price_treatment_chk CHECK (dynamic_price_treatment IN ('currentDynamicPrice', 'protectedUpgradeRate', 'configuredRate')),
+    upgrade_amount                    numeric(18,4),
+    upgrade_percent                   numeric(18,4),
+    carry_forward_discounts           text[],
+    approval_requirement              text CONSTRAINT upgrade_rule_approval_requirement_chk CHECK (char_length(approval_requirement) <= 200),
+    pro_rata_method                   text CONSTRAINT upgrade_rule_pro_rata_method_chk CHECK (pro_rata_method IN ('timeBased', 'usageBased', 'valueBased', 'entitlementBased', 'fixedCredit')),
+    fixed_credit_amount               numeric(18,4),
+    maximum_credit_percent            numeric(18,4),
+    minimum_upgrade_amount            numeric(18,4),
+    credit_expiry_days                integer,
+    non_creditable_components         text[],
+    exclude_fees_from_credit          boolean DEFAULT true,
+    tax_treatment                     text CONSTRAINT upgrade_rule_tax_treatment_chk CHECK (char_length(tax_treatment) <= 60),
+    negative_difference_treatment     text DEFAULT 'noRefund' CONSTRAINT upgrade_rule_negative_difference_treatment_chk CHECK (negative_difference_treatment IN ('noRefund', 'refundDifference', 'walletCredit', 'voucherCredit', 'supervisorApproval')),
+    credential_treatment              text DEFAULT 'regenerateQr' CONSTRAINT upgrade_rule_credential_treatment_chk CHECK (credential_treatment IN ('regenerateQr', 'invalidateOldQr', 'preserveExistingCredential')),
+    generated_documents               text[],
+    owner_principal_id                uuid,
+    valid_from                        timestamptz,
+    valid_to                          timestamptz,
+    is_active                         boolean NOT NULL,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
 );
 
 -- One reminder per booking, set by the guest. GST-018 Add to Calendar / Reminders had nothing

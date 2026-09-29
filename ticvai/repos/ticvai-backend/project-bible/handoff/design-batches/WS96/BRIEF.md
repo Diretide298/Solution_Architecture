@@ -1,6 +1,6 @@
 # WS96 — Rental Management board 9
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 17 operations · 20 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 7 permissions apply here:
+  `ASSET_MANAGE, ASSET_VIEW, INSPECTION_SUBMIT, MAINTENANCE_EXECUTE, WORK_ORDER_MANAGE, WORK_ORDER_VERIFY, WORK_ORDER_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-574` | Maintenance Command Center | commandCentre | 0 | 0 | — |
-| `BO-575` | Maintenance Rule & Service Plan Configuration | configEditor | 0 | 0 | — |
-| `BO-576` | Maintenance Calendar & Scheduling | configEditor | 0 | 0 | — |
-| `BO-577` | Maintenance Work Order | listDetail | 0 | 0 | — |
-| `BO-578` | Technician Repair Workspace | listDetail | 0 | 0 | — |
-| `BO-579` | Parts, Cost & Maintenance Expense Tracking | listDetail | 0 | 0 | — |
-| `BO-580` | Asset Maintenance History & Lifecycle | listDetail | 0 | 0 | — |
-| `BO-581` | Return-to-Service Inspection & Approval | listDetail | 0 | 0 | — |
-| `BO-582` | Asset Retirement, Write-Off & Replacement Recommendation | listDetail | 0 | 0 | — |
-| `BO-583` | Maintenance Intelligence & Predictive AI | listDetail | 0 | 0 | — |
+| `BO-574` | Maintenance Command Center | commandCentre | 2 | 0 | — |
+| `BO-575` | Maintenance Rule & Service Plan Configuration | configEditor | 3 | 0 | — |
+| `BO-576` | Maintenance Calendar & Scheduling | configEditor | 2 | 0 | — |
+| `BO-577` | Maintenance Work Order | listDetail | 5 | 0 | — |
+| `BO-578` | Technician Repair Workspace | listDetail | 3 | 0 | — |
+| `BO-579` | Parts, Cost & Maintenance Expense Tracking | listDetail | 1 | 0 | — |
+| `BO-580` | Asset Maintenance History & Lifecycle | listDetail | 1 | 0 | — |
+| `BO-581` | Return-to-Service Inspection & Approval | listDetail | 2 | 0 | — |
+| `BO-582` | Asset Retirement, Write-Off & Replacement Recommendation | listDetail | 2 | 0 | — |
+| `BO-583` | Maintenance Intelligence & Predictive AI | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-577, BO-578, BO-579, BO-580, BO-581, BO-582, BO-583 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-578, BO-579, BO-580, BO-581, BO-582, BO-583 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

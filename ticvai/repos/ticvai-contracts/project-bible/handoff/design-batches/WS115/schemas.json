@@ -1,0 +1,418 @@
+{
+ "AccreditationAccessEvent": {
+  "type": "object",
+  "description": "Board 8.4. **Granted access against used access is the whole of the annual review.**\n",
+  "properties": {
+   "at": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "holderName": {
+    "type": "string"
+   },
+   "zoneId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "zoneName": {
+    "type": "string"
+   },
+   "credentialId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "admitted",
+     "denied",
+     "escorted"
+    ]
+   },
+   "deniedReason": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "AccreditationAuditRecord": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.audit",
+  "description": "Board 8.7. **Who gave this person access to that place, when, and on whose authority.**\n",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "action": {
+    "type": "string"
+   },
+   "actorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "previousValue": {
+    "nullable": true
+   },
+   "newValue": {
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "previousRecordHash": {
+    "type": "string",
+    "nullable": true
+   },
+   "recordHash": {
+    "type": "string"
+   },
+   "integrity": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "intact",
+     "broken",
+     "unverifiable"
+    ]
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "AccreditationHolder": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.holder",
+  "description": "**A subject who may never sign in to anything.** `identity` owns principals; this owns accredited people.\n",
+  "required": [
+   "id",
+   "fullName"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "accreditationNumber": {
+    "type": "string"
+   },
+   "fullName": {
+    "type": "string"
+   },
+   "photoAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "dateOfBirth": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "nationality": {
+    "type": "string",
+    "nullable": true
+   },
+   "identityDocumentVerified": {
+    "type": "boolean",
+    "default": false
+   },
+   "organisationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "affiliationRole": {
+    "type": "string",
+    "nullable": true
+   },
+   "programmeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "categoryCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "suspended",
+     "revoked",
+     "expired",
+     "archived"
+    ]
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "completenessPercent": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "ApiClient": {
+  "type": "object",
+  "x-ticvai-persistence": "control.api_client",
+  "description": "CF-135a. **The one credential model.** 2.7.52, 7.1.25 and 7.1.30 each asserted their own, so a partner API key, a POS integration credential and a webstore credential were three unrelated things with three lifecycles.\n",
+  "required": [
+   "id",
+   "developerId",
+   "name",
+   "environment",
+   "scopes",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "developerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "clientId": {
+    "type": "string",
+    "readOnly": true
+   },
+   "environment": {
+    "type": "string",
+    "enum": [
+     "sandbox",
+     "production"
+    ],
+    "description": "**Bound to one, stated on the object rather than by naming convention.** A key that works in both is a key somebody will use in the wrong one.\n"
+   },
+   "scopes": {
+    "type": "array",
+    "description": "**Resolved against the tenant's licence at token issue** (13.3.24). A scope granted here and not licensed there produces no token — and the refusal is at issue rather than at call time, so an integrator finds out in testing.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "allowedTenantIds": {
+    "type": "array",
+    "description": "13.1.46. **Which tenants this client may act for.** A developer integrating for one venue must not reach another, and a client with an empty list reaches none.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "ipAllowList": {
+    "type": "array",
+    "description": "13.1.38. Optional, and the strongest control available where an integrator has fixed egress.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "suspended",
+     "revoked"
+    ],
+    "readOnly": true
+   },
+   "lastUsedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**A credential unused for a year is a credential nobody will notice being stolen.**\n"
+   }
+  }
+ },
+ "KpiValue": {
+  "type": "object",
+  "description": "BI board 10.3. **Value, target, variance, direction and freshness in one read.**",
+  "properties": {
+   "kpiId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "period": {
+    "type": "string"
+   },
+   "value": {
+    "$ref": "#/components/schemas/MetricValue"
+   },
+   "target": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   },
+   "comparison": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   },
+   "variancePercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "direction": {
+    "type": "string",
+    "enum": [
+     "up",
+     "down",
+     "flat"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "green",
+     "amber",
+     "red",
+     "noTarget"
+    ]
+   },
+   "asOf": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "stale": {
+    "type": "boolean",
+    "description": "**True when the pipeline behind it has not refreshed.** A number nobody flagged as stale is a number somebody will act on.\n"
+   }
+  }
+ },
+ "MetricValue": {
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**A reading of a metric or KPI, or a threshold on one.** A `Money` where the metric is money-valued — `MetricSource` lists those in `x-ticvai-money-valued`, and a KPI is when its `unit` is `currency` — and a plain number otherwise. naming-and-style 5.1: money is never a float, at any layer.\nStored as `numeric(18,4)` either way: a money value stores its amount, and currency and scale resolve from the scope as they do for every `Money`.\n",
+  "oneOf": [
+   {
+    "type": "number"
+   },
+   {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  ]
+ },
+ "WebhookSubscription": {
+  "type": "object",
+  "x-ticvai-persistence": "control.webhook_subscription",
+  "description": "13.1.26, 13.3.18 and 13.3.22. **The 29 events already exist and nothing outside could receive one.**\n",
+  "required": [
+   "id",
+   "clientId",
+   "endpointUrl",
+   "eventTypes",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "clientId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "endpointUrl": {
+    "type": "string"
+   },
+   "eventTypes": {
+    "type": "array",
+    "description": "**Filtered at subscription, not at delivery.** A subscriber taking every event and discarding 99% is a subscriber the platform pays to talk to.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "filters": {
+    "type": "object",
+    "nullable": true,
+    "description": "13.3.22. Tenant, venue, or a business condition on the payload.",
+    "additionalProperties": true
+   },
+   "signingSecret": {
+    "type": "string",
+    "format": "password",
+    "writeOnly": true,
+    "description": "**How the receiver knows it was TICVAI.** Without a signature an endpoint accepts a ticket-sale event from anybody who learns the URL.\n**Write-only: accepted on create, never returned.** The same rule as `clientSecret` — a system that can show you a secret later is a system that hands it to whoever reads the subscription.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pendingVerification",
+     "active",
+     "paused",
+     "failing",
+     "disabled"
+    ],
+    "readOnly": true
+   },
+   "consecutiveFailures": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "disabledReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "13.1.29. **An endpoint failing for days is disabled rather than retried forever**, and the developer is told — a queue growing against a dead endpoint is a cost the platform carries silently.\n"
+   }
+  }
+ }
+}

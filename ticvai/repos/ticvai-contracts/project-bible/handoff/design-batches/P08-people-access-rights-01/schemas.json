@@ -197,11 +197,13 @@
    },
    "delegatorPrincipalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "description": "A principal id (`identity.Principal.id`). This contract stores the id only; the name to show, and the people to pick from, come from `identity.listPrincipals` and `identity.getPrincipal`.\n"
    },
    "delegatePrincipalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "description": "A principal id, resolved to a name the same way as `delegatorPrincipalId`."
    },
    "kinds": {
     "type": "array",
@@ -242,7 +244,7 @@
  },
  "ApprovalKind": {
   "type": "string",
-  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n",
   "enum": [
    "refund",
    "priceOverride",
@@ -252,12 +254,14 @@
    "accessPermissionChange",
    "configurationChange",
    "aiRecommendation",
-   "shiftVariance",
    "releasePromotion",
    "requisition",
    "stockWriteOff",
    "journalEntry",
+   "periodClose",
    "periodReopen",
+   "purchaseOrderCancel",
+   "purchaseOrderShortClose",
    "tenantMigration"
   ]
  },
@@ -293,7 +297,7 @@
    "version": {
     "type": "integer",
     "readOnly": true,
-    "description": "11.1.80. **A request is decided by the rules it was raised under.** Changing the matrix mid-flight would mean an approver answering a question that changed while they read it.\n"
+    "description": "11.1.80. **A request is decided by the rules it was raised under.** Changing the matrix mid-flight would mean an approver answering a question that changed while they read it.\n**(`kind`, `scopePath`, `version`) is unique**, and a stored version is never edited: a request's `matrixVersion` names exactly one rule set (decided 28 September, audit R129 (2)).\n"
    },
    "rules": {
     "type": "array",
@@ -570,11 +574,12 @@
    "condition": {
     "type": "string",
     "nullable": true,
-    "description": "11.1.13. Evaluated against the attributes the caller supplied."
+    "description": "11.1.13. Evaluated against the attributes the caller supplied.\n\n**No condition language is defined yet** (pull audit R104, 26 September): the grammar, the attributes it may name and how two conditions are compared for `unreachableRule` are an open decision, not something to infer from this field.\n"
    },
    "approverRoleIds": {
     "type": "array",
     "minItems": 1,
+    "description": "Role ids from `identity.listRoles` (`Role.id`), which is where an editor gets the names to show and pick from. This contract stores the ids only.\n",
     "items": {
      "type": "string",
      "format": "uuid"
@@ -617,6 +622,7 @@
    },
    "escalateToRoleIds": {
     "type": "array",
+    "description": "Role ids from `identity.listRoles`, as `approverRoleIds`.",
     "items": {
      "type": "string",
      "format": "uuid"
@@ -635,12 +641,60 @@
    "draft",
    "pending",
    "escalated",
+   "returned",
+   "informationRequested",
    "approved",
    "rejected",
    "withdrawn",
    "expired",
    "cancelled"
   ]
+ },
+ "AttendanceAmendment": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.attendance_amendment",
+  "description": "One correction to an attendance record, appended by `amendAttendance` and never updated (decided 28 September, audit R129 (7)).\n",
+  "required": [
+   "id",
+   "attendanceRecordId",
+   "amendedByPrincipalId",
+   "amendedAt",
+   "occurredAtBefore",
+   "occurredAtAfter",
+   "reason"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "attendanceRecordId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "amendedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "amendedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "occurredAtBefore": {
+    "type": "string",
+    "format": "date-time",
+    "description": "The record's time before this correction."
+   },
+   "occurredAtAfter": {
+    "type": "string",
+    "format": "date-time",
+    "description": "The time this correction set (`correctedAt` on the request)."
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 300
+   }
+  }
  },
  "AttendanceRecord": {
   "type": "object",
@@ -708,17 +762,29 @@
    "amendedByPrincipalId": {
     "type": "string",
     "format": "uuid",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true,
+    "description": "Who made the latest amendment. The full history is `amendments` (audit R129 (7))."
    },
    "amendmentReason": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true,
+    "description": "The latest amendment's reason. The full history is `amendments` (audit R129 (7))."
    },
    "originalOccurredAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true,
     "description": "**The original is never overwritten.** Attendance feeds pay, and a record that can be quietly rewritten is not evidence.\n"
+   },
+   "amendments": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**Every correction, oldest first, one row each** (decided 28 September, audit R129 (7)). A single set of amendment columns holds only the last one, and the second correction to a record would erase the evidence of the first.\n",
+    "items": {
+     "$ref": "#/components/schemas/AttendanceAmendment"
+    }
    },
    "exception": {
     "type": "string",
@@ -732,6 +798,46 @@
      "unscheduled"
     ],
     "description": "Computed against the rota. Null where the record matches what was expected."
+   }
+  }
+ },
+ "CapabilityTemplate": {
+  "x-ticvai-persistence": "identity.capability_template",
+  "type": "object",
+  "description": "3.3.23, BL-110. **A named tick-set — a role, with nothing depending on the name.**\n",
+  "required": [
+   "code",
+   "name",
+   "capabilities"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "capabilities": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Written by the server at `tenant` scope; ignored if a request sends it."
    }
   }
  },
@@ -752,7 +858,8 @@
    },
    "initialCredential": {
     "type": "string",
-    "maxLength": 512
+    "maxLength": 512,
+    "writeOnly": true
    },
    "mustChangeCredential": {
     "type": "boolean",
@@ -843,6 +950,35 @@
    }
   }
  },
+ "ResetCredentialRequest": {
+  "type": "object",
+  "description": "Request only; see `ChangeCredentialRequest`.",
+  "required": [
+   "method",
+   "temporaryCredential",
+   "reason"
+  ],
+  "properties": {
+   "method": {
+    "type": "string",
+    "enum": [
+     "password",
+     "pin"
+    ]
+   },
+   "temporaryCredential": {
+    "type": "string",
+    "maxLength": 512,
+    "writeOnly": true,
+    "description": "Issued to the principal out of band. Must be changed at next sign-in."
+   },
+   "reason": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 500
+   }
+  }
+ },
  "Role": {
   "x-ticvai-persistence": "identity.role",
   "type": "object",
@@ -857,7 +993,9 @@
     "format": "uuid"
    },
    "code": {
-    "type": "string"
+    "type": "string",
+    "x-ticvai-unique": "tenant",
+    "description": "**Unique within the tenant** (decided 28 September, audit R108). A seeded role's code is reserved in every tenant. Unique per tenant, not per venue, because a grant names a role anywhere in the tree; `createRole` refuses a duplicate with `409 duplicate-code`.\n"
    },
    "name": {
     "type": "string"
@@ -881,7 +1019,7 @@
    "isSystem": {
     "type": "boolean",
     "default": false,
-    "description": "**Seeded roles ship and are editable; deleting one is refused.** A venue that removes `cashier` and rebuilds it has two roles with one name in the audit log.\n"
+    "description": "**Seeded roles ship and are editable; deleting one is refused.** A venue that removes `cashier` and rebuilds it has two roles with one name in the audit log.\n**The seeded system roles are Cashier, Supervisor, Venue Manager, Finance and Tenant Admin** (proposed in `docs/active/seed-data-proposal.md` section 2, client to correct; audit R229).\n"
    },
    "principalCount": {
     "type": "integer"
@@ -975,7 +1113,7 @@
    },
    "position": {
     "type": "string",
-    "description": "What they are rostered to do — gate steward, cashier, lifeguard, technician. **Most positions never touch a till**, which is why a rota assignment is not a shift.\n"
+    "description": "What they are rostered to do — gate steward, cashier, lifeguard, technician. **Most positions never touch a till**, which is why a rota assignment is not a shift.\n**A position code, not a label.** It is the same value as `StaffingRules.minimumCover[].positionCode`, `OpenShift.positionCode` and `StaffingCoverage.positionCode`: coverage counts rostered people per position, so an assignment spelled differently from the rule it fills is counted against nothing and the gap stays open. Tenant-defined, which is why it is not an enum here.\n"
    },
    "requiredRoleId": {
     "type": "string",
@@ -1021,5 +1159,118 @@
    "completed",
    "noShow"
   ]
+ },
+ "WorkforceJobTitle": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.job_title",
+  "description": "**Taken from the backend workbook, 20 September.** Stores job/designation definitions such as Cashier, Manager, Chef or Technician.",
+  "required": [
+   "tenantId",
+   "code",
+   "name",
+   "isActive",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 50
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "WorkforceWorkAssignment": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.work_assignment",
+  "description": "**Taken from the backend workbook, 20 September.** Assigns an employee to a job and operational location/scope for an effective period.",
+  "required": [
+   "employeeId",
+   "jobTitleId",
+   "effectiveFrom",
+   "isPrimary",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "employeeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "jobTitleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "departmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "isPrimary": {
+    "type": "boolean"
+   },
+   "status": {
+    "type": "string",
+    "maxLength": 30
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
  }
 }

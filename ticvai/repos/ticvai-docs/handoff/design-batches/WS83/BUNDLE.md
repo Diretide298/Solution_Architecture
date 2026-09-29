@@ -1,6 +1,6 @@
 # WS83 — Game and Ride board 6
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 9 operations · 7 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `ORDER_CREATE, PRICE_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, WALLET_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,20 +60,20 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-444` | Redemption Operations Dashboard | commandCentre | 0 | 0 | — |
-| `BO-445` | Redemption Credit Rule Configuration | configEditor | 0 | 0 | — |
-| `BO-446` | Ticket-Based Redemption / Ticket-Eater Integration | listDetail | 0 | 0 | — |
-| `BO-447` | Ticketless Redemption Game Integration | listDetail | 0 | 0 | — |
-| `BO-448` | Redemption Wallet & Balance View | listDetail | 0 | 0 | — |
-| `BO-449` | Redemption Counter / Prize Checkout | listDetail | 0 | 2 | — |
-| `BO-450` | Prize Catalogue & Credit Cost Configuration | listDetail | 0 | 0 | — |
-| `BO-451` | Prize Inventory Integration | listDetail | 0 | 0 | — |
-| `BO-452` | Direct-Pay / Crane & Prize Machine Configuration | listDetail | 0 | 0 | — |
-| `BO-453` | Redemption Transaction Ledger, Reconciliation & Audit | listDetail | 0 | 0 | — |
+| `BO-444` | Redemption Operations Dashboard | commandCentre | 1 | 0 | — |
+| `BO-445` | Redemption Credit Rule Configuration | configEditor | 2 | 0 | — |
+| `BO-446` | Ticket-Based Redemption / Ticket-Eater Integration | listDetail | 1 | 0 | — |
+| `BO-447` | Ticketless Redemption Game Integration | listDetail | 1 | 0 | — |
+| `BO-448` | Redemption Wallet & Balance View | listDetail | 1 | 0 | — |
+| `BO-449` | Redemption Counter / Prize Checkout | listDetail | 4 | 2 | — |
+| `BO-450` | Prize Catalogue & Credit Cost Configuration | listDetail | 2 | 0 | — |
+| `BO-451` | Prize Inventory Integration | listDetail | 2 | 0 | — |
+| `BO-452` | Direct-Pay / Crane & Prize Machine Configuration | listDetail | 1 | 0 | — |
+| `BO-453` | Redemption Transaction Ledger, Reconciliation & Audit | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-446, BO-447, BO-448, BO-450, BO-451, BO-452, BO-453 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-446, BO-447, BO-448, BO-450, BO-451, BO-453 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -261,10 +260,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the redemption operations are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listRedemption",
+    "contract": "promotions",
+    "purpose": "Redemption Analytics, Audit & AI Optimization",
+    "trigger": "onLoad"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-444"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-444",
+   "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-444"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 53. 0 of 7 labels bound to a contract property; 15 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -329,13 +336,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configuration) and no display directory — it is settings, not a population",
   "purpose": "Configure how games generate redemption credits.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: External Game Value. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Game_and_Ride_Module.pdf, page 54 §Support"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -388,6 +388,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "primaryButton",
        "label": "External Game Value",
        "provenance": "pack Game_and_Ride_Module.pdf, page 54 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Machine-Reported Value",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 54 §Support"
       }
      ]
     }
@@ -400,12 +405,31 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listPrizes",
+    "contract": "games",
+    "purpose": "Redemption operations",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setRedemptionRules",
+    "contract": "games",
+    "purpose": "Save how games earn redemption credits (credit source per earn rule)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) External Game Value, Machine-Reported Value",
+    "invalidates": [
+     "listPrizes"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-445"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-445",
+   "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-445"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 54. 0 of 0 labels bound to a contract property; 8 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 54. 0 of 0 labels bound to a contract property; 9 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** External Game Value, Machine-Reported Value: `setRedemptionRules`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -519,7 +543,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the ticket-based redemption ticket-eater are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setRedemptionRules",
+    "contract": "games",
+    "purpose": "How tickets are earned",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listPrizes"
+    ]
+   }
+  ],
   "entryState": {
    "preloaded": [
     "↓"
@@ -527,7 +562,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-446"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-446",
+   "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-446"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 55. 0 of 1 labels bound to a contract property; 9 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -643,7 +679,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the ticketless redemption game are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setRedemptionRules",
+    "contract": "games",
+    "purpose": "Ticket-eater integration",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listPrizes"
+    ]
+   }
+  ],
   "entryState": {
    "preloaded": [
     "↓"
@@ -651,7 +698,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-447"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-447",
+   "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-447"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 56. 0 of 1 labels bound to a contract property; 1 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -730,7 +778,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getWallet",
+       "notes": "One record, read-only."
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The redemption wallet balance list.",
@@ -739,12 +799,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the redemption wallet balance are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getWallet",
+    "contract": "wallet",
+    "purpose": "Redemption balance",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-448"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-448",
+   "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-448"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 57. 0 of 0 labels bound to a contract property; 0 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -810,11 +887,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved: Scan Prize Barcode, Search Prize, Change Quantity, Remove Item, Complete Redemption, Cancel Transaction. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Game_and_Ride_Module.pdf, page 58 §Actions"
-   },
-   {
-    "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Game_and_Ride_Module.pdf, page 58 §Scan / Tap Customer Card"
    }
@@ -863,11 +935,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "primaryButton",
        "label": "Scan Prize Barcode",
+       "operation": "lookupPrize",
        "provenance": "pack Game_and_Ride_Module.pdf, page 58 §Actions"
       },
       {
        "kind": "secondaryButton",
        "label": "Search Prize",
+       "operation": "lookupPrize",
        "provenance": "pack Game_and_Ride_Module.pdf, page 58 §Actions"
       },
       {
@@ -917,7 +991,41 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the redemption counter prize are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setRedemptionRules",
+    "contract": "games",
+    "purpose": "Ticketless redemption",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listPrizes"
+    ]
+   },
+   {
+    "operationId": "listPrizes",
+    "contract": "games",
+    "purpose": "Search the prize catalogue at this counter",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Search Prize; Complete Redemption"
+   },
+   {
+    "operationId": "redeemPrize",
+    "contract": "games",
+    "purpose": "Redeem the basket's prizes against the card's tickets",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Search Prize; Complete Redemption",
+    "invalidates": [
+     "listPrizes"
+    ]
+   },
+   {
+    "operationId": "lookupPrize",
+    "contract": "games",
+    "purpose": "Look up prize",
+    "trigger": "onScan"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "↓",
@@ -926,9 +1034,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-449"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-449",
+   "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-449"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 58. 0 of 2 labels bound to a contract property; 8 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 58. 0 of 2 labels bound to a contract property; 8 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Change Quantity, Remove Item are choices sent by `redeemPrize` (basket lines (prizeId, quantity) held client-side until redeemPrize); Search Prize: `listPrizes`; Complete Redemption: `redeemPrize`; Cancel Transaction dropped (basket is client-side until redeemPrize; cancelling discards it, no server state); still owed by a contract change: `lookupPrize`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1005,7 +1114,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "redeemPrize",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listPrizes",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "redeemPrize"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The prize catalogue credit list.",
@@ -1014,10 +1148,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the prize catalogue credit are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "redeemPrize",
+    "contract": "games",
+    "purpose": "Hand over a prize",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listPrizes",
+    "contract": "games",
+    "purpose": "The prize catalogue",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-450"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-450",
+   "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-450"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 59. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1085,11 +1235,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Redemption Counter. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Game_and_Ride_Module.pdf, page 60 §Support"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 60"
    },
@@ -1112,6 +1257,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Game_and_Ride_Module.pdf, page 60 §Support"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setPrizeCost"
+      }
+     ]
     }
    ]
   },
@@ -1122,12 +1279,39 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the prize inventory integration are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setPrizeCost",
+    "contract": "games",
+    "purpose": "Ticket price and unit cost",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listPrizes"
+    ]
+   },
+   {
+    "operationId": "createPrize",
+    "contract": "games",
+    "purpose": "Add a prize",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-451"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-451",
+   "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-451"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 60. 0 of 0 labels bound to a contract property; 1 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 60. 0 of 0 labels bound to a contract property; 1 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Redemption Counter dropped (navigation to the Redemption Counter screen (BO-449)).",
+  "entryState": {
+   "params": [
+    {
+     "name": "prizeId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1193,18 +1377,100 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Game_and_Ride_Module.pdf, page 61"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 61"
    }
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "filters",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Inventory location",
+       "operation": "getStockPositions",
+       "notes": "Sends `?locationId=`; the machine's prize location.",
+       "provenance": "contract inventory.yaml GET /stock"
+      },
+      {
+       "kind": "selectField",
+       "label": "Linked prize / SKU",
+       "operation": "getStockPositions",
+       "notes": "Sends `?itemId=`.",
+       "provenance": "contract inventory.yaml GET /stock"
+      },
+      {
+       "kind": "toggle",
+       "label": "Include out-of-stock prizes",
+       "operation": "getStockPositions",
+       "notes": "Sends `?includeZero=true`; a machine whose prize is at zero must not complete redemption.",
+       "provenance": "contract inventory.yaml GET /stock"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Prize machines and their stock",
+       "bindsTo": "StockPosition",
+       "columns": [
+        "Machine ID",
+        "Machine name",
+        "Machine type",
+        "StockPosition.itemName",
+        "StockPosition.sku",
+        "StockPosition.locationName",
+        "StockPosition.available",
+        "StockPosition.onHand",
+        "StockPosition.allocated",
+        "StockPosition.lastMovementAt",
+        "Play price",
+        "Machine status"
+       ],
+       "operation": "getStockPositions",
+       "notes": "Only stock is bound. No operation lists machines, so the machine columns are pack labels.",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 61"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected machine profile",
+       "bindsTo": "StockPosition",
+       "columns": [
+        "Machine ID",
+        "Machine name",
+        "Machine type",
+        "Venue",
+        "Zone",
+        "Reader",
+        "StockPosition.itemName",
+        "StockPosition.sku",
+        "StockPosition.locationName",
+        "StockPosition.available",
+        "StockPosition.unit",
+        "StockPosition.value",
+        "StockPosition.lastCountedAt",
+        "Play price",
+        "Machine status"
+       ],
+       "operation": "getStockPositions",
+       "notes": "The pack's Machine Profile; current stock is `available`.",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 61"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The direct-pay crane prize list.",
@@ -1213,12 +1479,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the direct-pay crane prize are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getStockPositions",
+    "contract": "inventory",
+    "purpose": "Prize stock",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-452"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-452",
+   "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-452"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 61. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 61. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Game_and_Ride_Module.pdf p.61; contract inventory.yaml GET /stock. Pack labels with no schema field yet (shown as plain labels): Machine ID, Machine name, Machine type (Crane / Capsule / Direct Prize / Skill Prize), Venue, Zone, Reader, Play price, Machine status, A machine read (bound op is getStockPositions).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1344,7 +1619,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the redemption transaction ledger are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setPrizeCost",
+    "contract": "games",
+    "purpose": "Direct-pay price",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listPrizes"
+    ]
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Game-reported credits",
@@ -1353,11 +1639,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "Wallet balance movements",
     "Prize transactions",
     "Inventory deductions"
+   ],
+   "params": [
+    {
+     "name": "prizeId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-453"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-453",
+   "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-453"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 62. 0 of 7 labels bound to a contract property; 7 of 69 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1391,7 +1684,248 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
-{}
+{
+ "createPrize": {
+  "method": "POST",
+  "path": "/prizes",
+  "contract": "games",
+  "summary": "Add a prize",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Prize",
+  "responds": "Prize"
+ },
+ "getStockPositions": {
+  "method": "GET",
+  "path": "/stock",
+  "contract": "inventory",
+  "summary": "Stock on hand by item and location",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "itemId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeZero",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "getWallet": {
+  "method": "GET",
+  "path": "/wallets/{subjectId}",
+  "contract": "wallet",
+  "summary": "Read a guest wallet",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Wallet"
+ },
+ "listPrizes": {
+  "method": "GET",
+  "path": "/prizes",
+  "contract": "games",
+  "summary": "The prize catalogue",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "maxPoints",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listRedemption": {
+  "method": "GET",
+  "path": "/redemption",
+  "contract": "promotions",
+  "summary": "Redemption Analytics, Audit & AI Optimization",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "campaign",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "code",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "batch",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerSegment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partner",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "RedemptionAnalyticsAuditAiOptimizationView"
+ },
+ "lookupPrize": {
+  "method": "GET",
+  "path": "/prizes/lookup",
+  "contract": "games",
+  "summary": "Look up a prize by barcode or SKU",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "code",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "Prize"
+ },
+ "redeemPrize": {
+  "method": "POST",
+  "path": "/prize-redemptions",
+  "contract": "games",
+  "summary": "Redeem points for a prize",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PrizeRedemption"
+ },
+ "setPrizeCost": {
+  "method": "PUT",
+  "path": "/prizes/{prizeId}/cost",
+  "contract": "games",
+  "summary": "What a prize costs in tickets, and what it costs the venue",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PrizeCost",
+  "responds": "PrizeCost"
+ },
+ "setRedemptionRules": {
+  "method": "PUT",
+  "path": "/redemption-rules",
+  "contract": "games",
+  "summary": "How tickets are earned, held and spent",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RedemptionRules",
+  "responds": "RedemptionRules"
+ }
+}
 ```
 
 ## `schemas.json`
@@ -1399,5 +1933,452 @@ Method, path, parameters, request and response for every operation these screens
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
-{}
+{
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Prize": {
+  "x-ticvai-persistence": "games.prize",
+  "type": "object",
+  "required": [
+   "id",
+   "name",
+   "venueId",
+   "pointCost",
+   "onHand"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "merchandiseId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Links to retail. Redemption depletes stock through the inventory ledger — a prize wall running out is a stock problem and should look like one.\n"
+   },
+   "pointCost": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "onHand": {
+    "type": "integer"
+   },
+   "isAvailable": {
+    "type": "boolean"
+   },
+   "tier": {
+    "type": "string",
+    "nullable": true,
+    "description": "Small, medium, large, jackpot. Drives prize-wall layout."
+   },
+   "imageAssetRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "barcode": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true,
+    "description": "The prize's own barcode, read by `lookupPrize` before the linked retail item's barcode or SKU. Unique within the venue (VM close-out, 29 September)."
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PrizeCost": {
+  "type": "object",
+  "x-ticvai-persistence": "games.prize_cost",
+  "description": "Boards 6.7 and 6.8. **Two numbers, one of them on the shelf.**",
+  "properties": {
+   "prizeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "ticketPrice": {
+    "type": "integer"
+   },
+   "unitCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "marginPercent": {
+    "type": "number",
+    "readOnly": true
+   },
+   "inventoryItemId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Stock comes from `inventory`.** A prize catalogue with its own count is one that disagrees with the stockroom.\n"
+   },
+   "directPayPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "displayTier": {
+    "type": "string",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "PrizeRedemption": {
+  "x-ticvai-persistence": "games.redemption + games.redemption_line",
+  "type": "object",
+  "required": [
+   "id",
+   "cardCode",
+   "lines",
+   "pointsUsed",
+   "pointsRemaining",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "redemptionNumber": {
+    "type": "string"
+   },
+   "cardCode": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "prizeId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "integer"
+      },
+      "pointCost": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "pointsUsed": {
+    "type": "integer"
+   },
+   "pointsRemaining": {
+    "type": "integer"
+   },
+   "stockMovementIds": {
+    "type": "array",
+    "description": "Movements raised in the inventory ledger.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "issuedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "RedemptionAnalyticsAuditAiOptimizationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Redemption Analytics, Audit & AI Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "codesGenerated": {
+    "type": "string",
+    "description": "Codes generated"
+   },
+   "codesDistributed": {
+    "type": "string",
+    "description": "Codes distributed"
+   },
+   "codesRedeemed": {
+    "type": "string",
+    "description": "Codes redeemed"
+   },
+   "redemptionRate": {
+    "type": "number",
+    "description": "Redemption rate"
+   },
+   "conversionRate": {
+    "type": "number",
+    "description": "Conversion rate"
+   },
+   "revenueGenerated": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue generated"
+   },
+   "discountGranted": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount granted"
+   },
+   "incrementalRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Incremental revenue"
+   },
+   "aovUplift": {
+    "type": "number",
+    "description": "AOV uplift"
+   },
+   "costPerRedemption": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Cost per redemption"
+   },
+   "marginImpact": {
+    "type": "number",
+    "description": "Margin impact"
+   },
+   "expiredUnusedCodes": {
+    "type": "integer",
+    "description": "Expired unused codes"
+   },
+   "user": {
+    "type": "string",
+    "description": "User"
+   },
+   "timestamp": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Timestamp"
+   },
+   "previousValue": {
+    "type": "string",
+    "description": "Previous value"
+   },
+   "newValue": {
+    "type": "integer",
+    "description": "New value"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "approvalReference": {
+    "type": "string",
+    "description": "Approval reference"
+   },
+   "auditEvent": {
+    "type": "string",
+    "enum": [
+     "created",
+     "modified",
+     "assigned",
+     "suspended",
+     "reactivated",
+     "cancelled"
+    ],
+    "description": "Code audit event."
+   }
+  }
+ },
+ "RedemptionRules": {
+  "type": "object",
+  "x-ticvai-persistence": "games.redemption_rules",
+  "description": "Board 6. **Ticket-based and ticketless are one currency arriving two ways.**",
+  "properties": {
+   "ticketCreditTypeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "earnRules": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "gameId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "ticketsPerPlay": {
+       "type": "integer",
+       "nullable": true
+      },
+      "ticketsPerScorePoint": {
+       "type": "number",
+       "nullable": true
+      },
+      "maximumPerPlay": {
+       "type": "integer",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "ticketEaterEnabled": {
+    "type": "boolean",
+    "default": false
+   },
+   "ticketlessEnabled": {
+    "type": "boolean",
+    "default": true
+   },
+   "ticketsExpire": {
+    "type": "boolean",
+    "default": false
+   },
+   "ticketValidityDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "counterApprovalAboveTickets": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**A prize above a threshold needs a second person.** The alternative is a counter that can hand out the top shelf.\n"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "Wallet": {
+  "x-ticvai-persistence": "wallet.wallet + wallet.credit_lot",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "balance",
+   "currency",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "balance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "credits": {
+    "type": "array",
+    "description": "4.3.5 and 4.3.19. **One balance and one bonus balance with one expiry could not express what the requirement asks for** — cash, bonus and redemption credit, each with its own expiry.\n**The expiries are the reason this is a list.** Cash a guest paid for should outlive a promotional credit they were given, and a single `expiresAt` either expires the money they paid or never expires the promotion.\n**Consumed first-expiry-first-out across all three** (4.3.19), which is also the order that is fairest to the guest — spend what is about to die before what is not.\n**One entry per `active` lot in `wallet.credit_lot`** for this wallet: `amount` is the lot's `remaining_amount`, `expiresAt` its `expires_at`, `sourceRef` its `source_reference`. `kind` and `isRefundable` are not stored on the lot; they come from the lot's credit type (`listCreditLots` returns the lots themselves).\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "amount"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "cash",
+        "bonus",
+        "redemption",
+        "refund",
+        "goodwill"
+       ],
+       "description": "**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability.\n",
+       "x-ticvai-persisted": false
+      },
+      "amount": {
+       "x-ticvai-column": "remaining_amount",
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "expiresAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "sourceRef": {
+       "type": "string",
+       "nullable": true,
+       "x-ticvai-column": "source_reference"
+      },
+      "isRefundable": {
+       "type": "boolean",
+       "default": false,
+       "x-ticvai-persisted": false,
+       "description": "**True only for `cash`.** A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice.\n"
+      }
+     }
+    }
+   },
+   "bonusBalance": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Promotional value. Typically non-refundable and spent first."
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "suspended",
+     "closed"
+    ]
+   },
+   "homeCellName": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where the authoritative balance lives. Present when the guest is linked across cells.\n"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastActivityAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ }
+}
 ```

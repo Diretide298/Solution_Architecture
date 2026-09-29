@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS ai.activity (
 
 -- Maps a Qdrant point id back to its document and scope. The join between the two stores Hangs
 -- off: reaches ai.index_source through its keys; references ai.knowledge_document. Reached by: 6
--- operations read it and 0 write it.
+-- operations read it and 0 write it; 2 tables reference it.
 CREATE TABLE IF NOT EXISTS ai.chunk_ref (
     id                                uuid PRIMARY KEY NOT NULL,
     document_id                       uuid NOT NULL

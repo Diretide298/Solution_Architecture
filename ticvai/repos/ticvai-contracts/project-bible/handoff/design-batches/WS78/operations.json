@@ -1,1 +1,327 @@
-{}
+{
+ "cloneGame": {
+  "method": "POST",
+  "path": "/games/{gameId}/clone",
+  "contract": "games",
+  "summary": "Copy a game or ride as a new one",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Game"
+ },
+ "createGame": {
+  "method": "POST",
+  "path": "/games",
+  "contract": "games",
+  "summary": "Register a game",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Game",
+  "responds": "Game"
+ },
+ "createGameEntitlement": {
+  "method": "POST",
+  "path": "/game-entitlements",
+  "contract": "games",
+  "summary": "Define a pass, package or per-game entitlement",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GameEntitlement",
+  "responds": "GameEntitlement"
+ },
+ "getGameCard": {
+  "method": "GET",
+  "path": "/game-cards/{cardCode}",
+  "contract": "games",
+  "summary": "Read a card's balances",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GameCard"
+ },
+ "listAttractionTypes": {
+  "method": "GET",
+  "path": "/attraction-types",
+  "contract": "games",
+  "summary": "The classes of game and ride",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AttractionType"
+ },
+ "listGameEntitlements": {
+  "method": "GET",
+  "path": "/game-entitlements",
+  "contract": "games",
+  "summary": "Passes, packages and per-game entitlements",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GameEntitlement"
+ },
+ "listGameplayTransactions": {
+  "method": "GET",
+  "path": "/gameplay-transactions",
+  "contract": "games",
+  "summary": "Taps, decisions and what they cost",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "readerId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outcome",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GameplayTransaction"
+ },
+ "listGames": {
+  "method": "GET",
+  "path": "/games",
+  "contract": "games",
+  "summary": "List games",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Game"
+ },
+ "listReaders": {
+  "method": "GET",
+  "path": "/readers",
+  "contract": "games",
+  "summary": "Readers, their attractions and their health",
+  "permission": "DEVICE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Reader"
+ },
+ "setAttractionType": {
+  "method": "PUT",
+  "path": "/attraction-types",
+  "contract": "games",
+  "summary": "Define a class of attraction",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AttractionType",
+  "responds": "AttractionType"
+ },
+ "setCreditEligibilityRules": {
+  "method": "PUT",
+  "path": "/credit-types/{creditTypeId}/eligibility",
+  "contract": "wallet",
+  "summary": "Where this credit may be spent, and on what",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreditEligibility",
+  "responds": "CreditEligibility"
+ },
+ "setGameOperationalConfiguration": {
+  "method": "PUT",
+  "path": "/games/{gameId}/operations",
+  "contract": "games",
+  "summary": "Capacity, cycle time, restrictions and staffing",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GameOperationalConfig",
+  "responds": "GameOperationalConfig"
+ },
+ "setReaderConfiguration": {
+  "method": "PUT",
+  "path": "/readers/{readerId}",
+  "contract": "games",
+  "summary": "What this reader charges, opens, shows and refuses",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Reader",
+  "responds": "Reader"
+ },
+ "simulateGameplayAuthorisation": {
+  "method": "POST",
+  "path": "/gameplay-authorisations/simulate",
+  "contract": "games",
+  "summary": "What would happen if this card tapped this reader",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GameplayAuthorisationRequest",
+  "responds": "GameplayAuthorisation"
+ },
+ "testReader": {
+  "method": "POST",
+  "path": "/readers/{readerId}/test",
+  "contract": "games",
+  "summary": "Prove a reader works before a guest finds out it does not",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ReaderTestResult"
+ },
+ "updateGame": {
+  "method": "PATCH",
+  "path": "/games/{gameId}",
+  "contract": "games",
+  "summary": "Amend a game",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Game"
+ },
+ "validateGameConfiguration": {
+  "method": "POST",
+  "path": "/game-configuration-validations",
+  "contract": "games",
+  "summary": "Re-run the configuration health checks for some or all games",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GameConfigurationHealth"
+ }
+}

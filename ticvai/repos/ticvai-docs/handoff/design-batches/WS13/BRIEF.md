@@ -1,6 +1,6 @@
 # WS13 — Approval Workflows and Governance board 1
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 8 operations · 10 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `APPROVAL_DECIDE, APPROVAL_REQUEST, APPROVAL_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-364` | Approval Command Center Dashboard | listDetail | 0 | 0 | — |
-| `BO-365` | My Approval Inbox | listDetail | 0 | 0 | — |
-| `BO-366` | Team / Shared Approval Queue | listDetail | 0 | 0 | — |
-| `BO-367` | Approval Request Detail | listDetail | 0 | 0 | — |
-| `BO-368` | AI Decision Support | listDetail | 0 | 0 | — |
-| `BO-369` | High Priority & Risk Queue | listDetail | 0 | 0 | — |
-| `BO-370` | Escalated Approval Center | listDetail | 0 | 0 | — |
-| `BO-371` | Completed Approval History | listDetail | 0 | 0 | — |
-| `BO-372` | Approval SLA & Workload Monitor | commandCentre | 0 | 0 | — |
-| `BO-373` | Approval Activity & Notification Center | listDetail | 0 | 0 | — |
+| `BO-364` | Approval Command Center Dashboard | listDetail | 2 | 0 | — |
+| `BO-365` | My Approval Inbox | listDetail | 1 | 0 | — |
+| `BO-366` | Team / Shared Approval Queue | listDetail | 1 | 0 | — |
+| `BO-367` | Approval Request Detail | listDetail | 2 | 0 | — |
+| `BO-368` | AI Decision Support | listDetail | 1 | 0 | — |
+| `BO-369` | High Priority & Risk Queue | listDetail | 1 | 0 | — |
+| `BO-370` | Escalated Approval Center | listDetail | 2 | 0 | — |
+| `BO-371` | Completed Approval History | listDetail | 1 | 0 | — |
+| `BO-372` | Approval SLA & Workload Monitor | commandCentre | 2 | 0 | — |
+| `BO-373` | Approval Activity & Notification Center | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 

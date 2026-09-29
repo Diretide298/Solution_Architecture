@@ -1,6 +1,6 @@
 # WS85 — Game and Ride board 8
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**9 screens · 7 operations · 8 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `DEVICE_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, WALLET_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-464` | Game & Ride Operations Control Center | listDetail | 0 | 0 | — |
-| `BO-465` | Live Gameplay Transaction Monitor | listDetail | 0 | 0 | — |
-| `BO-466` | Reader & Device Health Monitor | listDetail | 0 | 0 | — |
-| `BO-467` | Tap Validation & Decision Trace | listDetail | 0 | 0 | — |
-| `BO-468` | Rejected Transaction & Reason Analysis | commandCentre | 0 | 0 | — |
-| `BO-469` | Wallet & Deduction Transaction Monitor | listDetail | 0 | 0 | — |
-| `BO-470` | Entitlement & Free-Play Consumption Monitor | commandCentre | 0 | 0 | — |
-| `BO-471` | Offline, Synchronization & Recovery Monitor | listDetail | 0 | 0 | — |
-| `BO-472` | Operational Alerts & Exception Center | listDetail | 0 | 0 | — |
-| `BO-473` | Operational Analytics & Reconciliation Dashboard | listDetail | 0 | 0 | — |
+| `BO-464` | Game & Ride Operations Control Center | listDetail | 1 | 0 | — |
+| `BO-465` | Live Gameplay Transaction Monitor | listDetail | 1 | 0 | — |
+| `BO-466` | Reader & Device Health Monitor | listDetail | 2 | 0 | — |
+| `BO-467` | Tap Validation & Decision Trace | listDetail | 1 | 0 | — |
+| `BO-468` | Rejected Transaction & Reason Analysis | commandCentre | 1 | 0 | — |
+| `BO-469` | Wallet & Deduction Transaction Monitor | listDetail | 1 | 0 | — |
+| `BO-470` | Entitlement & Free-Play Consumption Monitor | commandCentre | 1 | 0 | — |
+| `BO-471` | Offline, Synchronization & Recovery Monitor | listDetail | 1 | 0 | — |
+| `BO-473` | Operational Analytics & Reconciliation Dashboard | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-464, BO-465, BO-466, BO-467, BO-469, BO-471, BO-472, BO-473 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-464, BO-465, BO-466, BO-467, BO-469 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

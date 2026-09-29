@@ -1,0 +1,248 @@
+[
+ {
+  "id": "BO-725",
+  "name": "Performance Operations Command Center",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "9",
+   "number": "01",
+   "page": 81
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/session-operations-command-center-bo-725",
+   "component": "apps/venue-management-web/src/routes/sell/SessionOperationsCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-726"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-726",
+     "trigger": "Participant Photo & Video Assignment",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide management with a consolidated backend view of the financial, commercial, sponsorship, attendance and operational performance of events.",
+  "purposeNote": "Authorized users can obtain a consolidated view of event commercial and operational performance while data visibility remains controlled by tenant, entity and role permissions.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 81"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 81"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listPerformanceTemplates",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The session operations list.",
+   "error": "Could not load. Names which read failed and leaves the session operations untouched.",
+   "emptyFirstRun": "No session operations yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the session operations are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPerformanceTemplates",
+    "contract": "catalogue",
+    "purpose": "Sessions running",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-725",
+   "workshopBoard": "wireframes/WS56 Event Management Configuration Backend Structure v1.0 Board 9.dc.html#bo-725"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Event_Management_Configuration_Backend_Structure_v1.0.pdf page 81. 0 of 0 labels bound to a contract property; 0 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-726",
+  "name": "Participant Photo & Video Assignment",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "9",
+   "number": "09",
+   "page": 87
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/participant-photo-video-assignment-bo-726",
+   "component": "apps/venue-management-web/src/routes/sell/ParticipantPhotoVideoAssignment.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-725"
+   ],
+   "exitTo": [
+    "BO-725"
+   ],
+   "transitions": [
+    {
+     "to": "BO-725",
+     "trigger": "Back to Performance Operations Command Center",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide detailed analytics for individual participant activity, especially for minute-based and flight/activity businesses.",
+  "purposeNote": "Authorized users can access accurate participant activity statistics derived from booking and completed-session records while respecting CRM/data-access permissions.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 87"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 87"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "assignPerformanceMedia",
+       "label": "Assign session media",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "assignPerformanceMedia"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The participant photo video list.",
+   "error": "Could not load. Names which read failed and leaves the participant photo video untouched.",
+   "emptyFirstRun": "No participant photo video yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the participant photo video are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "assignPerformanceMedia",
+    "contract": "catalogue",
+    "purpose": "Attach photos to participants",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-726",
+   "workshopBoard": "wireframes/WS56 Event Management Configuration Backend Structure v1.0 Board 9.dc.html#bo-726"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Event_Management_Configuration_Backend_Structure_v1.0.pdf page 87. 0 of 0 labels bound to a contract property; 0 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "performanceId",
+     "from": "BO-725"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

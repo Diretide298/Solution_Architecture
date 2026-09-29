@@ -39,6 +39,16 @@ CREATE TABLE IF NOT EXISTS pricing.dynamic_price_rule (
     priority                          integer NOT NULL,
     valid_from                        timestamptz,
     valid_to                          timestamptz,
-    is_active                         boolean NOT NULL
+    is_active                         boolean NOT NULL,
+    dynamic_pricing_strategy_id       uuid,
+    rule_type                         text CONSTRAINT dynamic_price_rule_rule_type_chk CHECK (char_length(rule_type) <= 40),
+    input_metric                      text CONSTRAINT dynamic_price_rule_input_metric_chk CHECK (char_length(input_metric) <= 40),
+    condition_logic                   text DEFAULT 'all' CONSTRAINT dynamic_price_rule_condition_logic_chk CHECK (condition_logic IN ('all', 'any')),
+    cooldown_minutes                  integer,
+    minimum_duration_minutes          integer,
+    exit_threshold_offset             numeric(18,4),
+    range_min_percent                 numeric(18,4),
+    range_max_percent                 numeric(18,4),
+    is_protected                      boolean DEFAULT false
 );
 

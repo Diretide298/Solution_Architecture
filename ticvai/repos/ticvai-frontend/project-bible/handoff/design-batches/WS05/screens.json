@@ -39,10 +39,7 @@
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-184 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-185",
@@ -101,13 +98,96 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized administrators can monitor and manage the biometric-access environment from one location.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Central dashboard for biometric access configuration and operational health.",
-  "purposeNote": "Authorized administrators can monitor and manage the biometric-access environment from one location.",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active Face Pass Profiles",
+       "bindsTo": "BiometricAccessCommandCenterViewSummary.activeFacePassProfiles",
+       "operation": "listBiometricAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Active Face Tags",
+       "bindsTo": "BiometricAccessCommandCenterViewSummary.activeFaceTags",
+       "operation": "listBiometricAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Enrollments Today",
+       "bindsTo": "BiometricAccessCommandCenterViewSummary.enrollmentsToday",
+       "operation": "listBiometricAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Successful Face Verifications",
+       "bindsTo": "BiometricAccessCommandCenterViewSummary.successfulFaceVerifications",
+       "operation": "listBiometricAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Failed Verifications",
+       "bindsTo": "BiometricAccessCommandCenterViewSummary.failedVerifications",
+       "operation": "listBiometricAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Manual Reviews",
+       "bindsTo": "BiometricAccessCommandCenterViewSummary.manualReviews",
+       "operation": "listBiometricAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Re-enrollment Requests",
+       "bindsTo": "BiometricAccessCommandCenterViewSummary.reEnrollmentRequests",
+       "operation": "listBiometricAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Blocked Face Changes",
+       "bindsTo": "BiometricAccessCommandCenterViewSummary.blockedFaceChanges",
+       "operation": "listBiometricAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Profiles Pending Deletion",
+       "bindsTo": "BiometricAccessCommandCenterViewSummary.profilesPendingDeletion",
+       "operation": "listBiometricAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Camera/Reader Health",
+       "bindsTo": "BiometricAccessCommandCenterViewSummary.cameraReaderHealth",
+       "operation": "listBiometricAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Biometric Security Alerts",
+       "bindsTo": "BiometricAccessCommandCenterViewSummary.biometricSecurityAlerts",
+       "operation": "listBiometricAccess",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -115,19 +195,6 @@
       {
        "kind": "dataTable",
        "label": "Every biometric access",
-       "columns": [
-        "BiometricAccessCommandCenterView.activeFacePassProfiles",
-        "BiometricAccessCommandCenterView.activeFaceTags",
-        "BiometricAccessCommandCenterView.enrollmentsToday",
-        "BiometricAccessCommandCenterView.successfulFaceVerifications",
-        "BiometricAccessCommandCenterView.failedVerifications",
-        "BiometricAccessCommandCenterView.manualReviews",
-        "BiometricAccessCommandCenterView.reEnrollmentRequests",
-        "BiometricAccessCommandCenterView.blockedFaceChanges",
-        "BiometricAccessCommandCenterView.profilesPendingDeletion",
-        "BiometricAccessCommandCenterView.cameraReaderHealth",
-        "BiometricAccessCommandCenterView.biometricSecurityAlerts"
-       ],
        "bindsTo": "BiometricAccessCommandCenterView",
        "operation": "listBiometricAccess",
        "provenance": "pack Access Control Module_Reference.pdf, page 56 §Display"
@@ -142,19 +209,6 @@
        "kind": "detailPanel",
        "label": "The selected biometric access",
        "bindsTo": "BiometricAccessCommandCenterView",
-       "columns": [
-        "BiometricAccessCommandCenterView.activeFacePassProfiles",
-        "BiometricAccessCommandCenterView.activeFaceTags",
-        "BiometricAccessCommandCenterView.enrollmentsToday",
-        "BiometricAccessCommandCenterView.successfulFaceVerifications",
-        "BiometricAccessCommandCenterView.failedVerifications",
-        "BiometricAccessCommandCenterView.manualReviews",
-        "BiometricAccessCommandCenterView.reEnrollmentRequests",
-        "BiometricAccessCommandCenterView.blockedFaceChanges",
-        "BiometricAccessCommandCenterView.profilesPendingDeletion",
-        "BiometricAccessCommandCenterView.cameraReaderHealth",
-        "BiometricAccessCommandCenterView.biometricSecurityAlerts"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “Profile Type Credential Venue Status”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 56 §Display"
       }
@@ -175,22 +229,43 @@
     "contract": "access",
     "purpose": "Biometric Access Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setBiometricVerificationProfile",
+    "contract": "access",
+    "purpose": "Create or change a biometric verification profile",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listBiometricAccess"
+    ]
+   },
+   {
+    "operationId": "setFacePassEnrollment",
+    "contract": "access",
+    "purpose": "Change Face Pass enrolment settings",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listBiometricAccess"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "BiometricAccessCommandCenterView.activeFacePassProfiles",
-    "BiometricAccessCommandCenterView.activeFaceTags",
-    "BiometricAccessCommandCenterView.enrollmentsToday",
-    "BiometricAccessCommandCenterView.successfulFaceVerifications",
-    "BiometricAccessCommandCenterView.failedVerifications",
-    "BiometricAccessCommandCenterView.manualReviews"
+    "BiometricAccessCommandCenterViewSummary.activeFacePassProfiles",
+    "BiometricAccessCommandCenterViewSummary.activeFaceTags",
+    "BiometricAccessCommandCenterViewSummary.enrollmentsToday",
+    "BiometricAccessCommandCenterViewSummary.successfulFaceVerifications",
+    "BiometricAccessCommandCenterViewSummary.failedVerifications",
+    "BiometricAccessCommandCenterViewSummary.manualReviews"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-184"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-184",
+   "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-184"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 56. 11 of 11 labels bound to a contract property; 11 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -253,10 +328,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Biometric requirements can be activated or deactivated by product, credential and access location without development.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Select) and no display directory — it is settings, not a population",
   "purpose": "Configure which ticket/credential types can or must use biometric verification. The matrix specifically requires biometric checks to be configurable by ticket type, including memberships, annual passes, multi-day and multi-attraction products.",
-  "purposeNote": "Biometric requirements can be activated or deactivated by product, credential and access location without development.",
   "layout": {
    "template": "form",
    "regions": [
@@ -330,16 +405,14 @@
     "operationId": "setBiometricVerificationProfile",
     "contract": "access",
     "purpose": "Biometric Verification Profile Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setBiometricVerificationProfile"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-185"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-185",
+   "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-185"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 58. 0 of 0 labels bound to a contract property; 8 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -402,10 +475,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Face Pass enrollment follows a controlled, configurable and fully auditable workflow.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture Required Consent; Capture Face; Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure persistent Face Pass registration. The source specifies that Face Pass may be registered through the App, ticket counters or Annual Pass counter.",
-  "purposeNote": "Face Pass enrollment follows a controlled, configurable and fully auditable workflow.",
   "layout": {
    "template": "form",
    "regions": [
@@ -479,16 +552,14 @@
     "operationId": "setFacePassEnrollment",
     "contract": "access",
     "purpose": "Face Pass Enrollment Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setFacePassEnrollment"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-186"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-186",
+   "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-186"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 59. 0 of 0 labels bound to a contract property; 8 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -551,10 +622,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Face Pass capture cannot proceed when the applicable configured consent requirement has not been satisfied.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure by) and no display directory — it is settings, not a population",
   "purpose": "Manage consent requirements associated with persistent biometric enrollment. The matrix requires App users to provide consent before Face Pass registration and requires guardian consent for minors. On-site enrollment also requires consent before facial data is captured.",
-  "purposeNote": "Face Pass capture cannot proceed when the applicable configured consent requirement has not been satisfied.",
   "layout": {
    "template": "form",
    "regions": [
@@ -608,7 +679,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-187"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-187",
+   "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-187"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 60. 0 of 0 labels bound to a contract property; 5 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -671,10 +743,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Temporary biometric identities are clearly separated from persistent biometric profiles and follow their configured automatic deletion lifecycle.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Face Captured) and no display directory — it is settings, not a population",
   "purpose": "Configure the temporary biometric model separately from Face Pass. The matrix describes Face Tag as temporarily stored facial data, enrollable at ticket counters or entry gates, with biometric data permanently deleted once the associated ticket is fully redeemed.",
-  "purposeNote": "Temporary biometric identities are clearly separated from persistent biometric profiles and follow their configured automatic deletion lifecycle.",
   "layout": {
    "template": "form",
    "regions": [
@@ -694,6 +766,18 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save Face Tag profile",
+       "operation": "setFaceTagTemporaryEnrollment",
+       "provenance": "contract access.yaml PUT /face-tag-temporary (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -709,12 +793,19 @@
     "contract": "access",
     "purpose": "Face Tag Temporary Enrollment",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setFaceTagTemporaryEnrollment",
+    "contract": "access",
+    "purpose": "Save Face Tag profile",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-188"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-188",
+   "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-188"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 61. 0 of 0 labels bound to a contract property; 1 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -777,10 +868,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Biometric verification sensitivity can be configured by access context and provider capability.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure biometric verification behavior. The source requires a configurable Biometric Check Level determining the scoring of biometric comparison.",
-  "purposeNote": "Biometric verification sensitivity can be configured by access context and provider capability.",
   "layout": {
    "template": "form",
    "regions": [
@@ -819,6 +910,18 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 62 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save thresholds",
+       "operation": "setFaceMatchingVerification",
+       "provenance": "contract access.yaml PUT /face-matching-verification (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -834,12 +937,19 @@
     "contract": "access",
     "purpose": "Face Matching & Verification Thresholds",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setFaceMatchingVerification",
+    "contract": "access",
+    "purpose": "Save thresholds",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-189"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-189",
+   "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-189"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 62. 0 of 0 labels bound to a contract property; 6 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -902,10 +1012,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Biometric re-enrollment cannot silently replace the identity attached to a credential.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Prevent guests from replacing a registered biometric identity with another person's face. The source explicitly states that customers may re-register Face Pass, but the system must compare the new facial data with the previous profile. If the difference exceeds an acceptable threshold, the update is blocked and venue assistance is required.",
-  "purposeNote": "Biometric re-enrollment cannot silently replace the identity attached to a credential.",
   "layout": {
    "template": "split",
    "regions": [
@@ -920,11 +1030,11 @@
         "FaceChangeReEnrollmentIdentityProtectionView.existingProfileReference",
         "FaceChangeReEnrollmentIdentityProtectionView.newCaptureReference",
         "FaceChangeReEnrollmentIdentityProtectionView.matchResult",
-        "FaceChangeReEnrollmentIdentityProtectionView.credential",
-        "FaceChangeReEnrollmentIdentityProtectionView.guest",
+        "FaceChangeReEnrollmentIdentityProtectionView.credentialId",
+        "FaceChangeReEnrollmentIdentityProtectionView.guestId",
         "FaceChangeReEnrollmentIdentityProtectionView.reasonForReEnrollment",
         "FaceChangeReEnrollmentIdentityProtectionView.previousChanges",
-        "FaceChangeReEnrollmentIdentityProtectionView.operator"
+        "FaceChangeReEnrollmentIdentityProtectionView.operatorId"
        ],
        "bindsTo": "FaceChangeReEnrollmentIdentityProtectionView",
        "operation": "listFaceChangeEnrollment",
@@ -944,11 +1054,11 @@
         "FaceChangeReEnrollmentIdentityProtectionView.existingProfileReference",
         "FaceChangeReEnrollmentIdentityProtectionView.newCaptureReference",
         "FaceChangeReEnrollmentIdentityProtectionView.matchResult",
-        "FaceChangeReEnrollmentIdentityProtectionView.credential",
-        "FaceChangeReEnrollmentIdentityProtectionView.guest",
+        "FaceChangeReEnrollmentIdentityProtectionView.credentialId",
+        "FaceChangeReEnrollmentIdentityProtectionView.guestId",
         "FaceChangeReEnrollmentIdentityProtectionView.reasonForReEnrollment",
         "FaceChangeReEnrollmentIdentityProtectionView.previousChanges",
-        "FaceChangeReEnrollmentIdentityProtectionView.operator"
+        "FaceChangeReEnrollmentIdentityProtectionView.operatorId"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Current Face”, “SIGNIFICANT IDENTITY DIFFERENCE”, “CHANGE BLOCKED”, “Change Reasons”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 63 §Show"
@@ -977,15 +1087,16 @@
     "FaceChangeReEnrollmentIdentityProtectionView.existingProfileReference",
     "FaceChangeReEnrollmentIdentityProtectionView.newCaptureReference",
     "FaceChangeReEnrollmentIdentityProtectionView.matchResult",
-    "FaceChangeReEnrollmentIdentityProtectionView.credential",
-    "FaceChangeReEnrollmentIdentityProtectionView.guest",
+    "FaceChangeReEnrollmentIdentityProtectionView.credentialId",
+    "FaceChangeReEnrollmentIdentityProtectionView.guestId",
     "FaceChangeReEnrollmentIdentityProtectionView.reasonForReEnrollment"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-190"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-190",
+   "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-190"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 63. 8 of 8 labels bound to a contract property; 8 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1048,10 +1159,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Biometric verification integrates transparently into the normal TICVAI admission and exit decision flow.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure how facial verification interacts with the physical access-control journey.",
-  "purposeNote": "Biometric verification integrates transparently into the normal TICVAI admission and exit decision flow.",
   "gaps": [
    {
     "operation": null,
@@ -1075,6 +1186,20 @@
        "derived": true,
        "impliedBy": "listBiometricValidationGate",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setBiometricVerificationProfile",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setBiometricVerificationProfile"
       }
      ]
     }
@@ -1093,18 +1218,26 @@
     "contract": "access",
     "purpose": "Biometric Validation at Gate",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setBiometricVerificationProfile",
+    "contract": "access",
+    "purpose": "Choose which gates, zones and attractions require a face match",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listBiometricValidationGate"
+    ]
    }
   ],
   "entryState": {
-   "preloaded": [
-    "BiometricValidationAtGateView.decisionReturned",
-    "BiometricValidationAtGateView.biometricMatchValidAccess"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-191"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-191",
+   "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-191"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 65. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1167,10 +1300,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Biometric information follows explicit, auditable lifecycle and deletion rules independently from ticket history.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure separately for) and no display directory — it is settings, not a population",
   "purpose": "Manage biometric-data lifecycle and deletion rules.",
-  "purposeNote": "Biometric information follows explicit, auditable lifecycle and deletion rules independently from ticket history.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1199,6 +1332,19 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 66 §Configure separately for"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save retention rule",
+       "operation": "setBiometricLifecycleRetention",
+       "notes": "Step-up (mfa) on save. The retention period is still provisional: how long Face Pass, Face Tag and failed capture data may be kept per region is the client's make-or-break question (K1).",
+       "provenance": "contract access.yaml PUT /biometric-lifecycle-retention (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -1214,12 +1360,19 @@
     "contract": "access",
     "purpose": "Biometric Lifecycle, Retention & Deletion",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setBiometricLifecycleRetention",
+    "contract": "access",
+    "purpose": "Save retention rule",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-192"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-192",
+   "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-192"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 66. 0 of 0 labels bound to a contract property; 4 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1274,16 +1427,11 @@
    "notes": "**Reached from BO-184, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "No biometric access configuration enters production without testing, authorization, version control and auditability. Board 5 — Final 10-Screen Structure # Backend Screen Main Responsibility 5.1 Biometric Access Command Center Biometric estate and operational health",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Test biometric configurations before live deployment.",
-  "purposeNote": "No biometric access configuration enters production without testing, authorization, version control and auditability. Board 5 — Final 10-Screen Structure # Backend Screen Main Responsibility 5.1 Biometric Access Command Center Biometric estate and operational health",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Low-confidence match, Duplicate profile. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Access Control Module_Reference.pdf, page 67 §Support"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
@@ -1333,6 +1481,12 @@
        "kind": "secondaryButton",
        "label": "Duplicate profile",
        "provenance": "pack Access Control Module_Reference.pdf, page 67 §Support"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Run simulation",
+       "operation": "simulateBiometricConfiguration",
+       "provenance": "contract access.yaml POST /biometric/simulate (decided 29 September, VM close-out)"
       }
      ]
     }
@@ -1351,14 +1505,21 @@
     "contract": "access",
     "purpose": "Biometric Simulation, Audit & Publication",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "simulateBiometricConfiguration",
+    "contract": "access",
+    "purpose": "Run simulation",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-193"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-193",
+   "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-193"
   },
-  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 67. 0 of 8 labels bound to a contract property; 10 of 69 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 67. 0 of 8 labels bound to a contract property; 10 of 69 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `simulateBiometricConfiguration`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",

@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `wallet` |
 | Schemas owned | `wallet` |
-| Operations in the slice | 5 of 59 |
+| Operations in the slice | 11 of 59 |
 | Scale | Read-heavy on the sale path — every till and reader resolves a balance — and write-heavy on top-up. Latency-critical in a way LedgerService is not, which is why the two are separate: the ledger is append-only and batch-tolerant, a balance check is neither. |
 | If it is down | It holds a liability owed to a customer. A wallet that double-spends is a financial loss, not a bug report. Deduction order across credit lots is FEFO and is decided here, once, rather than per caller. |
 
@@ -29,8 +29,14 @@
 | card | [`loadGameCredits`](#loadgamecredits) | POST | `/game-cards/{cardCode}/load` | core | 1 | POS-002 |
 | giftCard | [`getGiftCard`](#getgiftcard) | GET | `/gift-cards/{cardCode}` | core | 2 | BO-1123, GST-071, WEB-021 |
 | retail | [`transferWalletBalance`](#transferwalletbalance) | POST | `/wallets/{walletId}/transfer` | core | 2 | BO-1116, BO-1121, GST-071, WEB-021 |
+| wallet | [`createCreditType`](#createcredittype) | POST | `/credit-types` | setup | 1 | BO-1088, BO-1104, BO-415 |
+| wallet | [`expireCreditLots`](#expirecreditlots) | POST | `/credit-lots/expire` | setup | 1 | BO-1111, BO-1130 |
 | wallet | [`getWallet`](#getwallet) | GET | `/wallets/{subjectId}` | core | 2 | BO-1086, BO-414, BO-416, BO-448, BO-487, GST-011 … |
 | wallet | [`listWalletTransactions`](#listwallettransactions) | GET | `/wallets/{subjectId}/transactions` | core | 2 | BO-1093, BO-1102, BO-1142, BO-1143, BO-414, BO-423 … |
+| wallet | [`publishWalletConfiguration`](#publishwalletconfiguration) | POST | `/wallet-configuration/publish` | setup | 1 | BO-1092, BO-1112, BO-1132, BO-1162, BO-1173, BO-1180 … |
+| wallet | [`restoreWalletConfigurationVersion`](#restorewalletconfigurationversion) | POST | `/wallet-configuration/versions/{version}/restore` | setup | 1 | BO-1162 |
+| wallet | [`setWalletAccountingMapping`](#setwalletaccountingmapping) | PUT | `/wallet-accounting` | setup | 1 | BO-1164, BO-1169 |
+| wallet | [`updateCreditType`](#updatecredittype) | PUT | `/credit-types/{creditTypeId}` | setup | 1 | BO-1088, BO-1104, BO-1105, BO-1108, BO-420 |
 
 ## Group: card
 
@@ -239,6 +245,132 @@ Both wallets must belong to the same tenant. **A transfer across tenants is a pa
 
 ## Group: wallet
 
+### createCreditType
+
+**`POST /credit-types`**: Define a kind of credit, without a release
+
+|  |  |
+|---|---|
+| Permission | `WALLET_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `wallet.credit_type` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Reads | `wallet.credit_type` |
+| Writes | `wallet.credit_type` |
+| Called by | BO-1088, BO-1104, BO-415 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `CreditType`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  |  |
+| code | string | yes |  |
+| name | string | yes |  |
+| category | enum (cash, refund, bonus, promotional, giftCard, membership, loyalty, ride, …) |  |  |
+| monetary | boolean |  | Loyalty points are not money. (default True) |
+| conversionRate | number |  | (nullable) |
+| refundable | boolean |  | Promotional credit is not refundable and cash credit is. (default False) |
+| transferable | boolean |  | (default False) |
+| expires | boolean |  | (default False) |
+| validityDays | integer |  | (nullable) |
+| breakageEligible | boolean |  | (default False) |
+| ledgerAccountCode | string |  | (nullable) |
+| priority | integer |  | (default 0) |
+| scopePath | string |  |  |
+| isActive | boolean |  | (default True) |
+
+**Response**: `CreditType`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  |  |
+| code | string | yes |  |
+| name | string | yes |  |
+| category | enum (cash, refund, bonus, promotional, giftCard, membership, loyalty, ride, …) |  |  |
+| monetary | boolean |  | Loyalty points are not money. (default True) |
+| conversionRate | number |  | (nullable) |
+| refundable | boolean |  | Promotional credit is not refundable and cash credit is. (default False) |
+| transferable | boolean |  | (default False) |
+| expires | boolean |  | (default False) |
+| validityDays | integer |  | (nullable) |
+| breakageEligible | boolean |  | (default False) |
+| ledgerAccountCode | string |  | (nullable) |
+| priority | integer |  | (default 0) |
+| scopePath | string |  |  |
+| isActive | boolean |  | (default True) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created |
+
+### expireCreditLots
+
+**`POST /credit-lots/expire`**: Expire, extend or forfeit credit that has run out of time
+
+Board 3.9. **Expiry is an act with an accounting consequence, not a clock.** The moment unspent credit expires it stops being a liability and becomes breakage — recognised revenue — and `finance` needs to be told on a date somebody can defend.
+Extension exists because a venue will want it: a goodwill gesture, a closure, a dispute. **It is recorded with a reason and an approver** rather than done by editing a date.
+
+|  |  |
+|---|---|
+| Permission | `WALLET_OPERATE` |
+| Scope level | venue |
+| Part of slice | setup, makes `wallet.credit_lot` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Reads | `cache:idempotency`, `wallet.accounting_mapping`, `wallet.credit_lot`, `wallet.credit_type`, `wallet.wallet` |
+| Writes | `cache:idempotency`, `wallet.adjustment`, `wallet.credit_lot`, `wallet.wallet`, `wallet.wallet_transaction` |
+| Called by | BO-1111, BO-1130 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| action | enum (expire, extend, forfeit) | yes |  |
+| lotIds | array of string (uuid) |  |  |
+| asOf | string (date) |  | (nullable) |
+| extendToDate | string (date) |  | (nullable) |
+| reason | string |  | (nullable) |
+| mode | enum (preview, apply) |  | (default preview) |
+
+**Response**: `CreditExpiryResult`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| lotsAffected | integer |  |  |
+| totalAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| totalAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| totalAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| totalAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| breakageAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| breakageAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| breakageAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| breakageAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| walletsAffected | integer |  |  |
+| applied | boolean |  |  |
+| asOf | string (date) |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | What would happen, or what did |
+
 ### getWallet
 
 **`GET /wallets/{subjectId}`**: Read a guest wallet
@@ -358,9 +490,324 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 | 200 |  | Transactions |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
+### publishWalletConfiguration
+
+**`POST /wallet-configuration/publish`**: Validate and publish the wallet configuration as a version
+
+Boards 1.10, 10.8 and 10.9. **Ten boards of configuration that interact**, and the failure mode is a credit type with no accounting mapping or a consumption policy naming a type that was retired. Validation names those before they reach a till.
+Published as a version, so a change can be rolled back and so `getApprovalRecord` can say what was in force. **`mode: publish` writes `wallet.configuration_version` and one `wallet.configuration_version_snapshot` row per configuration area**, read from the area tables at that moment; validation alone writes neither (decided 29 September, writers pass; DM6).
+
+|  |  |
+|---|---|
+| Permission | `WALLET_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `wallet.configuration_version`, `wallet.configuration_version_snapshot` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Reads | `cache:idempotency`, `wallet.accounting_mapping`, `wallet.authentication_policy`, `wallet.channel_rules`, `wallet.configuration_version`, `wallet.consumption_policy`, `wallet.credit_type`, `wallet.funding_rules`, `wallet.integration_mapping`, `wallet.reconciliation_source`, `wallet.refund_policy`, `wallet.risk_rules`, `wallet.transfer_rules`, `wallet.wallet_type` |
+| Writes | `cache:idempotency`, `wallet.configuration_version`, `wallet.configuration_version_snapshot` |
+| Called by | BO-1092, BO-1112, BO-1132, BO-1162, BO-1173, BO-1180, BO-1181 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| mode | enum (validateOnly, publish) |  | (default validateOnly) |
+| note | string |  | (nullable) |
+
+**Response**: `WalletConfigurationVersion`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| version | integer |  |  |
+| publishedAt | string (date-time) |  | (nullable) |
+| publishedBy | string (uuid) |  | (nullable) |
+| note | string |  | (nullable) |
+| findings | array of object |  |  |
+| findings[].severity | enum (blocking, warning) |  |  |
+| findings[].code | string |  |  |
+| findings[].message | string |  |  |
+| scopePath | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Findings, and the version if published |
+
+### restoreWalletConfigurationVersion
+
+**`POST /wallet-configuration/versions/{version}/restore`**: Put a previous wallet configuration back as the working draft
+
+Board 8, p.98. Copies the chosen version's configuration into the working draft and returns it as a new unpublished version with its validation findings. **It does not publish**: restore, review with `diffWalletConfigurationVersion`, then `publishWalletConfiguration`, so a rollback is as deliberate as the change that caused it (same rule as `restoreConfigVersion`, audit R139). A credit type retired since that version is reported as a blocking finding rather than silently revived.
+**It reads the version's `wallet.configuration_version_snapshot` rows and writes their values back into the area tables** (wallet types, credit types, funding, consumption, transfer, refund, channel, risk, authentication, accounting, integration and reconciliation), which are the working draft (decided 29 September, writers pass; DM6).
+
+|  |  |
+|---|---|
+| Permission | `WALLET_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `wallet.accounting_mapping`, `wallet.credit_type` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `wallet.configuration_version`, `wallet.configuration_version_snapshot` |
+| Writes | `cache:idempotency`, `wallet.accounting_mapping`, `wallet.authentication_policy`, `wallet.channel_rules`, `wallet.consumption_policy`, `wallet.credit_type`, `wallet.funding_rules`, `wallet.integration_mapping`, `wallet.reconciliation_source`, `wallet.refund_policy`, `wallet.risk_rules`, `wallet.transfer_rules`, `wallet.wallet_type` |
+| Called by | BO-1162 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| version | path | yes | integer |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| reason | string | yes | (min length 1; max length 500) |
+
+**Response**: `WalletConfigurationVersion`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| version | integer |  |  |
+| publishedAt | string (date-time) |  | (nullable) |
+| publishedBy | string (uuid) |  | (nullable) |
+| note | string |  | (nullable) |
+| findings | array of object |  |  |
+| findings[].severity | enum (blocking, warning) |  |  |
+| findings[].code | string |  |  |
+| findings[].message | string |  |  |
+| scopePath | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Restored into the working draft, unpublished |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### setWalletAccountingMapping
+
+**`PUT /wallet-accounting`**: Which ledger account each credit type sits in
+
+Boards 9.2 and 9.3. **27 August, minuted:** *"every financial transaction is tied to a chart-of-account entry… total wallet balances outstanding are reported as a liability owed to customers."*
+**Different credit types are different liabilities.** Cash loaded by a guest is money the venue owes back. Promotional credit it gave away is not — it is a marketing cost already incurred, and booking the two together overstates the liability by whatever the marketing department did last quarter.
+
+|  |  |
+|---|---|
+| Permission | `WALLET_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `wallet.accounting_mapping` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Reads | `wallet.accounting_mapping` |
+| Writes | `wallet.accounting_mapping` |
+| Called by | BO-1164, BO-1169 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `WalletAccountingMapping`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| mappings | array of object |  |  |
+| mappings[].creditTypeId | string (uuid) |  |  |
+| mappings[].liabilityAccountCode | string |  |  |
+| mappings[].breakageRevenueAccountCode | string |  | (nullable) |
+| mappings[].costAccountCode | string |  | For credit the venue gave away. (nullable) |
+| breakagePolicy | object |  |  |
+| breakagePolicy.recogniseAfterMonths | integer |  | Recognised on a policy, not on the expiry date. (nullable) |
+| breakagePolicy.requiresApproval | boolean |  | (default True) |
+| scopePath | string |  |  |
+
+**Response**: `WalletAccountingMapping`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| mappings | array of object |  |  |
+| mappings[].creditTypeId | string (uuid) |  |  |
+| mappings[].liabilityAccountCode | string |  |  |
+| mappings[].breakageRevenueAccountCode | string |  | (nullable) |
+| mappings[].costAccountCode | string |  | For credit the venue gave away. (nullable) |
+| breakagePolicy | object |  |  |
+| breakagePolicy.recogniseAfterMonths | integer |  | Recognised on a policy, not on the expiry date. (nullable) |
+| breakagePolicy.requiresApproval | boolean |  | (default True) |
+| scopePath | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set |
+
+### updateCreditType
+
+**`PUT /credit-types/{creditTypeId}`**: Change a kind of credit
+
+**Changing expiry or refundability does not reach credit already issued.** A lot carries the terms it was issued under, because retro-expiring somebody's gift card is the kind of change that ends up in a regulator's inbox.
+
+|  |  |
+|---|---|
+| Permission | `WALLET_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `wallet.credit_type` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Reads | `wallet.credit_type` |
+| Writes | `wallet.credit_type` |
+| Called by | BO-1088, BO-1104, BO-1105, BO-1108, BO-420 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| creditTypeId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `CreditType`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  |  |
+| code | string | yes |  |
+| name | string | yes |  |
+| category | enum (cash, refund, bonus, promotional, giftCard, membership, loyalty, ride, …) |  |  |
+| monetary | boolean |  | Loyalty points are not money. (default True) |
+| conversionRate | number |  | (nullable) |
+| refundable | boolean |  | Promotional credit is not refundable and cash credit is. (default False) |
+| transferable | boolean |  | (default False) |
+| expires | boolean |  | (default False) |
+| validityDays | integer |  | (nullable) |
+| breakageEligible | boolean |  | (default False) |
+| ledgerAccountCode | string |  | (nullable) |
+| priority | integer |  | (default 0) |
+| scopePath | string |  |  |
+| isActive | boolean |  | (default True) |
+
+**Response**: `CreditType`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  |  |
+| code | string | yes |  |
+| name | string | yes |  |
+| category | enum (cash, refund, bonus, promotional, giftCard, membership, loyalty, ride, …) |  |  |
+| monetary | boolean |  | Loyalty points are not money. (default True) |
+| conversionRate | number |  | (nullable) |
+| refundable | boolean |  | Promotional credit is not refundable and cash credit is. (default False) |
+| transferable | boolean |  | (default False) |
+| expires | boolean |  | (default False) |
+| validityDays | integer |  | (nullable) |
+| breakageEligible | boolean |  | (default False) |
+| ledgerAccountCode | string |  | (nullable) |
+| priority | integer |  | (default 0) |
+| scopePath | string |  |  |
+| isActive | boolean |  | (default True) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Updated |
+
 ## Tables
 
 Every table this service owns that the slice reads or writes, with its columns as derived into `backend/tenant/*.sql`.
+
+### `wallet.accounting_mapping`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| breakage_policy | jsonb | no |  |
+| scope_path | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
+### `wallet.adjustment`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| wallet_id | uuid | no |  |
+| kind | text | no |  |
+| amount | numeric(18,4) | no |  |
+| affected_lot_ids | text[] | no |  |
+| reason | text | no |  |
+| performed_by | uuid | no |  |
+| approved_by | uuid | no |  |
+| at | timestamptz | no |  |
+| scope_path | text | no |  |
+
+### `wallet.authentication_policy`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| scope_path | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
+### `wallet.channel_rules`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| allowed_channels | text[] | no |  |
+| allowed_credential_kinds | text[] | no |  |
+| requires_pin | boolean | no |  |
+| pin_above_amount | numeric(18,4) | no |  |
+| is_offline_allowed | boolean | no |  |
+| offline_floor_limit | numeric(18,4) | no |  |
+| offline_maximum_age_minutes | integer | no | How stale a cached balance may be before the device refuses. |
+| acceptance_point_ids | text[] | no |  |
+| scope_path | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
+### `wallet.configuration_version`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| version | integer | no |  |
+| published_at | timestamptz | no |  |
+| published_by | uuid | no |  |
+| note | text | no |  |
+| scope_path | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
+### `wallet.configuration_version_snapshot`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| configuration_version_id | uuid | yes |  |
+| area | text | yes | The areas WalletConfigurationDiff compares. |
+| values | jsonb | yes | The area's rows as published, in that area's own schema. |
+| captured_at | timestamptz | yes |  |
+| scope_path | text | yes |  |
+
+### `wallet.consumption_policy`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| strategy | text | no | expiringFirst is the default because it is the one that does not quietly profit from the guest forgetting. |
+| type_order | text[] | no |  |
+| within_type_order | text | no |  |
+| allow_split_tender | boolean | no |  |
+| allow_guest_choice | boolean | no | Whether a guest may override the order at the till. |
+| scope_path | text | no |  |
+| id | uuid | yes | Synthesised key. |
 
 ### `wallet.credit_lot`
 
@@ -379,6 +826,42 @@ Every table this service owns that the slice reads or writes, with its columns a
 | status | text | no |  |
 | scope_path | text | no |  |
 
+### `wallet.credit_type`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| code | text | yes |  |
+| name | text | yes |  |
+| category | text | no |  |
+| is_monetary | boolean | no | Loyalty points are not money. |
+| conversion_rate | numeric | no |  |
+| is_refundable | boolean | no | Promotional credit is not refundable and cash credit is. |
+| is_transferable | boolean | no |  |
+| expires | boolean | no |  |
+| validity_days | integer | no |  |
+| is_breakage_eligible | boolean | no |  |
+| ledger_account_code | text | no |  |
+| priority | integer | no |  |
+| scope_path | text | no |  |
+| is_active | boolean | no |  |
+
+### `wallet.funding_rules`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| wallet_type_id | uuid | no |  |
+| minimum_top_up | numeric(18,4) | no |  |
+| maximum_top_up | numeric(18,4) | no |  |
+| allowed_channels | text[] | no |  |
+| allowed_funding_sources | text[] | no |  |
+| auto_reload | jsonb | no | Board 2.5, matrix 4.3.28. |
+| recurring_funding | jsonb | no | Board 2.6, matrix 4.3.29 — *"distinct from auto-reload"*. |
+| approval_above_amount | numeric(18,4) | no |  |
+| velocity_limits | jsonb | no | A fraud control, not a commercial one. |
+| scope_path | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
 ### `wallet.gift_card`
 
 | Column | Type | Required | Notes |
@@ -394,6 +877,56 @@ Every table this service owns that the slice reads or writes, with its columns a
 | expires_at | timestamptz | no |  |
 | id | uuid | yes | Synthesised key. |
 | subject_id | uuid | yes | Points at pii.subject. |
+
+### `wallet.integration_mapping`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| api_client_id | uuid | yes | The public-api ApiClient the integration authenticates as. |
+| date_time_format | text | no | The format the integration sends, e.g. |
+| time_zone | text | no | IANA zone the integration's local times are in. |
+| scope_path | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
+### `wallet.reconciliation_source`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| scope_path | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
+### `wallet.refund_policy`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| default_destination | text | no |  |
+| wallet_refund_credit_type_id | uuid | no |  |
+| restore_to_original_lots | boolean | no |  |
+| restore_original_expiry | boolean | no | Refunding into a new lot with a fresh expiry is a gift. |
+| wallet_refund_bonus_percent | numeric | no | An incentive to take the refund as credit rather than to a card. |
+| scope_path | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
+### `wallet.risk_rules`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| scope_path | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
+### `wallet.transfer_rules`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| is_peer_to_peer_allowed | boolean | no |  |
+| transferable_credit_type_ids | text[] | no |  |
+| maximum_per_transfer | numeric(18,4) | no |  |
+| maximum_per_day | numeric(18,4) | no |  |
+| approval_above_amount | numeric(18,4) | no |  |
+| is_both_parties_identified | boolean | no |  |
+| within_shared_wallet_only | boolean | no |  |
+| scope_path | text | no |  |
+| id | uuid | yes | Synthesised key. |
 
 ### `wallet.wallet`
 
@@ -424,13 +957,42 @@ Every table this service owns that the slice reads or writes, with its columns a
 | recorded_at | timestamptz | yes |  |
 | subject_id | uuid | yes | Points at wallet.wallet. |
 
+### `wallet.wallet_type`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| code | text | yes |  |
+| name | text | yes |  |
+| owner_kind | text | no |  |
+| stored_value_capability | boolean | no | Board 1.2. |
+| top_up_capability | boolean | no |  |
+| transfer_capability | boolean | no |  |
+| refund_capability | boolean | no |  |
+| gift_card_support | boolean | no |  |
+| voucher_support | boolean | no |  |
+| membership_credit_support | boolean | no |  |
+| wearable_support | boolean | no |  |
+| usage_channels | text[] | no | Where this wallet may be used, declared on the type itself. |
+| preset_name | text | no | The client's own name for this composition — "Resort Wallet", "Cashless Venue Wallet", "Closed-Loop Wallet". |
+| holder_may_differ_from_owner | boolean | no | A child wallet's owner is the parent. |
+| requires_identification | boolean | no |  |
+| maximum_balance | numeric(18,4) | no |  |
+| allowed_credit_type_ids | text[] | no |  |
+| allow_negative_balance | boolean | no |  |
+| is_shared_structure_allowed | boolean | no |  |
+| lifecycle_states | text[] | no |  |
+| numbering_pattern | text | no |  |
+| scope_path | text | no |  |
+| is_active | boolean | no |  |
+
 ## Not in the first release
 
-54 operations, added to this service in later releases without changing any of the above.
+48 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | card | `adjustGameCard` |
 | giftCard | `blockGiftCard`, `issueGiftCard` |
 | retail | `activateGiftCard`, `closeWallet`, `redeemGiftCard`, `reinstateWallet`, `suspendWallet` |
-| wallet | `adjustWallet`, `createCreditType`, `createSharedWallet`, `createVoucherType`, `createWalletType`, `diffWalletConfigurationVersion`, `expireCreditLots`, `getCreditConsumptionPolicy`, `getWalletBalance`, `getWalletFundingRules`, `getWalletLiability`, `getWalletReconciliation`, `linkWalletCredential`, `listCreditLots`, `listCreditTypes`, `listSharedWallets`, `listVoucherTypes`, `listWalletConfigurationVersions`, `listWalletDisputes`, `listWalletHolds`, `listWalletTypes`, `publishWalletConfiguration`, `raiseWalletDispute`, `resolveWalletDispute`, `restoreWalletConfigurationVersion`, `reverseWalletFunding`, `setCreditConsumptionPolicy`, `setCreditEligibilityRules`, `setGiftCardProduct`, `setSharedWalletMembers`, `setWalletAccountingMapping`, `setWalletAuthenticationPolicy`, `setWalletChannelRules`, `setWalletFundingRules`, `setWalletIntegrationMapping`, `setWalletReconciliationSources`, `setWalletRefundPolicy`, `setWalletRestriction`, `setWalletRiskRuleStatus`, `setWalletRiskRules`, `setWalletTransferRules`, `simulateCreditConsumption`, `topUpWallet`, `updateCreditType`, `updateWalletType`, `withdrawWalletDispute` |
+| wallet | `adjustWallet`, `createSharedWallet`, `createVoucherType`, `createWalletType`, `diffWalletConfigurationVersion`, `getCreditConsumptionPolicy`, `getWalletBalance`, `getWalletFundingRules`, `getWalletLiability`, `getWalletReconciliation`, `linkWalletCredential`, `listCreditLots`, `listCreditTypes`, `listSharedWallets`, `listVoucherTypes`, `listWalletConfigurationVersions`, `listWalletDisputes`, `listWalletHolds`, `listWalletTypes`, `raiseWalletDispute`, `resolveWalletDispute`, `reverseWalletFunding`, `setCreditConsumptionPolicy`, `setCreditEligibilityRules`, `setGiftCardProduct`, `setSharedWalletMembers`, `setWalletAuthenticationPolicy`, `setWalletChannelRules`, `setWalletFundingRules`, `setWalletIntegrationMapping`, `setWalletReconciliationSources`, `setWalletRefundPolicy`, `setWalletRestriction`, `setWalletRiskRuleStatus`, `setWalletRiskRules`, `setWalletTransferRules`, `simulateCreditConsumption`, `topUpWallet`, `updateWalletType`, `withdrawWalletDispute` |

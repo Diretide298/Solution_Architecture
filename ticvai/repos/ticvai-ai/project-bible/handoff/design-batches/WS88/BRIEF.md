@@ -1,6 +1,6 @@
 # WS88 — Rental Management board 1
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 16 operations · 13 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `AUDIT_VIEW, PLATFORM_CELL_MANAGE, RENTAL_APPROVE, RENTAL_CONFIGURE, RENTAL_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-494` | Rental Product Command Center | commandCentre | 0 | 0 | — |
-| `BO-495` | Create Rental Product Wizard | listDetail | 0 | 0 | — |
-| `BO-496` | Rental Product Profile | listDetail | 0 | 0 | — |
-| `BO-497` | Rental Category & Classification Setup | listDetail | 0 | 0 | — |
-| `BO-498` | Inventory Tracking Model | configEditor | 0 | 0 | — |
-| `BO-499` | Rental Location Assignment | listDetail | 0 | 0 | — |
-| `BO-500` | Rental Duration & Turnaround Configuration | configEditor | 0 | 0 | — |
-| `BO-501` | Rental Rules & Operational Policy | listDetail | 0 | 0 | — |
-| `BO-502` | Customer Requirements, Agreement & Waiver | configEditor | 0 | 0 | — |
-| `BO-503` | Product Validation, Approval & Publication | configEditor | 0 | 0 | — |
+| `BO-494` | Rental Product Command Center | commandCentre | 4 | 0 | — |
+| `BO-495` | Create Rental Product Wizard | listDetail | 2 | 0 | — |
+| `BO-496` | Rental Product Profile | listDetail | 2 | 0 | — |
+| `BO-497` | Rental Category & Classification Setup | listDetail | 2 | 0 | — |
+| `BO-498` | Inventory Tracking Model | configEditor | 1 | 0 | — |
+| `BO-499` | Rental Location Assignment | listDetail | 1 | 0 | — |
+| `BO-500` | Rental Duration & Turnaround Configuration | configEditor | 1 | 0 | — |
+| `BO-501` | Rental Rules & Operational Policy | listDetail | 1 | 0 | — |
+| `BO-502` | Customer Requirements, Agreement & Waiver | configEditor | 1 | 0 | — |
+| `BO-503` | Product Validation, Approval & Publication | configEditor | 4 | 0 | — |
 
 ## Thin screens in this batch
 

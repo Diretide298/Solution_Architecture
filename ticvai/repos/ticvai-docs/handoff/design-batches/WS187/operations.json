@@ -1,0 +1,120 @@
+{
+ "adjustWallet": {
+  "method": "POST",
+  "path": "/wallets/{subjectId}/adjust",
+  "contract": "wallet",
+  "summary": "Manually adjust a wallet balance",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Wallet"
+ },
+ "getWalletFundingRules": {
+  "method": "GET",
+  "path": "/wallet-funding-rules",
+  "contract": "wallet",
+  "summary": "How a wallet may be topped up",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WalletFundingRules"
+ },
+ "getWalletReconciliation": {
+  "method": "GET",
+  "path": "/wallet-reconciliation",
+  "contract": "wallet",
+  "summary": "The wallet sub-ledger against the general ledger and the acquirer",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletReconciliation"
+ },
+ "listWalletTransactions": {
+  "method": "GET",
+  "path": "/wallets/{subjectId}/transactions",
+  "contract": "wallet",
+  "summary": "Wallet transaction history",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "reverseWalletFunding": {
+  "method": "POST",
+  "path": "/wallet-funding/reversals",
+  "contract": "wallet",
+  "summary": "Undo a top-up, in full or in part",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletAdjustment"
+ },
+ "setWalletFundingRules": {
+  "method": "PUT",
+  "path": "/wallet-funding-rules",
+  "contract": "wallet",
+  "summary": "Amounts, channels, bonuses, limits and velocity",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletFundingRules",
+  "responds": "WalletFundingRules"
+ }
+}

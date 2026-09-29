@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Accreditation
   version: 1.0.0
-  x-ticvai-screen-count: 28
+  x-ticvai-screen-count: 29
   x-ticvai-tier: satellite
   x-ticvai-module: 12 — Accreditation & Credential Management
   x-ticvai-platforms:
@@ -197,6 +197,11 @@ paths:
 
         Guest-callable so an applicant can complete their own, and staff-callable so a coordinator can
         submit a roster.
+
+        **Runs the identity-conflict check** (decided 29 September, writers pass), the same one
+        `importAccreditationHolders` applies: a suspected match with an existing holder is written as a
+        `pending` `accreditation.identity_conflict` for `resolveIdentityConflict`, and a pair already `rejected`
+        as two different people is not raised again. The application is accepted either way.
 
         '
       tags:
@@ -1119,6 +1124,9 @@ paths:
                   default: validateOnly
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: What it found, and what it wrote
           content:
             application/json:
@@ -1219,8 +1227,97 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AccreditationAuditRecord'
+  /accreditation-identity-conflicts/{conflictId}/resolve:
+    parameters:
+    - name: conflictId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: resolveIdentityConflict
+      x-ticvai-consumed-by:
+        - "P08 BO-631 Duplicate & Identity Conflict Detection"
+      x-ticvai-agreed: '29 September: writers pass; board 2.7 (BO-631 Duplicate & Identity Conflict Detection);
+        closes DM2 open item (identity_conflict pending with no way out); shape follows verifyAccreditationDocument'
+      summary: Decide whether two accreditation records are the same person
+      description: '**Takes a suspected pair out of `pending`** (decided 29 September, writers pass). The reviewer
+        decides, with a reason, and the decision is kept on the conflict.
+
+
+        - `merged`: the records are one person. `survivingHolderId` (one of the conflict''s `holderIds`, `422`
+        otherwise) keeps the accreditation; the other holders'' applications and documents are re-pointed to it,
+        and each other holder goes to `archived` with **every credential invalidated and pushed to the gates
+        at once**, as a revocation is, because the point of the check is that one badge must not stay live
+        while the other is revoked. The survivor keeps its own access; where `differingAccess` was true the
+        reviewer sets it with `setHolderAccess`, never by adding the two profiles together.
+
+        - `rejected`: they are different people. The pair is kept as `rejected` and is not raised again by a
+        later application or import.
+
+
+        Only a `pending` conflict can be resolved (`409`). Transitions in `states/accreditation-identity-conflict.yaml`.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - outcome
+              - reason
+              properties:
+                outcome:
+                  type: string
+                  enum:
+                  - merged
+                  - rejected
+                survivingHolderId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: Required when outcome is merged; one of the conflict's holderIds
+                reason:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Resolved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationIdentityConflict'
+        '409':
+          description: The conflict is already merged or rejected
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: survivingHolderId missing for merged, or not one of the conflict's holders
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+
 components:
   schemas:
+
     AccreditationProgramme:
       type: object
       x-ticvai-persistence: accreditation.programme
@@ -1539,7 +1636,20 @@ components:
           type: string
     AccreditationIdentityConflict:
       type: object
-      description: 'Board 2.7. **One badge revoked and the other still opening doors.**'
+      x-ticvai-persistence: accreditation.identity_conflict
+      description: 'Board 2.7. **One badge revoked and the other still opening doors.**
+
+
+        **Stored, not recomputed on each read** (data model for the agreed operations, 29 September): a
+        suspected pair is raised by `createAccreditationApplication` and `importAccreditationHolders` using
+        `marketing-crm`''s identity resolution, and keeps its id and status while somebody decides it, so
+        a pair rejected as two different people is not raised again on the next import. Resolved by
+        `resolveIdentityConflict` (`pending` to `merged` or `rejected`, decided 29 September, writers pass);
+        lifecycle in `states/accreditation-identity-conflict.yaml`.'
+      required:
+      - id
+      - holderIds
+      - status
       properties:
         id:
           type: string
@@ -1563,6 +1673,33 @@ components:
           - pending
           - merged
           - rejected
+        detectedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        survivingHolderId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The holder kept when the conflict was merged
+        resolutionReason:
+          type: string
+          maxLength: 500
+          nullable: true
+          readOnly: true
+        resolvedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        resolvedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        scopePath:
+          type: string
     AccreditationCredential:
       type: object
       x-ticvai-persistence: accreditation.credential

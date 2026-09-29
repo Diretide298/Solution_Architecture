@@ -1,0 +1,277 @@
+{
+ "completeUpload": {
+  "method": "POST",
+  "path": "/media/uploads/{uploadId}/complete",
+  "contract": "assets",
+  "summary": "Confirm an upload and create the asset",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaAsset"
+ },
+ "createSeatMap": {
+  "method": "POST",
+  "path": "/seat-maps",
+  "contract": "seating",
+  "summary": "Create a seat map",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateSeatMapRequest",
+  "responds": "SeatMap"
+ },
+ "createSeatMapTemplate": {
+  "method": "POST",
+  "path": "/seat-map-templates",
+  "contract": "seating",
+  "summary": "Save a map as a reusable template",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatMapTemplate"
+ },
+ "createUpload": {
+  "method": "POST",
+  "path": "/media/uploads",
+  "contract": "assets",
+  "summary": "Request a signed upload URL",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "UploadTicket"
+ },
+ "getSeatMap": {
+  "method": "GET",
+  "path": "/seat-maps/{seatMapId}",
+  "contract": "seating",
+  "summary": "Read a seat map with its structure",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SeatMap"
+ },
+ "listSeatMapTemplates": {
+  "method": "GET",
+  "path": "/seat-map-templates",
+  "contract": "seating",
+  "summary": "List reusable layout templates",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SeatMapTemplate"
+ },
+ "listSeatMaps": {
+  "method": "GET",
+  "path": "/seat-maps",
+  "contract": "seating",
+  "summary": "List seat maps",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSeats": {
+  "method": "GET",
+  "path": "/seat-maps/{seatMapId}/seats",
+  "contract": "seating",
+  "summary": "List seats in a map",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "sectionCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "rowLabel",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "attribute",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "publishSeatMap": {
+  "method": "POST",
+  "path": "/seat-maps/{seatMapId}/publish",
+  "contract": "seating",
+  "summary": "Validate and publish a seat map",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatMap"
+ },
+ "setMapZones": {
+  "method": "PUT",
+  "path": "/seat-maps/{seatMapId}/zones",
+  "contract": "seating",
+  "summary": "Standing areas, suites, stages and obstructions",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MapZone"
+ },
+ "updateSeatMap": {
+  "method": "PATCH",
+  "path": "/seat-maps/{seatMapId}",
+  "contract": "seating",
+  "summary": "Rename or amend a seat map",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatMap"
+ },
+ "updateSeats": {
+  "method": "PATCH",
+  "path": "/seat-maps/{seatMapId}/seats",
+  "contract": "seating",
+  "summary": "Bulk-amend seats",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "BulkUpdateSeatsRequest",
+  "responds": null
+ },
+ "validateSeatMap": {
+  "method": "POST",
+  "path": "/seat-maps/{seatMapId}/validate",
+  "contract": "seating",
+  "summary": "Run validation without publishing",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ValidationReport"
+ }
+}

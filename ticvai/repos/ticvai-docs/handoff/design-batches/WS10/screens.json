@@ -39,10 +39,7 @@
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-234 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-235",
@@ -96,18 +93,90 @@
      "to": "BO-243",
      "trigger": "Works in Policy Approval, Audit, Analytics & AI Optimization",
      "provenance": "flow F120 step 17→18",
-     "operation": "listDynamicAccessPolicy"
+     "operation": "listDynamicAccessPolicy",
+     "carries": [
+      "policyId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can centrally understand the status, scope, performance and conflicts of all dynamic access policies.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Provide central governance and visibility over all dynamic access policies.",
-  "purposeNote": "Administrators can centrally understand the status, scope, performance and conflicts of all dynamic access policies.",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active Policies",
+       "bindsTo": "DynamicAccessPolicyCommandCenterViewSummary.activePolicies",
+       "operation": "listDynamicAccessPolicy",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Draft Policies",
+       "bindsTo": "DynamicAccessPolicyCommandCenterViewSummary.draftPolicies",
+       "operation": "listDynamicAccessPolicy",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Policies Pending Approval",
+       "bindsTo": "DynamicAccessPolicyCommandCenterViewSummary.policiesPendingApproval",
+       "operation": "listDynamicAccessPolicy",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Policies Triggered Today",
+       "bindsTo": "DynamicAccessPolicyCommandCenterViewSummary.policiesTriggeredToday",
+       "operation": "listDynamicAccessPolicy",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Allow Decisions",
+       "bindsTo": "DynamicAccessPolicyCommandCenterViewSummary.allowDecisions",
+       "operation": "listDynamicAccessPolicy",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Deny Decisions",
+       "bindsTo": "DynamicAccessPolicyCommandCenterViewSummary.denyDecisions",
+       "operation": "listDynamicAccessPolicy",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Policy Conflicts",
+       "bindsTo": "DynamicAccessPolicyCommandCenterViewSummary.policyConflicts",
+       "operation": "listDynamicAccessPolicy",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Expiring Policies",
+       "bindsTo": "DynamicAccessPolicyCommandCenterViewSummary.expiringPolicies",
+       "operation": "listDynamicAccessPolicy",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "AI Recommendations",
+       "bindsTo": "DynamicAccessPolicyCommandCenterViewSummary.aiRecommendations",
+       "operation": "listDynamicAccessPolicy",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -116,16 +185,7 @@
        "kind": "dataTable",
        "label": "Every dynamic access policy",
        "columns": [
-        "DynamicAccessPolicyCommandCenterView.activePolicies",
-        "DynamicAccessPolicyCommandCenterView.draftPolicies",
-        "DynamicAccessPolicyCommandCenterView.policiesPendingApproval",
-        "DynamicAccessPolicyCommandCenterView.policiesTriggeredToday",
-        "DynamicAccessPolicyCommandCenterView.allowDecisions",
-        "DynamicAccessPolicyCommandCenterView.denyDecisions",
-        "Review Decisions",
-        "DynamicAccessPolicyCommandCenterView.policyConflicts",
-        "DynamicAccessPolicyCommandCenterView.expiringPolicies",
-        "DynamicAccessPolicyCommandCenterView.aiRecommendations"
+        "Review Decisions"
        ],
        "bindsTo": "DynamicAccessPolicyCommandCenterView",
        "operation": "listDynamicAccessPolicy",
@@ -142,16 +202,7 @@
        "label": "The selected dynamic access policy",
        "bindsTo": "DynamicAccessPolicyCommandCenterView",
        "columns": [
-        "DynamicAccessPolicyCommandCenterView.activePolicies",
-        "DynamicAccessPolicyCommandCenterView.draftPolicies",
-        "DynamicAccessPolicyCommandCenterView.policiesPendingApproval",
-        "DynamicAccessPolicyCommandCenterView.policiesTriggeredToday",
-        "DynamicAccessPolicyCommandCenterView.allowDecisions",
-        "DynamicAccessPolicyCommandCenterView.denyDecisions",
-        "Review Decisions",
-        "DynamicAccessPolicyCommandCenterView.policyConflicts",
-        "DynamicAccessPolicyCommandCenterView.expiringPolicies",
-        "DynamicAccessPolicyCommandCenterView.aiRecommendations"
+        "Review Decisions"
        ],
        "notes": null,
        "provenance": "pack Access Control Module_Reference.pdf, page 133 §Show"
@@ -173,22 +224,33 @@
     "contract": "access",
     "purpose": "Dynamic Access Policy Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setVisualDynamicPolicy",
+    "contract": "access",
+    "purpose": "Create or change a dynamic access policy from the command centre",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listDynamicAccessPolicy"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "DynamicAccessPolicyCommandCenterView.activePolicies",
-    "DynamicAccessPolicyCommandCenterView.draftPolicies",
-    "DynamicAccessPolicyCommandCenterView.policiesPendingApproval",
-    "DynamicAccessPolicyCommandCenterView.policiesTriggeredToday",
-    "DynamicAccessPolicyCommandCenterView.allowDecisions",
-    "DynamicAccessPolicyCommandCenterView.denyDecisions"
+    "DynamicAccessPolicyCommandCenterViewSummary.activePolicies",
+    "DynamicAccessPolicyCommandCenterViewSummary.draftPolicies",
+    "DynamicAccessPolicyCommandCenterViewSummary.policiesPendingApproval",
+    "DynamicAccessPolicyCommandCenterViewSummary.policiesTriggeredToday",
+    "DynamicAccessPolicyCommandCenterViewSummary.allowDecisions",
+    "DynamicAccessPolicyCommandCenterViewSummary.denyDecisions"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-234"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-234",
+   "workshopBoard": "wireframes/WS27 Access Control Board 10.dc.html#bo-234"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 133. 9 of 10 labels bound to a contract property; 10 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -251,10 +313,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Policy designers use governed attributes rather than manually creating inconsistent fields in individual policies.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Define the attributes available to the TICVAI policy engine. This becomes the reusable data dictionary for dynamic access decisions.",
-  "purposeNote": "Policy designers use governed attributes rather than manually creating inconsistent fields in individual policies.",
   "gaps": [
    {
     "operation": null,
@@ -280,6 +342,18 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save attribute",
+       "operation": "setAccessAttributeCatalog",
+       "provenance": "contract access.yaml PUT /access-attribute-catalog (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -296,21 +370,22 @@
     "contract": "access",
     "purpose": "Access Attribute Catalog",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setAccessAttributeCatalog",
+    "contract": "access",
+    "purpose": "Save attribute",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
-   "preloaded": [
-    "AccessAttributeCatalogView.age",
-    "AccessAttributeCatalogView.genderWhereLegallyBusinessPermitted",
-    "AccessAttributeCatalogView.customerSegment",
-    "AccessAttributeCatalogView.guestCategory",
-    "AccessAttributeCatalogView.countryResidencyWhereApplicable"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-235"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-235",
+   "workshopBoard": "wireframes/WS27 Access Control Board 10.dc.html#bo-235"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 134. 0 of 0 labels bound to a contract property; 0 of 62 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -373,10 +448,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Business administrators can create sophisticated contextual access policies without development work.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide a no-code interface for constructing contextual access policies.",
-  "purposeNote": "Business administrators can create sophisticated contextual access policies without development work.",
   "gaps": [
    {
     "operation": null,
@@ -429,16 +504,14 @@
     "operationId": "setVisualDynamicPolicy",
     "contract": "access",
     "purpose": "Visual Dynamic Policy Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setVisualDynamicPolicy"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-236"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-236",
+   "workshopBoard": "wireframes/WS27 Access Control Board 10.dc.html#bo-236"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 136. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -501,10 +574,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Access behavior can dynamically respond to operating calendars, events, capacity, occupancy and venue status.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§MONITOR) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Configure policies driven by changing venue conditions rather than only guest attributes.",
-  "purposeNote": "Access behavior can dynamically respond to operating calendars, events, capacity, occupancy and venue status.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -525,8 +598,13 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
-       "provenance": "contract operation setContextTimeEvent"
+       "label": "Event",
+       "provenance": "pack Access Control Module_Reference.pdf, page 137 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Special Event",
+       "provenance": "pack Access Control Module_Reference.pdf, page 137 §Support"
       }
      ]
     }
@@ -544,18 +622,16 @@
     "operationId": "setContextTimeEvent",
     "contract": "access",
     "purpose": "Context, Time, Event & Capacity Policy Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setContextTimeEvent"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-237"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-237",
+   "workshopBoard": "wireframes/WS27 Access Control Board 10.dc.html#bo-237"
   },
-  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 137. 0 of 0 labels bound to a contract property; 1 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 137. 0 of 0 labels bound to a contract property; 3 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Special Event are choices sent by `setContextTimeEvent`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -616,16 +692,11 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Memberships, staff identities and accreditations can participate directly in access-policy decisions.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure policies based on who the requesting person is.",
-  "purposeNote": "Memberships, staff identities and accreditations can participate directly in access-policy decisions.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Guest, Security. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Access Control Module_Reference.pdf, page 139 §Support"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -675,23 +746,37 @@
     "contract": "access",
     "purpose": "Identity, Membership & Accreditation Policies",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setVisualDynamicPolicy",
+    "contract": "access",
+    "purpose": "Save a policy whose conditions are identity, membership or accreditation attributes",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listIdentityMembershipAccreditation"
+    ]
+   },
+   {
+    "operationId": "setAccessProfile",
+    "contract": "accreditation",
+    "purpose": "Map an accreditation category to the zones it opens",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
    }
   ],
   "entryState": {
    "preloaded": [
-    "IdentityMembershipAccreditationPoliciesView.guest",
-    "IdentityMembershipAccreditationPoliciesView.member",
-    "IdentityMembershipAccreditationPoliciesView.annualPassHolder",
-    "IdentityMembershipAccreditationPoliciesView.employee",
-    "IdentityMembershipAccreditationPoliciesView.contractor"
+    "IdentityMembershipAccreditationPoliciesView.identityType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-238"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-238",
+   "workshopBoard": "wireframes/WS27 Access Control Board 10.dc.html#bo-238"
   },
-  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 139. 0 of 0 labels bound to a contract property; 2 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 139. 0 of 0 labels bound to a contract property; 2 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Guest, Security are choices sent by `setVisualDynamicPolicy` (identity categories the policy condition tests).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -752,10 +837,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Policies behave predictably across tenants, venues and access hierarchies.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Administrator defines) and no display directory — it is settings, not a population",
   "purpose": "Govern how policies apply across TICVAI's multi-tenant and multi-venue architecture.",
-  "purposeNote": "Policies behave predictably across tenants, venues and access hierarchies.",
   "layout": {
    "template": "form",
    "regions": [
@@ -784,6 +869,18 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 140 §Administrator defines"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save scope placement",
+       "operation": "setPolicyScopeHierarchy",
+       "provenance": "contract access.yaml PUT /policy-scope-hierarchy (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -799,12 +896,19 @@
     "contract": "access",
     "purpose": "Policy Scope, Hierarchy & Inheritance",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPolicyScopeHierarchy",
+    "contract": "access",
+    "purpose": "Save scope placement",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-239"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-239",
+   "workshopBoard": "wireframes/WS27 Access Control Board 10.dc.html#bo-239"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 140. 0 of 0 labels bound to a contract property; 4 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -867,10 +971,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Privileged and temporary access follows controlled authorization rather than informal manual permissions.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Apply enterprise governance principles to privileged and temporary access.",
-  "purposeNote": "Privileged and temporary access follows controlled authorization rather than informal manual permissions.",
   "gaps": [
    {
     "operation": null,
@@ -887,15 +991,24 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "actionBar",
+     "slot": "rowActions",
      "components": [
       {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAuthorizationGovernanceTemporary",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "kind": "primaryButton",
+       "label": "Temporary Access",
+       "provenance": "pack Access Control Module_Reference.pdf, page 142 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Expiring Grants",
+       "provenance": "pack Access Control Module_Reference.pdf, page 142 §Support"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -915,20 +1028,15 @@
    }
   ],
   "entryState": {
-   "preloaded": [
-    "AuthorizationGovernanceTemporaryAccessView.leastPrivilege",
-    "AuthorizationGovernanceTemporaryAccessView.segregationOfDuties",
-    "AuthorizationGovernanceTemporaryAccessView.temporaryAccess",
-    "AuthorizationGovernanceTemporaryAccessView.expiringGrants",
-    "AuthorizationGovernanceTemporaryAccessView.delegatedAdministration"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-240"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-240",
+   "workshopBoard": "wireframes/WS27 Access Control Board 10.dc.html#bo-240"
   },
-  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 142. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 142. 0 of 0 labels bound to a contract property; 2 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Expiring Grants are choices sent by `listAuthorizationGovernanceTemporary`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -989,10 +1097,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every policy has a defined evaluation location and predictable behavior when connectivity or data sources are unavailable.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Define where and how policies are evaluated. This screen connects Board 10 with the offline/edge architecture already configured in Board 7.",
-  "purposeNote": "Every policy has a defined evaluation location and predictable behavior when connectivity or data sources are unavailable.",
   "gaps": [
    {
     "operation": null,
@@ -1016,6 +1124,20 @@
        "derived": true,
        "impliedBy": "listPolicyEvaluationArchitecture",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setEdgeNodeLocal",
+       "label": "Save edge node local",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setEdgeNodeLocal"
       }
      ]
     }
@@ -1034,19 +1156,33 @@
     "contract": "access",
     "purpose": "Policy Evaluation Architecture & Offline Distribution",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setEdgeNodeLocal",
+    "contract": "access",
+    "purpose": "Save where a policy is evaluated at the edge",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listPolicyEvaluationArchitecture"
+    ]
+   },
+   {
+    "operationId": "setOfflinePolicy",
+    "contract": "tenancy",
+    "purpose": "Save what the edge may decide while central services are unreachable",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
    }
   ],
   "entryState": {
-   "preloaded": [
-    "PolicyEvaluationArchitectureOfflineDistributionView.evaluatedAtVenueEdge",
-    "PolicyEvaluationArchitectureOfflineDistributionView.evaluatedLocallyWhereSupported",
-    "PolicyEvaluationArchitectureOfflineDistributionView.centralUnavailable"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-241"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-241",
+   "workshopBoard": "wireframes/WS27 Access Control Board 10.dc.html#bo-241"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 143. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1109,10 +1245,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "No policy reaches production without visibility into conflicts and potential operational impact.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Test policies before they affect live guest admission.",
-  "purposeNote": "No policy reaches production without visibility into conflicts and potential operational impact.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1183,10 +1319,7 @@
     "operationId": "simulatePolicyConflictImpact",
     "contract": "access",
     "purpose": "Policy Simulation, Conflict & Impact Analysis",
-    "trigger": "onAction",
-    "invalidates": [
-     "simulatePolicyConflictImpact"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1202,7 +1335,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-242"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-242",
+   "workshopBoard": "wireframes/WS27 Access Control Board 10.dc.html#bo-242"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 144. 6 of 6 labels bound to a contract property; 6 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1257,17 +1391,10 @@
    "notes": "**Reached from BO-234, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Dynamic access policies are versioned, approved, measurable, auditable and continuously optimizable. Board 10 — Final 10-Screen Structure # Backend Screen Main Responsibility 10.1 Dynamic Access Policy Command Center Policy estate and health 10.2 Access Attribute Catalog Govern reusable decision attributes 10.3 Visual Dynamic Policy Builder Build ABAC policies without code 10.4 Context, Time, Event & Capacity Policy Builder Context-aware operational policies 10.5 Identity, Membership & Accreditation Policies Identity-based authorization 10.6 Policy Scope, Hierarchy & Inheritance Multi-venue po",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Monitor; Measure) and no metric row",
   "purpose": "Govern the complete policy lifecycle and continuously measure policy effectiveness.",
-  "purposeNote": "Dynamic access policies are versioned, approved, measurable, auditable and continuously optimizable. Board 10 — Final 10-Screen Structure # Backend Screen Main Responsibility 10.1 Dynamic Access Policy Command Center Policy estate and health 10.2 Access Attribute Catalog Govern reusable decision attributes 10.3 Visual Dynamic Policy Builder Build ABAC policies without code 10.4 Context, Time, Event & Capacity Policy Builder Context-aware operational policies 10.5 Identity, Membership & Accreditation Policies Identity-based authorization 10.6 Policy Scope, Hierarchy & Inheritance Multi-venue po",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Policy Owner, Business Approval, Security Approval, Technical Approval, ROLLBACK TO V3.4. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Access Control Module_Reference.pdf, page 146 §Support"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1342,6 +1469,7 @@
       {
        "kind": "destructiveButton",
        "label": "ROLLBACK TO V3.4",
+       "operation": "rollbackAccessPolicy",
        "provenance": "pack Access Control Module_Reference.pdf, page 146 §Allow"
       }
      ]
@@ -1370,6 +1498,33 @@
     "contract": "white-label",
     "purpose": "List legal policies",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listDynamicAccessPolicy",
+    "contract": "access",
+    "purpose": "The access policies awaiting approval, with their versions",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "createApprovalRequest",
+    "contract": "approvals",
+    "purpose": "Send a policy version for business, security and technical approval",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "decideApprovalRequest",
+    "contract": "approvals",
+    "purpose": "Approve or reject a policy version",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "rollbackAccessPolicy",
+    "contract": "access",
+    "purpose": "Roll back policy",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1380,14 +1535,25 @@
     "False-Positive Indicators",
     "Operator Review Rate",
     "Guest Impact"
+   ],
+   "params": [
+    {
+     "name": "policyId",
+     "from": "navigation"
+    },
+    {
+     "name": "requestId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-243"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-243",
+   "workshopBoard": "wireframes/WS27 Access Control Board 10.dc.html#bo-243"
   },
-  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 146. 0 of 7 labels bound to a contract property; 12 of 89 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 146. 0 of 7 labels bound to a contract property; 12 of 89 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Policy Owner, Business Approval, Security Approval, Technical Approval: `decideApprovalRequest`; still owed by a contract change: `rollbackAccessPolicy`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",

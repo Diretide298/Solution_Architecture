@@ -1,4 +1,33 @@
 {
+ "getOfflinePackage": {
+  "method": "GET",
+  "path": "/access/offline-package",
+  "contract": "access",
+  "summary": "Entitlement and rule set for offline validation",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": "validFrom",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "validTo",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "If-None-Match",
+    "in": "header",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OfflinePackage"
+ },
  "listConnectivityFailureDegraded": {
   "method": "GET",
   "path": "/connectivity-failure-degraded",
@@ -21,9 +50,20 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "EdgePackageDataDistributionView"
+  "responds": "Page"
  },
  "listEdgeSecurityDeployment": {
   "method": "GET",
@@ -34,9 +74,20 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "EdgeSecurityAuditDeploymentView"
+  "responds": "Page"
  },
  "listOfflineCredentialRevocation": {
   "method": "GET",
@@ -60,9 +111,20 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "OfflineEdgeOperationsCommandCenterView"
+  "responds": "Page"
  },
  "listOfflineEntitlementUsage": {
   "method": "GET",
@@ -73,9 +135,20 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "OfflineEntitlementUsageLedgerView"
+  "responds": "Page"
  },
  "listReconnectionSynchronizationConflict": {
   "method": "GET",
@@ -86,9 +159,58 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ReconnectionSynchronizationConflictResolutionView"
+  "responds": "Page"
+ },
+ "publishHardwareDeployment": {
+  "method": "POST",
+  "path": "/hardware-deployments",
+  "contract": "access",
+  "summary": "Deploy a gate configuration version",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "HardwareDeploymentInput",
+  "responds": "HardwareDeploymentView"
+ },
+ "setConnectivityThresholds": {
+  "method": "PUT",
+  "path": "/connectivity-policy",
+  "contract": "tenancy",
+  "summary": "When a workstation decides it is offline, and when it is back",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ConnectivityPolicy",
+  "responds": "ConnectivityPolicy"
  },
  "setEdgeNodeLocal": {
   "method": "PUT",
@@ -99,7 +221,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "EdgeNodeLocalProcessingConfigurationInput",
   "responds": "EdgeNodeLocalProcessingConfigurationView"
  },
@@ -131,7 +259,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "OfflineSimulationResilienceTestingInput",
   "responds": "OfflineSimulationResilienceTestingView"
  }

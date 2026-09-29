@@ -1,6 +1,6 @@
 # WS61 — Ticket Media   Credential Management board 3
 
-**10 screens · 10 operations · 12 schemas · 2 permissions**
+**10 screens · 16 operations · 17 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, SCOPE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 7 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, AUDIT_VIEW, ORDER_EXCHANGE, ORDER_REPRINT, REPORT_VIEW_VENUE, SCOPE_VIEW, TICKET_LOOKUP`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -63,11 +62,11 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `BO-354` | Credential Operations Command Center | commandCentre | 1 | 0 | — |
 | `BO-355` | Virtual Ticket & Credential 360° Workspace | commandCentre | 1 | 0 | — |
-| `BO-356` | Credential Generation & Issuance Monitor | listDetail | 1 | 0 | — |
-| `BO-357` | Credential Delivery & Distribution Operations | listDetail | 1 | 0 | — |
+| `BO-356` | Credential Generation & Issuance Monitor | listDetail | 5 | 0 | — |
+| `BO-357` | Credential Delivery & Distribution Operations | listDetail | 2 | 0 | — |
 | `BO-358` | Media Binding, Activation & Assignment Operations | listDetail | 1 | 0 | — |
-| `BO-359` | Credential Replacement, Reissue, Revocation & Recovery | configEditor | 1 | 0 | — |
-| `BO-360` | Failed Generation, Delivery & Credential Exception Management | listDetail | 1 | 0 | — |
+| `BO-359` | Credential Replacement, Reissue, Revocation & Recovery | configEditor | 2 | 0 | — |
+| `BO-360` | Failed Generation, Delivery & Credential Exception Management | listDetail | 2 | 0 | — |
 | `BO-361` | Credential Usage & Cross-Media Traceability | configEditor | 1 | 0 | — |
 | `BO-362` | Credential Security, Audit & Operational Evidence | listDetail | 1 | 0 | — |
 | `BO-363` | Ticket Media Analytics & AI Operations Intelligence | listDetail | 1 | 0 | — |

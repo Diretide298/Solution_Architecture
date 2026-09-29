@@ -1,13 +1,13 @@
 id: HLD-LIFECYCLES
 sourceFiles:
   folder: states/
-  files: 135
-  drawn: 134
+  files: 187
+  drawn: 186
   skipped:
   - _schema.yaml
   why: '**`_schema.yaml` is the shape, not a model.** Every state file validates against it; it has
     no entity and no transitions.'
-title: 134 state models and 29 events
+title: 186 state models and 30 events
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 about: '**What can happen to a thing, and in what order.** A state model is a lifecycle within one entity;
@@ -21,6 +21,340 @@ naming: '**Called `domain` in the viewer, which names a methodology rather than 
   layer names a thing a reader recognises. `Lifecycles` covers both halves and says what question it
   answers.'
 stateModels:
+- entity: AccessBiometricProfile
+  contract: access
+  owner: access
+  service: AccessService
+  states: null
+  transitions: 8
+  initial:
+  - active
+  - inactive
+  terminal: []
+  operations:
+  - setBiometricVerificationProfile
+  - setFaceMatchingVerification
+  - setFacePassEnrollment
+  - setFaceTagTemporaryEnrollment
+  guarded: 8
+  ref: diagrams/lld/lifecycles/access-biometric-profile.yaml
+- entity: AccessConfigurationVersion
+  contract: access
+  owner: access
+  service: TenancyService
+  states: null
+  transitions: 17
+  initial:
+  - draft
+  terminal:
+  - rolledBack
+  operations:
+  - decideApprovalRequest
+  - publishRuleConflictCheck
+  - publishTopologyValidation
+  - rollbackConfigurationVersion
+  guarded: 17
+  ref: diagrams/lld/lifecycles/access-configuration-version.yaml
+- entity: AccessCredentialBinding
+  contract: access
+  owner: access
+  service: AccessService
+  states: null
+  transitions: 14
+  initial:
+  - pending
+  - active
+  terminal:
+  - revoked
+  - expired
+  operations:
+  - replaceCredential
+  - resolveCredentialException
+  - setMediaBindingActivation
+  guarded: 14
+  ref: diagrams/lld/lifecycles/access-credential-binding.yaml
+- entity: AccessCredentialDelivery
+  contract: access
+  owner: access
+  service: null
+  states: null
+  transitions: 12
+  initial:
+  - pending
+  - notRequired
+  terminal:
+  - completed
+  - failed
+  - bounced
+  - expired
+  - cancelled
+  - notRequired
+  operations: []
+  guarded: 12
+  ref: diagrams/lld/lifecycles/access-credential-delivery.yaml
+- entity: AccessCredentialException
+  contract: access
+  owner: access
+  service: AccessService
+  states: null
+  transitions: 7
+  initial:
+  - open
+  terminal:
+  - resolved
+  operations:
+  - resolveCredentialException
+  guarded: 7
+  ref: diagrams/lld/lifecycles/access-credential-exception.yaml
+- entity: AccessCredentialIssuance
+  contract: access
+  owner: access
+  service: AccessService
+  states: null
+  transitions: 14
+  initial:
+  - requested
+  terminal:
+  - delivered
+  operations:
+  - resolveCredentialException
+  - retryCredentialGeneration
+  guarded: 14
+  ref: diagrams/lld/lifecycles/access-credential-issuance.yaml
+- entity: AccessDeviceHealth
+  contract: access
+  owner: access
+  service: null
+  states: null
+  transitions: 20
+  initial:
+  - healthy
+  - active
+  - degraded
+  - offline
+  - localMode
+  terminal: []
+  operations: []
+  guarded: 20
+  ref: diagrams/lld/lifecycles/access-device-status.yaml
+- entity: AccessDynamicPolicyVersion
+  contract: access
+  owner: access
+  service: TenancyService
+  states: null
+  transitions: 4
+  initial:
+  - pendingApproval
+  - active
+  terminal:
+  - superseded
+  - rejected
+  operations:
+  - decideApprovalRequest
+  guarded: 4
+  ref: diagrams/lld/lifecycles/access-dynamic-policy-version.yaml
+- entity: AccessDynamicPolicy
+  contract: access
+  owner: access
+  service: TenancyService
+  states: null
+  transitions: 13
+  initial:
+  - pendingApproval
+  - inactive
+  terminal:
+  - expired
+  operations:
+  - decideApprovalRequest
+  - setContextTimeEvent
+  - setVisualDynamicPolicy
+  guarded: 13
+  ref: diagrams/lld/lifecycles/access-dynamic-policy.yaml
+- entity: AccessExternalCredentialIntegration
+  contract: access
+  owner: access
+  service: AccessService
+  states: null
+  transitions: 4
+  initial:
+  - draft
+  - active
+  terminal: []
+  operations:
+  - setHotelWalletExternal
+  guarded: 4
+  ref: diagrams/lld/lifecycles/access-external-credential-integration.yaml
+- entity: AccessGateModeChange
+  contract: access
+  owner: access
+  service: AccessService
+  states: null
+  transitions: 2
+  initial:
+  - pending
+  - applied
+  terminal:
+  - applied
+  - cancelled
+  operations:
+  - cancelGateModeChange
+  guarded: 2
+  ref: diagrams/lld/lifecycles/access-gate-mode-change.yaml
+- entity: AccessIdentityLock
+  contract: access
+  owner: access
+  service: AccessService
+  states: null
+  transitions: 3
+  initial:
+  - active
+  terminal:
+  - released
+  operations:
+  - releaseIdentityLock
+  guarded: 3
+  ref: diagrams/lld/lifecycles/access-identity-lock.yaml
+- entity: AccessIncident
+  contract: access
+  owner: access
+  service: AccessService
+  states: null
+  transitions: 6
+  initial:
+  - open
+  terminal:
+  - closed
+  operations:
+  - setOperationalIncidentException
+  guarded: 6
+  ref: diagrams/lld/lifecycles/access-incident.yaml
+- entity: AccessJourneyProfile
+  contract: access
+  owner: access
+  service: AccessService
+  states: null
+  transitions: 2
+  initial:
+  - active
+  - inactive
+  terminal: []
+  operations:
+  - setJourneyProfile
+  guarded: 2
+  ref: diagrams/lld/lifecycles/access-journey-profile.yaml
+- entity: AccessMediaTemplateVersion
+  contract: access
+  owner: access
+  service: TenancyService
+  states: null
+  transitions: 6
+  initial:
+  - pendingApproval
+  terminal:
+  - superseded
+  - rejected
+  operations:
+  - decideApprovalRequest
+  guarded: 6
+  ref: diagrams/lld/lifecycles/access-media-template-version.yaml
+- entity: AccessMediaTemplate
+  contract: access
+  owner: access
+  service: AccessService
+  states: null
+  transitions: 13
+  initial:
+  - draft
+  terminal:
+  - archived
+  operations:
+  - approveMultiMediaPreview
+  - archiveMediaTemplate
+  - decideApprovalRequest
+  - setAppleWalletPass
+  - setDigitalBarcodeTicket
+  - setDigitalCardMembership
+  - setGoogleWalletPass
+  - setPdfPrintablePos
+  - setRfidNfcCard
+  guarded: 13
+  ref: diagrams/lld/lifecycles/access-media-template.yaml
+- entity: AccessSecurityAlert
+  contract: access
+  owner: access
+  service: AccessService
+  states: null
+  transitions: 5
+  initial:
+  - open
+  terminal:
+  - resolved
+  - dismissed
+  operations:
+  - updateSecurityAlert
+  guarded: 5
+  ref: diagrams/lld/lifecycles/access-security-alert.yaml
+- entity: AccessSecurityInvestigation
+  contract: access
+  owner: access
+  service: AccessService
+  states: null
+  transitions: 7
+  initial:
+  - open
+  terminal:
+  - closed
+  operations:
+  - setSecurityInvestigationEvidence
+  guarded: 7
+  ref: diagrams/lld/lifecycles/access-security-investigation.yaml
+- entity: Accreditation identity conflict
+  contract: accreditation
+  owner: accreditation
+  service: TenancyService
+  states: null
+  transitions: 2
+  initial:
+  - pending
+  terminal:
+  - merged
+  - rejected
+  operations:
+  - resolveIdentityConflict
+  guarded: 2
+  ref: diagrams/lld/lifecycles/accreditation-identity-conflict.yaml
+- entity: After-sale request
+  contract: orders
+  owner: orders
+  service: OrderService
+  states: null
+  transitions: 7
+  initial:
+  - requested
+  terminal:
+  - completed
+  - rejected
+  - failed
+  operations:
+  - approveExceptionServiceRecovery
+  - setOrderAmendment
+  guarded: 7
+  ref: diagrams/lld/lifecycles/after-sale-request.yaml
+- entity: AI catalogue builder session
+  contract: catalogue
+  owner: catalogue
+  service: CatalogueService
+  states: null
+  transitions: 2
+  initial:
+  - open
+  terminal:
+  - draftCreated
+  - abandoned
+  operations:
+  - setCatalogueReview
+  guarded: 2
+  ref: diagrams/lld/lifecycles/ai-catalogue-session.yaml
 - entity: AI index job
   contract: ai
   owner: ai
@@ -174,6 +508,20 @@ stateModels:
   - verifyWorkOrder
   guarded: 10
   ref: diagrams/lld/lifecycles/asset.yaml
+- entity: Automation
+  contract: approvals
+  owner: approvals
+  service: TenancyService
+  states: null
+  transitions: 8
+  initial:
+  - active
+  - disabled
+  terminal: []
+  operations:
+  - createAutomationAutonomouAction
+  guarded: 8
+  ref: diagrams/lld/lifecycles/automation.yaml
 - entity: BurstEnvironment
   contract: subscription
   owner: PlatformService
@@ -247,6 +595,40 @@ stateModels:
   - updateCase
   guarded: 11
   ref: diagrams/lld/lifecycles/case.yaml
+- entity: Catalogue AI finding (governance risk or channel recommendation)
+  contract: catalogue
+  owner: catalogue
+  service: CatalogueService
+  states: null
+  transitions: 10
+  initial:
+  - open
+  terminal:
+  - dismissed
+  - resolved
+  operations:
+  - decideCatalogueAiFinding
+  guarded: 10
+  ref: diagrams/lld/lifecycles/catalogue-ai-finding.yaml
+- entity: Catalogue change request
+  contract: catalogue
+  owner: catalogue
+  service: CatalogueService
+  states: null
+  transitions: 15
+  initial:
+  - draft
+  - pendingApproval
+  terminal:
+  - rejected
+  - rolledBack
+  operations:
+  - approveReviewDecision
+  - decidePricingChangeRequest
+  - publishPricingEffectiveDate
+  - submitPricingChangeRequest
+  guarded: 15
+  ref: diagrams/lld/lifecycles/catalogue-change-request.yaml
 - entity: Catalogue import job
   contract: catalogue
   owner: catalogue
@@ -263,6 +645,25 @@ stateModels:
   - importProductCatalogue
   guarded: 6
   ref: diagrams/lld/lifecycles/catalogue-import-job.yaml
+- entity: Catalogue rollback or emergency action
+  contract: catalogue
+  owner: catalogue
+  service: CatalogueService
+  states: null
+  transitions: 9
+  initial:
+  - requested
+  - scheduled
+  - executing
+  terminal:
+  - completed
+  - failed
+  - cancelled
+  operations:
+  - cancelPricingRollback
+  - restoreProductVersion
+  guarded: 9
+  ref: diagrams/lld/lifecycles/catalogue-rollback-action.yaml
 - entity: Cell cluster
   contract: subscription
   owner: subscription
@@ -322,6 +723,21 @@ stateModels:
   operations: []
   guarded: 7
   ref: diagrams/lld/lifecycles/challenge.yaml
+- entity: Channel incident
+  contract: catalogue
+  owner: catalogue
+  service: CatalogueService
+  states: null
+  transitions: 9
+  initial:
+  - open
+  terminal:
+  - closed
+  operations:
+  - retryChannelIncident
+  - updateChannelIncident
+  guarded: 9
+  ref: diagrams/lld/lifecycles/channel-incident.yaml
 - entity: Channel listing
   contract: subscription
   owner: subscription
@@ -566,6 +982,21 @@ stateModels:
   - createDsarRequest
   guarded: 4
   ref: diagrams/lld/lifecycles/dsar-request.yaml
+- entity: Dynamic pricing strategy
+  contract: catalogue
+  owner: catalogue
+  service: CatalogueService
+  states: null
+  transitions: 11
+  initial:
+  - draft
+  terminal:
+  - retired
+  operations:
+  - setDynamicPricingGuardrailPolicy
+  - transitionDynamicPricingStrategy
+  guarded: 11
+  ref: diagrams/lld/lifecycles/dynamic-pricing-strategy.yaml
 - entity: Entitlement
   contract: orders
   owner: orders
@@ -685,6 +1116,39 @@ stateModels:
   operations: []
   guarded: 6
   ref: diagrams/lld/lifecycles/group-booking.yaml
+- entity: Group quote
+  contract: orders
+  owner: orders
+  service: OrderService
+  states: null
+  transitions: 7
+  initial:
+  - draft
+  terminal:
+  - superseded
+  - accepted
+  - rejected
+  - expired
+  operations:
+  - createGroupBooking
+  - setGroupQuotationProposal
+  guarded: 7
+  ref: diagrams/lld/lifecycles/group-quote.yaml
+- entity: Group task
+  contract: orders
+  owner: orders
+  service: OrderService
+  states: null
+  transitions: 6
+  initial:
+  - open
+  terminal:
+  - done
+  - cancelled
+  operations:
+  - setGroupOperationalPlanning
+  guarded: 6
+  ref: diagrams/lld/lifecycles/group-task.yaml
 - entity: Guest device
   contract: marketing-crm
   owner: marketing-crm
@@ -934,6 +1398,21 @@ stateModels:
   - relinquishInventoryHold
   guarded: 3
   ref: diagrams/lld/lifecycles/lease.yaml
+- entity: Product lifecycle action
+  contract: catalogue
+  owner: catalogue
+  service: CatalogueService
+  states: null
+  transitions: 6
+  initial:
+  - scheduled
+  terminal:
+  - completed
+  - failed
+  operations:
+  - publishActivationScheduler
+  guarded: 6
+  ref: diagrams/lld/lifecycles/lifecycle-action.yaml
 - entity: Lost item
   contract: marketing-crm
   owner: marketing-crm
@@ -962,6 +1441,20 @@ stateModels:
   - updateMediaAsset
   guarded: 6
   ref: diagrams/lld/lifecycles/media.yaml
+- entity: Membership product
+  contract: subscription
+  owner: subscription
+  service: PlatformService
+  states: null
+  transitions: 11
+  initial:
+  - draft
+  terminal:
+  - retired
+  operations:
+  - approveMembershipProductValidation
+  guarded: 11
+  ref: diagrams/lld/lifecycles/membership-product.yaml
 - entity: Merchandise reservation
   contract: retail
   owner: retail
@@ -1099,6 +1592,148 @@ stateModels:
   - updatePartnerAgreement
   guarded: 9
   ref: diagrams/lld/lifecycles/partner-agreement.yaml
+- entity: Partner application
+  contract: subscription
+  owner: subscription
+  service: PlatformService
+  states: null
+  transitions: 8
+  initial:
+  - submitted
+  terminal:
+  - approved
+  - rejected
+  - withdrawn
+  operations:
+  - actOnPartnerApplicationReview
+  - decideApprovalRequest
+  guarded: 8
+  ref: diagrams/lld/lifecycles/partner-application.yaml
+- entity: Partner case
+  contract: subscription
+  owner: subscription
+  service: PlatformService
+  states: null
+  transitions: 12
+  initial:
+  - open
+  terminal:
+  - closed
+  operations:
+  - actOnPartnerCase
+  guarded: 12
+  ref: diagrams/lld/lifecycles/partner-case.yaml
+- entity: Partner change request
+  contract: subscription
+  owner: subscription
+  service: PlatformService
+  states: null
+  transitions: 6
+  initial:
+  - requested
+  terminal:
+  - rejected
+  - processed
+  operations:
+  - createPartnerChangeRequest
+  - decideApprovalRequest
+  guarded: 6
+  ref: diagrams/lld/lifecycles/partner-change-request.yaml
+- entity: Partner commercial exception
+  contract: subscription
+  owner: subscription
+  service: PlatformService
+  states: null
+  transitions: 7
+  initial:
+  - pendingApproval
+  terminal:
+  - rejected
+  - expired
+  operations:
+  - approveBookingLimitCommercial
+  guarded: 7
+  ref: diagrams/lld/lifecycles/partner-commercial-exception.yaml
+- entity: Partner commission line
+  contract: subscription
+  owner: subscription
+  service: PlatformService
+  states: null
+  transitions: 19
+  initial:
+  - calculated
+  terminal:
+  - paid
+  - reversed
+  operations:
+  - actOnPartnerCommissionLine
+  - actOnPartnerSettlementBatch
+  guarded: 19
+  ref: diagrams/lld/lifecycles/partner-commission-line.yaml
+- entity: Partner contact
+  contract: subscription
+  owner: subscription
+  service: PlatformService
+  states: null
+  transitions: 7
+  initial:
+  - invited
+  - active
+  terminal:
+  - revoked
+  - expired
+  operations:
+  - setPartnerContact
+  guarded: 7
+  ref: diagrams/lld/lifecycles/partner-contact.yaml
+- entity: Partner reconciliation exception
+  contract: subscription
+  owner: subscription
+  service: PlatformService
+  states: null
+  transitions: 15
+  initial:
+  - open
+  terminal:
+  - matched
+  - corrected
+  - differenceAccepted
+  - adjusted
+  operations:
+  - actOnPartnerReconciliationException
+  guarded: 15
+  ref: diagrams/lld/lifecycles/partner-reconciliation-exception.yaml
+- entity: Partner settlement batch
+  contract: subscription
+  owner: subscription
+  service: PlatformService
+  states: null
+  transitions: 17
+  initial:
+  - calculated
+  terminal:
+  - paid
+  - reversed
+  operations:
+  - actOnPartnerSettlementBatch
+  guarded: 17
+  ref: diagrams/lld/lifecycles/partner-settlement-batch.yaml
+- entity: Partner account
+  contract: subscription
+  owner: subscription
+  service: PlatformService
+  states: null
+  transitions: 17
+  initial:
+  - lead
+  - applicant
+  terminal:
+  - archived
+  operations:
+  - actOnPartnerApplicationReview
+  - approvePartnerStatuLifecycle
+  guarded: 17
+  ref: diagrams/lld/lifecycles/partner.yaml
 - entity: PaymentLink
   contract: orders
   owner: OrderService
@@ -1171,6 +1806,83 @@ stateModels:
   - reopenPeriod
   guarded: 4
   ref: diagrams/lld/lifecycles/period.yaml
+- entity: Live dynamic price execution
+  contract: catalogue
+  owner: catalogue
+  service: null
+  states: null
+  transitions: 7
+  initial:
+  - scheduled
+  - executing
+  terminal:
+  - failed
+  - reverted
+  operations: []
+  guarded: 7
+  ref: diagrams/lld/lifecycles/price-execution.yaml
+- entity: Price list version
+  contract: catalogue
+  owner: catalogue
+  service: null
+  states: null
+  transitions: 4
+  initial:
+  - scheduled
+  terminal:
+  - superseded
+  - rolledBack
+  operations: []
+  guarded: 4
+  ref: diagrams/lld/lifecycles/price-list-version.yaml
+- entity: Pricing publication target
+  contract: catalogue
+  owner: catalogue
+  service: null
+  states: null
+  transitions: 4
+  initial:
+  - pending
+  terminal:
+  - inSync
+  operations: []
+  guarded: 4
+  ref: diagrams/lld/lifecycles/pricing-publication-target.yaml
+- entity: Pricing publication
+  contract: catalogue
+  owner: catalogue
+  service: CatalogueService
+  states: null
+  transitions: 6
+  initial:
+  - scheduled
+  - publishing
+  terminal:
+  - published
+  - failed
+  - cancelled
+  operations:
+  - publishPricingEffectiveDate
+  guarded: 6
+  ref: diagrams/lld/lifecycles/pricing-publication.yaml
+- entity: AI pricing recommendation
+  contract: catalogue
+  owner: catalogue
+  service: CatalogueService
+  states: null
+  transitions: 13
+  initial:
+  - pending
+  terminal:
+  - accepted
+  - rejected
+  - modified
+  - ignored
+  operations:
+  - decidePricingRecommendation
+  - setPricing
+  guarded: 13
+  ref: diagrams/lld/lifecycles/pricing-recommendation.yaml
 - entity: Privacy incident
   contract: marketing-crm
   owner: marketing-crm
@@ -1184,6 +1896,21 @@ stateModels:
   operations: []
   guarded: 6
   ref: diagrams/lld/lifecycles/privacy-incident.yaml
+- entity: Privacy notice governance
+  contract: marketing-crm
+  owner: marketing-crm
+  service: TenancyService
+  states: null
+  transitions: 8
+  initial:
+  - draft
+  terminal:
+  - archived
+  operations:
+  - decideApprovalRequest
+  - setPrivacyNoticePolicyGovernance
+  guarded: 8
+  ref: diagrams/lld/lifecycles/privacy-notice-governance.yaml
 - entity: Product
   contract: catalogue
   owner: catalogue
@@ -1244,6 +1971,23 @@ stateModels:
   - deployConfigurationProfile
   guarded: 7
   ref: diagrams/lld/lifecycles/profile-deployment.yaml
+- entity: Promotion channel publication
+  contract: promotions
+  owner: promotions
+  service: CatalogueService
+  states: null
+  transitions: 10
+  initial:
+  - notAssigned
+  - pendingPublication
+  terminal: []
+  operations:
+  - endPromotion
+  - pausePromotion
+  - publishPromotion
+  - updatePromotion
+  guarded: 10
+  ref: diagrams/lld/lifecycles/promotion-channel-publication.yaml
 - entity: Promotion
   contract: promotions
   owner: promotions
@@ -1435,17 +2179,36 @@ stateModels:
   owner: orders
   service: OrderService
   states: null
-  transitions: 5
+  transitions: 9
   initial:
   - listed
+  - pendingReview
   terminal:
   - sold
   - withdrawn
   - expired
+  - rejected
   operations:
+  - approveListingModeration
   - createResaleListing
-  guarded: 5
+  guarded: 9
   ref: diagrams/lld/lifecycles/resale-listing.yaml
+- entity: Resale settlement
+  contract: orders
+  owner: orders
+  service: OrderService
+  states: null
+  transitions: 11
+  initial:
+  - pending
+  terminal:
+  - paid
+  - reversed
+  operations:
+  - holdResaleSettlement
+  - releaseResaleSettlementHold
+  guarded: 11
+  ref: diagrams/lld/lifecycles/resale-settlement.yaml
 - entity: Reservation
   contract: orders
   owner: orders
@@ -1588,6 +2351,19 @@ stateModels:
   - updateRotaAssignment
   guarded: 11
   ref: diagrams/lld/lifecycles/rota-assignment.yaml
+- entity: Sales channel
+  contract: catalogue
+  owner: catalogue
+  service: CatalogueService
+  states: null
+  transitions: 7
+  initial:
+  - draft
+  terminal: []
+  operations:
+  - publishChannelReadinessValidation
+  guarded: 7
+  ref: diagrams/lld/lifecycles/sales-channel.yaml
 - entity: Sandbox
   contract: public-api
   owner: public-api
@@ -2097,6 +2873,23 @@ stateModels:
   - offerWaitlistCapacity
   guarded: 7
   ref: diagrams/lld/lifecycles/waitlist-entry.yaml
+- entity: Waiver requirement
+  contract: marketing-crm
+  owner: marketing-crm
+  service: MarketingService
+  states: null
+  transitions: 25
+  initial:
+  - notAssigned
+  - assigned
+  terminal:
+  - superseded
+  operations:
+  - actOnWaiverRequirements
+  - setWaiverVerificationValidation
+  - submitForm
+  guarded: 25
+  ref: diagrams/lld/lifecycles/waiver-requirement.yaml
 - entity: Cross-cell wallet authorisation
   contract: cross-region
   owner: cross-region
@@ -2213,6 +3006,37 @@ stateModels:
   - verifyWorkOrder
   guarded: 16
   ref: diagrams/lld/lifecycles/work-order.yaml
+- entity: Workflow instance
+  contract: approvals
+  owner: approvals
+  service: TenancyService
+  states: null
+  transitions: 28
+  initial:
+  - running
+  terminal:
+  - completed
+  - cancelled
+  operations:
+  - actOnWorkflowInstance
+  guarded: 28
+  ref: diagrams/lld/lifecycles/workflow-instance.yaml
+- entity: Workflow version
+  contract: approvals
+  owner: approvals
+  service: TenancyService
+  states: null
+  transitions: 17
+  initial:
+  - draft
+  terminal:
+  - retired
+  operations:
+  - approveVersioningGovernance
+  - setVisualWorkflow
+  - simulateWorkflowTestingImpact
+  guarded: 17
+  ref: diagrams/lld/lifecycles/workflow-version.yaml
 events:
 - event: access-validated
   description: An entitlement was presented and admitted.
@@ -2232,6 +3056,8 @@ events:
   description: An assistant conversation was passed to a human agent.
 - event: entitlement-issued
   description: A right to admission, a meal, a locker or a rental now exists.
+- event: entitlement-statusChanged
+  description: An entitlement was frozen, suspended, reinstated or had its validity moved by a renewal.
 - event: fnb-menuPublished
   description: A menu is live at an outlet.
 - event: fnb-orderReady

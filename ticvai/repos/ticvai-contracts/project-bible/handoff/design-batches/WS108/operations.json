@@ -1,0 +1,154 @@
+{
+ "createAccreditationApplication": {
+  "method": "POST",
+  "path": "/accreditation-applications",
+  "contract": "accreditation",
+  "summary": "Apply, or apply on behalf of somebody",
+  "permission": "ACCREDITATION_APPLY",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccreditationApplication",
+  "responds": "AccreditationApplication"
+ },
+ "createAccreditationProgramme": {
+  "method": "POST",
+  "path": "/accreditation-programmes",
+  "contract": "accreditation",
+  "summary": "Define a programme, its categories and its window",
+  "permission": "ACCREDITATION_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccreditationProgramme",
+  "responds": "AccreditationProgramme"
+ },
+ "createForm": {
+  "method": "POST",
+  "path": "/forms",
+  "contract": "marketing-crm",
+  "summary": "Define a waiver, survey or capture form",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FormDefinition",
+  "responds": "FormDefinition"
+ },
+ "listAccreditationApplications": {
+  "method": "GET",
+  "path": "/accreditation-applications",
+  "contract": "accreditation",
+  "summary": "Applications, by state and programme",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "programmeId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "applicantType",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationApplication"
+ },
+ "listAccreditationHolders": {
+  "method": "GET",
+  "path": "/accreditation-holders",
+  "contract": "accreditation",
+  "summary": "Everybody accredited, and what state they are in",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "programmeId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "organisationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "expiringWithinDays",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationHolder"
+ },
+ "listAccreditationProgrammes": {
+  "method": "GET",
+  "path": "/accreditation-programmes",
+  "contract": "accreditation",
+  "summary": "Programmes, their categories and their applicant types",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccreditationProgramme"
+ },
+ "setAccreditationRequirements": {
+  "method": "PUT",
+  "path": "/accreditation-requirements",
+  "contract": "accreditation",
+  "summary": "What each applicant type must supply and pass",
+  "permission": "ACCREDITATION_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccreditationRequirements",
+  "responds": "AccreditationRequirements"
+ }
+}

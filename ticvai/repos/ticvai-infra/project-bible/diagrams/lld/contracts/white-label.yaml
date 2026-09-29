@@ -143,8 +143,16 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - whitelabel.guided_choice
+  - whitelabel.guided_choice_answer
+  - whitelabel.guided_choice_question
+  writes:
+  - cache:idempotency
+  - whitelabel.guided_choice
+  - whitelabel.guided_choice_answer
+  - whitelabel.guided_choice_question
 - operation: deletePromoBlock
   verb: DELETE
   path: /tenant-config/promo-blocks/{promoBlockId}

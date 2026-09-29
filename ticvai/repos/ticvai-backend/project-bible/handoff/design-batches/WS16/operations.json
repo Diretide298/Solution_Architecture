@@ -1,1 +1,288 @@
-{}
+{
+ "approveDecision": {
+  "method": "PUT",
+  "path": "/decision",
+  "contract": "promotions",
+  "summary": "Approval Inbox & Decision Workspace",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalInboxDecisionWorkspaceInput",
+  "responds": "ApprovalInboxDecisionWorkspaceView"
+ },
+ "decideApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests/{requestId}/decide",
+  "contract": "approvals",
+  "summary": "Approve, reject, return or ask for information",
+  "permission": "APPROVAL_DECIDE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalRequest"
+ },
+ "getApprovalRecord": {
+  "method": "GET",
+  "path": "/approval-requests/{requestId}/record",
+  "contract": "approvals",
+  "summary": "The immutable decision record, and whether it is intact",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ApprovalRecord"
+ },
+ "listApprovalControlPolicies": {
+  "method": "GET",
+  "path": "/approval-control-policies",
+  "contract": "approvals",
+  "summary": "Segregation of duties, four-eyes and dual control",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ApprovalControlPolicy"
+ },
+ "listApprovalRequests": {
+  "method": "GET",
+  "path": "/approval-requests",
+  "contract": "approvals",
+  "summary": "Requests awaiting a decision, or already decided",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "assignedToMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "raisedByMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "breachingWithinMinutes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listApprovedActionExecutions": {
+  "method": "GET",
+  "path": "/approved-action-executions",
+  "contract": "approvals",
+  "summary": "Approved actions and whether they ran",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sourceModule",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "approvalRequestId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listStepUpPolicies": {
+  "method": "GET",
+  "path": "/step-up-policies",
+  "contract": "approvals",
+  "summary": "What needs a second factor here",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "effective",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "StepUpPolicy"
+ },
+ "listWorkflowInstanceProcess": {
+  "method": "GET",
+  "path": "/workflow-instance-process",
+  "contract": "approvals",
+  "summary": "Workflow Instance Monitor & Process Timeline",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "workflowInstance",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sourceModule",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "currentStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "resolveApprovedActionExecution": {
+  "method": "POST",
+  "path": "/approved-action-executions/{executionId}/resolve",
+  "contract": "approvals",
+  "summary": "Retry, investigate or escalate an approved action that failed",
+  "permission": "APPROVAL_ACT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovedActionExecutionActionInput",
+  "responds": "ApprovedActionExecutionView"
+ },
+ "resubmitApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests/{requestId}/resubmit",
+  "contract": "approvals",
+  "summary": "Amend a rejected request and try again",
+  "permission": "APPROVAL_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalRequest"
+ },
+ "signApprovalDecision": {
+  "method": "POST",
+  "path": "/approval-requests/{requestId}/signature",
+  "contract": "approvals",
+  "summary": "Sign a decision, so it can be proved later",
+  "permission": "APPROVAL_DECIDE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalSignature"
+ },
+ "withdrawApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests/{requestId}/withdraw",
+  "contract": "approvals",
+  "summary": "The requester takes it back",
+  "permission": "APPROVAL_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalRequest"
+ }
+}

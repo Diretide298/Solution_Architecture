@@ -1,0 +1,169 @@
+{
+ "approveDecision": {
+  "method": "PUT",
+  "path": "/decision",
+  "contract": "promotions",
+  "summary": "Approval Inbox & Decision Workspace",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalInboxDecisionWorkspaceInput",
+  "responds": "ApprovalInboxDecisionWorkspaceView"
+ },
+ "approveWorkflow": {
+  "method": "PUT",
+  "path": "/workflow",
+  "contract": "catalogue",
+  "summary": "Approval Workflow Designer",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalWorkflowDesignerInput",
+  "responds": "ApprovalWorkflowDesignerView"
+ },
+ "decideAccreditationApplication": {
+  "method": "POST",
+  "path": "/accreditation-applications/{applicationId}/decide",
+  "contract": "accreditation",
+  "summary": "Approve, reject, return for more, or escalate",
+  "permission": "ACCREDITATION_APPROVE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationApplication"
+ },
+ "escalateApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests/{requestId}/escalate",
+  "contract": "approvals",
+  "summary": "Move it up a level",
+  "permission": "APPROVAL_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalRequest"
+ },
+ "listAccreditationApplications": {
+  "method": "GET",
+  "path": "/accreditation-applications",
+  "contract": "accreditation",
+  "summary": "Applications, by state and programme",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "programmeId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "applicantType",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationApplication"
+ },
+ "listAccreditationAudit": {
+  "method": "GET",
+  "path": "/accreditation-audit",
+  "contract": "accreditation",
+  "summary": "The immutable record of who granted what to whom",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "holderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationAuditRecord"
+ },
+ "setApprovalMatrix": {
+  "method": "PUT",
+  "path": "/approval-matrices",
+  "contract": "approvals",
+  "summary": "Configure what requires approval",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalMatrix",
+  "responds": "ApprovalMatrix"
+ },
+ "setVisualWorkflow": {
+  "method": "PUT",
+  "path": "/visual-workflow",
+  "contract": "approvals",
+  "summary": "Visual Workflow Designer",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VisualWorkflowDesignerInput",
+  "responds": "VisualWorkflowDesignerView"
+ }
+}

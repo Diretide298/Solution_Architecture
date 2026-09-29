@@ -1,6 +1,6 @@
 # P08-access-venue-02 — P08 · Access & Venue (2 of 3)
 
-**10 screens · 50 operations · 47 schemas · 20 permissions**
+**10 screens · 53 operations · 60 schemas · 20 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,10 +48,9 @@ convincingly. It is never a caption.
 ## Rules that are not style preferences
 
 - **Every control that can be refused must be gated.** 20 permissions apply here:
-  `ACCESS_OVERRIDE, ACCESS_VALIDATE, AI_AUDIT_VIEW, ASSET_MANAGE, ASSET_VIEW, INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, QUEUE_MANAGE, QUEUE_VIEW`…. A control nobody can use must say so,
+  `ACCESS_OVERRIDE, ACCESS_VALIDATE, ASSET_MANAGE, ASSET_VIEW, AUDIT_VIEW, INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, QUEUE_MANAGE, QUEUE_VIEW`…. A control nobody can use must say so,
   not sit enabled and fail.
-- **18 of these operations work offline**: getAsset, getQueue, getVenueMap, getVenueMapGraph, getWaitTimes, listAssets, listGames, listQueues
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,20 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-034` | Scan Activity | listDetail | 7 | 1 | — |
-| `BO-035` | Override Audit | listDetail | 8 | 1 | — |
-| `BO-038` | Reconciliation Queue | listDetail | 9 | 0 | — |
-| `BO-069` | Asset Register | listDetail | 11 | 0 | — |
-| `BO-071` | Planned Maintenance | listDetail | 4 | 0 | — |
-| `BO-072` | Incident Log | listDetail | 5 | 0 | — |
-| `BO-092` | Venue Maps | listDetail | 2 | 0 | — |
-| `BO-093` | Map Import & Labelling | configEditor | 3 | 0 | — |
-| `BO-094` | Map Editor & Publish | statusTracker | 6 | 0 | — |
-| `BO-095` | Resources | listDetail | 2 | 0 | — |
+| `BO-034` | Scan Activity | listDetail | 7 | 4 | — |
+| `BO-035` | Override Audit | listDetail | 8 | 4 | — |
+| `BO-038` | Reconciliation Queue | listDetail | 9 | 5 | — |
+| `BO-069` | Asset Register | listDetail | 11 | 6 | — |
+| `BO-071` | Planned Maintenance | listDetail | 4 | 2 | — |
+| `BO-072` | Incident Log | listDetail | 5 | 3 | — |
+| `BO-092` | Venue Maps | listDetail | 2 | 1 | — |
+| `BO-093` | Map Import & Labelling | configEditor | 5 | 1 | — |
+| `BO-094` | Map Editor & Publish | statusTracker | 7 | 4 | — |
+| `BO-095` | Resources | listDetail | 2 | 1 | — |
+
+## Thin screens in this batch
+
+**BO-092 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -95,47 +98,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+    "BO-001"
    ],
    "inferred": true,
    "transitions": [
     {
      "to": "BO-001",
      "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-034 holds none of them, so the edge carries nothing and BO-001 opens cold"
     }
    ]
   },
@@ -152,8 +122,43 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Access point id",
+       "operation": "listScans",
+       "notes": "Sends `?accessPointId=` to `listScans`.",
+       "provenance": "contract access.yaml GET /access/scans"
+      },
+      {
+       "kind": "textField",
+       "label": "Ticket id",
+       "operation": "listScans",
+       "notes": "Sends `?ticketId=` to `listScans`.",
+       "provenance": "contract access.yaml GET /access/scans"
+      },
+      {
+       "kind": "textField",
+       "label": "Outcome",
+       "operation": "listScans",
+       "notes": "Sends `?outcome=` to `listScans`.",
+       "provenance": "contract access.yaml GET /access/scans"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Recorded from",
+       "operation": "listScans",
+       "notes": "Sends `?recordedFrom=` to `listScans`.",
+       "provenance": "contract access.yaml GET /access/scans"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Recorded to",
+       "operation": "listScans",
+       "notes": "Sends `?recordedTo=` to `listScans`.",
+       "provenance": "contract access.yaml GET /access/scans"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every scan activity",
+       "label": "Every scan event",
        "bindsTo": "ScanEvent",
        "columns": [
         "ScanEvent.id",
@@ -167,10 +172,25 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "ScanEvent.direction",
         "ScanEvent.operatorPrincipalId",
         "ScanEvent.deviceId",
-        "ScanEvent.overriddenByPrincipalId"
+        "ScanEvent.overridesScanId"
        ],
        "operation": "listScans",
        "provenance": "contract access.yaml GET /access/scans"
+      },
+      {
+       "kind": "scanTarget",
+       "derived": true,
+       "impliedBy": "listScans",
+       "notes": "**A screen that validates a credential needs somewhere to point the camera.** `denied` and `hardwareError` look different because an operator facing a guest needs to know whether to try again or explain something.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "searchField",
+       "derived": true,
+       "impliedBy": "lookupTicket",
+       "label": "Search",
+       "notes": "A search that returns nothing must say so differently from a search not yet run.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -180,7 +200,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected scan activity",
+       "label": "The selected scan event",
+       "bindsTo": "ScanEvent",
+       "columns": [
+        "ScanEvent.id",
+        "ScanEvent.accessPointId",
+        "ScanEvent.venueId",
+        "ScanEvent.scopePath",
+        "ScanEvent.ticketId",
+        "ScanEvent.mediaCode",
+        "ScanEvent.outcome",
+        "ScanEvent.denyReason",
+        "ScanEvent.direction",
+        "ScanEvent.operatorPrincipalId",
+        "ScanEvent.deviceId",
+        "ScanEvent.overridesScanId",
+        "ScanEvent.overrideReason",
+        "ScanEvent.recordedAt",
+        "ScanEvent.syncedAt"
+       ],
+       "operation": "listScans",
+       "notes": "**An override is its own row** (decided 28 September, audit R228): outcome `overridden`, `operatorPrincipalId` is the supervisor who overrode, and `overridesScanId` links it to the denied scan, which is never updated. Selecting either row shows the other.",
+       "provenance": "contract access.yaml GET /access/scans"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The offline package",
        "bindsTo": "OfflinePackage",
        "columns": [
         "OfflinePackage.generatedAt",
@@ -203,67 +248,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Sync",
+       "label": "Sync scans",
        "operation": "syncScans",
        "provenance": "contract access.yaml POST /access/scans"
       },
       {
        "kind": "secondaryButton",
-       "label": "Lookup",
+       "label": "Lookup ticket",
        "operation": "lookupTicket",
        "provenance": "contract access.yaml GET /access/lookup"
       },
       {
        "kind": "destructiveButton",
-       "label": "Override",
+       "label": "Override access",
        "operation": "overrideAccess",
        "provenance": "contract access.yaml POST /access/override"
       },
       {
        "kind": "secondaryButton",
-       "label": "Validate",
+       "label": "Validate access",
        "operation": "validateAccess",
        "provenance": "contract access.yaml POST /access/validate"
       },
       {
        "kind": "secondaryButton",
-       "label": "Validate",
+       "label": "Validate group access",
        "operation": "validateGroupAccess",
        "provenance": "contract access.yaml POST /access/group-validate"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "scanTarget",
-       "derived": true,
-       "impliedBy": "listScans",
-       "notes": "**A screen that validates a credential needs somewhere to point the camera.** `denied` and `hardwareError` look different because an operator facing a guest needs to know whether to try again or explain something.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "searchField",
-       "derived": true,
-       "impliedBy": "lookupTicket",
-       "label": "Search",
-       "notes": "A search that returns nothing must say so differently from a search not yet run.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "syncScans",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -273,17 +284,80 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmOverrideAccess",
     "component": "confirmDialog",
-    "trigger": "Override",
-    "body": "**Names what `overrideAccess` changes and what it leaves alone**, in the consequence rather than the verb. A scan activity this affects should be identified in the dialog, not just counted.",
+    "trigger": "Override access",
+    "body": "**Names what `overrideAccess` changes and what it leaves alone**, in the consequence rather than the verb. A scan activity this affects should be identified in the dialog, not just counted. **Collects what `overrideAccess` sends before it is called.** Required: `id`, `scanId`, `reason`, `recordedAt`.",
     "provenance": "contract access.yaml POST /access/override"
+   },
+   {
+    "id": "formSyncScans",
+    "component": "modal",
+    "trigger": "Sync scans",
+    "body": "**Collects what `syncScans` sends before it is called.** Required: `deviceId`, `scans`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Sync scans",
+     "operation": "syncScans"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "deviceId",
+      "scans"
+     ]
+    },
+    "provenance": "contract access.yaml POST /access/scans"
+   },
+   {
+    "id": "formValidateAccess",
+    "component": "modal",
+    "trigger": "Validate access",
+    "body": "**Collects what `validateAccess` sends before it is called.** Required: `id`, `mediaCode`, `mediaKind`, `direction`, `recordedAt`. Optional: `groupSize`, `proximityToken`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ValidateRequest",
+    "confirm": {
+     "label": "Validate access",
+     "operation": "validateAccess"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "mediaCode",
+      "mediaKind",
+      "direction",
+      "recordedAt",
+      "groupSize",
+      "proximityToken"
+     ]
+    },
+    "provenance": "contract access.yaml POST /access/validate"
+   },
+   {
+    "id": "formValidateGroupAccess",
+    "component": "modal",
+    "trigger": "Validate group access",
+    "body": "**Collects what `validateGroupAccess` sends before it is called.** Required: `id`, `mediaCode`, `admitCount`, `recordedAt`. Optional: `direction`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Validate group access",
+     "operation": "validateGroupAccess"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "mediaCode",
+      "admitCount",
+      "recordedAt",
+      "direction"
+     ]
+    },
+    "provenance": "contract access.yaml POST /access/group-validate"
    }
   ],
   "states": {
    "loading": "The scan activity list.",
    "error": "Could not load. Names which read failed and leaves the scan activity untouched.",
-   "emptyFirstRun": "No scan activity yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the scan activity are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No scan activity yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo and the scan activity are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -311,7 +385,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "lookupTicket",
     "contract": "access",
     "purpose": "Read-only validity check without admitting",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "overrideAccess",
@@ -343,11 +417,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "OfflinePackage.generatedAt",
-    "OfflinePackage.validFrom",
-    "OfflinePackage.validTo",
-    "OfflinePackage.accessPointId",
-    "OfflinePackage.entitlements"
+    "ScanEvent.id",
+    "ScanEvent.accessPointId",
+    "ScanEvent.venueId",
+    "ScanEvent.scopePath",
+    "ScanEvent.ticketId"
    ]
   },
   "wireframe": {
@@ -394,47 +468,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+    "BO-001"
    ],
    "inferred": true,
    "transitions": [
     {
      "to": "BO-001",
      "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-035 holds none of them, so the edge carries nothing and BO-001 opens cold"
     }
    ]
   },
@@ -443,13 +484,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listScans` reads the population and `getOfflinePackage` reads one of them — list, select, act",
   "purpose": "Review every admission that broke a rule.",
-  "gaps": [
-   {
-    "operation": "listAuditRecords",
-    "why": "**1 declared operation reach no component on this screen**: listAuditRecords. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -458,8 +492,43 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Access point id",
+       "operation": "listScans",
+       "notes": "Sends `?accessPointId=` to `listScans`.",
+       "provenance": "contract access.yaml GET /access/scans"
+      },
+      {
+       "kind": "textField",
+       "label": "Ticket id",
+       "operation": "listScans",
+       "notes": "Sends `?ticketId=` to `listScans`.",
+       "provenance": "contract access.yaml GET /access/scans"
+      },
+      {
+       "kind": "textField",
+       "label": "Outcome",
+       "operation": "listScans",
+       "notes": "Sends `?outcome=` to `listScans`.",
+       "provenance": "contract access.yaml GET /access/scans"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Recorded from",
+       "operation": "listScans",
+       "notes": "Sends `?recordedFrom=` to `listScans`.",
+       "provenance": "contract access.yaml GET /access/scans"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Recorded to",
+       "operation": "listScans",
+       "notes": "Sends `?recordedTo=` to `listScans`.",
+       "provenance": "contract access.yaml GET /access/scans"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every override audit",
+       "label": "Every scan event",
        "bindsTo": "ScanEvent",
        "columns": [
         "ScanEvent.id",
@@ -473,10 +542,41 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "ScanEvent.direction",
         "ScanEvent.operatorPrincipalId",
         "ScanEvent.deviceId",
-        "ScanEvent.overriddenByPrincipalId"
+        "ScanEvent.overridesScanId"
        ],
        "operation": "listScans",
        "provenance": "contract access.yaml GET /access/scans"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every audit",
+       "bindsTo": "AuditRecord",
+       "columns": [
+        "AuditRecord.id",
+        "AuditRecord.principalId",
+        "AuditRecord.orgUnitId",
+        "AuditRecord.workstationId",
+        "AuditRecord.action",
+        "AuditRecord.subjectRef",
+        "AuditRecord.occurredAt"
+       ],
+       "operation": "listAuditRecords",
+       "provenance": "contract tenancy.yaml GET /audit-records"
+      },
+      {
+       "kind": "scanTarget",
+       "derived": true,
+       "impliedBy": "listScans",
+       "notes": "**A screen that validates a credential needs somewhere to point the camera.** `denied` and `hardwareError` look different because an operator facing a guest needs to know whether to try again or explain something.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "searchField",
+       "derived": true,
+       "impliedBy": "lookupTicket",
+       "label": "Search",
+       "notes": "A search that returns nothing must say so differently from a search not yet run.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -486,7 +586,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected override audit",
+       "label": "The selected scan event",
+       "bindsTo": "ScanEvent",
+       "columns": [
+        "ScanEvent.id",
+        "ScanEvent.accessPointId",
+        "ScanEvent.venueId",
+        "ScanEvent.scopePath",
+        "ScanEvent.ticketId",
+        "ScanEvent.mediaCode",
+        "ScanEvent.outcome",
+        "ScanEvent.denyReason",
+        "ScanEvent.direction",
+        "ScanEvent.operatorPrincipalId",
+        "ScanEvent.deviceId",
+        "ScanEvent.overridesScanId",
+        "ScanEvent.overrideReason",
+        "ScanEvent.recordedAt",
+        "ScanEvent.syncedAt"
+       ],
+       "operation": "listScans",
+       "notes": "**An override is its own row** (decided 28 September, audit R228): outcome `overridden`, `operatorPrincipalId` is the supervisor who overrode, and `overridesScanId` links it to the denied scan, which is never updated. Selecting either row shows the other.",
+       "provenance": "contract access.yaml GET /access/scans"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The offline package",
        "bindsTo": "OfflinePackage",
        "columns": [
         "OfflinePackage.generatedAt",
@@ -509,74 +634,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Lookup",
+       "label": "Lookup ticket",
        "operation": "lookupTicket",
        "provenance": "contract access.yaml GET /access/lookup"
       },
       {
        "kind": "destructiveButton",
-       "label": "Override",
+       "label": "Override access",
        "operation": "overrideAccess",
        "provenance": "contract access.yaml POST /access/override"
       },
       {
        "kind": "secondaryButton",
-       "label": "Sync",
+       "label": "Sync scans",
        "operation": "syncScans",
        "provenance": "contract access.yaml POST /access/scans"
       },
       {
        "kind": "secondaryButton",
-       "label": "Validate",
+       "label": "Validate access",
        "operation": "validateAccess",
        "provenance": "contract access.yaml POST /access/validate"
       },
       {
        "kind": "secondaryButton",
-       "label": "Validate",
+       "label": "Validate group access",
        "operation": "validateGroupAccess",
        "provenance": "contract access.yaml POST /access/group-validate"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "scanTarget",
-       "derived": true,
-       "impliedBy": "listScans",
-       "notes": "**A screen that validates a credential needs somewhere to point the camera.** `denied` and `hardwareError` look different because an operator facing a guest needs to know whether to try again or explain something.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "searchField",
-       "derived": true,
-       "impliedBy": "lookupTicket",
-       "label": "Search",
-       "notes": "A search that returns nothing must say so differently from a search not yet run.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAuditRecords",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "overrideAccess",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -586,17 +670,80 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmOverrideAccess",
     "component": "confirmDialog",
-    "trigger": "Override",
-    "body": "**Names what `overrideAccess` changes and what it leaves alone**, in the consequence rather than the verb. A override audit this affects should be identified in the dialog, not just counted.",
+    "trigger": "Override access",
+    "body": "**Names what `overrideAccess` changes and what it leaves alone**, in the consequence rather than the verb. A override audit this affects should be identified in the dialog, not just counted. **Collects what `overrideAccess` sends before it is called.** Required: `id`, `scanId`, `reason`, `recordedAt`.",
     "provenance": "contract access.yaml POST /access/override"
+   },
+   {
+    "id": "formSyncScans",
+    "component": "modal",
+    "trigger": "Sync scans",
+    "body": "**Collects what `syncScans` sends before it is called.** Required: `deviceId`, `scans`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Sync scans",
+     "operation": "syncScans"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "deviceId",
+      "scans"
+     ]
+    },
+    "provenance": "contract access.yaml POST /access/scans"
+   },
+   {
+    "id": "formValidateAccess",
+    "component": "modal",
+    "trigger": "Validate access",
+    "body": "**Collects what `validateAccess` sends before it is called.** Required: `id`, `mediaCode`, `mediaKind`, `direction`, `recordedAt`. Optional: `groupSize`, `proximityToken`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ValidateRequest",
+    "confirm": {
+     "label": "Validate access",
+     "operation": "validateAccess"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "mediaCode",
+      "mediaKind",
+      "direction",
+      "recordedAt",
+      "groupSize",
+      "proximityToken"
+     ]
+    },
+    "provenance": "contract access.yaml POST /access/validate"
+   },
+   {
+    "id": "formValidateGroupAccess",
+    "component": "modal",
+    "trigger": "Validate group access",
+    "body": "**Collects what `validateGroupAccess` sends before it is called.** Required: `id`, `mediaCode`, `admitCount`, `recordedAt`. Optional: `direction`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Validate group access",
+     "operation": "validateGroupAccess"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "mediaCode",
+      "admitCount",
+      "recordedAt",
+      "direction"
+     ]
+    },
+    "provenance": "contract access.yaml POST /access/group-validate"
    }
   ],
   "states": {
    "loading": "The override audit list.",
    "error": "Could not load. Names which read failed and leaves the override audit untouched.",
-   "emptyFirstRun": "No override audit yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the override audit are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No override audit yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo and the override audit are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -615,7 +762,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "lookupTicket",
     "contract": "access",
     "purpose": "Read-only validity check without admitting",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "overrideAccess",
@@ -662,11 +809,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "OfflinePackage.generatedAt",
-    "OfflinePackage.validFrom",
-    "OfflinePackage.validTo",
-    "OfflinePackage.accessPointId",
-    "OfflinePackage.entitlements"
+    "ScanEvent.id",
+    "ScanEvent.accessPointId",
+    "ScanEvent.venueId",
+    "ScanEvent.scopePath",
+    "ScanEvent.ticketId"
    ]
   },
   "wireframe": {
@@ -713,10 +860,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+    "BO-001"
    ],
    "inferred": true,
    "transitions": [
@@ -724,36 +868,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-001",
      "trigger": "Queue Directory",
      "carries": [
-      "eventId",
       "feedId",
       "queueId"
      ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-038 holds feedId, queueId, so an edge into it carries them"
     }
    ]
   },
@@ -762,13 +880,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listQueues` reads the population and `getQueue` reads one of them — list, select, act",
   "purpose": "Handle scans the server disagreed with.",
-  "gaps": [
-   {
-    "operation": "getWaitTimes",
-    "why": "**2 declared operations reach no component on this screen**: getWaitTimes, listQueueEntries. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -777,8 +888,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listQueues",
+       "notes": "Sends `?venueId=` to `listQueues`.",
+       "provenance": "contract queue.yaml GET /queues"
+      },
+      {
+       "kind": "toggle",
+       "label": "Open only",
+       "operation": "listQueues",
+       "notes": "Sends `?openOnly=` to `listQueues`.",
+       "provenance": "contract queue.yaml GET /queues"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every reconciliation queue",
+       "label": "Every queue",
        "bindsTo": "Queue",
        "columns": [
         "Queue.code",
@@ -796,6 +921,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listQueues",
        "provenance": "contract queue.yaml GET /queues"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every waiting guest",
+       "bindsTo": "WaitingGuest",
+       "columns": [
+        "WaitingGuest.id",
+        "WaitingGuest.queueId",
+        "WaitingGuest.queueName",
+        "WaitingGuest.subjectId",
+        "WaitingGuest.partyNumber",
+        "WaitingGuest.partySize",
+        "WaitingGuest.status",
+        "WaitingGuest.positionInQueue",
+        "WaitingGuest.partiesAhead",
+        "WaitingGuest.estimatedCallAt",
+        "WaitingGuest.isFastPass",
+        "WaitingGuest.entitlementId"
+       ],
+       "operation": "listQueueEntries",
+       "provenance": "contract queue.yaml GET /queues/{queueId}/entries"
       }
      ]
     },
@@ -805,7 +951,52 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected reconciliation queue",
+       "label": "The selected queue",
+       "bindsTo": "Queue",
+       "columns": [
+        "Queue.code",
+        "Queue.name",
+        "Queue.venueId",
+        "Queue.attractionProductId",
+        "Queue.assetId",
+        "Queue.accessPointId",
+        "Queue.kind",
+        "Queue.operatingWindows",
+        "Queue.parentQueueId",
+        "Queue.loadBalanceWithQueueIds",
+        "Queue.inQueueOfferEnabled",
+        "Queue.notifyBeforeCallMinutes",
+        "Queue.capacityPerCycle",
+        "Queue.cycleMinutes",
+        "Queue.maxPartySize",
+        "Queue.returnWindowMinutes"
+       ],
+       "operation": "listQueues",
+       "provenance": "contract queue.yaml GET /queues"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The wait time",
+       "bindsTo": "WaitTime",
+       "columns": [
+        "WaitTime.queueId",
+        "WaitTime.queueName",
+        "WaitTime.attractionProductId",
+        "WaitTime.attractionCategoryId",
+        "WaitTime.status",
+        "WaitTime.waitMinutes",
+        "WaitTime.source",
+        "WaitTime.isStale",
+        "WaitTime.heightRequirementCm",
+        "WaitTime.zone",
+        "WaitTime.asOf"
+       ],
+       "operation": "getWaitTimes",
+       "provenance": "contract queue.yaml GET /queues/wait-times"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The queue",
        "bindsTo": "QueueDetail",
        "columns": [
         "QueueDetail.nowServingPartyNumber",
@@ -825,66 +1016,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create queue",
        "operation": "createQueue",
        "provenance": "contract queue.yaml POST /queues"
       },
       {
        "kind": "secondaryButton",
-       "label": "Call",
+       "label": "Call next parties",
        "operation": "callNextParties",
        "provenance": "contract queue.yaml POST /queues/{queueId}/call-next"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save queue status",
        "operation": "setQueueStatus",
        "provenance": "contract queue.yaml PUT /queues/{queueId}/status"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save wait time",
        "operation": "setWaitTime",
        "provenance": "contract queue.yaml PUT /queues/{queueId}/wait-time"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save queue",
        "operation": "updateQueue",
        "provenance": "contract queue.yaml PATCH /queues/{queueId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listQueues",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createQueue",
-       "label": "Create queue",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createQueue",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -893,9 +1051,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The reconciliation queue list.",
    "error": "Could not load. Names which read failed and leaves the reconciliation queue untouched.",
-   "emptyFirstRun": "No reconciliation queue yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the reconciliation queue are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No reconciliation queue yet. Offers Create queue (`createQueue`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on venueId, openOnly and the reconciliation queue are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -908,7 +1066,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getQueue",
     "contract": "queue",
     "purpose": "Read a queue with live position",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createQueue",
@@ -938,7 +1096,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "listQueueEntries",
     "contract": "queue",
     "purpose": "List entries in a queue",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "setQueueStatus",
@@ -977,11 +1135,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `queueId`.",
    "preloaded": [
-    "QueueDetail.nowServingPartyNumber",
-    "QueueDetail.lastCalledAt",
-    "QueueDetail.throughputLastHour",
-    "QueueDetail.noShowRatePercent",
-    "QueueDetail.feed"
+    "Queue.code",
+    "Queue.name",
+    "Queue.venueId",
+    "Queue.attractionProductId",
+    "Queue.assetId"
    ]
   },
   "wireframe": {
@@ -990,6 +1148,122 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P08 Venue Management.dc.html#bo-038"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateQueue",
+    "component": "modal",
+    "trigger": "Create queue",
+    "body": "**Collects what `createQueue` sends before it is called.** Required: `code`, `name`, `venueId`, `capacityPerCycle`, `cycleMinutes`. Optional: `attractionProductId`, `assetId`, `accessPointId`, `kind`, `operatingWindows`, `parentQueueId`, `loadBalanceWithQueueIds`, `inQueueOfferEnabled`, `notifyBeforeCallMinutes`, `maxPartySize`, `returnWindowMinutes`, `heightRequirementCm` and 2 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateQueueRequest",
+    "confirm": {
+     "label": "Create queue",
+     "operation": "createQueue"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "venueId",
+      "capacityPerCycle",
+      "cycleMinutes",
+      "attractionProductId",
+      "assetId",
+      "accessPointId",
+      "kind",
+      "operatingWindows",
+      "parentQueueId",
+      "loadBalanceWithQueueIds",
+      "inQueueOfferEnabled",
+      "notifyBeforeCallMinutes",
+      "maxPartySize",
+      "returnWindowMinutes",
+      "heightRequirementCm",
+      "fastPassAllocationPercent"
+     ]
+    },
+    "provenance": "contract queue.yaml POST /queues"
+   },
+   {
+    "id": "formCallNextParties",
+    "component": "modal",
+    "trigger": "Call next parties",
+    "body": "**Collects what `callNextParties` sends before it is called.** Nothing in the body is required. Optional: `partyCount`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Call next parties",
+     "operation": "callNextParties"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "partyCount"
+     ]
+    },
+    "provenance": "contract queue.yaml POST /queues/{queueId}/call-next"
+   },
+   {
+    "id": "formSetQueueStatus",
+    "component": "modal",
+    "trigger": "Save queue status",
+    "body": "**Collects what `setQueueStatus` sends before it is called.** Required: `status`, `reason`. Optional: `guestMessage`, `expectedReopenAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save queue status",
+     "operation": "setQueueStatus"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "reason",
+      "guestMessage",
+      "expectedReopenAt"
+     ]
+    },
+    "provenance": "contract queue.yaml PUT /queues/{queueId}/status"
+   },
+   {
+    "id": "formSetWaitTime",
+    "component": "modal",
+    "trigger": "Save wait time",
+    "body": "**Collects what `setWaitTime` sends before it is called.** Required: `waitMinutes`. Optional: `expiresInMinutes`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save wait time",
+     "operation": "setWaitTime"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "waitMinutes",
+      "expiresInMinutes",
+      "note"
+     ]
+    },
+    "provenance": "contract queue.yaml PUT /queues/{queueId}/wait-time"
+   },
+   {
+    "id": "formUpdateQueue",
+    "component": "modal",
+    "trigger": "Save queue",
+    "body": "**Collects what `updateQueue` sends before it is called.** Nothing in the body is required. Optional: `name`, `capacityPerCycle`, `cycleMinutes`, `maxPartySize`, `returnWindowMinutes`, `heightRequirementCm`, `fastPassAllocationPercent`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save queue",
+     "operation": "updateQueue"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "capacityPerCycle",
+      "cycleMinutes",
+      "maxPartySize",
+      "returnWindowMinutes",
+      "heightRequirementCm",
+      "fastPassAllocationPercent"
+     ]
+    },
+    "provenance": "contract queue.yaml PATCH /queues/{queueId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1028,47 +1302,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+    "BO-070"
    ],
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
+     "to": "BO-070",
+     "trigger": "Work Orders",
+     "provenance": "VM close-out 29 September: maintenance home",
      "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+      "workOrderId"
+     ]
     }
    ]
   },
@@ -1077,13 +1321,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listAssets` reads the population and `getAsset` reads one of them — list, select, act",
   "purpose": "Know what equipment exists and where.",
-  "gaps": [
-   {
-    "operation": "getAssetHistory",
-    "why": "**2 declared operations reach no component on this screen**: getAssetHistory, listGames. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1092,8 +1329,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listAssets",
+       "notes": "Sends `?venueId=` to `listAssets`.",
+       "provenance": "contract maintenance.yaml GET /assets"
+      },
+      {
+       "kind": "textField",
+       "label": "Category id",
+       "operation": "listAssets",
+       "notes": "Sends `?categoryId=` to `listAssets`.",
+       "provenance": "contract maintenance.yaml GET /assets"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listAssets",
+       "notes": "Sends `?status=` to `listAssets`.",
+       "provenance": "contract maintenance.yaml GET /assets"
+      },
+      {
+       "kind": "toggle",
+       "label": "Maintenance due",
+       "operation": "listAssets",
+       "notes": "Sends `?maintenanceDue=` to `listAssets`.",
+       "provenance": "contract maintenance.yaml GET /assets"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every asset register",
+       "label": "Every asset",
        "bindsTo": "Asset",
        "columns": [
         "Asset.assetTag",
@@ -1111,6 +1376,35 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listAssets",
        "provenance": "contract maintenance.yaml GET /assets"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every game",
+       "bindsTo": "Game",
+       "columns": [
+        "Game.id",
+        "Game.code",
+        "Game.name",
+        "Game.venueId",
+        "Game.zone",
+        "Game.assetId",
+        "Game.readerId",
+        "Game.creditCost",
+        "Game.minPointsAwarded",
+        "Game.maxPointsAwarded",
+        "Game.heightRequirementCm",
+        "Game.status"
+       ],
+       "operation": "listGames",
+       "provenance": "contract games.yaml GET /games"
+      },
+      {
+       "kind": "searchField",
+       "derived": true,
+       "impliedBy": "lookupAsset",
+       "label": "Search",
+       "notes": "A search that returns nothing must say so differently from a search not yet run.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1120,7 +1414,46 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected asset register",
+       "label": "The selected asset",
+       "bindsTo": "Asset",
+       "columns": [
+        "Asset.assetTag",
+        "Asset.name",
+        "Asset.venueId",
+        "Asset.categoryId",
+        "Asset.locationDescription",
+        "Asset.criticality",
+        "Asset.manufacturer",
+        "Asset.model",
+        "Asset.serialNumber",
+        "Asset.commissionedAt",
+        "Asset.warrantyExpiresAt",
+        "Asset.supplierId",
+        "Asset.linkedProductIds",
+        "Asset.linkedAccessPointId",
+        "Asset.requiresInspectionToReturn",
+        "Asset.documents"
+       ],
+       "operation": "listAssets",
+       "provenance": "contract maintenance.yaml GET /assets"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The asset history entry",
+       "bindsTo": "AssetHistoryEntry",
+       "columns": [
+        "AssetHistoryEntry.kind",
+        "AssetHistoryEntry.referenceId",
+        "AssetHistoryEntry.summary",
+        "AssetHistoryEntry.principalId",
+        "AssetHistoryEntry.occurredAt"
+       ],
+       "operation": "getAssetHistory",
+       "provenance": "contract maintenance.yaml GET /assets/{assetId}/history"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The asset",
        "bindsTo": "AssetDetail",
        "columns": [
         "AssetDetail.openWorkOrders",
@@ -1138,86 +1471,45 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create asset",
        "operation": "createAsset",
        "provenance": "contract maintenance.yaml POST /assets"
       },
       {
        "kind": "secondaryButton",
-       "label": "Lookup",
+       "label": "Lookup asset",
        "operation": "lookupAsset",
        "provenance": "contract maintenance.yaml GET /assets/lookup"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save asset status",
        "operation": "setAssetStatus",
        "provenance": "contract maintenance.yaml PUT /assets/{assetId}/status"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save asset",
        "operation": "updateAsset",
        "provenance": "contract maintenance.yaml PATCH /assets/{assetId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save game",
        "operation": "updateGame",
        "provenance": "contract games.yaml PATCH /games/{gameId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Record",
+       "label": "Record game play",
        "operation": "recordGamePlay",
        "provenance": "contract games.yaml POST /game-plays"
       },
       {
        "kind": "secondaryButton",
-       "label": "Sync",
+       "label": "Sync game plays",
        "operation": "syncGamePlays",
        "provenance": "contract games.yaml POST /game-plays/sync"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAssets",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createAsset",
-       "label": "Create asset",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "searchField",
-       "derived": true,
-       "impliedBy": "lookupAsset",
-       "label": "Search",
-       "notes": "A search that returns nothing must say so differently from a search not yet run.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createAsset",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1226,9 +1518,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The asset register list.",
    "error": "Could not load. Names which read failed and leaves the asset register untouched.",
-   "emptyFirstRun": "No asset register yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the asset register are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No asset register yet. Offers Create asset (`createAsset`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on venueId, categoryId, status, maintenanceDue and the asset register are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ASSET_VIEW`, which `listAssets` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1241,7 +1533,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getAsset",
     "contract": "maintenance",
     "purpose": "Read an asset with history and documents",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createAsset",
@@ -1256,13 +1548,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getAssetHistory",
     "contract": "maintenance",
     "purpose": "Service history",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "lookupAsset",
     "contract": "maintenance",
     "purpose": "Find an asset by tag or QR",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "setAssetStatus",
@@ -1329,9 +1621,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `assetId`, `gameId`.",
    "preloaded": [
-    "AssetDetail.openWorkOrders",
-    "AssetDetail.maintenancePlans",
-    "AssetDetail.documents"
+    "Asset.assetTag",
+    "Asset.name",
+    "Asset.venueId",
+    "Asset.categoryId",
+    "Asset.locationDescription"
    ]
   },
   "wireframe": {
@@ -1340,6 +1634,151 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P08 Venue Management.dc.html#bo-069"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateAsset",
+    "component": "modal",
+    "trigger": "Create asset",
+    "body": "**Collects what `createAsset` sends before it is called.** Required: `assetTag`, `name`, `venueId`, `criticality`. Optional: `categoryId`, `locationDescription`, `manufacturer`, `model`, `serialNumber`, `commissionedAt`, `warrantyExpiresAt`, `supplierId`, `linkedProductIds`, `linkedAccessPointId`, `requiresInspectionToReturn`, `documents` and 1 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateAssetRequest",
+    "confirm": {
+     "label": "Create asset",
+     "operation": "createAsset"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "assetTag",
+      "name",
+      "venueId",
+      "criticality",
+      "categoryId",
+      "locationDescription",
+      "manufacturer",
+      "model",
+      "serialNumber",
+      "commissionedAt",
+      "warrantyExpiresAt",
+      "supplierId",
+      "linkedProductIds",
+      "linkedAccessPointId",
+      "requiresInspectionToReturn",
+      "documents",
+      "documentRefs"
+     ]
+    },
+    "provenance": "contract maintenance.yaml POST /assets"
+   },
+   {
+    "id": "formSetAssetStatus",
+    "component": "modal",
+    "trigger": "Save asset status",
+    "body": "**Collects what `setAssetStatus` sends before it is called.** Required: `status`, `reason`, `recordedAt`. Optional: `inspectionId`, `raiseWorkOrder`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SetAssetStatusRequest",
+    "confirm": {
+     "label": "Save asset status",
+     "operation": "setAssetStatus"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "reason",
+      "recordedAt",
+      "inspectionId",
+      "raiseWorkOrder"
+     ]
+    },
+    "provenance": "contract maintenance.yaml PUT /assets/{assetId}/status"
+   },
+   {
+    "id": "formUpdateAsset",
+    "component": "modal",
+    "trigger": "Save asset",
+    "body": "**Collects what `updateAsset` sends before it is called.** Nothing in the body is required. Optional: `name`, `locationDescription`, `categoryId`, `warrantyExpiresAt`, `supplierId`, `documents`, `documentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save asset",
+     "operation": "updateAsset"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "locationDescription",
+      "categoryId",
+      "warrantyExpiresAt",
+      "supplierId",
+      "documents",
+      "documentRefs"
+     ]
+    },
+    "provenance": "contract maintenance.yaml PATCH /assets/{assetId}"
+   },
+   {
+    "id": "formUpdateGame",
+    "component": "modal",
+    "trigger": "Save game",
+    "body": "**Collects what `updateGame` sends before it is called.** Nothing in the body is required. Optional: `name`, `creditCost`, `minPointsAwarded`, `maxPointsAwarded`, `status`, `heightRequirementCm`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save game",
+     "operation": "updateGame"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "creditCost",
+      "minPointsAwarded",
+      "maxPointsAwarded",
+      "status",
+      "heightRequirementCm"
+     ]
+    },
+    "provenance": "contract games.yaml PATCH /games/{gameId}"
+   },
+   {
+    "id": "formRecordGamePlay",
+    "component": "modal",
+    "trigger": "Record game play",
+    "body": "**Collects what `recordGamePlay` sends before it is called.** Required: `id`, `cardCode`, `gameId`, `recordedAt`. Optional: `creditsUsed`, `pointsAwarded`, `sequence`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RecordPlayRequest",
+    "confirm": {
+     "label": "Record game play",
+     "operation": "recordGamePlay"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "cardCode",
+      "gameId",
+      "recordedAt",
+      "creditsUsed",
+      "pointsAwarded",
+      "sequence"
+     ]
+    },
+    "provenance": "contract games.yaml POST /game-plays"
+   },
+   {
+    "id": "formSyncGamePlays",
+    "component": "modal",
+    "trigger": "Sync game plays",
+    "body": "**Collects what `syncGamePlays` sends before it is called.** Required: `readerId`, `plays`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Sync game plays",
+     "operation": "syncGamePlays"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "readerId",
+      "plays"
+     ]
+    },
+    "provenance": "contract games.yaml POST /game-plays/sync"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1378,47 +1817,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+    "BO-070"
    ],
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
+     "to": "BO-070",
+     "trigger": "Work Orders",
+     "provenance": "VM close-out 29 September: maintenance home",
      "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+      "workOrderId"
+     ]
     }
    ]
   },
@@ -1436,7 +1845,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every planned maintenance",
+       "label": "Every maintenance plan",
        "bindsTo": "MaintenancePlan",
        "columns": [
         "MaintenancePlan.id",
@@ -1462,7 +1871,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected planned maintenance",
+       "label": "The selected maintenance plan",
+       "bindsTo": "MaintenancePlan",
+       "columns": [
+        "MaintenancePlan.id",
+        "MaintenancePlan.name",
+        "MaintenancePlan.assetId",
+        "MaintenancePlan.assetCategoryId",
+        "MaintenancePlan.intervalDays",
+        "MaintenancePlan.usageInterval",
+        "MaintenancePlan.leadTimeDays",
+        "MaintenancePlan.taskTemplate",
+        "MaintenancePlan.lastCompletedAt",
+        "MaintenancePlan.nextDueAt",
+        "MaintenancePlan.isActive"
+       ],
+       "operation": "listMaintenancePlans",
+       "provenance": "contract maintenance.yaml GET /maintenance-plans"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The due maintenance task",
        "bindsTo": "DueMaintenanceTask",
        "columns": [
         "DueMaintenanceTask.planId",
@@ -1487,48 +1916,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create maintenance plan",
        "operation": "createMaintenancePlan",
        "provenance": "contract maintenance.yaml POST /maintenance-plans"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save role permissions",
        "operation": "setRolePermissions",
        "provenance": "contract tenancy.yaml PUT /roles/{roleId}/permissions"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listMaintenancePlans",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createMaintenancePlan",
-       "label": "Create maintenance plan",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createMaintenancePlan",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1537,9 +1933,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The planned maintenance list.",
    "error": "Could not load. Names which read failed and leaves the planned maintenance untouched.",
-   "emptyFirstRun": "No planned maintenance yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the planned maintenance are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No planned maintenance yet. Offers Create maintenance plan (`createMaintenancePlan`).",
+   "emptyNoResults": "Never shown: `listMaintenancePlans` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `ASSET_VIEW`, which `listMaintenancePlans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1582,11 +1978,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "A role opened from the directory. **Permissions are set per role, not per person** — ADR-0002 makes authorisation user-driven through roles.",
    "preloaded": [
-    "DueMaintenanceTask.planId",
-    "DueMaintenanceTask.planName",
-    "DueMaintenanceTask.assetId",
-    "DueMaintenanceTask.assetName",
-    "DueMaintenanceTask.criticality"
+    "MaintenancePlan.id",
+    "MaintenancePlan.name",
+    "MaintenancePlan.assetId",
+    "MaintenancePlan.assetCategoryId",
+    "MaintenancePlan.intervalDays"
    ]
   },
   "wireframe": {
@@ -1595,6 +1991,54 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P08 Venue Management.dc.html#bo-071"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateMaintenancePlan",
+    "component": "modal",
+    "trigger": "Create maintenance plan",
+    "body": "**Collects what `createMaintenancePlan` sends before it is called.** Required: `id`, `name`, `assetId`, `taskTemplate`. Optional: `assetCategoryId`, `intervalDays`, `usageInterval`, `leadTimeDays`, `lastCompletedAt`, `nextDueAt`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "MaintenancePlan",
+    "confirm": {
+     "label": "Create maintenance plan",
+     "operation": "createMaintenancePlan"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "name",
+      "assetId",
+      "taskTemplate",
+      "assetCategoryId",
+      "intervalDays",
+      "usageInterval",
+      "leadTimeDays",
+      "lastCompletedAt",
+      "nextDueAt",
+      "isActive"
+     ]
+    },
+    "provenance": "contract maintenance.yaml POST /maintenance-plans"
+   },
+   {
+    "id": "formSetRolePermissions",
+    "component": "modal",
+    "trigger": "Save role permissions",
+    "body": "**Collects what `setRolePermissions` sends before it is called.** Required: `permissions`. Optional: `inheritsFromRoleId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save role permissions",
+     "operation": "setRolePermissions"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "inheritsFromRoleId"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /roles/{roleId}/permissions"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1633,47 +2077,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+    "BO-070"
    ],
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "to": "BO-070",
+     "trigger": "Work Orders",
+     "provenance": "VM close-out 29 September: maintenance home"
     }
    ]
   },
@@ -1690,8 +2101,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Severity",
+       "operation": "listIncidents",
+       "notes": "Sends `?severity=` to `listIncidents`.",
+       "provenance": "contract maintenance.yaml GET /incidents"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listIncidents",
+       "notes": "Sends `?status=` to `listIncidents`.",
+       "provenance": "contract maintenance.yaml GET /incidents"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is reportable",
+       "operation": "listIncidents",
+       "notes": "Sends `?isReportable=` to `listIncidents`.",
+       "provenance": "contract maintenance.yaml GET /incidents"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every incident log",
+       "label": "Every incident",
        "bindsTo": "Incident",
        "columns": [
         "Incident.id",
@@ -1718,7 +2150,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected incident log",
+       "label": "The selected incident",
+       "bindsTo": "Incident",
+       "columns": [
+        "Incident.id",
+        "Incident.incidentNumber",
+        "Incident.kind",
+        "Incident.severity",
+        "Incident.status",
+        "Incident.venueId",
+        "Incident.assetId",
+        "Incident.locationDescription",
+        "Incident.isReportable",
+        "Incident.notificationDueAt",
+        "Incident.notifiedAt",
+        "Incident.assignedToPrincipalId",
+        "Incident.reportedByPrincipalId",
+        "Incident.correctiveWorkOrderId",
+        "Incident.occurredAt",
+        "Incident.recordedAt"
+       ],
+       "operation": "listIncidents",
+       "provenance": "contract maintenance.yaml GET /incidents"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The incident",
        "bindsTo": "IncidentDetail",
        "columns": [
         "IncidentDetail.id",
@@ -1749,47 +2206,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Report",
+       "label": "Report incident",
        "operation": "reportIncident",
        "provenance": "contract maintenance.yaml POST /incidents"
       },
       {
        "kind": "secondaryButton",
-       "label": "Record",
+       "label": "Record authority notification",
        "operation": "recordAuthorityNotification",
        "provenance": "contract maintenance.yaml POST /incidents/{incidentId}/notify-authority"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save incident",
        "operation": "updateIncident",
        "provenance": "contract maintenance.yaml PATCH /incidents/{incidentId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listIncidents",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "reportIncident",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1798,9 +2229,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The incident log list.",
    "error": "Could not load. Names which read failed and leaves the incident log untouched.",
-   "emptyFirstRun": "No incident log yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the incident log are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No incident log yet. Offers Record authority notification (`recordAuthorityNotification`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on severity, status, isReportable and the incident log are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `INCIDENT_VIEW`, which `listIncidents` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1813,7 +2244,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getIncident",
     "contract": "maintenance",
     "purpose": "Read an incident",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "reportIncident",
@@ -1852,11 +2283,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `incidentId`.",
    "preloaded": [
-    "IncidentDetail.id",
-    "IncidentDetail.incidentNumber",
-    "IncidentDetail.kind",
-    "IncidentDetail.severity",
-    "IncidentDetail.status"
+    "Incident.id",
+    "Incident.incidentNumber",
+    "Incident.kind",
+    "Incident.severity",
+    "Incident.status"
    ]
   },
   "wireframe": {
@@ -1865,6 +2296,85 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P08 Venue Management.dc.html#bo-072"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formReportIncident",
+    "component": "modal",
+    "trigger": "Report incident",
+    "body": "**Collects what `reportIncident` sends before it is called.** Required: `id`, `kind`, `severity`, `venueId`, `description`, `occurredAt`, `recordedAt`. Optional: `assetId`, `locationDescription`, `involvedSubjectIds`, `involvedStaffPrincipalIds`, `witnessCount`, `firstAidGiven`, `emergencyServicesCalled`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ReportIncidentRequest",
+    "confirm": {
+     "label": "Report incident",
+     "operation": "reportIncident"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "severity",
+      "venueId",
+      "description",
+      "occurredAt",
+      "recordedAt",
+      "assetId",
+      "locationDescription",
+      "involvedSubjectIds",
+      "involvedStaffPrincipalIds",
+      "witnessCount",
+      "firstAidGiven",
+      "emergencyServicesCalled",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract maintenance.yaml POST /incidents"
+   },
+   {
+    "id": "formRecordAuthorityNotification",
+    "component": "modal",
+    "trigger": "Record authority notification",
+    "body": "**Collects what `recordAuthorityNotification` sends before it is called.** Required: `authority`, `notifiedAt`. Optional: `reference`, `notifiedByPrincipalId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Record authority notification",
+     "operation": "recordAuthorityNotification"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "authority",
+      "notifiedAt",
+      "reference",
+      "notifiedByPrincipalId",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract maintenance.yaml POST /incidents/{incidentId}/notify-authority"
+   },
+   {
+    "id": "formUpdateIncident",
+    "component": "modal",
+    "trigger": "Save incident",
+    "body": "**Collects what `updateIncident` sends before it is called.** Nothing in the body is required. Optional: `status`, `severity`, `assignedToPrincipalId`, `investigationNote`, `rootCause`, `correctiveActions`, `correctiveWorkOrderId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save incident",
+     "operation": "updateIncident"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "severity",
+      "assignedToPrincipalId",
+      "investigationNote",
+      "rootCause",
+      "correctiveActions",
+      "correctiveWorkOrderId",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract maintenance.yaml PATCH /incidents/{incidentId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1915,11 +2425,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-094",
      "trigger": "Map Editor & Publish",
-     "carries": [
-      "mapId",
-      "pathId"
-     ],
-     "provenance": "derived — BO-094 declares entryState.params mapId, pathId, so an edge into it must carry them"
+     "provenance": "derived — BO-094 declares entryState.params mapId, pathId and BO-092 holds none of them, so the edge carries nothing and BO-094 opens cold"
     }
    ]
   },
@@ -1940,7 +2446,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every venue maps",
+       "label": "Every venue map",
        "bindsTo": "VenueMap",
        "columns": [
         "VenueMap.id",
@@ -1967,7 +2473,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected venue maps",
+       "label": "The selected venue map",
        "bindsTo": "VenueMap",
        "columns": [
         "VenueMap.id",
@@ -1996,37 +2502,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create venue map",
        "operation": "createVenueMap",
        "provenance": "contract venue-map.yaml POST /venue-maps"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listVenueMaps",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createVenueMap",
-       "label": "Create venue map",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createVenueMap",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -2035,9 +2513,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The venue maps list.",
    "error": "Could not load. Names which read failed and leaves the venue maps untouched.",
-   "emptyFirstRun": "No venue maps yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the venue maps are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No venue maps yet. Offers Create venue map (`createVenueMap`).",
+   "emptyNoResults": "Never shown: `listVenueMaps` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `VENUE_MAP_VIEW`, which `listVenueMaps` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2069,9 +2547,44 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-092",
+   "derivedFrom": "wireframes/reference/Seat Board 2.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateVenueMap",
+    "component": "modal",
+    "trigger": "Create venue map",
+    "body": "**Collects what `createVenueMap` sends before it is called.** Required: `id`, `name`, `venueId`, `status`. Optional: `scopePath`, `kind`, `floorLevel`, `publishedVersion`, `graphVersion`, `isGeoreferenced`, `baseAssetId`, `baseImageAlignment`, `tileSetRef`, `boundsGeoJson`, `graphStatus`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "VenueMap",
+    "confirm": {
+     "label": "Create venue map",
+     "operation": "createVenueMap"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "name",
+      "venueId",
+      "status",
+      "scopePath",
+      "kind",
+      "floorLevel",
+      "publishedVersion",
+      "graphVersion",
+      "isGeoreferenced",
+      "baseAssetId",
+      "baseImageAlignment",
+      "tileSetRef",
+      "boundsGeoJson",
+      "graphStatus"
+     ]
+    },
+    "provenance": "contract venue-map.yaml POST /venue-maps"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2116,7 +2629,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-094",
      "trigger": "The operator places what the drawing did not carry and links each point to what it is",
-     "provenance": "flow F26 step 3→4"
+     "provenance": "flow F26 step 3→4",
+     "carries": [
+      "mapId"
+     ]
     }
    ]
   },
@@ -2127,14 +2643,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`importVenueGeometry`, `proposeVenueLabels`, `acceptVenueLabelProposals`) and no read of a population — it is settings, not a list",
-  "purpose": "Upload a plan, check what was read, and review what the assistant suggests.",
-  "gaps": [
-   {
-    "operation": "importVenueGeometry",
-    "why": "**`importVenueGeometry` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
-    "source": "contract venue-map.yaml POST /venue-maps/{mapId}/import"
-   }
-  ],
+  "purpose": "Upload a plan, check what was read, and review what the assistant suggests; on a map that carries bookable places, also read the cabanas, loungers and tables and join them to what they sell as (decided 29 September, rev 3 REV3-15 and GAP-C2).",
   "layout": {
    "template": "form",
    "regions": [
@@ -2144,20 +2653,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Import",
+       "label": "Import venue geometry",
        "operation": "importVenueGeometry",
        "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/import"
       },
       {
        "kind": "secondaryButton",
-       "label": "Propose",
+       "label": "Propose venue labels",
        "operation": "proposeVenueLabels",
        "provenance": "contract ai.yaml POST /ai/venue-map/{mapId}/propose-labels"
       },
       {
        "kind": "secondaryButton",
-       "label": "Accept",
+       "label": "Accept venue label proposals",
        "operation": "acceptVenueLabelProposals",
+       "notes": "**Accept, edit or reject, per proposal** (decided 28 September, audit R275 (f)) — each row of the review carries its own decision; an edit sends the operator's corrected point.",
        "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/proposals"
       }
      ]
@@ -2177,19 +2687,90 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "carried from the previous definition"
       },
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "importVenueGeometry",
-       "label": "Import venue geometry",
-       "provenance": "carried from the previous definition"
+       "kind": "selectField",
+       "label": "Format",
+       "operation": "importVenueGeometry",
+       "notes": "Required.",
+       "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/import"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "importVenueGeometry",
-       "provenance": "carried from the previous definition"
+       "kind": "textField",
+       "label": "Source ref",
+       "operation": "importVenueGeometry",
+       "notes": "Required.",
+       "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/import"
+      },
+      {
+       "kind": "textField",
+       "label": "Layer mapping",
+       "operation": "importVenueGeometry",
+       "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/import"
+      },
+      {
+       "kind": "toggle",
+       "label": "Digit normalisation",
+       "operation": "importVenueGeometry",
+       "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/import"
+      },
+      {
+       "kind": "textField",
+       "label": "Georeference",
+       "operation": "importVenueGeometry",
+       "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/import"
+      },
+      {
+       "kind": "textField",
+       "label": "Manifest ref",
+       "operation": "importVenueGeometry",
+       "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/import"
+      },
+      {
+       "kind": "textField",
+       "label": "Resource layer",
+       "operation": "importVenueGeometry",
+       "notes": "`layerMapping.resourceLayer`: the drawing layers that hold the bookable places (decided 29 September, rev 3 REV3-15). Absent, the accepted names in the venue-map input spec are matched.",
+       "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/import"
+      },
+      {
+       "kind": "fileUpload",
+       "label": "Resource manifest",
+       "operation": "importVenueGeometry",
+       "notes": "`resourceManifestRef`: one sheet, header on row 3, five columns (Label, Kind, Zone, Capacity, Price band), uploaded through the asset library like the drawing. **Kind is cabana, lounger, table, pitch or other**; a table here is a non-dining spot sold like a cabana, and a restaurant table stays an F&B reservation (decided 29 September, rev 3 GAP-C2).",
+       "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/import"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Price bands",
+       "operation": "importVenueGeometry",
+       "notes": "`priceBands`: each band code the manifest uses and the catalogue product variant that prices it (Family 6, Medium 10, Large 15, XL 20 on the Coastal Aqua map). **The price is the variant's**; the map holds none.",
+       "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/import"
+      },
+      {
+       "kind": "toggle",
+       "label": "Create missing resources",
+       "operation": "importVenueGeometry",
+       "notes": "`createMissingResources`, **off by default**: where a manifest label has no resource with that code at this venue, create one instead of reporting `resourceCodeUnmatched`. Off, a mistyped label is a finding rather than a new cabana.",
+       "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/import"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "What the import read",
+       "bindsTo": "VenueMapImportJob",
+       "columns": [
+        "VenueMapImportJob.status",
+        "VenueMapImportJob.outcome",
+        "VenueMapImportJob.shapesFound",
+        "VenueMapImportJob.layersFound",
+        "VenueMapImportJob.unmappedLayers",
+        "VenueMapImportJob.manifestRowsRead",
+        "VenueMapImportJob.resourcesFound",
+        "VenueMapImportJob.resourceRowsJoined",
+        "VenueMapImportJob.manifestRowsJoined",
+        "VenueMapImportJob.findings"
+       ],
+       "operation": "getVenueMapImportJob",
+       "notes": "Polled while the import runs. **The resource findings are listed apart** from the geometry ones (a manifest row with no shape, a shape with no row, a label with no resource, a band with no variant), each naming the row or the label, so an operator can fix the sheet rather than guess.",
+       "provenance": "contract venue-map.yaml GET /venue-maps/{mapId}/import/{jobId}"
       }
      ]
     }
@@ -2198,8 +2779,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The saved map import labelling.",
    "error": "Could not load. Names which read failed and leaves the map import labelling untouched.",
-   "emptyFirstRun": "No map import labelling configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoResults": "An import that read no resources on a map meant to carry them says so (`resourcesFound` 0) and names the resource layer it looked for, rather than showing an empty price-band table.",
+   "emptyFirstRun": "No map import labelling configured. The form opens empty and `importVenueGeometry` saves the first one; it says what the platform does in the meantime.",
+   "emptyNoAccess": "Shown when the caller lacks `VENUE_MAP_MANAGE`, which `importVenueGeometry` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2217,8 +2799,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "operationId": "acceptVenueLabelProposals",
     "contract": "venue-map",
-    "purpose": "Accept or reject",
+    "purpose": "Accept, edit or reject each label proposal (audit R275 (f))",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getVenueMapImportJob",
+    "contract": "venue-map",
+    "purpose": "What the import read, including the resources it found and joined (rev 3 REV3-15)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "acceptWalkwayProposals",
+    "contract": "venue-map",
+    "purpose": "Accept or reject proposed walkways",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "getVenueMapImportJob"
+    ]
    }
   ],
   "entryState": {
@@ -2226,6 +2824,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "mapId",
      "from": "deepLink"
+    },
+    {
+     "name": "jobId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `mapId`."
@@ -2234,9 +2836,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-093",
+   "derivedFrom": "wireframes/reference/Seat Board 1.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAcceptVenueLabelProposals",
+    "component": "modal",
+    "trigger": "Accept venue label proposals",
+    "body": "**Collects what `acceptVenueLabelProposals` sends before it is called.** Required: `decisions` — one per proposal, each `accept`, `edit` or `reject` (decided 28 September, audit R275 (f)). An `edit` carries the corrected `point`; a reject writes nothing to the map. Decisions are per proposal, never all-or-nothing. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Accept venue label proposals",
+     "operation": "acceptVenueLabelProposals"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "decisions"
+     ]
+    },
+    "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/proposals"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2283,7 +2905,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "provenance": "flow F26 step 6→7",
      "operation": "publishVenueMap",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "mapId"
+     ]
     }
    ]
   },
@@ -2294,14 +2919,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "pattern": "statusTracker",
   "patternReason": "`getVenueMap` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "Place booths, toilets, exits, rides and restaurants, then publish.",
-  "gaps": [
-   {
-    "operation": "getVenueMapGraph",
-    "why": "**1 declared operation reach no component on this screen**: getVenueMapGraph. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
+  "purpose": "Place booths, toilets, exits, rides and restaurants, and the cabanas, loungers and tables guests book from the map, then publish.",
   "layout": {
    "template": "detail",
    "regions": [
@@ -2311,7 +2929,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected map editor publish",
+       "label": "The venue map",
        "bindsTo": "VenueMapDetail",
        "columns": [
         "VenueMapDetail.map",
@@ -2319,6 +2937,37 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "VenueMapDetail.paths"
        ],
        "operation": "getVenueMap",
+       "provenance": "contract venue-map.yaml GET /venue-maps/{mapId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The venue map graph",
+       "bindsTo": "VenueMapGraph",
+       "columns": [
+        "VenueMapGraph.mapId",
+        "VenueMapGraph.generatedAt",
+        "VenueMapGraph.nodes",
+        "VenueMapGraph.edges",
+        "VenueMapGraph.components"
+       ],
+       "operation": "getVenueMapGraph",
+       "provenance": "contract venue-map.yaml GET /venue-maps/{mapId}/graph"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishVenueMap",
+       "notes": "**Publishing a map moves people.** The gate names what changes before it happens — which routes, which closures, which points become unreachable.\n",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Bookable places on the map",
+       "bindsTo": "VenueMapDetail",
+       "columns": [
+        "VenueMapDetail.resources"
+       ],
+       "operation": "getVenueMap",
+       "notes": "**Each placed resource with its label, kind, zone, capacity and price band** (decided 29 September, rev 3 REV3-15, superseding audit R073 (c) for resources on an ingested map). Guests pick one of these on the map and buy it. A place with no linked resource or no price band is marked, because publishing will refuse it.",
        "provenance": "contract venue-map.yaml GET /venue-maps/{mapId}"
       }
      ]
@@ -2329,78 +2978,50 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save venue point",
        "operation": "setVenuePoint",
        "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/points"
       },
       {
        "kind": "secondaryButton",
-       "label": "Publish",
+       "label": "Publish venue map",
        "operation": "publishVenueMap",
        "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/publish"
       },
       {
        "kind": "secondaryButton",
-       "label": "Validate",
+       "label": "Validate venue map graph",
        "operation": "validateVenueMapGraph",
        "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/validate-graph"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save path closure",
        "operation": "setPathClosure",
        "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/paths/{pathId}/closure"
       },
       {
        "kind": "publishGate",
        "label": "What publishing changes",
-       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
+       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save. **Lists the resource blockers apart** (decided 29 September, rev 3 REV3-15): `resourceUnlinked` (no resource), `resourcePriceBandMissing` (no band, or a band with no variant) and `duplicateResourceLabel`, each naming the place; `validateVenueMapGraph` reports the same as resource findings before anyone presses Publish.",
        "provenance": "authored — required by check-screens"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "derived": true,
-       "impliedBy": "getVenueMap",
-       "notes": "One record, read-only.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setVenuePoint",
-       "label": "Save venue point",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishVenueMap",
-       "notes": "**Publishing a map moves people.** The gate names what changes before it happens — which routes, which closures, which points become unreachable.\n",
-       "provenance": "carried from the previous definition"
       },
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setVenuePoint",
-       "provenance": "carried from the previous definition"
+       "label": "Place resource",
+       "operation": "setPlacedResource",
+       "notes": "Places or amends a cabana, lounger, table (a non-dining spot; restaurant tables stay F&B reservations, rev 3 GAP-C2), pitch or other bookable place and links it to its `resources.Resource`. Bookings follow the resource, not the placement, so moving a cabana on a later version keeps its bookings.",
+       "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/resources"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The map editor publish list.",
+   "loading": "The map editor publish, read by `getVenueMap`.",
    "error": "Could not load. Names which read failed and leaves the map editor publish untouched.",
-   "emptyFirstRun": "No map editor publish yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the map editor publish are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No map editor publish yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `VENUE_MAP_VIEW`, which `getVenueMap` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2438,6 +3059,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "venue-map",
     "purpose": "The navigation graph, ready to route over",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPlacedResource",
+    "contract": "venue-map",
+    "purpose": "Place or amend a bookable place and link it to its resource (rev 3 REV3-15)",
+    "trigger": "onAction",
+    "invalidates": [
+     "getVenueMap"
+    ]
    }
   ],
   "entryState": {
@@ -2457,9 +3087,110 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-094",
+   "derivedFrom": "wireframes/reference/Seat Board 1.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetVenuePoint",
+    "component": "modal",
+    "trigger": "Save venue point",
+    "body": "**Collects what `setVenuePoint` sends before it is called.** Required: `id`, `mapId`, `kind`, `name`, `position`. Optional: `nameLocalised`, `outletId`, `productId`, `accessPointId`, `isStepFree`, `openingHours`, `iconRef`, `isActive`, `isNavigable`, `isDestination`, `pointId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SetVenuePointRequest",
+    "confirm": {
+     "label": "Save venue point",
+     "operation": "setVenuePoint"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "mapId",
+      "kind",
+      "name",
+      "position",
+      "nameLocalised",
+      "outletId",
+      "productId",
+      "accessPointId",
+      "isStepFree",
+      "openingHours",
+      "iconRef",
+      "isActive",
+      "isNavigable",
+      "isDestination",
+      "pointId"
+     ]
+    },
+    "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/points"
+   },
+   {
+    "id": "formPublishVenueMap",
+    "component": "modal",
+    "trigger": "Publish venue map",
+    "body": "**Collects what `publishVenueMap` sends before it is called.** Nothing in the body is required. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Publish venue map",
+     "operation": "publishVenueMap"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "note"
+     ]
+    },
+    "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/publish"
+   },
+   {
+    "id": "formSetPathClosure",
+    "component": "modal",
+    "trigger": "Save path closure",
+    "body": "**Collects what `setPathClosure` sends before it is called.** Required: `isClosed`. Optional: `reason` (maintenance, incident, event, weather, crowding, other), `note`, `force`, `expectedReopenAt`. **Choosing Other makes the note required** — the form will not confirm without it and the server refuses 400 (decided 28 September, audit R222). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save path closure",
+     "operation": "setPathClosure"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "isClosed",
+      "reason",
+      "note",
+      "force",
+      "expectedReopenAt"
+     ]
+    },
+    "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/paths/{pathId}/closure"
+   },
+   {
+    "id": "formSetPlacedResource",
+    "component": "modal",
+    "trigger": "Place resource",
+    "body": "**Collects what `setPlacedResource` sends before it is called.** `resourceId` (the resource it is), `label` (what the guest taps, e.g. B09; unique on the map), `kind` (cabana, lounger, table, pitch, other), `zone`, `capacity` (1 to 500, checked against the party at hold), `priceBandCode` (one of the bands given at import; its variant prices it), `position` or `boundary`, `isBookable`; `placedResourceId` to amend one. Decided 29 September, rev 3 REV3-15. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SetPlacedResourceRequest",
+    "confirm": {
+     "label": "Place resource",
+     "operation": "setPlacedResource"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "resourceId",
+      "label",
+      "kind",
+      "zone",
+      "capacity",
+      "priceBandCode",
+      "position",
+      "boundary",
+      "isBookable",
+      "placedResourceId"
+     ]
+    },
+    "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/resources"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2498,7 +3229,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "navigation": {
    "exitTo": [
     "BO-096",
-    "BO-097"
+    "BO-097",
+    "BO-098"
    ],
    "transitions": [
     {
@@ -2507,16 +3239,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "resourceId"
      ],
-     "provenance": "derived — BO-096 declares entryState.params resourceId, so an edge into it must carry them"
+     "provenance": "derived — BO-096 declares entryState.params resourceId and BO-095 holds resourceId, so an edge into it carries them"
     },
     {
      "to": "BO-097",
      "trigger": "Check Out & Check In",
+     "provenance": "derived — BO-097 declares entryState.params authorisationId, bookingId and BO-095 holds none of them, so the edge carries nothing and BO-097 opens cold"
+    },
+    {
+     "to": "BO-098",
+     "trigger": "Qualifications",
      "carries": [
-      "authorisationId",
-      "bookingId"
+      "resourceId"
      ],
-     "provenance": "derived — BO-097 declares entryState.params authorisationId, bookingId, so an edge into it must carry them"
+     "provenance": "derived — BO-098 declares entryState.params resourceId and BO-095 holds resourceId, so an edge into it carries them"
     }
    ]
   },
@@ -2533,8 +3269,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listResources",
+       "notes": "Sends `?kind=` to `listResources`.",
+       "provenance": "contract resources.yaml GET /resources"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Available from",
+       "operation": "listResources",
+       "notes": "Sends `?availableFrom=` to `listResources`.",
+       "provenance": "contract resources.yaml GET /resources"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Available to",
+       "operation": "listResources",
+       "notes": "Sends `?availableTo=` to `listResources`.",
+       "provenance": "contract resources.yaml GET /resources"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every resources",
+       "label": "Every resource",
        "bindsTo": "Resource",
        "columns": [
         "Resource.id",
@@ -2552,6 +3309,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listResources",
        "provenance": "contract resources.yaml GET /resources"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search resources",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Kind",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "bindsTo": "Resource[]",
+       "notes": "Status column carries the reason — **booked and under repair need different responses from somebody looking for something free**",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -2561,7 +3334,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected resources",
+       "label": "The selected resource",
        "bindsTo": "Resource",
        "columns": [
         "Resource.id",
@@ -2591,31 +3364,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create resource",
        "operation": "createResource",
        "provenance": "contract resources.yaml POST /resources"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search resources",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Kind",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "bindsTo": "Resource[]",
-       "notes": "Status column carries the reason — **booked and under repair need different responses from somebody looking for something free**",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -2660,6 +3411,40 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P08 Venue Management.dc.html#bo-095"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateResource",
+    "component": "modal",
+    "trigger": "Create resource",
+    "body": "**Collects what `createResource` sends before it is called.** Required: `id`, `code`, `name`, `kind`, `venueId`. Optional: `scopePath`, `parentResourceId`, `principalId`, `attributes`, `setupMinutes`, `teardownMinutes`, `requiresQualification`, `depositAmount`, `status`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "Resource",
+    "confirm": {
+     "label": "Create resource",
+     "operation": "createResource"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "kind",
+      "venueId",
+      "scopePath",
+      "parentResourceId",
+      "principalId",
+      "attributes",
+      "setupMinutes",
+      "teardownMinutes",
+      "requiresQualification",
+      "depositAmount",
+      "status",
+      "isActive"
+     ]
+    },
+    "provenance": "contract resources.yaml POST /resources"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2710,6 +3495,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "VenuePoint"
+ },
+ "acceptWalkwayProposals": {
+  "method": "POST",
+  "path": "/venue-maps/{mapId}/walkway-proposals",
+  "contract": "venue-map",
+  "summary": "Accept or reject proposed walkways",
+  "permission": "VENUE_MAP_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GraphValidation"
  },
  "callNextParties": {
   "method": "POST",
@@ -2955,6 +3759,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": "version",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "draft",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -2971,6 +3780,11 @@ Method, path, parameters, request and response for every operation these screens
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": "draft",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": "stepFreeOnly",
     "in": "query",
     "required": null
@@ -2978,6 +3792,19 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "VenueMapGraph"
+ },
+ "getVenueMapImportJob": {
+  "method": "GET",
+  "path": "/venue-maps/{mapId}/import/{jobId}",
+  "contract": "venue-map",
+  "summary": "Import progress and findings",
+  "permission": "VENUE_MAP_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VenueMapImportJob"
  },
  "getWaitTimes": {
   "method": "GET",
@@ -3071,7 +3898,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/audit-records",
   "contract": "tenancy",
   "summary": "Who did what, where, and when",
-  "permission": "AI_AUDIT_VIEW",
+  "permission": "AUDIT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -3102,6 +3929,11 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    },
    {
+    "name": "platformStaffGrantId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": "from",
     "in": "query",
     "required": null
@@ -3110,10 +3942,20 @@ Method, path, parameters, request and response for every operation these screens
     "name": "to",
     "in": "query",
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Page"
  },
  "listGames": {
   "method": "GET",
@@ -3554,7 +4396,26 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "VenuePath"
+  "responds": "PathClosureResult"
+ },
+ "setPlacedResource": {
+  "method": "POST",
+  "path": "/venue-maps/{mapId}/resources",
+  "contract": "venue-map",
+  "summary": "Place or amend a bookable resource on the map",
+  "permission": "VENUE_MAP_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SetPlacedResourceRequest",
+  "responds": "PlacedResource"
  },
  "setQueueStatus": {
   "method": "PUT",
@@ -3610,7 +4471,7 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    }
   ],
-  "requestBody": "VenuePoint",
+  "requestBody": "SetVenuePointRequest",
   "responds": "VenuePoint"
  },
  "setWaitTime": {
@@ -3641,7 +4502,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": null
  },
@@ -3654,7 +4521,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ScanSyncResult"
  },
@@ -3781,7 +4654,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "GraphValidation"
  }
@@ -3802,6 +4681,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    {
     "type": "object",
+    "x-ticvai-retired-columns": [
+     "is_maintenance_overdue",
+     "document_refs"
+    ],
     "required": [
      "id",
      "status"
@@ -3816,6 +4699,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "format": "uuid",
       "nullable": true,
       "description": "1.2.x. **Where this asset is also bookable.** An AV rig is an asset to maintain and a resource to allocate, and they are the same object seen from two sides.\n**`resources` owns the calendar and this owns the condition.** An asset out of service makes its resource unbookable, which is one link rather than two models of availability.\n"
+     },
+     "deviceId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "BL-160. **Where this asset is also a registered device.** A turnstile is an asset to maintain and a device to operate, and — exactly as with `resourceId` above — they are the same object seen from two sides.\n**Nothing joined them before this.** A turnstile controller reporting `needsAttention` could not raise a work order against itself, and an engineer closing one had no way back to the device whose firmware caused it.\n**Null for most assets and for most devices.** A chiller is not a device and a signature pad is not on the asset register; the link is sparse, and it lives here rather than on `platform.device` because `platform` is the foundation tier and a foreign key pointing from it into `maintenance` would invert the tiers — every cell running a spine would carry a column for a satellite it may not deploy.\n"
      },
      "acquisitionCost": {
       "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -3867,20 +4756,33 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "nullable": true
      },
      "openWorkOrderCount": {
-      "type": "integer"
+      "type": "integer",
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "Work orders on this asset whose status is `open`, `assigned`, `inProgress`, `paused` or `awaitingParts` — the same set `AssetDetail.openWorkOrders` returns. **Maintained on write**: `createWorkOrder` and every transition into or out of that set (complete, cancel, close, reject back to open) adjust it in the same transaction as the work-order row.\n"
      },
      "nextMaintenanceDueAt": {
       "type": "string",
       "format": "date-time",
-      "nullable": true
+      "nullable": true,
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "The earliest `nextDueAt` among this asset's active maintenance plans; null when none has one. **Maintained on write**: recomputed whenever one of those plans is created, amended, suspended or has its `nextDueAt` moved by a completed work order. `listAssets?maintenanceDue` filters on this column against the clock.\n"
      },
      "isMaintenanceOverdue": {
-      "type": "boolean"
+      "type": "boolean",
+      "readOnly": true,
+      "x-ticvai-persisted": false,
+      "x-ticvai-derived": "onRead",
+      "description": "`nextMaintenanceDueAt` is in the past at the moment of the read. **Computed on read and not stored** — it depends on the clock, so a stored copy is stale the minute after it is written.\n"
      },
      "lastInspectionAt": {
       "type": "string",
       "format": "date-time",
-      "nullable": true
+      "nullable": true,
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "`performedAt` of the latest inspection submitted against this asset. **Maintained on write** by `submitInspection`, in the same transaction as the inspection row; an inspection synced late with an earlier `performedAt` does not move it back.\n"
      },
      "usageCounter": {
       "type": "number",
@@ -3923,33 +4825,73 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "documents": {
       "type": "array",
-      "description": "Manuals, procedures, certificates. What a technician needs on site.",
+      "description": "Manuals, procedures, certificates. What a technician needs on site. Read from `maintenance.asset_document`.\n",
       "items": {
-       "type": "object",
-       "properties": {
-        "ref": {
-         "type": "string"
-        },
-        "name": {
-         "type": "string"
-        },
-        "kind": {
-         "type": "string",
-         "enum": [
-          "manual",
-          "sop",
-          "certificate",
-          "warranty",
-          "drawing",
-          "riskAssessment"
-         ]
-        }
-       }
+       "$ref": "#/components/schemas/AssetDocument"
       }
      }
     }
    }
   ]
+ },
+ "AssetDocument": {
+  "x-ticvai-persistence": "maintenance.asset_document",
+  "type": "object",
+  "description": "A document attached to an asset — manual, procedure, certificate — with the name and kind a technician needs on site. **One row per document**, because `AssetDetail.documents` returns a name and a kind for each and a `text[]` of refs has nowhere to hold either.\n",
+  "required": [
+   "id",
+   "assetId",
+   "ref"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "ref": {
+    "type": "string",
+    "description": "The document in the media store."
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "kind": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AssetDocumentKind"
+     }
+    ],
+    "nullable": true,
+    "description": "Null where the document arrived as a bare ref in `documentRefs`."
+   }
+  }
+ },
+ "AssetDocumentInput": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "ref",
+   "kind"
+  ],
+  "properties": {
+   "ref": {
+    "type": "string",
+    "description": "The document in the media store."
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "kind": {
+    "$ref": "#/components/schemas/AssetDocumentKind"
+   }
+  }
  },
  "AssetStatus": {
   "type": "string",
@@ -3992,6 +4934,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "workOrderId": {
       "type": "string",
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
       "nullable": true
      }
     }
@@ -4010,7 +4953,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "assetTag": {
     "type": "string",
-    "maxLength": 64
+    "maxLength": 64,
+    "x-ticvai-unique": "venue",
+    "description": "**Unique per venue** (decided 28 September, audit R108). Two assets in one venue never share a tag; `createAsset` refuses a duplicate with `409` `duplicate-code`. Two venues may each have an `A-001`.\n"
    },
    "name": {
     "type": "string",
@@ -4074,8 +5019,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "default": false,
     "description": "True means a completed inspection is required before return to service. A technician cannot simply declare a ride safe.\n"
    },
+   "documents": {
+    "type": "array",
+    "description": "Manuals, procedures, certificates, each with its name and kind. Stored one row per document in `maintenance.asset_document`, which is where `AssetDetail.documents` reads them from.\n",
+    "items": {
+     "$ref": "#/components/schemas/AssetDocumentInput"
+    }
+   },
    "documentRefs": {
     "type": "array",
+    "x-ticvai-persisted": false,
+    "description": "**The refs alone, kept for callers that predate `documents`.** Each ref sent here is stored as an `asset_document` row with no name and no kind. Returned as the refs of `documents`, computed on read — there is no second copy to fall out of step.\n",
     "items": {
      "type": "string"
     }
@@ -4135,9 +5089,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "operatingWindows": {
     "type": "array",
-    "description": "**When the queue runs, which is not when the venue is open.** A ride closing an hour early for maintenance leaves a queue accepting guests for a cycle that will not happen.\n",
+    "description": "**When the queue runs, which is not when the venue is open.** A ride closing an hour early for maintenance leaves a queue accepting guests for a cycle that will not happen.\nStored one row per window in `queue.queue_operating_window` (see `Queue`), not as a column on the queue.\n",
     "items": {
      "type": "object",
+     "required": [
+      "day",
+      "from",
+      "to"
+     ],
      "properties": {
       "day": {
        "type": "string",
@@ -4152,10 +5111,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        ]
       },
       "from": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+       "description": "Venue local time, 24-hour `HH:MM`, when the queue starts running."
       },
       "to": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+       "description": "Venue local time, 24-hour `HH:MM`, when the queue stops running."
       },
       "lastEntryMinutesBefore": {
        "type": "integer",
@@ -4220,6 +5183,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "zone": {
     "type": "string",
     "nullable": true
+   },
+   "fastPass": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/QueueFastPass"
+     }
+    ],
+    "nullable": true,
+    "description": "The lane's Fast Pass block (decided 29 September, VM close-out). Null on a queue that takes no Fast Pass.\n"
    }
   }
  },
@@ -4244,7 +5216,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "mediaDeactivated",
    "unpaid",
    "delegatedRightExhausted",
-   "delegatedRightRevoked"
+   "delegatedRightRevoked",
+   "journeyNotCovered"
   ]
  },
  "Direction": {
@@ -4304,6 +5277,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "workOrderId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    }
   }
@@ -4462,6 +5436,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       }
      }
     }
+   },
+   "resourceFindings": {
+    "type": "array",
+    "description": "**Placed resources a guest could not buy** (rev 3 REV3-15), named by label. Any entry here makes `isValid` false, and `publishVenueMap` refuses with the matching blocker.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "placedResourceId",
+      "label",
+      "reason"
+     ],
+     "properties": {
+      "placedResourceId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "label": {
+       "type": "string"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "resourceUnlinked",
+        "resourcePriceBandMissing",
+        "duplicateResourceLabel"
+       ]
+      }
+     }
+    }
    }
   }
  },
@@ -4480,10 +5483,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "incidentNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.\n"
    },
    "kind": {
     "$ref": "#/components/schemas/IncidentKind"
@@ -4519,7 +5525,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "notifiedAt": {
     "type": "string",
     "format": "date-time",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "The earliest `notifiedAt` among this incident's authority notifications. **Maintained on write** by `recordAuthorityNotification`; each notification itself is a row of `maintenance.incident_authority_notification`.\n"
    },
    "assignedToPrincipalId": {
     "type": "string",
@@ -4532,6 +5541,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "correctiveWorkOrderId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "occurredAt": {
@@ -4554,6 +5564,54 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "IncidentAuthorityNotification": {
+  "x-ticvai-persistence": "maintenance.incident_authority_notification",
+  "type": "object",
+  "description": "**One notification to an external authority, appended by `recordAuthorityNotification`.** An incident may be reported to more than one authority, or to the same one twice, and each is the evidence that an obligation was met — so each is a row, not an overwrite of `maintenance.incident.notified_at`.\n",
+  "required": [
+   "id",
+   "incidentId",
+   "authority",
+   "notifiedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "incidentId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "authority": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "reference": {
+    "type": "string",
+    "maxLength": 128,
+    "nullable": true
+   },
+   "notifiedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "notifiedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "attachmentRefs": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "IncidentDetail": {
   "x-ticvai-persistence": "maintenance.incident",
   "allOf": [
@@ -4569,7 +5627,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "investigationNote": {
       "type": "string",
-      "nullable": true
+      "nullable": true,
+      "readOnly": true,
+      "description": "The latest entry of `investigationNotes`, kept for readers that show one line."
+     },
+     "investigationNotes": {
+      "type": "array",
+      "readOnly": true,
+      "description": "**Every investigation note, oldest first** (decided 28 September, audit R106 (5)). Read from `maintenance.incident_investigation_note`; appended by `updateIncident`.\n",
+      "items": {
+       "$ref": "#/components/schemas/IncidentInvestigationNote"
+      }
      },
      "rootCause": {
       "type": "string",
@@ -4594,32 +5662,95 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        "type": "string"
       }
      },
+     "involvedParties": {
+      "type": "array",
+      "description": "Who was involved, as given in `ReportIncidentRequest.involvedSubjectIds` and `involvedStaffPrincipalIds`. Read from `maintenance.incident_involved_party`.\n",
+      "items": {
+       "$ref": "#/components/schemas/IncidentInvolvedParty"
+      }
+     },
      "authorityNotifications": {
       "type": "array",
+      "description": "Read from `maintenance.incident_authority_notification`, oldest first.",
       "items": {
-       "type": "object",
-       "properties": {
-        "authority": {
-         "type": "string"
-        },
-        "reference": {
-         "type": "string",
-         "nullable": true
-        },
-        "notifiedAt": {
-         "type": "string",
-         "format": "date-time"
-        },
-        "notifiedByPrincipalId": {
-         "type": "string",
-         "format": "uuid"
-        }
-       }
+       "$ref": "#/components/schemas/IncidentAuthorityNotification"
       }
      }
     }
    }
   ]
+ },
+ "IncidentInvestigationNote": {
+  "x-ticvai-persistence": "maintenance.incident_investigation_note",
+  "type": "object",
+  "description": "**One investigation note, appended by `updateIncident`** (decided 28 September, audit R106 (5)). A history rather than a field, so what an investigator thought on Tuesday survives what they found on Thursday.\n",
+  "required": [
+   "id",
+   "incidentId",
+   "note",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "incidentId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 10000
+   },
+   "writtenByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "IncidentInvolvedParty": {
+  "x-ticvai-persistence": "maintenance.incident_involved_party",
+  "type": "object",
+  "description": "**One person involved in an incident, by opaque reference.** A guest or member of the public is a `pii.subject` id — personal details live there, the erasable store of ADR-0023, so the incident record survives an erasure request intact. A member of staff is a principal id. Exactly one of the two is set, as `kind` says.\n",
+  "required": [
+   "id",
+   "incidentId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "incidentId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "subject",
+     "staff"
+    ]
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A `pii.subject` id where `kind` is `subject`."
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The staff principal where `kind` is `staff`."
+   }
+  }
  },
  "IncidentKind": {
   "type": "string",
@@ -4663,7 +5794,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   }
  },
  "MaintenancePlan": {
-  "x-ticvai-persistence": "maintenance.maintenance_plan",
+  "x-ticvai-persistence": "maintenance.preventive_plan",
   "type": "object",
   "required": [
    "id",
@@ -4809,7 +5940,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      ],
      "properties": {
       "ticketId": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "description": "The `Entitlement.id`."
       },
       "mediaCodes": {
        "type": "array",
@@ -4867,7 +6000,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        "type": "string"
       },
       "ticketId": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "description": "The `Entitlement.id` in the issuing cell."
       },
       "issuingCellId": {
        "type": "string"
@@ -4962,6 +6097,140 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "PathClosureResult": {
+  "description": "What `setPathClosure` returns: the path, and **what a forced closure cut off**, named.\n",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/VenuePath"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "strandedPoints": {
+      "type": "array",
+      "readOnly": true,
+      "description": "Points no longer reachable because of this closure. Empty unless `force` was used.\n",
+      "items": {
+       "$ref": "#/components/schemas/StrandedPoint"
+      }
+     }
+    }
+   }
+  ]
+ },
+ "PlacedResource": {
+  "type": "object",
+  "x-ticvai-persistence": "venuemap.placed_resource",
+  "description": "**A bookable resource where it stands on the map** (decided 29 September, rev 3 REV3-15 and GAP-C2): cabana B09 on the Beach, 15 guests, Large. The resource itself, its bookings and its holds live in `resources`; this row says where it is drawn and what the guest sees. Written into the working draft by `importVenueGeometry` or `setPlacedResource`, copied into the `VenueMapVersion` snapshot at publish. A guest picks one on the published map, holds it with `resources.createResourceHold` and buys it. **Supersedes audit R073 (c) and the 26 August minute for resources on an ingested map.**\n",
+  "required": [
+   "id",
+   "mapId",
+   "resourceId",
+   "label",
+   "kind",
+   "zone",
+   "capacity",
+   "priceBandCode",
+   "position"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "mapId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "From the path of the operation that writes it."
+   },
+   "resourceId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "resources.Resource",
+    "description": "The `resources.Resource` this is. **Availability, holds and bookings are keyed by this**, so a republished map with the cabana moved keeps its bookings.\n"
+   },
+   "label": {
+    "type": "string",
+    "maxLength": 40,
+    "x-ticvai-unique": "map",
+    "description": "What the guest sees and taps, e.g. `B09`. **Unique on the map**, compared without case after digit normalisation; normally the resource's `code`.\n"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "cabana",
+     "lounger",
+     "table",
+     "pitch",
+     "other"
+    ],
+    "description": "A subset of `resources.ResourceKind`, the kinds a guest books from a map. A `table` here is a non-dining spot (a beach or event table) sold like a cabana; restaurant tables stay `fnb` table reservations (decided 29 September, rev 3 GAP-C2)."
+   },
+   "zone": {
+    "type": "string",
+    "maxLength": 80,
+    "description": "The area the guest reads it by, e.g. `Beach`, `River`, `Terrace`."
+   },
+   "capacity": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 500,
+    "description": "Guests it takes, e.g. 15. Shown on the map and checked against the party at hold."
+   },
+   "priceBandCode": {
+    "type": "string",
+    "maxLength": 40,
+    "description": "The band it sells in, e.g. `Large`, one of the `priceBands` given at import. The band's `variantId` prices it; the map holds no price.\n"
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "catalogue.ProductVariant",
+    "description": "Resolved from the price band. What a cart line for this resource names."
+   },
+   "position": {
+    "type": "object",
+    "required": [
+     "x",
+     "y"
+    ],
+    "description": "Drawing coordinates of its label anchor, as on `VenuePoint`.",
+    "properties": {
+     "x": {
+      "type": "number"
+     },
+     "y": {
+      "type": "number"
+     }
+    }
+   },
+   "boundary": {
+    "type": "array",
+    "nullable": true,
+    "description": "The shape drawn, as a polygon in drawing coordinates. Null for a pin.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "x": {
+       "type": "number"
+      },
+      "y": {
+       "type": "number"
+      }
+     }
+    }
+   },
+   "isBookable": {
+    "type": "boolean",
+    "default": true,
+    "description": "False keeps it on the map and off sale, e.g. a cabana kept for staff use. Shown greyed.\n"
+   }
+  }
+ },
  "PlayResult": {
   "x-ticvai-persistence": "games.play",
   "type": "object",
@@ -5007,7 +6276,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   }
  },
  "Queue": {
-  "x-ticvai-persistence": "queue.queue",
+  "x-ticvai-persistence": "queue.queue + queue.queue_operating_window",
   "allOf": [
    {
     "$ref": "#/components/schemas/CreateQueueRequest"
@@ -5043,6 +6312,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "waitTimeSource": {
       "$ref": "#/components/schemas/WaitTimeSource"
+     },
+     "waitTimeAsOf": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "description": "When `currentWaitMinutes` was last set, by whichever source set it. `WaitTime.asOf` reads this.\n"
+     },
+     "manualWaitExpiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "description": "Set by `setWaitTime` as now plus `expiresInMinutes`. Past it, the manual figure is dropped and the queue reverts to its sensor or throughput estimate. Null when the current figure is not manual.\n"
+     },
+     "manualWaitNote": {
+      "type": "string",
+      "maxLength": 200,
+      "nullable": true,
+      "readOnly": true,
+      "description": "The `note` given with the current manual figure. Cleared when it expires."
      },
      "expectedReopenAt": {
       "type": "string",
@@ -5084,6 +6374,46 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   ]
  },
+ "QueueFastPass": {
+  "x-ticvai-persistence": "queue.queue",
+  "type": "object",
+  "description": "**Which Fast Pass entitlements this lane accepts, and how** (decided 29 September, VM close-out; pack 'Access Control Module' p.109, BO-221 Fast Pass & Attraction Access Journey). Fast Pass stays an entitlement owned by Product & Entitlement; this block is the lane's side of it: which products it honours, the return window, a per-guest daily cap and the access points that redeem it. Stored on the queue row. Only meaningful where `kind` is `fastPass` or `fastPassAllocationPercent` is above 0.\n",
+  "required": [
+   "entitlementProductIds"
+  ],
+  "properties": {
+   "entitlementProductIds": {
+    "type": "array",
+    "minItems": 1,
+    "description": "Catalogue products whose entitlement admits to this lane.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "returnWindowMinutes": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 240,
+    "default": 60,
+    "description": "How long after the booked return time a Fast Pass holder may still enter. Proposed, our build plan.\n"
+   },
+   "maxPerGuestPerDay": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Fast Pass redemptions one guest may make on this lane per day; null is no cap."
+   },
+   "allowedAccessPointIds": {
+    "type": "array",
+    "description": "Access points that redeem Fast Pass for this lane; empty is the queue's own.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   }
+  }
+ },
  "QueueFeedHealth": {
   "x-ticvai-persistence": "none — computed",
   "type": "object",
@@ -5101,7 +6431,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "$ref": "#/components/schemas/QueueFeedAdaptor"
    },
    "isHealthy": {
-    "type": "boolean"
+    "type": "boolean",
+    "description": "**Healthy means the last reading arrived within the feed's expected interval** (decided 28 September, audit R106 (1)): `lastReadingAt` is no older than `expectedIntervalSeconds`. It is the opposite of `isQuiet`, and nothing else (latency, discards) makes a reporting feed unhealthy.\n"
    },
    "isQuiet": {
     "type": "boolean",
@@ -5112,12 +6443,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "date-time",
     "nullable": true
    },
+   "expectedIntervalSeconds": {
+    "type": "integer",
+    "description": "The feed's `expectedIntervalSeconds` — the interval `isQuiet` is judged against, returned here so a health panel does not need the feed row as well.\n"
+   },
    "readingsLastHour": {
     "type": "integer"
    },
    "discardedLastHour": {
     "type": "integer",
-    "description": "Out-of-order or duplicate readings rejected."
+    "description": "Out-of-order readings rejected in the last hour — rows of `queue.reading` for this feed with `disposition: discardedOutOfOrder`. Duplicates are not counted here: a duplicate has no row, and `submitQueueReading` reports it in its own `duplicates`.\n"
    }
   }
  },
@@ -5170,7 +6505,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The play ID, generated on the reader, and returned as `PlayResult.playId`. Also the idempotency key: on `recordGamePlay` it must equal the `Idempotency-Key` header (a mismatch is the shared 409 `Conflict`); in a `syncGamePlays` batch it is the key on its own.\n"
    },
    "cardCode": {
     "type": "string"
@@ -5190,6 +6526,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "sequence": {
     "type": "integer",
     "description": "Monotonic per reader. Preserves order across an offline batch."
+   },
+   "playedOffline": {
+    "type": "boolean",
+    "default": false,
+    "description": "**True where the reader recorded the play while offline** and is replaying it. Such a play is accepted even against too few credits and reported for reconciliation; a live play (false) is refused instead (decided 28 September, audit R106 (3)). Every play in a `syncGamePlays` batch is treated as offline.\n"
    },
    "recordedAt": {
     "type": "string",
@@ -5302,25 +6643,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string"
    },
    "kind": {
-    "type": "string",
-    "enum": [
-     "cabana",
-     "locker",
-     "wheelchair",
-     "stroller",
-     "equipment",
-     "room",
-     "auditorium",
-     "vehicle",
-     "instructor",
-     "staff",
-     "table",
-     "pitch",
-     "studio",
-     "mealPlan",
-     "other"
-    ],
-    "description": "BL-135. **`locker` was an entitlement kind in `orders` and nothing issued, assigned or released one.** A locker is a specific object checked out to a named guest and returned — which is this context exactly, and modelling it as an entitlement would have needed a second check-out mechanism.\n**`mealPlan` is the exception and is listed here to be refused**: 5.5.8b groups it with lockers and parking, and a meal plan is a balance rather than an object. It resolves to `retail.Wallet` with a `mealPlan` credit kind (CF-126), not to a resource.\n"
+    "$ref": "#/components/schemas/ResourceKind"
    },
    "venueId": {
     "type": "string",
@@ -5339,7 +6662,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "For a person resource. **`workforce` still owns their rota** — this says whether they are qualified and whether they are already committed.\n"
+    "description": "For a resource of kind `instructor` or `staff`. **`workforce` still owns their rota** — this says whether they are qualified and whether they are already committed.\n"
    },
    "attributes": {
     "type": "object",
@@ -5379,6 +6702,30 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "boolean",
     "default": true
    }
+  }
+ },
+ "ResourceKind": {
+  "type": "string",
+  "description": "BL-135. **`locker` was an entitlement kind in `orders` and nothing issued, assigned or released one.** A locker is a specific object checked out to a named guest and returned — which is this context exactly, and modelling it as an entitlement would have needed a second check-out mechanism.\nA seed for `ResourceType` rather than the law (board 1.02): a customer adding a class does it with `createResourceType`, not by waiting for this list to grow.\n**`table` is a non-dining spot** (decided 29 September, rev 3 GAP-C2, confirmed by Chinmay): a beach or event table placed on a venue map, picked and sold like a cabana (`createResourceHold`, then the order). **A dining table is not this**: restaurant tables stay `fnb` tables, booked with `fnb.createTableReservation` and the waitlist (audit R073 (d)).\n",
+  "enum": [
+   "cabana",
+   "lounger",
+   "locker",
+   "wheelchair",
+   "stroller",
+   "equipment",
+   "room",
+   "auditorium",
+   "vehicle",
+   "instructor",
+   "staff",
+   "table",
+   "pitch",
+   "studio",
+   "other"
+  ],
+  "x-ticvai-refuses": {
+   "mealPlan": "**Listed by 5.5.8b and deliberately not a kind.** 5.5.8b groups meal plans with lockers and parking, but a meal plan is a balance rather than an object. It resolves to `retail.Wallet` with a `mealPlan` credit kind (CF-126), not to a resource — so it is not offered here, and a form built from this enum cannot offer it either."
   }
  },
  "ScanOutcome": {
@@ -5466,6 +6813,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "inspectionId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true,
     "description": "Required for return to service where the asset demands it."
    },
@@ -5476,6 +6824,70 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "recordedAt": {
     "type": "string",
     "format": "date-time"
+   }
+  }
+ },
+ "SetPlacedResourceRequest": {
+  "description": "What `setPlacedResource` takes: a `PlacedResource` without its server-owned fields. **`placedResourceId` absent places a new one; present amends that one**, as `setVenuePoint`.\n",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/PlacedResource"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "placedResourceId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "The placed resource to amend. Absent or null places a new one."
+     }
+    }
+   }
+  ]
+ },
+ "SetVenuePointRequest": {
+  "description": "What `setVenuePoint` takes: a `VenuePoint` without its server-owned fields, plus the point to amend. **`pointId` absent places a new point; present amends that one**, and it must be a point on the map in the path.\n",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/VenuePoint"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "pointId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "The point to amend. Absent or null places a new point."
+     }
+    }
+   }
+  ]
+ },
+ "StrandedPoint": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed from the graph",
+  "required": [
+   "pointId",
+   "name",
+   "kind",
+   "isCritical"
+  ],
+  "properties": {
+   "pointId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string"
+   },
+   "isCritical": {
+    "type": "boolean",
+    "description": "First aid, an emergency exit or an assembly point, the same set as `GraphValidation.criticalUnreachable`. **The one the operator must read first.**\n"
    }
   }
  },
@@ -5641,6 +7053,33 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "serverEvaluatedAt": {
     "type": "string",
     "format": "date-time"
+   },
+   "advisory": {
+    "type": "object",
+    "nullable": true,
+    "description": "BL-179, CF-130. **What a device observed, for the steward, never for the gate.** Present only where an access point's device reports the matching `DeviceCapability` and the venue has turned the corresponding setting on.\n**Never persisted.** This schema is computed and stored as `access.scan_event`, and the advisory is deliberately not part of what is stored: an inferred classification kept against a guest is sensitive personal data with no consent behind it. **A guest agreed to be admitted, not to be classified** — Face Pass and Face Tag carry `consent_purpose_id` and `consent_given_at` because somebody enrolled, and nobody enrols in being looked at by a turnstile. `scan_event` records that an override happened and never what the device thought, which keeps `overrideRateAlertThreshold` working without building a register nobody agreed to.\n**It cannot reach `outcome` or `denyReason`.** Those are decisive and `entitlementGated` is `true` and read-only: the gate admits on the entitlement, and everything here sits on top of that without replacing any of it.\n",
+    "properties": {
+     "genderClassification": {
+      "type": "string",
+      "enum": [
+       "women",
+       "men",
+       "undetermined"
+      ],
+      "description": "**`undetermined` is a real answer and the most common one to design for.** A classifier that never returns it is one that has been tuned to look confident.\n"
+     },
+     "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "**Required reading for the steward, not decoration.** An advisory with no confidence is read as a fact, and `overrideRateAlertThreshold` exists to catch exactly the failure that produces — *an override rate near zero means the steward has stopped deciding.* That number only means anything if the steward could see how sure the device was.\n"
+     },
+     "reportedByDeviceId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "**Which device said it.** A classifier that degrades is one camera, not a venue, and an advisory nobody can trace to hardware cannot be investigated or switched off alone.\n"
+     }
+    }
    }
   }
  },
@@ -5657,7 +7096,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "name": {
     "type": "string"
@@ -5667,7 +7107,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid"
    },
    "scopePath": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "Derived from `venueId`. Not sent by a client."
    },
    "kind": {
     "type": "string",
@@ -5688,11 +7130,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "draft",
      "published",
      "archived"
-    ]
+    ],
+    "readOnly": true,
+    "description": "`draft` on create. Moves through `publishVenueMap` (`states/venue-map.yaml`), never by sending a value.\n"
    },
    "publishedVersion": {
     "type": "integer",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `VenueMapVersion.version` guests are served. Null until the first publish.\n"
+   },
+   "graphVersion": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "**Bumped by a publish or a closure**, and returned as `VenueMapGraph.version`. Separate from `publishedVersion` because a closure changes the routes without creating a map version, and a closure that looked like a publish would lie about what changed.\n"
    },
    "isGeoreferenced": {
     "type": "boolean",
@@ -5744,6 +7195,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "tileSetRef": {
     "type": "string",
     "nullable": true,
+    "readOnly": true,
     "description": "Where a base image is large enough to need zoom levels. **A 12,000-pixel park map is not something a phone downloads on arrival**, and a guest opening the map on venue wifi at the gate is the worst moment to send twenty megabytes.\nGenerated from the base asset. Null means the image is small enough to serve whole.\n"
    },
    "boundsGeoJson": {
@@ -5767,6 +7219,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "type": "object",
   "description": "19.2.55. **The whole map in one call**, so a client caches it and filters locally.",
   "properties": {
+   "version": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The published version these points and paths belong to**, which is the number a client caches and sends back as `version`. It can differ from `map.publishedVersion` when an older version was asked for. Null when the draft was read.\n"
+   },
    "map": {
     "$ref": "#/components/schemas/VenueMap"
    },
@@ -5780,6 +7238,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "array",
     "items": {
      "$ref": "#/components/schemas/VenuePath"
+    }
+   },
+   "resources": {
+    "type": "array",
+    "description": "The bookable resources placed on this version of the map (rev 3 REV3-15). Empty on a map that carries none.\n",
+    "items": {
+     "$ref": "#/components/schemas/PlacedResource"
     }
    }
   }
@@ -5800,7 +7265,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "version": {
     "type": "integer",
-    "description": "**Bumped by a publish or a closure.** A client holding an older version knows its route may cross something that closed, and asking for the graph is cheaper than asking whether the graph changed.\n"
+    "description": "**Bumped by a publish or a closure**, and stored as `VenueMap.graphVersion`. A client holding an older version knows its route may cross something that closed, and asking for the graph is cheaper than asking whether the graph changed.\n"
    },
    "generatedAt": {
     "type": "string",
@@ -5824,7 +7289,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "kind": {
        "type": "string"
       },
-      "isAccessible": {
+      "isStepFree": {
        "type": "boolean"
       }
      }
@@ -5866,6 +7331,144 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "VenueMapImportJob": {
+  "type": "object",
+  "x-ticvai-persistence": "venuemap.import_job",
+  "description": "**Two-phase, following `seating.ImportJob`**, and carrying its lesson: a job that finds nothing is not a successful job.\n",
+  "required": [
+   "id",
+   "status",
+   "outcome"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "mapId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "parsing",
+     "previewReady",
+     "committed",
+     "failed"
+    ]
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "parsed",
+     "parsedWithFindings",
+     "nothingFound",
+     "noLayersMatched",
+     "unreadable"
+    ]
+   },
+   "shapesFound": {
+    "type": "integer"
+   },
+   "layersFound": {
+    "type": "array",
+    "description": "**Every layer name in the source, decoded.** Shown whether or not extraction worked, so an operator maps a role by reading rather than guessing.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "unmappedLayers": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "manifestRowsRead": {
+    "type": "integer",
+    "nullable": true
+   },
+   "resourcesFound": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Bookable resource shapes found on the resource layer (rev 3 REV3-15). Null where the map has none.\n"
+   },
+   "resourceRowsJoined": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Resource manifest rows that joined a shape and a `resources.Resource`. **The number to check against your own count**, as `manifestRowsJoined` is for seats: 34 cabanas on the plan and 30 joined is four labels that differ.\n"
+   },
+   "manifestRowsJoined": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**The number to check against your own count.** A manifest of 396 seats that joins 220 is the digit problem in §4, or a section code that differs by a space — and both look like success without this figure.\n"
+   },
+   "findings": {
+    "type": "array",
+    "description": "**Named against the spec**, so a finding maps to a section of `handoff/venue-map-input-spec.md` rather than to a stack trace.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "code",
+      "severity",
+      "message"
+     ],
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "duplicateLayerName",
+        "geometryOnLayerZero",
+        "unmappedLayer",
+        "mixedLayerContent",
+        "sectionCodeMismatch",
+        "digitScriptMismatch",
+        "mergedCells",
+        "totalRowDetected",
+        "manifestSectionMissingFromPlan",
+        "planSectionMissingFromManifest",
+        "exitLayerNotSplit",
+        "noGeoreference",
+        "layerNameUndecodable",
+        "rasterOnly",
+        "resourceLabelMissing",
+        "resourceLabelDuplicate",
+        "resourceManifestMissingFromPlan",
+        "resourcePlanMissingFromManifest",
+        "resourceCodeUnmatched",
+        "resourcePriceBandUnknown"
+       ],
+       "description": "**A closed set, and each one names a rule in the spec.** Free-text findings are findings a drawing office cannot act on. The six `resource*` codes check placed resources (rev 3 REV3-15): a shape with no label, two with one label, a manifest row with no shape or the reverse, a label with no `resources.Resource`, and a price band not in `priceBands`.\n"
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "error",
+        "warning",
+        "info"
+       ],
+       "description": "**`warning` is the important level here.** `rasterOnly` and `noGeoreference` are warnings — the map still works, with less — and treating them as errors would refuse a venue that sent everything it had.\n"
+      },
+      "message": {
+       "type": "string"
+      },
+      "specSection": {
+       "type": "string",
+       "nullable": true,
+       "description": "Which part of the spec covers it — `§2 Layers`, `§4 Digits`."
+      },
+      "affected": {
+       "type": "array",
+       "description": "The layers, sections or rows involved. **Named, not counted.**",
+       "items": {
+        "type": "string"
+       }
+      }
+     }
+    }
+   }
+  }
+ },
  "VenuePath": {
   "type": "object",
   "x-ticvai-persistence": "venuemap.path",
@@ -5879,11 +7482,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "mapId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true,
+    "description": "From the path of the operation that writes the path."
    },
    "fromPointId": {
     "type": "string",
@@ -5901,7 +7507,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "distanceMetres": {
     "type": "number",
     "nullable": true,
-    "description": "**Along the centreline, not point to point.** A path that curves round a lake is longer than the distance between its ends, and a guest told 80 metres who walks 200 stops trusting the map.\nRequires a georeference for real units; without one, distances are in drawing units and routing still works because **only the ratios matter to a shortest path.**\n"
+    "readOnly": true,
+    "description": "Computed by the server from `geometry` and the georeference. **Along the centreline, not point to point.** A path that curves round a lake is longer than the distance between its ends, and a guest told 80 metres who walks 200 stops trusting the map.\nRequires a georeference for real units; without one, distances are in drawing units and routing still works because **only the ratios matter to a shortest path.**\n"
    },
    "isStepFree": {
     "type": "boolean",
@@ -5921,7 +7528,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "closedReason": {
     "type": "string",
     "nullable": true,
-    "description": "Set during works or an incident. **A closed path removes routes rather than hiding the path**, so a guest sees why rather than wondering where it went.\n"
+    "readOnly": true,
+    "description": "Set by `setPathClosure` during works or an incident, never by sending it here. **A closed path removes routes rather than hiding the path**, so a guest sees why rather than wondering where it went.\n"
    }
   }
  },
@@ -5939,11 +7547,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "mapId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true,
+    "description": "From the path of the operation that writes the point."
    },
    "kind": {
     "type": "string",
@@ -5977,7 +7588,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "**A closed set, and `emergencyExit` is separate from `exit` on purpose.** An exit is where a guest leaves; an emergency exit is where they are sent, and a map that cannot tell them apart is a map that routes a normal departure through a fire door.\n**`junction` is the one that is not a point of interest.** A path connects two points, so a fork in a walkway with nothing at it still needs a node — otherwise every bend has to be named as a destination, and a guest browsing the map sees forty entries called *Path junction 12*.\n**Junctions are hidden from guests and present in the graph.** Generated by extraction where paths meet; a venue never places one by hand.\n"
    },
    "name": {
-    "type": "string"
+    "type": "string",
+    "x-ticvai-unique": "venue",
+    "description": "**Unique per venue** (decided 28 September, audit R108). Two points on a venue's maps never share a name, compared without case, so *Toilets North* names one place; `setVenuePoint` refuses a duplicate with `409` `duplicate-code`. Junctions are named by extraction and are exempt.\n"
    },
    "nameLocalised": {
     "type": "object",
@@ -6020,10 +7633,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true,
     "description": "For an entrance or exit. **This is what makes 3.2.64 work** — live admission statistics drawn on the point they came from.\n"
    },
-   "isAccessible": {
+   "isStepFree": {
     "type": "boolean",
     "default": true,
-    "description": "Step-free. **Placed on the point rather than inferred from the path**, because a step-free route to a building with steps at the door is not a step-free route.\n"
+    "description": "Whether the point itself can be reached without steps. **The same name as `VenuePath.isStepFree`, because it is the same concept** (it was `isAccessible` until the 26 September audit). **Placed on the point rather than inferred from the path**, because a step-free route to a building with steps at the door is not a step-free route.\n"
    },
    "openingHours": {
     "type": "string",
@@ -6072,6 +7685,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid",
     "nullable": true
    },
+   "attractionCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The catalogue `ProductCategory` the attraction product is filed under — the value the `category` filter on `getWaitTimes` matches. Read from catalogue, not stored here.\n"
+   },
    "status": {
     "$ref": "#/components/schemas/QueueStatus"
    },
@@ -6085,7 +7704,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "isStale": {
     "type": "boolean",
-    "description": "The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as current.\n"
+    "description": "The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as current, and it is not hidden (decided 28 September, audit R080 (b)): the screen shows `waitMinutes` with its `asOf` and a stale marker.\n"
    },
    "heightRequirementCm": {
     "type": "integer",
@@ -6097,7 +7716,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "asOf": {
     "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "description": "When the figure was produced — the queue's `waitTimeAsOf`."
    }
   }
  },
@@ -6113,6 +7733,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "WorkOrder": {
   "x-ticvai-persistence": "maintenance.work_order",
+  "x-ticvai-retired-columns": [
+   "is_overdue"
+  ],
   "type": "object",
   "required": [
    "id",
@@ -6129,7 +7752,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "nullable": true,
     "readOnly": true,
-    "description": "**Measured from out-of-service to back-in-service, not from work start to work end.** A ride down for six hours of which two were spent working is down six hours, and the gap between the two numbers is the thing worth managing.\n"
+    "x-ticvai-derived": "onWrite",
+    "description": "**Measured from out-of-service to back-in-service, not from work start to work end.** A ride down for six hours of which two were spent working is down six hours, and the gap between the two numbers is the thing worth managing.\n**Maintained on write**: set when the asset returns to service, as the minutes from the `maintenance.asset_status_change` row that took it out carrying this work order's id to the asset's next change back to `inService`. Null while the asset is still out, and for a work order that never took it out.\n"
    },
    "rootCause": {
     "type": "string",
@@ -6162,10 +7786,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "**Escalation is a clock, not a decision.** A work order on a ride nobody has accepted after twenty minutes escalates itself, because the alternative is somebody noticing.\n"
    },
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "workOrderNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.\n"
    },
    "title": {
     "type": "string"
@@ -6181,7 +7808,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "assetName": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "The asset's name, copied when the work order is raised or its asset changes, and not updated when the asset is later renamed — the record reads as it was raised.\n"
    },
    "status": {
     "$ref": "#/components/schemas/WorkOrderStatus"
@@ -6201,11 +7831,29 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid"
    },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "As raised in `CreateWorkOrderRequest.categoryId`, amendable by `updateWorkOrder`. The category is what `completeWorkOrder` reads to decide whether completion photographs are required.\n"
+   },
+   "locationDescription": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "Where the fault is, as raised. Needed where there is no asset — a broken tile, a leak in a corridor.\n"
+   },
    "elapsedMinutes": {
-    "type": "integer"
+    "type": "integer",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Labour minutes accumulated up to the last pause or stop. **Maintained on write** by `recordWorkOrderTime`, `pauseWorkOrder` and `completeWorkOrder`; while `isTimerRunning` is true the interval since the last start is not yet included.\n"
    },
    "isTimerRunning": {
-    "type": "boolean"
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Maintained on write by `startWorkOrder`, `resumeWorkOrder`, `recordWorkOrderTime`, `pauseWorkOrder` and `completeWorkOrder`.\n"
    },
    "dueAt": {
     "type": "string",
@@ -6213,7 +7861,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true
    },
    "isOverdue": {
-    "type": "boolean"
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "`dueAt` is in the past and the status is still `open`, `assigned`, `inProgress`, `paused` or `awaitingParts`. **Computed on read and not stored** — it depends on the clock. `listWorkOrders?overdueOnly` applies the same test to `due_at`.\n"
    },
    "requiresVerification": {
     "type": "boolean"
@@ -6225,10 +7877,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "sourceInspectionId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "sourceIncidentId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "createdAt": {

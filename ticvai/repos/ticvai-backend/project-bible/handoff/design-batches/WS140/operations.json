@@ -1,0 +1,428 @@
+{
+ "addSuppression": {
+  "method": "POST",
+  "path": "/consent/suppression-list",
+  "contract": "marketing-crm",
+  "summary": "Suppress an address",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Suppression"
+ },
+ "createMessageTemplate": {
+  "method": "POST",
+  "path": "/message-templates",
+  "contract": "marketing-crm",
+  "summary": "Create a message template",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MessageTemplate",
+  "responds": "MessageTemplate"
+ },
+ "getMarketingSubscription": {
+  "method": "GET",
+  "path": "/marketing-subscriptions",
+  "contract": "marketing-crm",
+  "summary": "What this guest has opted into",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MarketingSubscription"
+ },
+ "listCommunicationService": {
+  "method": "GET",
+  "path": "/communication-service",
+  "contract": "marketing-crm",
+  "summary": "Communication Service Command Center",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "CommunicationServiceCommandCenterView"
+ },
+ "listDeliveryQueueFailure": {
+  "method": "GET",
+  "path": "/delivery-queue-failure",
+  "contract": "marketing-crm",
+  "summary": "Delivery Queue, Failure & Retry Management",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sourceModule",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "businessEvent",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "providerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priority",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "failureCategory",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMessageTemplates": {
+  "method": "GET",
+  "path": "/message-templates",
+  "contract": "marketing-crm",
+  "summary": "List message templates",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listProviderHealthUsage": {
+  "method": "GET",
+  "path": "/provider-health-usage",
+  "contract": "marketing-crm",
+  "summary": "Provider Health, Usage & Cost Monitoring",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "providerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brandId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "module",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "messageClass",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProviderHealthUsageCostMonitoringView"
+ },
+ "listRoutingPriorityThrottling": {
+  "method": "GET",
+  "path": "/routing-priority-throttling",
+  "contract": "marketing-crm",
+  "summary": "Routing, Priority, Throttling & Fallback Rules",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brandId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priorityClass",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSystemTransactionalTemplate": {
+  "method": "GET",
+  "path": "/system-transactional-template",
+  "contract": "marketing-crm",
+  "summary": "System Transactional Template Registry",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "ownership",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sourceModule",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "businessEvent",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brandId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "retryMessageDispatch": {
+  "method": "POST",
+  "path": "/message-dispatches/{dispatchId}/retry",
+  "contract": "marketing-crm",
+  "summary": "Send it again, or by another channel",
+  "permission": "MARKETING_SEND",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MessageDispatch"
+ },
+ "setLocalizationBrandingCustomer": {
+  "method": "PUT",
+  "path": "/localization-branding-customer",
+  "contract": "marketing-crm",
+  "summary": "Set a waiver version's languages, branding and channels",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "LocalizationBrandingCustomerExperienceConfigurationInput",
+  "responds": "LocalizationBrandingCustomerExperienceConfigurationView"
+ },
+ "setMarketingSubscription": {
+  "method": "PUT",
+  "path": "/marketing-subscriptions",
+  "contract": "marketing-crm",
+  "summary": "Subscribe or unsubscribe",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MarketingSubscription",
+  "responds": "MarketingSubscription"
+ },
+ "setMessageTrigger": {
+  "method": "POST",
+  "path": "/message-triggers",
+  "contract": "marketing-crm",
+  "summary": "Fire a message from a platform event",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MessageTrigger",
+  "responds": "MessageTrigger"
+ }
+}

@@ -1,0 +1,477 @@
+{
+ "AccessibleSeating": {
+  "type": "object",
+  "x-ticvai-persistence": "seating.accessible",
+  "description": "Boards 7.6 to 7.8. **An accessible seat with no accessible route is not an accessible seat.**\n",
+  "properties": {
+   "seatMapId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "spaces": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "seatId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "wheelchairSpace",
+        "transferSeat",
+        "ambulant",
+        "easyAccess",
+        "assistanceDog",
+        "hearingLoop",
+        "visuallyImpaired"
+       ]
+      },
+      "routeDescription": {
+       "type": "string",
+       "nullable": true
+      },
+      "stepFree": {
+       "type": "boolean",
+       "default": true
+      },
+      "nearestAccessibleWc": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "eligibility": {
+    "type": "string",
+    "enum": [
+     "open",
+     "selfDeclared",
+     "verifiedOnce",
+     "verifiedEachTime"
+    ],
+    "default": "selfDeclared",
+    "description": "**Contested in both directions.** Open sale leaves none for the guests who need them; hard gating turns people away at the door.\n"
+   },
+   "minimumProvisionPercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "CreateSeatHoldRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "performanceId",
+   "seatIds"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "seatIds": {
+    "type": "array",
+    "minItems": 1,
+    "maxItems": 50,
+    "description": "50 is the ceiling of the venue setting, not the limit a caller gets. On a guest channel the limit is `VenueSettings.seating.maxSeatsPerGuestOrder` (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); on a staff channel it stays 10 per sale (audit R080 (c)), as POS-002 shows. Either is refused with `422` `seat-limit-exceeded`.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "ttlSeconds": {
+    "type": "integer",
+    "minimum": 60,
+    "maximum": 1800,
+    "default": 480,
+    "description": "**8 minutes by default, extendable to 30 in all** (decided 28 September, audit R169). Left out, the hold lasts 480 seconds. No hold, first grant or extended, outlives 1800 seconds from its creation.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   }
+  }
+ },
+ "Point": {
+  "type": "object",
+  "required": [
+   "x",
+   "y"
+  ],
+  "properties": {
+   "x": {
+    "type": "number"
+   },
+   "y": {
+    "type": "number"
+   }
+  }
+ },
+ "RealTimeAvailabilityCheckoutValidationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Real-Time Availability & Checkout Validation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "failedChecks": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "productInactive",
+      "inventoryUnavailable",
+      "capacityUnavailable",
+      "timeslotUnavailable",
+      "resourceUnavailable",
+      "priceInvalid",
+      "promotionInvalid",
+      "partnerComponentInvalid",
+      "componentMappingInvalid"
+     ]
+    },
+    "description": "Checkout validations that failed; empty means the bundle is sellable."
+   },
+   "bundleId": {
+    "type": "string",
+    "description": "Bundle ID"
+   },
+   "sellable": {
+    "type": "boolean",
+    "description": "Whether the bundle can be sold now"
+   }
+  }
+ },
+ "SeatAvailability": {
+  "x-ticvai-persistence": "none — computed from seat, hold and block",
+  "type": "object",
+  "required": [
+   "performanceId",
+   "seatMapId",
+   "renderMode",
+   "totals",
+   "seats"
+  ],
+  "properties": {
+   "performanceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "seatMapId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "renderMode": {
+    "type": "string",
+    "enum": [
+     "graphical",
+     "list"
+    ],
+    "description": "The mode the server actually used. With `mode=auto` this is how a client knows what it got: `list` means the map has no geometry (the seat map's `noGeometry` state), so the client sells from categories and best-available groups and does not draw a plan. `graphical` means every seat carries `position`.\n"
+   },
+   "totals": {
+    "type": "object",
+    "properties": {
+     "total": {
+      "type": "integer"
+     },
+     "available": {
+      "type": "integer"
+     },
+     "held": {
+      "type": "integer"
+     },
+     "sold": {
+      "type": "integer"
+     },
+     "blocked": {
+      "type": "integer"
+     },
+     "buffered": {
+      "type": "integer"
+     }
+    }
+   },
+   "byCategory": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "categoryId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "available": {
+       "type": "integer"
+      },
+      "sold": {
+       "type": "integer"
+      },
+      "price": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "sections": {
+    "type": "array",
+    "description": "The map's sections with what a guest screen needs to show the view from each (decided 29 September, rev 3 23SEP-14): the photo where the venue supplied one, otherwise null and the client renders the view from `boundary` and the seat positions. In this response so WEB-007 and GST-049 need no second call.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "code",
+      "name"
+     ],
+     "properties": {
+      "code": {
+       "type": "string"
+      },
+      "name": {
+       "type": "string"
+      },
+      "viewAssetId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "description": "As `Section.viewAssetId`. Null means render the view from geometry."
+      },
+      "boundary": {
+       "type": "array",
+       "nullable": true,
+       "items": {
+        "$ref": "#/components/schemas/Point"
+       },
+       "description": "As `Section.boundary`. Null when `renderMode` is `list`."
+      }
+     }
+    }
+   },
+   "seats": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "seatId",
+      "status"
+     ],
+     "properties": {
+      "seatId": {
+       "type": "string"
+      },
+      "status": {
+       "$ref": "#/components/schemas/SeatStatus"
+      },
+      "categoryId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "displayLabel": {
+       "type": "string",
+       "description": "What the guest sees, e.g. `A2-7-11`, as on `Seat`."
+      },
+      "position": {
+       "allOf": [
+        {
+         "$ref": "#/components/schemas/Point"
+        }
+       ],
+       "nullable": true,
+       "description": "The seat's coordinates on the map, as on `Seat`. Present when `renderMode` is `graphical`; null when it is `list`."
+      }
+     }
+    }
+   }
+  }
+ },
+ "SeatHold": {
+  "x-ticvai-persistence": "seating.seat_hold",
+  "type": "object",
+  "required": [
+   "id",
+   "performanceId",
+   "seatIds",
+   "status",
+   "createdAt",
+   "expiresAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "seatIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "bufferedSeatIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Neighbours implicitly held by a seating rule."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "held",
+     "converted",
+     "released",
+     "expired"
+    ]
+   },
+   "totalPrice": {
+    "x-ticvai-column": "gross_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "heldByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "extensionCount": {
+    "type": "integer"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "SeatRecommendationRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "partySize",
+   "strategy"
+  ],
+  "properties": {
+   "partySize": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 50
+   },
+   "strategy": {
+    "$ref": "#/components/schemas/SeatRecommendationStrategy"
+   },
+   "categoryIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "maxPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "accessibleCount": {
+    "type": "integer",
+    "default": 0,
+    "description": "Wheelchair spaces in the party. Companions are added automatically."
+   },
+   "maxOptions": {
+    "type": "integer",
+    "default": 3,
+    "maximum": 10
+   }
+  }
+ },
+ "SeatRecommendationStrategy": {
+  "type": "string",
+  "enum": [
+   "bestAvailable",
+   "bestValue",
+   "closestToStage",
+   "accessible",
+   "contiguous"
+  ]
+ },
+ "SeatStatus": {
+  "type": "string",
+  "enum": [
+   "available",
+   "held",
+   "sold",
+   "blocked",
+   "buffered",
+   "unavailable"
+  ]
+ },
+ "SeatingRules": {
+  "x-ticvai-persistence": "seating.seating_rules",
+  "type": "object",
+  "required": [
+   "seatMapId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "seatMapId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "bufferSeats": {
+    "type": "integer",
+    "minimum": 0,
+    "default": 0,
+    "description": "Seats kept empty either side of a sold party."
+   },
+   "bufferRows": {
+    "type": "integer",
+    "minimum": 0,
+    "default": 0
+   },
+   "preventOrphanSeats": {
+    "type": "boolean",
+    "default": false,
+    "description": "Refuse a selection that would leave a single unsellable seat between parties. Operators want this and rarely ask for it by name.\n"
+   },
+   "maxPartySize": {
+    "type": "integer",
+    "nullable": true
+   },
+   "requireContiguous": {
+    "type": "boolean",
+    "default": false,
+    "description": "A party must sit together or the selection is refused."
+   },
+   "accessibleCompanionCount": {
+    "type": "integer",
+    "default": 1,
+    "description": "Companion seats sold alongside each accessible space."
+   },
+   "allowSplitAcrossRows": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ }
+}

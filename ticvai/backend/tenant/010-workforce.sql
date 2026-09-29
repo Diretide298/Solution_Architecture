@@ -1,4 +1,4 @@
--- workforce — 22 tables
+-- workforce — 24 tables
 -- **Derived. Do not hand-edit.**
 
 -- Targeted by venue, department or role. emergency is not a louder operational Hangs off: reaches
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS workforce.announcement_receipt (
 
 -- Who actually turned up. occurredAt and recordedAt are both kept — a steward clocking in offline
 -- is not late because the sync was Hangs off: reaches workforce.employee through its keys;
--- references access.access_point, identity.principal, platform.scope. Reached by: 3 operations
+-- references access.access_point, identity.principal, platform.scope. Reached by: 5 operations
 -- read it and 2 write it.
 CREATE TABLE IF NOT EXISTS workforce.attendance (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -75,6 +75,7 @@ CREATE TABLE IF NOT EXISTS workforce.employee (
     email                             text CONSTRAINT employee_email_chk CHECK (char_length(email) <= 254),
     mobile                            text CONSTRAINT employee_mobile_chk CHECK (char_length(mobile) <= 30),
     date_of_joining                   date NOT NULL,
+    date_of_birth                     date,
     employment_type                   text NOT NULL CONSTRAINT employee_employment_type_chk CHECK (char_length(employment_type) <= 30),
     employment_status                 text NOT NULL CONSTRAINT employee_employment_status_chk CHECK (char_length(employment_status) <= 30),
     manager_employee_id               uuid,
@@ -132,6 +133,20 @@ CREATE TABLE IF NOT EXISTS workforce.job_title (
     description                       text CONSTRAINT job_title_description_chk CHECK (char_length(description) <= 500),
     is_active                         boolean NOT NULL,
     created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS workforce.labour_budget (
+    id                                uuid PRIMARY KEY NOT NULL,
+    venue_id                          uuid NOT NULL,
+    department_id                     uuid,
+    period_start                      date NOT NULL,
+    period_end                        date NOT NULL,
+    budget_amount                     numeric(18,4) NOT NULL,
+    scope_path                        ltree NOT NULL,
+    created_at                        timestamptz,
     updated_at                        timestamptz
 );
 
@@ -198,9 +213,27 @@ CREATE TABLE IF NOT EXISTS workforce.open_shift (
     scope_path                        ltree NOT NULL
 );
 
+-- Holds 13 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS workforce.position_requirement (
+    staffing_rules_id                 uuid NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
+    position_code                     text NOT NULL,
+    label                             text,
+    venue_id                          uuid,
+    attraction_id                     uuid,
+    minimum_headcount                 integer NOT NULL,
+    days_of_week                      text[],
+    starts_at                         text,
+    ends_at                           text,
+    required_qualifications           text[],
+    applies_when_open                 boolean,
+    blocks_operation                  boolean
+);
+
 -- A person expected somewhere at a time. Not a shift — a shift is a cash session, and most people
 -- on a rota never touch a till Hangs off: reaches workforce.employee through its keys; references
--- identity.principal, identity.role, platform.scope. Reached by: 7 operations read it and 2 write
+-- identity.principal, identity.role, platform.scope. Reached by: 10 operations read it and 2 write
 -- it; 3 tables reference it.
 CREATE TABLE IF NOT EXISTS workforce.rota_assignment (
     overtime_minutes                  integer,

@@ -1,6 +1,6 @@
 # WS60 — Ticket Media   Credential Management board 2
 
-**10 screens · 10 operations · 18 schemas · 2 permissions**
+**10 screens · 17 operations · 24 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, SCOPE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, ORDER_REPRINT, PRODUCT_CONFIGURE, PRODUCT_VIEW, SCOPE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,20 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-344` | Media Design Studio Command Center | commandCentre | 1 | 0 | — |
+| `BO-344` | Media Design Studio Command Center | commandCentre | 4 | 0 | — |
 | `BO-345` | Digital QR & Barcode Ticket Designer | configEditor | 1 | 0 | — |
-| `BO-346` | PDF, Printable & POS Ticket Designer | configEditor | 1 | 0 | — |
+| `BO-346` | PDF, Printable & POS Ticket Designer | configEditor | 5 | 0 | — |
 | `BO-347` | Apple Wallet Pass Designer | configEditor | 1 | 0 | — |
 | `BO-348` | Google Wallet Pass Designer | configEditor | 1 | 0 | — |
 | `BO-349` | RFID, NFC, Card & Wristband Media Designer | configEditor | 1 | 0 | — |
 | `BO-350` | Digital Card, Membership & Wearable Designer | configEditor | 1 | 0 | — |
 | `BO-351` | Dynamic Fields, Data Mapping & Content Builder | configEditor | 1 | 0 | — |
-| `BO-352` | Branding, Localization & Template Inheritance | listDetail | 1 | 0 | — |
+| `BO-352` | Branding, Localization & Template Inheritance | listDetail | 2 | 0 | — |
 | `BO-353` | Multi-Media Preview, Testing, Approval & Publication | listDetail | 1 | 0 | — |
-
-## Thin screens in this batch
-
-**BO-352, BO-353 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -124,21 +119,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-344 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-345",
      "trigger": "Works in Digital QR & Barcode Ticket Designer",
      "provenance": "flow F169 step 1→2",
-     "operation": "listMediaDesign"
-    },
-    {
-     "to": "BO-346",
-     "trigger": "Works in PDF, Printable & POS Ticket Designer",
-     "provenance": "flow F169 step 3→4",
      "operation": "listMediaDesign"
     },
     {
@@ -182,20 +168,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "trigger": "Works in Multi-Media Preview, Testing, Approval & Publication",
      "provenance": "flow F169 step 17→18",
      "operation": "listMediaDesign"
+    },
+    {
+     "to": "BO-346",
+     "trigger": "Works in PDF, Printable & POS Ticket Designer",
+     "provenance": "flow F169 step 3→4",
+     "operation": "listMediaDesign",
+     "carries": [
+      "templateId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can locate, create and manage every ticket-media template from one centralized Media Design Studio.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each template should show) — counts over a population, then the population",
   "purpose": "Provide administrators with the central workspace for creating and managing all ticket and credential media templates. This should be the entry point for the entire no-code Media Design Studio.",
-  "purposeNote": "Administrators can locate, create and manage every ticket-media template from one centralized Media Design Studio.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Duplicate Existing, Import supported template definition. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Allow"
-   },
    {
     "operation": null,
     "why": "**Media Design Studio Command Center declares no operation that writes anything** — its only declared call is `listMediaDesign`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
@@ -213,85 +203,85 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "metricTile",
        "label": "Total Media Templates",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.totalMediaTemplates"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.totalMediaTemplates"
       },
       {
        "kind": "metricTile",
        "label": "Published",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.published"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.published"
       },
       {
        "kind": "metricTile",
        "label": "Draft",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.draft"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.draft"
       },
       {
        "kind": "metricTile",
        "label": "Pending Approval",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.pendingApproval"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.pendingApproval"
       },
       {
        "kind": "metricTile",
        "label": "Scheduled",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.scheduled"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.scheduled"
       },
       {
        "kind": "metricTile",
        "label": "Archived",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.archived"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.archived"
       },
       {
        "kind": "metricTile",
        "label": "QR / Digital Templates",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.qrDigitalTemplates"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.qrDigitalTemplates"
       },
       {
        "kind": "metricTile",
        "label": "PDF / Print Templates",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.pdfPrintTemplates"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.pdfPrintTemplates"
       },
       {
        "kind": "metricTile",
        "label": "Apple Wallet Templates",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.appleWalletTemplates"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.appleWalletTemplates"
       },
       {
        "kind": "metricTile",
        "label": "Google Wallet Templates",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.googleWalletTemplates"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.googleWalletTemplates"
       },
       {
        "kind": "metricTile",
        "label": "RFID / NFC Templates",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.rfidNfcTemplates"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.rfidNfcTemplates"
       },
       {
        "kind": "metricTile",
        "label": "Card / Wristband Templates",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.cardWristbandTemplates"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.cardWristbandTemplates"
       },
       {
        "kind": "metricTile",
        "label": "Templates Requiring Review",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.templatesRequiringReview"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.templatesRequiringReview"
       },
       {
        "kind": "metricTile",
        "label": "Templates with Validation Errors",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "MediaDesignStudioCommandCenterView.templatesWithValidationErrors"
+       "bindsTo": "MediaDesignStudioCommandCenterViewSummary.templatesWithValidationErrors"
       }
      ]
     },
@@ -358,11 +348,23 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "primaryButton",
        "label": "Duplicate Existing",
+       "operation": "cloneTicketTemplate",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Use Venue Template",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Use Product Template",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Allow"
       },
       {
        "kind": "secondaryButton",
        "label": "Import supported template definition",
+       "operation": "importTicketTemplate",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Allow"
       }
      ]
@@ -382,14 +384,41 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Media Design Studio Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTicketTemplates",
+    "contract": "orders",
+    "purpose": "The ticket templates to duplicate or start from",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "cloneTicketTemplate",
+    "contract": "orders",
+    "purpose": "Duplicate",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "importTicketTemplate",
+    "contract": "orders",
+    "purpose": "Import",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-344"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-344",
+   "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-344"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 23. 27 of 27 labels bound to a contract property; 29 of 59 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 23. 27 of 27 labels bound to a contract property; 31 of 59 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `importTicketTemplate`, `cloneTicketTemplate`.",
+  "entryState": {
+   "params": [
+    {
+     "name": "templateId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -445,15 +474,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-344",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F169 step 2→3",
-     "operation": "setDigitalBarcodeTicket"
+     "operation": "setDigitalBarcodeTicket",
+     "carries": [
+      "templateId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized administrators can visually design and configure customer-facing QR/barcode tickets without development.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Barcode Configuration) and no display directory — it is settings, not a population",
   "purpose": "Provide a visual no-code designer specifically for digital QR and barcode tickets.",
-  "purposeNote": "Authorized administrators can visually design and configure customer-facing QR/barcode tickets without development.",
   "layout": {
    "template": "form",
    "regions": [
@@ -562,16 +594,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setDigitalBarcodeTicket",
     "contract": "access",
     "purpose": "Digital QR & Barcode Ticket Designer",
-    "trigger": "onAction",
-    "invalidates": [
-     "setDigitalBarcodeTicket"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-345"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-345",
+   "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-345"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 24. 0 of 0 labels bound to a contract property; 15 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -629,22 +659,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-344",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F169 step 4→5",
-     "operation": "setPdfPrintablePos"
+     "operation": "setPdfPrintablePos",
+     "carries": [
+      "templateId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "and operational environments.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Configure/reference) and no display directory — it is settings, not a population",
   "purpose": "Design tickets intended for printing, PDF generation, POS, box office and other physical/document outputs.",
-  "purposeNote": "and operational environments.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Thermal ticket. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Support"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -760,6 +786,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "POS receipt",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Thermal ticket",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Support"
       }
@@ -775,21 +806,57 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "apis": [
    {
+    "operationId": "listTicketTemplates",
+    "contract": "orders",
+    "purpose": "The templates this venue issues from",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createTicketTemplate",
+    "contract": "orders",
+    "purpose": "Create a template",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTicketTemplates"
+    ]
+   },
+   {
+    "operationId": "updateTicketTemplate",
+    "contract": "orders",
+    "purpose": "Change or retire a template",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTicketTemplates"
+    ]
+   },
+   {
+    "operationId": "printTicketProof",
+    "contract": "orders",
+    "purpose": "Print a sample without selling anything",
+    "trigger": "onAction"
+   },
+   {
     "operationId": "setPdfPrintablePos",
     "contract": "access",
     "purpose": "PDF, Printable & POS Ticket Designer",
-    "trigger": "onAction",
-    "invalidates": [
-     "setPdfPrintablePos"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-346"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-346",
+   "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-346"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 26. 0 of 0 labels bound to a contract property; 21 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 26. 0 of 0 labels bound to a contract property; 22 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Thermal ticket are choices sent by `setPdfPrintablePos`.",
+  "entryState": {
+   "params": [
+    {
+     "name": "templateId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -845,15 +912,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-344",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F169 step 6→7",
-     "operation": "setAppleWalletPass"
+     "operation": "setAppleWalletPass",
+     "carries": [
+      "templateId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can configure, preview, test and publish Apple Wallet presentations of TICVAI Virtual Tickets using supported wallet capabilities.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Pass Configuration; Configure the appropriate; Configure/reference) and no display directory — it is settings, not a population",
   "purpose": "Provide an Apple Wallet-specific configuration experience for eligible TICVAI credentials. This should not simply be a PDF ticket rendered inside a wallet.",
-  "purposeNote": "Administrators can configure, preview, test and publish Apple Wallet presentations of TICVAI Virtual Tickets using supported wallet capabilities.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1007,16 +1077,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setAppleWalletPass",
     "contract": "access",
     "purpose": "Apple Wallet Pass Designer",
-    "trigger": "onAction",
-    "invalidates": [
-     "setAppleWalletPass"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-347"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-347",
+   "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-347"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 27. 0 of 0 labels bound to a contract property; 24 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1074,22 +1142,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-344",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F169 step 8→9",
-     "operation": "setGoogleWalletPass"
+     "operation": "setGoogleWalletPass",
+     "carries": [
+      "templateId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can independently configure and govern Google Wallet ticket presentations while retaining the same underlying Virtual Ticket architecture.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure supported; Configure) and no display directory — it is settings, not a population",
   "purpose": "Provide a dedicated Google Wallet configuration environment.",
-  "purposeNote": "Administrators can independently configure and govern Google Wallet ticket presentations while retaining the same underlying Virtual Ticket architecture.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Venue change, Ticket status change, Relevant ticket information changes. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Support/reference updates such as"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1195,6 +1259,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Event time change",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Support/reference updates such as"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Venue change",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Support/reference updates such as"
       },
@@ -1223,18 +1292,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setGoogleWalletPass",
     "contract": "access",
     "purpose": "Google Wallet Pass Designer",
-    "trigger": "onAction",
-    "invalidates": [
-     "setGoogleWalletPass"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-348"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-348",
+   "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-348"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 21 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 22 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Event time change, Venue change, Ticket status change, Relevant ticket information changes are choices sent by `setGoogleWalletPass`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1290,22 +1357,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-344",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F169 step 10→11",
-     "operation": "setRfidNfcCard"
+     "operation": "setRfidNfcCard",
+     "carries": [
+      "templateId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "cards, wristbands and supported wearable media.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Configure/reference) and no display directory — it is settings, not a population",
   "purpose": "Configure both the visual and technical profile of physical electronic credentials. This is important because RFID/NFC media are not merely artwork.",
-  "purposeNote": "cards, wristbands and supported wearable media.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Membership Card. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Support"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1421,7 +1484,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "RFID Card",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "NFC Card",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Membership Card",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Staff/guest card where applicable",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Size where applicable",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Deposit/reference where applicable",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Support"
       }
      ]
@@ -1439,18 +1527,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setRfidNfcCard",
     "contract": "access",
     "purpose": "RFID, NFC, Card & Wristband Media Designer",
-    "trigger": "onAction",
-    "invalidates": [
-     "setRfidNfcCard"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-349"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-349",
+   "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-349"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 30. 0 of 0 labels bound to a contract property; 21 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 30. 0 of 0 labels bound to a contract property; 26 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Membership Card, Staff/guest card where applicable, Size where applicable, Deposit/reference where applicable are choices sent by `setRfidNfcCard`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1506,15 +1592,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-344",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F169 step 12→13",
-     "operation": "setDigitalCardMembership"
+     "operation": "setDigitalCardMembership",
+     "carries": [
+      "templateId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "templates linked to persistent Virtual Tickets or applicable entitlement identities.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Provide specialized configuration for persistent credentials that may represent longer-lived relationships rather than a single event ticket.",
-  "purposeNote": "templates linked to persistent Virtual Tickets or applicable entitlement identities.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1585,6 +1674,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Tier designs",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 31 §Support different"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Membership types",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 31 §Support different"
       }
@@ -1603,18 +1697,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setDigitalCardMembership",
     "contract": "access",
     "purpose": "Digital Card, Membership & Wearable Designer",
-    "trigger": "onAction",
-    "invalidates": [
-     "setDigitalCardMembership"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-350"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-350",
+   "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-350"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 31. 0 of 0 labels bound to a contract property; 12 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 31. 0 of 0 labels bound to a contract property; 13 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Tier designs are choices sent by `setDigitalCardMembership`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1675,10 +1767,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "All media designers consume a governed reusable field/data-mapping framework rather than independently hard-coding ticket information.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Custom Fields; Configure) and no display directory — it is settings, not a population",
   "purpose": "Create a centralized reusable field library so development team does not hard-code ticket fields separately into every media designer. This is another important architecture screen.",
-  "purposeNote": "All media designers consume a governed reusable field/data-mapping framework rather than independently hard-coding ticket information.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1747,16 +1839,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setDynamicFieldData",
     "contract": "access",
     "purpose": "Dynamic Fields, Data Mapping & Content Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setDynamicFieldData"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-351"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-351",
+   "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-351"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 7 of 64 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1819,17 +1909,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "controlled inheritance and media-specific overrides.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Track) and no metric row",
   "purpose": "Allow TICVAI's multi-tenant clients to control branding and localization without rebuilding every ticket template.",
-  "purposeNote": "controlled inheritance and media-specific overrides.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Additional configured languages. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 34 §Support"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1883,6 +1966,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "primaryButton",
        "label": "Additional configured languages",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 34 §Support"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save branding and languages",
+       "operation": "setBrandingLocalizationTemplate",
+       "provenance": "contract access.yaml PUT /branding-localization-template (decided 29 September, VM close-out)"
       }
      ]
     }
@@ -1901,6 +1990,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Branding, Localization & Template Inheritance",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setBrandingLocalizationTemplate",
+    "contract": "access",
+    "purpose": "Save branding and languages",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1916,9 +2011,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-352"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-352",
+   "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-352"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 34. 6 of 6 labels bound to a contract property; 16 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 34. 6 of 6 labels bound to a contract property; 16 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `setBrandingLocalizationTemplate`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1968,19 +2064,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "BO-344"
    ],
    "inferred": false,
-   "notes": "**Reached from BO-344, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+   "notes": "**Reached from BO-344, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-344",
+     "trigger": "Media Design Studio Command Center",
+     "carries": [
+      "templateId"
+     ],
+     "provenance": "derived — BO-344 declares entryState.params templateId and BO-353 holds templateId, so an edge into it carries them"
+    }
+   ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can preview, test, approve, version and publish every supported ticket-media configuration before it becomes available for production issuance. Board 2 — Final Screen Register",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide the final quality and governance gate before any media template becomes operational. This should be a particularly visual screen. Board 1 established the Virtual Ticket as the authoritative ticket identity and the one- Virtual-Ticket-to-many-media architecture. Board 2 established how administrators design and configure each media type. Board 3 manages what happens to the actual credential instances in production after a Virtual Ticket has been created.",
-  "purposeNote": "Administrators can preview, test, approve, version and publish every supported ticket-media configuration before it becomes available for production issuance. Board 2 — Final Screen Register",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Publish Now, Schedule. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 36 §Support"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -2008,6 +2109,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "Schedule",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 36 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected Brands",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 36 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected Venues",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 36 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected Products",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 36 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected Channels",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 36 §Support"
       }
      ]
     },
@@ -2029,18 +2150,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "approveMultiMediaPreview",
     "contract": "access",
     "purpose": "Multi-Media Preview, Testing, Approval & Publication",
-    "trigger": "onAction",
-    "invalidates": [
-     "approveMultiMediaPreview"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-353"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-353",
+   "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-353"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 36. 0 of 0 labels bound to a contract property; 3 of 126 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 36. 0 of 0 labels bound to a contract property; 7 of 126 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Publish Now, Schedule, Selected Brands, Selected Venues, Selected Products, Selected Channels are choices sent by `approveMultiMediaPreview`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2082,9 +2201,72 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "MultiMediaPreviewTestingApprovalPublicationInput",
   "responds": "MultiMediaPreviewTestingApprovalPublicationView"
+ },
+ "cloneTicketTemplate": {
+  "method": "POST",
+  "path": "/ticket-templates/{templateId}/clone",
+  "contract": "orders",
+  "summary": "Create a ticket template from an existing one",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CloneTicketTemplateInput",
+  "responds": "TicketTemplate"
+ },
+ "createTicketTemplate": {
+  "method": "POST",
+  "path": "/ticket-templates",
+  "contract": "orders",
+  "summary": "Create a ticket template",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TicketTemplateRequest",
+  "responds": "TicketTemplate"
+ },
+ "importTicketTemplate": {
+  "method": "POST",
+  "path": "/ticket-templates/imports",
+  "contract": "orders",
+  "summary": "Import a ticket template definition",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TicketTemplateImportInput",
+  "responds": "TicketTemplate"
  },
  "listBrandingLocalizationTemplate": {
   "method": "GET",
@@ -2108,9 +2290,93 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "mediaType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "MediaDesignStudioCommandCenterView"
+  "responds": "Page"
+ },
+ "listTicketTemplates": {
+  "method": "GET",
+  "path": "/ticket-templates",
+  "contract": "orders",
+  "summary": "The ticket templates a venue issues from",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "mediaType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "includeInactive",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "printTicketProof": {
+  "method": "POST",
+  "path": "/ticket-templates/{templateId}/proof",
+  "contract": "orders",
+  "summary": "Print a sample without selling anything",
+  "permission": "ORDER_REPRINT",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TicketProof"
  },
  "setAppleWalletPass": {
   "method": "PUT",
@@ -2121,9 +2387,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "AppleWalletPassDesignerInput",
   "responds": "AppleWalletPassDesignerView"
+ },
+ "setBrandingLocalizationTemplate": {
+  "method": "PUT",
+  "path": "/branding-localization-template",
+  "contract": "access",
+  "summary": "Save branding and languages for a level",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "BrandingLocalizationTemplateInheritanceInput",
+  "responds": "BrandingLocalizationTemplateInheritanceView"
  },
  "setDigitalBarcodeTicket": {
   "method": "PUT",
@@ -2134,7 +2425,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "DigitalQrBarcodeTicketDesignerInput",
   "responds": "DigitalQrBarcodeTicketDesignerView"
  },
@@ -2147,7 +2444,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "DigitalCardMembershipWearableDesignerInput",
   "responds": "DigitalCardMembershipWearableDesignerView"
  },
@@ -2160,7 +2463,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "DynamicFieldsDataMappingContentBuilderInput",
   "responds": "DynamicFieldsDataMappingContentBuilderView"
  },
@@ -2173,7 +2482,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "GoogleWalletPassDesignerInput",
   "responds": "GoogleWalletPassDesignerView"
  },
@@ -2186,7 +2501,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PdfPrintablePosTicketDesignerInput",
   "responds": "PdfPrintablePosTicketDesignerView"
  },
@@ -2199,9 +2520,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "RfidNfcCardWristbandMediaDesignerInput",
   "responds": "RfidNfcCardWristbandMediaDesignerView"
+ },
+ "updateTicketTemplate": {
+  "method": "PATCH",
+  "path": "/ticket-templates/{templateId}",
+  "contract": "orders",
+  "summary": "Change or retire a ticket template",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TicketTemplateRequest",
+  "responds": "TicketTemplate"
  }
 }
 ```
@@ -2218,6 +2564,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Apple Wallet Pass Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
+   "templateId": {
+    "type": "string",
+    "description": "Media template being designed"
+   },
    "passIdentity": {
     "type": "string",
     "description": "Pass identity"
@@ -2239,7 +2589,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Icon"
    },
    "imagesWhereSupported": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Images where supported"
    },
    "backgroundAppearance": {
@@ -2255,56 +2608,64 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Label appearance"
    },
    "primaryFields": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Primary fields"
    },
    "secondaryFields": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Secondary fields"
    },
    "auxiliaryFields": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Auxiliary fields"
    },
    "headerFields": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Header fields"
    },
    "backFields": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Back fields"
    },
-   "qr": {
+   "credentialEncoding": {
     "type": "string",
-    "description": "QR"
-   },
-   "barcode": {
-    "type": "string",
-    "description": "Barcode"
-   },
-   "tokenReference": {
-    "type": "string",
-    "description": "Token/reference"
-   },
-   "accordingToTheCredentialProfile": {
-    "type": "string",
-    "description": "according to the credential profile"
+    "enum": [
+     "qr",
+     "barcode",
+     "tokenReference"
+    ],
+    "description": "How the credential is carried on the pass, per the credential profile"
    },
    "dynamicUpdates": {
-    "type": "string",
-    "description": "Dynamic updates"
+    "type": "boolean",
+    "description": "Issued passes receive updates"
    },
-   "eventChanges": {
-    "type": "string",
-    "description": "Event changes"
-   },
-   "seatChanges": {
-    "type": "string",
-    "description": "Seat changes"
-   },
-   "ticketStatusChanges": {
-    "type": "string",
-    "description": "Ticket status changes"
+   "updateTriggers": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "eventChange",
+      "seatChange",
+      "ticketStatusChange"
+     ]
+    },
+    "description": "Changes that push an update to issued passes"
    },
    "relevantNotificationUpdateBehavior": {
     "type": "string",
@@ -2312,14 +2673,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "expiry": {
     "type": "string",
-    "format": "date-time",
-    "description": "Expiry"
+    "description": "Expiry rule for the pass, e.g. end of validity"
    },
    "revocationInvalidationBehaviorWhereSupported": {
     "type": "string",
     "description": "Revocation/invalidation behavior where supported"
    }
-  }
+  },
+  "required": [
+   "templateId"
+  ]
  },
  "AppleWalletPassDesignerView": {
   "type": "object",
@@ -2327,6 +2690,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Apple Wallet Pass Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
+   "templateId": {
+    "type": "string",
+    "description": "Media template being designed"
+   },
    "passIdentity": {
     "type": "string",
     "description": "Pass identity"
@@ -2348,7 +2715,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Icon"
    },
    "imagesWhereSupported": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Images where supported"
    },
    "backgroundAppearance": {
@@ -2364,56 +2734,64 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Label appearance"
    },
    "primaryFields": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Primary fields"
    },
    "secondaryFields": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Secondary fields"
    },
    "auxiliaryFields": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Auxiliary fields"
    },
    "headerFields": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Header fields"
    },
    "backFields": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Back fields"
    },
-   "qr": {
+   "credentialEncoding": {
     "type": "string",
-    "description": "QR"
-   },
-   "barcode": {
-    "type": "string",
-    "description": "Barcode"
-   },
-   "tokenReference": {
-    "type": "string",
-    "description": "Token/reference"
-   },
-   "accordingToTheCredentialProfile": {
-    "type": "string",
-    "description": "according to the credential profile"
+    "enum": [
+     "qr",
+     "barcode",
+     "tokenReference"
+    ],
+    "description": "How the credential is carried on the pass, per the credential profile"
    },
    "dynamicUpdates": {
-    "type": "string",
-    "description": "Dynamic updates"
+    "type": "boolean",
+    "description": "Issued passes receive updates"
    },
-   "eventChanges": {
-    "type": "string",
-    "description": "Event changes"
-   },
-   "seatChanges": {
-    "type": "string",
-    "description": "Seat changes"
-   },
-   "ticketStatusChanges": {
-    "type": "string",
-    "description": "Ticket status changes"
+   "updateTriggers": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "eventChange",
+      "seatChange",
+      "ticketStatusChange"
+     ]
+    },
+    "description": "Changes that push an update to issued passes"
    },
    "relevantNotificationUpdateBehavior": {
     "type": "string",
@@ -2421,12 +2799,104 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "expiry": {
     "type": "string",
-    "format": "date-time",
-    "description": "Expiry"
+    "description": "Expiry rule for the pass, e.g. end of validity"
    },
    "revocationInvalidationBehaviorWhereSupported": {
     "type": "string",
     "description": "Revocation/invalidation behavior where supported"
+   }
+  },
+  "required": [
+   "templateId"
+  ]
+ },
+ "BrandingLocalizationTemplateInheritanceInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; the write configures the rules the matching View reads back (decided 29 September, VM close-out)",
+  "description": "**What Branding, Localization & Template Inheritance submits** (decided 29 September, VM close-out). The writable fields of its View; the figures the screen computes are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "required": [
+   "level",
+   "scopeId",
+   "sourceLanguage"
+  ],
+  "properties": {
+   "level": {
+    "type": "string",
+    "enum": [
+     "tenant",
+     "brand",
+     "venue",
+     "event",
+     "product",
+     "mediaTemplate"
+    ]
+   },
+   "scopeId": {
+    "type": "string"
+   },
+   "parentScopeId": {
+    "type": "string",
+    "description": "The level above this one inherits from; empty at tenant"
+   },
+   "logo": {
+    "type": "string",
+    "description": "Asset library reference"
+   },
+   "colors": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^#[0-9A-Fa-f]{6}$"
+    }
+   },
+   "typography": {
+    "type": "string"
+   },
+   "backgrounds": {
+    "type": "string"
+   },
+   "headerFooter": {
+    "type": "string"
+   },
+   "legalFooter": {
+    "type": "string"
+   },
+   "supportInformation": {
+    "type": "string"
+   },
+   "sponsorPlacement": {
+    "type": "string"
+   },
+   "images": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "sourceLanguage": {
+    "type": "string",
+    "maxLength": 35,
+    "description": "BCP 47 tag"
+   },
+   "languages": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "maxLength": 35
+    },
+    "description": "Additional configured languages (BCP 47)"
+   },
+   "rtl": {
+    "type": "boolean",
+    "default": false,
+    "description": "Right-to-left layout for the RTL languages in `languages`"
+   },
+   "fieldOverrides": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "string"
+    },
+    "description": "Field-level overrides of the inherited template, keyed by field name"
    }
   }
  },
@@ -2436,12 +2906,39 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Branding, Localization & Template Inheritance displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
+   "parentScopeId": {
+    "type": "string",
+    "description": "The level above this one inherits from; empty at tenant (decided 29 September, VM close-out)"
+   },
+   "rtl": {
+    "type": "boolean",
+    "description": "Right-to-left layout for the RTL languages in `languages` (decided 29 September, VM close-out)"
+   },
+   "scopeId": {
+    "type": "string",
+    "description": "ID of the tenant, brand, venue, event, product or template at that level"
+   },
+   "level": {
+    "type": "string",
+    "enum": [
+     "tenant",
+     "brand",
+     "venue",
+     "event",
+     "product",
+     "mediaTemplate"
+    ],
+    "description": "Inheritance level"
+   },
    "logo": {
     "type": "string",
     "description": "Logo"
    },
    "colors": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Colors"
    },
    "typography": {
@@ -2469,20 +2966,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Sponsor placement"
    },
    "images": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Images"
-   },
-   "english": {
-    "type": "string",
-    "description": "English"
-   },
-   "arabic": {
-    "type": "string",
-    "description": "Arabic"
-   },
-   "additionalConfiguredLanguages": {
-    "type": "string",
-    "description": "Additional configured languages"
    },
    "sourceLanguage": {
     "type": "string",
@@ -2493,7 +2981,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Translation"
    },
    "translationStatus": {
-    "type": "integer",
+    "type": "string",
+    "enum": [
+     "notStarted",
+     "inProgress",
+     "inReview",
+     "approved"
+    ],
     "description": "Translation status"
    },
    "reviewer": {
@@ -2507,6 +3001,53 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "version": {
     "type": "string",
     "description": "Version"
+   },
+   "languages": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Language codes; English and Arabic at minimum, plus configured languages"
+   }
+  },
+  "required": [
+   "level",
+   "scopeId"
+  ]
+ },
+ "CloneTicketTemplateInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only",
+  "description": "What `cloneTicketTemplate` takes (decided 29 September, readiness close-out).",
+  "required": [
+   "name",
+   "source"
+  ],
+  "properties": {
+   "name": {
+    "type": "string",
+    "maxLength": 120
+   },
+   "source": {
+    "type": "string",
+    "description": "What the template in the path is (decided 29 September, readiness close-out).",
+    "enum": [
+     "existingTemplate",
+     "venueTemplate",
+     "productTemplate"
+    ]
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The venue whose template is copied. Required for `venueTemplate`."
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The product the template issues for. Required for `productTemplate`."
    }
   }
  },
@@ -2516,6 +3057,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Digital Card, Membership & Wearable Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
+   "templateId": {
+    "type": "string",
+    "description": "Media template being designed"
+   },
    "brand": {
     "type": "string",
     "description": "Brand"
@@ -2561,47 +3106,58 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Dynamic messaging"
    },
    "tierDesigns": {
-    "type": "string",
-    "description": "Tier designs"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Artwork per tier, e.g. Silver, Gold, Platinum"
    },
    "membershipTypes": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Membership types"
    },
    "brands": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Brands"
    },
    "venues": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Venues"
    },
    "ageCategories": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Age categories"
    },
-   "membershipRenewal": {
-    "type": "string",
-    "description": "Membership renewal"
-   },
-   "tierChange": {
-    "type": "string",
-    "description": "Tier change"
-   },
-   "expiry": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Expiry"
-   },
-   "suspension": {
-    "type": "string",
-    "description": "Suspension"
-   },
-   "benefitStatus": {
-    "type": "string",
-    "description": "Benefit status"
+   "stateTriggers": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "membershipRenewal",
+      "tierChange",
+      "expiry",
+      "suspension",
+      "benefitStatus"
+     ]
+    },
+    "description": "Changes that alter how the persistent card is presented"
    }
-  }
+  },
+  "required": [
+   "templateId"
+  ]
  },
  "DigitalCardMembershipWearableDesignerView": {
   "type": "object",
@@ -2609,6 +3165,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Digital Card, Membership & Wearable Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
+   "templateId": {
+    "type": "string",
+    "description": "Media template being designed"
+   },
    "brand": {
     "type": "string",
     "description": "Brand"
@@ -2654,47 +3214,58 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Dynamic messaging"
    },
    "tierDesigns": {
-    "type": "string",
-    "description": "Tier designs"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Artwork per tier, e.g. Silver, Gold, Platinum"
    },
    "membershipTypes": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Membership types"
    },
    "brands": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Brands"
    },
    "venues": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Venues"
    },
    "ageCategories": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Age categories"
    },
-   "membershipRenewal": {
-    "type": "string",
-    "description": "Membership renewal"
-   },
-   "tierChange": {
-    "type": "string",
-    "description": "Tier change"
-   },
-   "expiry": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Expiry"
-   },
-   "suspension": {
-    "type": "string",
-    "description": "Suspension"
-   },
-   "benefitStatus": {
-    "type": "string",
-    "description": "Benefit status"
+   "stateTriggers": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "membershipRenewal",
+      "tierChange",
+      "expiry",
+      "suspension",
+      "benefitStatus"
+     ]
+    },
+    "description": "Changes that alter how the persistent card is presented"
    }
-  }
+  },
+  "required": [
+   "templateId"
+  ]
  },
  "DigitalQrBarcodeTicketDesignerInput": {
   "type": "object",
@@ -2702,115 +3273,51 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Digital QR & Barcode Ticket Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "logo": {
+   "templateId": {
     "type": "string",
-    "description": "Logo"
+    "description": "Media template being designed"
    },
-   "eventImage": {
+   "components": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "logo",
+      "eventImage",
+      "eventName",
+      "ticketType",
+      "customerName",
+      "participantName",
+      "date",
+      "time",
+      "venue",
+      "entrance",
+      "section",
+      "row",
+      "seat",
+      "price",
+      "orderReference",
+      "virtualTicketId",
+      "qr",
+      "barcode",
+      "terms",
+      "instructions",
+      "waiverLinkStatus",
+      "sponsor",
+      "customFields"
+     ]
+    },
+    "description": "Components placed on the layout; values come from the dynamic-field library"
+   },
+   "qrMode": {
     "type": "string",
-    "description": "Event Image"
-   },
-   "eventName": {
-    "type": "string",
-    "description": "Event Name"
-   },
-   "ticketType": {
-    "type": "string",
-    "description": "Ticket Type"
-   },
-   "customerName": {
-    "type": "string",
-    "description": "Customer Name"
-   },
-   "participantName": {
-    "type": "string",
-    "description": "Participant Name"
-   },
-   "date": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date"
-   },
-   "time": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Time"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "entrance": {
-    "type": "string",
-    "description": "Entrance"
-   },
-   "section": {
-    "type": "string",
-    "description": "Section"
-   },
-   "row": {
-    "type": "string",
-    "description": "Row"
-   },
-   "seat": {
-    "type": "string",
-    "description": "Seat"
-   },
-   "price": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price"
-   },
-   "orderReference": {
-    "type": "string",
-    "description": "Order Reference"
-   },
-   "virtualTicketId": {
-    "type": "string",
-    "description": "Virtual Ticket ID"
-   },
-   "qr": {
-    "type": "string",
-    "description": "QR"
-   },
-   "barcode": {
-    "type": "string",
-    "description": "Barcode"
-   },
-   "terms": {
-    "type": "string",
-    "description": "Terms"
-   },
-   "instructions": {
-    "type": "string",
-    "description": "Instructions"
-   },
-   "waiverLinkStatus": {
-    "type": "string",
-    "description": "Waiver Link / Status"
-   },
-   "sponsor": {
-    "type": "string",
-    "description": "Sponsor"
-   },
-   "customFields": {
-    "type": "string",
-    "description": "Custom Fields"
-   },
-   "staticQr": {
-    "type": "string",
-    "description": "Static QR"
-   },
-   "dynamicQr": {
-    "type": "string",
-    "description": "Dynamic QR"
-   },
-   "signedQr": {
-    "type": "string",
-    "description": "Signed QR"
-   },
-   "tokenizedQr": {
-    "type": "string",
-    "description": "Tokenized QR"
+    "enum": [
+     "staticQr",
+     "dynamicQr",
+     "signedQr",
+     "tokenizedQr"
+    ],
+    "description": "QR payload profile"
    },
    "rotationBehaviorWhereSupported": {
     "type": "string",
@@ -2830,7 +3337,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "errorCorrection": {
     "type": "string",
-    "description": "Error correction"
+    "enum": [
+     "l",
+     "m",
+     "q",
+     "h"
+    ],
+    "description": "QR error-correction level"
    },
    "expiration": {
     "type": "string",
@@ -2849,22 +3362,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Orientation"
    },
    "humanReadableValue": {
-    "type": "string",
+    "type": "boolean",
     "description": "Human-readable value"
    },
    "hideShowEncodedReference": {
-    "type": "string",
-    "description": "Hide/show encoded reference"
+    "type": "boolean",
+    "description": "Show the encoded reference"
    },
    "showPriceOnOff": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Show Price: ON / OFF"
-   },
-   "mobileTabletDesktop": {
-    "type": "string",
-    "description": "Mobile | Tablet | Desktop"
+    "type": "boolean",
+    "description": "Show price on the ticket"
    }
-  }
+  },
+  "required": [
+   "templateId"
+  ]
  },
  "DigitalQrBarcodeTicketDesignerView": {
   "type": "object",
@@ -2872,115 +3384,51 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Digital QR & Barcode Ticket Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "logo": {
+   "templateId": {
     "type": "string",
-    "description": "Logo"
+    "description": "Media template being designed"
    },
-   "eventImage": {
+   "components": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "logo",
+      "eventImage",
+      "eventName",
+      "ticketType",
+      "customerName",
+      "participantName",
+      "date",
+      "time",
+      "venue",
+      "entrance",
+      "section",
+      "row",
+      "seat",
+      "price",
+      "orderReference",
+      "virtualTicketId",
+      "qr",
+      "barcode",
+      "terms",
+      "instructions",
+      "waiverLinkStatus",
+      "sponsor",
+      "customFields"
+     ]
+    },
+    "description": "Components placed on the layout; values come from the dynamic-field library"
+   },
+   "qrMode": {
     "type": "string",
-    "description": "Event Image"
-   },
-   "eventName": {
-    "type": "string",
-    "description": "Event Name"
-   },
-   "ticketType": {
-    "type": "string",
-    "description": "Ticket Type"
-   },
-   "customerName": {
-    "type": "string",
-    "description": "Customer Name"
-   },
-   "participantName": {
-    "type": "string",
-    "description": "Participant Name"
-   },
-   "date": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date"
-   },
-   "time": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Time"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "entrance": {
-    "type": "string",
-    "description": "Entrance"
-   },
-   "section": {
-    "type": "string",
-    "description": "Section"
-   },
-   "row": {
-    "type": "string",
-    "description": "Row"
-   },
-   "seat": {
-    "type": "string",
-    "description": "Seat"
-   },
-   "price": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price"
-   },
-   "orderReference": {
-    "type": "string",
-    "description": "Order Reference"
-   },
-   "virtualTicketId": {
-    "type": "string",
-    "description": "Virtual Ticket ID"
-   },
-   "qr": {
-    "type": "string",
-    "description": "QR"
-   },
-   "barcode": {
-    "type": "string",
-    "description": "Barcode"
-   },
-   "terms": {
-    "type": "string",
-    "description": "Terms"
-   },
-   "instructions": {
-    "type": "string",
-    "description": "Instructions"
-   },
-   "waiverLinkStatus": {
-    "type": "string",
-    "description": "Waiver Link / Status"
-   },
-   "sponsor": {
-    "type": "string",
-    "description": "Sponsor"
-   },
-   "customFields": {
-    "type": "string",
-    "description": "Custom Fields"
-   },
-   "staticQr": {
-    "type": "string",
-    "description": "Static QR"
-   },
-   "dynamicQr": {
-    "type": "string",
-    "description": "Dynamic QR"
-   },
-   "signedQr": {
-    "type": "string",
-    "description": "Signed QR"
-   },
-   "tokenizedQr": {
-    "type": "string",
-    "description": "Tokenized QR"
+    "enum": [
+     "staticQr",
+     "dynamicQr",
+     "signedQr",
+     "tokenizedQr"
+    ],
+    "description": "QR payload profile"
    },
    "rotationBehaviorWhereSupported": {
     "type": "string",
@@ -3000,7 +3448,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "errorCorrection": {
     "type": "string",
-    "description": "Error correction"
+    "enum": [
+     "l",
+     "m",
+     "q",
+     "h"
+    ],
+    "description": "QR error-correction level"
    },
    "expiration": {
     "type": "string",
@@ -3019,22 +3473,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Orientation"
    },
    "humanReadableValue": {
-    "type": "string",
+    "type": "boolean",
     "description": "Human-readable value"
    },
    "hideShowEncodedReference": {
-    "type": "string",
-    "description": "Hide/show encoded reference"
+    "type": "boolean",
+    "description": "Show the encoded reference"
    },
    "showPriceOnOff": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Show Price: ON / OFF"
-   },
-   "mobileTabletDesktop": {
-    "type": "string",
-    "description": "Mobile | Tablet | Desktop"
+    "type": "boolean",
+    "description": "Show price on the ticket"
    }
-  }
+  },
+  "required": [
+   "templateId"
+  ]
  },
  "DynamicFieldsDataMappingContentBuilderInput": {
   "type": "object",
@@ -3042,172 +3495,113 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is access.entitlement at 3%, so this is not an update to anything the package stores today and no new table has been decided",
   "description": "**What Dynamic Fields, Data Mapping & Content Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "customerName": {
+   "category": {
     "type": "string",
-    "description": "Customer Name"
+    "enum": [
+     "customer",
+     "participant",
+     "order",
+     "virtualTicket",
+     "productEvent",
+     "seating",
+     "commercial",
+     "membership",
+     "compliance",
+     "credential",
+     "custom"
+    ],
+    "description": "Field group"
    },
-   "customerId": {
+   "fieldKey": {
     "type": "string",
-    "description": "Customer ID"
+    "description": "Token used in templates, e.g. ticket.seat"
    },
-   "mobile": {
+   "standardField": {
     "type": "string",
-    "description": "Mobile"
-   },
-   "email": {
-    "type": "string",
-    "description": "Email"
-   },
-   "photo": {
-    "type": "string",
-    "description": "Photo"
-   },
-   "participantName": {
-    "type": "string",
-    "description": "Participant Name"
-   },
-   "dobAgeCategory": {
-    "type": "string",
-    "description": "DOB/Age category"
-   },
-   "participantId": {
-    "type": "string",
-    "description": "Participant ID"
-   },
-   "orderId": {
-    "type": "string",
-    "description": "Order ID"
-   },
-   "bookingReference": {
-    "type": "string",
-    "description": "Booking Reference"
-   },
-   "purchaseDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Purchase Date"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "virtualTicketId": {
-    "type": "string",
-    "description": "Virtual Ticket ID"
-   },
-   "ticketType": {
-    "type": "string",
-    "description": "Ticket Type"
-   },
-   "status": {
-    "type": "string",
-    "description": "Status"
-   },
-   "validity": {
-    "type": "string",
-    "description": "Validity"
-   },
-   "usageStatus": {
-    "type": "string",
-    "description": "Usage Status"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "performance": {
-    "type": "string",
-    "description": "Performance"
-   },
-   "date": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date"
-   },
-   "time": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Time"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "entrance": {
-    "type": "string",
-    "description": "Entrance"
-   },
-   "section": {
-    "type": "string",
-    "description": "Section"
-   },
-   "row": {
-    "type": "string",
-    "description": "Row"
-   },
-   "seat": {
-    "type": "string",
-    "description": "Seat"
-   },
-   "faceValue": {
-    "type": "string",
-    "description": "Face Value"
-   },
-   "paidPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Paid Price"
-   },
-   "discount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount"
-   },
-   "currency": {
-    "type": "string",
-    "description": "Currency"
-   },
-   "membershipId": {
-    "type": "string",
-    "description": "Membership ID"
-   },
-   "tier": {
-    "type": "string",
-    "description": "Tier"
-   },
-   "expiry": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Expiry"
-   },
-   "waiverStatus": {
-    "type": "string",
-    "description": "Waiver Status"
-   },
-   "waiverLinkWherePermitted": {
-    "type": "string",
-    "description": "Waiver Link where permitted"
-   },
-   "qr": {
-    "type": "string",
-    "description": "QR"
-   },
-   "barcode": {
-    "type": "string",
-    "description": "Barcode"
-   },
-   "credentialReference": {
-    "type": "string",
-    "description": "Credential Reference"
+    "enum": [
+     "customerName",
+     "customerId",
+     "mobile",
+     "email",
+     "photo",
+     "participantName",
+     "dobAgeCategory",
+     "participantId",
+     "orderId",
+     "bookingReference",
+     "purchaseDate",
+     "channel",
+     "virtualTicketId",
+     "ticketType",
+     "status",
+     "validity",
+     "usageStatus",
+     "product",
+     "event",
+     "performance",
+     "date",
+     "time",
+     "venue",
+     "entrance",
+     "section",
+     "block",
+     "row",
+     "seat",
+     "faceValue",
+     "paidPrice",
+     "discount",
+     "currency",
+     "membershipId",
+     "tier",
+     "expiry",
+     "waiverStatus",
+     "waiverLink",
+     "qr",
+     "barcode",
+     "credentialReference"
+    ],
+    "description": "Standard source field; empty for a tenant-defined custom field"
    },
    "dateFormats": {
     "type": "string",
-    "format": "date-time",
-    "description": "Date formats"
+    "description": "Date format pattern"
+   },
+   "timeFormat": {
+    "type": "string",
+    "description": "Time format pattern"
+   },
+   "numberFormat": {
+    "type": "string",
+    "description": "Number formatting"
+   },
+   "textTransformation": {
+    "type": "string",
+    "description": "Text transformation"
+   },
+   "characterLimit": {
+    "type": "integer",
+    "description": "Character limit"
+   },
+   "conditionalVisibility": {
+    "type": "string",
+    "description": "Condition under which the field shows, e.g. seat assigned"
+   },
+   "allowedMedia": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Media types that may display this field"
+   },
+   "sensitive": {
+    "type": "boolean",
+    "description": "Personal or sensitive data; not permitted on media by default"
    }
-  }
+  },
+  "required": [
+   "fieldKey",
+   "category"
+  ]
  },
  "DynamicFieldsDataMappingContentBuilderView": {
   "type": "object",
@@ -3215,172 +3609,113 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Dynamic Fields, Data Mapping & Content Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "customerName": {
+   "category": {
     "type": "string",
-    "description": "Customer Name"
+    "enum": [
+     "customer",
+     "participant",
+     "order",
+     "virtualTicket",
+     "productEvent",
+     "seating",
+     "commercial",
+     "membership",
+     "compliance",
+     "credential",
+     "custom"
+    ],
+    "description": "Field group"
    },
-   "customerId": {
+   "fieldKey": {
     "type": "string",
-    "description": "Customer ID"
+    "description": "Token used in templates, e.g. ticket.seat"
    },
-   "mobile": {
+   "standardField": {
     "type": "string",
-    "description": "Mobile"
-   },
-   "email": {
-    "type": "string",
-    "description": "Email"
-   },
-   "photo": {
-    "type": "string",
-    "description": "Photo"
-   },
-   "participantName": {
-    "type": "string",
-    "description": "Participant Name"
-   },
-   "dobAgeCategory": {
-    "type": "string",
-    "description": "DOB/Age category"
-   },
-   "participantId": {
-    "type": "string",
-    "description": "Participant ID"
-   },
-   "orderId": {
-    "type": "string",
-    "description": "Order ID"
-   },
-   "bookingReference": {
-    "type": "string",
-    "description": "Booking Reference"
-   },
-   "purchaseDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Purchase Date"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "virtualTicketId": {
-    "type": "string",
-    "description": "Virtual Ticket ID"
-   },
-   "ticketType": {
-    "type": "string",
-    "description": "Ticket Type"
-   },
-   "status": {
-    "type": "string",
-    "description": "Status"
-   },
-   "validity": {
-    "type": "string",
-    "description": "Validity"
-   },
-   "usageStatus": {
-    "type": "string",
-    "description": "Usage Status"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "performance": {
-    "type": "string",
-    "description": "Performance"
-   },
-   "date": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date"
-   },
-   "time": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Time"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "entrance": {
-    "type": "string",
-    "description": "Entrance"
-   },
-   "section": {
-    "type": "string",
-    "description": "Section"
-   },
-   "row": {
-    "type": "string",
-    "description": "Row"
-   },
-   "seat": {
-    "type": "string",
-    "description": "Seat"
-   },
-   "faceValue": {
-    "type": "string",
-    "description": "Face Value"
-   },
-   "paidPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Paid Price"
-   },
-   "discount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount"
-   },
-   "currency": {
-    "type": "string",
-    "description": "Currency"
-   },
-   "membershipId": {
-    "type": "string",
-    "description": "Membership ID"
-   },
-   "tier": {
-    "type": "string",
-    "description": "Tier"
-   },
-   "expiry": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Expiry"
-   },
-   "waiverStatus": {
-    "type": "string",
-    "description": "Waiver Status"
-   },
-   "waiverLinkWherePermitted": {
-    "type": "string",
-    "description": "Waiver Link where permitted"
-   },
-   "qr": {
-    "type": "string",
-    "description": "QR"
-   },
-   "barcode": {
-    "type": "string",
-    "description": "Barcode"
-   },
-   "credentialReference": {
-    "type": "string",
-    "description": "Credential Reference"
+    "enum": [
+     "customerName",
+     "customerId",
+     "mobile",
+     "email",
+     "photo",
+     "participantName",
+     "dobAgeCategory",
+     "participantId",
+     "orderId",
+     "bookingReference",
+     "purchaseDate",
+     "channel",
+     "virtualTicketId",
+     "ticketType",
+     "status",
+     "validity",
+     "usageStatus",
+     "product",
+     "event",
+     "performance",
+     "date",
+     "time",
+     "venue",
+     "entrance",
+     "section",
+     "block",
+     "row",
+     "seat",
+     "faceValue",
+     "paidPrice",
+     "discount",
+     "currency",
+     "membershipId",
+     "tier",
+     "expiry",
+     "waiverStatus",
+     "waiverLink",
+     "qr",
+     "barcode",
+     "credentialReference"
+    ],
+    "description": "Standard source field; empty for a tenant-defined custom field"
    },
    "dateFormats": {
     "type": "string",
-    "format": "date-time",
-    "description": "Date formats"
+    "description": "Date format pattern"
+   },
+   "timeFormat": {
+    "type": "string",
+    "description": "Time format pattern"
+   },
+   "numberFormat": {
+    "type": "string",
+    "description": "Number formatting"
+   },
+   "textTransformation": {
+    "type": "string",
+    "description": "Text transformation"
+   },
+   "characterLimit": {
+    "type": "integer",
+    "description": "Character limit"
+   },
+   "conditionalVisibility": {
+    "type": "string",
+    "description": "Condition under which the field shows, e.g. seat assigned"
+   },
+   "allowedMedia": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Media types that may display this field"
+   },
+   "sensitive": {
+    "type": "boolean",
+    "description": "Personal or sensitive data; not permitted on media by default"
    }
-  }
+  },
+  "required": [
+   "fieldKey",
+   "category"
+  ]
  },
  "GoogleWalletPassDesignerInput": {
   "type": "object",
@@ -3388,6 +3723,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Google Wallet Pass Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
+   "templateId": {
+    "type": "string",
+    "description": "Media template being designed"
+   },
    "passClass": {
     "type": "string",
     "description": "Pass class"
@@ -3409,7 +3748,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Logo"
    },
    "heroImageAssetsWhereApplicable": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Hero/image assets where applicable"
    },
    "eventInformation": {
@@ -3422,8 +3764,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "dateTime": {
     "type": "string",
-    "format": "date-time",
-    "description": "Date/time"
+    "description": "Field key mapped to the event date/time"
    },
    "ticketHolder": {
     "type": "string",
@@ -3438,7 +3779,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Ticket type"
    },
    "customFields": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Custom fields"
    },
    "status": {
@@ -3446,59 +3790,43 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Status"
    },
    "links": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Links"
    },
    "additionalInformation": {
     "type": "string",
     "description": "Additional information"
    },
-   "qr": {
+   "credentialEncoding": {
     "type": "string",
-    "description": "QR"
+    "enum": [
+     "qr",
+     "barcode",
+     "credentialTokenReference"
+    ],
+    "description": "How the credential is carried on the pass"
    },
-   "barcode": {
-    "type": "string",
-    "description": "Barcode"
-   },
-   "credentialTokenReference": {
-    "type": "string",
-    "description": "Credential/token reference"
-   },
-   "accordingToSupportedWalletFunctionality": {
-    "type": "string",
-    "description": "according to supported wallet functionality"
-   },
-   "eventTimeChange": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Event time change"
-   },
-   "venueChange": {
-    "type": "string",
-    "description": "Venue change"
-   },
-   "seatReassignment": {
-    "type": "string",
-    "description": "Seat reassignment"
-   },
-   "ticketStatusChange": {
-    "type": "string",
-    "description": "Ticket status change"
-   },
-   "relevantTicketInformationChanges": {
-    "type": "string",
-    "description": "Relevant ticket information changes"
-   },
-   "provideDeviceOrientedPreviewBeforePublication": {
-    "type": "string",
-    "description": "Provide device-oriented preview before publication"
-   },
-   "mapping": {
-    "type": "string",
-    "description": "mapping"
+   "updateTriggers": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "eventTimeChange",
+      "venueChange",
+      "seatReassignment",
+      "ticketStatusChange",
+      "otherTicketInformationChange"
+     ]
+    },
+    "description": "Changes that push an update to issued passes"
    }
-  }
+  },
+  "required": [
+   "templateId"
+  ]
  },
  "GoogleWalletPassDesignerView": {
   "type": "object",
@@ -3506,6 +3834,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Google Wallet Pass Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
+   "templateId": {
+    "type": "string",
+    "description": "Media template being designed"
+   },
    "passClass": {
     "type": "string",
     "description": "Pass class"
@@ -3527,7 +3859,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Logo"
    },
    "heroImageAssetsWhereApplicable": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Hero/image assets where applicable"
    },
    "eventInformation": {
@@ -3540,8 +3875,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "dateTime": {
     "type": "string",
-    "format": "date-time",
-    "description": "Date/time"
+    "description": "Field key mapped to the event date/time"
    },
    "ticketHolder": {
     "type": "string",
@@ -3556,7 +3890,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Ticket type"
    },
    "customFields": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Custom fields"
    },
    "status": {
@@ -3564,229 +3901,43 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Status"
    },
    "links": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Links"
    },
    "additionalInformation": {
     "type": "string",
     "description": "Additional information"
    },
-   "qr": {
+   "credentialEncoding": {
     "type": "string",
-    "description": "QR"
+    "enum": [
+     "qr",
+     "barcode",
+     "credentialTokenReference"
+    ],
+    "description": "How the credential is carried on the pass"
    },
-   "barcode": {
-    "type": "string",
-    "description": "Barcode"
-   },
-   "credentialTokenReference": {
-    "type": "string",
-    "description": "Credential/token reference"
-   },
-   "accordingToSupportedWalletFunctionality": {
-    "type": "string",
-    "description": "according to supported wallet functionality"
-   },
-   "eventTimeChange": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Event time change"
-   },
-   "venueChange": {
-    "type": "string",
-    "description": "Venue change"
-   },
-   "seatReassignment": {
-    "type": "string",
-    "description": "Seat reassignment"
-   },
-   "ticketStatusChange": {
-    "type": "string",
-    "description": "Ticket status change"
-   },
-   "relevantTicketInformationChanges": {
-    "type": "string",
-    "description": "Relevant ticket information changes"
-   },
-   "provideDeviceOrientedPreviewBeforePublication": {
-    "type": "string",
-    "description": "Provide device-oriented preview before publication"
-   },
-   "mapping": {
-    "type": "string",
-    "description": "mapping"
+   "updateTriggers": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "eventTimeChange",
+      "venueChange",
+      "seatReassignment",
+      "ticketStatusChange",
+      "otherTicketInformationChange"
+     ]
+    },
+    "description": "Changes that push an update to issued passes"
    }
-  }
- },
- "MediaDesignStudioCommandCenterView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Media Design Studio Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "totalMediaTemplates": {
-    "type": "integer",
-    "description": "Total Media Templates"
-   },
-   "published": {
-    "type": "string",
-    "description": "Published"
-   },
-   "draft": {
-    "type": "string",
-    "description": "Draft"
-   },
-   "pendingApproval": {
-    "type": "integer",
-    "description": "Pending Approval"
-   },
-   "scheduled": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Scheduled"
-   },
-   "archived": {
-    "type": "string",
-    "description": "Archived"
-   },
-   "qrDigitalTemplates": {
-    "type": "string",
-    "description": "QR / Digital Templates"
-   },
-   "pdfPrintTemplates": {
-    "type": "string",
-    "description": "PDF / Print Templates"
-   },
-   "appleWalletTemplates": {
-    "type": "integer",
-    "description": "Apple Wallet Templates"
-   },
-   "googleWalletTemplates": {
-    "type": "integer",
-    "description": "Google Wallet Templates"
-   },
-   "rfidNfcTemplates": {
-    "type": "string",
-    "description": "RFID / NFC Templates"
-   },
-   "cardWristbandTemplates": {
-    "type": "string",
-    "description": "Card / Wristband Templates"
-   },
-   "templatesRequiringReview": {
-    "type": "string",
-    "description": "Templates Requiring Review"
-   },
-   "templatesWithValidationErrors": {
-    "type": "integer",
-    "description": "Templates with Validation Errors"
-   },
-   "templateId": {
-    "type": "string",
-    "description": "Template ID"
-   },
-   "templateName": {
-    "type": "string",
-    "description": "Template Name"
-   },
-   "mediaType": {
-    "type": "string",
-    "description": "Media Type"
-   },
-   "brand": {
-    "type": "string",
-    "description": "Brand"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "productEventAssociation": {
-    "type": "string",
-    "description": "Product / Event association"
-   },
-   "language": {
-    "type": "string",
-    "description": "Language"
-   },
-   "version": {
-    "type": "string",
-    "description": "Version"
-   },
-   "effectiveFrom": {
-    "type": "string",
-    "description": "Effective From"
-   },
-   "effectiveTo": {
-    "type": "string",
-    "description": "Effective To"
-   },
-   "status": {
-    "type": "integer",
-    "description": "Status"
-   },
-   "owner": {
-    "type": "string",
-    "description": "Owner"
-   },
-   "lastModified": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Last Modified"
-   },
-   "createMediaTemplate": {
-    "type": "string",
-    "description": "+ Create Media Template"
-   },
-   "qrTicket": {
-    "type": "string",
-    "description": "QR Ticket"
-   },
-   "dynamicQrTicket": {
-    "type": "string",
-    "description": "Dynamic QR Ticket"
-   },
-   "barcodeTicket": {
-    "type": "string",
-    "description": "Barcode Ticket"
-   },
-   "mobileTicket": {
-    "type": "string",
-    "description": "Mobile Ticket"
-   },
-   "pdf": {
-    "type": "string",
-    "description": "PDF"
-   },
-   "a4A5": {
-    "type": "string",
-    "description": "A4 / A5"
-   },
-   "thermal": {
-    "type": "string",
-    "description": "Thermal"
-   },
-   "pos": {
-    "type": "string",
-    "description": "POS"
-   },
-   "customPrint": {
-    "type": "string",
-    "description": "Custom Print"
-   },
-   "appleWallet": {
-    "type": "string",
-    "description": "Apple Wallet"
-   },
-   "googleWallet": {
-    "type": "string",
-    "description": "Google Wallet"
-   },
-   "rfidCard": {
-    "type": "string",
-    "description": "RFID Card"
-   }
-  }
+  },
+  "required": [
+   "templateId"
+  ]
  },
  "MultiMediaPreviewTestingApprovalPublicationInput": {
   "type": "object",
@@ -3794,169 +3945,102 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Multi-Media Preview, Testing, Approval & Publication submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "sideBySideWherePractical": {
+   "publishMode": {
     "type": "string",
-    "description": "side by side where practical"
+    "enum": [
+     "publishNow",
+     "schedule"
+    ],
+    "description": "Publish now or on a schedule"
    },
-   "virtualTicketVt2026009821": {
+   "templateId": {
     "type": "string",
-    "description": "Virtual Ticket: VT-2026-009821"
+    "description": "Media template being published"
    },
-   "productVipConcert": {
-    "type": "string",
-    "description": "Product: VIP Concert"
+   "validationChecks": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "dynamicFields",
+      "missingFields",
+      "qrReadability",
+      "barcodeReadability",
+      "walletConfiguration",
+      "printBoundaries",
+      "localization",
+      "rtl",
+      "branding",
+      "imageResolution",
+      "credentialPayload",
+      "virtualTicketResolution",
+      "providerConfiguration"
+     ]
+    },
+    "description": "Pre-publication checks run"
    },
-   "date15Sep2026": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date: 15 Sep 2026"
-   },
-   "time1930": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Time: 19:30"
-   },
-   "venueArena": {
-    "type": "string",
-    "description": "Venue: Arena"
-   },
-   "sectionA": {
-    "type": "string",
-    "description": "Section: A"
-   },
-   "row3": {
-    "type": "string",
-    "description": "Row: 3"
-   },
-   "seat18": {
-    "type": "string",
-    "description": "Seat: 18"
-   },
-   "dynamicFields": {
-    "type": "string",
-    "description": "Dynamic fields"
-   },
-   "missingFields": {
-    "type": "string",
-    "description": "Missing fields"
-   },
-   "qrReadability": {
-    "type": "string",
-    "description": "QR readability"
-   },
-   "barcodeReadability": {
-    "type": "string",
-    "description": "Barcode readability"
-   },
-   "walletConfiguration": {
-    "type": "string",
-    "description": "Wallet configuration"
-   },
-   "localization": {
-    "type": "string",
-    "description": "Localization"
-   },
-   "rtl": {
-    "type": "string",
-    "description": "RTL"
-   },
-   "branding": {
-    "type": "string",
-    "description": "Branding"
-   },
-   "imageResolution": {
-    "type": "string",
-    "description": "Image resolution"
-   },
-   "credentialPayload": {
-    "type": "string",
-    "description": "Credential payload"
-   },
-   "virtualTicketResolution": {
-    "type": "string",
-    "description": "Virtual Ticket resolution"
-   },
-   "providerConfiguration": {
-    "type": "string",
-    "description": "Provider configuration"
-   },
-   "desktop": {
-    "type": "string",
-    "description": "Desktop"
-   },
-   "mobile": {
-    "type": "string",
-    "description": "Mobile"
-   },
-   "tablet": {
-    "type": "string",
-    "description": "Tablet"
-   },
-   "printer": {
-    "type": "string",
-    "description": "Printer"
-   },
-   "pos": {
-    "type": "string",
-    "description": "POS"
-   },
-   "wallet": {
-    "type": "string",
-    "description": "Wallet"
-   },
-   "encoder": {
-    "type": "string",
-    "description": "Encoder"
-   },
-   "missingMandatoryField": {
-    "type": "string",
-    "description": "Missing mandatory field"
-   },
-   "qrOverlapsCustomerName": {
-    "type": "string",
-    "description": "QR overlaps customer name"
-   },
-   "arabicLayoutExceedsPrintableArea": {
-    "type": "string",
-    "description": "Arabic layout exceeds printable area"
+   "previewTargets": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "desktop",
+      "mobile",
+      "tablet",
+      "printer",
+      "pos",
+      "wallet",
+      "encoder"
+     ]
+    },
+    "description": "Targets previewed"
    },
    "selectedBrands": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Selected Brands"
    },
    "selectedVenues": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Selected Venues"
    },
    "selectedProducts": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Selected Products"
    },
    "selectedChannels": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Selected Channels"
    },
    "controlledRollout": {
-    "type": "string",
+    "type": "boolean",
     "description": "Controlled rollout"
    },
-   "aTemplateChanges": {
+   "templateVersion": {
     "type": "string",
-    "description": "a template changes"
+    "description": "Version created by this publication"
    },
-   "eachTemplate": {
+   "scheduledAt": {
     "type": "string",
-    "description": "each template"
-   },
-   "redesigningTheVirtualTicketCore": {
-    "type": "string",
-    "description": "redesigning the Virtual Ticket core"
-   },
-   "approvalPublishedMediaTemplate": {
-    "type": "string",
-    "description": "Approval → Published Media Template"
+    "format": "date-time",
+    "description": "Publication time when scheduled"
    }
-  }
+  },
+  "required": [
+   "templateId",
+   "publishMode"
+  ]
  },
  "MultiMediaPreviewTestingApprovalPublicationView": {
   "type": "object",
@@ -3964,167 +4048,119 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Multi-Media Preview, Testing, Approval & Publication displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "sideBySideWherePractical": {
+   "publishMode": {
     "type": "string",
-    "description": "side by side where practical"
+    "enum": [
+     "publishNow",
+     "schedule"
+    ],
+    "description": "Publish now or on a schedule"
    },
-   "virtualTicketVt2026009821": {
+   "templateId": {
     "type": "string",
-    "description": "Virtual Ticket: VT-2026-009821"
+    "description": "Media template being published"
    },
-   "productVipConcert": {
-    "type": "string",
-    "description": "Product: VIP Concert"
+   "validationChecks": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "dynamicFields",
+      "missingFields",
+      "qrReadability",
+      "barcodeReadability",
+      "walletConfiguration",
+      "printBoundaries",
+      "localization",
+      "rtl",
+      "branding",
+      "imageResolution",
+      "credentialPayload",
+      "virtualTicketResolution",
+      "providerConfiguration"
+     ]
+    },
+    "description": "Pre-publication checks run"
    },
-   "date15Sep2026": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date: 15 Sep 2026"
-   },
-   "time1930": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Time: 19:30"
-   },
-   "venueArena": {
-    "type": "string",
-    "description": "Venue: Arena"
-   },
-   "sectionA": {
-    "type": "string",
-    "description": "Section: A"
-   },
-   "row3": {
-    "type": "string",
-    "description": "Row: 3"
-   },
-   "seat18": {
-    "type": "string",
-    "description": "Seat: 18"
-   },
-   "dynamicFields": {
-    "type": "string",
-    "description": "Dynamic fields"
-   },
-   "missingFields": {
-    "type": "string",
-    "description": "Missing fields"
-   },
-   "qrReadability": {
-    "type": "string",
-    "description": "QR readability"
-   },
-   "barcodeReadability": {
-    "type": "string",
-    "description": "Barcode readability"
-   },
-   "walletConfiguration": {
-    "type": "string",
-    "description": "Wallet configuration"
-   },
-   "localization": {
-    "type": "string",
-    "description": "Localization"
-   },
-   "rtl": {
-    "type": "string",
-    "description": "RTL"
-   },
-   "branding": {
-    "type": "string",
-    "description": "Branding"
-   },
-   "imageResolution": {
-    "type": "string",
-    "description": "Image resolution"
-   },
-   "credentialPayload": {
-    "type": "string",
-    "description": "Credential payload"
-   },
-   "virtualTicketResolution": {
-    "type": "string",
-    "description": "Virtual Ticket resolution"
-   },
-   "providerConfiguration": {
-    "type": "string",
-    "description": "Provider configuration"
-   },
-   "desktop": {
-    "type": "string",
-    "description": "Desktop"
-   },
-   "mobile": {
-    "type": "string",
-    "description": "Mobile"
-   },
-   "tablet": {
-    "type": "string",
-    "description": "Tablet"
-   },
-   "printer": {
-    "type": "string",
-    "description": "Printer"
-   },
-   "pos": {
-    "type": "string",
-    "description": "POS"
-   },
-   "wallet": {
-    "type": "string",
-    "description": "Wallet"
-   },
-   "encoder": {
-    "type": "string",
-    "description": "Encoder"
-   },
-   "missingMandatoryField": {
-    "type": "string",
-    "description": "Missing mandatory field"
-   },
-   "qrOverlapsCustomerName": {
-    "type": "string",
-    "description": "QR overlaps customer name"
-   },
-   "arabicLayoutExceedsPrintableArea": {
-    "type": "string",
-    "description": "Arabic layout exceeds printable area"
+   "previewTargets": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "desktop",
+      "mobile",
+      "tablet",
+      "printer",
+      "pos",
+      "wallet",
+      "encoder"
+     ]
+    },
+    "description": "Targets previewed"
    },
    "selectedBrands": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Selected Brands"
    },
    "selectedVenues": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Selected Venues"
    },
    "selectedProducts": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Selected Products"
    },
    "selectedChannels": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Selected Channels"
    },
    "controlledRollout": {
-    "type": "string",
+    "type": "boolean",
     "description": "Controlled rollout"
    },
-   "aTemplateChanges": {
+   "templateVersion": {
     "type": "string",
-    "description": "a template changes"
+    "description": "Version created by this publication"
    },
-   "eachTemplate": {
+   "scheduledAt": {
     "type": "string",
-    "description": "each template"
+    "format": "date-time",
+    "description": "Publication time when scheduled"
+   }
+  },
+  "required": [
+   "templateId",
+   "publishMode"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
    },
-   "redesigningTheVirtualTicketCore": {
-    "type": "string",
-    "description": "redesigning the Virtual Ticket core"
+   "nextCursor": {
+    "type": "string"
    },
-   "approvalPublishedMediaTemplate": {
-    "type": "string",
-    "description": "Approval → Published Media Template"
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },
@@ -4134,37 +4170,23 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What PDF, Printable & POS Ticket Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "pdf": {
+   "templateId": {
     "type": "string",
-    "description": "PDF"
+    "description": "Media template being designed"
    },
-   "a4": {
+   "outputFormat": {
     "type": "string",
-    "description": "A4"
-   },
-   "a5": {
-    "type": "string",
-    "description": "A5"
-   },
-   "customDimensions": {
-    "type": "string",
-    "description": "Custom dimensions"
-   },
-   "posReceipt": {
-    "type": "string",
-    "description": "POS receipt"
-   },
-   "thermalTicket": {
-    "type": "string",
-    "description": "Thermal ticket"
-   },
-   "boxOfficeStock": {
-    "type": "string",
-    "description": "Box-office stock"
-   },
-   "prePrintedStockWhereRequired": {
-    "type": "boolean",
-    "description": "Pre-printed stock where required"
+    "enum": [
+     "pdf",
+     "a4",
+     "a5",
+     "customDimensions",
+     "posReceipt",
+     "thermalTicket",
+     "boxOfficeStock",
+     "prePrintedStock"
+    ],
+    "description": "Print output this template produces"
    },
    "pageSize": {
     "type": "string",
@@ -4195,7 +4217,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Logo"
    },
    "images": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Images"
    },
    "text": {
@@ -4203,8 +4228,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Text"
    },
    "dynamicFields": {
-    "type": "string",
-    "description": "Dynamic fields"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Field keys from the dynamic-field library"
    },
    "qrBarcode": {
     "type": "string",
@@ -4227,7 +4255,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Printer profile"
    },
    "dpi": {
-    "type": "string",
+    "type": "integer",
     "description": "DPI"
    },
    "paperStockType": {
@@ -4246,7 +4274,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Supported printer integration"
    }
-  }
+  },
+  "required": [
+   "templateId",
+   "outputFormat"
+  ]
  },
  "PdfPrintablePosTicketDesignerView": {
   "type": "object",
@@ -4254,37 +4286,23 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What PDF, Printable & POS Ticket Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "pdf": {
+   "templateId": {
     "type": "string",
-    "description": "PDF"
+    "description": "Media template being designed"
    },
-   "a4": {
+   "outputFormat": {
     "type": "string",
-    "description": "A4"
-   },
-   "a5": {
-    "type": "string",
-    "description": "A5"
-   },
-   "customDimensions": {
-    "type": "string",
-    "description": "Custom dimensions"
-   },
-   "posReceipt": {
-    "type": "string",
-    "description": "POS receipt"
-   },
-   "thermalTicket": {
-    "type": "string",
-    "description": "Thermal ticket"
-   },
-   "boxOfficeStock": {
-    "type": "string",
-    "description": "Box-office stock"
-   },
-   "prePrintedStockWhereRequired": {
-    "type": "boolean",
-    "description": "Pre-printed stock where required"
+    "enum": [
+     "pdf",
+     "a4",
+     "a5",
+     "customDimensions",
+     "posReceipt",
+     "thermalTicket",
+     "boxOfficeStock",
+     "prePrintedStock"
+    ],
+    "description": "Print output this template produces"
    },
    "pageSize": {
     "type": "string",
@@ -4315,7 +4333,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Logo"
    },
    "images": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Images"
    },
    "text": {
@@ -4323,8 +4344,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Text"
    },
    "dynamicFields": {
-    "type": "string",
-    "description": "Dynamic fields"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Field keys from the dynamic-field library"
    },
    "qrBarcode": {
     "type": "string",
@@ -4347,7 +4371,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Printer profile"
    },
    "dpi": {
-    "type": "string",
+    "type": "integer",
     "description": "DPI"
    },
    "paperStockType": {
@@ -4366,7 +4390,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Supported printer integration"
    }
-  }
+  },
+  "required": [
+   "templateId",
+   "outputFormat"
+  ]
  },
  "RfidNfcCardWristbandMediaDesignerInput": {
   "type": "object",
@@ -4374,48 +4402,37 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What RFID, NFC, Card & Wristband Media Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "rfidCard": {
+   "templateId": {
     "type": "string",
-    "description": "RFID Card"
+    "description": "Media template being designed"
    },
-   "rfidWristband": {
+   "mediaKind": {
     "type": "string",
-    "description": "RFID Wristband"
+    "enum": [
+     "rfidCard",
+     "rfidWristband",
+     "nfcCard",
+     "nfcWristband",
+     "membershipCard",
+     "staffGuestCard",
+     "customWearable"
+    ],
+    "description": "Physical medium"
    },
-   "nfcCard": {
+   "reusability": {
     "type": "string",
-    "description": "NFC Card"
-   },
-   "nfcWristband": {
-    "type": "string",
-    "description": "NFC Wristband"
-   },
-   "membershipCard": {
-    "type": "string",
-    "description": "Membership Card"
-   },
-   "staffGuestCardWhereApplicable": {
-    "type": "string",
-    "description": "Staff/guest card where applicable"
-   },
-   "customWearable": {
-    "type": "string",
-    "description": "Custom Wearable"
-   },
-   "disposable": {
-    "type": "string",
-    "description": "Disposable"
-   },
-   "reusable": {
-    "type": "string",
-    "description": "Reusable"
+    "enum": [
+     "disposable",
+     "reusable"
+    ],
+    "description": "Disposable or reusable medium"
    },
    "printed": {
-    "type": "string",
+    "type": "boolean",
     "description": "Printed"
    },
    "encoded": {
-    "type": "string",
+    "type": "boolean",
     "description": "Encoded"
    },
    "colorCategory": {
@@ -4427,7 +4444,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Size where applicable"
    },
    "activationAtCollection": {
-    "type": "string",
+    "type": "boolean",
     "description": "Activation at collection"
    },
    "depositReferenceWhereApplicable": {
@@ -4454,26 +4471,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Logo"
    },
-   "customerName": {
-    "type": "string",
-    "description": "Customer name"
-   },
-   "photo": {
-    "type": "string",
-    "description": "Photo"
-   },
-   "membershipTier": {
-    "type": "string",
-    "description": "Membership tier"
-   },
-   "expiry": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Expiry"
-   },
-   "serialNumber": {
-    "type": "string",
-    "description": "Serial number"
+   "printedFields": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "customerName",
+      "photo",
+      "membershipTier",
+      "expiry",
+      "serialNumber",
+      "qrBarcode"
+     ]
+    },
+    "description": "Personal and reference fields printed on the medium"
    },
    "customArtwork": {
     "type": "string",
@@ -4504,18 +4515,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Provider"
    },
    "readerCompatibility": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Reader compatibility"
    },
    "printerEncoderIntegration": {
     "type": "string",
     "description": "Printer/encoder integration"
-   },
-   "credentialBindingVirtualTicket": {
-    "type": "string",
-    "description": "Credential Binding → Virtual Ticket"
    }
-  }
+  },
+  "required": [
+   "templateId",
+   "mediaKind"
+  ]
  },
  "RfidNfcCardWristbandMediaDesignerView": {
   "type": "object",
@@ -4523,48 +4537,37 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What RFID, NFC, Card & Wristband Media Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "rfidCard": {
+   "templateId": {
     "type": "string",
-    "description": "RFID Card"
+    "description": "Media template being designed"
    },
-   "rfidWristband": {
+   "mediaKind": {
     "type": "string",
-    "description": "RFID Wristband"
+    "enum": [
+     "rfidCard",
+     "rfidWristband",
+     "nfcCard",
+     "nfcWristband",
+     "membershipCard",
+     "staffGuestCard",
+     "customWearable"
+    ],
+    "description": "Physical medium"
    },
-   "nfcCard": {
+   "reusability": {
     "type": "string",
-    "description": "NFC Card"
-   },
-   "nfcWristband": {
-    "type": "string",
-    "description": "NFC Wristband"
-   },
-   "membershipCard": {
-    "type": "string",
-    "description": "Membership Card"
-   },
-   "staffGuestCardWhereApplicable": {
-    "type": "string",
-    "description": "Staff/guest card where applicable"
-   },
-   "customWearable": {
-    "type": "string",
-    "description": "Custom Wearable"
-   },
-   "disposable": {
-    "type": "string",
-    "description": "Disposable"
-   },
-   "reusable": {
-    "type": "string",
-    "description": "Reusable"
+    "enum": [
+     "disposable",
+     "reusable"
+    ],
+    "description": "Disposable or reusable medium"
    },
    "printed": {
-    "type": "string",
+    "type": "boolean",
     "description": "Printed"
    },
    "encoded": {
-    "type": "string",
+    "type": "boolean",
     "description": "Encoded"
    },
    "colorCategory": {
@@ -4576,7 +4579,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Size where applicable"
    },
    "activationAtCollection": {
-    "type": "string",
+    "type": "boolean",
     "description": "Activation at collection"
    },
    "depositReferenceWhereApplicable": {
@@ -4603,26 +4606,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Logo"
    },
-   "customerName": {
-    "type": "string",
-    "description": "Customer name"
-   },
-   "photo": {
-    "type": "string",
-    "description": "Photo"
-   },
-   "membershipTier": {
-    "type": "string",
-    "description": "Membership tier"
-   },
-   "expiry": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Expiry"
-   },
-   "serialNumber": {
-    "type": "string",
-    "description": "Serial number"
+   "printedFields": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "customerName",
+      "photo",
+      "membershipTier",
+      "expiry",
+      "serialNumber",
+      "qrBarcode"
+     ]
+    },
+    "description": "Personal and reference fields printed on the medium"
    },
    "customArtwork": {
     "type": "string",
@@ -4653,16 +4650,211 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Provider"
    },
    "readerCompatibility": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Reader compatibility"
    },
    "printerEncoderIntegration": {
     "type": "string",
     "description": "Printer/encoder integration"
-   },
-   "credentialBindingVirtualTicket": {
+   }
+  },
+  "required": [
+   "templateId",
+   "mediaKind"
+  ]
+ },
+ "TicketProof": {
+  "type": "object",
+  "x-ticvai-persistence": "none — rendered on request, nothing is stored",
+  "description": "A sample ticket from a template, **marked as a proof on the artefact itself** so it cannot be presented at a gate.",
+  "required": [
+   "templateId",
+   "mediaType",
+   "contentRef"
+  ],
+  "properties": {
+   "templateId": {
     "type": "string",
-    "description": "Credential Binding → Virtual Ticket"
+    "format": "uuid"
+   },
+   "mediaType": {
+    "type": "string",
+    "enum": [
+     "thermalTicket",
+     "a4Pdf",
+     "wristband",
+     "rfidCard",
+     "walletPass",
+     "qrOnly",
+     "sms"
+    ]
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true
+   },
+   "contentRef": {
+    "type": "string",
+    "format": "uri",
+    "description": "Where the rendered proof can be fetched or sent to the printer from."
+   }
+  }
+ },
+ "TicketTemplate": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.ticket_template + orders.ticket_template_channel",
+  "description": "BL-102. **A venue changing its ticket artwork had no path that was not a code change.**\n2.16.6 asks to print a proof without processing a sale — the equivalent of `white-label.createPreview`, and the same reason: **artwork is checked by looking at it, and the only way to look at it was to sell something.**\n",
+  "required": [
+   "id",
+   "name",
+   "mediaType",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "isRecyclable": {
+    "type": "boolean",
+    "default": false,
+    "description": "BL-103. **An RFID wristband handed back at the exit is stock, not waste** — and nothing released it, so a venue reissuing one had a card serving two entitlements.\n**Replacement disables the previous medium automatically**, following the F23 rule: a guest issued a replacement wristband must not walk in on the old one, and relying on somebody remembering to blacklist it is how they do.\n"
+   },
+   "recycleAfterDays": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**A quarantine before reissue.** A wristband returned today and reissued tomorrow to a different guest is a support call waiting to happen when the first guest's app still shows it.\n"
+   },
+   "mediaType": {
+    "type": "string",
+    "enum": [
+     "thermalTicket",
+     "a4Pdf",
+     "wristband",
+     "rfidCard",
+     "walletPass",
+     "qrOnly",
+     "sms"
+    ]
+   },
+   "appliesToProductKinds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "appliesToChannels": {
+    "type": "array",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+    }
+   },
+   "selectionPriority": {
+    "type": "integer",
+    "default": 100,
+    "description": "2.16.x. **Automatic media-type selection**, which was absent — a kiosk with no printer and a guest with no smartphone need different answers, and neither should be chosen by the caller.\n"
+   },
+   "layoutRef": {
+    "type": "string"
+   },
+   "localeVariants": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "TicketTemplateImportInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only",
+  "description": "What `importTicketTemplate` takes (decided 29 September, readiness close-out).",
+  "required": [
+   "format",
+   "fileRef",
+   "name"
+  ],
+  "properties": {
+   "format": {
+    "type": "string",
+    "maxLength": 30,
+    "description": "The definition format of the file. One the service does not read is a 422."
+   },
+   "fileRef": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The uploaded definition file."
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 120
+   }
+  }
+ },
+ "TicketTemplateRequest": {
+  "type": "object",
+  "description": "Request only; persisted as `TicketTemplate`. On update every field is optional and absent means unchanged. On create, `name` and `mediaType` are required and the operation enforces it.",
+  "properties": {
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "mediaType": {
+    "type": "string",
+    "enum": [
+     "thermalTicket",
+     "a4Pdf",
+     "wristband",
+     "rfidCard",
+     "walletPass",
+     "qrOnly",
+     "sms"
+    ]
+   },
+   "isRecyclable": {
+    "type": "boolean"
+   },
+   "recycleAfterDays": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "appliesToProductKinds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "appliesToChannels": {
+    "type": "array",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+    }
+   },
+   "selectionPriority": {
+    "type": "integer"
+   },
+   "layoutRef": {
+    "type": "string",
+    "description": "The artwork, as a media-asset reference."
+   },
+   "localeVariants": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "isActive": {
+    "type": "boolean"
    }
   }
  }

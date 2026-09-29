@@ -1,0 +1,1451 @@
+[
+ {
+  "id": "BO-953",
+  "name": "Seat Map Command Center",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "1",
+   "number": "01",
+   "page": 5
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/seat-map-command-center-bo-953",
+   "component": "apps/venue-management-web/src/routes/access-venue/SeatMapCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-954",
+    "BO-955",
+    "BO-956",
+    "BO-957",
+    "BO-958",
+    "BO-959",
+    "BO-960",
+    "BO-961",
+    "BO-962"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-954",
+     "trigger": "Venue Canvas",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-955",
+     "trigger": "Sections & Zones",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-956",
+     "trigger": "Rows & Seats",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-957",
+     "trigger": "Standing Zones",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-958",
+     "trigger": "Suites & Boxes",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-959",
+     "trigger": "Stage & Focal Point",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-960",
+     "trigger": "Entrances, Exits & Aisles",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-961",
+     "trigger": "Amenities & Obstructions",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-962",
+     "trigger": "Templates, Validation & Publish",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide a role-specific overview of every venue map and its operational readiness. Show total venues, active maps, seats, sections, capacity, drafts, approvals, validation errors and upcoming layout changes. Filter and compare by tenant, brand, region, venue, map type, status, owner and last-published date. Open recent maps, validation alerts, approval tasks and impacted performances directly from the dashboard. Version geometry and property changes, enforce venue-scoped permissions, validate affected capacity and preserve before/after audit evidence. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 5"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 5"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listSeatMaps",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The seat map list.",
+   "error": "Could not load. Names which read failed and leaves the seat map untouched.",
+   "emptyFirstRun": "No seat map yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the seat map are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listSeatMaps",
+    "contract": "seating",
+    "purpose": "List seat maps",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSeatMapTemplates",
+    "contract": "seating",
+    "purpose": "List reusable layout templates",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-953",
+   "workshopBoard": "wireframes/WS140 Seat Management Venue Mapping Reference v1.0 Board 1.dc.html#bo-953"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 5. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-954",
+  "name": "Venue Canvas",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "1",
+   "number": "02",
+   "page": 5
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/venue-canvas-bo-954",
+   "component": "apps/venue-management-web/src/routes/access-venue/VenueCanvas.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-953"
+   ],
+   "exitTo": [
+    "BO-953"
+   ],
+   "transitions": [
+    {
+     "to": "BO-953",
+     "trigger": "Back to Seat Map Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide the primary drag-and-drop workspace for constructing a venue map. Offer components for section, row, seat, standing zone, suite, stage, entrance, exit, aisle, facility, obstruction and label. Support zoom, pan, snap-to-grid, rulers, coordinates, layers, alignment, grouping, undo/redo and background- reference controls. Configure venue name, dimensions, unit, scale, orientation, origin, focal point and canvas boundaries in a properties inspector. Version geometry and property changes, enforce venue-scoped permissions, validate affected capacity and preserve before/after audit evidence. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 5"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 5"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getSeatMap",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createSeatMap",
+       "label": "Create seat map",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createSeatMap"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The venue canvas list.",
+   "error": "Could not load. Names which read failed and leaves the venue canvas untouched.",
+   "emptyFirstRun": "No venue canvas yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the venue canvas are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getSeatMap",
+    "contract": "seating",
+    "purpose": "The map being drawn",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "createSeatMap",
+    "contract": "seating",
+    "purpose": "Start a new map",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSeatMaps"
+    ]
+   },
+   {
+    "operationId": "updateSeatMap",
+    "contract": "seating",
+    "purpose": "Save the canvas",
+    "trigger": "onAction",
+    "invalidates": [
+     "getSeatMap",
+     "listSeatMaps"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-954",
+   "workshopBoard": "wireframes/WS140 Seat Management Venue Mapping Reference v1.0 Board 1.dc.html#bo-954"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 5. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "seatMapId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-955",
+  "name": "Sections & Zones",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "1",
+   "number": "03",
+   "page": 5
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/sections-zones-bo-955",
+   "component": "apps/venue-management-web/src/routes/access-venue/SectionsZones.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-953"
+   ],
+   "exitTo": [
+    "BO-953"
+   ],
+   "transitions": [
+    {
+     "to": "BO-953",
+     "trigger": "Back to Seat Map Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Define the commercial and operational hierarchy of the venue. Create, draw and edit section or zone polygons with name, code, level, capacity, color, category and parent hierarchy. Support curved, rectangular, freeform and imported boundaries with duplication, alignment and bulk-property updates. Configuration Scope of Work | Version 1.0 5 Map sections to pricing, access gates, sales channels, accessibility attributes and reporting dimensions. Version geometry and property changes, enforce venue-scoped permissions, validate affected capacity and preserve before/after audit evidence. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 5"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 5"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getSeatMap",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setMapZones",
+       "label": "Save map zones",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setMapZones"
+      },
+      {
+       "kind": "fileUpload",
+       "label": "View from this section",
+       "operation": "createUpload",
+       "notes": "**An optional photo per section** (decided 29 September, rev 3 23SEP-14): the view a guest sees on the seat map when they pick the section. Uploaded to the asset library (`createUpload`, then `completeUpload`) and saved with `updateSeatMap` `sectionViews`, which is allowed on a published map. With no photo, the guest app renders the view from the imported geometry (a closer section shows a larger stage and fewer rows ahead). Removing the photo sends a null `viewAssetId`.",
+       "provenance": "contract assets.yaml POST /media/uploads"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save section views",
+       "operation": "updateSeatMap",
+       "provenance": "contract seating.yaml PATCH /seat-maps/{seatMapId}"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The sections zones list.",
+   "error": "Could not load. Names which read failed and leaves the sections zones untouched.",
+   "emptyFirstRun": "No sections zones yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the sections zones are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getSeatMap",
+    "contract": "seating",
+    "purpose": "The map being sectioned",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "setMapZones",
+    "contract": "seating",
+    "purpose": "Section type, set at the section level",
+    "trigger": "onAction",
+    "invalidates": [
+     "getSeatMap"
+    ]
+   },
+   {
+    "operationId": "updateSeatMap",
+    "contract": "seating",
+    "purpose": "Set or clear the view photo of each section (rev 3 23SEP-14)",
+    "trigger": "onAction",
+    "invalidates": [
+     "getSeatMap"
+    ]
+   },
+   {
+    "operationId": "createUpload",
+    "contract": "assets",
+    "purpose": "Upload a section's view photo",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "completeUpload",
+    "contract": "assets",
+    "purpose": "Finish the upload so the photo can be linked",
+    "trigger": "onAction"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-955",
+   "workshopBoard": "wireframes/WS140 Seat Management Venue Mapping Reference v1.0 Board 1.dc.html#bo-955"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 5. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "seatMapId",
+     "from": "navigation"
+    },
+    {
+     "name": "uploadId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-956",
+  "name": "Rows & Seats",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "1",
+   "number": "04",
+   "page": 6
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/rows-seats-bo-956",
+   "component": "apps/venue-management-web/src/routes/access-venue/RowsSeats.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-953"
+   ],
+   "exitTo": [
+    "BO-953"
+   ],
+   "transitions": [
+    {
+     "to": "BO-953",
+     "trigger": "Back to Seat Map Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Build and maintain numbered rows and individual seat positions at scale. Generate straight, curved, radial or custom rows using seat count, spacing, radius, angle, direction and offset parameters. Configure seat number, label, type, category, coordinate, status default, accessibility, view quality and amenity attributes. Support bulk add, renumber, reverse, insert, remove, copy, align and spacing changes with collision and duplicate detection. Version geometry and property changes, enforce venue-scoped permissions, validate affected capacity and preserve before/after audit evidence. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 6"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 6"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listSeats",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateSeats",
+       "label": "Save seats",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateSeats"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The rows seats list.",
+   "error": "Could not load. Names which read failed and leaves the rows seats untouched.",
+   "emptyFirstRun": "No rows seats yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the rows seats are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listSeats",
+    "contract": "seating",
+    "purpose": "The rows and seats as drawn",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "updateSeats",
+    "contract": "seating",
+    "purpose": "Renumber, move or relabel",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSeats"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-956",
+   "workshopBoard": "wireframes/WS140 Seat Management Venue Mapping Reference v1.0 Board 1.dc.html#bo-956"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 6. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "seatMapId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-957",
+  "name": "Standing Zones",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "1",
+   "number": "05",
+   "page": 6
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/standing-zones-bo-957",
+   "component": "apps/venue-management-web/src/routes/access-venue/StandingZones.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-953"
+   ],
+   "exitTo": [
+    "BO-953"
+   ],
+   "transitions": [
+    {
+     "to": "BO-953",
+     "trigger": "Back to Seat Map Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure non-assigned areas with controlled capacity and density. Draw standing, general-admission, pit, dance-floor or hospitality zones and assign type, capacity, density and color. Calculate capacity from area and approved density while allowing an authorized lower operating limit. Associate entrances, exits, age rules, access products, pricing bands and event-specific restrictions. Version geometry and property changes, enforce venue-scoped permissions, validate affected capacity and preserve before/after audit evidence. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 6"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 6"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setMapZones",
+       "label": "Save map zones",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setMapZones"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The standing zones list.",
+   "error": "Could not load. Names which read failed and leaves the standing zones untouched.",
+   "emptyFirstRun": "No standing zones yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the standing zones are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setMapZones",
+    "contract": "seating",
+    "purpose": "Standing areas",
+    "trigger": "onAction",
+    "invalidates": [
+     "getSeatMap"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-957",
+   "workshopBoard": "wireframes/WS140 Seat Management Venue Mapping Reference v1.0 Board 1.dc.html#bo-957"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 6. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "seatMapId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-958",
+  "name": "Suites & Boxes",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "1",
+   "number": "06",
+   "page": 6
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/suites-boxes-bo-958",
+   "component": "apps/venue-management-web/src/routes/access-venue/SuitesBoxes.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-953"
+   ],
+   "exitTo": [
+    "BO-953"
+   ],
+   "transitions": [
+    {
+     "to": "BO-953",
+     "trigger": "Back to Seat Map Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Model suites, boxes and hospitality spaces as sellable seating inventory. Create suites and boxes with code, capacity, internal seat layout, standing allowance, amenities and accessibility attributes. Support whole-suite, per-seat, shared and configurable sales models with linked products and price categories. Maintain owner, contract, allocation, entrance, service area and operational-status references without duplicating CRM or contract data. Version geometry and property changes, enforce venue-scoped permissions, validate affected capacity and preserve before/after audit evidence. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 6",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 6"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 6"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setMapZones",
+       "label": "Save map zones",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setMapZones"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The suites boxes list.",
+   "error": "Could not load. Names which read failed and leaves the suites boxes untouched.",
+   "emptyFirstRun": "No suites boxes yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the suites boxes are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setMapZones",
+    "contract": "seating",
+    "purpose": "Suites and boxes",
+    "trigger": "onAction",
+    "invalidates": [
+     "getSeatMap"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-958",
+   "workshopBoard": "wireframes/WS140 Seat Management Venue Mapping Reference v1.0 Board 1.dc.html#bo-958"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 6. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "seatMapId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-959",
+  "name": "Stage & Focal Point",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "1",
+   "number": "07",
+   "page": 7
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/stage-focal-point-bo-959",
+   "component": "apps/venue-management-web/src/routes/access-venue/StageFocalPoint.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-953"
+   ],
+   "exitTo": [
+    "BO-953"
+   ],
+   "transitions": [
+    {
+     "to": "BO-953",
+     "trigger": "Back to Seat Map Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Define the viewing focal point and production footprint used by seating logic. Add stage, field, screen, court, track or custom focal areas with position, dimensions, rotation, height and event- specific variant. Configure one or multiple focal points for distance, orientation, best-seat and closest-to-stage calculations. Preview sightline coverage, obstructed areas and seats affected by production structures before publication. Version geometry and property changes, enforce venue-scoped permissions, validate affected capacity and preserve before/after audit evidence. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 7"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 7"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setMapZones",
+       "label": "Save map zones",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setMapZones"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The stage focal point list.",
+   "error": "Could not load. Names which read failed and leaves the stage focal point untouched.",
+   "emptyFirstRun": "No stage focal point yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the stage focal point are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setMapZones",
+    "contract": "seating",
+    "purpose": "Stage and focal point",
+    "trigger": "onAction",
+    "invalidates": [
+     "getSeatMap"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-959",
+   "workshopBoard": "wireframes/WS140 Seat Management Venue Mapping Reference v1.0 Board 1.dc.html#bo-959"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 7. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "seatMapId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-960",
+  "name": "Entrances, Exits & Aisles",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "1",
+   "number": "08",
+   "page": 7
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/entrances-exits-aisles-bo-960",
+   "component": "apps/venue-management-web/src/routes/access-venue/EntrancesExitsAisles.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-953"
+   ],
+   "exitTo": [
+    "BO-953"
+   ],
+   "transitions": [
+    {
+     "to": "BO-953",
+     "trigger": "Back to Seat Map Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Map circulation elements used by access, accessibility and safety operations. Create entrances, exits, gates, portals, vomitories, concourses, stairways and aisles with unique identifiers and attributes. Define width, direction, level, connected zones, access-control device, accessible status and emergency designation. Validate disconnected zones, blocked paths, minimum aisle width and route continuity against configured venue rules. Version geometry and property changes, enforce venue-scoped permissions, validate affected capacity and preserve before/after audit evidence. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 7"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 7"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setMapZones",
+       "label": "Save map zones",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setMapZones"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The entrances exits aisles list.",
+   "error": "Could not load. Names which read failed and leaves the entrances exits aisles untouched.",
+   "emptyFirstRun": "No entrances exits aisles yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the entrances exits aisles are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setMapZones",
+    "contract": "seating",
+    "purpose": "Entrances, exits and aisles",
+    "trigger": "onAction",
+    "invalidates": [
+     "getSeatMap"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-960",
+   "workshopBoard": "wireframes/WS140 Seat Management Venue Mapping Reference v1.0 Board 1.dc.html#bo-960"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 7. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "seatMapId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-961",
+  "name": "Amenities & Obstructions",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "1",
+   "number": "09",
+   "page": 7
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/amenities-obstructions-bo-961",
+   "component": "apps/venue-management-web/src/routes/access-venue/AmenitiesObstructions.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-953"
+   ],
+   "exitTo": [
+    "BO-953"
+   ],
+   "transitions": [
+    {
+     "to": "BO-953",
+     "trigger": "Back to Seat Map Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Add guest facilities, service points and view-affecting objects to the venue map. Place restrooms, concessions, bars, first aid, merchandise, lifts, escalators, information, prayer and accessibility facilities. Map pillars, cameras, speaker arrays, lighting trusses, barriers and production structures with obstruction type and dimensions. Expose approved amenity and view attributes to filters, seat previews, operations and accessibility routing. Version geometry and property changes, enforce venue-scoped permissions, validate affected capacity and preserve before/after audit evidence. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 7"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 7"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setMapZones",
+       "label": "Save map zones",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setMapZones"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The amenities obstructions list.",
+   "error": "Could not load. Names which read failed and leaves the amenities obstructions untouched.",
+   "emptyFirstRun": "No amenities obstructions yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the amenities obstructions are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setMapZones",
+    "contract": "seating",
+    "purpose": "Amenities and obstructions",
+    "trigger": "onAction",
+    "invalidates": [
+     "getSeatMap"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-961",
+   "workshopBoard": "wireframes/WS140 Seat Management Venue Mapping Reference v1.0 Board 1.dc.html#bo-961"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 7. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "seatMapId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-962",
+  "name": "Templates, Validation & Publish",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "1",
+   "number": "10",
+   "page": 7
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/templates-validation-publish-bo-962",
+   "component": "apps/venue-management-web/src/routes/access-venue/TemplatesValidationPublish.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-953"
+   ],
+   "exitTo": [
+    "BO-953"
+   ],
+   "transitions": [
+    {
+     "to": "BO-953",
+     "trigger": "Back to Seat Map Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Govern reusable venue templates and release a map only when it is operationally complete. Create, classify, clone, archive and reuse venue templates while preserving lineage and ownership. Run checks for geometry, capacity, duplicate numbering, overlaps, missing routes, accessibility, sightlines and dependent products. Provide draft, review, approval, scheduled publication, preview, version comparison and rollback with impact confirmation. Configuration Scope of Work | Version 1.0 7 Version geometry and property changes, enforce venue-scoped permissions, validate affected capacity and preserve before/after audit evidence. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 8 Board 2 - AI Seat Map Import & Designer Figure 2. High-definition configuration board with all 10 screens. Visual reference: information architecture and configuration coverage; detailed production behavior is defined in the following scope. Configuration Scope of Work | Version 1.0 9",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 7"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 7"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listSeatMapTemplates",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createSeatMapTemplate",
+       "label": "Create seat map template",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createSeatMapTemplate"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Replaces the map every channel sells from.** Seats already sold keep their labels; seats that no longer exist in the new map are listed before this proceeds.",
+       "provenance": "authored — required by check-screens, 19 September 2026"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The templates validation publish list.",
+   "error": "Could not load. Names which read failed and leaves the templates validation publish untouched.",
+   "emptyFirstRun": "No templates validation publish yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the templates validation publish are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listSeatMapTemplates",
+    "contract": "seating",
+    "purpose": "Templates to start from",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createSeatMapTemplate",
+    "contract": "seating",
+    "purpose": "Save this map as a template",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSeatMapTemplates"
+    ]
+   },
+   {
+    "operationId": "validateSeatMap",
+    "contract": "seating",
+    "purpose": "Check before publishing",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "publishSeatMap",
+    "contract": "seating",
+    "purpose": "Publish",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSeatMaps",
+     "getSeatMap"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-962",
+   "workshopBoard": "wireframes/WS140 Seat Management Venue Mapping Reference v1.0 Board 1.dc.html#bo-962"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 7. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "seatMapId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

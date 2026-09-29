@@ -38,12 +38,35 @@ END
 $$;
 
 
--- **51 tables qualify today** — a NOT NULL `venue_id` in the schema reference.
+-- **83 tables qualify today** — a NOT NULL `venue_id` in the schema reference.
 -- Listed rather than counted, because ADR-0044's rule is checkable and the list is how.
 
+--   access.access_device
+--   access.access_incident
+--   access.access_map
 --   access.access_point
+--   access.access_point_configuration
+--   access.access_point_group
+--   access.attraction_access
+--   access.biometric_audit_event
+--   access.biometric_profile
+--   access.companion_rule
 --   access.credential_issuance_retry_policy
+--   access.device_configuration
+--   access.edge_node
+--   access.edge_package
+--   access.face_reenrolment_attempt
+--   access.gate_lane
+--   access.gate_mode_change
+--   access.gate_mode_policy
+--   access.gate_outcome_profile
+--   access.group_admission_rule
+--   access.media_compatibility_test
+--   access.offline_policy
+--   access.operating_calendar_entry
 --   access.parking_facility
+--   access.podium
+--   access.podium_shift
 --   access.scan_event
 --   catalogue.donation_campaign
 --   catalogue.event
@@ -74,8 +97,16 @@ $$;
 --   platform.sale_board
 --   platform.workstation
 --   promotions.bundle
+--   promotions.campaign
 --   promotions.coupon_campaign
 --   promotions.promotion
+--   promotions.promotion_alert
+--   promotions.promotion_audit
+--   promotions.promotion_channel_publication
+--   promotions.promotion_conflict
+--   promotions.promotion_evaluation_trace
+--   promotions.promotion_rule
+--   promotions.stacking_rule
 --   promotions.voucher_batch
 --   queue.queue
 --   rental.agreement
@@ -91,4 +122,5 @@ $$;
 --   venuemap.map
 --   whitelabel.guided_choice
 --   workforce.announcement
+--   workforce.labour_budget
 --   workforce.rota_assignment

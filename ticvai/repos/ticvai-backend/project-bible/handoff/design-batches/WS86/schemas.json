@@ -1,1 +1,298 @@
-{}
+{
+ "IntegrationListing": {
+  "type": "object",
+  "x-ticvai-persistence": "control.integration_listing",
+  "description": "13.1.50, decision D1. **A listing, not an installation.** The integration runs on the developer's own infrastructure.\n**Third-party code does not execute inside TICVAI** — stated rather than assumed, because that is a different product with a different threat model.\n",
+  "required": [
+   "id",
+   "developerId",
+   "name",
+   "category",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "developerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "category": {
+    "type": "string",
+    "enum": [
+     "crm",
+     "marketing",
+     "accounting",
+     "hotel",
+     "transport",
+     "analytics",
+     "accessibility",
+     "other"
+    ]
+   },
+   "description": {
+    "type": "string"
+   },
+   "integrationUrl": {
+    "type": "string"
+   },
+   "requiredScopes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "submitted",
+     "inReview",
+     "certified",
+     "rejected",
+     "revoked",
+     "delisted"
+    ],
+    "readOnly": true
+   },
+   "certifiedUntil": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Certification expires.** An integration certified against v1 and still listed after v3 is TICVAI vouching for something it has not looked at in two years.\n"
+   },
+   "certifiedAgainstVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "listingFeeModel": {
+    "type": "string",
+    "enum": [
+     "none",
+     "flat",
+     "revenueShare"
+    ],
+    "nullable": true
+   }
+  }
+ },
+ "Reader": {
+  "type": "object",
+  "x-ticvai-persistence": "games.reader",
+  "description": "Board 2. **A `tenancy` device with a game configuration on it.**",
+  "required": [
+   "deviceId"
+  ],
+  "properties": {
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "`tenancy.RegisteredDevice`. **Enrolment, firmware and tamper state live there.**\n"
+   },
+   "gameId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "readerProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "acceptedCreditTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "acceptsDirectPay": {
+    "type": "boolean",
+    "default": false
+   },
+   "retapDelaySeconds": {
+    "type": "integer",
+    "default": 3,
+    "description": "**The setting that stops a guest paying twice for one go.** A wristband held against a reader for a second and a half is two taps to the hardware and one intention to the guest.\n"
+   },
+   "displayRules": {
+    "type": "object",
+    "properties": {
+     "freeGameGlow": {
+      "type": "boolean",
+      "default": true,
+      "description": "**What tells a guest their entitlement was used rather than their money.** Without it the complaint arrives at the desk.\n"
+     },
+     "showBalance": {
+      "type": "boolean",
+      "default": true
+     },
+     "showPrice": {
+      "type": "boolean",
+      "default": true
+     },
+     "themeCode": {
+      "type": "string",
+      "nullable": true
+     },
+     "languages": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "ioMapping": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Board 9.6. Which output starts the game, which input reports it finished. **Deliberately open.** The keys are the reader model's own I/O lines, so the shape belongs to the vendor adaptor for that model (game readers are a driver, not a build — ADR-0012, ADR-0015), not to this contract.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "unconfigured",
+     "active",
+     "offline",
+     "maintenance",
+     "disabled"
+    ]
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "ReaderProfile": {
+  "type": "object",
+  "x-ticvai-persistence": "games.reader_profile",
+  "description": "BL-153. **`games` is well built on the money and what is missing sits at the reader.**\n10.2.14 and 10.2.17 want a different colour for a free game and a different one for insufficient credit — **because a guest at an arcade machine cannot read a message, they can only see a light.** The whole interaction is a second long and happens across a noisy room.\n",
+  "required": [
+   "id",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "displayBehaviour": {
+    "type": "object",
+    "description": "**What the reader shows, per outcome.** Colour and tone, because the guest is looking at a machine rather than a screen.\n",
+    "properties": {
+     "accepted": {
+      "type": "string"
+     },
+     "freeGame": {
+      "type": "string"
+     },
+     "insufficientCredit": {
+      "type": "string"
+     },
+     "cardBlocked": {
+      "type": "string"
+     },
+     "readError": {
+      "type": "string"
+     }
+    }
+   },
+   "retryPricing": {
+    "type": "object",
+    "nullable": true,
+    "description": "**A retry after a machine fault is not a second play.** Without this a guest whose game crashed pays twice, and the attendant refunds by hand — which is how an arcade loses money and goodwill at once.\n",
+    "properties": {
+     "isFree": {
+      "type": "boolean",
+      "default": true
+     },
+     "withinSeconds": {
+      "type": "integer",
+      "default": 60
+     },
+     "maxRetries": {
+      "type": "integer",
+      "default": 1
+     }
+    }
+   },
+   "rePlayWindowSeconds": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**A second tap within this window is the same play, not a new one.** A guest tapping twice because nothing appeared to happen should not be charged twice.\n"
+   },
+   "entitlementProductIds": {
+    "type": "array",
+    "description": "**Per-game entitlement.** A pass that includes ten specific rides needs the reader to know which, and a card that works everywhere is a different product.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "ReaderTestResult": {
+  "type": "object",
+  "description": "Boards 2.10 and 9.9. **Each check separately**, because they send an engineer to different places.\n",
+  "properties": {
+   "readerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "testedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "checks": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "check": {
+       "type": "string",
+       "enum": [
+        "connectivity",
+        "cardRead",
+        "balanceCheck",
+        "display",
+        "sound",
+        "gameTrigger",
+        "gameCompleteSignal"
+       ]
+      },
+      "passed": {
+       "type": "boolean"
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "overall": {
+    "type": "string",
+    "enum": [
+     "pass",
+     "partial",
+     "fail"
+    ]
+   }
+  }
+ }
+}

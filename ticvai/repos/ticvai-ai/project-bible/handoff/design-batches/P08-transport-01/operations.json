@@ -1,0 +1,571 @@
+{
+ "applyTransportNetworkImport": {
+  "method": "POST",
+  "path": "/transport/network-imports/{importId}/apply",
+  "contract": "transport",
+  "summary": "Apply a previewed import to the network",
+  "permission": "TRANSPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TransportNetworkImport"
+ },
+ "cancelPerformance": {
+  "method": "POST",
+  "path": "/performances/{performanceId}/cancel",
+  "contract": "catalogue",
+  "summary": "Cancel a performance",
+  "permission": "PERFORMANCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PerformanceCancellationResult"
+ },
+ "completeUpload": {
+  "method": "POST",
+  "path": "/media/uploads/{uploadId}/complete",
+  "contract": "assets",
+  "summary": "Confirm an upload and create the asset",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaAsset"
+ },
+ "createTransportPassType": {
+  "method": "POST",
+  "path": "/transport/pass-types",
+  "contract": "transport",
+  "summary": "Define a multi-trip or unlimited pass",
+  "permission": "TRANSPORT_PRICE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePassTypeRequest",
+  "responds": "PassType"
+ },
+ "createTransportRoute": {
+  "method": "POST",
+  "path": "/transport/routes",
+  "contract": "transport",
+  "summary": "Define a route with its ordered stops",
+  "permission": "TRANSPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateTransportRouteRequest",
+  "responds": "TransportRoute"
+ },
+ "createTransportStation": {
+  "method": "POST",
+  "path": "/transport/stations",
+  "contract": "transport",
+  "summary": "Add a station",
+  "permission": "TRANSPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateStationRequest",
+  "responds": "Station"
+ },
+ "createTransportTimetable": {
+  "method": "POST",
+  "path": "/transport/routes/{routeId}/timetables",
+  "contract": "transport",
+  "summary": "Draft a timetable for a route",
+  "permission": "TRANSPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateTimetableRequest",
+  "responds": "Timetable"
+ },
+ "createUpload": {
+  "method": "POST",
+  "path": "/media/uploads",
+  "contract": "assets",
+  "summary": "Request a signed upload URL",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "UploadTicket"
+ },
+ "getTransportFareTable": {
+  "method": "GET",
+  "path": "/transport/routes/{routeId}/fare-table",
+  "contract": "transport",
+  "summary": "A route's fares and passenger types",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FareTable"
+ },
+ "getTransportNetworkImport": {
+  "method": "GET",
+  "path": "/transport/network-imports/{importId}",
+  "contract": "transport",
+  "summary": "An import's status, preview counts and findings",
+  "permission": "TRANSPORT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TransportNetworkImport"
+ },
+ "getTransportRoute": {
+  "method": "GET",
+  "path": "/transport/routes/{routeId}",
+  "contract": "transport",
+  "summary": "A route with its stops",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TransportRoute"
+ },
+ "importTransportNetwork": {
+  "method": "POST",
+  "path": "/transport/network-imports",
+  "contract": "transport",
+  "summary": "Read a network file into a preview",
+  "permission": "TRANSPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ImportTransportNetworkRequest",
+  "responds": null
+ },
+ "listTransportPassTypes": {
+  "method": "GET",
+  "path": "/transport/pass-types",
+  "contract": "transport",
+  "summary": "The venue's multi-trip pass types",
+  "permission": "TRANSPORT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listTransportRouteDepartures": {
+  "method": "GET",
+  "path": "/transport/routes/{routeId}/departures",
+  "contract": "transport",
+  "summary": "A route's departures, for operations",
+  "permission": "TRANSPORT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listTransportRoutes": {
+  "method": "GET",
+  "path": "/transport/routes",
+  "contract": "transport",
+  "summary": "Routes, optionally those serving a pair of stations",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "fromStationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "toStationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listTransportStations": {
+  "method": "GET",
+  "path": "/transport/stations",
+  "contract": "transport",
+  "summary": "Stations of a venue's transport network",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "includeInactive",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listTransportTimetables": {
+  "method": "GET",
+  "path": "/transport/routes/{routeId}/timetables",
+  "contract": "transport",
+  "summary": "A route's timetables",
+  "permission": "TRANSPORT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "publishTransportTimetable": {
+  "method": "POST",
+  "path": "/transport/timetables/{timetableId}/publish",
+  "contract": "transport",
+  "summary": "Publish a timetable and release its departures",
+  "permission": "TRANSPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Timetable"
+ },
+ "quoteTransportFare": {
+  "method": "POST",
+  "path": "/transport/fare-quotes",
+  "contract": "transport",
+  "summary": "Price a one-way trip or a pass for a party",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "FareQuoteRequest",
+  "responds": "FareQuote"
+ },
+ "setTransportFareTable": {
+  "method": "PUT",
+  "path": "/transport/routes/{routeId}/fare-table",
+  "contract": "transport",
+  "summary": "Set a route's fares and passenger types",
+  "permission": "TRANSPORT_PRICE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SetFareTableRequest",
+  "responds": "FareTable"
+ },
+ "setTransportRouteStatus": {
+  "method": "PUT",
+  "path": "/transport/routes/{routeId}/status",
+  "contract": "transport",
+  "summary": "Activate, suspend or retire a route",
+  "permission": "TRANSPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TransportRoute"
+ },
+ "updateTransportDeparture": {
+  "method": "PATCH",
+  "path": "/transport/departures/{departureId}",
+  "contract": "transport",
+  "summary": "Change a departure's coach or capacity",
+  "permission": "TRANSPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Departure"
+ },
+ "updateTransportPassType": {
+  "method": "PATCH",
+  "path": "/transport/pass-types/{passTypeId}",
+  "contract": "transport",
+  "summary": "Amend or retire a pass type",
+  "permission": "TRANSPORT_PRICE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PassType"
+ },
+ "updateTransportRoute": {
+  "method": "PATCH",
+  "path": "/transport/routes/{routeId}",
+  "contract": "transport",
+  "summary": "Amend a route",
+  "permission": "TRANSPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TransportRoute"
+ },
+ "updateTransportStation": {
+  "method": "PATCH",
+  "path": "/transport/stations/{stationId}",
+  "contract": "transport",
+  "summary": "Amend or deactivate a station",
+  "permission": "TRANSPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Station"
+ },
+ "updateTransportTimetable": {
+  "method": "PATCH",
+  "path": "/transport/timetables/{timetableId}",
+  "contract": "transport",
+  "summary": "Amend a draft timetable",
+  "permission": "TRANSPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Timetable"
+ },
+ "withdrawTransportTimetable": {
+  "method": "POST",
+  "path": "/transport/timetables/{timetableId}/withdraw",
+  "contract": "transport",
+  "summary": "Withdraw a published timetable",
+  "permission": "TRANSPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Timetable"
+ }
+}

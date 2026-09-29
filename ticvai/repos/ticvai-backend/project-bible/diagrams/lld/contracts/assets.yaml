@@ -14,8 +14,13 @@ operations:
   - staff
   offline: false
   reads:
+  - assets.media_asset
   - assets.tag
-  writes: []
+  - cache:idempotency
+  writes:
+  - assets.media_fingerprint
+  - assets.tag
+  - cache:idempotency
 - operation: bulkUpdateMediaAssets
   verb: POST
   path: /media-assets/bulk
@@ -24,8 +29,16 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - assets.media_asset
+  - assets.tag
+  - assets.taxonomy
+  - cache:idempotency
+  writes:
+  - assets.audit
+  - assets.media_asset
+  - assets.tag
+  - cache:idempotency
 - operation: completeUpload
   verb: POST
   path: /media/uploads/{uploadId}/complete
@@ -36,9 +49,11 @@ operations:
   offline: false
   reads:
   - assets.media_asset
+  - assets.media_upload
   - cache:idempotency
   writes:
   - assets.media_asset
+  - assets.media_fingerprint
   - cache:idempotency
 - operation: createCollection
   verb: POST
@@ -102,7 +117,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - assets.asset_version
+  - assets.media_asset
+  - assets.media_fingerprint
+  - assets.tag
   writes: []
 - operation: getExpiringRights
   verb: GET
@@ -135,7 +154,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - assets.distribution_channel
+  - assets.media_asset
+  - assets.media_usage
+  - assets.rendition
   writes: []
 - operation: getMediaTaxonomy
   verb: GET
@@ -156,7 +179,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - assets.audit
+  - assets.media_asset
+  - assets.media_usage
+  - assets.share
+  - assets.tag
   writes: []
 - operation: listCollections
   verb: GET
@@ -214,7 +242,9 @@ operations:
   - assets.media_asset
   - cache:idempotency
   writes:
+  - assets.asset_version
   - assets.media_asset
+  - assets.media_fingerprint
   - cache:idempotency
 - operation: requestMediaRendition
   verb: POST
@@ -258,8 +288,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - assets.media_asset
+  - cache:idempotency
+  writes:
+  - assets.media_asset
+  - cache:idempotency
 - operation: setMediaAssetTags
   verb: PUT
   path: /media-assets/{assetId}/tags

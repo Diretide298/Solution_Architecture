@@ -1,6 +1,6 @@
 # WS97 — Rental Management board 10
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 8 operations · 12 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `ASSET_VIEW, PRODUCT_VIEW, RENTAL_VIEW, REPORT_VIEW_TENANT, REPORT_VIEW_VENUE, RESOURCE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,20 +60,20 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-584` | Rental Executive Command Center | listDetail | 0 | 0 | — |
-| `BO-585` | Rental Revenue & Commercial Analytics | commandCentre | 0 | 0 | — |
-| `BO-586` | Utilization & Capacity Analytics | commandCentre | 0 | 0 | — |
-| `BO-587` | Inventory & Equipment Performance Analytics | commandCentre | 0 | 0 | — |
-| `BO-588` | Rental Duration, Extension & Return Analytics | commandCentre | 0 | 0 | — |
-| `BO-589` | Damage, Loss, Deposit & Exception Analytics | commandCentre | 0 | 0 | — |
-| `BO-590` | Location & Channel Performance | listDetail | 0 | 0 | — |
-| `BO-591` | Rental Forecasting & Demand Intelligence | commandCentre | 0 | 0 | — |
-| `BO-592` | Audit, Governance & Operational Control | listDetail | 0 | 0 | — |
-| `BO-593` | AI Rental Management Copilot & Action Center | commandCentre | 0 | 0 | — |
+| `BO-584` | Rental Executive Command Center | listDetail | 1 | 0 | — |
+| `BO-585` | Rental Revenue & Commercial Analytics | commandCentre | 1 | 0 | — |
+| `BO-586` | Utilization & Capacity Analytics | commandCentre | 1 | 0 | — |
+| `BO-587` | Inventory & Equipment Performance Analytics | commandCentre | 1 | 0 | — |
+| `BO-588` | Rental Duration, Extension & Return Analytics | commandCentre | 1 | 0 | — |
+| `BO-589` | Damage, Loss, Deposit & Exception Analytics | commandCentre | 1 | 0 | — |
+| `BO-590` | Location & Channel Performance | listDetail | 1 | 0 | — |
+| `BO-591` | Rental Forecasting & Demand Intelligence | commandCentre | 1 | 0 | — |
+| `BO-592` | Audit, Governance & Operational Control | listDetail | 1 | 0 | — |
+| `BO-593` | AI Rental Management Copilot & Action Center | commandCentre | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-584, BO-590, BO-592, BO-593 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-584, BO-592, BO-593 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -222,10 +221,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the rental executive are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listRentalBookings",
+    "contract": "rental",
+    "purpose": "The commercial picture",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-584"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-584",
+   "workshopBoard": "wireframes/WS125 Rental Management Board 10.dc.html#bo-584"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 124. 0 of 8 labels bound to a contract property; 8 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -384,7 +392,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the rental revenue commercial are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Rental revenue",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Gross Rental Revenue",
@@ -397,7 +413,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-585"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-585",
+   "workshopBoard": "wireframes/WS125 Rental Management Board 10.dc.html#bo-585"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 126. 0 of 8 labels bound to a contract property; 18 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -514,10 +531,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the utilization capacity analytics are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getResourceUtilisation",
+    "contract": "resources",
+    "purpose": "Utilisation and capacity",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-586"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-586",
+   "workshopBoard": "wireframes/WS125 Rental Management Board 10.dc.html#bo-586"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 127. 0 of 0 labels bound to a contract property; 7 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -688,7 +714,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the inventory equipment performance are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getAssetHistory",
+    "contract": "maintenance",
+    "purpose": "Equipment performance",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Total Assets",
@@ -697,11 +731,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "Maintenance",
     "Out of Service",
     "Lost"
+   ],
+   "params": [
+    {
+     "name": "assetId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-587"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-587",
+   "workshopBoard": "wireframes/WS125 Rental Management Board 10.dc.html#bo-587"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 127. 0 of 6 labels bound to a contract property; 14 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -823,10 +864,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the rental duration extension are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listRentalBookings",
+    "contract": "rental",
+    "purpose": "Duration, extension and return",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-588"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-588",
+   "workshopBoard": "wireframes/WS125 Rental Management Board 10.dc.html#bo-588"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 128. 0 of 0 labels bound to a contract property; 8 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -958,7 +1008,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the damage loss deposit are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listRentalBookings",
+    "contract": "rental",
+    "purpose": "Damage, loss and deposit exceptions",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Damage Cases",
@@ -971,7 +1029,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-589"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-589",
+   "workshopBoard": "wireframes/WS125 Rental Management Board 10.dc.html#bo-589"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 129. 0 of 0 labels bound to a contract property; 10 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1038,18 +1097,95 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Rental_Management.pdf, page 130"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Rental_Management.pdf, page 130"
    }
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "filters",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "KPI",
+       "operation": "getAnalyticsBenchmark",
+       "notes": "Sends `?kpiId=` (required): rentals, revenue, utilisation, availability or damage, one per read.",
+       "provenance": "contract reporting.yaml GET /analytics-benchmarks"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Locations",
+       "operation": "getAnalyticsBenchmark",
+       "notes": "Sends `?scopePaths=`.",
+       "provenance": "contract reporting.yaml GET /analytics-benchmarks"
+      },
+      {
+       "kind": "selectField",
+       "label": "Normalise by",
+       "operation": "getAnalyticsBenchmark",
+       "notes": "Sends `?normaliseBy=`.",
+       "provenance": "contract reporting.yaml GET /analytics-benchmarks"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Location comparison",
+       "bindsTo": "BenchmarkRow",
+       "columns": [
+        "BenchmarkRow.label",
+        "BenchmarkRow.value",
+        "BenchmarkRow.normalisedValue",
+        "BenchmarkRow.normaliseBy",
+        "BenchmarkRow.rank",
+        "BenchmarkRow.percentile"
+       ],
+       "operation": "getAnalyticsBenchmark",
+       "notes": "One KPI per read; the pack's side-by-side Rentals / Revenue / Utilization / Availability / Damage table needs one read per KPI.",
+       "provenance": "contract reporting.yaml GET /analytics-benchmarks"
+      },
+      {
+       "kind": "chart",
+       "label": "Channel comparison",
+       "columns": [
+        "Channel",
+        "Bookings",
+        "Revenue",
+        "Average value",
+        "Cancellation",
+        "No-show",
+        "Utilization contribution"
+       ],
+       "notes": "B2C, B2B, POS, Walk-In, Mobile App, API/Partner. Benchmarks compare scope paths, not sales channels.",
+       "provenance": "pack Rental_Management.pdf, page 130"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "AI rebalancing insight",
+       "columns": [
+        "Insight",
+        "Recommendation",
+        "Linked inventory transfer"
+       ],
+       "notes": "The pack's Marina A to North Station example; no operation returns it.",
+       "provenance": "pack Rental_Management.pdf, page 130"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The location channel performance list.",
@@ -1058,12 +1194,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the location channel performance are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getAnalyticsBenchmark",
+    "contract": "reporting",
+    "purpose": "Location and channel performance",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-590"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-590",
+   "workshopBoard": "wireframes/WS125 Rental Management Board 10.dc.html#bo-590"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 130. 0 of 0 labels bound to a contract property; 0 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 130. 0 of 0 labels bound to a contract property; 0 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Rental_Management.pdf p.130; contract reporting.yaml GET /analytics-benchmarks. Pack labels with no schema field yet (shown as plain labels): Channel dimension (B2C, B2B, POS, Walk-In, Mobile App, API), Bookings, Average value, Cancellation, No-show, Utilization contribution, AI rebalancing insight.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1173,7 +1318,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the rental forecasting demand are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listDemandBookingCurve",
+    "contract": "catalogue",
+    "purpose": "Demand forecast",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Expected Rentals",
@@ -1186,7 +1339,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-591"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-591",
+   "workshopBoard": "wireframes/WS125 Rental Management Board 10.dc.html#bo-591"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 131. 0 of 0 labels bound to a contract property; 6 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1331,7 +1485,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the audit governance operational are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getResourceAuditTrail",
+    "contract": "resources",
+    "purpose": "Governance and audit",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Product configuration change",
@@ -1340,11 +1502,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "Price change",
     "Deposit override",
     "Booking modification"
+   ],
+   "params": [
+    {
+     "name": "resourceId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-592"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-592",
+   "workshopBoard": "wireframes/WS125 Rental Management Board 10.dc.html#bo-592"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 131. 0 of 16 labels bound to a contract property; 16 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1419,6 +1588,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "metricTile",
        "label": "↓",
        "provenance": "pack Rental_Management.pdf, page 133 §KPIs & Dashboards"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "askReportingQuestion",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "askReportingQuestion"
       }
      ]
     }
@@ -1431,7 +1613,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the rental copilot action are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "askReportingQuestion",
+    "contract": "reporting",
+    "purpose": "Ask about rentals",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "↓"
@@ -1439,7 +1629,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-593"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-593",
+   "workshopBoard": "wireframes/WS125 Rental Management Board 10.dc.html#bo-593"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 133. 0 of 0 labels bound to a contract property; 1 of 112 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1473,7 +1664,259 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
-{}
+{
+ "askReportingQuestion": {
+  "method": "POST",
+  "path": "/reports/ask",
+  "contract": "reporting",
+  "summary": "Natural-language reporting query",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "NaturalLanguageAnswer"
+ },
+ "getAnalyticsBenchmark": {
+  "method": "GET",
+  "path": "/analytics-benchmarks",
+  "contract": "reporting",
+  "summary": "One site against another, on a like-for-like basis",
+  "permission": "REPORT_VIEW_TENANT",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "kpiId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "scopePaths",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "normaliseBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "BenchmarkRow"
+ },
+ "getAssetHistory": {
+  "method": "GET",
+  "path": "/assets/{assetId}/history",
+  "contract": "maintenance",
+  "summary": "Service history",
+  "permission": "ASSET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "getKpiValues": {
+  "method": "GET",
+  "path": "/kpi-values",
+  "contract": "reporting",
+  "summary": "Current values, against target, with movement",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kpiIds",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kpiCodes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "compareTo",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KpiValue"
+ },
+ "getResourceAuditTrail": {
+  "method": "GET",
+  "path": "/resources/{resourceId}/audit",
+  "contract": "resources",
+  "summary": "Every material change, with who and why",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResourceAuditEntry"
+ },
+ "getResourceUtilisation": {
+  "method": "GET",
+  "path": "/resource-utilisation",
+  "contract": "resources",
+  "summary": "How much of each resource's available time was used",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceUtilisation"
+ },
+ "listDemandBookingCurve": {
+  "method": "GET",
+  "path": "/demand-booking-curve",
+  "contract": "catalogue",
+  "summary": "AI Demand Forecasting & Booking Curve Studio",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "performance",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "horizon",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listRentalBookings": {
+  "method": "GET",
+  "path": "/rental-bookings",
+  "contract": "rental",
+  "summary": "Reservations across venues and locations",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RentalBooking"
+ }
+}
 ```
 
 ## `schemas.json`
@@ -1481,5 +1924,535 @@ Method, path, parameters, request and response for every operation these screens
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
-{}
+{
+ "BenchmarkNormalisation": {
+  "type": "string",
+  "description": "The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`.",
+  "enum": [
+   "none",
+   "perVisitor",
+   "perOperatingHour",
+   "perStaffedPosition",
+   "perSquareMetre"
+  ]
+ },
+ "BenchmarkRow": {
+  "type": "object",
+  "description": "BI board 10.4. **The normalisation travels with the comparison.**",
+  "properties": {
+   "scopePath": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "value": {
+    "$ref": "#/components/schemas/MetricValue"
+   },
+   "normalisedValue": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   },
+   "normaliseBy": {
+    "$ref": "#/components/schemas/BenchmarkNormalisation"
+   },
+   "rank": {
+    "type": "integer"
+   },
+   "percentile": {
+    "type": "number",
+    "nullable": true
+   }
+  }
+ },
+ "GeneratedQuery": {
+  "x-ticvai-persistence": "none — embedded; stored whole in `reporting.natural_language_query`",
+  "type": "object",
+  "description": "The structured query a natural-language question produced — data source, columns, filters, grouping. Named on 26 September so the answer and the kept copy are one shape.\n",
+  "properties": {
+   "dataSource": {
+    "$ref": "#/components/schemas/DataSource"
+   },
+   "columns": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ReportColumn"
+    }
+   },
+   "filters": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ReportFilter"
+    }
+   },
+   "groupBy": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "KpiValue": {
+  "type": "object",
+  "description": "BI board 10.3. **Value, target, variance, direction and freshness in one read.**",
+  "properties": {
+   "kpiId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "period": {
+    "type": "string"
+   },
+   "value": {
+    "$ref": "#/components/schemas/MetricValue"
+   },
+   "target": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   },
+   "comparison": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   },
+   "variancePercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "direction": {
+    "type": "string",
+    "enum": [
+     "up",
+     "down",
+     "flat"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "green",
+     "amber",
+     "red",
+     "noTarget"
+    ]
+   },
+   "asOf": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "stale": {
+    "type": "boolean",
+    "description": "**True when the pipeline behind it has not refreshed.** A number nobody flagged as stale is a number somebody will act on.\n"
+   }
+  }
+ },
+ "MetricValue": {
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**A reading of a metric or KPI, or a threshold on one.** A `Money` where the metric is money-valued — `MetricSource` lists those in `x-ticvai-money-valued`, and a KPI is when its `unit` is `currency` — and a plain number otherwise. naming-and-style 5.1: money is never a float, at any layer.\nStored as `numeric(18,4)` either way: a money value stores its amount, and currency and scale resolve from the scope as they do for every `Money`.\n",
+  "oneOf": [
+   {
+    "type": "number"
+   },
+   {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  ]
+ },
+ "NaturalLanguageAnswer": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "conversationId",
+   "question",
+   "interpretation",
+   "result",
+   "confidence"
+  ],
+  "properties": {
+   "conversationId": {
+    "type": "string"
+   },
+   "question": {
+    "type": "string"
+   },
+   "interpretation": {
+    "type": "string",
+    "description": "What the question was understood to mean, in plain language."
+   },
+   "generatedQuery": {
+    "$ref": "#/components/schemas/GeneratedQuery",
+    "description": "The structured query produced — data source, columns, filters, grouping. Returned so the answer can be checked. An answer nobody can verify is worse than no answer. **Also kept, as `NaturalLanguageQuery`**, for `saveNaturalLanguageQuery`.\n"
+   },
+   "result": {
+    "$ref": "#/components/schemas/ReportResult"
+   },
+   "confidence": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1
+   },
+   "suggestedFollowUps": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "modelVersion": {
+    "type": "string"
+   },
+   "tokensUsed": {
+    "type": "integer"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "RentalBooking": {
+  "type": "object",
+  "x-ticvai-persistence": "rental.booking",
+  "description": "Board 5. **The booking outlives the order** — an order completes at payment and the rental is still out.\n",
+  "required": [
+   "id",
+   "productId",
+   "from",
+   "to",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "reference": {
+    "type": "string"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "returnLocationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "customerId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "from": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "to": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "quantity": {
+    "type": "integer"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "confirmed",
+     "awaitingArrival",
+     "checkedOut",
+     "overdue",
+     "partiallyReturned",
+     "completed",
+     "completedWithDamage",
+     "notReturned",
+     "cancelled",
+     "noShow"
+    ]
+   },
+   "checkedOutAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "dueBackAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "returnedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "depositAuthorisationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "accruedLateFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "readiness": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**Computed, not stored** — agreement, requirements, deposit, equipment.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "check": {
+       "type": "string"
+      },
+      "satisfied": {
+       "type": "boolean"
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "participants": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/RentalParticipant"
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "RentalParticipant": {
+  "type": "object",
+  "x-ticvai-persistence": "rental.participant",
+  "description": "Board 5.5. **A group rental is one booking with participants**, because the agreement, the deposit and the return are handled together.\n",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "isPrimaryRenter": {
+    "type": "boolean",
+    "default": false
+   },
+   "dateOfBirth": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "idNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "guardianName": {
+    "type": "string",
+    "nullable": true
+   },
+   "emergencyContact": {
+    "type": "string",
+    "nullable": true
+   },
+   "hasSignedWaiver": {
+    "type": "boolean",
+    "readOnly": true
+   },
+   "customFields": {
+    "type": "object",
+    "additionalProperties": true
+   }
+  }
+ },
+ "ReportResult": {
+  "x-ticvai-persistence": "none — result set, cached in object storage",
+  "type": "object",
+  "required": [
+   "executionId",
+   "columns",
+   "rows"
+  ],
+  "properties": {
+   "executionId": {
+    "type": "string"
+   },
+   "columns": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "key": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string"
+      },
+      "type": {
+       "$ref": "#/components/schemas/FieldType"
+      }
+     }
+    }
+   },
+   "rows": {
+    "type": "array",
+    "description": "**Open on purpose; the shape is `columns`.** Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a `Money`, dates, date-times and uuids as strings. A report's columns are chosen at run time, so no fixed schema can name them.\n",
+    "items": {
+     "type": "object",
+     "additionalProperties": true
+    }
+   },
+   "totals": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Aggregated columns only, keyed and typed as a row is."
+   },
+   "rowCount": {
+    "type": "integer"
+   },
+   "nextCursor": {
+    "type": "string",
+    "nullable": true
+   },
+   "generatedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "dataAsOf": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it prevents an argument about a figure that moved.\n"
+   }
+  }
+ },
+ "ResourceAuditEntry": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.resource_audit",
+  "description": "Board 1.10. **Immutable, and it carries the previous value.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "resourceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "actorId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "action": {
+    "type": "string"
+   },
+   "field": {
+    "type": "string",
+    "nullable": true
+   },
+   "previousValue": {
+    "nullable": true
+   },
+   "newValue": {
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "sourceChannel": {
+    "type": "string",
+    "nullable": true
+   },
+   "apiOrigin": {
+    "type": "string",
+    "nullable": true
+   },
+   "correlationId": {
+    "type": "string",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "ResourceUtilisation": {
+  "type": "object",
+  "description": "Board 10.02. **Booked time over available time**, where available knows about schedules, blocks, setup and travel.\n",
+  "properties": {
+   "key": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "availableMinutes": {
+    "type": "integer"
+   },
+   "bookedMinutes": {
+    "type": "integer"
+   },
+   "blockedMinutes": {
+    "type": "integer"
+   },
+   "utilisationPercent": {
+    "type": "number"
+   },
+   "bookingCount": {
+    "type": "integer"
+   }
+  }
+ }
+}
 ```

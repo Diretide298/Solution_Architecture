@@ -17,62 +17,63 @@ tiers:
 contracts:
 - contract: marketing-crm
   tier: satellite
-  operations: 248
+  operations: 253
   holds: null
   service: MarketingService
   verbs:
-    GET: 118
+    GET: 120
     POST: 68
-    PUT: 55
+    PUT: 58
     PATCH: 5
     DELETE: 2
   guestCallable: 42
   offlineCapable: 11
   events: null
   ref: diagrams/lld/contracts/marketing-crm.yaml
+- contract: access
+  tier: spine
+  operations: 243
+  holds: null
+  service: AccessService
+  verbs:
+    GET: 123
+    PUT: 79
+    POST: 31
+    DELETE: 8
+    PATCH: 2
+  guestCallable: 12
+  offlineCapable: 14
+  events:
+  - access-validated
+  ref: diagrams/lld/contracts/access.yaml
 - contract: catalogue
   tier: spine
-  operations: 214
+  operations: 236
   holds: null
   service: CatalogueService
   verbs:
     GET: 119
-    PUT: 47
-    POST: 39
-    PATCH: 7
+    PUT: 62
+    POST: 45
+    PATCH: 8
     DELETE: 2
   guestCallable: 20
   offlineCapable: 10
   events:
   - catalogue-productPublished
   - entitlement-issued
+  - entitlement-statusChanged
   - performance-cancelled
   ref: diagrams/lld/contracts/catalogue.yaml
-- contract: access
-  tier: spine
-  operations: 206
-  holds: null
-  service: AccessService
-  verbs:
-    GET: 123
-    PUT: 60
-    POST: 19
-    PATCH: 2
-    DELETE: 2
-  guestCallable: 11
-  offlineCapable: 12
-  events:
-  - access-validated
-  ref: diagrams/lld/contracts/access.yaml
 - contract: orders
   tier: spine
-  operations: 206
+  operations: 215
   holds: null
   service: OrderService
   verbs:
-    GET: 99
-    POST: 68
-    PUT: 33
+    GET: 102
+    POST: 73
+    PUT: 34
     DELETE: 3
     PATCH: 3
   guestCallable: 38
@@ -85,14 +86,14 @@ contracts:
   ref: diagrams/lld/contracts/orders.yaml
 - contract: promotions
   tier: satellite
-  operations: 146
+  operations: 153
   holds: null
   service: CatalogueService
   verbs:
-    GET: 97
-    POST: 25
-    PUT: 21
-    PATCH: 2
+    GET: 100
+    POST: 26
+    PUT: 23
+    PATCH: 3
     DELETE: 1
   guestCallable: 7
   offlineCapable: 7
@@ -100,13 +101,13 @@ contracts:
   ref: diagrams/lld/contracts/promotions.yaml
 - contract: subscription
   tier: satellite
-  operations: 129
+  operations: 145
   holds: null
   service: PlatformService
   verbs:
     GET: 65
-    POST: 37
-    PUT: 23
+    POST: 44
+    PUT: 32
     PATCH: 3
     DELETE: 1
   guestCallable: 3
@@ -145,6 +146,21 @@ contracts:
   offlineCapable: 6
   events: null
   ref: diagrams/lld/contracts/identity.yaml
+- contract: resources
+  tier: satellite
+  operations: 61
+  holds: null
+  service: VenueOpsService
+  verbs:
+    GET: 25
+    POST: 18
+    PUT: 13
+    DELETE: 4
+    PATCH: 1
+  guestCallable: 8
+  offlineCapable: 6
+  events: null
+  ref: diagrams/lld/contracts/resources.yaml
 - contract: white-label
   tier: satellite
   operations: 60
@@ -173,21 +189,6 @@ contracts:
   offlineCapable: 1
   events: null
   ref: diagrams/lld/contracts/wallet.yaml
-- contract: resources
-  tier: satellite
-  operations: 58
-  holds: null
-  service: VenueOpsService
-  verbs:
-    GET: 24
-    POST: 17
-    PUT: 13
-    DELETE: 3
-    PATCH: 1
-  guestCallable: 8
-  offlineCapable: 6
-  events: null
-  ref: diagrams/lld/contracts/resources.yaml
 - contract: finance
   tier: spine
   operations: 57
@@ -236,13 +237,13 @@ contracts:
   ref: diagrams/lld/contracts/inventory.yaml
 - contract: approvals
   tier: spine
-  operations: 48
+  operations: 49
   holds: null
   service: TenancyService
   verbs:
     GET: 20
+    POST: 14
     PUT: 14
-    POST: 13
     DELETE: 1
   guestCallable: 0
   offlineCapable: 0
@@ -267,13 +268,13 @@ contracts:
   ref: diagrams/lld/contracts/tenancy.yaml
 - contract: reporting
   tier: satellite
-  operations: 44
+  operations: 47
   holds: null
   service: ReportingService
   verbs:
-    GET: 24
-    POST: 10
-    PUT: 5
+    GET: 25
+    POST: 11
+    PUT: 6
     DELETE: 4
     PATCH: 1
   guestCallable: 0
@@ -281,6 +282,20 @@ contracts:
   events:
   - reporting-definitionPublished
   ref: diagrams/lld/contracts/reporting.yaml
+- contract: workforce
+  tier: satellite
+  operations: 45
+  holds: null
+  service: TenancyService
+  verbs:
+    GET: 24
+    POST: 11
+    PUT: 9
+    PATCH: 1
+  guestCallable: 0
+  offlineCapable: 5
+  events: null
+  ref: diagrams/lld/contracts/workforce.yaml
 - contract: rental
   tier: satellite
   operations: 43
@@ -295,20 +310,6 @@ contracts:
   offlineCapable: 5
   events: null
   ref: diagrams/lld/contracts/rental.yaml
-- contract: workforce
-  tier: satellite
-  operations: 43
-  holds: null
-  service: TenancyService
-  verbs:
-    GET: 23
-    POST: 11
-    PUT: 8
-    PATCH: 1
-  guestCallable: 0
-  offlineCapable: 5
-  events: null
-  ref: diagrams/lld/contracts/workforce.yaml
 - contract: payments
   tier: satellite
   operations: 41
@@ -324,13 +325,13 @@ contracts:
   ref: diagrams/lld/contracts/payments.yaml
 - contract: games
   tier: satellite
-  operations: 39
+  operations: 40
   holds: null
   service: VenueOpsService
   verbs:
     POST: 16
     GET: 12
-    PUT: 10
+    PUT: 11
     PATCH: 1
   guestCallable: 2
   offlineCapable: 6
@@ -398,11 +399,11 @@ contracts:
   ref: diagrams/lld/contracts/transport.yaml
 - contract: accreditation
   tier: satellite
-  operations: 29
+  operations: 30
   holds: null
   service: TenancyService
   verbs:
-    POST: 11
+    POST: 12
     GET: 11
     PUT: 7
   guestCallable: 2

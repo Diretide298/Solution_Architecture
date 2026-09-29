@@ -39,10 +39,7 @@
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-021 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-022",
@@ -101,10 +98,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "An authorized administrator can centrally understand and manage TICVAI's privacy, consent and preference configuration without navigating individual sales or customer modules.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Display configuration indicators such as; Configuration Type Scope Status) and no display directory — it is settings, not a population",
   "purpose": "Provide administrators with one central dashboard for configuring and governing TICVAI's privacy framework across tenants, brands, venues and customer channels.",
-  "purposeNote": "An authorized administrator can centrally understand and manage TICVAI's privacy, consent and preference configuration without navigating individual sales or customer modules.",
   "gaps": [
    {
     "operation": null,
@@ -261,12 +258,19 @@
     "contract": "marketing-crm",
     "purpose": "Privacy & Consent Configuration Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCustomerPrivacyConsent",
+    "contract": "marketing-crm",
+    "purpose": "Customer Privacy, Consent & Preference 360°",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-021"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-021",
+   "workshopBoard": "wireframes/WS102 Privacy  Consent   Preference Management Board 1.dc.html#cms-021"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 4. 0 of 10 labels bound to a contract property; 28 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -329,10 +333,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every governed processing purpose can be centrally documented, classified, versioned and associated with the appropriate TICVAI processes.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Create a central registry explaining why customer data is being collected or processed. This becomes the foundation used by consent forms, policies, customer journeys and downstream systems. Ticket Purchase & Fulfillment Customer Account Management Membership Administration Customer Support Transactional Communication Marketing Communication Personalization Analytics Fraud Prevention Security Biometric Processing Location-Based Services Loyalty Customer Research",
-  "purposeNote": "Every governed processing purpose can be centrally documented, classified, versioned and associated with the appropriate TICVAI processes.",
   "gaps": [
    {
     "operation": null,
@@ -388,7 +392,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-022"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-022",
+   "workshopBoard": "wireframes/WS102 Privacy  Consent   Preference Management Board 1.dc.html#cms-022"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 5. 0 of 0 labels bound to a contract property; 0 of 54 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -451,10 +456,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can create reusable, granular and version-controlled consent definitions without development effort.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure the actual consent objects that TICVAI may request from customers.",
-  "purposeNote": "Administrators can create reusable, granular and version-controlled consent definitions without development effort.",
   "layout": {
    "template": "form",
    "regions": [
@@ -573,16 +578,14 @@
     "operationId": "setConsentPurposes",
     "contract": "marketing-crm",
     "purpose": "Configure consent purposes",
-    "trigger": "onAction",
-    "invalidates": [
-     "setConsentPurposes"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-023"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-023",
+   "workshopBoard": "wireframes/WS102 Privacy  Consent   Preference Management Board 1.dc.html#cms-023"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 17 of 46 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -645,10 +648,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "downstream communication systems can consistently enforce.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Administrators define) and no display directory — it is settings, not a population",
   "purpose": "Define how customers control the communications they wish to receive. This screen should integrate strongly with CRM and Marketing but remain governed by the central Privacy Engine.",
-  "purposeNote": "downstream communication systems can consistently enforce.",
   "gaps": [
    {
     "operation": null,
@@ -774,16 +777,14 @@
     "operationId": "setCommunicationPreferenceMarketing",
     "contract": "marketing-crm",
     "purpose": "Communication Preference & Marketing Permission Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setCommunicationPreferenceMarketing"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-024"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-024",
+   "workshopBoard": "wireframes/WS102 Privacy  Consent   Preference Management Board 1.dc.html#cms-024"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 18 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -846,14 +847,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators maintain an auditable inventory of governed cookies and tracking technologies, their purposes and applicable consent requirements.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Maintain a centralized registry of cookies, SDKs, pixels and other governed tracking technologies used by TICVAI digital channels. This should cover more than traditional browser cookies.",
-  "purposeNote": "Administrators maintain an auditable inventory of governed cookies and tracking technologies, their purposes and applicable consent requirements.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Other tracking technology. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Analytics Tracker, Embedded Service, Other tracking technology. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 10 §Support"
    },
    {
@@ -876,6 +877,16 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Analytics Tracker",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 10 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Embedded Service",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 10 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Other tracking technology",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 10 §Support"
       }
@@ -883,14 +894,7 @@
     },
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listCookieTrackingDigital",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
+     "components": []
     }
    ]
   },
@@ -911,19 +915,16 @@
   ],
   "entryState": {
    "preloaded": [
-    "CookieTrackingDigitalTechnologyRegistryView.firstPartyCookie",
-    "CookieTrackingDigitalTechnologyRegistryView.thirdPartyCookie",
-    "CookieTrackingDigitalTechnologyRegistryView.mobileSdk",
-    "CookieTrackingDigitalTechnologyRegistryView.analyticsTracker",
-    "CookieTrackingDigitalTechnologyRegistryView.advertisingPixel"
+    "CookieTrackingDigitalTechnologyRegistryView.technologyType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-025"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-025",
+   "workshopBoard": "wireframes/WS102 Privacy  Consent   Preference Management Board 1.dc.html#cms-025"
   },
-  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 1 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 3 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -984,10 +985,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can design and publish branded cookie/privacy preference experiences without requiring source-code changes for ordinary configuration changes.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Provide a no-code designer for privacy/cookie interfaces displayed on digital channels.",
-  "purposeNote": "Authorized users can design and publish branded cookie/privacy preference experiences without requiring source-code changes for ordinary configuration changes.",
   "gaps": [
    {
     "operation": null,
@@ -1089,7 +1090,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-026"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-026",
+   "workshopBoard": "wireframes/WS102 Privacy  Consent   Preference Management Board 1.dc.html#cms-026"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 11 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1152,10 +1154,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "without duplicating configuration inside each frontend channel.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Potential capture points include; For each capture point define) and no display directory — it is settings, not a population",
   "purpose": "Define where, when and under what circumstances privacy notices and consent requests appear. This prevents each channel from implementing consent independently.",
-  "purposeNote": "without duplicating configuration inside each frontend channel.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1329,16 +1331,14 @@
     "operationId": "setConsentCapturePoint",
     "contract": "marketing-crm",
     "purpose": "Consent Capture Point & Customer Journey Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setConsentCapturePoint"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-027"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-027",
+   "workshopBoard": "wireframes/WS102 Privacy  Consent   Preference Management Board 1.dc.html#cms-027"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 12. 0 of 0 labels bound to a contract property; 28 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1401,10 +1401,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "which version was presented to a customer.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Manage customer-facing privacy notices and related governed documents with complete version control.",
-  "purposeNote": "which version was presented to a customer.",
   "gaps": [
    {
     "operation": null,
@@ -1459,17 +1459,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "PrivacyNoticePolicyTermsVersionManagementView.privacyPolicy",
-    "PrivacyNoticePolicyTermsVersionManagementView.privacyNotice",
-    "PrivacyNoticePolicyTermsVersionManagementView.cookieNotice",
-    "PrivacyNoticePolicyTermsVersionManagementView.marketingNotice",
-    "PrivacyNoticePolicyTermsVersionManagementView.biometricPrivacyNotice"
+    "PrivacyNoticePolicyTermsVersionManagementView.documentType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-028"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-028",
+   "workshopBoard": "wireframes/WS102 Privacy  Consent   Preference Management Board 1.dc.html#cms-028"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 2 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1532,10 +1529,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "separation between privacy consent and operational waivers.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Where required/configured) and no display directory — it is settings, not a population",
   "purpose": "Provide specialized privacy configuration for journeys involving children and guardians. This is especially important for TICVAI customers operating: Theme parks Attractions Camps Academies Family entertainment Children's events",
-  "purposeNote": "separation between privacy consent and operational waivers.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1609,16 +1606,14 @@
     "operationId": "setMinorGuardianAge",
     "contract": "marketing-crm",
     "purpose": "Minor, Guardian & Age-Based Privacy Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setMinorGuardianAge"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-029"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-029",
+   "workshopBoard": "wireframes/WS102 Privacy  Consent   Preference Management Board 1.dc.html#cms-029"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 8 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1673,14 +1668,14 @@
    "notes": "**Reached from CMS-021, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "live customer journeys. Board 1 — Final Screen Register # Backend Screen Core Responsibility 17.1. Privacy & Consent Configuration Command",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Detect configuration problems such as; Central configuration) and no display directory — it is settings, not a population",
   "purpose": "Act as the final governance gate before privacy configurations are deployed into production. No major privacy configuration should move directly from editing to production without validation. Board 1 defines what TICVAI's privacy rules are. Board 2 manages what happens after those rules are live and customers begin interacting with them.",
-  "purposeNote": "live customer journeys. Board 1 — Final Screen Register # Backend Screen Core Responsibility 17.1. Privacy & Consent Configuration Command",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Publish Now, Schedule Publication, Selected Channel. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Publish Now, Schedule Publication, Selected Tenant, Selected Brand, Selected Country, Selected Channel. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Support"
    }
   ],
@@ -1859,6 +1854,21 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Selected Tenant",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected Brand",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected Country",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Selected Channel",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Support"
       }
@@ -1877,18 +1887,16 @@
     "operationId": "approvePrivacyTesting",
     "contract": "marketing-crm",
     "purpose": "Privacy Configuration Testing, Approval & Publication",
-    "trigger": "onAction",
-    "invalidates": [
-     "approvePrivacyTesting"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-030"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-030",
+   "workshopBoard": "wireframes/WS102 Privacy  Consent   Preference Management Board 1.dc.html#cms-030"
   },
-  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 37 of 118 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 40 of 118 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P13",
    "audience": "staff",

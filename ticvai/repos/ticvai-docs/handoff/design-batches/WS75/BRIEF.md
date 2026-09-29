@@ -1,6 +1,6 @@
 # WS75 — Digital Asset Management DAM board 2
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 12 operations · 12 schemas · 3 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW, ASSET_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `CMS-071` | AI Asset Intelligence Command Center | listDetail | 0 | 0 | — |
-| `CMS-072` | AI Auto-Tagging & Content Understanding | listDetail | 0 | 1 | — |
-| `CMS-073` | Semantic & Natural-Language Asset Search | listDetail | 0 | 0 | — |
-| `CMS-074` | Visual Similarity & Related Asset Discovery | listDetail | 0 | 0 | — |
-| `CMS-075` | Duplicate & Near-Duplicate Management | listDetail | 0 | 1 | — |
-| `CMS-076` | Asset Version Control & Revision History | listDetail | 0 | 0 | — |
-| `CMS-077` | Version Comparison & Replacement Impact | listDetail | 0 | 0 | — |
-| `CMS-078` | Transformation & Rendition Management | configEditor | 0 | 0 | — |
-| `CMS-079` | Rendition Processing & Delivery Readiness | listDetail | 0 | 1 | — |
-| `CMS-080` | AI Quality, Intelligence Review & Recommendations | listDetail | 0 | 1 | — |
+| `CMS-071` | AI Asset Intelligence Command Center | listDetail | 2 | 0 | — |
+| `CMS-072` | AI Auto-Tagging & Content Understanding | listDetail | 2 | 1 | — |
+| `CMS-073` | Semantic & Natural-Language Asset Search | listDetail | 1 | 0 | — |
+| `CMS-074` | Visual Similarity & Related Asset Discovery | listDetail | 1 | 0 | — |
+| `CMS-075` | Duplicate & Near-Duplicate Management | listDetail | 3 | 2 | — |
+| `CMS-076` | Asset Version Control & Revision History | listDetail | 2 | 0 | — |
+| `CMS-077` | Version Comparison & Replacement Impact | listDetail | 1 | 0 | — |
+| `CMS-078` | Transformation & Rendition Management | configEditor | 2 | 0 | — |
+| `CMS-079` | Rendition Processing & Delivery Readiness | listDetail | 1 | 1 | — |
+| `CMS-080` | AI Quality, Intelligence Review & Recommendations | listDetail | 1 | 1 | — |
 
 ## Thin screens in this batch
 
-**CMS-073, CMS-074, CMS-076, CMS-077, CMS-078 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**CMS-073, CMS-076, CMS-077 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

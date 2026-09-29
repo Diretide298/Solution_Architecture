@@ -1,10 +1,102 @@
 id: LLD-subscription
-title: subscription — 129 operations
+title: subscription — 145 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
 service: PlatformService
 operations:
+- operation: actOnPartnerApplicationReview
+  verb: POST
+  path: /partner-applications/{applicationId}/review-actions
+  scope: tenant
+  permission: PARTNER_MANAGE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.partner
+  - control.partner_application
+  - control.partner_application_review_task
+  - control.partner_document
+  - identity.principal
+  writes:
+  - approvals.request
+  - cache:idempotency
+  - control.partner
+  - control.partner_application
+  - control.partner_application_review_task
+  - control.partner_status_history
+- operation: actOnPartnerCase
+  verb: POST
+  path: /partner-cases/{caseId}/actions
+  scope: tenant
+  permission: CASE_MANAGE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - approvals.sla_policy
+  - cache:idempotency
+  - control.partner_case
+  - identity.principal
+  writes:
+  - cache:idempotency
+  - control.partner_case
+  - control.partner_commission_line
+  - control.partner_settlement_batch
+- operation: actOnPartnerCommissionLine
+  verb: POST
+  path: /partner-commission-lines/{lineId}/actions
+  scope: tenant
+  permission: SETTLEMENT_RECONCILE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.partner_case
+  - control.partner_commission_line
+  writes:
+  - cache:idempotency
+  - control.partner_commission_line
+- operation: actOnPartnerReconciliationException
+  verb: POST
+  path: /partner-reconciliation-exceptions/{exceptionId}/actions
+  scope: tenant
+  permission: SETTLEMENT_RECONCILE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.partner_commission_line
+  - control.partner_reconciliation_exception
+  - identity.principal
+  writes:
+  - cache:idempotency
+  - control.partner_case
+  - control.partner_reconciliation_exception
+- operation: actOnPartnerSettlementBatch
+  verb: POST
+  path: /partner-settlement-batches/{batchId}/actions
+  scope: tenant
+  permission: SETTLEMENT_RECONCILE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.partner_case
+  - control.partner_commission_line
+  - control.partner_settlement_batch
+  - ledger.legal_entity
+  writes:
+  - cache:idempotency
+  - control.partner_commission_line
+  - control.partner_settlement_batch
 - operation: addCapacityPack
   verb: POST
   path: /capacity-packs
@@ -40,8 +132,17 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - approvals.request
+  - cache:idempotency
+  - control.partner_agreement
+  - control.partner_booking_limit
+  - control.partner_commercial_exception
+  writes:
+  - approvals.request
+  - cache:idempotency
+  - control.partner_booking_limit
+  - control.partner_commercial_exception
 - operation: approveMembershipProductValidation
   verb: PUT
   path: /membership-product-validation
@@ -50,8 +151,22 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.entitlement
+  - approvals.request
+  - cache:idempotency
+  - catalogue.product
+  - subscription.membership_eligibility_rule
+  - subscription.membership_entitlement
+  - subscription.membership_household_policy
+  - subscription.membership_product
+  - subscription.membership_renewal_policy
+  - subscription.membership_usage_policy
+  writes:
+  - approvals.request
+  - cache:idempotency
+  - subscription.membership_product
+  - subscription.membership_product_history
 - operation: approvePartnerStatuLifecycle
   verb: PUT
   path: /partner-statu-lifecycle
@@ -60,8 +175,21 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - control.channel_listing
+  - control.partner
+  - control.partner_agreement
+  - control.partner_allocation
+  - control.partner_status_history
+  - control.partner_user
+  - orders.sales_order
+  writes:
+  - approvals.request
+  - cache:idempotency
+  - control.partner
+  - control.partner_agreement
+  - control.partner_status_history
 - operation: cancelDecommission
   verb: POST
   path: /cells/{cellId}/cancel-decommission
@@ -115,6 +243,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.partner
   - control.partner_agreement
   - ledger.fx_rate
   - platform.tenant
@@ -122,6 +251,53 @@ operations:
   - approvals.request
   - cache:idempotency
   - control.partner_agreement
+- operation: createPartnerCase
+  verb: POST
+  path: /partner-cases
+  scope: tenant
+  permission: CASE_MANAGE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - approvals.sla_policy
+  - cache:idempotency
+  - control.partner
+  - control.partner_case
+  - control.partner_contact
+  - control.partner_settlement_batch
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - control.partner_case
+  - control.partner_commission_line
+  - control.partner_settlement_batch
+- operation: createPartnerChangeRequest
+  verb: POST
+  path: /partner-change-requests
+  scope: tenant
+  permission: ORDER_MODIFY
+  audience:
+  - partner
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.performance
+  - catalogue.product
+  - control.partner
+  - control.partner_agreement
+  - control.partner_allocation
+  - control.partner_booking_limit
+  - control.partner_change_request
+  - control.partner_commission_rule
+  - orders.order_line
+  - orders.sales_order
+  writes:
+  - approvals.request
+  - cache:idempotency
+  - control.partner_change_request
 - operation: createPartnerQuote
   verb: POST
   path: /partner-quotes
@@ -145,12 +321,14 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.partner
   - control.partner_agreement
   - control.partner_user
   - identity.principal
   - platform.scope
   writes:
   - cache:idempotency
+  - control.partner_contact
   - control.partner_user
 - operation: createPlan
   verb: POST
@@ -306,7 +484,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - control.invoice
+  - control.invoice_line
+  - control.usage_record
+  - subscription.contract
+  - subscription.licensing_model
   writes: []
 - operation: getCell
   verb: GET
@@ -389,7 +572,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - control.licence_add_on_limit
+  - control.usage_record
+  - subscription.capacity_pack
+  - subscription.contract
+  - subscription.enforcement_policy
+  - subscription.plan_limit
+  - subscription.tier_allowance
   writes: []
 - operation: getPlan
   verb: GET
@@ -544,7 +734,16 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
+  reads:
+  - approvals.request
+  - control.partner
+  - control.partner_agreement
+  - control.partner_allocation
+  - control.partner_commercial_exception
+  - control.partner_commission_rule
+  - control.partner_credit_profile
+  - orders.payment
+  - orders.sales_order
   writes: []
 - operation: listCommercialAgreementHealth
   verb: GET
@@ -554,7 +753,20 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
+  reads:
+  - approvals.request
+  - control.partner
+  - control.partner_agreement
+  - control.partner_allocation
+  - control.partner_commercial_exception
+  - control.partner_commission_rule
+  - control.partner_credit_profile
+  - control.partner_rate
+  - control.partner_security
+  - ledger.posting
+  - orders.payment
+  - orders.refund
+  - orders.sales_order
   writes: []
 - operation: listCommercialAllocationQuota
   verb: GET
@@ -564,7 +776,15 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
+  reads:
+  - catalogue.channel_capacity
+  - catalogue.performance
+  - control.channel_listing
+  - control.partner_agreement
+  - control.partner_allocation
+  - control.partner_user
+  - orders.order_line
+  - orders.sales_order
   writes: []
 - operation: listCommissionCalculationSettlement
   verb: GET
@@ -574,7 +794,17 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
+  reads:
+  - control.partner
+  - control.partner_agreement
+  - control.partner_commission_line
+  - control.partner_commission_rule
+  - control.partner_settlement_batch
+  - ledger.fx_rate
+  - ledger.legal_entity
+  - orders.order_line
+  - orders.refund
+  - orders.sales_order
   writes: []
 - operation: listCommissionMarginIncentive
   verb: GET
@@ -584,7 +814,13 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
+  reads:
+  - catalogue.price_list
+  - catalogue.product
+  - control.partner_agreement
+  - control.partner_commission_rule
+  - control.partner_commission_rule_tier
+  - control.partner_rate
   writes: []
 - operation: listCreditLimitExposure
   verb: GET
@@ -594,7 +830,14 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
+  reads:
+  - control.partner
+  - control.partner_agreement
+  - control.partner_credit_profile
+  - control.partner_user
+  - ledger.posting
+  - orders.payment
+  - orders.sales_order
   writes: []
 - operation: listDepositGuaranteeFinancial
   verb: GET
@@ -604,7 +847,11 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
+  reads:
+  - control.partner_agreement
+  - control.partner_security
+  - orders.payment
+  - orders.sales_order
   writes: []
 - operation: listLicensingModels
   verb: GET
@@ -625,7 +872,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - catalogue.product
+  - orders.sales_order
+  - subscription.membership_product
   writes: []
 - operation: listMemberExceptionOverride
   verb: GET
@@ -635,7 +886,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - approvals.request
+  - identity.principal
   writes: []
 - operation: listMemberLifecycleCase
   verb: GET
@@ -645,7 +899,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - approvals.request
+  - identity.principal
+  - orders.payment
+  - orders.refund
+  - orders.sales_order
   writes: []
 - operation: listMembershipActivationCredential
   verb: GET
@@ -655,7 +915,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - catalogue.product
+  - orders.order_line
+  - orders.sales_order
+  - subscription.membership_product
   writes: []
 - operation: listMembershipAnnualPass
   verb: GET
@@ -665,7 +930,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - approvals.request
+  - catalogue.product
+  - subscription.membership_eligibility_rule
+  - subscription.membership_entitlement
+  - subscription.membership_household_policy
+  - subscription.membership_product
+  - subscription.membership_renewal_policy
   writes: []
 - operation: listMembershipCommercialPricing
   verb: GET
@@ -675,7 +948,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.channel_capacity
+  - catalogue.price_list
+  - catalogue.product
+  - subscription.membership_product
   writes: []
 - operation: listMembershipFreezeSuspension
   verb: GET
@@ -685,7 +962,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - approvals.request
+  - subscription.membership_product
   writes: []
 - operation: listMembershipRenewalRetention
   verb: GET
@@ -695,7 +975,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - catalogue.product
+  - orders.order_line
+  - orders.refund
+  - orders.sales_order
+  - subscription.membership_product
   writes: []
 - operation: listMembershipUpgradeDowngrade
   verb: GET
@@ -705,7 +991,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - catalogue.product
+  - orders.payment
+  - orders.sales_order
+  - subscription.membership_product
   writes: []
 - operation: listMembershipUsageVisit
   verb: GET
@@ -715,7 +1006,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.product
+  - subscription.membership_product
+  - subscription.membership_usage_policy
   writes: []
 - operation: listModuleCatalogue
   verb: GET
@@ -737,7 +1031,20 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
+  reads:
+  - control.api_client
+  - control.channel_listing
+  - control.partner
+  - control.partner_agreement
+  - control.partner_application
+  - control.partner_credit_profile
+  - control.partner_distribution_right
+  - control.partner_document
+  - control.partner_scope_assignment
+  - control.partner_user
+  - control.webhook_delivery
+  - orders.payment
+  - orders.sales_order
   writes: []
 - operation: listPartner2
   verb: GET
@@ -747,7 +1054,20 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
+  reads:
+  - control.partner
+  - control.partner_agreement
+  - control.partner_allocation
+  - control.partner_case
+  - control.partner_commission_line
+  - control.partner_credit_profile
+  - control.partner_reconciliation_exception
+  - control.partner_settlement_batch
+  - ledger.fx_rate
+  - orders.order_line
+  - orders.payment
+  - orders.refund
+  - orders.sales_order
   writes: []
 - operation: listPartnerAccessRole
   verb: GET
@@ -757,7 +1077,10 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
+  reads:
+  - approvals.request
+  - control.partner_agreement
+  - control.partner_capability_grant
   writes: []
 - operation: listPartnerAgreements
   verb: GET
@@ -769,6 +1092,7 @@ operations:
   - partner
   offline: false
   reads:
+  - control.partner
   - control.partner_agreement
   writes: []
 - operation: listPartnerCancellationRefund
@@ -779,7 +1103,15 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
+  reads:
+  - approvals.request
+  - control.partner
+  - control.partner_agreement
+  - control.partner_booking_limit
+  - control.partner_change_request
+  - orders.order_line
+  - orders.refund
+  - orders.sales_order
   writes: []
 - operation: listPartnerContactUser
   verb: GET
@@ -789,7 +1121,11 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
+  reads:
+  - control.partner
+  - control.partner_contact
+  - control.partner_user
+  - identity.principal
   writes: []
 - operation: listPartnerDisputeCase
   verb: GET
@@ -799,7 +1135,14 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
+  reads:
+  - approvals.sla_policy
+  - control.partner
+  - control.partner_agreement
+  - control.partner_case
+  - control.partner_contact
+  - control.partner_user
+  - orders.sales_order
   writes: []
 - operation: listPartnerDocumentationCompliance
   verb: GET
@@ -809,7 +1152,10 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
+  reads:
+  - control.partner
+  - control.partner_agreement
+  - control.partner_document
   writes: []
 - operation: listPartnerOnboardingApplication
   verb: GET
@@ -819,7 +1165,12 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
+  reads:
+  - approvals.request
+  - control.partner
+  - control.partner_agreement
+  - control.partner_application
+  - control.partner_application_review_task
   writes: []
 - operation: listPartnerOrderBooking
   verb: GET
@@ -829,7 +1180,17 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
+  reads:
+  - catalogue.performance
+  - catalogue.product
+  - control.partner
+  - control.partner_agreement
+  - control.partner_commission_line
+  - control.partner_user
+  - identity.principal
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
   writes: []
 - operation: listPartnerPerformanceScorecard
   verb: GET
@@ -839,7 +1200,19 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
+  reads:
+  - control.channel_listing
+  - control.partner
+  - control.partner_agreement
+  - control.partner_allocation
+  - control.partner_case
+  - control.partner_credit_profile
+  - control.partner_document
+  - control.partner_security
+  - orders.order_line
+  - orders.payment
+  - orders.refund
+  - orders.sales_order
   writes: []
 - operation: listPartnerProfileReadiness
   verb: GET
@@ -849,7 +1222,21 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
+  reads:
+  - approvals.request
+  - control.channel_listing
+  - control.partner
+  - control.partner_agreement
+  - control.partner_capability_grant
+  - control.partner_contact
+  - control.partner_credit_profile
+  - control.partner_distribution_right
+  - control.partner_document
+  - control.partner_scope_assignment
+  - control.partner_user
+  - identity.principal
+  - orders.payment
+  - orders.sales_order
   writes: []
 - operation: listPartnerQuotes
   verb: GET
@@ -870,7 +1257,17 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
+  reads:
+  - control.channel_listing
+  - control.partner
+  - control.partner_agreement
+  - control.partner_commission_line
+  - control.partner_rate
+  - control.partner_reconciliation_exception
+  - ledger.posting
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
   writes: []
 - operation: listPartnerRelationship
   verb: GET
@@ -880,7 +1277,11 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
+  reads:
+  - control.partner
+  - control.partner_agreement
+  - orders.refund
+  - orders.sales_order
   writes: []
 - operation: listPartnerStatementAccount
   verb: GET
@@ -890,7 +1291,15 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
+  reads:
+  - control.partner_agreement
+  - control.partner_commission_line
+  - control.partner_credit_profile
+  - control.partner_settlement_batch
+  - ledger.posting
+  - orders.payment
+  - orders.refund
+  - orders.sales_order
   writes: []
 - operation: listPartnerUsers
   verb: GET
@@ -926,7 +1335,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - catalogue.product
+  - orders.payment
+  - orders.sales_order
+  - subscription.membership_product
+  - subscription.membership_renewal_policy
   writes: []
 - operation: listReservationHoldRelease
   verb: GET
@@ -936,7 +1351,13 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
+  reads:
+  - catalogue.channel_capacity
+  - catalogue.performance
+  - catalogue.product
+  - control.partner
+  - control.partner_agreement
+  - control.partner_allocation
   writes: []
 - operation: listSubscriptionInvoices
   verb: GET
@@ -991,7 +1412,10 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
+  reads:
+  - control.partner_agreement
+  - control.partner_distribution_right
+  - control.partner_scope_assignment
   writes: []
 - operation: listVenueTypeTemplates
   verb: GET
@@ -1012,7 +1436,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.entitlement
+  - catalogue.product
+  - subscription.membership_entitlement
+  - subscription.membership_product
+  - subscription.membership_usage_policy
   writes: []
 - operation: planTenantMigration
   verb: POST
@@ -1128,11 +1557,18 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.partner
   - control.partner_agreement
+  - control.partner_application
+  - control.partner_application_review_task
   writes:
   - approvals.request
   - cache:idempotency
+  - control.partner
   - control.partner_agreement
+  - control.partner_application
+  - control.partner_application_review_task
+  - control.partner_contact
 - operation: removeLicenceAddOn
   verb: DELETE
   path: /tenants/{tenantId}/licences/add-ons
@@ -1221,8 +1657,18 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - control.partner
+  - control.partner_agreement
+  - control.partner_document
+  - ledger.fx_rate
+  - ledger.legal_entity
+  writes:
+  - approvals.request
+  - cache:idempotency
+  - control.partner_agreement
+  - control.partner_document
 - operation: setChannelListing
   verb: PUT
   path: /channel-listings
@@ -1248,8 +1694,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - catalogue.product
+  - subscription.membership_household_policy
+  - subscription.membership_product
+  writes:
+  - cache:idempotency
+  - subscription.membership_household_policy
+  - subscription.membership_household_policy_role_limit
 - operation: setLicenceEnforcementPolicy
   verb: PUT
   path: /licence-enforcement
@@ -1282,8 +1735,32 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - access.entitlement
+  - cache:idempotency
+  - catalogue.product
+  - orders.order_line
+  - orders.sales_order
+  - subscription.membership_product
+  writes:
+  - cache:idempotency
+- operation: setMembershipCommercialConfig
+  verb: PUT
+  path: /membership-commercial-config
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.price_list
+  - catalogue.product
+  - subscription.membership_product
+  writes:
+  - cache:idempotency
+  - subscription.membership_product
+  - subscription.membership_product_history
 - operation: setMembershipEligibilityQualification
   verb: PUT
   path: /membership-eligibility-qualification
@@ -1292,8 +1769,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - catalogue.product
+  - subscription.membership_eligibility_rule
+  - subscription.membership_product
+  writes:
+  - cache:idempotency
+  - subscription.membership_eligibility_rule
+  - subscription.membership_product
 - operation: setMembershipEntitlementAdmission
   verb: PUT
   path: /membership-entitlement-admission
@@ -1302,8 +1786,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - catalogue.price_list
+  - catalogue.product
+  - subscription.membership_entitlement
+  - subscription.membership_product
+  writes:
+  - cache:idempotency
+  - subscription.membership_entitlement
 - operation: setMembershipProductTier
   verb: PUT
   path: /membership-product-tier
@@ -1312,8 +1803,31 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - catalogue.product
+  - subscription.membership_product
+  writes:
+  - cache:idempotency
+  - subscription.membership_product
+  - subscription.membership_product_history
+- operation: setMembershipUsagePolicy
+  verb: PUT
+  path: /membership-usage-policy
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - subscription.membership_product
+  - subscription.membership_usage_policy
+  writes:
+  - cache:idempotency
+  - subscription.membership_product
+  - subscription.membership_product_history
+  - subscription.membership_usage_policy
 - operation: setModuleListing
   verb: PUT
   path: /module-catalogue
@@ -1326,6 +1840,29 @@ operations:
   - subscription.module_listing
   writes:
   - subscription.module_listing
+- operation: setPartnerAllocations
+  verb: PUT
+  path: /partner-agreements/{agreementId}/allocations
+  scope: tenant
+  permission: PARTNER_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.channel_capacity
+  - catalogue.event
+  - catalogue.product
+  - control.partner_agreement
+  - control.partner_allocation
+  - control.partner_commission_rule
+  - control.partner_commission_rule_tier
+  - control.partner_credit_profile
+  - orders.order_line
+  writes:
+  - approvals.request
+  - cache:idempotency
+  - control.partner_allocation
 - operation: setPartnerBrandVenue
   verb: PUT
   path: /partner-brand-venue
@@ -1334,8 +1871,109 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - control.partner
+  - control.partner_agreement
+  - control.partner_scope_assignment
+  - platform.scope
+  writes:
+  - cache:idempotency
+  - control.partner_scope_assignment
+- operation: setPartnerCapabilityGrants
+  verb: PUT
+  path: /partners/{partnerId}/capability-grants
+  scope: tenant
+  permission: PARTNER_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.event
+  - control.partner
+  - control.partner_capability_grant
+  - control.partner_credit_profile
+  writes:
+  - cache:idempotency
+  - control.partner_capability_grant
+- operation: setPartnerCommissionRules
+  verb: PUT
+  path: /partner-agreements/{agreementId}/commission-rules
+  scope: tenant
+  permission: PARTNER_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.event
+  - catalogue.product
+  - control.partner_agreement
+  - control.partner_allocation
+  - control.partner_commission_rule
+  - control.partner_commission_rule_tier
+  - control.partner_credit_profile
+  writes:
+  - approvals.request
+  - cache:idempotency
+  - control.partner_commission_rule
+  - control.partner_commission_rule_tier
+- operation: setPartnerContact
+  verb: PUT
+  path: /partner-contacts
+  scope: tenant
+  permission: PARTNER_MANAGE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.partner
+  - control.partner_contact
+  - control.partner_user
+  writes:
+  - cache:idempotency
+  - control.partner_contact
+  - control.partner_user
+- operation: setPartnerCreditProfile
+  verb: PUT
+  path: /partner-agreements/{agreementId}/credit-profile
+  scope: tenant
+  permission: CREDIT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.partner_agreement
+  - control.partner_allocation
+  - control.partner_commission_rule
+  - control.partner_commission_rule_tier
+  - control.partner_credit_profile
+  - identity.principal
+  writes:
+  - approvals.request
+  - cache:idempotency
+  - control.partner_credit_profile
+- operation: setPartnerDistributionRights
+  verb: PUT
+  path: /partners/{partnerId}/distribution-rights
+  scope: tenant
+  permission: PARTNER_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.event
+  - control.partner
+  - control.partner_distribution_right
+  - platform.scope
+  writes:
+  - cache:idempotency
+  - control.partner_distribution_right
 - operation: setPartnerProfileOrganization
   verb: PUT
   path: /partner-profile-organization
@@ -1344,8 +1982,14 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - control.partner
+  - control.partner_agreement
+  - identity.principal
+  writes:
+  - cache:idempotency
+  - control.partner
 - operation: setPartnerRateNet
   verb: PUT
   path: /partner-rate-net
@@ -1354,8 +1998,35 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - catalogue.price_list
+  - catalogue.product
+  - control.partner_agreement
+  - control.partner_rate
+  - control.partner_rate_volume_band
+  writes:
+  - approvals.request
+  - cache:idempotency
+  - control.partner_rate
+  - control.partner_rate_volume_band
+- operation: setPartnerSecurity
+  verb: PUT
+  path: /partners/{partnerId}/securities
+  scope: tenant
+  permission: CREDIT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.partner
+  - control.partner_agreement
+  - control.partner_document
+  - control.partner_security
+  writes:
+  - cache:idempotency
+  - control.partner_security
 - operation: setPaymentTermBilling
   verb: PUT
   path: /payment-term-billing
@@ -1364,8 +2035,21 @@ operations:
   audience:
   - partner
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - control.partner
+  - control.partner_agreement
+  - control.partner_billing_profile
+  - control.partner_contact
+  - ledger.legal_entity
+  - ledger.posting
+  - orders.payment
+  - orders.sales_order
+  writes:
+  - approvals.request
+  - cache:idempotency
+  - control.partner_agreement
+  - control.partner_billing_profile
 - operation: setPlanTiers
   verb: PUT
   path: /plans/{planId}/tiers
@@ -1388,8 +2072,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - catalogue.product
+  - subscription.membership_product
+  - subscription.membership_renewal_policy
+  writes:
+  - cache:idempotency
+  - subscription.membership_renewal_policy
 - operation: setSubscription
   verb: PUT
   path: /tenants/{tenantId}/subscription
@@ -1424,8 +2114,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - catalogue.product
+  - subscription.membership_product
+  writes:
+  - cache:idempotency
+  - subscription.membership_product
 - operation: setVsiModel
   verb: PUT
   path: /vsi-models
@@ -1464,8 +2159,18 @@ operations:
   - staff
   - guest
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - control.licence_add_on
+  - control.licence_add_on_limit
+  - subscription.capacity_pack
+  - subscription.licensing_model
+  - subscription.module_listing
+  - subscription.plan
+  - subscription.tier_allowance
+  - subscription.tier_module
+  writes:
+  - cache:idempotency
 - operation: submitOnboardingApplication
   verb: POST
   path: /onboarding-applications
@@ -1537,6 +2242,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.partner
   - control.partner_agreement
   - ledger.fx_rate
   writes:

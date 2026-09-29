@@ -26,8 +26,14 @@
   "permission": "AI_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "AiPolicy"
  },
@@ -55,12 +61,51 @@
   "requestBody": null,
   "responds": "AiUsageReport"
  },
+ "getKpiValues": {
+  "method": "GET",
+  "path": "/kpi-values",
+  "contract": "reporting",
+  "summary": "Current values, against target, with movement",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kpiIds",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kpiCodes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "compareTo",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KpiValue"
+ },
  "getVenueSettings": {
   "method": "GET",
   "path": "/venues/{venueId}/settings",
   "contract": "tenancy",
   "summary": "Operational settings for this venue",
-  "permission": "TENANT_CONFIGURE",
+  "permission": "TENANT_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -73,7 +118,7 @@
   "path": "/audit-records",
   "contract": "tenancy",
   "summary": "Who did what, where, and when",
-  "permission": "AI_AUDIT_VIEW",
+  "permission": "AUDIT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -104,6 +149,11 @@
     "required": null
    },
    {
+    "name": "platformStaffGrantId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": "from",
     "in": "query",
     "required": null
@@ -112,10 +162,20 @@
     "name": "to",
     "in": "query",
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Page"
  },
  "listCampaigns": {
   "method": "GET",
@@ -174,7 +234,7 @@
   "method": "GET",
   "path": "/lost-items",
   "contract": "marketing-crm",
-  "summary": "Reported and found, with suggested matches",
+  "summary": "Reported and found items",
   "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -192,7 +252,36 @@
    }
   ],
   "requestBody": null,
-  "responds": "LostItem"
+  "responds": "Page"
+ },
+ "listPlatformStaffGrants": {
+  "method": "GET",
+  "path": "/platform-staff-grants",
+  "contract": "identity",
+  "summary": "Which platform staff have acted in this tenant, and under what grant",
+  "permission": "AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "activeOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "matchLostItem": {
   "method": "POST",
@@ -211,6 +300,25 @@
    }
   ],
   "requestBody": null,
+  "responds": "LostItem"
+ },
+ "recordLostItem": {
+  "method": "POST",
+  "path": "/lost-items",
+  "contract": "marketing-crm",
+  "summary": "Report something lost, or hand something in",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "LostItem",
   "responds": "LostItem"
  },
  "resolvePermissions": {
@@ -240,7 +348,7 @@
   "permission": "AI_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,

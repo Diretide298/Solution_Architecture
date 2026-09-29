@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Promotions & Bundles
   version: 0.1.0
-  x-ticvai-screen-count: 140
+  x-ticvai-screen-count: 147
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
   x-ticvai-requirements: 229
@@ -162,6 +162,10 @@ paths:
 
         **The `trafficPercent` of all variants must sum to exactly 100; there is no minimum per variant**
         (decided 28 September, audit R101). A variant at 0 is kept but receives no traffic.
+
+        **Writes `promotions.promotion_variant` and `promotions.promotion_audit`** in the same
+        transaction, as every promotions configuration change does (entityType `promotion`, eventType
+        `promotionEdited`) (decided 29 September, writers pass).
 
         '
       tags:
@@ -432,6 +436,11 @@ paths:
       description: 'Created in `draft`. A draft promotion never evaluates — publishing is the act that
         makes it live, and it appears at terminals with the next catalogue bundle.
 
+        **Writes `promotions.promotion` and `promotions.promotion_audit`** in the same transaction, as
+        every promotions configuration change does (entityType `promotion`, eventType
+        `promotionCreated`, promotionVersion 1). No channel publication row exists until
+        publishPromotion (decided 29 September, writers pass).
+
         '
       tags:
       - promotion
@@ -535,6 +544,13 @@ paths:
       description: 'Amending a live promotion changes behaviour mid-sale. Conditions and discount are
         editable only in draft; a live promotion may be paused, extended or ended, nothing more.
 
+        **Writes `promotions.promotion_channel_publication` and `promotions.promotion_audit`.** Each
+        channel row of the promotion that is `published` moves to `outOfSync`
+        (states/promotion-channel-publication.yaml) and the sync job pushes the new `version`; the audit
+        row records the changed fields before and after (eventType `promotionEdited`, or
+        `discountChanged`, `eligibilityChanged`, `datesChanged` where only that changed) with the new
+        promotionVersion (decided 29 September, writers pass).
+
         '
       tags:
       - promotion
@@ -598,6 +614,10 @@ paths:
       description: '**Carts already priced keep their price.** A guest mid-checkout is not repriced —
         the discount they were shown is the one they pay.
 
+        **Writes `promotions.promotion_channel_publication` and `promotions.promotion_audit`.** Each
+        `published` channel row moves to `suspended`, so the channel stops offering it; the audit row is
+        eventType `promotionPaused` with the reason given (decided 29 September, writers pass).
+
         '
       tags:
       - promotion
@@ -648,6 +668,11 @@ paths:
       description: 'Distinct from expiry. `expired` means it ran its course; `ended` means somebody decided,
         and the register should be able to answer which after a bad month.
 
+        **Writes `promotions.promotion_channel_publication` and `promotions.promotion_audit`.** Each
+        `published` channel row moves to `suspended` and stays there (the channel rows have no terminal
+        state); the audit row is eventType `promotionEnded` with the reason given (decided 29 September,
+        writers pass).
+
         '
       tags:
       - promotion
@@ -697,6 +722,10 @@ paths:
       summary: Pull a scheduled promotion before it starts
       description: 'Returns it to draft. Nothing has priced against it yet, so nothing needs honouring.
 
+        **Writes `promotions.promotion_audit`** in the same transaction, as every promotions
+        configuration change does (eventType `promotionUnscheduled`). No channel row has been published
+        yet, so none changes (decided 29 September, writers pass).
+
         '
       tags:
       - promotion
@@ -741,6 +770,14 @@ paths:
         **The floor is zero: a combined line price of zero or below is refused** (decided 28 September,
         audit R101). A line that stays above zero, however small, publishes. One that falls below the
         near-zero minimum (`ConflictAnalysis`, audit R096 (5)) publishes too, flagged rather than refused.
+
+        **Writes `promotions.promotion_channel_publication` and `promotions.promotion_audit`.** One row
+        per sales channel the promotion runs on goes to `pendingPublication` (created there when the
+        channel has none, resumed from `suspended` when it has), for the channel sync job to take up
+        (states/promotion-channel-publication.yaml); the audit row is eventType `promotionActivated`
+        with the published promotionVersion. The conflicts found here are recorded in
+        `promotions.promotion_conflict` by the conflict detection job, not by this operation (decided 29
+        September, writers pass).
 
         '
       tags:
@@ -893,6 +930,11 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Create a coupon campaign
+      description: 'Creates the coupon campaign (`promotions.coupon_campaign`). **Writes
+        `promotions.promotion_audit`** in the same transaction, as every promotions configuration change
+        does (entityType `couponCampaign`, eventType `created`) (decided 29 September, writers pass).
+
+        '
       tags:
       - coupon
       x-ticvai-permission: PRICE_CONFIGURE
@@ -983,6 +1025,10 @@ paths:
         **Codes are single-use by default** (the campaign''s `isSingleUse` defaults to true), and **the
         number of assigned guests must not exceed `quantity`**. Fewer is allowed: the codes left over
         are anonymous (decided 28 September, audit R101).
+
+        **Writes `promotions.promotion_audit`** in the same transaction, as every promotions
+        configuration change does: one row per batch, not per code (entityType `couponCampaign`,
+        eventType `modified`, newValue the batch id and quantity) (decided 29 September, writers pass).
 
         '
       tags:
@@ -1147,6 +1193,10 @@ paths:
       description: 'Allocates an issued code to a subject. Only that guest may redeem it, which is the
         difference between a campaign code and a service-recovery one.
 
+        **Writes `promotions.promotion_audit`** in the same transaction, as every promotions
+        configuration change does (entityType `couponCode`, entityId the code, eventType `assigned`)
+        (decided 29 September, writers pass).
+
         '
       tags:
       - coupon
@@ -1193,7 +1243,13 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Void a code
-      description: Cancellation, fraud, or a batch issued in error.
+      description: 'Cancellation, fraud, or a batch issued in error.
+
+        **Writes `promotions.promotion_audit`** in the same transaction, as every promotions
+        configuration change does (entityType `couponCode`, entityId the code, eventType `cancelled`,
+        with the reason) (decided 29 September, writers pass).
+
+        '
       tags:
       - coupon
       x-ticvai-permission: PRICE_CONFIGURE
@@ -1408,6 +1464,11 @@ paths:
         `proRataListPrice` is the default method; `percentage` and `fixedAmount` remain for an explicit
         split and follow the same remainder rule.
 
+        **Writes `promotions.promotion_audit`** in the same transaction, as every promotions
+        configuration change does (entityType `bundle`, eventType `created`). Capacity policies and
+        partner product mappings are set afterwards by setBundleCapacityPolicy and
+        setBundlePartnerProductMappings (decided 29 September, writers pass).
+
         '
       tags:
       - bundle
@@ -1495,6 +1556,10 @@ paths:
         date and whether the bundle is on sale. The one refusal it can meet is a price that breaks the
         split. Under a `fixedAmount` allocation the fixed amounts must sum to the bundle price (the same
         rule `createBundle` answers 400 for), and a new price with an unchanged split no longer does.
+
+        **Writes `promotions.promotion_audit`** in the same transaction, as every promotions
+        configuration change does (entityType `bundle`, eventType `modified`, the changed fields before
+        and after) (decided 29 September, writers pass).
 
         '
       tags:
@@ -1847,6 +1912,17 @@ paths:
         Terminals evaluate locally from the catalogue bundle. This endpoint serves online channels and
         lets the back office test a rule before publishing it.
 
+        **Reads `promotions.promotion_rule`**: a promotion whose `conditions.eligibilityRuleIds` names
+        reusable eligibility rules is eligible only when each named rule holds (decided 29 September,
+        writers pass).
+
+        **Writes `promotions.promotion_evaluation_trace` only when it prices an order being confirmed.**
+        The order service calls it with `orderId` when it prices an order for payment (createOrder,
+        convertReservation); that call stores one trace row for the order: which promotions were
+        evaluated, which were eligible, which applied in what order and why the others did not. A cart,
+        till or back-office evaluation sends no `orderId` and stores nothing (decided 29 September,
+        writers pass).
+
         '
       tags:
       - evaluation
@@ -1862,6 +1938,9 @@ paths:
               $ref: '#/components/schemas/EvaluatePromotionsRequest'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Evaluation
           content:
             application/json:
@@ -1909,6 +1988,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: promotionType
           in: query
           required: false
@@ -2266,6 +2346,8 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-146 Promotion Health & Performance Monitor"
         - "P09 ADM-228 Promotion Performance Command Center"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.16; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape agreed as drafted'
@@ -2402,6 +2484,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Promotion Rule Builder
           content:
             application/json:
@@ -2581,6 +2666,8 @@ paths:
       operationId: listCustomerMembershipSegment
       x-ticvai-consumed-by:
         - "P09 ADM-153 Customer, Membership & Segment Discount Rules"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.28; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape agreed as drafted'
@@ -2835,6 +2922,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Coupon & Promo Code Builder
           content:
             application/json:
@@ -2928,6 +3018,8 @@ paths:
       operationId: listUsageCapacityFrequency
       x-ticvai-consumed-by:
         - "P09 ADM-162 Usage, Capacity & Frequency Control"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.41; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (6 non-field properties removed; enums usageType; added issued, redeemed, reservedPending, remaining)'
@@ -3053,6 +3145,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Code Distribution & Assignment Manager
           content:
             application/json:
@@ -3092,6 +3187,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: promoCode
           in: query
           required: false
@@ -3160,6 +3256,8 @@ paths:
       operationId: listCodeSecurityFraud
       x-ticvai-consumed-by:
         - "P09 ADM-166 Code Security, Fraud & Exception Center"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.44; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (1 non-field properties removed; enums signalType; added codeId, detectedAt, details)'
@@ -3231,8 +3329,9 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: replica
+      x-ticvai-read-routing: analytical
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: campaign
           in: query
           required: false
@@ -3322,6 +3421,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: buyXGetX
           in: query
           required: false
@@ -3443,6 +3543,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Buy X Get Y / BOGO Rule Builder
           content:
             application/json:
@@ -3574,6 +3677,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Fixed-Price & “N for X” Offer Builder
           content:
             application/json:
@@ -3620,6 +3726,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Gift, Free Product & Added-Value Offer Builder
           content:
             application/json:
@@ -3665,6 +3774,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Cross-Category Promotion Builder
           content:
             application/json:
@@ -3840,6 +3952,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: ticketBundle
           in: query
           required: false
@@ -3974,6 +4087,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Bundle Definition & Setup
           content:
             application/json:
@@ -4021,6 +4137,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Bundle Component Builder
           content:
             application/json:
@@ -4069,6 +4188,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Guest Choice & Build-Your-Own Bundle Designer
           content:
             application/json:
@@ -4347,6 +4469,8 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-188 Dynamic Bundle Operations Command Center"
         - "P09 ADM-197 Dynamic Bundle Simulation & AI Optimization"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.78; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (5 non-field properties removed; enums health)'
@@ -4683,6 +4807,8 @@ paths:
       operationId: listBundleAvailabilityForecast
       x-ticvai-consumed-by:
         - "P09 ADM-196 Bundle Availability Forecast, Alerts & Recovery"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.86; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape agreed as drafted'
@@ -4707,7 +4833,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: replica
+      x-ticvai-read-routing: analytical
       responses:
         '200':
           description: Bundle Availability Forecast, Alerts & Recovery
@@ -4790,6 +4916,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: guestType
           in: query
           required: false
@@ -4926,6 +5053,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Eligibility Rule Builder
           content:
             application/json:
@@ -4936,6 +5066,8 @@ paths:
       operationId: listCrmCustomerSegment
       x-ticvai-consumed-by:
         - "P09 ADM-200 CRM & Customer Segment Manager"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.96; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (1 non-field properties removed; enums source)'
@@ -4977,6 +5109,8 @@ paths:
       operationId: listMembershipLoyaltyGuest
       x-ticvai-consumed-by:
         - "P09 ADM-201 Membership, Loyalty & Guest Eligibility"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.97; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (4 non-field properties removed; enums guestCategories; added tierBenefits)'
@@ -5018,6 +5152,8 @@ paths:
       operationId: listBehavioralTransactionTargeting
       x-ticvai-consumed-by:
         - "P09 ADM-202 Behavioral & Transaction Targeting"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.98; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (2 non-field properties removed; added lookbackPeriod)'
@@ -5043,7 +5179,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: replica
+      x-ticvai-read-routing: analytical
       responses:
         '200':
           description: Behavioral & Transaction Targeting
@@ -5137,6 +5273,8 @@ paths:
       operationId: listAudiencePreviewReach
       x-ticvai-consumed-by:
         - "P09 ADM-205 Audience Preview, Reach & Eligibility Simulator"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.101; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (3 non-field properties removed; added sampleProfileResult)'
@@ -5162,7 +5300,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: replica
+      x-ticvai-read-routing: analytical
       responses:
         '200':
           description: Audience Preview, Reach & Eligibility Simulator
@@ -5177,6 +5315,8 @@ paths:
       operationId: listTargetingConflictFrequency
       x-ticvai-consumed-by:
         - "P09 ADM-206 Targeting Conflict, Frequency & Exclusion Controls"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.102; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape agreed as drafted'
@@ -5217,6 +5357,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-761 AI Audience Discovery"
         - "P09 ADM-207 AI Audience Discovery & Targeting Optimization"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.103; MoM 14 Aug (AI advisory in phase one); shape fixed (30 non-field properties removed; added audienceName, audienceSize, suggestedOffer, predictedConversion, estimatedIncrementalRevenue, rationale)'
@@ -5248,7 +5390,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: replica
+      x-ticvai-read-routing: analytical
       responses:
         '200':
           description: AI Audience Discovery & Targeting Optimization
@@ -5263,6 +5405,8 @@ paths:
       operationId: listStackingConflict
       x-ticvai-consumed-by:
         - "P09 ADM-208 Stacking & Conflict Command Center"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.109; MoM 1 Sep 4.4 (conflicts resolve through the configurable hierarchy, not ''lowest price wins''); shape agreed as drafted'
@@ -5380,6 +5524,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Promotion Stacking Rule Builder
           content:
             application/json:
@@ -5601,6 +5748,8 @@ paths:
       operationId: listPromotionDecisionTrace
       x-ticvai-consumed-by:
         - "P09 ADM-216 Promotion Decision Trace & Transaction Explainer"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.117; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (10 non-field properties removed; added transactionId, evaluatedPromotions, eligiblePromotions, rejectedPromotions, appliedPromotions, steps)'
@@ -5685,6 +5834,8 @@ paths:
       operationId: listCampaignGovernanceBudget
       x-ticvai-consumed-by:
         - "P09 ADM-218 Campaign Governance & Budget Command Center"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.125; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (7 non-field properties removed; enums budgetHealth; added utilization)'
@@ -5749,6 +5900,7 @@ paths:
         - drafted
       x-ticvai-permission: PRICE_CONFIGURE
       x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
@@ -5762,6 +5914,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Campaign Budget & Financial Limit Setup
           content:
             application/json:
@@ -5812,6 +5967,8 @@ paths:
       operationId: listBudgetConsumptionForecast
       x-ticvai-consumed-by:
         - "P09 ADM-221 Budget Consumption & Forecast Monitor"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.129; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (1 non-field properties removed)'
@@ -5837,7 +5994,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: replica
+      x-ticvai-read-routing: analytical
       responses:
         '200':
           description: Budget Consumption & Forecast Monitor
@@ -5993,6 +6150,8 @@ paths:
       operationId: listCampaignFinancialCommercial
       x-ticvai-consumed-by:
         - "P09 ADM-225 Campaign Financial & Commercial Simulator"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.133; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape agreed as drafted'
@@ -6017,7 +6176,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: replica
+      x-ticvai-read-routing: analytical
       responses:
         '200':
           description: Campaign Financial & Commercial Simulator
@@ -6032,6 +6191,8 @@ paths:
       operationId: listCampaignExperimentTest
       x-ticvai-consumed-by:
         - "P09 ADM-226 Campaign Experiment & A/B Test Manager"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.134; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (4 non-field properties removed; added variantAllocation)'
@@ -6058,7 +6219,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: replica
+      x-ticvai-read-routing: analytical
       responses:
         '200':
           description: Campaign Experiment & A/B Test Manager
@@ -6143,8 +6304,9 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: replica
+      x-ticvai-read-routing: analytical
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: dateRange
           in: query
           required: false
@@ -6239,6 +6401,8 @@ paths:
         - "P09 ADM-139 Promotion & Campaign Directory"
         - "P09 ADM-228 Promotion Performance Command Center"
         - "P09 ADM-229 Campaign & Promotion Performance Explorer"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.143; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (6 non-field properties removed; enums classification; added campaignId, campaignName)'
@@ -6265,7 +6429,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: replica
+      x-ticvai-read-routing: analytical
       responses:
         '200':
           description: Campaign & Promotion Performance Explorer
@@ -6304,8 +6468,9 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: replica
+      x-ticvai-read-routing: analytical
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: channel
           in: query
           required: false
@@ -6368,6 +6533,8 @@ paths:
       operationId: listDiscountMarginProfitability
       x-ticvai-consumed-by:
         - "P09 ADM-231 Discount, Margin & Profitability Analytics"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.145; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (1 non-field properties removed; enums quadrant)'
@@ -6394,7 +6561,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: replica
+      x-ticvai-read-routing: analytical
       responses:
         '200':
           description: Discount, Margin & Profitability Analytics
@@ -6409,6 +6576,8 @@ paths:
       operationId: listBundleBogoAdvanced
       x-ticvai-consumed-by:
         - "P09 ADM-232 Bundle, BOGO & Advanced Offer Analytics"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.146; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (7 non-field properties removed; added componentAttachRates)'
@@ -6435,7 +6604,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: replica
+      x-ticvai-read-routing: analytical
       responses:
         '200':
           description: Bundle, BOGO & Advanced Offer Analytics
@@ -6451,6 +6620,8 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-233 Upsell, Cross-Sell & Attach-Rate Analytics"
         - "P09 ADM-659 Cross-Sell Command Center"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.147; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape agreed as drafted'
@@ -6476,7 +6647,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: replica
+      x-ticvai-read-routing: analytical
       responses:
         '200':
           description: Upsell, Cross-Sell & Attach-Rate Analytics
@@ -6491,6 +6662,8 @@ paths:
       operationId: listCustomerSegmentChannel
       x-ticvai-consumed-by:
         - "P09 ADM-234 Customer, Segment, Channel & Partner Analytics"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.148; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (7 non-field properties removed; enums channel; added segment)'
@@ -6517,7 +6690,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: replica
+      x-ticvai-read-routing: analytical
       responses:
         '200':
           description: Customer, Segment, Channel & Partner Analytics
@@ -6532,6 +6705,8 @@ paths:
       operationId: listIncrementalityAttributionCannibalization
       x-ticvai-consumed-by:
         - "P09 ADM-235 Incrementality, Attribution & Cannibalization Analysis"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.149; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (3 non-field properties removed; enums attributionMethod, cannibalizationType; added totalRevenue, baselineRevenue, incrementalRevenue)'
@@ -6559,7 +6734,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: replica
+      x-ticvai-read-routing: analytical
       responses:
         '200':
           description: Incrementality, Attribution & Cannibalization Analysis
@@ -6574,6 +6749,8 @@ paths:
       operationId: listNextBestAction
       x-ticvai-consumed-by:
         - "P09 ADM-236 AI Optimization & Next-Best-Action Center"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.150; MoM 14 Aug (AI advisory in phase one); shape fixed (5 non-field properties removed; enums recommendation; added revenueImpact, grossProfitImpact, rationale)'
@@ -6604,7 +6781,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: replica
+      x-ticvai-read-routing: analytical
       responses:
         '200':
           description: AI Optimization & Next-Best-Action Center
@@ -6650,8 +6827,9 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: replica
+      x-ticvai-read-routing: analytical
       parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: metric
           in: query
           required: false
@@ -6943,7 +7121,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
-      x-ticvai-read-routing: replica
+      x-ticvai-read-routing: analytical
       parameters:
       - name: productId
         in: query
@@ -7186,7 +7364,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
-      x-ticvai-read-routing: replica
+      x-ticvai-read-routing: analytical
       parameters:
       - name: from
         in: query
@@ -7312,9 +7490,525 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecommendationPerformance'
+  /commercial-campaigns:
+    get:
+      operationId: listCommercialCampaigns
+      x-ticvai-consumed-by:
+        - "P08 BO-010 Promotions & Coupons"
+        - "P08 BO-011 Packages & Bundles"
+        - "P09 ADM-139 Promotion & Campaign Directory"
+        - "P09 ADM-142 Campaign Calendar & Timeline"
+        - "P09 ADM-179 Bundle Definition & Setup"
+        - "P09 ADM-219 Campaign Budget & Financial Limit Setup"
+        - "P09 ADM-229 Campaign & Promotion Performance Explorer"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass; pack Promotions___Bundles_Management_Reference.pdf p.8 (Promotion & Campaign Directory lists every commercial campaign) and p.12 (Campaign Calendar & Timeline); no promotions minutes on file, so our build plan; shape follows listPromotions'
+      x-ticvai-read-routing: replica
+      summary: List commercial campaigns
+      description: 'The commercial campaigns (`promotions.campaign`) with their budget lines
+        (`promotions.campaign_budget`): the list a promotion, coupon campaign or bundle builder picks
+        its `campaignId` from, and the campaign rows of the Promotion & Campaign Directory. **Not the
+        marketing send campaigns** (`listCampaigns` in marketing-crm). Consumed, committed and reserved
+        budget are not in these rows; the governance and budget screens work them out on read.
+        (decided 29 September, writers pass)
+
+        '
+      tags:
+      - promotion
+      x-ticvai-permission: PRICE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: venueId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: activeAt
+        in: query
+        description: Only campaigns whose validFrom/validTo window contains this instant (an open end
+          counts as unbounded).
+        schema:
+          type: string
+          format: date-time
+      - name: ownerPrincipalId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: q
+        in: query
+        description: Matches the start of `name` or `code`, case-insensitively.
+        schema:
+          type: string
+          maxLength: 100
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Commercial campaigns
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/CommercialCampaign'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+    post:
+      operationId: createCommercialCampaign
+      x-ticvai-consumed-by:
+        - "P09 ADM-139 Promotion & Campaign Directory"
+        - "P09 ADM-219 Campaign Budget & Financial Limit Setup"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass; pack Promotions___Bundles_Management_Reference.pdf p.8 (every commercial campaign created within TICVAI) and p.126 (campaign, owner, business entity and effective dates); no promotions minutes on file, so our build plan; shape follows createPromotion'
+      summary: Create a commercial campaign
+      description: 'Creates the campaign header (`promotions.campaign`) without budget lines, so a
+        promotion, coupon campaign or bundle can name it by `campaignId` before its budget is set. **Budget
+        lines are set by setCampaignBudgetFinancial**, which also saves the header; this operation never
+        writes `promotions.campaign_budget`. A campaign has no status of its own (see
+        `CommercialCampaign`), so there is nothing to publish.
+
+        **Writes `promotions.promotion_audit`** in the same transaction (entityType `campaign`, eventType
+        `created`), as every promotions configuration change does (decided 29 September, writers pass).
+
+        '
+      tags:
+      - promotion
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommercialCampaignRequest'
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Created, with an empty `budgets` array
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommercialCampaign'
+        '400':
+          description: '`validTo` at or before `validFrom`.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: '`code` is already used by another campaign at the venue.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /commercial-campaigns/{campaignId}:
+    parameters:
+    - name: campaignId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    patch:
+      operationId: updateCommercialCampaign
+      x-ticvai-consumed-by:
+        - "P09 ADM-139 Promotion & Campaign Directory"
+        - "P09 ADM-219 Campaign Budget & Financial Limit Setup"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass; pack Promotions___Bundles_Management_Reference.pdf p.8 and p.126; no promotions minutes on file, so our build plan; shape follows updatePromotion'
+      summary: Amend a commercial campaign
+      description: 'Amends the campaign header (`promotions.campaign`): name, code, description, owner,
+        business entity and dates. **Budget lines are not in this body**; setCampaignBudgetFinancial
+        changes them.
+
+        **Narrowing the dates is refused while it would strand something** (decided 29 September,
+        writers pass): a scheduled or live promotion, a coupon campaign or an active bundle of the
+        campaign whose own validity would fall outside the new window answers 409, naming each one.
+
+        **Writes `promotions.promotion_audit`** in the same transaction (entityType `campaign`, eventType
+        `modified`, previous and new values of the changed fields).
+
+        '
+      tags:
+      - promotion
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                code:
+                  type: string
+                  maxLength: 64
+                  nullable: true
+                name:
+                  type: string
+                  maxLength: 200
+                description:
+                  type: string
+                  maxLength: 1000
+                  nullable: true
+                ownerPrincipalId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                legalEntityId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                validFrom:
+                  type: string
+                  format: date-time
+                  nullable: true
+                validTo:
+                  type: string
+                  format: date-time
+                  nullable: true
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommercialCampaign'
+        '400':
+          description: '`validTo` at or before `validFrom`.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The new code is already used at the venue, or the new dates would leave a scheduled
+            or live promotion, coupon campaign or active bundle of the campaign outside them. The response
+            names each one.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /bundles/{bundleId}/capacity-policies:
+    parameters:
+    - name: bundleId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listBundleCapacityPolicies
+      x-ticvai-consumed-by:
+        - "P09 ADM-191 Capacity Pool & Reservation Manager"
+        - "P09 ADM-195 Bundle Availability by Channel, Venue & Partner"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass; pack Promotions___Bundles_Management_Reference.pdf p.81 (Capacity Pool & Reservation Manager) and p.85 (Bundle Availability by Channel, Venue & Partner); no promotions minutes on file, so our build plan; shape follows listBundles'
+      x-ticvai-read-routing: replica
+      summary: List a bundle's capacity policies
+      description: 'The stored `promotions.bundle_capacity_policy` rows of one bundle, as the setup form
+        edits them: the default row (no channel, venue or partner) and one row per channel, venue or
+        partner where it differs. The live figures (reserved, remaining) are the catalogue''s and are
+        shown by listCapacityPoolReservation and listBundleAvailabilityChannel, not here.
+
+        '
+      tags:
+      - bundle
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Capacity policies
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/BundleCapacityPolicy'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+    put:
+      operationId: setBundleCapacityPolicy
+      x-ticvai-consumed-by:
+        - "P09 ADM-191 Capacity Pool & Reservation Manager"
+        - "P09 ADM-195 Bundle Availability by Channel, Venue & Partner"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass; pack Promotions___Bundles_Management_Reference.pdf p.81 and p.85; no promotions minutes on file, so our build plan; shape follows setPromotionVariants (the set replaces the one before)'
+      x-ticvai-config-scope: venue
+      summary: Set a bundle's capacity policies
+      description: 'Replaces the bundle''s `promotions.bundle_capacity_policy` rows with the set sent:
+        a row sent with an `id` is updated, one without is created, and a stored row not sent is removed.
+        `bundleId` is taken from the path.
+
+        **Separate from createBundle and updateBundle on purpose** (decided 29 September, writers pass):
+        how a bundle draws on capacity is adjusted while it is on sale, and updateBundle deliberately
+        carries nothing but name, price, end date and on-sale flag once the bundle has sold. Changing a
+        policy never releases or re-prices a hold already taken; it applies to the next reservation.
+
+        **At most one row per (channel, venueId, partnerId)**, and exactly one default row (all three
+        null) when any row is sent. **Writes `promotions.promotion_audit`** in the same transaction
+        (entityType `bundle`, eventType `modified`).
+
+        '
+      tags:
+      - bundle
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - policies
+              properties:
+                policies:
+                  type: array
+                  maxItems: 200
+                  items:
+                    $ref: '#/components/schemas/BundleCapacityPolicy'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set. The policies now stored for the bundle, replacing any set before.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - bundleId
+                - policies
+                properties:
+                  bundleId:
+                    type: string
+                    format: uuid
+                  policies:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BundleCapacityPolicy'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '422':
+          description: Two rows share a (channel, venueId, partnerId), there is no default row, or an `id`
+            names a policy of another bundle.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /bundles/{bundleId}/partner-products:
+    parameters:
+    - name: bundleId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listBundlePartnerProductMappings
+      x-ticvai-consumed-by:
+        - "P09 ADM-185 Partner & External Product Bundle Manager"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass; pack Promotions___Bundles_Management_Reference.pdf p.71 (Partner & External Product Bundle Manager); no promotions minutes on file, so our build plan; shape follows listBundles'
+      x-ticvai-read-routing: replica
+      summary: List a bundle's partner product mappings
+      description: 'The stored `promotions.partner_bundle_product` rows of one bundle: which component
+        stands for which partner product, on what price, commission and terms, and the last connection
+        reading the partner sync job wrote. The cross-bundle monitor is listPartnerExternalProduct.
+
+        '
+      tags:
+      - bundle
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Partner product mappings
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/PartnerBundleProduct'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+    put:
+      operationId: setBundlePartnerProductMappings
+      x-ticvai-consumed-by:
+        - "P09 ADM-185 Partner & External Product Bundle Manager"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass; pack Promotions___Bundles_Management_Reference.pdf p.71; no promotions minutes on file, so our build plan; shape follows setPromotionVariants (the set replaces the one before)'
+      x-ticvai-config-scope: venue
+      summary: Set a bundle's partner product mappings
+      description: 'Replaces the bundle''s `promotions.partner_bundle_product` rows with the set sent: a
+        row sent with an `id` is updated, one without is created, and a stored row not sent is removed.
+        Each `bundleComponentId` must be a component of this bundle, and a component maps to at most one
+        partner product.
+
+        **Separate from createBundle and updateBundle on purpose** (decided 29 September, writers pass):
+        partner prices, commission and terms change while the bundle is on sale, and updateBundle carries
+        none of them. A change applies to orders placed after it; an order already placed keeps the
+        terms it was sold on.
+
+        **`connectionStatus` and `lastCheckedAt` are not taken from the body**: the partner sync job
+        writes them. A new row starts with `connectionStatus` `available` until the job first reads the
+        partner. **Writes `promotions.promotion_audit`** in the same transaction (entityType `bundle`,
+        eventType `modified`).
+
+        '
+      tags:
+      - bundle
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - mappings
+              properties:
+                mappings:
+                  type: array
+                  maxItems: 200
+                  items:
+                    $ref: '#/components/schemas/PartnerBundleProduct'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set. The mappings now stored for the bundle, replacing any set before.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - bundleId
+                - mappings
+                properties:
+                  bundleId:
+                    type: string
+                    format: uuid
+                  mappings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PartnerBundleProduct'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '422':
+          description: A `bundleComponentId` is not a component of this bundle, two rows map the same
+            component, or an `id` names a mapping of another bundle.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
 
 components:
   schemas:
+    CreateCommercialCampaignRequest:
+      x-ticvai-persistence: none — request only; saved as a `promotions.campaign` row (CommercialCampaign)
+      type: object
+      description: 'What createCommercialCampaign takes: the campaign header only. Budget lines are set by
+        setCampaignBudgetFinancial. (decided 29 September, writers pass)'
+      required:
+      - venueId
+      - name
+      properties:
+        venueId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 64
+          nullable: true
+          description: Unique at the venue when given.
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        ownerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The campaign (and budget) owner.
+        legalEntityId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The business entity that funds and books the campaign.
+        validFrom:
+          type: string
+          format: date-time
+          nullable: true
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
     RecommendationStrategy:
       type: object
       x-ticvai-persistence: promotions.recommendation_strategy
@@ -7904,6 +8598,21 @@ components:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
           description: Cap on a percentage discount. Prevents an unbounded discount on a large basket.
+        rewardVariantIds:
+          type: array
+          nullable: true
+          items:
+            type: string
+            format: uuid
+          description: 'The reward products, where the reward is not the qualifying product: the free
+            gift of `freeItem`, the "different product" of a `buyXGetY` (setGiftFreeProduct, setBuyGetBogo).
+            Absent means the reward is taken from the qualifying lines. (DM5, 29 September: data model for the agreed operations)'
+        maxApplicationsPerBasket:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: 'How many times the offer repeats in one basket: the "maximum repetitions" of
+            an N-for-X offer (setFixedPriceOffer). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)'
     PromotionConditions:
       x-ticvai-persistence: none — embedded in promotion
       type: object
@@ -8012,6 +8721,15 @@ components:
         advanceDaysMax:
           type: integer
           description: Last-minute — booked no more than this many days ahead.
+        eligibilityRuleIds:
+          type: array
+          nullable: true
+          items:
+            type: string
+            format: uuid
+          description: 'Reusable eligibility rules (`promotions.promotion_rule` rows of `ruleType: eligibility`
+            with no promotion of their own, saved by setEligibilityRule) that must also hold. Each is
+            evaluated with its own `effect`. (DM5, 29 September: data model for the agreed operations)'
     StackingMode:
       type: string
       description: 'How this promotion combines with others. Declared, never inferred from creation order
@@ -8079,6 +8797,13 @@ components:
           description: Total discount value after which the promotion stops automatically. **Enforced at
             checkout**, where an order whose discount would take the total past the cap does not receive
             the promotion (decided 28 September, audit R101).
+        campaignId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'The commercial campaign (`promotions.campaign`) this promotion belongs to; null
+            for a promotion run on its own. The directory, calendar and campaign budget screens group
+            by it. (DM5, 29 September: data model for the agreed operations)'
     Promotion:
       x-ticvai-persistence: promotions.promotion
       allOf:
@@ -8103,6 +8828,13 @@ components:
             type: string
             format: date-time
             nullable: true
+          version:
+            type: integer
+            minimum: 1
+            readOnly: true
+            description: 'Starts at 1 and goes up by one on every saved change. The version the directory,
+              the audit history (`promotions.promotion_audit`) and the channel publication monitor
+              (`promotions.promotion_channel_publication`) name. (DM5, 29 September: data model for the agreed operations)'
     PromotionVariant:
       x-ticvai-persistence: promotions.promotion_variant
       type: object
@@ -8134,6 +8866,781 @@ components:
             (decided 28 September, audit R101).
         discountPercent:
           type: number
+    CommercialCampaign:
+      x-ticvai-persistence: promotions.campaign + promotions.campaign_budget
+      type: object
+      description: 'A commercial campaign: the grouping of promotions, coupon campaigns and bundles that
+        share an owner, a business entity, dates and a budget. **Not `marketing.campaign`**, which
+        is the CRM send campaign in another service. The header is saved with its budget lines by
+        setCampaignBudgetFinancial (the budget screen is where the pack captures campaign, owner,
+        business entity and effective dates), and on its own by createCommercialCampaign and
+        updateCommercialCampaign; listCommercialCampaigns lists it (decided 29 September, writers pass); promotions, coupon campaigns and bundles point at it
+        by `campaignId`. No status of its own: a campaign is live while its promotions are, and a
+        threshold action that stops it pauses them. (DM5, 29 September: data model for the agreed operations)'
+      required:
+      - id
+      - venueId
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        venueId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 64
+          nullable: true
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        ownerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The campaign (and budget) owner.
+        legalEntityId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The business entity that funds and books the campaign.
+        validFrom:
+          type: string
+          format: date-time
+          nullable: true
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+        budgets:
+          type: array
+          description: The rows of `promotions.campaign_budget`, one per budget line.
+          items:
+            $ref: '#/components/schemas/CampaignBudget'
+    CampaignBudget:
+      x-ticvai-persistence: promotions.campaign_budget
+      type: object
+      description: 'One budget line of a commercial campaign (setCampaignBudgetFinancial): what kind of
+        spend it caps, who funds it, what it covers, and what happens as it is consumed. **Consumed,
+        committed and reserved are not stored**: consumed is the discount given on orders
+        (`orders.discount`, `promotions.promotion.discount_given`), committed and reserved are
+        priced carts not yet paid, all worked out on read so they cannot drift from the orders
+        they summarise. (DM5, 29 September: data model for the agreed operations)'
+      required:
+      - budgetType
+      - amount
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        budgetType:
+          type: string
+          enum:
+          - total
+          - discount
+          - reward
+          - freeProduct
+          description: The spend this line caps (total campaign, discount, reward or free-product budget).
+        fundingSource:
+          type: string
+          nullable: true
+          enum:
+          - venue
+          - department
+          - marketing
+          - partner
+          description: Who pays for it; `partner` is a co-funded (e.g. bank or partner-funded) line.
+        amount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        scope:
+          type: string
+          enum:
+          - entireCampaign
+          - promotion
+          - product
+          - channel
+          - partner
+          - customerSegment
+          default: entireCampaign
+          description: What the line covers.
+        scopeRef:
+          type: string
+          nullable: true
+          description: The promotion, product, partner or segment id, or the SalesChannel value, that
+            `scope` names. Null for `entireCampaign`.
+        ownerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The budget owner.
+        costCentre:
+          type: string
+          maxLength: 64
+          nullable: true
+        department:
+          type: string
+          maxLength: 100
+          nullable: true
+        validFrom:
+          type: string
+          format: date-time
+          nullable: true
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+        thresholdPolicy:
+          $ref: '#/components/schemas/BudgetThresholdPolicy'
+    BudgetThresholdPolicy:
+      x-ticvai-persistence: none — embedded in campaign_budget
+      type: object
+      description: 'The automatic actions as a budget line is consumed (Threshold Actions & Automatic
+        Suspension). Steps are checked in ascending `percent`; `stopPromotion` and `stopCampaign`
+        pause the promotions concerned (`promotions.promotion.is_paused`). (DM5, 29 September: data model for the agreed operations)'
+      properties:
+        steps:
+          type: array
+          items:
+            type: object
+            required:
+            - percent
+            - action
+            properties:
+              percent:
+                type: number
+                minimum: 0
+                maximum: 200
+                description: Consumption, percent of `amount`, at which the action fires.
+              action:
+                type: string
+                enum:
+                - warn
+                - requireApproval
+                - reduceAllocation
+                - stopSpecificChannel
+                - stopPartner
+                - stopPromotion
+                - stopCampaign
+                - allowGraceAmount
+                - continueWithExecutiveAuthorization
+    PromotionRule:
+      x-ticvai-persistence: promotions.promotion_rule
+      type: object
+      description: 'A rule made in the Promotion Rule Builder (setPromotionRule, `ruleType: benefit`) or
+        the Eligibility Rule Builder (setEligibilityRule, `ruleType: eligibility`). **One table for
+        both**: each is a named, prioritised set of nested condition groups; a benefit rule adds its
+        outcomes, an eligibility rule its include/exclude effect. A rule with a `promotionId` belongs
+        to that promotion; one without is a reusable library rule that promotions name in
+        `PromotionConditions.eligibilityRuleIds`. (DM5, 29 September: data model for the agreed operations)'
+      required:
+      - id
+      - venueId
+      - ruleType
+      - name
+      - conditions
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        venueId:
+          type: string
+          format: uuid
+        promotionId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The promotion the rule belongs to; null for a reusable library rule.
+        campaignId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The commercial campaign an eligibility rule is limited to, where the builder names one.
+        ruleType:
+          type: string
+          enum:
+          - benefit
+          - eligibility
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        ownerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        priority:
+          type: integer
+          default: 0
+          description: Evaluation order among the rules of one promotion; higher first (the builder's
+            priority and rule ordering).
+        conditions:
+          $ref: '#/components/schemas/RuleConditionGroup'
+        effect:
+          type: string
+          nullable: true
+          enum:
+          - include
+          - exclude
+          description: Eligibility rules only. Whether guests who match are included or excluded.
+        outcomes:
+          $ref: '#/components/schemas/RuleOutcomeSet'
+        isActive:
+          type: boolean
+          default: false
+          description: False while the rule is a draft or switched off; only active rules are evaluated.
+    RuleConditionGroup:
+      x-ticvai-persistence: none — embedded in promotion_rule
+      type: object
+      description: 'A nested condition group. `match: all` needs every criterion and sub-group to hold,
+        `any` at least one. `groups` holds further groups of this same shape, which is how the
+        builders nest. (DM5, 29 September: data model for the agreed operations)'
+      required:
+      - match
+      properties:
+        match:
+          type: string
+          enum:
+          - all
+          - any
+          default: all
+        criteria:
+          type: array
+          items:
+            type: object
+            required:
+            - attribute
+            - operator
+            properties:
+              attribute:
+                type: string
+                enum:
+                - guestType
+                - customerSegment
+                - ageCategory
+                - membership
+                - loyaltyTier
+                - purchaseHistory
+                - visitHistory
+                - transactionValue
+                - basketValue
+                - quantity
+                - product
+                - productCategory
+                - productPurchased
+                - channel
+                - venue
+                - location
+                - partner
+                - dateTime
+                - paymentMethod
+                - campaign
+                - couponCode
+                - customerAccountAttribute
+              operator:
+                type: string
+                enum:
+                - equals
+                - notEquals
+                - in
+                - notIn
+                - greaterThan
+                - greaterOrEqual
+                - lessThan
+                - lessOrEqual
+                - between
+              values:
+                type: array
+                items:
+                  type: string
+        groups:
+          type: array
+          description: Nested groups, each a RuleConditionGroup.
+          items:
+            type: object
+    RuleOutcomeSet:
+      x-ticvai-persistence: none — embedded in promotion_rule
+      type: object
+      description: 'What a benefit rule grants (the builder''s "multiple outcomes"). `combine: all` grants
+        every outcome, `bestOf` the one worth most to the guest. (DM5, 29 September: data model for the agreed operations)'
+      properties:
+        combine:
+          type: string
+          enum:
+          - all
+          - bestOf
+          default: all
+        outcomes:
+          type: array
+          items:
+            type: object
+            required:
+            - kind
+            properties:
+              kind:
+                type: string
+                enum:
+                - percentageDiscount
+                - fixedDiscount
+                - fixedSellingPrice
+                - freeProduct
+                - freeTicket
+                - addedValue
+                - voucher
+                - rewardEntitlement
+              percentage:
+                type: number
+                minimum: 0
+                maximum: 100
+              amount:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              rewardVariantIds:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+              quantity:
+                type: integer
+                minimum: 1
+              voucherBatchId:
+                type: string
+                format: uuid
+                nullable: true
+    StackingRule:
+      x-ticvai-persistence: promotions.stacking_rule
+      description: 'One cell of the promotion-type stacking matrix (setPromotionStackingRule): whether
+        promotion type A may combine with type B at a scope, under which model. The builder''s input
+        is the row; this adds its identity and venue. Per-promotion `stackingMode`, `stackingGroup`
+        and `precedence` stay on `promotions.promotion`; a pair with no row is `notConfigured` in the
+        compatibility matrix. (DM5, 29 September: data model for the agreed operations)'
+      allOf:
+      - $ref: '#/components/schemas/PromotionStackingRuleBuilderInput'
+      - type: object
+        required:
+        - id
+        - venueId
+        properties:
+          id:
+            type: string
+            format: uuid
+            readOnly: true
+          venueId:
+            type: string
+            format: uuid
+    PromotionConflict:
+      x-ticvai-persistence: promotions.promotion_conflict
+      type: object
+      description: 'A conflict found between promotions: which promotions, what kind, how it was or will be
+        resolved. Resolved when `resolvedAt` is set. (DM5, 29 September: data model for the agreed operations)
+
+        **Written only by the conflict detection job** (decided 29 September, writers pass), which runs on
+        a schedule and on each publishPromotion, and sets `resolvedAt` when a later run no longer finds the
+        conflict. No operation writes it: analysePromotionConflicts computes its answer on read and stores
+        nothing, and listConflictDetectionResolution and listStackingConflict read these rows.'
+      required:
+      - id
+      - venueId
+      - conflictType
+      - promotionIds
+      - detectedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        venueId:
+          type: string
+          format: uuid
+        conflictType:
+          type: string
+          enum:
+          - sameProduct
+          - sameAudience
+          - sameChannel
+          - sameValidity
+          - incompatiblePromotions
+          - missingHierarchy
+          - missingStackingRule
+          - discountCapBreach
+          - circularDependency
+        severity:
+          type: string
+          enum:
+          - information
+          - warning
+          - high
+          - critical
+        promotionIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        resolutionMethod:
+          type: string
+          nullable: true
+          enum:
+          - automatic
+          - ruleBased
+          - bestPrice
+          - priority
+          - manualIntervention
+        detectedAt:
+          type: string
+          format: date-time
+        resolvedAt:
+          type: string
+          format: date-time
+          nullable: true
+    PromotionEvaluationTrace:
+      x-ticvai-persistence: promotions.promotion_evaluation_trace
+      type: object
+      description: 'How the promotions on one order were decided: evaluated, eligible, rejected (with
+        reason) and applied, in the order the engine took its steps. **One row per placed order**,
+        written when the order is priced for payment, not per cart evaluation. (DM5, 29 September: data model for the agreed operations)
+
+        **Written by evaluatePromotions when the order service calls it with `orderId`** (createOrder,
+        convertReservation pricing the order); read by listPromotionDecisionTrace (decided 29 September,
+        writers pass).'
+      required:
+      - id
+      - venueId
+      - orderId
+      - evaluatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        venueId:
+          type: string
+          format: uuid
+        orderId:
+          type: string
+          format: uuid
+          description: The order (`orders.sales_order`) in the order service.
+        evaluatedAt:
+          type: string
+          format: date-time
+        evaluatedPromotionIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        eligiblePromotionIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        appliedPromotionIds:
+          type: array
+          description: In application order.
+          items:
+            type: string
+            format: uuid
+        totalSaving:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        decision:
+          type: object
+          description: 'The rejections (promotion id and a `PromotionEvaluation` reason: conditionsNotMet,
+            supersededByBetterOffer, exclusivePromotionApplied, redemptionLimitReached, budgetExhausted,
+            outsideValidPeriod, wrongChannel, membershipRequired, couponRequired) and the ordered steps
+            (eligibility, hierarchy, stacking, caps, best permitted combination).'
+          properties:
+            rejected:
+              type: array
+              items:
+                type: object
+                properties:
+                  promotionId:
+                    type: string
+                    format: uuid
+                  reason:
+                    type: string
+            steps:
+              type: array
+              items:
+                type: string
+    PromotionAlert:
+      x-ticvai-persistence: promotions.promotion_alert
+      type: object
+      description: 'A raised promotion alert or exception, **including code security and fraud signals**
+        (category `fraudRisk`), which are the same kind of row about a code rather than a promotion.
+        Raised by the monitoring and channel sync jobs; resolved when `resolvedAt` is set. (DM5, 29 September: data model for the agreed operations)
+
+        **Written only by jobs** (decided 29 September, writers pass): the promotion monitoring job raises
+        the configuration, financial, commercial and `fraudRisk` alerts (code security signals included),
+        the channel sync job raises `promotionFailedToPublish` and `channelSynchronizationFailure`, and
+        each job sets `resolvedAt` when its condition clears. No operation writes it;
+        listPromotionAlertException and listCodeSecurityFraud read it.'
+      required:
+      - id
+      - venueId
+      - alertType
+      - category
+      - severity
+      - raisedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        venueId:
+          type: string
+          format: uuid
+        promotionId:
+          type: string
+          format: uuid
+          nullable: true
+        couponCampaignId:
+          type: string
+          format: uuid
+          nullable: true
+        couponCodeBatchId:
+          type: string
+          format: uuid
+          nullable: true
+        couponCode:
+          type: string
+          nullable: true
+          description: The code a code-security signal is about.
+        alertType:
+          type: string
+          enum:
+          - missingProduct
+          - missingEligibility
+          - invalidDates
+          - invalidDiscount
+          - invalidCode
+          - missingApproval
+          - budgetNearLimit
+          - budgetExceeded
+          - marginBelowThreshold
+          - excessiveDiscountExposure
+          - promotionFailedToPublish
+          - productUnavailable
+          - bundleComponentUnavailable
+          - channelSynchronizationFailure
+          - lowConversion
+          - lowRedemption
+          - unexpectedHighRedemption
+          - campaignUnderperforming
+          - abnormalCouponUsage
+          - excessiveRepeatRedemption
+          - suspiciousCustomerBehavior
+          - promoCodeLeakage
+          - excessiveRedemptionVelocity
+          - repeatedFailedAttempts
+          - multipleCustomersUsingCustomerSpecificCode
+          - unusualGeographicUsage
+          - highVolumeRedemptionFromOneDevice
+          - suspiciousPosOperatorActivity
+          - codeEnumerationAttempts
+          - partnerCodeLeakage
+          - redemptionAboveExpectedCampaignPattern
+        category:
+          type: string
+          enum:
+          - configuration
+          - financial
+          - operational
+          - commercial
+          - fraudRisk
+        severity:
+          type: string
+          enum:
+          - information
+          - warning
+          - critical
+        riskLevel:
+          type: string
+          nullable: true
+          enum:
+          - low
+          - medium
+          - high
+          - critical
+          description: Fraud-risk alerts only, the code security screen's risk level.
+        details:
+          type: string
+          nullable: true
+          description: What was observed.
+        raisedAt:
+          type: string
+          format: date-time
+        resolvedAt:
+          type: string
+          format: date-time
+          nullable: true
+    PromotionAuditEvent:
+      x-ticvai-persistence: promotions.promotion_audit
+      type: object
+      description: 'One change to promotions configuration: who, when, what it was and became, why, and
+        the approval behind it. Written in the same transaction as the change by every operation that
+        changes a promotion, rule, stacking rule, campaign, budget, coupon campaign, coupon code or
+        bundle. **Append-only.** (DM5, 29 September: data model for the agreed operations)
+
+        **Every promotions mutation writes it** (decided 29 September, writers pass): createPromotion,
+        updatePromotion, publishPromotion, pausePromotion, endPromotion, unschedulePromotion,
+        setPromotionVariants, the promotion, rule, stacking, coupon and bundle builders,
+        createCouponCampaign, generateCouponCodes, assignCoupon, voidCouponCode, createBundle,
+        updateBundle, setBundleCapacityPolicy, setBundlePartnerProductMappings,
+        createCommercialCampaign, updateCommercialCampaign and setCampaignBudgetFinancial. Read by
+        listPromotionActivityVersion and listRedemption. `promotionEnded` (endPromotion) and
+        `promotionUnscheduled` (unschedulePromotion) added with the writers pass.'
+      required:
+      - id
+      - venueId
+      - entityType
+      - entityId
+      - eventType
+      - occurredAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        venueId:
+          type: string
+          format: uuid
+        entityType:
+          type: string
+          enum:
+          - promotion
+          - promotionRule
+          - stackingRule
+          - campaign
+          - campaignBudget
+          - couponCampaign
+          - couponCode
+          - bundle
+        entityId:
+          type: string
+          description: The changed row's id (a coupon code's `code`).
+        promotionId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The promotion the change belongs to, for the promotion version history.
+        promotionVersion:
+          type: integer
+          nullable: true
+          description: The promotion's `version` after the change.
+        eventType:
+          type: string
+          enum:
+          - promotionCreated
+          - promotionEdited
+          - ruleChanged
+          - discountChanged
+          - productAdded
+          - productRemoved
+          - eligibilityChanged
+          - channelChanged
+          - datesChanged
+          - budgetChanged
+          - approvalSubmitted
+          - approvalGranted
+          - approvalRejected
+          - promotionActivated
+          - promotionPaused
+          - promotionSuspended
+          - promotionExpired
+          - promotionArchived
+          - promotionEnded
+          - promotionUnscheduled
+          - created
+          - modified
+          - assigned
+          - suspended
+          - reactivated
+          - cancelled
+        previousValue:
+          type: object
+          nullable: true
+          description: The changed fields before the change.
+        newValue:
+          type: object
+          nullable: true
+          description: The changed fields after the change.
+        reason:
+          type: string
+          nullable: true
+        approvalReference:
+          type: string
+          nullable: true
+          description: The approvals-engine request that authorised the change.
+        actorPrincipalId:
+          type: string
+          format: uuid
+        actorRole:
+          type: string
+          nullable: true
+        occurredAt:
+          type: string
+          format: date-time
+    PromotionChannelPublication:
+      x-ticvai-persistence: promotions.promotion_channel_publication
+      type: object
+      description: 'A promotion''s (or coupon campaign''s) publication on one sales channel: which version
+        is live there, when it last synchronised, what failed. Written by publishPromotion,
+        updatePromotion, pausePromotion and endPromotion and by the channel sync job (decided 29
+        September, writers pass). (DM5, 29 September: data model for the agreed operations)'
+      required:
+      - id
+      - venueId
+      - channel
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        venueId:
+          type: string
+          format: uuid
+        promotionId:
+          type: string
+          format: uuid
+          nullable: true
+        couponCampaignId:
+          type: string
+          format: uuid
+          nullable: true
+        channel:
+          $ref: ../shared/common.yaml#/components/schemas/SalesChannel
+        status:
+          type: string
+          enum:
+          - notAssigned
+          - pendingPublication
+          - synchronizing
+          - published
+          - publicationFailed
+          - outOfSync
+          - suspended
+          description: State model states/promotion-channel-publication.yaml.
+        publishedVersion:
+          type: integer
+          nullable: true
+          description: The promotion `version` live on the channel.
+        lastSynchronizedAt:
+          type: string
+          format: date-time
+          nullable: true
+        lastError:
+          type: string
+          nullable: true
+          description: The channel's last rejection, while status is `publicationFailed` or `outOfSync`.
     GuestPromotion:
       x-ticvai-persistence: none — guest projection of promotions.promotion
       type: object
@@ -8330,6 +9837,12 @@ components:
         validTo:
           type: string
           format: date-time
+        campaignId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'The commercial campaign (`promotions.campaign`) the codes are issued under, as
+            the Coupon & Promo Code Builder names it. (DM5, 29 September: data model for the agreed operations)'
     CouponCampaign:
       x-ticvai-persistence: promotions.coupon_campaign
       allOf:
@@ -8682,6 +10195,37 @@ components:
             type: string
             format: uuid
           description: For dynamic bundles — guest chooses among these.
+        substitutionTriggers:
+          type: array
+          nullable: true
+          items:
+            type: string
+            enum:
+            - soldOut
+            - capacityExhausted
+            - productSuspended
+            - venueClosed
+            - externalApiUnavailable
+            - inventoryBelowThreshold
+          description: 'When a substitute from `substituteVariantIds` may replace this component (Dynamic
+            Component Substitution Engine). Empty: never substituted. (DM5, 29 September: data model for the agreed operations)'
+        substitutionPriceEffect:
+          type: string
+          enum:
+          - samePrice
+          - surcharge
+          - reducedPrice
+          default: samePrice
+          description: 'What a substitution does to the bundle price. (DM5, 29 September: data model for the agreed operations)'
+        substitutionApproval:
+          type: string
+          enum:
+          - none
+          - customer
+          - operator
+          default: customer
+          description: 'Who must accept a substitution before it stands. Customer by default, because
+            a substitution the guest did not choose is a complaint at the gate. (DM5, 29 September: data model for the agreed operations)'
         venueId:
           type: string
           format: uuid
@@ -8873,6 +10417,38 @@ components:
         validTo:
           type: string
           format: date-time
+        campaignId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'The commercial campaign (`promotions.campaign`) the bundle is sold under. (DM5, 29 September: data model for the agreed operations)'
+        ownerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'The bundle owner (Bundle Definition & Setup). (DM5, 29 September: data model for the agreed operations)'
+        category:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: 'The bundle category the setup screen files it under. (DM5, 29 September: data model for the agreed operations)'
+        isStandaloneProduct:
+          type: boolean
+          default: true
+          description: 'Whether the bundle appears as a product in its own right, or only as an offer
+            on another product. (DM5, 29 September: data model for the agreed operations)'
+        isRecommendedAtCheckout:
+          type: boolean
+          default: false
+          description: 'Whether checkout recommends the bundle. (DM5, 29 September: data model for the agreed operations)'
+        requiredVariantIds:
+          type: array
+          nullable: true
+          items:
+            type: string
+            format: uuid
+          description: 'Products that must already be in the basket for the bundle to be sold (the
+            setup screen''s "requires another product"). (DM5, 29 September: data model for the agreed operations)'
     Bundle:
       x-ticvai-persistence: promotions.bundle + promotions.bundle_component
       allOf:
@@ -8898,6 +10474,164 @@ components:
             description: True locks components and allocation against amendment.
           isActive:
             type: boolean
+    PartnerBundleProduct:
+      x-ticvai-persistence: promotions.partner_bundle_product
+      type: object
+      description: 'A partner''s or external product sold as a bundle component: the partner''s product
+        id and source, its price to us and ours to the guest, the commission, and the settlement,
+        cancellation and redemption terms (Partner & External Product Bundle Manager). Tied to the
+        `promotions.bundle_component` that stands for it. `connectionStatus` is the last health
+        reading of the partner integration, written by the sync job. (DM5, 29 September: data model for the agreed operations)
+
+        **Written by setBundlePartnerProductMappings; read by listBundlePartnerProductMappings and
+        listPartnerExternalProduct** (decided 29 September, writers pass). `connectionStatus` and
+        `lastCheckedAt` are the partner sync job''s alone: it polls each mapped partner product and
+        writes them, and no operation takes them from a request.'
+      required:
+      - id
+      - bundleComponentId
+      - partnerId
+      - externalProductId
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        bundleComponentId:
+          type: string
+          format: uuid
+        partnerId:
+          type: string
+          format: uuid
+        externalProductId:
+          type: string
+          maxLength: 128
+        productName:
+          type: string
+          maxLength: 200
+        apiSource:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: The partner integration the product comes through.
+        availabilitySource:
+          type: string
+          enum:
+          - partnerApi
+          - allocation
+          - onRequest
+          default: partnerApi
+          description: Where availability is checked.
+        externalPrice:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        sellingPrice:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        commission:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        settlementRule:
+          type: string
+          maxLength: 500
+          nullable: true
+        cancellationRule:
+          type: string
+          maxLength: 500
+          nullable: true
+        redemptionMethod:
+          type: string
+          maxLength: 100
+          nullable: true
+        connectionStatus:
+          type: string
+          readOnly: true
+          description: Written by the partner sync job only; `available` until its first reading.
+          enum:
+          - connected
+          - available
+          - degraded
+          - apiError
+          - productUnavailable
+          - mappingError
+        lastCheckedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the partner sync job last read the partner.
+    BundleCapacityPolicy:
+      x-ticvai-persistence: promotions.bundle_capacity_policy
+      type: object
+      description: 'How a bundle draws on capacity, per channel where it differs: the capacity source,
+        dedicated or shared and hard or soft allocation, the ceiling, how long a hold lasts, the
+        booking cut-off, and whether overbooking or a waitlist is allowed (Capacity Pool & Reservation
+        Manager; Bundle Availability by Channel, Venue & Partner). The capacity itself is the
+        catalogue''s (`catalogue.channel_capacity`, `catalogue.inventory_hold`). A row with no
+        channel is the bundle''s default. (DM5, 29 September: data model for the agreed operations)
+
+        **Written by setBundleCapacityPolicy; read by listBundleCapacityPolicies,
+        listCapacityPoolReservation and listBundleAvailabilityChannel** (decided 29 September, writers pass).'
+      required:
+      - id
+      - bundleId
+      - capacitySource
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        bundleId:
+          type: string
+          format: uuid
+        channel:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/SalesChannel
+          nullable: true
+        venueId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Where the policy differs by venue for a multi-venue bundle.
+        partnerId:
+          type: string
+          format: uuid
+          nullable: true
+        capacitySource:
+          type: string
+          enum:
+          - sharedPool
+          - dedicatedBundleAllocation
+          - channelAllocation
+          - partnerAllocation
+          - eventCapacity
+          - timeslotCapacity
+          - seatInventory
+          - resourceCapacity
+        allocationMode:
+          type: string
+          enum:
+          - hard
+          - soft
+          default: hard
+          description: Hard allocation is ring-fenced for the bundle; soft is released back when unsold.
+        capacityCeiling:
+          type: integer
+          minimum: 0
+          nullable: true
+        holdDurationMinutes:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: How long a temporary reservation of the components lasts.
+        bookingCutoffMinutes:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: Minutes before the experience after which the bundle is no longer sold.
+        allowOverbooking:
+          type: boolean
+          default: false
+        allowWaitlist:
+          type: boolean
+          default: false
     UpsellPlacement:
       type: string
       enum:
@@ -9039,6 +10773,13 @@ components:
           type: string
           format: date-time
           description: For back-office testing of a rule before publishing.
+        orderId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'The order (`orders.sales_order`) being priced for payment. Sent only by the order
+            service when it confirms an order; when present the evaluation writes one
+            `promotions.promotion_evaluation_trace` row for it. (decided 29 September, writers pass)'
         lines:
           type: array
           minItems: 1
@@ -9667,9 +11408,8 @@ components:
     PromotionRuleBuilderInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is promotions.upsell_rule at 5%, so this is not an update to anything the package stores today
-        and no new table has been decided
+      x-ticvai-persistence: 'none — request only; saved as a `promotions.promotion_rule` row (PromotionRule,
+        ruleType benefit) (DM5, 29 September: data model for the agreed operations)'
       description: '**What Promotion Rule Builder submits.** The configurable fields from the pack''s
         directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -12839,8 +14579,8 @@ components:
     EligibilityRuleBuilderInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; saved as a `promotions.promotion_rule` row (PromotionRule,
+        ruleType eligibility, its criteria as the condition group and ruleEffect as effect) (DM5, 29 September: data model for the agreed operations)'
       description: '**What Eligibility Rule Builder submits.** The configurable fields from the pack''s
         directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -13582,8 +15322,8 @@ components:
     PromotionStackingRuleBuilderInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; the configurable part of a `promotions.stacking_rule`
+        row (StackingRule composes it) (DM5, 29 September: data model for the agreed operations)'
       description: '**What Promotion Stacking Rule Builder submits.** The configurable fields from
         the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -14079,8 +15819,9 @@ components:
     CampaignBudgetFinancialLimitSetupInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; saved as the `promotions.campaign` header (campaign,
+        budget owner, business entity, venue, effective dates) and its `promotions.campaign_budget`
+        lines (one per budget amount given, with funding source, cost centre and scope) (DM5, 29 September: data model for the agreed operations)'
       description: '**What Campaign Budget & Financial Limit Setup submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'

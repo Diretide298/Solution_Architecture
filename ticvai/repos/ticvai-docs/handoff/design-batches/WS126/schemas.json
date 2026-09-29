@@ -1,0 +1,148 @@
+{
+ "EventReschedule": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.event_reschedule",
+  "description": "Event boards 7.4 and 7.5. **The decision that generates every phone call.**",
+  "required": [
+   "kind",
+   "reason"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "moveTime",
+     "moveDate",
+     "moveVenue",
+     "cancel",
+     "abandon"
+    ]
+   },
+   "performanceIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "newStartsAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "newSpaceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string"
+   },
+   "ticketTreatment": {
+    "type": "string",
+    "enum": [
+     "moveAutomatically",
+     "offerChoice",
+     "refund",
+     "creditToWallet",
+     "honourAtAnyPerformance"
+    ],
+    "description": "**Made once and applied consistently**, rather than per guest at a desk."
+   },
+   "refundFees": {
+    "type": "boolean",
+    "default": true
+   },
+   "notifyGuests": {
+    "type": "boolean",
+    "default": true
+   },
+   "notificationTemplateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "affectedOrders": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "affectedGuests": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "EventSchedule": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.event_schedule",
+  "description": "Event board 2.2. **A performance that overruns pushes the next one.**",
+  "properties": {
+   "eventId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "performances": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "performanceId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "startsAt": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "plannedMinutes": {
+       "type": "integer"
+      },
+      "turnaroundMinutes": {
+       "type": "integer",
+       "default": 0
+      },
+      "spaceId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "seatMapId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "durationIsDynamic": {
+    "type": "boolean",
+    "default": false
+   },
+   "maximumOverrunMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "cascadeOverrun": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Whether a late finish moves everything after it**, which is the honest behaviour and the one venues forget to ask for until the first time it happens.\n"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ }
+}

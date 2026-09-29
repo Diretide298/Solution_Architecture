@@ -1,0 +1,1392 @@
+[
+ {
+  "id": "BO-744",
+  "name": "Data Governance Center",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "2",
+   "number": "01",
+   "page": 11
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/data-governance-center-bo-744",
+   "component": "apps/venue-management-web/src/routes/engagement-support/DataGovernanceCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-745",
+    "BO-746",
+    "BO-747",
+    "BO-748",
+    "BO-749",
+    "BO-750",
+    "BO-751",
+    "BO-752",
+    "BO-753"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-745",
+     "trigger": "Identity Resolution Rules",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-746",
+     "trigger": "Duplicate Review & Merge",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-747",
+     "trigger": "Consent Policy Configuration",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-748",
+     "trigger": "Consent Capture & Versions",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-749",
+     "trigger": "Guest Preference Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-750",
+     "trigger": "Data Subject Requests",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-751",
+     "trigger": "Retention & Anonymization",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-752",
+     "trigger": "Privacy & AI Governance",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-753",
+     "trigger": "Compliance Audit Dashboard",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide a consolidated view of customer-data quality, consent and privacy operations. Show duplicate profiles, pending merges, consent coverage, expiring consent, data-subject requests, retention actions and incidents. Filter by tenant, brand, venue, region, jurisdiction, data category, severity and owner. Surface overdue work, legal deadlines and high-risk exceptions with drill-down to the governing record. Provide trend analysis and controlled exports for privacy, legal, security and audit teams. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 11"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 11"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listPrivacyCompliance",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The data governance list.",
+   "error": "Could not load. Names which read failed and leaves the data governance untouched.",
+   "emptyFirstRun": "No data governance yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the data governance are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPrivacyCompliance",
+    "contract": "marketing-crm",
+    "purpose": "Data quality and consent coverage",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listDuplicateCandidates",
+    "contract": "marketing-crm",
+    "purpose": "Pending merges",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-744",
+   "workshopBoard": "wireframes/WS71 Marketing CRM Configuration Reference v1.0 Board 2.dc.html#bo-744"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 11. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-745",
+  "name": "Identity Resolution Rules",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "2",
+   "number": "02",
+   "page": 11
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/identity-resolution-rules-bo-745",
+   "component": "apps/venue-management-web/src/routes/engagement-support/IdentityResolutionRules.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-744"
+   ],
+   "exitTo": [
+    "BO-744"
+   ],
+   "transitions": [
+    {
+     "to": "BO-744",
+     "trigger": "Back to Data Governance Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure how potential duplicates are detected and a master identity is selected. Build weighted exact, normalized and fuzzy matching rules for email, phone, name, date of birth, membership, loyalty, passport and external IDs. Define match, possible-match and no-match thresholds, source priority, survivorship and field- level confidence. Support jurisdictional restrictions, excluded sources, false-positive handling and rule simulation before activation. Version, approve and audit rules and record the rule/version used for every automated decision. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 11"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 11"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setIdentityResolutionRules",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setIdentityResolutionRules"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The identity resolution rules list.",
+   "error": "Could not load. Names which read failed and leaves the identity resolution rules untouched.",
+   "emptyFirstRun": "No identity resolution rules yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the identity resolution rules are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getIdentityResolutionRules",
+    "contract": "marketing-crm",
+    "purpose": "Matching rules",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setIdentityResolutionRules",
+    "contract": "marketing-crm",
+    "purpose": "Weights, thresholds, survivorship",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getIdentityResolutionRules",
+     "listDuplicateCandidates"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-745",
+   "workshopBoard": "wireframes/WS71 Marketing CRM Configuration Reference v1.0 Board 2.dc.html#bo-745"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 11. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-746",
+  "name": "Duplicate Review & Merge",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "2",
+   "number": "03",
+   "page": 11
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/duplicate-review-merge-bo-746",
+   "component": "apps/venue-management-web/src/routes/engagement-support/DuplicateReviewMerge.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-744"
+   ],
+   "exitTo": [
+    "BO-744"
+   ],
+   "transitions": [
+    {
+     "to": "BO-744",
+     "trigger": "Back to Data Governance Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow trained users to review, merge, split or reject suspected duplicate profiles. Compare records side by side, highlight conflicts and display recommended master values with confidence and source provenance. Configuration Scope of Work | Version 1.0 11 Preview linked tickets, bookings, memberships, loyalty, wallet, cases, consents and documents before committing. Preserve all transaction history, identifiers, relationships and audit evidence and prevent unsafe automatic merges. Require reason codes and approval for high-risk merges and support controlled split/recovery where permitted. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 11"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 11"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listDuplicateCandidates",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows. **Only unverified matches arrive here** (decided 28 September, audit R120 (b)): a verified contact match attaches the order to the guest automatically at checkout, so this queue holds the matches no guest has proved."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "decideDuplicateCandidate",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "decideDuplicateCandidate"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The duplicate review merge list.",
+   "error": "Could not load. Names which read failed and leaves the duplicate review merge untouched.",
+   "emptyFirstRun": "No duplicate review merge yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the duplicate review merge are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getGuestMatchPolicy",
+    "contract": "marketing-crm",
+    "purpose": "How returning guests are recognised",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setGuestMatchPolicy",
+    "contract": "marketing-crm",
+    "purpose": "Match returning guests by email, mobile or either",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listDuplicateCandidates",
+    "contract": "marketing-crm",
+    "purpose": "Side by side",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "decideDuplicateCandidate",
+    "contract": "marketing-crm",
+    "purpose": "Merge, reject or split",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listDuplicateCandidates"
+    ]
+   },
+   {
+    "operationId": "mergeGuests",
+    "contract": "marketing-crm",
+    "purpose": "Perform the merge",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listDuplicateCandidates",
+     "searchGuests",
+     "getGuestProfile"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-746",
+   "workshopBoard": "wireframes/WS71 Marketing CRM Configuration Reference v1.0 Board 2.dc.html#bo-746"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 11. 0 of 0 labels bound to a contract property; 0 of 12 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "candidateId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-747",
+  "name": "Consent Policy Configuration",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "2",
+   "number": "04",
+   "page": 12
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/consent-policy-configuration-bo-747",
+   "component": "apps/venue-management-web/src/routes/engagement-support/ConsentPolicyConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-744"
+   ],
+   "exitTo": [
+    "BO-744"
+   ],
+   "transitions": [
+    {
+     "to": "BO-744",
+     "trigger": "Back to Data Governance Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Define the legal and operational rules governing consent. Configure consent purposes, marketing categories, processing purposes and channel-specific permission for email, SMS, WhatsApp, push and direct mail. Define jurisdiction, lawful basis, age and guardian requirements, capture channels, expiry, renewal and hard/soft enforcement. Map policies to brands, venues, products, audiences and processing activities with precedence and conflict handling. Require legal review, effective dates, version control and immutable policy-change history. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 12"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 12"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listConsentPurposes",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setConsentPurposes",
+       "label": "Save consent purposes",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setConsentPurposes"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The consent policy list.",
+   "error": "Could not load. Names which read failed and leaves the consent policy untouched.",
+   "emptyFirstRun": "No consent policy yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the consent policy are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "Purposes and lawful bases",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "Configure them",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-747",
+   "workshopBoard": "wireframes/WS71 Marketing CRM Configuration Reference v1.0 Board 2.dc.html#bo-747"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 12. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-748",
+  "name": "Consent Capture & Versions",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "2",
+   "number": "05",
+   "page": 12
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/consent-capture-versions-bo-748",
+   "component": "apps/venue-management-web/src/routes/engagement-support/ConsentCaptureVersions.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-744"
+   ],
+   "exitTo": [
+    "BO-744"
+   ],
+   "transitions": [
+    {
+     "to": "BO-744",
+     "trigger": "Back to Data Governance Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Manage the content and lifecycle of guest consent statements. Create multilingual consent versions with acknowledgement text, links, effective dates and supported channels. Capture who consented, what they saw, when, where, by which channel and under which policy version. Support withdrawal, expiry, re-consent and guardian authorization without overwriting prior evidence. Publish only approved versions and make the active statement available consistently to all touchpoints. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 12"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 12"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listVersioningEffectiveDate",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "recordConsent",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "recordConsent"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The consent capture versions list.",
+   "error": "Could not load. Names which read failed and leaves the consent capture versions untouched.",
+   "emptyFirstRun": "No consent capture versions yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the consent capture versions are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listVersioningEffectiveDate",
+    "contract": "marketing-crm",
+    "purpose": "Consent versions",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Capture a decision",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGuestConsents",
+     "getAudienceOverlap"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-748",
+   "workshopBoard": "wireframes/WS71 Marketing CRM Configuration Reference v1.0 Board 2.dc.html#bo-748"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 12. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-749",
+  "name": "Guest Preference Center",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "2",
+   "number": "06",
+   "page": 12
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/guest-preference-center-bo-749",
+   "component": "apps/venue-management-web/src/routes/engagement-support/GuestPreferenceCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-744"
+   ],
+   "exitTo": [
+    "BO-744"
+   ],
+   "transitions": [
+    {
+     "to": "BO-744",
+     "trigger": "Back to Data Governance Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure the guest-facing center for communication choices and privacy preferences. Expose subscription categories, topics, preferred channels, contact frequency, quiet hours and global or brand-level opt-outs. Apply identity verification and clearly distinguish transactional messages from optional marketing. Synchronize changes in real time to campaigns, journeys, chatbot, newsletters and notification delivery. Store an auditable receipt for every preference change and provide accessible, multilingual presentation. Configuration Scope of Work | Version 1.0 12 Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 12"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 12"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setCommunicationPreferenceMarketing",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getGuestConsents",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setCommunicationPreferenceMarketing"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The guest preference list.",
+   "error": "Could not load. Names which read failed and leaves the guest preference untouched.",
+   "emptyFirstRun": "No guest preference yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the guest preference are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setCommunicationPreferenceMarketing",
+    "contract": "marketing-crm",
+    "purpose": "The preference centre",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getGuestConsents",
+    "contract": "marketing-crm",
+    "purpose": "What a guest has chosen",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-749",
+   "workshopBoard": "wireframes/WS71 Marketing CRM Configuration Reference v1.0 Board 2.dc.html#bo-749"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 12. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-750",
+  "name": "Data Subject Requests",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "2",
+   "number": "07",
+   "page": 13
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/data-subject-requests-bo-750",
+   "component": "apps/venue-management-web/src/routes/engagement-support/DataSubjectRequests.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-744"
+   ],
+   "exitTo": [
+    "BO-744"
+   ],
+   "transitions": [
+    {
+     "to": "BO-744",
+     "trigger": "Back to Data Governance Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Manage privacy requests from intake through verified completion. Support access, rectification, portability, erasure, restriction and objection request types. Verify requester identity, calculate statutory deadlines, assign owners, gather approvals and track dependencies. Search connected systems, assemble export packages and document exclusions, legal holds or denied actions. Record communications, evidence, completion status and SLA performance in an immutable case history. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 13"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 13"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listDataSubjectCustomer",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setDataDiscoveryAccess",
+       "label": "Save data discovery access",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setDataDiscoveryAccess"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The data subject requests list.",
+   "error": "Could not load. Names which read failed and leaves the data subject requests untouched.",
+   "emptyFirstRun": "No data subject requests yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the data subject requests are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listDataSubjectCustomer",
+    "contract": "marketing-crm",
+    "purpose": "Privacy requests",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setDataDiscoveryAccess",
+    "contract": "marketing-crm",
+    "purpose": "Assemble and respond",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-750",
+   "workshopBoard": "wireframes/WS71 Marketing CRM Configuration Reference v1.0 Board 2.dc.html#bo-750"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 13. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-751",
+  "name": "Retention & Anonymization",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "2",
+   "number": "08",
+   "page": 13
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/retention-anonymization-bo-751",
+   "component": "apps/venue-management-web/src/routes/engagement-support/RetentionAnonymization.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-744"
+   ],
+   "exitTo": [
+    "BO-744"
+   ],
+   "transitions": [
+    {
+     "to": "BO-744",
+     "trigger": "Back to Data Governance Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure how long customer data is retained and what happens at expiry. Define policies by data category, jurisdiction, purpose, guest status, transaction type and source system. Support archive, anonymize, pseudonymize and delete actions, legal holds, fraud exceptions and scheduled execution. Preview affected records, dependencies and downstream consequences before high-impact actions. Produce completion evidence and reconcile results across analytics, search, documents, backups and integrations. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 13"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 13"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setDataRetentionPolicy",
+       "label": "Save data retention policy",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setDataRetentionPolicy"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The retention anonymization list.",
+   "error": "Could not load. Names which read failed and leaves the retention anonymization untouched.",
+   "emptyFirstRun": "No retention anonymization yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the retention anonymization are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setDataRetentionPolicy",
+    "contract": "marketing-crm",
+    "purpose": "Retention by category and jurisdiction",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listDataRetentionExpiry"
+    ]
+   },
+   {
+    "operationId": "runDataRetention",
+    "contract": "marketing-crm",
+    "purpose": "Preview or execute",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listDataRetentionExpiry",
+     "searchGuests"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-751",
+   "workshopBoard": "wireframes/WS71 Marketing CRM Configuration Reference v1.0 Board 2.dc.html#bo-751"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 13. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-752",
+  "name": "Privacy & AI Governance",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "2",
+   "number": "09",
+   "page": 13
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/privacy-ai-governance-bo-752",
+   "component": "apps/venue-management-web/src/routes/engagement-support/PrivacyAiGovernance.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-744"
+   ],
+   "exitTo": [
+    "BO-744"
+   ],
+   "transitions": [
+    {
+     "to": "BO-744",
+     "trigger": "Back to Data Governance Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Control privacy incidents and approved uses of customer data by AI. Track incident type, severity, affected data, containment, owner, notification obligations, mitigation and closure. Maintain approved models/use cases, prohibited data, risk level, purpose limitation and human- review requirements. Configure prompt/output retention, masking, vendor/model access and escalation for sensitive or high-impact decisions. Link controls to AI recommendations across CRM and preserve model, policy, reviewer and outcome evidence. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 13"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 13"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "recordPrivacyIncident",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listPrivacy",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "recordPrivacyIncident"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The privacy governance list.",
+   "error": "Could not load. Names which read failed and leaves the privacy governance untouched.",
+   "emptyFirstRun": "No privacy governance yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the privacy governance are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "recordPrivacyIncident",
+    "contract": "marketing-crm",
+    "purpose": "Record an incident",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listPrivacy",
+    "contract": "marketing-crm",
+    "purpose": "Approved AI uses and limits",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-752",
+   "workshopBoard": "wireframes/WS71 Marketing CRM Configuration Reference v1.0 Board 2.dc.html#bo-752"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 13. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-753",
+  "name": "Compliance Audit Dashboard",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "2",
+   "number": "10",
+   "page": 13
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/compliance-audit-dashboard-bo-753",
+   "component": "apps/venue-management-web/src/routes/engagement-support/ComplianceAuditDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-744"
+   ],
+   "exitTo": [
+    "BO-744"
+   ],
+   "transitions": [
+    {
+     "to": "BO-744",
+     "trigger": "Back to Data Governance Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Demonstrate consent and privacy compliance through measurable evidence. Configuration Scope of Work | Version 1.0 13 Report consent coverage and expiry, request volumes and SLA, retention completion, anonymization, deletion and incident trends. Drill down by jurisdiction, business unit, channel, policy, owner and data category. Provide controlled evidence packages, exception logs and audit exports with source references and timestamps. Restrict compliance information appropriately and record every view, export and administrative action. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history. Configuration Scope of Work | Version 1.0 14 Board 3 - Audience Segmentation & Personalization Figure 3. High-definition configuration board with all 10 screens. Configuration Scope of Work | Version 1.0 15",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 13"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 13"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listPrivacyEvidenceCompliance",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The compliance audit list.",
+   "error": "Could not load. Names which read failed and leaves the compliance audit untouched.",
+   "emptyFirstRun": "No compliance audit yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the compliance audit are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPrivacyEvidenceCompliance",
+    "contract": "marketing-crm",
+    "purpose": "Evidence for an audit",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-753",
+   "workshopBoard": "wireframes/WS71 Marketing CRM Configuration Reference v1.0 Board 2.dc.html#bo-753"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 13. 0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

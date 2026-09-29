@@ -34,8 +34,8 @@ The four parts share 16 back-end services. Each looks after one area of the busi
 
 | Service | What it looks after | If it is unavailable |
 |---|---|---|
-| Sign-in and people | Staff and guest accounts, sign-in, roles and permissions, and personal-data requests. | Nobody can sign in, so everything stops. |
 | Organisation and settings | Your organisation, regions, venues, outlets and tills, and the settings each one uses. | Nothing can find its venue or settings, so everything stops. |
+| Sign-in and people | Staff and guest accounts, sign-in, roles and permissions, and personal-data requests. | Nobody can sign in, so everything stops. |
 | Sales and payments | Baskets, orders, payments, refunds, and opening and closing cashier shifts. | No new sales can be taken. This service has the highest availability target. |
 | Products and pricing | What is sold, at what price and when: products, events and sessions, price lists, promotions, bundles and seating. | Tills keep selling from their last published catalogue; changes wait. |
 | Entry and admission | Tickets and passes at the gate, admission rules and entry validation. | Gates fall back to their local copy of what is valid. |

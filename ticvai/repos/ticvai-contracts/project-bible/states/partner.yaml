@@ -1,0 +1,117 @@
+# Partner account — state model
+# Contract: subscription.PartnerAccountStatus
+# Checked by tools/check-states.py.
+
+entity: Partner account
+contract: subscription
+enum: PartnerAccountStatus
+enumKind: named
+enumSchema: PartnerAccountStatus
+owner: subscription
+initial:
+- lead
+- applicant
+terminal:
+- archived
+transitions:
+- from: lead
+  to: applicant
+  trigger: cascade
+  guard: An onboarding application (`control.partner_application`) is submitted for the lead. A partner
+    that self-registers through `registerPartner` is created already `applicant`
+- from: applicant
+  to: underReview
+  operation: actOnPartnerApplicationReview
+  trigger: operation
+  guard: '`action: startReview` on the application: it leaves the `application` stage and the departmental reviews
+    begin (decided 29 September, writers pass; DM4)'
+- from: underReview
+  to: approved
+  operation: approvePartnerStatuLifecycle
+  trigger: operation
+  requiresApproval: true
+  guard: '**Action `approve`, and it goes through the approvals engine.** Whether to trade with a company
+    is a commercial decision, as `registerPartner` already says: the operation raises the request and
+    answers `applied: false` with its `approvalRequestId` until it is decided'
+- from: approved
+  to: configuration
+  trigger: cascade
+  guard: The first commercial agreement for the approved partner is drafted (`createPartnerAgreement` or
+    `setAgreementContractTerm`)
+- from: configuration
+  to: active
+  operation: approvePartnerStatuLifecycle
+  trigger: operation
+  guard: Action `activate`. **No critical readiness blocker** (`listPartnerProfileReadiness`) and an active
+    agreement
+- from: active
+  to: restricted
+  operation: approvePartnerStatuLifecycle
+  trigger: operation
+  guard: Action `restrict`, with the selected restrictions recorded on `control.partner_status_history`
+- from: restricted
+  to: active
+  operation: approvePartnerStatuLifecycle
+  trigger: operation
+  guard: Action `reactivate`; the restrictions lapse
+  isReversal: true
+- from: active
+  to: suspended
+  operation: approvePartnerStatuLifecycle
+  trigger: operation
+  guard: Action `suspend`. **Existing tickets stay valid**; new business stops, fully or per the selected
+    restrictions
+- from: restricted
+  to: suspended
+  operation: approvePartnerStatuLifecycle
+  trigger: operation
+  guard: Action `suspend` on a partner already restricted
+- from: suspended
+  to: active
+  operation: approvePartnerStatuLifecycle
+  trigger: operation
+  guard: Action `reactivate`; the reason for the suspension is resolved
+  isReversal: true
+- from: active
+  to: terminated
+  operation: approvePartnerStatuLifecycle
+  trigger: operation
+  guard: Action `terminate`. **Terminating does not settle** — outstanding balances and settlements survive
+- from: restricted
+  to: terminated
+  operation: approvePartnerStatuLifecycle
+  trigger: operation
+  guard: Action `terminate` on a restricted partner
+- from: suspended
+  to: terminated
+  operation: approvePartnerStatuLifecycle
+  trigger: operation
+  guard: Action `terminate` on a suspended partner
+- from: lead
+  to: archived
+  operation: approvePartnerStatuLifecycle
+  trigger: operation
+  guard: Action `archive`; the lead is not pursued
+- from: applicant
+  to: archived
+  operation: approvePartnerStatuLifecycle
+  trigger: operation
+  guard: Action `archive`; the application is withdrawn or rejected before review
+- from: underReview
+  to: archived
+  operation: approvePartnerStatuLifecycle
+  trigger: operation
+  guard: Action `archive`; the application is refused. The record is kept for the duplicate check
+- from: terminated
+  to: archived
+  operation: approvePartnerStatuLifecycle
+  trigger: operation
+  guard: Action `archive`, once nothing is owed either way
+notes: '**The partner lifecycle is not the agreement lifecycle** (decided 29 September, data model DM4).
+  `PartnerAgreementStatus` says whether a set of terms is in force; this says whether the company may
+  trade at all. Every action is recorded on `control.partner_status_history` with its reason, scope and
+  effective date, and a change dated in the future takes effect when that date arrives.
+
+
+  **`approved` and `configuration` are separate** because a partner the business has agreed to trade with
+  still cannot sell until its agreement, rates, credit and access are set up.'

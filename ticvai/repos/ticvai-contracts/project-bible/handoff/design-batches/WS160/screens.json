@@ -1,0 +1,1935 @@
+[
+ {
+  "id": "BO-903",
+  "name": "Equipment & Asset Command Center",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "6",
+   "number": "01",
+   "page": 82
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/equipment-asset-command-center-bo-903",
+   "component": "apps/venue-management-web/src/routes/rentals/EquipmentAssetCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-904",
+    "BO-905",
+    "BO-906",
+    "BO-907",
+    "BO-908",
+    "BO-909",
+    "BO-910",
+    "BO-911",
+    "BO-912"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-904",
+     "trigger": "Rental Resource Configuration",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-905",
+     "trigger": "Rental Inventory & Availability Control",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-906",
+     "trigger": "Resource Checkout Workspace",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-907",
+     "trigger": "Guest & Resource Assignment",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-908",
+     "trigger": "Rental Duration, Extension & Return Management",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-909",
+     "trigger": "Deposit & Rental Financial Control",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-910",
+     "trigger": "Maintenance & Resource Blocking",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-911",
+     "trigger": "Inspection, Condition & Compliance Management",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-912",
+     "trigger": "Asset Lifecycle, Depreciation & Retirement",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "carries": [
+      "assetId",
+      "resourceId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Provide operations teams with a real-time overview of all physical resources across the organization.",
+  "purposeNote": "Authorized users can understand the real-time operational state of all physical resources and immediately identify assets requiring operational action.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 82 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every equipment asset",
+       "columns": [
+        "Total assets",
+        "Available",
+        "Reserved",
+        "Checked out",
+        "In use",
+        "Due for return",
+        "Overdue",
+        "Under maintenance",
+        "Inspection due",
+        "Damaged",
+        "Lost",
+        "Retired",
+        "Asset Value Indicators"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 82 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected equipment asset",
+       "bindsTo": null,
+       "columns": [
+        "Total assets",
+        "Available",
+        "Reserved",
+        "Checked out",
+        "In use",
+        "Due for return",
+        "Overdue",
+        "Under maintenance",
+        "Inspection due",
+        "Damaged",
+        "Lost",
+        "Retired",
+        "Asset Value Indicators"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Users shall view resources by”, “Users may initiate”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 82 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "banner",
+       "label": "Permissions this screen separates",
+       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Total asset value, Replacement value, Depreciated value, Maintenance cost, Lost/damaged value. Each needs attaching to the control it gates, or the screen needs the control.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 82 §Where financial permissions allow"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The equipment asset list.",
+   "error": "Could not load. Names which read failed and leaves the equipment asset untouched.",
+   "emptyFirstRun": "No equipment asset yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the equipment asset are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listResources",
+    "contract": "resources",
+    "purpose": "Equipment and assets",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listAssets",
+    "contract": "maintenance",
+    "purpose": "The asset register",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Total assets",
+    "Available",
+    "Reserved",
+    "Checked out",
+    "In use",
+    "Due for return"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-903",
+   "workshopBoard": "wireframes/WS131 Resource Management Configuration Board 6.dc.html#bo-903"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 82. 0 of 13 labels bound to a contract property; 18 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-904",
+  "name": "Rental Resource Configuration",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "6",
+   "number": "02",
+   "page": 83
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/rental-resource-configuration-bo-904",
+   "component": "apps/venue-management-web/src/routes/rentals/RentalResourceConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-903"
+   ],
+   "exitTo": [
+    "BO-903"
+   ],
+   "transitions": [
+    {
+     "to": "BO-903",
+     "trigger": "Back to Equipment & Asset Command Center",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Administrators shall configure; Configure) and no display directory — it is settings, not a population",
+  "purpose": "Define how a physical resource behaves when offered as a customer-rental resource.",
+  "purposeNote": "Administrators can define how each physical resource or resource category behaves throughout the rental process.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Rental enabled",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Rental item/resource type",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Rental duration",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Minimum duration",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum duration",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Rental increments",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Same-day return required",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Overnight rental permitted",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Extension permitted",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum extension",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Advance reservation permitted",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Walk-in rental permitted",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer eligibility",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue availability",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Quantity Model",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Expected return time",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Grace period",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Late-return policy",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Automatic overdue status",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Return venue",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Cross-venue return allowed",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Inspection required",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Channel Rules",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "POS",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "B2C",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Mobile App",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Kiosk",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Employee App",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "API",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 83 §Configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The rental resource configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the rental resource untouched.",
+   "emptyFirstRun": "No rental resource configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "getRentalProduct",
+    "contract": "rental",
+    "purpose": "The rental product behind the resource",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setRentalInventoryModel",
+    "contract": "rental",
+    "purpose": "Pooled, serialised or hybrid",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getRentalProduct",
+     "getRentalAvailability"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-904",
+   "workshopBoard": "wireframes/WS131 Resource Management Configuration Board 6.dc.html#bo-904"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 83. 0 of 0 labels bound to a contract property; 29 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "productId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-905",
+  "name": "Rental Inventory & Availability Control",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "6",
+   "number": "03",
+   "page": 84
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/rental-inventory-availability-control-bo-905",
+   "component": "apps/venue-management-web/src/routes/rentals/RentalInventoryAvailabilityControl.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-903"
+   ],
+   "exitTo": [
+    "BO-903"
+   ],
+   "transitions": [
+    {
+     "to": "BO-903",
+     "trigger": "Back to Equipment & Asset Command Center",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Administrators shall configure) and no display directory — it is settings, not a population",
+  "purpose": "Provide real-time inventory visibility for rental and operational resources.",
+  "purposeNote": "before they impact customer operations.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Minimum available quantity",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 84 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reorder/transfer threshold",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 84 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Critical threshold",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 84 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum quantity",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 84 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Smart Alerts",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 84 §Administrators shall configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The rental inventory availability configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the rental inventory availability untouched.",
+   "emptyFirstRun": "No rental inventory availability configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "getRentalAvailability",
+    "contract": "rental",
+    "purpose": "What is free, with turnaround subtracted",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setRentalAvailabilityRules",
+    "contract": "rental",
+    "purpose": "Buffers and release rules",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getRentalAvailability"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-905",
+   "workshopBoard": "wireframes/WS131 Resource Management Configuration Board 6.dc.html#bo-905"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 84. 0 of 0 labels bound to a contract property; 5 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "productId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-906",
+  "name": "Resource Checkout Workspace",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "6",
+   "number": "04",
+   "page": 85
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/resource-checkout-workspace-bo-906",
+   "component": "apps/venue-management-web/src/routes/rentals/ResourceCheckoutWorkspace.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-903"
+   ],
+   "exitTo": [
+    "BO-903"
+   ],
+   "transitions": [
+    {
+     "to": "BO-903",
+     "trigger": "Back to Equipment & Asset Command Center",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
+  "purpose": "Provide frontline employees with a fast digital interface for issuing physical resources to guests.",
+  "purposeNote": "Frontline employees can issue a resource to a guest through a fast scan-driven workflow, and resource availability updates immediately.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Resource",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 85 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Guest",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 85 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Checkout time",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 85 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Expected return",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 85 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Rental duration",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 85 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 85 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Rental station",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 85 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Employee",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 85 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Condition at checkout",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 85 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Deposit",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 85 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Notes",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 85 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Fast Checkout",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 85 §Capture"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resource checkout configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the resource checkout untouched.",
+   "emptyFirstRun": "No resource checkout configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "checkOutRental",
+    "contract": "rental",
+    "purpose": "Hand it over",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getRentalBooking",
+     "listRentalBookings",
+     "getRentalAvailability"
+    ]
+   },
+   {
+    "operationId": "getRentalBooking",
+    "contract": "rental",
+    "purpose": "The booking being checked out",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-906",
+   "workshopBoard": "wireframes/WS131 Resource Management Configuration Board 6.dc.html#bo-906"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 85. 0 of 0 labels bound to a contract property; 12 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "bookingId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-907",
+  "name": "Guest & Resource Assignment",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "6",
+   "number": "05",
+   "page": 87
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/guest-resource-assignment-bo-907",
+   "component": "apps/venue-management-web/src/routes/rentals/GuestResourceAssignment.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-903"
+   ],
+   "exitTo": [
+    "BO-903"
+   ],
+   "transitions": [
+    {
+     "to": "BO-903",
+     "trigger": "Back to Equipment & Asset Command Center",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Maintain a live relationship between every checked-out physical resource and the guest responsible for it.",
+  "purposeNote": "Every checked-out tracked resource can be traced to the responsible guest, booking, transaction, and issuing employee.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 87 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every guest resource",
+       "columns": [
+        "Guest",
+        "Photograph where available",
+        "Ticket/booking",
+        "Membership",
+        "Resource",
+        "Resource ID",
+        "Checkout time",
+        "Expected return",
+        "Current status",
+        "Deposit",
+        "Venue",
+        "Responsible employee",
+        "Guest Resource Timeline"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 87 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected guest resource",
+       "bindsTo": null,
+       "columns": [
+        "Guest",
+        "Photograph where available",
+        "Ticket/booking",
+        "Membership",
+        "Resource",
+        "Resource ID",
+        "Checkout time",
+        "Expected return",
+        "Current status",
+        "Deposit",
+        "Venue",
+        "Responsible employee",
+        "Guest Resource Timeline"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Expected returns”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 87 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The guest resource list.",
+   "error": "Could not load. Names which read failed and leaves the guest resource untouched.",
+   "emptyFirstRun": "No guest resource yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the guest resource are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "assignRentalEquipment",
+    "contract": "rental",
+    "purpose": "Bind assets to the booking",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getRentalBooking"
+    ]
+   },
+   {
+    "operationId": "checkOutResource",
+    "contract": "resources",
+    "purpose": "Hand the resource over",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Guest",
+    "Photograph where available",
+    "Ticket/booking",
+    "Membership",
+    "Resource",
+    "Resource ID"
+   ],
+   "params": [
+    {
+     "name": "bookingId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-907",
+   "workshopBoard": "wireframes/WS131 Resource Management Configuration Board 6.dc.html#bo-907"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 87. 0 of 13 labels bound to a contract property; 21 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-908",
+  "name": "Rental Duration, Extension & Return Management",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "6",
+   "number": "06",
+   "page": 88
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/rental-duration-extension-return-management-bo-908",
+   "component": "apps/venue-management-web/src/routes/rentals/RentalDurationExtensionReturnManagement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-903"
+   ],
+   "exitTo": [
+    "BO-903"
+   ],
+   "transitions": [
+    {
+     "to": "BO-903",
+     "trigger": "Back to Equipment & Asset Command Center",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Control rental periods and manage extensions, overdue items, and returns.",
+  "purposeNote": "and final return.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 88 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every rental duration extension",
+       "columns": [
+        "Resource",
+        "Guest",
+        "Checkout",
+        "Due time",
+        "Remaining time",
+        "Status",
+        "Deposit",
+        "Extension eligibility",
+        "Status Indicators",
+        "Active",
+        "Due Soon",
+        "Overdue",
+        "Extended",
+        "Return Pending",
+        "Returned",
+        "Extension"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 88 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected rental duration extension",
+       "bindsTo": null,
+       "columns": [
+        "Resource",
+        "Guest",
+        "Checkout",
+        "Due time",
+        "Remaining time",
+        "Status",
+        "Deposit",
+        "Extension eligibility",
+        "Status Indicators",
+        "Active",
+        "Due Soon",
+        "Overdue",
+        "Extended",
+        "Return Pending",
+        "Returned",
+        "Extension"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Extend Rental”, “On return”, “Possible next status”, “Overdue Management”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 88 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The rental duration extension list.",
+   "error": "Could not load. Names which read failed and leaves the rental duration extension untouched.",
+   "emptyFirstRun": "No rental duration extension yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the rental duration extension are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "extendRental",
+    "contract": "rental",
+    "purpose": "Keep it longer",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getRentalBooking",
+     "getRentalAvailability"
+    ]
+   },
+   {
+    "operationId": "returnRental",
+    "contract": "rental",
+    "purpose": "Take it back and settle",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getRentalBooking",
+     "listRentalBookings",
+     "getRentalAvailability",
+     "listOverdueRentals"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Resource",
+    "Guest",
+    "Checkout",
+    "Due time",
+    "Remaining time",
+    "Status"
+   ],
+   "params": [
+    {
+     "name": "bookingId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-908",
+   "workshopBoard": "wireframes/WS131 Resource Management Configuration Board 6.dc.html#bo-908"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 88. 0 of 16 labels bound to a contract property; 16 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-909",
+  "name": "Deposit & Rental Financial Control",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "6",
+   "number": "07",
+   "page": 89
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/deposit-rental-financial-control-bo-909",
+   "component": "apps/venue-management-web/src/routes/rentals/DepositRentalFinancialControl.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-903"
+   ],
+   "exitTo": [
+    "BO-903"
+   ],
+   "transitions": [
+    {
+     "to": "BO-903",
+     "trigger": "Back to Equipment & Asset Command Center",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Track) and no metric row",
+  "purpose": "Configure and manage deposits associated with rental resources.",
+  "purposeNote": "Deposits are collected, held, adjusted, and returned according to configurable rental policies with complete financial traceability.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 89 §Track"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every deposit rental financial",
+       "columns": [
+        "Required",
+        "Collected",
+        "Authorized",
+        "Held",
+        "Partially retained",
+        "Returned",
+        "Forfeited",
+        "Return Decision"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 89 §Track"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected deposit rental financial",
+       "bindsTo": null,
+       "columns": [
+        "Required",
+        "Collected",
+        "Authorized",
+        "Held",
+        "Partially retained",
+        "Returned",
+        "Forfeited",
+        "Return Decision"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Stroller”, “Premium Camera”, “Collection Methods”, “Upon resource return”, “Governance”, “Finance Integration”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 89 §Track"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The deposit rental financial list.",
+   "error": "Could not load. Names which read failed and leaves the deposit rental financial untouched.",
+   "emptyFirstRun": "No deposit rental financial yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the deposit rental financial are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setRentalDepositPolicy",
+    "contract": "rental",
+    "purpose": "How much is held, and how",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listRentalPricingProfiles"
+    ]
+   },
+   {
+    "operationId": "setRentalFeePolicy",
+    "contract": "rental",
+    "purpose": "Grace period and late fees",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listRentalPricingProfiles"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Required",
+    "Collected",
+    "Authorized",
+    "Held",
+    "Partially retained",
+    "Returned"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-909",
+   "workshopBoard": "wireframes/WS131 Resource Management Configuration Board 6.dc.html#bo-909"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 89. 0 of 8 labels bound to a contract property; 16 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-910",
+  "name": "Maintenance & Resource Blocking",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "6",
+   "number": "08",
+   "page": 91
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/maintenance-resource-blocking-bo-910",
+   "component": "apps/venue-management-web/src/routes/rentals/MaintenanceResourceBlocking.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-903"
+   ],
+   "exitTo": [
+    "BO-903"
+   ],
+   "transitions": [
+    {
+     "to": "BO-903",
+     "trigger": "Back to Equipment & Asset Command Center",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
+  "purpose": "Prevent unavailable or unsafe resources from being assigned, rented, or reserved.",
+  "purposeNote": "Resources under maintenance are automatically removed from operational availability and affected future assignments are identified immediately.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Resource",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 91 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maintenance type",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 91 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Issue",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 91 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Severity",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 91 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Start date/time",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 91 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Expected completion",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 91 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Actual completion",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 91 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Technician/vendor",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 91 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Cost",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 91 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Attachments",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 91 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Notes",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 91 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Automatic Blocking",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 91 §Capture"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Manufacturer service",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 91 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The maintenance resource blocking configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the maintenance resource blocking untouched.",
+   "emptyFirstRun": "No maintenance resource blocking configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "createResourceBlock",
+    "contract": "resources",
+    "purpose": "Take it out of service",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listResourceBlocks",
+     "getResourceCalendar"
+    ]
+   },
+   {
+    "operationId": "createWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Raise the repair",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listWorkOrders",
+     "getDueMaintenance"
+    ]
+   },
+   {
+    "operationId": "getDueMaintenance",
+    "contract": "maintenance",
+    "purpose": "What is due",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-910",
+   "workshopBoard": "wireframes/WS131 Resource Management Configuration Board 6.dc.html#bo-910"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 91. 0 of 0 labels bound to a contract property; 13 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Manufacturer service are choices sent by `createWorkOrder` (planned work order assigned to the manufacturer (resolution referredExternal)).",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-911",
+  "name": "Inspection, Condition & Compliance Management",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "6",
+   "number": "09",
+   "page": 92
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/inspection-condition-compliance-management-bo-911",
+   "component": "apps/venue-management-web/src/routes/rentals/InspectionConditionComplianceManagement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-903"
+   ],
+   "exitTo": [
+    "BO-903"
+   ],
+   "transitions": [
+    {
+     "to": "BO-903",
+     "trigger": "Back to Equipment & Asset Command Center",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Track) and no metric row",
+  "purpose": "Ensure physical resources remain safe, compliant, and operationally fit for use.",
+  "purposeNote": "resources from operational use.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 92 §Track"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every inspection condition compliance",
+       "columns": [
+        "Last inspection",
+        "Next inspection",
+        "Inspection frequency",
+        "Responsible person",
+        "Compliance status",
+        "Automatic Status"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 92 §Track"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected inspection condition compliance",
+       "bindsTo": null,
+       "columns": [
+        "Last inspection",
+        "Next inspection",
+        "Inspection frequency",
+        "Responsible person",
+        "Compliance status",
+        "Automatic Status"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Inspection Templates”, “Stroller Return Inspection”, “AV Equipment Inspection”, “Users may attach”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 92 §Track"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Passed with Observation",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 92 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Failed",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 92 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Evidence",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 92 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The inspection condition compliance list.",
+   "error": "Could not load. Names which read failed and leaves the inspection condition compliance untouched.",
+   "emptyFirstRun": "No inspection condition compliance yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the inspection condition compliance are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "recordRentalInspection",
+    "contract": "rental",
+    "purpose": "Condition, with evidence",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getRentalBooking"
+    ]
+   },
+   {
+    "operationId": "submitInspection",
+    "contract": "maintenance",
+    "purpose": "The maintenance inspection",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listInspections",
+    "contract": "maintenance",
+    "purpose": "Inspections so far",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Last inspection",
+    "Next inspection",
+    "Inspection frequency",
+    "Responsible person",
+    "Compliance status",
+    "Automatic Status"
+   ],
+   "params": [
+    {
+     "name": "bookingId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-911",
+   "workshopBoard": "wireframes/WS131 Resource Management Configuration Board 6.dc.html#bo-911"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 92. 0 of 6 labels bound to a contract property; 9 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Passed with Observation, Failed, Evidence are choices sent by `submitInspection` (responses[].passed + note (passed with observation / failed), attachmentRefs (evidence)).",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-912",
+  "name": "Asset Lifecycle, Depreciation & Retirement",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "6",
+   "number": "10",
+   "page": 93
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/asset-lifecycle-depreciation-retirement-bo-912",
+   "component": "apps/venue-management-web/src/routes/rentals/AssetLifecycleDepreciationRetirement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-903"
+   ],
+   "exitTo": [
+    "BO-903"
+   ],
+   "transitions": [
+    {
+     "to": "BO-903",
+     "trigger": "Back to Equipment & Asset Command Center",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Track) and no metric row",
+  "purpose": "Manage the physical resource from acquisition through operational use to final retirement. Provide TICVAI with a centralized Event Resource Planning Engine that allows event managers and operations teams to define everything required to deliver an event and convert those requirements into actual resource reservations and assignments. The board shall manage event requirements across: Venues Auditoriums Halls Rooms Stages Breakout areas Outdoor areas AV systems Lighting Sound systems Projectors Screens Chairs Tables Booths Operational equipment Event managers Ushers Security Technical crew Hosts Performers Mascots Temporary staff Other configurable resources",
+  "purposeNote": "retirement, including operational history, maintenance, condition, value references, and governance. Board 6 Shared Digital Resource Journey A physical resource should have a complete digital operational history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 93 §Track"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every asset lifecycle depreciation",
+       "columns": [
+        "Acquisition date",
+        "Purchase cost",
+        "Supplier",
+        "Warranty",
+        "Expected useful life",
+        "Replacement value",
+        "Current book/reference value",
+        "Depreciation method",
+        "Depreciation period",
+        "Maintenance history",
+        "Utilization",
+        "Condition",
+        "Depreciation",
+        "Straight-line depreciation",
+        "Configurable financial method",
+        "Accumulated depreciation",
+        "Current value"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 93 §Track"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected asset lifecycle depreciation",
+       "bindsTo": null,
+       "columns": [
+        "Acquisition date",
+        "Purchase cost",
+        "Supplier",
+        "Warranty",
+        "Expected useful life",
+        "Replacement value",
+        "Current book/reference value",
+        "Depreciation method",
+        "Depreciation period",
+        "Maintenance history",
+        "Utilization",
+        "Condition",
+        "Depreciation",
+        "Straight-line depreciation",
+        "Configurable financial method",
+        "Accumulated depreciation",
+        "Current value"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Retirement Assessment”, “Projector P-17”, “Retirement may require”, “Stroller S-084”, “Typical operational states include”, “Board 6 shall integrate with”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 93 §Track"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "→ End of Life",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 93 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Asset Information",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 93 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The asset lifecycle depreciation list.",
+   "error": "Could not load. Names which read failed and leaves the asset lifecycle depreciation untouched.",
+   "emptyFirstRun": "No asset lifecycle depreciation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the asset lifecycle depreciation are still there. The pack's own statuses are deliver this event? — the state names which is selected.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setResourceLifecycleState",
+    "contract": "resources",
+    "purpose": "Retire or archive it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getResource",
+     "listResources",
+     "getResourceAuditTrail"
+    ]
+   },
+   {
+    "operationId": "getAssetHistory",
+    "contract": "maintenance",
+    "purpose": "Its life so far",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Acquisition date",
+    "Purchase cost",
+    "Supplier",
+    "Warranty",
+    "Expected useful life",
+    "Replacement value"
+   ],
+   "params": [
+    {
+     "name": "assetId",
+     "from": "navigation"
+    },
+    {
+     "name": "resourceId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-912",
+   "workshopBoard": "wireframes/WS131 Resource Management Configuration Board 6.dc.html#bo-912"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 93. 0 of 17 labels bound to a contract property; 25 of 188 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** → End of Life are choices sent by `setResourceLifecycleState` (state retired with disposal); Asset Information dropped (section heading).",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

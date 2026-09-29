@@ -1,1 +1,120 @@
-{}
+{
+ "authoriseGameplay": {
+  "method": "POST",
+  "path": "/gameplay-authorisations",
+  "contract": "games",
+  "summary": "Decide a tap, now",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GameplayAuthorisationRequest",
+  "responds": "GameplayAuthorisation"
+ },
+ "getGameCard": {
+  "method": "GET",
+  "path": "/game-cards/{cardCode}",
+  "contract": "games",
+  "summary": "Read a card's balances",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GameCard"
+ },
+ "linkWalletCredential": {
+  "method": "POST",
+  "path": "/wallet-credentials",
+  "contract": "wallet",
+  "summary": "Bind a wristband, card or device to a wallet",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": true,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletCredential",
+  "responds": "WalletCredential"
+ },
+ "listGameplayTransactions": {
+  "method": "GET",
+  "path": "/gameplay-transactions",
+  "contract": "games",
+  "summary": "Taps, decisions and what they cost",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "readerId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outcome",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GameplayTransaction"
+ },
+ "setGameCardExpiryRules": {
+  "method": "PUT",
+  "path": "/game-card-expiry-rules",
+  "contract": "games",
+  "summary": "When a card lapses, and what warns the guest first",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GameCardExpiryRules",
+  "responds": "GameCardExpiryRules"
+ },
+ "setGameCardLifecycle": {
+  "method": "POST",
+  "path": "/game-cards/{cardId}/lifecycle",
+  "contract": "games",
+  "summary": "Block, suspend, reactivate, replace or expire a card",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GameCard"
+ }
+}

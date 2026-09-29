@@ -11,7 +11,7 @@
                                                       v
                                                 tables - stored procedure
 
-`wireframes/P01 Guest Web.dc.html#web-005` is `WEB-005 Ticket Type Selection`, which calls `evaluatePromotions`, which lives in `CatalogueService`, reads `cache:idempotency`, `catalogue.price_list`, `promotions.promotion` and writes `cache:idempotency`.
+`wireframes/P01 Guest Web.dc.html#web-005` is `WEB-005 Ticket Type Selection`, which calls `evaluatePromotions`, which lives in `CatalogueService`, reads `cache:idempotency`, `catalogue.price_list`, `promotions.coupon_code`, `promotions.promotion` and writes `cache:idempotency`, `promotions.promotion_evaluation_trace`.
 
 ## Where each link lives
 
@@ -20,7 +20,7 @@
 | Screen -> board | `wireframe.board` on every screen: `wireframes/<file>#<id>` |
 | Platform -> board | `platform.wireframeBoard` |
 | Board -> screen | The anchor `id` on each frame, matched by id |
-| Screen -> operations | `apis[].operationId`, validated against 2,298 |
+| Screen -> operations | `apis[].operationId`, validated against 2,405 |
 | Operation -> tables | `handoff/api-data-lineage.json` |
 | Screen -> everything | **`handoff/screen-index.json`** - the join, pre-computed |
 
@@ -34,11 +34,11 @@
 | Screens with a board anchor | 2,440 |
 | **Screens with no anchor** | **0** |
 | Screens declaring at least one operation | 2,334 |
-| Screens whose operations resolve to a table | 1,648 |
+| Screens whose operations resolve to a table | 2,331 |
 | Anchored links inside the boards | 5,421 |
 | Cross-platform reaches declared | 6 |
 
-**106 screens declare no operation.** They are real screens with a purpose and nothing specified yet, and `screen-index.json` says so by returning empty arrays rather than guessing. **686 declare operations that reach no table** - mostly configuration reads served from a cache, and navigation screens that only route.
+**106 screens declare no operation.** They are real screens with a purpose and nothing specified yet, and `screen-index.json` says so by returning empty arrays rather than guessing. **3 declare operations that reach no table** - mostly configuration reads served from a cache, and navigation screens that only route.
 
 ## What the checker enforces
 

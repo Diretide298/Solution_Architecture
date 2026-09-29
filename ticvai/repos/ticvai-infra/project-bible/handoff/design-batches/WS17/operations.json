@@ -1,1 +1,178 @@
-{}
+{
+ "createApprovalDelegation": {
+  "method": "POST",
+  "path": "/delegations",
+  "contract": "approvals",
+  "summary": "Delegate approval authority",
+  "permission": "APPROVAL_DECIDE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalDelegation",
+  "responds": "ApprovalDelegation"
+ },
+ "getApprovalAnalytics": {
+  "method": "GET",
+  "path": "/approval-analytics",
+  "contract": "approvals",
+  "summary": "Volumes, times, rejections and bottlenecks",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalAnalytics"
+ },
+ "listApprovalDelegations": {
+  "method": "GET",
+  "path": "/delegations",
+  "contract": "approvals",
+  "summary": "Who is standing in for whom",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ApprovalDelegation"
+ },
+ "listDelegations": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/delegations",
+  "contract": "identity",
+  "summary": "Who may act for this guest, and for whom they may act",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSlaEscalationBottleneck": {
+  "method": "GET",
+  "path": "/sla-escalation-bottleneck",
+  "contract": "approvals",
+  "summary": "SLA, Escalation & Bottleneck Monitor",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "workflow",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "risk",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "escalationLevel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "revokeApprovalDelegation": {
+  "method": "DELETE",
+  "path": "/delegations/{delegationId}",
+  "contract": "approvals",
+  "summary": "End a delegation early",
+  "permission": "APPROVAL_DECIDE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setApprovalSlaPolicy": {
+  "method": "PUT",
+  "path": "/approval-sla-policies",
+  "contract": "approvals",
+  "summary": "How long a decision may take, and what happens when it does not",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalSlaPolicy",
+  "responds": "ApprovalSlaPolicy"
+ },
+ "setApproverAvailability": {
+  "method": "PUT",
+  "path": "/approval-delegations/availability",
+  "contract": "approvals",
+  "summary": "Out of office, and who decides instead",
+  "permission": "APPROVAL_DECIDE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApproverAvailability",
+  "responds": "ApproverAvailability"
+ }
+}

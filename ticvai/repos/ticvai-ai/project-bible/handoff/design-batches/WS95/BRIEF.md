@@ -1,6 +1,6 @@
 # WS95 — Rental Management board 8
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 6 operations · 10 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `ASSET_MANAGE, RENTAL_OPERATE, RENTAL_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-564` | Rental Return Command Center | commandCentre | 0 | 0 | — |
-| `BO-565` | Return Scan & Rental Retrieval | listDetail | 0 | 0 | — |
-| `BO-566` | Return Summary & Actual Return Time | listDetail | 0 | 0 | — |
-| `BO-567` | Post-Rental Condition Inspection | listDetail | 0 | 0 | — |
-| `BO-568` | Before vs After Condition Comparison | listDetail | 0 | 0 | — |
-| `BO-569` | Damage Assessment & Charge Workflow | listDetail | 0 | 0 | — |
-| `BO-570` | Partial Return & Missing Equipment | listDetail | 0 | 0 | — |
-| `BO-571` | Late Fees, Damage Fees & Final Settlement | listDetail | 0 | 0 | — |
-| `BO-572` | Deposit Release, Capture & Customer Confirmation | listDetail | 0 | 0 | — |
-| `BO-573` | Return Completion & Equipment Disposition | listDetail | 0 | 0 | — |
+| `BO-564` | Rental Return Command Center | commandCentre | 1 | 0 | — |
+| `BO-565` | Return Scan & Rental Retrieval | listDetail | 1 | 0 | — |
+| `BO-566` | Return Summary & Actual Return Time | listDetail | 1 | 0 | — |
+| `BO-567` | Post-Rental Condition Inspection | listDetail | 1 | 0 | — |
+| `BO-568` | Before vs After Condition Comparison | listDetail | 1 | 0 | — |
+| `BO-569` | Damage Assessment & Charge Workflow | listDetail | 1 | 0 | — |
+| `BO-570` | Partial Return & Missing Equipment | listDetail | 1 | 0 | — |
+| `BO-571` | Late Fees, Damage Fees & Final Settlement | listDetail | 1 | 0 | — |
+| `BO-572` | Deposit Release, Capture & Customer Confirmation | listDetail | 1 | 0 | — |
+| `BO-573` | Return Completion & Equipment Disposition | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
 

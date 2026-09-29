@@ -11,7 +11,7 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 77,
-  "operations": 188,
+  "operations": 189,
   "contracts": 19,
   "modules": 17,
   "undrawn": 0,
@@ -180,18 +180,18 @@
   },
   {
    "contract": "access",
-   "operations": 10
+   "operations": 11
   },
   {
    "contract": "resources",
    "operations": 6
   },
   {
-   "contract": "white-label",
+   "contract": "queue",
    "operations": 5
   },
   {
-   "contract": "queue",
+   "contract": "white-label",
    "operations": 5
   },
   {
@@ -203,11 +203,11 @@
    "operations": 4
   },
   {
-   "contract": "ai",
+   "contract": "seating",
    "operations": 4
   },
   {
-   "contract": "seating",
+   "contract": "ai",
    "operations": 4
   },
   {
@@ -223,11 +223,11 @@
    "operations": 2
   },
   {
-   "contract": "finance",
+   "contract": "games",
    "operations": 1
   },
   {
-   "contract": "games",
+   "contract": "finance",
    "operations": 1
   }
  ],
@@ -346,7 +346,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/general/ticket-details",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -724,7 +724,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/general/dynamic-qr-ticket",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {

@@ -176,10 +176,18 @@
    "emptyNoResults": "The filter narrowed it and the redemption operations are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listRedemption",
+    "contract": "promotions",
+    "purpose": "Redemption Analytics, Audit & AI Optimization",
+    "trigger": "onLoad"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-444"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-444",
+   "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-444"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 53. 0 of 7 labels bound to a contract property; 15 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -244,13 +252,6 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configuration) and no display directory — it is settings, not a population",
   "purpose": "Configure how games generate redemption credits.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: External Game Value. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Game_and_Ride_Module.pdf, page 54 §Support"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -303,6 +304,11 @@
        "kind": "primaryButton",
        "label": "External Game Value",
        "provenance": "pack Game_and_Ride_Module.pdf, page 54 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Machine-Reported Value",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 54 §Support"
       }
      ]
     }
@@ -315,12 +321,31 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listPrizes",
+    "contract": "games",
+    "purpose": "Redemption operations",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setRedemptionRules",
+    "contract": "games",
+    "purpose": "Save how games earn redemption credits (credit source per earn rule)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) External Game Value, Machine-Reported Value",
+    "invalidates": [
+     "listPrizes"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-445"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-445",
+   "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-445"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 54. 0 of 0 labels bound to a contract property; 8 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 54. 0 of 0 labels bound to a contract property; 9 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** External Game Value, Machine-Reported Value: `setRedemptionRules`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -434,7 +459,18 @@
    "emptyNoResults": "The filter narrowed it and the ticket-based redemption ticket-eater are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setRedemptionRules",
+    "contract": "games",
+    "purpose": "How tickets are earned",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listPrizes"
+    ]
+   }
+  ],
   "entryState": {
    "preloaded": [
     "↓"
@@ -442,7 +478,8 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-446"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-446",
+   "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-446"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 55. 0 of 1 labels bound to a contract property; 9 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -558,7 +595,18 @@
    "emptyNoResults": "The filter narrowed it and the ticketless redemption game are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setRedemptionRules",
+    "contract": "games",
+    "purpose": "Ticket-eater integration",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listPrizes"
+    ]
+   }
+  ],
   "entryState": {
    "preloaded": [
     "↓"
@@ -566,7 +614,8 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-447"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-447",
+   "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-447"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 56. 0 of 1 labels bound to a contract property; 1 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -645,7 +694,19 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getWallet",
+       "notes": "One record, read-only."
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The redemption wallet balance list.",
@@ -654,12 +715,29 @@
    "emptyNoResults": "The filter narrowed it and the redemption wallet balance are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getWallet",
+    "contract": "wallet",
+    "purpose": "Redemption balance",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-448"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-448",
+   "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-448"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 57. 0 of 0 labels bound to a contract property; 0 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -725,11 +803,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved: Scan Prize Barcode, Search Prize, Change Quantity, Remove Item, Complete Redemption, Cancel Transaction. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Game_and_Ride_Module.pdf, page 58 §Actions"
-   },
-   {
-    "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Game_and_Ride_Module.pdf, page 58 §Scan / Tap Customer Card"
    }
@@ -778,11 +851,13 @@
       {
        "kind": "primaryButton",
        "label": "Scan Prize Barcode",
+       "operation": "lookupPrize",
        "provenance": "pack Game_and_Ride_Module.pdf, page 58 §Actions"
       },
       {
        "kind": "secondaryButton",
        "label": "Search Prize",
+       "operation": "lookupPrize",
        "provenance": "pack Game_and_Ride_Module.pdf, page 58 §Actions"
       },
       {
@@ -832,7 +907,41 @@
    "emptyNoResults": "The filter narrowed it and the redemption counter prize are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setRedemptionRules",
+    "contract": "games",
+    "purpose": "Ticketless redemption",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listPrizes"
+    ]
+   },
+   {
+    "operationId": "listPrizes",
+    "contract": "games",
+    "purpose": "Search the prize catalogue at this counter",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Search Prize; Complete Redemption"
+   },
+   {
+    "operationId": "redeemPrize",
+    "contract": "games",
+    "purpose": "Redeem the basket's prizes against the card's tickets",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Search Prize; Complete Redemption",
+    "invalidates": [
+     "listPrizes"
+    ]
+   },
+   {
+    "operationId": "lookupPrize",
+    "contract": "games",
+    "purpose": "Look up prize",
+    "trigger": "onScan"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "↓",
@@ -841,9 +950,10 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-449"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-449",
+   "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-449"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 58. 0 of 2 labels bound to a contract property; 8 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 58. 0 of 2 labels bound to a contract property; 8 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Change Quantity, Remove Item are choices sent by `redeemPrize` (basket lines (prizeId, quantity) held client-side until redeemPrize); Search Prize: `listPrizes`; Complete Redemption: `redeemPrize`; Cancel Transaction dropped (basket is client-side until redeemPrize; cancelling discards it, no server state); still owed by a contract change: `lookupPrize`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -920,7 +1030,32 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "redeemPrize",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listPrizes",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "redeemPrize"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The prize catalogue credit list.",
@@ -929,10 +1064,26 @@
    "emptyNoResults": "The filter narrowed it and the prize catalogue credit are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "redeemPrize",
+    "contract": "games",
+    "purpose": "Hand over a prize",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listPrizes",
+    "contract": "games",
+    "purpose": "The prize catalogue",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-450"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-450",
+   "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-450"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 59. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1000,11 +1151,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Redemption Counter. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Game_and_Ride_Module.pdf, page 60 §Support"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 60"
    },
@@ -1027,6 +1173,18 @@
        "provenance": "pack Game_and_Ride_Module.pdf, page 60 §Support"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setPrizeCost"
+      }
+     ]
     }
    ]
   },
@@ -1037,12 +1195,39 @@
    "emptyNoResults": "The filter narrowed it and the prize inventory integration are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setPrizeCost",
+    "contract": "games",
+    "purpose": "Ticket price and unit cost",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listPrizes"
+    ]
+   },
+   {
+    "operationId": "createPrize",
+    "contract": "games",
+    "purpose": "Add a prize",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-451"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-451",
+   "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-451"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 60. 0 of 0 labels bound to a contract property; 1 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 60. 0 of 0 labels bound to a contract property; 1 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Redemption Counter dropped (navigation to the Redemption Counter screen (BO-449)).",
+  "entryState": {
+   "params": [
+    {
+     "name": "prizeId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1108,18 +1293,100 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Game_and_Ride_Module.pdf, page 61"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 61"
    }
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "filters",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Inventory location",
+       "operation": "getStockPositions",
+       "notes": "Sends `?locationId=`; the machine's prize location.",
+       "provenance": "contract inventory.yaml GET /stock"
+      },
+      {
+       "kind": "selectField",
+       "label": "Linked prize / SKU",
+       "operation": "getStockPositions",
+       "notes": "Sends `?itemId=`.",
+       "provenance": "contract inventory.yaml GET /stock"
+      },
+      {
+       "kind": "toggle",
+       "label": "Include out-of-stock prizes",
+       "operation": "getStockPositions",
+       "notes": "Sends `?includeZero=true`; a machine whose prize is at zero must not complete redemption.",
+       "provenance": "contract inventory.yaml GET /stock"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Prize machines and their stock",
+       "bindsTo": "StockPosition",
+       "columns": [
+        "Machine ID",
+        "Machine name",
+        "Machine type",
+        "StockPosition.itemName",
+        "StockPosition.sku",
+        "StockPosition.locationName",
+        "StockPosition.available",
+        "StockPosition.onHand",
+        "StockPosition.allocated",
+        "StockPosition.lastMovementAt",
+        "Play price",
+        "Machine status"
+       ],
+       "operation": "getStockPositions",
+       "notes": "Only stock is bound. No operation lists machines, so the machine columns are pack labels.",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 61"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected machine profile",
+       "bindsTo": "StockPosition",
+       "columns": [
+        "Machine ID",
+        "Machine name",
+        "Machine type",
+        "Venue",
+        "Zone",
+        "Reader",
+        "StockPosition.itemName",
+        "StockPosition.sku",
+        "StockPosition.locationName",
+        "StockPosition.available",
+        "StockPosition.unit",
+        "StockPosition.value",
+        "StockPosition.lastCountedAt",
+        "Play price",
+        "Machine status"
+       ],
+       "operation": "getStockPositions",
+       "notes": "The pack's Machine Profile; current stock is `available`.",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 61"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The direct-pay crane prize list.",
@@ -1128,12 +1395,21 @@
    "emptyNoResults": "The filter narrowed it and the direct-pay crane prize are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getStockPositions",
+    "contract": "inventory",
+    "purpose": "Prize stock",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-452"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-452",
+   "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-452"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 61. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 61. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Game_and_Ride_Module.pdf p.61; contract inventory.yaml GET /stock. Pack labels with no schema field yet (shown as plain labels): Machine ID, Machine name, Machine type (Crane / Capsule / Direct Prize / Skill Prize), Venue, Zone, Reader, Play price, Machine status, A machine read (bound op is getStockPositions).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1259,7 +1535,18 @@
    "emptyNoResults": "The filter narrowed it and the redemption transaction ledger are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setPrizeCost",
+    "contract": "games",
+    "purpose": "Direct-pay price",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listPrizes"
+    ]
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Game-reported credits",
@@ -1268,11 +1555,18 @@
     "Wallet balance movements",
     "Prize transactions",
     "Inventory deductions"
+   ],
+   "params": [
+    {
+     "name": "prizeId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-453"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-453",
+   "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-453"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 62. 0 of 7 labels bound to a contract property; 7 of 69 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

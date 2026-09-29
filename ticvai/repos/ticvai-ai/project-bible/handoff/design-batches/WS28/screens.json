@@ -39,10 +39,7 @@
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-274 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-275",
@@ -51,39 +48,9 @@
      "operation": "listGroupBooking"
     },
     {
-     "to": "BO-276",
-     "trigger": "Works in Participants, Guest Lists & Group Structure",
-     "provenance": "flow F137 step 3→4",
-     "operation": "listGroupBooking"
-    },
-    {
-     "to": "BO-277",
-     "trigger": "Works in Group Payment, Deposit & Balance Management",
-     "provenance": "flow F137 step 5→6",
-     "operation": "listGroupBooking"
-    },
-    {
-     "to": "BO-278",
-     "trigger": "Works in Group Ticket, Seat & Entitlement Allocation",
-     "provenance": "flow F137 step 7→8",
-     "operation": "listGroupBooking"
-    },
-    {
-     "to": "BO-279",
-     "trigger": "Works in Group Ticket Fulfillment & Distribution",
-     "provenance": "flow F137 step 9→10",
-     "operation": "listGroupBooking"
-    },
-    {
      "to": "BO-280",
      "trigger": "Works in Group Arrival, Check-In & Admission Operations",
      "provenance": "flow F137 step 11→12",
-     "operation": "listGroupBooking"
-    },
-    {
-     "to": "BO-281",
-     "trigger": "Works in Group Amendments, Cancellation & Refund Operations",
-     "provenance": "flow F137 step 13→14",
      "operation": "listGroupBooking"
     },
     {
@@ -97,14 +64,59 @@
      "trigger": "Works in Group Sales Analytics & AI Intelligence Center",
      "provenance": "flow F137 step 17→18",
      "operation": "listGroupBooking"
+    },
+    {
+     "to": "BO-276",
+     "trigger": "Works in Participants, Guest Lists & Group Structure",
+     "provenance": "flow F137 step 3→4",
+     "operation": "listGroupBooking",
+     "carries": [
+      "groupBookingId"
+     ]
+    },
+    {
+     "to": "BO-277",
+     "trigger": "Works in Group Payment, Deposit & Balance Management",
+     "provenance": "flow F137 step 5→6",
+     "operation": "listGroupBooking",
+     "carries": [
+      "groupBookingId"
+     ]
+    },
+    {
+     "to": "BO-278",
+     "trigger": "Works in Group Ticket, Seat & Entitlement Allocation",
+     "provenance": "flow F137 step 7→8",
+     "operation": "listGroupBooking",
+     "carries": [
+      "groupBookingId"
+     ]
+    },
+    {
+     "to": "BO-279",
+     "trigger": "Works in Group Ticket Fulfillment & Distribution",
+     "provenance": "flow F137 step 9→10",
+     "operation": "listGroupBooking",
+     "carries": [
+      "groupBookingId"
+     ]
+    },
+    {
+     "to": "BO-281",
+     "trigger": "Works in Group Amendments, Cancellation & Refund Operations",
+     "provenance": "flow F137 step 13→14",
+     "operation": "listGroupBooking",
+     "carries": [
+      "groupBookingId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations can identify every upcoming group, its readiness and outstanding actions from one centralized workspace.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide Operations with a real-time command center for all confirmed and upcoming group bookings.",
-  "purposeNote": "Operations can identify every upcoming group, its readiness and outstanding actions from one centralized workspace.",
   "layout": {
    "template": "split",
    "regions": [
@@ -205,6 +217,12 @@
     "contract": "orders",
     "purpose": "Group Booking Operations Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listGroupBookingReconciliation",
+    "contract": "orders",
+    "purpose": "Group Booking Reconciliation, Closure & Performance",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -220,7 +238,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-274"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-274",
+   "workshopBoard": "wireframes/WS69 Group Sales   Corporate Booking Management Board 2.dc.html#bo-274"
   },
   "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 20. 26 of 26 labels bound to a contract property; 26 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -283,10 +302,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every confirmed group can be translated into a structured operational plan with owners, deadlines and dependencies.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure/reference) and no display directory — it is settings, not a population",
   "purpose": "Convert the commercial booking into a detailed operational execution plan.",
-  "purposeNote": "Every confirmed group can be translated into a structured operational plan with owners, deadlines and dependencies.",
   "layout": {
    "template": "form",
    "regions": [
@@ -410,16 +429,14 @@
     "operationId": "setGroupOperationalPlanning",
     "contract": "orders",
     "purpose": "Group Operational Planning & Task Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setGroupOperationalPlanning"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-275"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-275",
+   "workshopBoard": "wireframes/WS69 Group Sales   Corporate Booking Management Board 2.dc.html#bo-275"
   },
   "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 22. 0 of 0 labels bound to a contract property; 18 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -482,17 +499,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "confirmed group quantity.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Detect) and no metric row",
   "purpose": "Manage the people participating in the group where individual information is required.",
-  "purposeNote": "confirmed group quantity.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: CSV/Excel Import, Customer Upload. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 23 §Support"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -505,10 +515,7 @@
        "label": "Every participants guest lists",
        "columns": [
         "Duplicate guest",
-        "ParticipantsGuestListsGroupStructureView.missingRequiredField",
-        "ParticipantsGuestListsGroupStructureView.invalidCategory",
-        "ParticipantsGuestListsGroupStructureView.guestCountMismatch",
-        "ParticipantsGuestListsGroupStructureView.ageTicketMismatch",
+        "ParticipantsGuestListsGroupStructureView.validationIssues",
         "Duplicate ticket assignment"
        ],
        "bindsTo": "ParticipantsGuestListsGroupStructureView",
@@ -527,10 +534,7 @@
        "bindsTo": "ParticipantsGuestListsGroupStructureView",
        "columns": [
         "Duplicate guest",
-        "ParticipantsGuestListsGroupStructureView.missingRequiredField",
-        "ParticipantsGuestListsGroupStructureView.invalidCategory",
-        "ParticipantsGuestListsGroupStructureView.guestCountMismatch",
-        "ParticipantsGuestListsGroupStructureView.ageTicketMismatch",
+        "ParticipantsGuestListsGroupStructureView.validationIssues",
         "Duplicate ticket assignment"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Named Guests”, “Quantity-Based”, “Hybrid”, “Where required”, “Privacy”.",
@@ -544,6 +548,11 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Manual Entry",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 23 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "CSV/Excel Import",
        "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 23 §Support"
       },
@@ -551,6 +560,17 @@
        "kind": "secondaryButton",
        "label": "Customer Upload",
        "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 23 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "API",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 23 §Support"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save participant list",
+       "operation": "setParticipantGuestList",
+       "provenance": "contract orders.yaml PUT /group-bookings/{groupBookingId}/participants (decided 29 September, VM close-out)"
       }
      ]
     }
@@ -569,24 +589,34 @@
     "contract": "orders",
     "purpose": "Participants, Guest Lists & Group Structure",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setParticipantGuestList",
+    "contract": "orders",
+    "purpose": "Save participant list",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "groupBookingId",
+     "from": "navigation"
+    }
+   ],
    "preloaded": [
     "Duplicate guest",
-    "ParticipantsGuestListsGroupStructureView.missingRequiredField",
-    "ParticipantsGuestListsGroupStructureView.invalidCategory",
-    "ParticipantsGuestListsGroupStructureView.guestCountMismatch",
-    "ParticipantsGuestListsGroupStructureView.ageTicketMismatch",
+    "ParticipantsGuestListsGroupStructureView.validationIssues",
     "Duplicate ticket assignment"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-276"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-276",
+   "workshopBoard": "wireframes/WS69 Group Sales   Corporate Booking Management Board 2.dc.html#bo-276"
   },
-  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 23. 4 of 6 labels bound to a contract property; 8 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 23. 4 of 6 labels bound to a contract property; 10 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `setParticipantGuestList`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -647,17 +677,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Sales, Finance and Operations can understand exactly what has been paid, what remains due and whether payment conditions permit fulfillment.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Track the complete payment lifecycle of a group booking.",
-  "purposeNote": "Sales, Finance and Operations can understand exactly what has been paid, what remains due and whether payment conditions permit fulfillment.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Custom Schedule. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 25 §Support"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -713,8 +736,29 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Deposit",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 25 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Milestone Payment",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 25 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Final Balance",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 25 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Custom Schedule",
        "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 25 §Support"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save payment schedule",
+       "operation": "setGroupPaymentSchedule",
+       "provenance": "contract orders.yaml PUT /group-bookings/{groupBookingId}/payment-schedule (decided 29 September, VM close-out)"
       }
      ]
     }
@@ -733,9 +777,21 @@
     "contract": "orders",
     "purpose": "Group Payment, Deposit & Balance Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setGroupPaymentSchedule",
+    "contract": "orders",
+    "purpose": "Save payment schedule",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "groupBookingId",
+     "from": "navigation"
+    }
+   ],
    "preloaded": [
     "GroupPaymentDepositBalanceManagementView.bookingValue",
     "GroupPaymentDepositBalanceManagementView.depositRequired",
@@ -748,9 +804,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-277"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-277",
+   "workshopBoard": "wireframes/WS69 Group Sales   Corporate Booking Management Board 2.dc.html#bo-277"
   },
-  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 25. 8 of 8 labels bound to a contract property; 9 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 25. 8 of 8 labels bound to a contract property; 12 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `setGroupPaymentSchedule`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -811,17 +868,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every confirmed group entitlement can be correctly allocated without creating duplicate capacity or conflicting seat assignments.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Allocate the confirmed group inventory to individual guests, subgroups or quantity blocks.",
-  "purposeNote": "Every confirmed group entitlement can be correctly allocated without creating duplicate capacity or conflicting seat assignments.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Individual Ticket, Bulk Ticket, Named Ticket, Quantity-Based Ticket, Zone Allocation, VIP allocation. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 26 §Support"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -902,8 +952,19 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Keep group together",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 26 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "VIP allocation",
        "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 26 §Support"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save allocation",
+       "operation": "setGroupTicketAllocation",
+       "provenance": "contract orders.yaml PUT /group-bookings/{groupBookingId}/allocation (decided 29 September, VM close-out)"
       }
      ]
     }
@@ -922,9 +983,21 @@
     "contract": "orders",
     "purpose": "Group Ticket, Seat & Entitlement Allocation",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setGroupTicketAllocation",
+    "contract": "orders",
+    "purpose": "Save allocation",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "groupBookingId",
+     "from": "navigation"
+    }
+   ],
    "preloaded": [
     "GroupTicketSeatEntitlementAllocationView.product",
     "GroupTicketSeatEntitlementAllocationView.quantityBooked",
@@ -937,9 +1010,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-278"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-278",
+   "workshopBoard": "wireframes/WS69 Group Sales   Corporate Booking Management Board 2.dc.html#bo-278"
   },
-  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 26. 8 of 8 labels bound to a contract property; 14 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 26. 8 of 8 labels bound to a contract property; 15 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `setGroupTicketAllocation`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1000,10 +1074,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "maintaining complete ticket-to-guest traceability.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Control how tickets and other credentials are delivered to the group.",
-  "purposeNote": "maintaining complete ticket-to-guest traceability.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1058,10 +1132,27 @@
      "slot": "rowActions",
      "components": [
       {
+       "kind": "primaryButton",
+       "label": "POS Print",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 27 §Support",
+       "permission": "Print"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Physical Collection",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 27 §Support"
+      },
+      {
        "kind": "banner",
        "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Generate Tickets, Send, Resend, Print, Reissue, Change Delivery Method, Revoke where permitted. Each needs attaching to the control it gates, or the screen needs the control.",
+       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Generate Tickets, Send, Resend, Reissue, Change Delivery Method, Revoke where permitted. Each needs attaching to the control it gates, or the screen needs the control.",
        "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 27 §Authorized users can"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save fulfilment",
+       "operation": "setGroupTicketFulfillment",
+       "provenance": "contract orders.yaml PUT /group-bookings/{groupBookingId}/fulfillment (decided 29 September, VM close-out)"
       }
      ]
     }
@@ -1080,9 +1171,21 @@
     "contract": "orders",
     "purpose": "Group Ticket Fulfillment & Distribution",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setGroupTicketFulfillment",
+    "contract": "orders",
+    "purpose": "Save fulfilment",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "groupBookingId",
+     "from": "navigation"
+    }
+   ],
    "preloaded": [
     "GroupTicketFulfillmentDistributionView.ticketsRequired",
     "GroupTicketFulfillmentDistributionView.generated",
@@ -1095,9 +1198,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-279"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-279",
+   "workshopBoard": "wireframes/WS69 Group Sales   Corporate Booking Management Board 2.dc.html#bo-279"
   },
-  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 27. 8 of 8 labels bound to a contract property; 15 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 27. 8 of 8 labels bound to a contract property; 17 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `setGroupTicketFulfillment`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1158,10 +1262,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations can process large group arrivals efficiently while preserving accurate admission and headcount records.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Manage the physical arrival and admission of large groups efficiently.",
-  "purposeNote": "Operations can process large group arrivals efficiently while preserving accurate admission and headcount records.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1245,7 +1349,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-280"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-280",
+   "workshopBoard": "wireframes/WS69 Group Sales   Corporate Booking Management Board 2.dc.html#bo-280"
   },
   "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 29. 10 of 10 labels bound to a contract property; 16 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1308,16 +1413,11 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Post-confirmation changes update all affected commercial, capacity, resource, ticketing and operational records through one governed amendment process.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Manage changes occurring after group confirmation.",
-  "purposeNote": "Post-confirmation changes update all affected commercial, capacity, resource, ticketing and operational records through one governed amendment process.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 9 actions on this screen and the screen declares 1 operation.** Unserved: Increase Guest Count, Reduce Guest Count, Date Change, Time Change, Product Change, Package Change, Seat Change, Catering Change …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 30 §Support"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -1397,23 +1497,61 @@
     "contract": "orders",
     "purpose": "Group Amendments, Cancellation & Refund Operations",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateGroupBooking",
+    "contract": "orders",
+    "purpose": "Change the group size or package",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Increase Guest Count, Reduce Guest Count, Package Change; Date Change, Time Change; Product Change, Seat Change, Catering Change …",
+    "invalidates": [
+     "listGroupAmendmentCancellation"
+    ]
+   },
+   {
+    "operationId": "rescheduleOrder",
+    "contract": "orders",
+    "purpose": "Move the group order to another date or time",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Increase Guest Count, Reduce Guest Count, Package Change; Date Change, Time Change; Product Change, Seat Change, Catering Change …",
+    "invalidates": [
+     "listGroupAmendmentCancellation"
+    ]
+   },
+   {
+    "operationId": "modifyOrder",
+    "contract": "orders",
+    "purpose": "Swap product, seat or catering lines on the group order",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Increase Guest Count, Reduce Guest Count, Package Change; Date Change, Time Change; Product Change, Seat Change, Catering Change …",
+    "invalidates": [
+     "listGroupAmendmentCancellation"
+    ]
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "groupBookingId",
+     "from": "navigation"
+    },
+    {
+     "name": "orderId",
+     "from": "navigation"
+    }
+   ],
    "preloaded": [
-    "GroupAmendmentsCancellationRefundOperationsView.increaseGuestCount",
-    "GroupAmendmentsCancellationRefundOperationsView.reduceGuestCount",
-    "GroupAmendmentsCancellationRefundOperationsView.dateChange",
-    "GroupAmendmentsCancellationRefundOperationsView.timeChange",
-    "GroupAmendmentsCancellationRefundOperationsView.productChange"
-   ]
+    "GroupAmendmentsCancellationRefundOperationsView.amendmentType"
+   ],
+   "coldEntry": "Opened from BO-274 with the group booking picked there. Opened cold (a bookmark or a refresh), it shows the list to pick from rather than an empty record, and says plainly if the group booking no longer exists."
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-281"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-281",
+   "workshopBoard": "wireframes/WS69 Group Sales   Corporate Booking Management Board 2.dc.html#bo-281"
   },
-  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 30. 0 of 0 labels bound to a contract property; 9 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 30. 0 of 0 labels bound to a contract property; 9 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Increase Guest Count, Reduce Guest Count, Package Change: `updateGroupBooking`; Date Change, Time Change: `rescheduleOrder`; Product Change, Seat Change, Catering Change …: `modifyOrder`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1474,10 +1612,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "A group booking cannot be considered fully closed until operational and financial activity has been reconciled.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Measure; Display) and no metric row",
   "purpose": "Close the group booking after the visit and reconcile what was sold against what actually occurred.",
-  "purposeNote": "A group booking cannot be considered fully closed until operational and financial activity has been reconciled.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1489,7 +1627,6 @@
        "kind": "dataTable",
        "label": "Every group booking reconciliation",
        "columns": [
-        "GroupBookingReconciliationClosurePerformanceView.ty",
         "GroupBookingReconciliationClosurePerformanceView.finalBookingValue",
         "GroupBookingReconciliationClosurePerformanceView.amountPaid",
         "GroupBookingReconciliationClosurePerformanceView.refunds",
@@ -1512,7 +1649,6 @@
        "label": "The selected group booking reconciliation",
        "bindsTo": "GroupBookingReconciliationClosurePerformanceView",
        "columns": [
-        "GroupBookingReconciliationClosurePerformanceView.ty",
         "GroupBookingReconciliationClosurePerformanceView.finalBookingValue",
         "GroupBookingReconciliationClosurePerformanceView.amountPaid",
         "GroupBookingReconciliationClosurePerformanceView.refunds",
@@ -1544,7 +1680,6 @@
   ],
   "entryState": {
    "preloaded": [
-    "GroupBookingReconciliationClosurePerformanceView.ty",
     "GroupBookingReconciliationClosurePerformanceView.finalBookingValue",
     "GroupBookingReconciliationClosurePerformanceView.amountPaid",
     "GroupBookingReconciliationClosurePerformanceView.refunds",
@@ -1555,7 +1690,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-282"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-282",
+   "workshopBoard": "wireframes/WS69 Group Sales   Corporate Booking Management Board 2.dc.html#bo-282"
   },
   "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 31. 7 of 7 labels bound to a contract property; 14 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1610,10 +1746,10 @@
    "notes": "**Reached from BO-274, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Management can analyze group-sales performance and use explainable AI recommendations to improve conversion, utilization, revenue and operational planning. Board 2 — Final Screen Register",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
   "purpose": "Provide management with intelligence across the complete group-sales lifecycle. This should combine data from Board 1 + Board 2.",
-  "purposeNote": "Management can analyze group-sales performance and use explainable AI recommendations to improve conversion, utilization, revenue and operational planning. Board 2 — Final Screen Register",
   "layout": {
    "template": "split",
    "regions": [
@@ -1719,6 +1855,12 @@
     "contract": "orders",
     "purpose": "Group Sales Analytics & AI Intelligence Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listGroupSale",
+    "contract": "orders",
+    "purpose": "Group Sales Command Center",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -1734,7 +1876,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-283"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-283",
+   "workshopBoard": "wireframes/WS69 Group Sales   Corporate Booking Management Board 2.dc.html#bo-283"
   },
   "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 33. 14 of 24 labels bound to a contract property; 24 of 99 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

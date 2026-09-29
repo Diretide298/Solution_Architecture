@@ -1,6 +1,6 @@
 # WS77 — Digital Asset Management DAM board 4
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 5 operations · 6 schemas · 2 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 2 permissions apply here:
+  `ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `CMS-091` | Asset Distribution & Delivery Command Center | listDetail | 0 | 0 | — |
-| `CMS-092` | Asset Usage & Distribution Map | listDetail | 0 | 0 | — |
-| `CMS-093` | Channel & Distribution Configuration | configEditor | 0 | 0 | — |
-| `CMS-094` | Secure Delivery URL, CDN & Rendition Delivery | listDetail | 0 | 0 | — |
-| `CMS-095` | Asset Replacement & Propagation Management | listDetail | 0 | 0 | — |
-| `CMS-096` | Fallback, Expiry & Distribution Continuity | configEditor | 0 | 0 | — |
-| `CMS-097` | DAM API & Integration Hub | listDetail | 0 | 0 | — |
-| `CMS-098` | Delivery Monitoring & Integration Health | commandCentre | 0 | 0 | — |
-| `CMS-099` | Asset Usage & Performance Analytics | commandCentre | 0 | 0 | — |
-| `CMS-100` | Distribution Intelligence, AI Insights & Optimization | configEditor | 0 | 0 | — |
+| `CMS-091` | Asset Distribution & Delivery Command Center | listDetail | 1 | 0 | — |
+| `CMS-092` | Asset Usage & Distribution Map | listDetail | 1 | 0 | — |
+| `CMS-093` | Channel & Distribution Configuration | configEditor | 1 | 0 | — |
+| `CMS-094` | Secure Delivery URL, CDN & Rendition Delivery | listDetail | 2 | 0 | — |
+| `CMS-095` | Asset Replacement & Propagation Management | listDetail | 2 | 0 | — |
+| `CMS-096` | Fallback, Expiry & Distribution Continuity | configEditor | 1 | 0 | — |
+| `CMS-097` | DAM API & Integration Hub | listDetail | 1 | 0 | — |
+| `CMS-098` | Delivery Monitoring & Integration Health | commandCentre | 1 | 0 | — |
+| `CMS-099` | Asset Usage & Performance Analytics | commandCentre | 1 | 0 | — |
+| `CMS-100` | Distribution Intelligence, AI Insights & Optimization | configEditor | 1 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -138,7 +137,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-094",
      "trigger": "Secure Delivery URL, CDN & Rendition Delivery",
-     "provenance": "structural — pack board 4 wiring, 11 September 2026"
+     "provenance": "structural — pack board 4 wiring, 11 September 2026",
+     "carries": [
+      "assetId"
+     ]
     },
     {
      "to": "CMS-095",
@@ -314,7 +316,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the asset distribution delivery are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getMediaDistribution",
+    "contract": "assets",
+    "purpose": "Delivery across channels",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Assets in Active Use",
@@ -327,7 +337,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-091"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-091",
+   "workshopBoard": "wireframes/WS47 Digital Asset Management DAM Board 4.dc.html#cms-091"
   },
   "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 62. 0 of 24 labels bound to a contract property; 30 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -456,7 +467,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the asset usage distribution are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getMediaDistribution",
+    "contract": "assets",
+    "purpose": "Where each asset appears",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "TICVAI DAM Asset",
@@ -469,7 +488,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-092"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-092",
+   "workshopBoard": "wireframes/WS47 Digital Asset Management DAM Board 4.dc.html#cms-092"
   },
   "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 64. 0 of 8 labels bound to a contract property; 8 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -616,10 +636,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setMediaDistributionChannels",
+    "contract": "assets",
+    "purpose": "CDN, signing and defaults",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getMediaDistribution"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-093"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-093",
+   "workshopBoard": "wireframes/WS47 Digital Asset Management DAM Board 4.dc.html#cms-093"
   },
   "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 65. 0 of 0 labels bound to a contract property; 13 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -686,7 +718,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: configurable expiry, cache policy, revocation where applicable. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: tokenized access, configurable expiry, cache policy, revocation where applicable. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Digital Asset Management DAM.pdf, page 66 §Support"
    },
    {
@@ -709,6 +741,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "tokenized access",
+       "provenance": "pack Digital Asset Management DAM.pdf, page 66 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "configurable expiry",
        "provenance": "pack Digital Asset Management DAM.pdf, page 66 §Support"
       },
@@ -729,6 +766,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Digital Asset Management DAM.pdf, page 66 §Permission / Eligibility Check"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -739,12 +780,39 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the secure delivery url are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setMediaDistributionChannels",
+    "contract": "assets",
+    "purpose": "Signed URLs and rendition delivery",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getMediaDistribution"
+    ]
+   },
+   {
+    "operationId": "listMediaRenditions",
+    "contract": "assets",
+    "purpose": "What can be delivered",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-094"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-094",
+   "workshopBoard": "wireframes/WS47 Digital Asset Management DAM Board 4.dc.html#cms-094"
   },
-  "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 66. 0 of 0 labels bound to a contract property; 4 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 66. 0 of 0 labels bound to a contract property; 5 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "assetId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -856,6 +924,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Digital Asset Management DAM.pdf, page 67 §Support"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -866,12 +938,40 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the asset replacement propagation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "replaceMediaAsset",
+    "contract": "assets",
+    "purpose": "Replace and propagate",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listMediaAssetVersions",
+     "getMediaDistribution"
+    ]
+   },
+   {
+    "operationId": "getMediaDistribution",
+    "contract": "assets",
+    "purpose": "Everywhere it would propagate to",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-095"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-095",
+   "workshopBoard": "wireframes/WS47 Digital Asset Management DAM Board 4.dc.html#cms-095"
   },
   "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 67. 0 of 0 labels bound to a contract property; 5 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "mediaId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1009,10 +1109,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setMediaDistributionChannels",
+    "contract": "assets",
+    "purpose": "Fallback and expiry behaviour",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getMediaDistribution"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-096"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-096",
+   "workshopBoard": "wireframes/WS47 Digital Asset Management DAM Board 4.dc.html#cms-096"
   },
   "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 68. 0 of 0 labels bound to a contract property; 14 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1079,7 +1191,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: API credentials. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved: API credentials, service accounts. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Digital Asset Management DAM.pdf, page 69 §Support appropriate"
    },
    {
@@ -1104,8 +1216,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "primaryButton",
        "label": "API credentials",
        "provenance": "pack Digital Asset Management DAM.pdf, page 69 §Support appropriate"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "service accounts",
+       "provenance": "pack Digital Asset Management DAM.pdf, page 69 §Support appropriate"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -1116,12 +1237,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the dam api integration are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getMediaDistribution",
+    "contract": "assets",
+    "purpose": "What the API exposes",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-097"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-097",
+   "workshopBoard": "wireframes/WS47 Digital Asset Management DAM Board 4.dc.html#cms-097"
   },
-  "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 69. 0 of 0 labels bound to a contract property; 1 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 69. 0 of 0 labels bound to a contract property; 2 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1279,10 +1409,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the delivery monitoring integration are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getMediaUsageAnalytics",
+    "contract": "assets",
+    "purpose": "Delivery health",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-098"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-098",
+   "workshopBoard": "wireframes/WS47 Digital Asset Management DAM Board 4.dc.html#cms-098"
   },
   "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 70. 0 of 0 labels bound to a contract property; 16 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1432,7 +1571,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the asset usage performance are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getMediaUsageAnalytics",
+    "contract": "assets",
+    "purpose": "Usage and performance",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Assets Used",
@@ -1445,7 +1592,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-099"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-099",
+   "workshopBoard": "wireframes/WS47 Digital Asset Management DAM Board 4.dc.html#cms-099"
   },
   "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 71. 0 of 3 labels bound to a contract property; 8 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1532,10 +1680,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getMediaUsageAnalytics",
+    "contract": "assets",
+    "purpose": "Distribution intelligence",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-100"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-100",
+   "workshopBoard": "wireframes/WS47 Digital Asset Management DAM Board 4.dc.html#cms-100"
   },
   "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 73. 0 of 0 labels bound to a contract property; 1 of 152 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1569,7 +1726,107 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
-{}
+{
+ "getMediaDistribution": {
+  "method": "GET",
+  "path": "/media-distribution",
+  "contract": "assets",
+  "summary": "Where an asset is used and how it is delivered",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "assetId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaDistribution"
+ },
+ "getMediaUsageAnalytics": {
+  "method": "GET",
+  "path": "/media-usage",
+  "contract": "assets",
+  "summary": "Downloads, views, shares and library health",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaUsageRow"
+ },
+ "listMediaRenditions": {
+  "method": "GET",
+  "path": "/media-assets/{assetId}/renditions",
+  "contract": "assets",
+  "summary": "The derived sizes and formats, and whether they are ready",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MediaRendition"
+ },
+ "replaceMediaAsset": {
+  "method": "POST",
+  "path": "/media/{mediaId}/replace",
+  "contract": "assets",
+  "summary": "Replace the file behind an asset",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaReplaceResult"
+ },
+ "setMediaDistributionChannels": {
+  "method": "PUT",
+  "path": "/media-distribution/channels",
+  "contract": "assets",
+  "summary": "CDN, delivery URLs, fallbacks and expiry behaviour",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MediaDistributionChannel",
+  "responds": "MediaDistributionChannel"
+ }
+}
 ```
 
 ## `schemas.json`
@@ -1577,5 +1834,350 @@ Method, path, parameters, request and response for every operation these screens
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
-{}
+{
+ "MediaAsset": {
+  "x-ticvai-persistence": "assets.media_asset",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "status",
+   "filename",
+   "contentType",
+   "sizeBytes",
+   "referenceCount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MediaKind"
+   },
+   "status": {
+    "$ref": "#/components/schemas/MediaStatus"
+   },
+   "filename": {
+    "type": "string"
+   },
+   "contentType": {
+    "type": "string"
+   },
+   "sizeBytes": {
+    "type": "integer"
+   },
+   "title": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "description": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"
+   },
+   "altText": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "Required before use in a guest-facing surface. WCAG 2.2 AA."
+   },
+   "width": {
+    "type": "integer",
+    "nullable": true
+   },
+   "height": {
+    "type": "integer",
+    "nullable": true
+   },
+   "durationSeconds": {
+    "type": "number",
+    "nullable": true
+   },
+   "customMetadata": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": true,
+    "description": "BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"
+   },
+   "sharedWithTenantIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"
+   },
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "url": {
+    "type": "string",
+    "description": "Signed and expiring for private assets; stable CDN URL for public ones."
+   },
+   "thumbnailUrl": {
+    "type": "string",
+    "nullable": true
+   },
+   "referenceCount": {
+    "type": "integer",
+    "description": "How many surfaces reference this asset. Non-zero refuses deletion.\n"
+   },
+   "rights": {
+    "$ref": "#/components/schemas/MediaRights"
+   },
+   "isRightsExpired": {
+    "type": "boolean"
+   },
+   "version": {
+    "type": "integer"
+   },
+   "uploadedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "MediaDistribution": {
+  "type": "object",
+  "description": "Boards 4.2 and 4.5. **The usage map that makes replacement safe.**",
+  "properties": {
+   "assetId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "deliveryUrls": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "channel": {
+       "type": "string"
+      },
+      "rendition": {
+       "type": "string"
+      },
+      "url": {
+       "type": "string"
+      },
+      "cdn": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "usedBy": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "surface": {
+       "type": "string"
+      },
+      "referenceId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "label": {
+       "type": "string"
+      },
+      "live": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "lastDeliveredAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "MediaDistributionChannel": {
+  "type": "object",
+  "x-ticvai-persistence": "assets.distribution_channel",
+  "description": "Boards 4.3, 4.4 and 4.6. **The fallback keeps a page from breaking.**",
+  "required": [
+   "code"
+  ],
+  "properties": {
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "cdnBaseUrl": {
+    "type": "string",
+    "nullable": true
+   },
+   "signedUrls": {
+    "type": "boolean",
+    "default": false
+   },
+   "signedUrlTtlSeconds": {
+    "type": "integer",
+    "nullable": true
+   },
+   "defaultRendition": {
+    "type": "string",
+    "nullable": true
+   },
+   "fallbackAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**What renders when the real one cannot.** Rights expired, rendition failed, CDN unreachable — three causes, one visible outcome, and one place to decide it.\n"
+   },
+   "onRightsExpiry": {
+    "type": "string",
+    "enum": [
+     "serveFallback",
+     "serveNothing",
+     "continueServing"
+    ],
+    "default": "serveFallback"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "MediaRendition": {
+  "type": "object",
+  "x-ticvai-persistence": "assets.rendition",
+  "description": "Boards 2.8 and 2.9. **Readiness is the fact that matters**, not existence.",
+  "required": [
+   "preset"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "preset": {
+    "type": "string",
+    "description": "e.g. `thumbnail`, `web1600`, `printCmyk`, `hls720`."
+   },
+   "format": {
+    "type": "string",
+    "nullable": true
+   },
+   "width": {
+    "type": "integer",
+    "nullable": true
+   },
+   "height": {
+    "type": "integer",
+    "nullable": true
+   },
+   "sizeBytes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "queued",
+     "processing",
+     "ready",
+     "failed"
+    ]
+   },
+   "failureReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "url": {
+    "type": "string",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "MediaReplaceResult": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "asset",
+   "affectedSurfaces"
+  ],
+  "properties": {
+   "asset": {
+    "$ref": "#/components/schemas/MediaAsset"
+   },
+   "affectedSurfaces": {
+    "type": "integer",
+    "description": "How many surfaces now show the new file."
+   },
+   "liveSurfaces": {
+    "type": "integer",
+    "description": "Of those, how many are published to guests right now."
+   },
+   "derivativesRegenerating": {
+    "type": "boolean"
+   }
+  }
+ },
+ "MediaUsageRow": {
+  "type": "object",
+  "description": "Boards 1.10 and 4.9. **Assets never used is the number that justifies the library.**",
+  "properties": {
+   "key": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "assetCount": {
+    "type": "integer"
+   },
+   "storageBytes": {
+    "type": "integer"
+   },
+   "downloads": {
+    "type": "integer"
+   },
+   "views": {
+    "type": "integer"
+   },
+   "shares": {
+    "type": "integer"
+   },
+   "neverUsedCount": {
+    "type": "integer"
+   },
+   "unclassifiedCount": {
+    "type": "integer"
+   }
+  }
+ }
+}
 ```

@@ -1,6 +1,6 @@
 # WS85 — Game and Ride board 8
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**9 screens · 7 operations · 8 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `DEVICE_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, WALLET_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,20 +60,19 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-464` | Game & Ride Operations Control Center | listDetail | 0 | 0 | — |
-| `BO-465` | Live Gameplay Transaction Monitor | listDetail | 0 | 0 | — |
-| `BO-466` | Reader & Device Health Monitor | listDetail | 0 | 0 | — |
-| `BO-467` | Tap Validation & Decision Trace | listDetail | 0 | 0 | — |
-| `BO-468` | Rejected Transaction & Reason Analysis | commandCentre | 0 | 0 | — |
-| `BO-469` | Wallet & Deduction Transaction Monitor | listDetail | 0 | 0 | — |
-| `BO-470` | Entitlement & Free-Play Consumption Monitor | commandCentre | 0 | 0 | — |
-| `BO-471` | Offline, Synchronization & Recovery Monitor | listDetail | 0 | 0 | — |
-| `BO-472` | Operational Alerts & Exception Center | listDetail | 0 | 0 | — |
-| `BO-473` | Operational Analytics & Reconciliation Dashboard | listDetail | 0 | 0 | — |
+| `BO-464` | Game & Ride Operations Control Center | listDetail | 1 | 0 | — |
+| `BO-465` | Live Gameplay Transaction Monitor | listDetail | 1 | 0 | — |
+| `BO-466` | Reader & Device Health Monitor | listDetail | 2 | 0 | — |
+| `BO-467` | Tap Validation & Decision Trace | listDetail | 1 | 0 | — |
+| `BO-468` | Rejected Transaction & Reason Analysis | commandCentre | 1 | 0 | — |
+| `BO-469` | Wallet & Deduction Transaction Monitor | listDetail | 1 | 0 | — |
+| `BO-470` | Entitlement & Free-Play Consumption Monitor | commandCentre | 1 | 0 | — |
+| `BO-471` | Offline, Synchronization & Recovery Monitor | listDetail | 1 | 0 | — |
+| `BO-473` | Operational Analytics & Reconciliation Dashboard | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-464, BO-465, BO-466, BO-467, BO-469, BO-471, BO-472, BO-473 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-464, BO-465, BO-466, BO-467, BO-469 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -115,7 +113,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "BO-469",
     "BO-470",
     "BO-471",
-    "BO-472",
+    "BO-141",
     "BO-473"
    ],
    "transitions": [
@@ -161,8 +159,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "provenance": "structural — pack board 8 wiring, 11 September 2026"
     },
     {
-     "to": "BO-472",
-     "trigger": "Operational Alerts & Exception Center",
+     "to": "BO-141",
+     "trigger": "Operational Alerts & Exception Center (BO-141, absorbed BO-472, audit R276)",
      "provenance": "structural — pack board 8 wiring, 11 September 2026"
     },
     {
@@ -222,10 +220,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the game ride operations are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listGameplayTransactions",
+    "contract": "games",
+    "purpose": "Live operations",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-464"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-464",
+   "workshopBoard": "wireframes/WS65 Game and Ride Board 8.dc.html#bo-464"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 74. 0 of 7 labels bound to a contract property; 7 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -363,7 +370,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the live gameplay transaction are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listGameplayTransactions",
+    "contract": "games",
+    "purpose": "Every tap",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Transaction ID",
@@ -376,7 +391,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-465"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-465",
+   "workshopBoard": "wireframes/WS65 Game and Ride Board 8.dc.html#bo-465"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 75. 0 of 12 labels bound to a contract property; 12 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -455,7 +471,25 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listReaders",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getDeviceTelemetry",
+       "notes": "One record, read-only."
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The reader device health list.",
@@ -464,12 +498,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the reader device health are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listReaders",
+    "contract": "games",
+    "purpose": "Reader and device health",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getDeviceTelemetry",
+    "contract": "tenancy",
+    "purpose": "Telemetry behind it",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-466"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-466",
+   "workshopBoard": "wireframes/WS65 Game and Ride Board 8.dc.html#bo-466"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 76. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "session"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -546,7 +604,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "simulateGameplayAuthorisation",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "simulateGameplayAuthorisation"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The tap validation decision list.",
@@ -555,10 +632,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the tap validation decision are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "simulateGameplayAuthorisation",
+    "contract": "games",
+    "purpose": "Trace a decision",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-467"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-467",
+   "workshopBoard": "wireframes/WS65 Game and Ride Board 8.dc.html#bo-467"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 77. 0 of 0 labels bound to a contract property; 0 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -727,7 +813,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the rejected transaction reason are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listGameplayTransactions",
+    "contract": "games",
+    "purpose": "Refusals, by reason",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Rejections Today",
@@ -740,7 +834,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-468"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-468",
+   "workshopBoard": "wireframes/WS65 Game and Ride Board 8.dc.html#bo-468"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 78. 0 of 7 labels bound to a contract property; 14 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -819,7 +914,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listWalletTransactions",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The wallet deduction transaction list.",
@@ -828,12 +935,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the wallet deduction transaction are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listWalletTransactions",
+    "contract": "wallet",
+    "purpose": "Wallet transaction history",
+    "trigger": "onAction"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-469"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-469",
+   "workshopBoard": "wireframes/WS65 Game and Ride Board 8.dc.html#bo-469"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 79. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "navigation"
+    }
+   ],
+   "coldEntry": "**Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that list — never an empty form that looks configurable."
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -944,7 +1068,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the entitlement free-play consumption are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listGameEntitlements",
+    "contract": "games",
+    "purpose": "Entitlement consumption",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Entitlement Plays Today",
@@ -957,7 +1089,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-470"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-470",
+   "workshopBoard": "wireframes/WS65 Game and Ride Board 8.dc.html#bo-470"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 80. 0 of 0 labels bound to a contract property; 6 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1025,117 +1158,97 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Game_and_Ride_Module.pdf, page 80"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 80"
    }
   ],
   "layout": {
    "template": "split",
-   "regions": []
-  },
-  "states": {
-   "loading": "The offline synchronization recovery list.",
-   "error": "Could not load. Names which read failed and leaves the offline synchronization recovery untouched.",
-   "emptyFirstRun": "No offline synchronization recovery yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the offline synchronization recovery are still there. The pack's own statuses are Online — the state names which is selected.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-471"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 80. 0 of 0 labels bound to a contract property; 7 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-472",
-  "name": "Operational Alerts & Exception Center",
-  "module": "Games & Rides",
-  "requiresModule": "games",
-  "wave": 3,
-  "source": {
-   "pack": "Game_and_Ride_Module.pdf",
-   "board": "8",
-   "number": "9",
-   "page": 81
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/games-rides/operational-alerts-exception-center-bo-472",
-   "component": "apps/venue-management-web/src/routes/games-rides/OperationalAlertsExceptionCenter.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-464"
-   ],
-   "exitTo": [
-    "BO-464"
-   ],
-   "transitions": [
-    {
-     "to": "BO-464",
-     "trigger": "Back to Game & Ride Operations Control Center",
-     "provenance": "structural — pack board 8 wiring, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "purposeNote": "Operational exceptions can be prioritized, assigned and resolved through a central operational queue.",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Card) and no metric row",
-  "purpose": "Provide one central queue for operational problems requiring attention.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Game_and_Ride_Module.pdf, page 81 §Card"
-   }
-  ],
-  "layout": {
-   "template": "split",
    "regions": [
+    {
+     "name": "filters",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Status",
+       "operation": "getGameplaySyncStatus",
+       "notes": "Filters the returned readers client-side by `status` (online, offline, degraded, unreachable). The pack's statuses Synchronizing, Synchronized, Conflict and Failed Sync have no value in the enum.",
+       "provenance": "contract games.yaml GET /gameplay-sync-status"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Readers offline",
+       "bindsTo": "ReaderSyncStatus",
+       "columns": [
+        "ReaderSyncStatus.status"
+       ],
+       "operation": "getGameplaySyncStatus",
+       "notes": "Count of readers whose `status` is offline or unreachable.",
+       "provenance": "contract games.yaml GET /gameplay-sync-status"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending offline transactions",
+       "bindsTo": "ReaderSyncStatus",
+       "columns": [
+        "ReaderSyncStatus.pendingTransactions"
+       ],
+       "operation": "getGameplaySyncStatus",
+       "notes": "Summed across readers.",
+       "provenance": "contract games.yaml GET /gameplay-sync-status"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending offline value",
+       "bindsTo": "ReaderSyncStatus",
+       "columns": [
+        "ReaderSyncStatus.pendingValue"
+       ],
+       "operation": "getGameplaySyncStatus",
+       "notes": "Summed across readers.",
+       "provenance": "contract games.yaml GET /gameplay-sync-status"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Stale edge packages",
+       "bindsTo": "ReaderSyncStatus",
+       "columns": [
+        "ReaderSyncStatus.edgePackageStale"
+       ],
+       "operation": "getGameplaySyncStatus",
+       "notes": "Count where `edgePackageStale` is true.",
+       "provenance": "contract games.yaml GET /gameplay-sync-status"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every operational alerts exception",
+       "label": "Readers and their sync state",
+       "bindsTo": "ReaderSyncStatus",
        "columns": [
-        "Expiry/Status Issue"
+        "ReaderSyncStatus.readerId",
+        "ReaderSyncStatus.readerName",
+        "ReaderSyncStatus.oldestPendingAt",
+        "ReaderSyncStatus.pendingTransactions",
+        "ReaderSyncStatus.pendingValue",
+        "ReaderSyncStatus.edgePackageVersion",
+        "ReaderSyncStatus.lastSyncAt",
+        "ReaderSyncStatus.status"
        ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack Game_and_Ride_Module.pdf, page 81 §Card"
+       "operation": "getGameplaySyncStatus",
+       "notes": "The pack's device table: Offline Since is `oldestPendingAt`, Config Version is `edgePackageVersion`.",
+       "provenance": "contract games.yaml GET /gameplay-sync-status"
       }
      ]
     },
@@ -1145,36 +1258,68 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected operational alerts exception",
-       "bindsTo": null,
+       "label": "The selected reader",
+       "bindsTo": "ReaderSyncStatus",
        "columns": [
-        "Expiry/Status Issue"
+        "ReaderSyncStatus.readerId",
+        "ReaderSyncStatus.readerName",
+        "ReaderSyncStatus.status",
+        "ReaderSyncStatus.lastSyncAt",
+        "ReaderSyncStatus.oldestPendingAt",
+        "ReaderSyncStatus.pendingTransactions",
+        "ReaderSyncStatus.pendingValue",
+        "ReaderSyncStatus.edgePackageVersion",
+        "ReaderSyncStatus.edgePackageStale",
+        "Offline operation allowed",
+        "Maximum offline duration",
+        "Maximum offline transaction value"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Reader”, “Transaction”, “Wallet”, “Pricing”, “Redemption”, “Severity Alert Attraction Age Status”.",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 81 §Card"
+       "operation": "getGameplaySyncStatus",
+       "notes": "The three offline controls are the pack's; no field or operation carries them.",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 81"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Force synchronization",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 81"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Block offline operation",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 81"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The operational alerts exception list.",
-   "error": "Could not load. Names which read failed and leaves the operational alerts exception untouched.",
-   "emptyFirstRun": "No operational alerts exception yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the operational alerts exception are still there. Names the active filter and offers to clear it.",
+   "loading": "The offline synchronization recovery list.",
+   "error": "Could not load. Names which read failed and leaves the offline synchronization recovery untouched.",
+   "emptyFirstRun": "No offline synchronization recovery yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the offline synchronization recovery are still there. The pack's own statuses are Online — the state names which is selected.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
-  "entryState": {
-   "preloaded": [
-    "Expiry/Status Issue"
-   ]
-  },
+  "apis": [
+   {
+    "operationId": "getGameplaySyncStatus",
+    "contract": "games",
+    "purpose": "What is held offline",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-472"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-471",
+   "workshopBoard": "wireframes/WS65 Game and Ride Board 8.dc.html#bo-471"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 81. 0 of 1 labels bound to a contract property; 1 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 80. 0 of 0 labels bound to a contract property; 7 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Game_and_Ride_Module.pdf p.81; contract games.yaml GET /gameplay-sync-status. Pack labels with no schema field yet (shown as plain labels): Sync states: Offline Transactions Pending, Synchronizing, Synchronized, Conflict, Failed Sync, Offline operation allowed, Maximum offline duration, Maximum offline transaction value.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1240,18 +1385,123 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Game_and_Ride_Module.pdf, page 82"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 82"
    }
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Total plays",
+       "columns": [
+        "Total plays"
+       ],
+       "notes": "The pack asks for total plays; the contract has no field for it.",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 82"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Authorization rate",
+       "columns": [
+        "Authorization rate"
+       ],
+       "notes": "The pack asks for authorization rate; the contract has no field for it.",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 82"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Rejection rate",
+       "columns": [
+        "Rejection rate"
+       ],
+       "notes": "The pack asks for rejection rate; the contract has no field for it.",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 82"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Reader uptime",
+       "columns": [
+        "Reader uptime"
+       ],
+       "notes": "The pack asks for reader uptime; the contract has no field for it.",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 83"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Offline readers",
+       "bindsTo": "ReaderSyncStatus",
+       "columns": [
+        "ReaderSyncStatus.status"
+       ],
+       "operation": "getGameplaySyncStatus",
+       "notes": "The one device KPI the bound read supports: count of readers offline or unreachable.",
+       "provenance": "contract games.yaml GET /gameplay-sync-status"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending offline transactions",
+       "bindsTo": "ReaderSyncStatus",
+       "columns": [
+        "ReaderSyncStatus.pendingTransactions"
+       ],
+       "operation": "getGameplaySyncStatus",
+       "notes": "Summed across readers; feeds the reconciliation variance.",
+       "provenance": "contract games.yaml GET /gameplay-sync-status"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "chart",
+       "label": "Plays by attraction and rejection trend",
+       "columns": [
+        "Attraction",
+        "Plays",
+        "Revenue",
+        "Rejection rate",
+        "Hour of day"
+       ],
+       "notes": "The pack's analytics set (plays by attraction, revenue by game/ride, peak usage times, rejection trend). No operation returns gameplay aggregates.",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 83"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Reconciliation summary",
+       "columns": [
+        "Authorized plays",
+        "Wallet / entitlement transactions",
+        "Confirmed game starts",
+        "Variance"
+       ],
+       "notes": "Clicking the variance drills to missing deduction, missing game-start confirmation, duplicate event or reader communication issue. No operation reconciles these three counts.",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 83"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Reader performance",
+       "bindsTo": "ReaderSyncStatus",
+       "columns": [
+        "ReaderSyncStatus.readerName",
+        "ReaderSyncStatus.status",
+        "ReaderSyncStatus.lastSyncAt",
+        "ReaderSyncStatus.pendingTransactions",
+        "ReaderSyncStatus.edgePackageVersion"
+       ],
+       "operation": "getGameplaySyncStatus",
+       "provenance": "contract games.yaml GET /gameplay-sync-status"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The operational analytics reconciliation list.",
@@ -1260,12 +1510,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the operational analytics reconciliation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getGameplaySyncStatus",
+    "contract": "games",
+    "purpose": "Reconciliation",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-473"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-473",
+   "workshopBoard": "wireframes/WS65 Game and Ride Board 8.dc.html#bo-473"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 82. 0 of 0 labels bound to a contract property; 0 of 83 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 82. 0 of 0 labels bound to a contract property; 0 of 83 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Game_and_Ride_Module.pdf p.82; pack Game_and_Ride_Module.pdf p.83; contract games.yaml GET /gameplay-sync-status. Pack labels with no schema field yet (shown as plain labels): Total plays, Authorization rate, Rejection rate, Reader uptime, Unique players, Paid credit consumed, Bonus consumed, Average spend per play, Package / free / VIP / retry plays, Average response time, Credits earned, Credits redeemed, Outstanding redemption credits, Plays by attraction, Revenue by game/ride, Peak usage times, Rejection trend, Wallet consumption mix, Redemption earned vs redeemed, Authorized plays, Wallet / entitlement transactions, Confirmed game starts, Variance.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1297,7 +1556,159 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
-{}
+{
+ "getDeviceTelemetry": {
+  "method": "GET",
+  "path": "/devices/{deviceId}/telemetry",
+  "contract": "tenancy",
+  "summary": "Battery, performance and consumables over time",
+  "permission": "DEVICE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "metric",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DeviceTelemetryPoint"
+ },
+ "getGameplaySyncStatus": {
+  "method": "GET",
+  "path": "/gameplay-sync-status",
+  "contract": "games",
+  "summary": "What readers took offline and have not sent",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ReaderSyncStatus"
+ },
+ "listGameEntitlements": {
+  "method": "GET",
+  "path": "/game-entitlements",
+  "contract": "games",
+  "summary": "Passes, packages and per-game entitlements",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GameEntitlement"
+ },
+ "listGameplayTransactions": {
+  "method": "GET",
+  "path": "/gameplay-transactions",
+  "contract": "games",
+  "summary": "Taps, decisions and what they cost",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "readerId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outcome",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GameplayTransaction"
+ },
+ "listReaders": {
+  "method": "GET",
+  "path": "/readers",
+  "contract": "games",
+  "summary": "Readers, their attractions and their health",
+  "permission": "DEVICE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Reader"
+ },
+ "listWalletTransactions": {
+  "method": "GET",
+  "path": "/wallets/{subjectId}/transactions",
+  "contract": "wallet",
+  "summary": "Wallet transaction history",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "simulateGameplayAuthorisation": {
+  "method": "POST",
+  "path": "/gameplay-authorisations/simulate",
+  "contract": "games",
+  "summary": "What would happen if this card tapped this reader",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GameplayAuthorisationRequest",
+  "responds": "GameplayAuthorisation"
+ }
+}
 ```
 
 ## `schemas.json`
@@ -1305,5 +1716,501 @@ Method, path, parameters, request and response for every operation these screens
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
-{}
+{
+ "DeviceTelemetryPoint": {
+  "type": "object",
+  "x-ticvai-persistence": "tenancy.device_telemetry",
+  "description": "16.4.21 and 16.4.22. **A series, because degradation is not visible in a point-in-time reading.**\n",
+  "properties": {
+   "deviceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "batteryPercent": {
+    "type": "integer",
+    "nullable": true
+   },
+   "batteryHealthPercent": {
+    "type": "integer",
+    "nullable": true
+   },
+   "charging": {
+    "type": "boolean",
+    "nullable": true
+   },
+   "signalStrength": {
+    "type": "integer",
+    "nullable": true
+   },
+   "cpuPercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "memoryPercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "storageFreeMb": {
+    "type": "integer",
+    "nullable": true
+   },
+   "consumables": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Paper, ribbon, wristband stock — whatever the device kind reports."
+   },
+   "uptimeSeconds": {
+    "type": "integer",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "GameEntitlement": {
+  "type": "object",
+  "x-ticvai-persistence": "games.entitlement",
+  "description": "Board 4. **A right to play, not money** — consumed before money is.",
+  "required": [
+   "code",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "allGamesPass",
+     "unlimitedSingleGame",
+     "limitedSingleGame",
+     "package",
+     "freePlay"
+    ]
+   },
+   "gameIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "attractionTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "playCount": {
+    "type": "integer",
+    "nullable": true,
+    "description": "For `limitedSingleGame` and `package`. Null means unlimited."
+   },
+   "validityKind": {
+    "type": "string",
+    "enum": [
+     "sameDay",
+     "days",
+     "untilDate",
+     "untilUsed"
+    ]
+   },
+   "validityDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "activationKind": {
+    "type": "string",
+    "enum": [
+     "onPurchase",
+     "onFirstUse",
+     "onDate"
+    ],
+    "default": "onFirstUse",
+    "description": "**On first use is what a guest expects from a day pass bought the night before.** On purchase is what a venue defaults to by accident, and it costs them a day.\n"
+   },
+   "dailyPlayCap": {
+    "type": "integer",
+    "nullable": true
+   },
+   "cooldownMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**Unlimited does not mean continuous.** A cooldown is how one child does not hold a popular ride all afternoon.\n"
+   },
+   "linkedProductId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "GameplayAuthorisation": {
+  "type": "object",
+  "x-ticvai-persistence": "games.authorisation",
+  "description": "Board 4.9. **The refusal reason is the product.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "decision": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "refuse"
+    ]
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "ok",
+     "cardNotFound",
+     "cardExpired",
+     "cardBlocked",
+     "retapTooSoon",
+     "heightRestriction",
+     "ageRestriction",
+     "insufficientFunds",
+     "entitlementExhausted",
+     "entitlementNotValidHere",
+     "cooldownActive",
+     "dailyCapReached",
+     "readerNotConfigured",
+     "gameUnavailable"
+    ]
+   },
+   "guestMessage": {
+    "type": "string",
+    "nullable": true,
+    "description": "***\"No plays left on your pass\"* rather than *\"Declined\"*.** One is a guest who understands; the other is a member of staff walking over.\n"
+   },
+   "chargedFrom": {
+    "type": "string",
+    "nullable": true
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "entitlementId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "remainingBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "remainingPlays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "trace": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "check": {
+       "type": "string"
+      },
+      "passed": {
+       "type": "boolean"
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "decidedOffline": {
+    "type": "boolean",
+    "default": false
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "GameplayAuthorisationRequest": {
+  "type": "object",
+  "required": [
+   "readerId"
+  ],
+  "properties": {
+   "readerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "cardId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "credentialIdentifier": {
+    "type": "string",
+    "nullable": true
+   },
+   "gameId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "guestHeightCm": {
+    "type": "integer",
+    "nullable": true
+   },
+   "offline": {
+    "type": "boolean",
+    "default": false
+   }
+  }
+ },
+ "GameplayTransaction": {
+  "type": "object",
+  "x-ticvai-persistence": "games.gameplay_transaction",
+  "description": "Boards 8.2 and 8.5. **The refused ones are the valuable half.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "readerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "gameId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "cardId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "allowed",
+     "refused",
+     "reversed"
+    ]
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "chargedFrom": {
+    "type": "string",
+    "nullable": true
+   },
+   "entitlementId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "ticketsEarned": {
+    "type": "integer",
+    "nullable": true
+   },
+   "decidedOffline": {
+    "type": "boolean",
+    "default": false
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Reader": {
+  "type": "object",
+  "x-ticvai-persistence": "games.reader",
+  "description": "Board 2. **A `tenancy` device with a game configuration on it.**",
+  "required": [
+   "deviceId"
+  ],
+  "properties": {
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "`tenancy.RegisteredDevice`. **Enrolment, firmware and tamper state live there.**\n"
+   },
+   "gameId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "readerProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "acceptedCreditTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "acceptsDirectPay": {
+    "type": "boolean",
+    "default": false
+   },
+   "retapDelaySeconds": {
+    "type": "integer",
+    "default": 3,
+    "description": "**The setting that stops a guest paying twice for one go.** A wristband held against a reader for a second and a half is two taps to the hardware and one intention to the guest.\n"
+   },
+   "displayRules": {
+    "type": "object",
+    "properties": {
+     "freeGameGlow": {
+      "type": "boolean",
+      "default": true,
+      "description": "**What tells a guest their entitlement was used rather than their money.** Without it the complaint arrives at the desk.\n"
+     },
+     "showBalance": {
+      "type": "boolean",
+      "default": true
+     },
+     "showPrice": {
+      "type": "boolean",
+      "default": true
+     },
+     "themeCode": {
+      "type": "string",
+      "nullable": true
+     },
+     "languages": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "ioMapping": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Board 9.6. Which output starts the game, which input reports it finished. **Deliberately open.** The keys are the reader model's own I/O lines, so the shape belongs to the vendor adaptor for that model (game readers are a driver, not a build — ADR-0012, ADR-0015), not to this contract.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "unconfigured",
+     "active",
+     "offline",
+     "maintenance",
+     "disabled"
+    ]
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "ReaderSyncStatus": {
+  "type": "object",
+  "description": "Board 8.8. **Revenue the platform has not seen.**",
+  "properties": {
+   "readerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "readerName": {
+    "type": "string"
+   },
+   "pendingTransactions": {
+    "type": "integer"
+   },
+   "pendingValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "oldestPendingAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastSyncAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "edgePackageVersion": {
+    "type": "integer",
+    "nullable": true
+   },
+   "edgePackageStale": {
+    "type": "boolean"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "online",
+     "offline",
+     "degraded",
+     "unreachable"
+    ]
+   }
+  }
+ }
+}
 ```

@@ -1,6 +1,6 @@
 # P08-guests-marketing-01 — P08 · Guests & Marketing
 
-**4 screens · 11 operations · 14 schemas · 8 permissions**
+**4 screens · 14 operations · 17 schemas · 10 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 8 permissions apply here:
-  `AI_AUDIT_VIEW, AI_CONFIGURE, CASE_MANAGE, CASE_VIEW, MARKETING_MANAGE, MARKETING_VIEW, PERMISSION_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 10 permissions apply here:
+  `AI_AUDIT_VIEW, AI_CONFIGURE, AUDIT_VIEW, CASE_MANAGE, CASE_VIEW, MARKETING_MANAGE, MARKETING_VIEW, PERMISSION_VIEW, REPORT_VIEW_VENUE, TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **1 of these operations work offline**: getVenueSettings
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,7 +60,11 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-068` | Audit Log | listDetail | 2 | 0 | — |
-| `BO-073` | Lost & Found Register | listDetail | 2 | 0 | — |
-| `BO-091` | AI Policy & Spend | listDetail | 4 | 0 | — |
-| `BO-107` | Guests & Marketing | listDetail | 3 | 0 | — |
+| `BO-068` | Audit Log | listDetail | 3 | 1 | — |
+| `BO-073` | Lost & Found Register | listDetail | 3 | 1 | — |
+| `BO-091` | AI Policy & Spend | listDetail | 4 | 1 | — |
+| `BO-107` | Guests & Marketing | listDetail | 4 | 1 | — |
+
+## Thin screens in this batch
+
+**BO-073 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

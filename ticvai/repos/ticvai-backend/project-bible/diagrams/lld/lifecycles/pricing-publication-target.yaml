@@ -1,0 +1,36 @@
+id: LLD-Pricing publication target
+title: Pricing publication target — 4 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/pricing-publication-target.yaml
+entity: Pricing publication target
+contract: catalogue
+enum: PricingPublicationTarget.status
+enumKind: inline
+enumSchema: PricingPublicationTarget
+enumProperty: status
+owner: catalogue
+initial:
+- pending
+terminal:
+- inSync
+transitions:
+- from: pending
+  to: publishing
+  trigger: job
+  guard: The distribution job starts sending the publication to this target
+- from: publishing
+  to: inSync
+  trigger: job
+  guard: The target acknowledged every record
+- from: publishing
+  to: failed
+  trigger: job
+  guard: The target refused or timed out; `failureReason` records why
+- from: failed
+  to: publishing
+  trigger: job
+  guard: The distribution job retries with backoff until the target acknowledges
+notes: '**Written only by the distribution job**, one row per target of a `catalogue.pricing_publication`
+  (`publishPricingEffectiveDate`). A target left `failed` keeps the publication `publishing` and is
+  shown on ADM-085.'

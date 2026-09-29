@@ -1,0 +1,225 @@
+{
+ "createForm": {
+  "method": "POST",
+  "path": "/forms",
+  "contract": "marketing-crm",
+  "summary": "Define a waiver, survey or capture form",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FormDefinition",
+  "responds": "FormDefinition"
+ },
+ "listCustomerSatisfactionFeedback": {
+  "method": "GET",
+  "path": "/customer-satisfaction-feedback",
+  "contract": "marketing-crm",
+  "summary": "Customer Satisfaction, Feedback & Voice of Customer",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "source",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "eventId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "agentPrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sentiment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "CustomerSatisfactionFeedbackVoiceOfCustomerView"
+ },
+ "listReviews": {
+  "method": "GET",
+  "path": "/reviews",
+  "contract": "marketing-crm",
+  "summary": "List guest reviews and ratings",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "minRating",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "hasResponse",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listServiceRootCause": {
+  "method": "GET",
+  "path": "/service-root-cause",
+  "contract": "marketing-crm",
+  "summary": "Service Analytics & Root-Cause Intelligence",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "eventId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "compare",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "compareId",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "ServiceAnalyticsRootCauseIntelligenceView"
+ },
+ "respondToReview": {
+  "method": "POST",
+  "path": "/reviews/{reviewId}/respond",
+  "contract": "marketing-crm",
+  "summary": "Respond to a review",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Review"
+ },
+ "setMessageTrigger": {
+  "method": "POST",
+  "path": "/message-triggers",
+  "contract": "marketing-crm",
+  "summary": "Fire a message from a platform event",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MessageTrigger",
+  "responds": "MessageTrigger"
+ },
+ "setRefundCompensationService": {
+  "method": "PUT",
+  "path": "/refund-compensation-service",
+  "contract": "marketing-crm",
+  "summary": "Raise or change a refund, compensation or policy-exception request on a case",
+  "permission": "ORDER_REFUND",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RefundCompensationServiceExceptionWorkspaceInput",
+  "responds": "RefundCompensationServiceExceptionWorkspaceView"
+ }
+}

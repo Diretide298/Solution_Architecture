@@ -1,4 +1,4 @@
--- seating — 21 tables
+-- seating — 22 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 5 columns. No description has been written for this table — the name is the only thing
@@ -28,6 +28,18 @@ CREATE TABLE IF NOT EXISTS seating.group_request (
     quote_expires_at                  timestamptz,
     deposit_amount                    numeric(18,4),
     order_id                          text,
+    scope_path                        ltree NOT NULL
+);
+
+-- Holds 7 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS seating.group_request_participant (
+    id                                uuid PRIMARY KEY,
+    group_request_id                  uuid,
+    name                              text NOT NULL,
+    seat_id                           uuid,
+    notes                             text,
+    updated_at                        timestamptz,
     scope_path                        ltree NOT NULL
 );
 

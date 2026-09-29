@@ -1,6 +1,6 @@
 # P08-people-access-rights-01 — P08 · People & Access Rights (1 of 2)
 
-**10 screens · 28 operations · 20 schemas · 10 permissions**
+**10 screens · 34 operations · 25 schemas · 10 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 10 permissions apply here:
   `ANNOUNCEMENT_PUBLISH, APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_REQUEST, APPROVAL_VIEW, ATTENDANCE_RECORD, ROLE_MANAGE, USER_MANAGE, WORKFORCE_MANAGE, WORKFORCE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **5 of these operations work offline**: acknowledgeAnnouncement, listAnnouncements, listRoles, listRotaAssignments, recordAttendance
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,20 +60,20 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-053` | Staff Directory | listDetail | 4 | 0 | — |
-| `BO-054` | Role Assignment | listDetail | 2 | 0 | — |
-| `BO-055` | Rota & Scheduling | listDetail | 4 | 0 | — |
-| `BO-056` | Time & Attendance | listDetail | 3 | 0 | — |
+| `BO-053` | Staff Directory | listDetail | 9 | 3 | — |
+| `BO-054` | Role Assignment | listDetail | 3 | 1 | — |
+| `BO-055` | Rota & Scheduling | listDetail | 4 | 3 | — |
+| `BO-056` | Time & Attendance | listDetail | 3 | 2 | — |
 | `BO-057` | Training & Certification | listDetail | 1 | 0 | — |
-| `BO-066` | Notification Settings | listDetail | 4 | 0 | — |
-| `BO-084` | Approval Inbox | approvalInbox | 3 | 0 | — |
-| `BO-085` | Approval Request | approvalInbox | 5 | 1 | — |
-| `BO-086` | Approval Matrix | listDetail | 2 | 0 | — |
-| `BO-087` | Approval Delegations | listDetail | 3 | 1 | — |
+| `BO-066` | Notification Settings | listDetail | 4 | 1 | — |
+| `BO-084` | Approval Inbox | approvalInbox | 3 | 2 | — |
+| `BO-085` | Approval Request | approvalInbox | 5 | 4 | — |
+| `BO-086` | Approval Matrix | listDetail | 2 | 1 | — |
+| `BO-087` | Approval Delegations | listDetail | 3 | 2 | — |
 
 ## Thin screens in this batch
 
-**BO-086 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-054 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -98,50 +97,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted"
   },
   "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
-   ],
-   "inferred": true,
-   "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
-    }
-   ]
+   "inferred": true
   },
   "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Drawn 31 August** — `Marketing Board 1.dc.html` frame `crm-1b` (*Guest Directory*), matched on title at 0.80 within this board’s platforms.",
   "density": "compact",
@@ -159,8 +115,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Scope path",
+       "operation": "listPrincipals",
+       "notes": "Sends `?scopePath=` to `listPrincipals`.",
+       "provenance": "contract identity.yaml GET /principals"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is active",
+       "operation": "listPrincipals",
+       "notes": "Sends `?isActive=` to `listPrincipals`.",
+       "provenance": "contract identity.yaml GET /principals"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every staff",
+       "label": "Every principal",
        "bindsTo": "Principal",
        "columns": [
         "Principal.id",
@@ -184,7 +154,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected staff",
+       "label": "The selected principal",
        "bindsTo": "Principal",
        "columns": [
         "Principal.id",
@@ -208,48 +178,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create principal",
        "operation": "createPrincipal",
        "provenance": "contract identity.yaml POST /principals"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save principal",
        "operation": "updatePrincipal",
        "provenance": "contract identity.yaml PATCH /principals/{principalId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
       },
       {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listPrincipals",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createPrincipal",
-       "label": "Create principal",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createPrincipal",
-       "provenance": "carried from the previous definition"
+       "kind": "destructiveButton",
+       "label": "Reset principal credential",
+       "operation": "resetPrincipalCredential",
+       "provenance": "contract identity.yaml POST /principals/{principalId}/credential-reset"
       }
      ]
     }
@@ -258,11 +201,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The staff list.",
    "error": "Could not load. Names which read failed and leaves the staff untouched.",
-   "emptyFirstRun": "No staff yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the staff are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No staff yet. Offers Create principal (`createPrincipal`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on scopePath, isActive and the staff are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "resetPrincipalCredential",
+    "contract": "identity",
+    "purpose": "Reset a forgotten password or PIN",
+    "trigger": "onAction"
+   },
    {
     "operationId": "listPrincipals",
     "contract": "identity",
@@ -292,6 +241,41 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listPrincipals"
     ]
+   },
+   {
+    "operationId": "listJobTitles",
+    "contract": "workforce",
+    "purpose": "Job titles",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "setJobTitle",
+    "contract": "workforce",
+    "purpose": "Define a job title",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listJobTitles"
+    ]
+   },
+   {
+    "operationId": "listWorkAssignments",
+    "contract": "workforce",
+    "purpose": "Who is posted to which job title at which venue",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "setWorkAssignment",
+    "contract": "workforce",
+    "purpose": "Post a person to a job title at a venue",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listJobTitles",
+     "listWorkAssignments"
+    ]
    }
   ],
   "entryState": {
@@ -314,9 +298,63 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-053",
+   "derivedFrom": "wireframes/reference/Marketing Board 1.dc.html",
    "note": "**Drawn by Claude Design on `Marketing Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "confirmResetPrincipalCredential",
+    "component": "confirmDialog",
+    "trigger": "Reset principal credential",
+    "body": "**Names what `resetPrincipalCredential` changes and what it leaves alone**, in the consequence rather than the verb. A staff this affects should be identified in the dialog, not just counted. **Collects what `resetPrincipalCredential` sends before it is called.** Required: `method`, `temporaryCredential`, `reason`.",
+    "bindsTo": "ResetCredentialRequest",
+    "provenance": "contract identity.yaml POST /principals/{principalId}/credential-reset"
+   },
+   {
+    "id": "formCreatePrincipal",
+    "component": "modal",
+    "trigger": "Create principal",
+    "body": "**Collects what `createPrincipal` sends before it is called.** Required: `username`, `displayName`. Optional: `initialCredential`, `mustChangeCredential`, `validTo`, `roleIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreatePrincipalRequest",
+    "confirm": {
+     "label": "Create principal",
+     "operation": "createPrincipal"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "username",
+      "displayName",
+      "initialCredential",
+      "mustChangeCredential",
+      "validTo",
+      "roleIds"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /principals"
+   },
+   {
+    "id": "formUpdatePrincipal",
+    "component": "modal",
+    "trigger": "Save principal",
+    "body": "**Collects what `updatePrincipal` sends before it is called.** Nothing in the body is required. Optional: `displayName`, `isActive`, `validTo`, `primaryRoleId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save principal",
+     "operation": "updatePrincipal"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "displayName",
+      "isActive",
+      "validTo",
+      "primaryRoleId"
+     ]
+    },
+    "provenance": "contract identity.yaml PATCH /principals/{principalId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -354,50 +392,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted"
   },
   "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
-   ],
-   "inferred": true,
-   "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
-    }
-   ]
+   "inferred": true
   },
   "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
   "density": "compact",
@@ -413,7 +408,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every role assignment",
+       "label": "Every role",
        "bindsTo": "Role",
        "columns": [
         "Role.id",
@@ -437,7 +432,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected role assignment",
+       "label": "The selected role",
        "bindsTo": "Role",
        "columns": [
         "Role.id",
@@ -461,42 +456,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create role",
        "operation": "createRole",
        "provenance": "contract identity.yaml POST /roles"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listRoles",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createRole",
-       "label": "Create role",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createRole",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -505,9 +467,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The role assignment list.",
    "error": "Could not load. Names which read failed and leaves the role assignment untouched.",
-   "emptyFirstRun": "No role assignment yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the role assignment are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No role assignment yet. Offers Create role (`createRole`).",
+   "emptyNoResults": "Never shown: `listRoles` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -521,6 +483,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "identity",
     "purpose": "Create a role",
     "trigger": "onAction",
+    "invalidates": [
+     "listRoles"
+    ]
+   },
+   {
+    "operationId": "setCapabilityTemplate",
+    "contract": "identity",
+    "purpose": "Save a tick-set of permissions under a name",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
     "invalidates": [
      "listRoles"
     ]
@@ -541,6 +513,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P08 Venue Management.dc.html#bo-054"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateRole",
+    "component": "modal",
+    "trigger": "Create role",
+    "body": "**Collects what `createRole` sends before it is called.** Required: `code`, `name`. Optional: `description`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create role",
+     "operation": "createRole"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "description"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /roles"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -578,50 +571,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted"
   },
   "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
-   ],
-   "inferred": true,
-   "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
-    }
-   ]
+   "inferred": true
   },
   "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
   "density": "compact",
@@ -636,8 +586,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "datePicker",
+       "label": "From",
+       "operation": "listRotaAssignments",
+       "notes": "Sends `?from=` to `listRotaAssignments`.",
+       "provenance": "contract workforce.yaml GET /rota-assignments"
+      },
+      {
+       "kind": "datePicker",
+       "label": "To",
+       "operation": "listRotaAssignments",
+       "notes": "Sends `?to=` to `listRotaAssignments`.",
+       "provenance": "contract workforce.yaml GET /rota-assignments"
+      },
+      {
+       "kind": "textField",
+       "label": "Principal id",
+       "operation": "listRotaAssignments",
+       "notes": "Sends `?principalId=` to `listRotaAssignments`.",
+       "provenance": "contract workforce.yaml GET /rota-assignments"
+      },
+      {
+       "kind": "textField",
+       "label": "Department id",
+       "operation": "listRotaAssignments",
+       "notes": "Sends `?departmentId=` to `listRotaAssignments`.",
+       "provenance": "contract workforce.yaml GET /rota-assignments"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every rota scheduling",
+       "label": "Every rota assignment",
        "bindsTo": "RotaAssignment",
        "columns": [
         "RotaAssignment.overtimeMinutes",
@@ -664,7 +642,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected rota scheduling",
+       "label": "The selected rota assignment",
        "bindsTo": "RotaAssignment",
        "columns": [
         "RotaAssignment.overtimeMinutes",
@@ -695,54 +673,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create rota assignment",
        "operation": "createRotaAssignment",
        "provenance": "contract workforce.yaml POST /rota-assignments"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save rota assignment",
        "operation": "updateRotaAssignment",
        "provenance": "contract workforce.yaml PATCH /rota-assignments/{assignmentId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Request",
+       "label": "Request shift swap",
        "operation": "requestShiftSwap",
        "provenance": "contract workforce.yaml POST /rota-assignments/{assignmentId}/swap"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listRotaAssignments",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createRotaAssignment",
-       "label": "Create rota assignment",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createRotaAssignment",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -751,9 +696,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The rota scheduling list.",
    "error": "Could not load. Names which read failed and leaves the rota scheduling untouched.",
-   "emptyFirstRun": "No rota scheduling yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the rota scheduling are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No rota scheduling yet. Offers Create rota assignment (`createRotaAssignment`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on from, to, principalId, departmentId and the rota scheduling are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `WORKFORCE_VIEW`, which `listRotaAssignments` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -812,6 +757,94 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P08 Venue Management.dc.html#bo-055"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateRotaAssignment",
+    "component": "modal",
+    "trigger": "Create rota assignment",
+    "body": "**Collects what `createRotaAssignment` sends before it is called.** Required: `principalId`, `venueId`, `position`, `startsAt`, `endsAt`. Optional: `overtimeMinutes`, `restPeriodBefore`, `breachesWorkingHourLimit`, `labourCost`, `id`, `displayName`, `departmentId`, `requiredRoleId`, `workstationId`, `status`, `breakMinutes`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RotaAssignment",
+    "confirm": {
+     "label": "Create rota assignment",
+     "operation": "createRotaAssignment"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "principalId",
+      "venueId",
+      "position",
+      "startsAt",
+      "endsAt",
+      "overtimeMinutes",
+      "restPeriodBefore",
+      "breachesWorkingHourLimit",
+      "labourCost",
+      "id",
+      "displayName",
+      "departmentId",
+      "requiredRoleId",
+      "workstationId",
+      "status",
+      "breakMinutes",
+      "note"
+     ]
+    },
+    "provenance": "contract workforce.yaml POST /rota-assignments"
+   },
+   {
+    "id": "formUpdateRotaAssignment",
+    "component": "modal",
+    "trigger": "Save rota assignment",
+    "body": "**Collects what `updateRotaAssignment` sends before it is called.** Required: `principalId`, `venueId`, `position`, `startsAt`, `endsAt`. Optional: `overtimeMinutes`, `restPeriodBefore`, `breachesWorkingHourLimit`, `labourCost`, `id`, `displayName`, `departmentId`, `requiredRoleId`, `workstationId`, `status`, `breakMinutes`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RotaAssignment",
+    "confirm": {
+     "label": "Save rota assignment",
+     "operation": "updateRotaAssignment"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "principalId",
+      "venueId",
+      "position",
+      "startsAt",
+      "endsAt",
+      "overtimeMinutes",
+      "restPeriodBefore",
+      "breachesWorkingHourLimit",
+      "labourCost",
+      "id",
+      "displayName",
+      "departmentId",
+      "requiredRoleId",
+      "workstationId",
+      "status",
+      "breakMinutes",
+      "note"
+     ]
+    },
+    "provenance": "contract workforce.yaml PATCH /rota-assignments/{assignmentId}"
+   },
+   {
+    "id": "formRequestShiftSwap",
+    "component": "modal",
+    "trigger": "Request shift swap",
+    "body": "**Collects what `requestShiftSwap` sends before it is called.** Required: `toPrincipalId`. Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Request shift swap",
+     "operation": "requestShiftSwap"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "toPrincipalId",
+      "reason"
+     ]
+    },
+    "provenance": "contract workforce.yaml POST /rota-assignments/{assignmentId}/swap"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -849,50 +882,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted"
   },
   "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
-   ],
-   "inferred": true,
-   "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
-    }
-   ]
+   "inferred": true
   },
   "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
   "density": "compact",
@@ -907,8 +897,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "datePicker",
+       "label": "Date",
+       "operation": "listAttendance",
+       "notes": "Sends `?date=` to `listAttendance`.",
+       "provenance": "contract workforce.yaml GET /attendance"
+      },
+      {
+       "kind": "textField",
+       "label": "Principal id",
+       "operation": "listAttendance",
+       "notes": "Sends `?principalId=` to `listAttendance`.",
+       "provenance": "contract workforce.yaml GET /attendance"
+      },
+      {
+       "kind": "toggle",
+       "label": "Exceptions only",
+       "operation": "listAttendance",
+       "notes": "Sends `?exceptionsOnly=` to `listAttendance`.",
+       "provenance": "contract workforce.yaml GET /attendance"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every time attendance",
+       "label": "Every attendance",
        "bindsTo": "AttendanceRecord",
        "columns": [
         "AttendanceRecord.id",
@@ -935,7 +946,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected time attendance",
+       "label": "The selected attendance",
        "bindsTo": "AttendanceRecord",
        "columns": [
         "AttendanceRecord.id",
@@ -952,9 +963,25 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "AttendanceRecord.amendedByPrincipalId",
         "AttendanceRecord.amendmentReason",
         "AttendanceRecord.originalOccurredAt",
+        "AttendanceRecord.amendments",
         "AttendanceRecord.exception"
        ],
        "operation": "listAttendance",
+       "provenance": "contract workforce.yaml GET /attendance"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Amendment history",
+       "bindsTo": "AttendanceAmendment",
+       "columns": [
+        "AttendanceAmendment.amendedAt",
+        "AttendanceAmendment.amendedByPrincipalId",
+        "AttendanceAmendment.occurredAtBefore",
+        "AttendanceAmendment.occurredAtAfter",
+        "AttendanceAmendment.reason"
+       ],
+       "operation": "listAttendance",
+       "notes": "**Every correction, not only the last** (decided 28 September, audit R129 (7)) — read from `AttendanceRecord.amendments`: who, when, before, after and why.",
        "provenance": "contract workforce.yaml GET /attendance"
       }
      ]
@@ -965,41 +992,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Amend",
+       "label": "Amend attendance",
        "operation": "amendAttendance",
        "provenance": "contract workforce.yaml POST /attendance/{recordId}/amend"
       },
       {
        "kind": "secondaryButton",
-       "label": "Record",
+       "label": "Record attendance",
        "operation": "recordAttendance",
        "provenance": "contract workforce.yaml POST /attendance/clock"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAttendance",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "amendAttendance",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1008,9 +1009,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The time attendance list.",
    "error": "Could not load. Names which read failed and leaves the time attendance untouched.",
-   "emptyFirstRun": "No time attendance yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the time attendance are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No time attendance yet. Offers Record attendance (`recordAttendance`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on date, principalId, exceptionsOnly and the time attendance are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `WORKFORCE_VIEW`, which `listAttendance` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1060,6 +1061,48 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P08 Venue Management.dc.html#bo-056"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAmendAttendance",
+    "component": "modal",
+    "trigger": "Amend attendance",
+    "body": "**Collects what `amendAttendance` sends before it is called.** Required: `correctedAt`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Amend attendance",
+     "operation": "amendAttendance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "correctedAt",
+      "reason"
+     ]
+    },
+    "provenance": "contract workforce.yaml POST /attendance/{recordId}/amend"
+   },
+   {
+    "id": "formRecordAttendance",
+    "component": "modal",
+    "trigger": "Record attendance",
+    "body": "**Collects what `recordAttendance` sends before it is called.** Required: `kind`, `occurredAt`. Optional: `assignmentId`, `accessPointId`, `latitude`, `longitude`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Record attendance",
+     "operation": "recordAttendance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "occurredAt",
+      "assignmentId",
+      "accessPointId",
+      "latitude",
+      "longitude"
+     ]
+    },
+    "provenance": "contract workforce.yaml POST /attendance/clock"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1097,50 +1140,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted"
   },
   "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
-   ],
-   "inferred": true,
-   "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
-    }
-   ]
+   "inferred": true
   },
   "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
   "density": "compact",
@@ -1155,8 +1155,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Scope path",
+       "operation": "listPrincipals",
+       "notes": "Sends `?scopePath=` to `listPrincipals`.",
+       "provenance": "contract identity.yaml GET /principals"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is active",
+       "operation": "listPrincipals",
+       "notes": "Sends `?isActive=` to `listPrincipals`.",
+       "provenance": "contract identity.yaml GET /principals"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every training certification",
+       "label": "Every principal",
        "bindsTo": "Principal",
        "columns": [
         "Principal.id",
@@ -1180,7 +1194,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected training certification",
+       "label": "The selected principal",
        "bindsTo": "Principal",
        "columns": [
         "Principal.id",
@@ -1197,33 +1211,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "contract identity.yaml GET /principals"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listPrincipals",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The training certification list.",
    "error": "Could not load. Names which read failed and leaves the training certification untouched.",
-   "emptyFirstRun": "No training certification yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the training certification are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No training certification yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on scopePath, isActive and the training certification are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1285,50 +1281,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted"
   },
   "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
-   ],
-   "inferred": true,
-   "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
-    }
-   ]
+   "inferred": true
   },
   "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
   "density": "compact",
@@ -1343,8 +1296,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "toggle",
+       "label": "Unacknowledged only",
+       "operation": "listAnnouncements",
+       "notes": "Sends `?unacknowledgedOnly=` to `listAnnouncements`.",
+       "provenance": "contract workforce.yaml GET /announcements"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every notification settings",
+       "label": "Every announcement",
        "bindsTo": "Announcement",
        "columns": [
         "Announcement.id",
@@ -1362,6 +1322,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listAnnouncements",
        "provenance": "contract workforce.yaml GET /announcements"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishAnnouncement",
+       "notes": "Declares `publishAnnouncement`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1371,7 +1337,28 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected notification settings",
+       "label": "The selected announcement",
+       "bindsTo": "Announcement",
+       "columns": [
+        "Announcement.id",
+        "Announcement.title",
+        "Announcement.body",
+        "Announcement.kind",
+        "Announcement.venueIds",
+        "Announcement.departmentIds",
+        "Announcement.roleIds",
+        "Announcement.requiresAcknowledgement",
+        "Announcement.expiresAt",
+        "Announcement.publishedByPrincipalId",
+        "Announcement.publishedAt",
+        "Announcement.locale"
+       ],
+       "operation": "listAnnouncements",
+       "provenance": "contract workforce.yaml GET /announcements"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The announcement reach",
        "bindsTo": "AnnouncementReach",
        "columns": [
         "AnnouncementReach.announcementId",
@@ -1391,13 +1378,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Publish",
+       "label": "Publish announcement",
        "operation": "publishAnnouncement",
        "provenance": "contract workforce.yaml POST /announcements"
       },
       {
        "kind": "secondaryButton",
-       "label": "Acknowledge",
+       "label": "Acknowledge announcement",
        "operation": "acknowledgeAnnouncement",
        "provenance": "contract workforce.yaml POST /announcements/{announcementId}/acknowledge"
       },
@@ -1408,54 +1395,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "authored — required by check-screens"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAnnouncements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "publishAnnouncement",
-       "label": "Publish announcement",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "publishAnnouncement",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishAnnouncement",
-       "notes": "Declares `publishAnnouncement`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The notification settings list.",
    "error": "Could not load. Names which read failed and leaves the notification settings untouched.",
-   "emptyFirstRun": "No notification settings yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the notification settings are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No notification settings yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on unacknowledgedOnly and the notification settings are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `WORKFORCE_VIEW`, which `listAnnouncements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1486,7 +1434,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getAnnouncementReach",
     "contract": "workforce",
     "purpose": "Who has acknowledged, and who has not",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1498,11 +1446,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `announcementId`.",
    "preloaded": [
-    "AnnouncementReach.announcementId",
-    "AnnouncementReach.targeted",
-    "AnnouncementReach.delivered",
-    "AnnouncementReach.acknowledged",
-    "AnnouncementReach.outstanding"
+    "Announcement.id",
+    "Announcement.title",
+    "Announcement.body",
+    "Announcement.kind",
+    "Announcement.venueIds"
    ]
   },
   "wireframe": {
@@ -1511,6 +1459,37 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P08 Venue Management.dc.html#bo-066"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formPublishAnnouncement",
+    "component": "modal",
+    "trigger": "Publish announcement",
+    "body": "**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`, `kind`, `publishedAt`. Optional: `id`, `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`, `expiresAt`, `publishedByPrincipalId`, `locale`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "Announcement",
+    "confirm": {
+     "label": "Publish announcement",
+     "operation": "publishAnnouncement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "title",
+      "body",
+      "kind",
+      "publishedAt",
+      "id",
+      "venueIds",
+      "departmentIds",
+      "roleIds",
+      "requiresAcknowledgement",
+      "expiresAt",
+      "publishedByPrincipalId",
+      "locale"
+     ]
+    },
+    "provenance": "contract workforce.yaml POST /announcements"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1549,7 +1528,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-052",
     "BO-085",
     "BO-086",
@@ -1564,28 +1542,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "provenance": "flow F15 step 3→4"
     },
     {
+     "to": "BO-087",
+     "trigger": "Approval Delegations",
+     "provenance": "derived — BO-087 declares entryState.params delegationId and BO-084 holds none of them, so the edge carries nothing and BO-087 opens cold"
+    },
+    {
      "to": "BO-085",
      "trigger": "Approves it",
      "provenance": "flow F14 step 3→4",
-     "operation": "listApprovalRequests"
-    },
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
+     "operation": "listApprovalRequests",
      "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-087",
-     "trigger": "Approval Delegations",
-     "carries": [
-      "delegationId"
-     ],
-     "provenance": "derived — BO-087 declares entryState.params delegationId, so an edge into it must carry them"
+      "requestId"
+     ]
     }
    ]
   },
@@ -1602,228 +1570,40 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "queue",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Waiting for a decision",
-       "bindsTo": "ApprovalRequest",
-       "columns": [
-        "ApprovalRequest.id",
-        "ApprovalRequest.kind",
-        "ApprovalRequest.rerouteOnNoApprover",
-        "ApprovalRequest.outOfOfficeDelegateId",
-        "ApprovalRequest.allowEmailApproval",
-        "ApprovalRequest.reopenedFrom",
-        "ApprovalRequest.status",
-        "ApprovalRequest.subjectContract",
-        "ApprovalRequest.subjectType",
-        "ApprovalRequest.subjectId",
-        "ApprovalRequest.scopePath",
-        "ApprovalRequest.summary"
-       ],
+       "kind": "toggle",
+       "label": "Assigned to me",
        "operation": "listApprovalRequests",
+       "notes": "Sends `?assignedToMe=` to `listApprovalRequests`.",
        "provenance": "contract approvals.yaml GET /approval-requests"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "item",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected approval",
-       "bindsTo": "ApprovalRequest",
-       "columns": [
-        "ApprovalRequest.id",
-        "ApprovalRequest.kind",
-        "ApprovalRequest.rerouteOnNoApprover",
-        "ApprovalRequest.outOfOfficeDelegateId",
-        "ApprovalRequest.allowEmailApproval",
-        "ApprovalRequest.reopenedFrom",
-        "ApprovalRequest.status",
-        "ApprovalRequest.subjectContract",
-        "ApprovalRequest.subjectType",
-        "ApprovalRequest.subjectId",
-        "ApprovalRequest.scopePath",
-        "ApprovalRequest.summary",
-        "ApprovalRequest.amount",
-        "ApprovalRequest.justification",
-        "ApprovalRequest.requestedByPrincipalId",
-        "ApprovalRequest.matrixVersion"
-       ],
-       "operation": "listApprovalRequests",
-       "provenance": "contract approvals.yaml GET /approval-requests"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "decision",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Decide",
-       "operation": "decideApprovalRequest",
-       "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/decide"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Escalate",
-       "operation": "escalateApprovalRequest",
-       "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/escalate"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The approval list.",
-   "error": "Could not load. Names which read failed and leaves the approval untouched.",
-   "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
-   "emptyNoResults": "The filter narrowed it and the approval are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listApprovalRequests",
-    "contract": "approvals",
-    "purpose": "Requests awaiting a decision, or already decided",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "decideApprovalRequest",
-    "contract": "approvals",
-    "purpose": "Approve or reject",
-    "trigger": "onAction",
-    "invalidates": [
-     "listApprovalRequests"
-    ]
-   },
-   {
-    "operationId": "escalateApprovalRequest",
-    "contract": "approvals",
-    "purpose": "Move it up a level",
-    "trigger": "onAction",
-    "invalidates": [
-     "listApprovalRequests"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "requestId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `requestId`.",
-   "preloaded": [
-    "ApprovalRequest.id",
-    "ApprovalRequest.kind",
-    "ApprovalRequest.rerouteOnNoApprover",
-    "ApprovalRequest.outOfOfficeDelegateId",
-    "ApprovalRequest.allowEmailApproval"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-084"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-085",
-  "name": "Approval Request",
-  "module": "People & Access Rights",
-  "requiresModule": "core",
-  "wave": 1,
-  "capability": "C00",
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/approvals/approval-request",
-   "component": "apps/venue-management-web/src/routes/approvals/ApprovalRequest.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-084",
-    "BO-086",
-    "BO-087"
-   ],
-   "inferred": true,
-   "fromFlows": true,
-   "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-084",
-     "trigger": "Approval Inbox",
-     "carries": [
-      "requestId"
-     ],
-     "provenance": "derived — BO-084 declares entryState.params requestId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-087",
-     "trigger": "Approval Delegations",
-     "carries": [
-      "delegationId"
-     ],
-     "provenance": "derived — BO-087 declares entryState.params delegationId, so an edge into it must carry them"
-    },
-    {
-     "to": "POS-005",
-     "trigger": "The till applies it and completes the sale",
-     "provenance": "flow F14 step 4→5",
-     "operation": "decideApprovalRequest",
-     "crossesDevice": true,
-     "back": false
-    }
-   ]
-  },
-  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **Cross-platform navigation removed 24 August**: POS-005. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
-  "density": "compact",
-  "pattern": "approvalInbox",
-  "patternReason": "`decideApprovalRequest` decides items that `listApprovalRequests` queues — every row is waiting for a person, so the empty state is success",
-  "purpose": "One request, its subject, and the decision.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "queue",
-     "components": [
+       "kind": "toggle",
+       "label": "Raised by me",
+       "operation": "listApprovalRequests",
+       "notes": "Sends `?raisedByMe=` to `listApprovalRequests`.",
+       "provenance": "contract approvals.yaml GET /approval-requests"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listApprovalRequests",
+       "notes": "Sends `?status=` to `listApprovalRequests`.",
+       "provenance": "contract approvals.yaml GET /approval-requests"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listApprovalRequests",
+       "notes": "Sends `?kind=` to `listApprovalRequests`.",
+       "provenance": "contract approvals.yaml GET /approval-requests"
+      },
+      {
+       "kind": "numberField",
+       "label": "Breaching within minutes",
+       "operation": "listApprovalRequests",
+       "notes": "Sends `?breachingWithinMinutes=` to `listApprovalRequests`.",
+       "provenance": "contract approvals.yaml GET /approval-requests"
+      },
       {
        "kind": "dataTable",
        "label": "Waiting for a decision",
@@ -1884,25 +1664,309 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Decide",
+       "label": "Decide approval request",
        "operation": "decideApprovalRequest",
        "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/decide"
       },
       {
        "kind": "secondaryButton",
-       "label": "Resubmit",
+       "label": "Escalate approval request",
+       "operation": "escalateApprovalRequest",
+       "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/escalate"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The approval list.",
+   "error": "Could not load. Names which read failed and leaves the approval untouched.",
+   "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
+   "emptyNoResults": "Nothing matches the filter on assignedToMe, raisedByMe, status, kind, breachingWithinMinutes and the approval are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalRequests` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listApprovalRequests",
+    "contract": "approvals",
+    "purpose": "Requests awaiting a decision, or already decided",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "decideApprovalRequest",
+    "contract": "approvals",
+    "purpose": "Approve or reject",
+    "trigger": "onAction",
+    "invalidates": [
+     "listApprovalRequests"
+    ]
+   },
+   {
+    "operationId": "escalateApprovalRequest",
+    "contract": "approvals",
+    "purpose": "Move it up a level",
+    "trigger": "onAction",
+    "invalidates": [
+     "listApprovalRequests"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "requestId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `requestId`.",
+   "preloaded": [
+    "ApprovalRequest.id",
+    "ApprovalRequest.kind",
+    "ApprovalRequest.rerouteOnNoApprover",
+    "ApprovalRequest.outOfOfficeDelegateId",
+    "ApprovalRequest.allowEmailApproval"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-084"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formDecideApprovalRequest",
+    "component": "modal",
+    "trigger": "Decide approval request",
+    "body": "**Collects what `decideApprovalRequest` sends before it is called.** Required: `decision`. Optional: `comment`, `reason`, `stepUpToken`, `signature`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Decide approval request",
+     "operation": "decideApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "decision",
+      "comment",
+      "reason",
+      "stepUpToken",
+      "signature"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/decide"
+   },
+   {
+    "id": "formEscalateApprovalRequest",
+    "component": "modal",
+    "trigger": "Escalate approval request",
+    "body": "**Collects what `escalateApprovalRequest` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Escalate approval request",
+     "operation": "escalateApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/escalate"
+   }
+  ],
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-085",
+  "name": "Approval Request",
+  "module": "People & Access Rights",
+  "requiresModule": "core",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/approvals/approval-request",
+   "component": "apps/venue-management-web/src/routes/approvals/ApprovalRequest.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-084",
+    "BO-086",
+    "BO-087"
+   ],
+   "inferred": true,
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "BO-084",
+     "trigger": "Approval Inbox",
+     "carries": [
+      "requestId"
+     ],
+     "provenance": "derived — BO-084 declares entryState.params requestId and BO-085 holds requestId, so an edge into it carries them"
+    },
+    {
+     "to": "BO-087",
+     "trigger": "Approval Delegations",
+     "provenance": "derived — BO-087 declares entryState.params delegationId and BO-085 holds none of them, so the edge carries nothing and BO-087 opens cold"
+    },
+    {
+     "to": "POS-005",
+     "trigger": "The till applies it and completes the sale",
+     "provenance": "flow F14 step 4→5",
+     "operation": "decideApprovalRequest",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **Cross-platform navigation removed 24 August**: POS-005. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
+  "density": "compact",
+  "pattern": "approvalInbox",
+  "patternReason": "`decideApprovalRequest` decides items that `listApprovalRequests` queues — every row is waiting for a person, so the empty state is success",
+  "purpose": "One request, its subject, and the decision.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "queue",
+     "components": [
+      {
+       "kind": "toggle",
+       "label": "Assigned to me",
+       "operation": "listApprovalRequests",
+       "notes": "Sends `?assignedToMe=` to `listApprovalRequests`.",
+       "provenance": "contract approvals.yaml GET /approval-requests"
+      },
+      {
+       "kind": "toggle",
+       "label": "Raised by me",
+       "operation": "listApprovalRequests",
+       "notes": "Sends `?raisedByMe=` to `listApprovalRequests`.",
+       "provenance": "contract approvals.yaml GET /approval-requests"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listApprovalRequests",
+       "notes": "Sends `?status=` to `listApprovalRequests`.",
+       "provenance": "contract approvals.yaml GET /approval-requests"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listApprovalRequests",
+       "notes": "Sends `?kind=` to `listApprovalRequests`.",
+       "provenance": "contract approvals.yaml GET /approval-requests"
+      },
+      {
+       "kind": "numberField",
+       "label": "Breaching within minutes",
+       "operation": "listApprovalRequests",
+       "notes": "Sends `?breachingWithinMinutes=` to `listApprovalRequests`.",
+       "provenance": "contract approvals.yaml GET /approval-requests"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Waiting for a decision",
+       "bindsTo": "ApprovalRequest",
+       "columns": [
+        "ApprovalRequest.id",
+        "ApprovalRequest.kind",
+        "ApprovalRequest.rerouteOnNoApprover",
+        "ApprovalRequest.outOfOfficeDelegateId",
+        "ApprovalRequest.allowEmailApproval",
+        "ApprovalRequest.reopenedFrom",
+        "ApprovalRequest.status",
+        "ApprovalRequest.subjectContract",
+        "ApprovalRequest.subjectType",
+        "ApprovalRequest.subjectId",
+        "ApprovalRequest.scopePath",
+        "ApprovalRequest.summary"
+       ],
+       "operation": "listApprovalRequests",
+       "provenance": "contract approvals.yaml GET /approval-requests"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "item",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected approval request",
+       "bindsTo": "ApprovalRequest",
+       "columns": [
+        "ApprovalRequest.id",
+        "ApprovalRequest.kind",
+        "ApprovalRequest.rerouteOnNoApprover",
+        "ApprovalRequest.outOfOfficeDelegateId",
+        "ApprovalRequest.allowEmailApproval",
+        "ApprovalRequest.reopenedFrom",
+        "ApprovalRequest.status",
+        "ApprovalRequest.subjectContract",
+        "ApprovalRequest.subjectType",
+        "ApprovalRequest.subjectId",
+        "ApprovalRequest.scopePath",
+        "ApprovalRequest.summary",
+        "ApprovalRequest.amount",
+        "ApprovalRequest.justification",
+        "ApprovalRequest.requestedByPrincipalId",
+        "ApprovalRequest.matrixVersion"
+       ],
+       "operation": "listApprovalRequests",
+       "provenance": "contract approvals.yaml GET /approval-requests"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "decision",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Decide approval request",
+       "operation": "decideApprovalRequest",
+       "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/decide"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resubmit approval request",
        "operation": "resubmitApprovalRequest",
        "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/resubmit"
       },
       {
        "kind": "destructiveButton",
-       "label": "Withdraw",
+       "label": "Withdraw approval request",
        "operation": "withdrawApprovalRequest",
        "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/withdraw"
       },
       {
        "kind": "secondaryButton",
-       "label": "Evaluate",
+       "label": "Evaluate approval requirement",
        "operation": "evaluateApprovalRequirement",
        "provenance": "contract approvals.yaml POST /approval-requests/evaluate"
       }
@@ -1914,17 +1978,76 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmWithdrawApprovalRequest",
     "component": "confirmDialog",
-    "trigger": "Withdraw",
-    "body": "**Names what `withdrawApprovalRequest` changes and what it leaves alone**, in the consequence rather than the verb. A approval request this affects should be identified in the dialog, not just counted.",
+    "trigger": "Withdraw approval request",
+    "body": "**Names what `withdrawApprovalRequest` changes and what it leaves alone**, in the consequence rather than the verb. A approval request this affects should be identified in the dialog, not just counted. **Collects what `withdrawApprovalRequest` sends before it is called.** Nothing in the body is required. Optional: `reason`.",
     "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/withdraw"
+   },
+   {
+    "id": "formDecideApprovalRequest",
+    "component": "modal",
+    "trigger": "Decide approval request",
+    "body": "**Collects what `decideApprovalRequest` sends before it is called.** Required: `decision`. Optional: `comment`, `reason`, `stepUpToken`, `signature`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Decide approval request",
+     "operation": "decideApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "decision",
+      "comment",
+      "reason",
+      "stepUpToken",
+      "signature"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/decide"
+   },
+   {
+    "id": "formResubmitApprovalRequest",
+    "component": "modal",
+    "trigger": "Resubmit approval request",
+    "body": "**Collects what `resubmitApprovalRequest` sends before it is called.** Required: `changes`. Optional: `amount`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Resubmit approval request",
+     "operation": "resubmitApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "changes",
+      "amount"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/resubmit"
+   },
+   {
+    "id": "formEvaluateApprovalRequirement",
+    "component": "modal",
+    "trigger": "Evaluate approval requirement",
+    "body": "**Collects what `evaluateApprovalRequirement` sends before it is called.** Required: `kind`, `scopePath`. Optional: `amount`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Evaluate approval requirement",
+     "operation": "evaluateApprovalRequirement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "scopePath",
+      "amount",
+      "attributes"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests/evaluate"
    }
   ],
   "states": {
    "loading": "The approval request list.",
    "error": "Could not load. Names which read failed and leaves the approval request untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
-   "emptyNoResults": "The filter narrowed it and the approval request are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoResults": "Nothing matches the filter on assignedToMe, raisedByMe, status, kind, breachingWithinMinutes and the approval request are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalRequests` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2030,7 +2153,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-084",
     "BO-085",
     "BO-087"
@@ -2038,38 +2160,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-084",
      "trigger": "Approval Inbox",
-     "carries": [
-      "requestId"
-     ],
-     "provenance": "derived — BO-084 declares entryState.params requestId, so an edge into it must carry them"
+     "provenance": "derived — BO-084 declares entryState.params requestId and BO-086 holds none of them, so the edge carries nothing and BO-084 opens cold"
     },
     {
      "to": "BO-085",
      "trigger": "Approval Request",
-     "carries": [
-      "requestId"
-     ],
-     "provenance": "derived — BO-085 declares entryState.params requestId, so an edge into it must carry them"
+     "provenance": "derived — BO-085 declares entryState.params requestId and BO-086 holds none of them, so the edge carries nothing and BO-085 opens cold"
     },
     {
      "to": "BO-087",
      "trigger": "Approval Delegations",
-     "carries": [
-      "delegationId"
-     ],
-     "provenance": "derived — BO-087 declares entryState.params delegationId, so an edge into it must carry them"
+     "provenance": "derived — BO-087 declares entryState.params delegationId and BO-086 holds none of them, so the edge carries nothing and BO-087 opens cold"
     }
    ]
   },
@@ -2086,8 +2189,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listApprovalMatrices",
+       "notes": "Sends `?kind=` to `listApprovalMatrices`.",
+       "provenance": "contract approvals.yaml GET /approval-matrices"
+      },
+      {
+       "kind": "toggle",
+       "label": "Effective",
+       "operation": "listApprovalMatrices",
+       "notes": "Sends `?effective=` to `listApprovalMatrices`.",
+       "provenance": "contract approvals.yaml GET /approval-matrices"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every approval",
+       "label": "Every approval matrix",
        "bindsTo": "ApprovalMatrix",
        "columns": [
         "ApprovalMatrix.id",
@@ -2108,7 +2225,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected approval",
+       "label": "The selected approval matrix",
        "bindsTo": "ApprovalMatrix",
        "columns": [
         "ApprovalMatrix.id",
@@ -2129,7 +2246,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save approval matrix",
        "operation": "setApprovalMatrix",
        "provenance": "contract approvals.yaml PUT /approval-matrices"
       }
@@ -2140,9 +2257,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The approval list.",
    "error": "Could not load. Names which read failed and leaves the approval untouched.",
-   "emptyFirstRun": "No approval yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the approval are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No approval yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on kind, effective and the approval are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `APPROVAL_CONFIGURE`, which `listApprovalMatrices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2176,6 +2293,31 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P08 Venue Management.dc.html#bo-086"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetApprovalMatrix",
+    "component": "modal",
+    "trigger": "Save approval matrix",
+    "body": "**Collects what `setApprovalMatrix` sends before it is called.** Required: `kind`, `scopeLevel`, `rules`. Optional: `id`, `scopePath`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ApprovalMatrix",
+    "confirm": {
+     "label": "Save approval matrix",
+     "operation": "setApprovalMatrix"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "scopeLevel",
+      "rules",
+      "id",
+      "scopePath",
+      "isActive"
+     ]
+    },
+    "provenance": "contract approvals.yaml PUT /approval-matrices"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2214,7 +2356,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-084",
     "BO-085",
     "BO-086"
@@ -2222,30 +2363,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-084",
      "trigger": "Approval Inbox",
-     "carries": [
-      "requestId"
-     ],
-     "provenance": "derived — BO-084 declares entryState.params requestId, so an edge into it must carry them"
+     "provenance": "derived — BO-084 declares entryState.params requestId and BO-087 holds none of them, so the edge carries nothing and BO-084 opens cold"
     },
     {
      "to": "BO-085",
      "trigger": "Approval Request",
-     "carries": [
-      "requestId"
-     ],
-     "provenance": "derived — BO-085 declares entryState.params requestId, so an edge into it must carry them"
+     "provenance": "derived — BO-085 declares entryState.params requestId and BO-087 holds none of them, so the edge carries nothing and BO-085 opens cold"
     }
    ]
   },
@@ -2263,7 +2388,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every approval delegations",
+       "label": "Every approval delegation",
        "bindsTo": "ApprovalDelegation",
        "columns": [
         "ApprovalDelegation.id",
@@ -2288,7 +2413,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected approval delegations",
+       "label": "The selected approval delegation",
        "bindsTo": "ApprovalDelegation",
        "columns": [
         "ApprovalDelegation.id",
@@ -2313,13 +2438,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create approval delegation",
        "operation": "createApprovalDelegation",
        "provenance": "contract approvals.yaml POST /delegations"
       },
       {
        "kind": "destructiveButton",
-       "label": "Revoke",
+       "label": "Revoke approval delegation",
        "operation": "revokeApprovalDelegation",
        "provenance": "contract approvals.yaml DELETE /delegations/{delegationId}"
       }
@@ -2331,17 +2456,44 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmRevokeApprovalDelegation",
     "component": "confirmDialog",
-    "trigger": "Revoke",
+    "trigger": "Revoke approval delegation",
     "body": "**Names what `revokeApprovalDelegation` changes and what it leaves alone**, in the consequence rather than the verb. A approval delegations this affects should be identified in the dialog, not just counted.",
     "provenance": "contract approvals.yaml DELETE /delegations/{delegationId}"
+   },
+   {
+    "id": "formCreateApprovalDelegation",
+    "component": "modal",
+    "trigger": "Create approval delegation",
+    "body": "**Collects what `createApprovalDelegation` sends before it is called.** Required: `delegatorPrincipalId`, `delegatePrincipalId`, `from`, `to`. Optional: `id`, `kinds`, `maxAmount`, `reason`, `isActive`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ApprovalDelegation",
+    "confirm": {
+     "label": "Create approval delegation",
+     "operation": "createApprovalDelegation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "delegatorPrincipalId",
+      "delegatePrincipalId",
+      "from",
+      "to",
+      "id",
+      "kinds",
+      "maxAmount",
+      "reason",
+      "isActive",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /delegations"
    }
   ],
   "states": {
    "loading": "The approval delegations list.",
    "error": "Could not load. Names which read failed and leaves the approval delegations untouched.",
-   "emptyFirstRun": "No approval delegations yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the approval delegations are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No approval delegations yet. Offers Create approval delegation (`createApprovalDelegation`).",
+   "emptyNoResults": "Never shown: `listApprovalDelegations` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalDelegations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2541,7 +2693,7 @@ Method, path, parameters, request and response for every operation these screens
   "method": "POST",
   "path": "/approval-requests/{requestId}/decide",
   "contract": "approvals",
-  "summary": "Approve or reject",
+  "summary": "Approve, reject, return or ask for information",
   "permission": "APPROVAL_DECIDE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -2754,6 +2906,19 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "AttendanceRecord"
  },
+ "listJobTitles": {
+  "method": "GET",
+  "path": "/job-titles",
+  "contract": "workforce",
+  "summary": "The job titles a posting can name",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WorkforceJobTitle"
+ },
  "listPrincipals": {
   "method": "GET",
   "path": "/principals",
@@ -2854,7 +3019,36 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "RotaAssignment"
+  "responds": "Page"
+ },
+ "listWorkAssignments": {
+  "method": "GET",
+  "path": "/work-assignments",
+  "contract": "workforce",
+  "summary": "Where each person is posted, and from when",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "employeeId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "activeOn",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkforceWorkAssignment"
  },
  "publishAnnouncement": {
   "method": "POST",
@@ -2913,6 +3107,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": null
  },
+ "resetPrincipalCredential": {
+  "method": "POST",
+  "path": "/principals/{principalId}/credential-reset",
+  "contract": "identity",
+  "summary": "Reset a member of staff's password or PIN",
+  "permission": "USER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResetCredentialRequest",
+  "responds": null
+ },
  "resubmitApprovalRequest": {
   "method": "POST",
   "path": "/approval-requests/{requestId}/resubmit",
@@ -2969,6 +3182,63 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "ApprovalMatrix",
   "responds": "ApprovalMatrix"
+ },
+ "setCapabilityTemplate": {
+  "method": "PUT",
+  "path": "/capability-templates",
+  "contract": "identity",
+  "summary": "Save a tick-set under a name",
+  "permission": "ROLE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CapabilityTemplate",
+  "responds": "CapabilityTemplate"
+ },
+ "setJobTitle": {
+  "method": "PUT",
+  "path": "/job-titles",
+  "contract": "workforce",
+  "summary": "Define a job title",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WorkforceJobTitle",
+  "responds": "WorkforceJobTitle"
+ },
+ "setWorkAssignment": {
+  "method": "PUT",
+  "path": "/work-assignments",
+  "contract": "workforce",
+  "summary": "Post a person to a job title at a venue",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WorkforceWorkAssignment",
+  "responds": "WorkforceWorkAssignment"
  },
  "updatePrincipal": {
   "method": "PATCH",
@@ -3234,11 +3504,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "delegatorPrincipalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "description": "A principal id (`identity.Principal.id`). This contract stores the id only; the name to show, and the people to pick from, come from `identity.listPrincipals` and `identity.getPrincipal`.\n"
    },
    "delegatePrincipalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "description": "A principal id, resolved to a name the same way as `delegatorPrincipalId`."
    },
    "kinds": {
     "type": "array",
@@ -3279,7 +3551,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "ApprovalKind": {
   "type": "string",
-  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n",
   "enum": [
    "refund",
    "priceOverride",
@@ -3289,12 +3561,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "accessPermissionChange",
    "configurationChange",
    "aiRecommendation",
-   "shiftVariance",
    "releasePromotion",
    "requisition",
    "stockWriteOff",
    "journalEntry",
+   "periodClose",
    "periodReopen",
+   "purchaseOrderCancel",
+   "purchaseOrderShortClose",
    "tenantMigration"
   ]
  },
@@ -3330,7 +3604,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "version": {
     "type": "integer",
     "readOnly": true,
-    "description": "11.1.80. **A request is decided by the rules it was raised under.** Changing the matrix mid-flight would mean an approver answering a question that changed while they read it.\n"
+    "description": "11.1.80. **A request is decided by the rules it was raised under.** Changing the matrix mid-flight would mean an approver answering a question that changed while they read it.\n**(`kind`, `scopePath`, `version`) is unique**, and a stored version is never edited: a request's `matrixVersion` names exactly one rule set (decided 28 September, audit R129 (2)).\n"
    },
    "rules": {
     "type": "array",
@@ -3607,11 +3881,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "condition": {
     "type": "string",
     "nullable": true,
-    "description": "11.1.13. Evaluated against the attributes the caller supplied."
+    "description": "11.1.13. Evaluated against the attributes the caller supplied.\n\n**No condition language is defined yet** (pull audit R104, 26 September): the grammar, the attributes it may name and how two conditions are compared for `unreachableRule` are an open decision, not something to infer from this field.\n"
    },
    "approverRoleIds": {
     "type": "array",
     "minItems": 1,
+    "description": "Role ids from `identity.listRoles` (`Role.id`), which is where an editor gets the names to show and pick from. This contract stores the ids only.\n",
     "items": {
      "type": "string",
      "format": "uuid"
@@ -3654,6 +3929,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "escalateToRoleIds": {
     "type": "array",
+    "description": "Role ids from `identity.listRoles`, as `approverRoleIds`.",
     "items": {
      "type": "string",
      "format": "uuid"
@@ -3672,12 +3948,60 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "draft",
    "pending",
    "escalated",
+   "returned",
+   "informationRequested",
    "approved",
    "rejected",
    "withdrawn",
    "expired",
    "cancelled"
   ]
+ },
+ "AttendanceAmendment": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.attendance_amendment",
+  "description": "One correction to an attendance record, appended by `amendAttendance` and never updated (decided 28 September, audit R129 (7)).\n",
+  "required": [
+   "id",
+   "attendanceRecordId",
+   "amendedByPrincipalId",
+   "amendedAt",
+   "occurredAtBefore",
+   "occurredAtAfter",
+   "reason"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "attendanceRecordId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "amendedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "amendedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "occurredAtBefore": {
+    "type": "string",
+    "format": "date-time",
+    "description": "The record's time before this correction."
+   },
+   "occurredAtAfter": {
+    "type": "string",
+    "format": "date-time",
+    "description": "The time this correction set (`correctedAt` on the request)."
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 300
+   }
+  }
  },
  "AttendanceRecord": {
   "type": "object",
@@ -3745,17 +4069,29 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "amendedByPrincipalId": {
     "type": "string",
     "format": "uuid",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true,
+    "description": "Who made the latest amendment. The full history is `amendments` (audit R129 (7))."
    },
    "amendmentReason": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true,
+    "description": "The latest amendment's reason. The full history is `amendments` (audit R129 (7))."
    },
    "originalOccurredAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true,
     "description": "**The original is never overwritten.** Attendance feeds pay, and a record that can be quietly rewritten is not evidence.\n"
+   },
+   "amendments": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**Every correction, oldest first, one row each** (decided 28 September, audit R129 (7)). A single set of amendment columns holds only the last one, and the second correction to a record would erase the evidence of the first.\n",
+    "items": {
+     "$ref": "#/components/schemas/AttendanceAmendment"
+    }
    },
    "exception": {
     "type": "string",
@@ -3769,6 +4105,46 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "unscheduled"
     ],
     "description": "Computed against the rota. Null where the record matches what was expected."
+   }
+  }
+ },
+ "CapabilityTemplate": {
+  "x-ticvai-persistence": "identity.capability_template",
+  "type": "object",
+  "description": "3.3.23, BL-110. **A named tick-set — a role, with nothing depending on the name.**\n",
+  "required": [
+   "code",
+   "name",
+   "capabilities"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "capabilities": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Written by the server at `tenant` scope; ignored if a request sends it."
    }
   }
  },
@@ -3789,7 +4165,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "initialCredential": {
     "type": "string",
-    "maxLength": 512
+    "maxLength": 512,
+    "writeOnly": true
    },
    "mustChangeCredential": {
     "type": "boolean",
@@ -3880,6 +4257,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "ResetCredentialRequest": {
+  "type": "object",
+  "description": "Request only; see `ChangeCredentialRequest`.",
+  "required": [
+   "method",
+   "temporaryCredential",
+   "reason"
+  ],
+  "properties": {
+   "method": {
+    "type": "string",
+    "enum": [
+     "password",
+     "pin"
+    ]
+   },
+   "temporaryCredential": {
+    "type": "string",
+    "maxLength": 512,
+    "writeOnly": true,
+    "description": "Issued to the principal out of band. Must be changed at next sign-in."
+   },
+   "reason": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 500
+   }
+  }
+ },
  "Role": {
   "x-ticvai-persistence": "identity.role",
   "type": "object",
@@ -3894,7 +4300,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid"
    },
    "code": {
-    "type": "string"
+    "type": "string",
+    "x-ticvai-unique": "tenant",
+    "description": "**Unique within the tenant** (decided 28 September, audit R108). A seeded role's code is reserved in every tenant. Unique per tenant, not per venue, because a grant names a role anywhere in the tree; `createRole` refuses a duplicate with `409 duplicate-code`.\n"
    },
    "name": {
     "type": "string"
@@ -3918,7 +4326,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "isSystem": {
     "type": "boolean",
     "default": false,
-    "description": "**Seeded roles ship and are editable; deleting one is refused.** A venue that removes `cashier` and rebuilds it has two roles with one name in the audit log.\n"
+    "description": "**Seeded roles ship and are editable; deleting one is refused.** A venue that removes `cashier` and rebuilds it has two roles with one name in the audit log.\n**The seeded system roles are Cashier, Supervisor, Venue Manager, Finance and Tenant Admin** (proposed in `docs/active/seed-data-proposal.md` section 2, client to correct; audit R229).\n"
    },
    "principalCount": {
     "type": "integer"
@@ -4012,7 +4420,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "position": {
     "type": "string",
-    "description": "What they are rostered to do — gate steward, cashier, lifeguard, technician. **Most positions never touch a till**, which is why a rota assignment is not a shift.\n"
+    "description": "What they are rostered to do — gate steward, cashier, lifeguard, technician. **Most positions never touch a till**, which is why a rota assignment is not a shift.\n**A position code, not a label.** It is the same value as `StaffingRules.minimumCover[].positionCode`, `OpenShift.positionCode` and `StaffingCoverage.positionCode`: coverage counts rostered people per position, so an assignment spelled differently from the rule it fills is counted against nothing and the gap stays open. Tenant-defined, which is why it is not an enum here.\n"
    },
    "requiredRoleId": {
     "type": "string",
@@ -4058,6 +4466,119 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "completed",
    "noShow"
   ]
+ },
+ "WorkforceJobTitle": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.job_title",
+  "description": "**Taken from the backend workbook, 20 September.** Stores job/designation definitions such as Cashier, Manager, Chef or Technician.",
+  "required": [
+   "tenantId",
+   "code",
+   "name",
+   "isActive",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 50
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "WorkforceWorkAssignment": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.work_assignment",
+  "description": "**Taken from the backend workbook, 20 September.** Assigns an employee to a job and operational location/scope for an effective period.",
+  "required": [
+   "employeeId",
+   "jobTitleId",
+   "effectiveFrom",
+   "isPrimary",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "employeeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "jobTitleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "departmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "isPrimary": {
+    "type": "boolean"
+   },
+   "status": {
+    "type": "string",
+    "maxLength": 30
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
  }
 }
 ```

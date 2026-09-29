@@ -1,0 +1,571 @@
+[
+ {
+  "id": "BO-706",
+  "name": "Registration & Attendance Command Center",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "5",
+   "number": "01",
+   "page": 81
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/registration-attendance-command-center-bo-706",
+   "component": "apps/venue-management-web/src/routes/sell/RegistrationAttendanceCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-707",
+    "BO-708",
+    "BO-709"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-707",
+     "trigger": "Attendee Data & Registration Form Configuration",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "carries": [
+      "eventId"
+     ]
+    },
+    {
+     "to": "BO-708",
+     "trigger": "Accreditation & Participant Category Configuration",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "carries": [
+      "eventId"
+     ]
+    },
+    {
+     "to": "BO-709",
+     "trigger": "Event Admission & Entry Policy Configuration",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "carries": [
+      "eventId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide management with a consolidated backend view of the financial, commercial, sponsorship, attendance and operational performance of events.",
+  "purposeNote": "Authorized users can obtain a consolidated view of event commercial and operational performance while data visibility remains controlled by tenant, entity and role permissions.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 81"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 81"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setEventRegistration",
+       "label": "Save event registration",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setEventRegistration"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The registration attendance list.",
+   "error": "Could not load. Names which read failed and leaves the registration attendance untouched.",
+   "emptyFirstRun": "No registration attendance yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the registration attendance are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setEventRegistration",
+    "contract": "catalogue",
+    "purpose": "Registration at a glance",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-706",
+   "workshopBoard": "wireframes/WS52 Event Management Configuration Backend Structure v1.0 Board 5.dc.html#bo-706"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Event_Management_Configuration_Backend_Structure_v1.0.pdf page 81. 0 of 0 labels bound to a contract property; 0 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "eventId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-707",
+  "name": "Attendee Data & Registration Form Configuration",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "5",
+   "number": "05",
+   "page": 85
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/attendee-data-registration-form-configuration-bo-707",
+   "component": "apps/venue-management-web/src/routes/sell/AttendeeDataRegistrationFormConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-706"
+   ],
+   "exitTo": [
+    "BO-706"
+   ],
+   "transitions": [
+    {
+     "to": "BO-706",
+     "trigger": "Back to Registration & Attendance Command Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "eventId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure dashboards used to measure event sales, attendance and check-in performance.",
+  "purposeNote": "Authorized users can monitor configured sales and attendance KPIs with current check-in information supplied by shared Ticketing and Access Control services.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 85"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 85"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setEventRegistration",
+       "label": "Save event registration",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setEventRegistration"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The attendee data registration list.",
+   "error": "Could not load. Names which read failed and leaves the attendee data registration untouched.",
+   "emptyFirstRun": "No attendee data registration yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the attendee data registration are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setEventRegistration",
+    "contract": "catalogue",
+    "purpose": "Attendee data and form",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-707",
+   "workshopBoard": "wireframes/WS52 Event Management Configuration Backend Structure v1.0 Board 5.dc.html#bo-707"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Event_Management_Configuration_Backend_Structure_v1.0.pdf page 85. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "eventId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-708",
+  "name": "Accreditation & Participant Category Configuration",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "5",
+   "number": "06",
+   "page": 85
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/accreditation-participant-category-configuration-bo-708",
+   "component": "apps/venue-management-web/src/routes/sell/AccreditationParticipantCategoryConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-706"
+   ],
+   "exitTo": [
+    "BO-706"
+   ],
+   "transitions": [
+    {
+     "to": "BO-706",
+     "trigger": "Back to Registration & Attendance Command Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "eventId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Allow authorized administrators to use AI to accelerate creation of event configuration from natural-language instructions or existing templates.",
+  "purposeNote": "AI can accelerate event setup while every proposed configuration remains reviewable, editable, permission-controlled and subject to normal approval workflows.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 85 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every accreditation participant category",
+       "columns": [
+        "AI Proposal",
+        "Existing / Approved Configuration"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 85 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected accreditation participant category",
+       "bindsTo": null,
+       "columns": [
+        "AI Proposal",
+        "Existing / Approved Configuration"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Administrators can”, “Critical Governance Principle”.",
+       "provenance": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 85 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The accreditation participant category list.",
+   "error": "Could not load. Names which read failed and leaves the accreditation participant category untouched.",
+   "emptyFirstRun": "No accreditation participant category yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the accreditation participant category are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setEventRegistration",
+    "contract": "catalogue",
+    "purpose": "Participant categories",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listAccessProfiles",
+    "contract": "accreditation",
+    "purpose": "The passes they map to",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "AI Proposal",
+    "Existing / Approved Configuration"
+   ],
+   "params": [
+    {
+     "name": "eventId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-708",
+   "workshopBoard": "wireframes/WS52 Event Management Configuration Backend Structure v1.0 Board 5.dc.html#bo-708"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Event_Management_Configuration_Backend_Structure_v1.0.pdf page 85. 0 of 2 labels bound to a contract property; 2 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-709",
+  "name": "Event Admission & Entry Policy Configuration",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "5",
+   "number": "08",
+   "page": 87
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/event-admission-entry-policy-configuration-bo-709",
+   "component": "apps/venue-management-web/src/routes/sell/EventAdmissionEntryPolicyConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-706"
+   ],
+   "exitTo": [
+    "BO-706"
+   ],
+   "transitions": [
+    {
+     "to": "BO-706",
+     "trigger": "Back to Registration & Attendance Command Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "eventId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure automatic invoice generation for eligible event-related customers and commercial accounts.",
+  "purposeNote": "Eligible event transactions can trigger automated invoice requests with complete event and customer references while financial posting remains controlled by Finance.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 87"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 87"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setEventRegistration",
+       "label": "Save event registration",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setEventRegistration"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The event admission entry list.",
+   "error": "Could not load. Names which read failed and leaves the event admission entry untouched.",
+   "emptyFirstRun": "No event admission entry yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the event admission entry are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setEventRegistration",
+    "contract": "catalogue",
+    "purpose": "Admission and entry policy",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-709",
+   "workshopBoard": "wireframes/WS52 Event Management Configuration Backend Structure v1.0 Board 5.dc.html#bo-709"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Event_Management_Configuration_Backend_Structure_v1.0.pdf page 87. 0 of 0 labels bound to a contract property; 0 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "eventId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

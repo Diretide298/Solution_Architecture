@@ -1,0 +1,635 @@
+{
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Point": {
+  "type": "object",
+  "required": [
+   "x",
+   "y"
+  ],
+  "properties": {
+   "x": {
+    "type": "number"
+   },
+   "y": {
+    "type": "number"
+   }
+  }
+ },
+ "PolicySimulationConflictImpactAnalysisInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Policy Simulation, Conflict & Impact Analysis submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "policyId": {
+    "type": "string"
+   },
+   "policyVersion": {
+    "type": "string"
+   },
+   "scenarioTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Simulated moment of the scan"
+   },
+   "credentialId": {
+    "type": "string",
+    "description": "Optional credential to simulate"
+   },
+   "runSavedScenarios": {
+    "type": "boolean",
+    "description": "Regression: run saved scenarios against this policy version"
+   },
+   "scenarioCount": {
+    "type": "integer"
+   },
+   "passedCount": {
+    "type": "integer"
+   },
+   "changedOutcomeCount": {
+    "type": "integer"
+   },
+   "affectedCredentials": {
+    "type": "integer"
+   }
+  },
+  "required": [
+   "policyId"
+  ]
+ },
+ "PolicySimulationConflictImpactAnalysisView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Policy Simulation, Conflict & Impact Analysis displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "policyId": {
+    "type": "string"
+   },
+   "occupancy": {
+    "type": "integer",
+    "description": "Occupancy (the pack shows 82%)"
+   },
+   "policiesInvolved": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "policies involved"
+   },
+   "hierarchy": {
+    "type": "string",
+    "description": "hierarchy"
+   },
+   "priority": {
+    "type": "integer",
+    "description": "priority"
+   },
+   "resultingDecision": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "deny",
+     "review",
+     "requireId",
+     "requireBiometric",
+     "requireCompanion",
+     "requireSupervisor"
+    ],
+    "description": "resulting decision"
+   },
+   "affectedProducts": {
+    "type": "integer",
+    "description": "affected products"
+   },
+   "affectedVenues": {
+    "type": "integer",
+    "description": "affected venues"
+   },
+   "estimatedGuestsImpacted": {
+    "type": "integer",
+    "description": "estimated guests impacted"
+   },
+   "policyVersion": {
+    "type": "string"
+   },
+   "scenarioTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Simulated moment of the scan"
+   },
+   "credentialId": {
+    "type": "string",
+    "description": "Optional credential to simulate"
+   },
+   "runSavedScenarios": {
+    "type": "boolean",
+    "description": "Regression: run saved scenarios against this policy version"
+   },
+   "scenarioCount": {
+    "type": "integer"
+   },
+   "passedCount": {
+    "type": "integer"
+   },
+   "changedOutcomeCount": {
+    "type": "integer"
+   },
+   "affectedCredentials": {
+    "type": "integer"
+   }
+  },
+  "required": [
+   "policyId"
+  ]
+ },
+ "SeatHoldPool": {
+  "type": "object",
+  "x-ticvai-persistence": "seating.hold_pool",
+  "description": "Board 6.3. **Utilisation decides next season's allocation.**",
+  "required": [
+   "holdTypeId",
+   "performanceId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "holdTypeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "seatIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "seatCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "usedCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "releasedCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "holderName": {
+    "type": "string",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "releaseAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "partiallyReleased",
+     "released",
+     "expired"
+    ]
+   },
+   "createdBy": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "SeatHoldType": {
+  "type": "object",
+  "x-ticvai-persistence": "seating.hold_type",
+  "description": "Board 6.2. **A hold with no release rule becomes a permanent hole in the map.**",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "purpose": {
+    "type": "string",
+    "enum": [
+     "production",
+     "house",
+     "accessibility",
+     "press",
+     "sponsor",
+     "contractual",
+     "maintenance",
+     "distancing"
+    ]
+   },
+   "ownerRole": {
+    "type": "string",
+    "nullable": true
+   },
+   "releaseRule": {
+    "type": "string",
+    "enum": [
+     "manual",
+     "hoursBeforePerformance",
+     "onDate",
+     "onSelloutThreshold"
+    ],
+    "default": "hoursBeforePerformance"
+   },
+   "releaseHoursBefore": {
+    "type": "integer",
+    "nullable": true
+   },
+   "releaseTo": {
+    "type": "string",
+    "enum": [
+     "generalSale",
+     "anotherPool",
+     "remainsHeld"
+    ],
+    "default": "generalSale"
+   },
+   "countsAgainstCapacity": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Whether held seats are still \"sold out\".** A production hold that reads as availability puts a show on sale it cannot honour.\n"
+   },
+   "visibleToGuest": {
+    "type": "boolean",
+    "default": false
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "SeatMap": {
+  "x-ticvai-persistence": "seating.seat_map",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/SeatMapSummary"
+   },
+   {
+    "type": "object",
+    "required": [
+     "sections"
+    ],
+    "properties": {
+     "description": {
+      "type": "string",
+      "nullable": true
+     },
+     "viewBox": {
+      "type": "object",
+      "description": "Coordinate space for rendering. Absent when there is no geometry.",
+      "nullable": true,
+      "properties": {
+       "width": {
+        "type": "number"
+       },
+       "height": {
+        "type": "number"
+       }
+      }
+     },
+     "stagePosition": {
+      "$ref": "#/components/schemas/Point"
+     },
+     "sections": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/Section"
+      }
+     },
+     "isActive": {
+      "type": "boolean"
+     }
+    }
+   }
+  ]
+ },
+ "SeatMapDiff": {
+  "type": "object",
+  "description": "**A diff a person can read, not 396 changed cells.** `Seating_Manifest_1.xlsx` is 396 rows and a comparison that lists every one is noise — *row H moved back two* is what a venue manager needs, and it only exists if the diff understands sections and rows rather than treating a map as a grid of values.\n\n**Counts first, then the shape, then the detail.** A reconfiguration is judged on whether the house got bigger or smaller before anything else.",
+  "required": [
+   "fromVersion",
+   "toVersion",
+   "seatCountBefore",
+   "seatCountAfter"
+  ],
+  "properties": {
+   "fromVersion": {
+    "type": "integer"
+   },
+   "toVersion": {
+    "type": "integer"
+   },
+   "seatCountBefore": {
+    "type": "integer"
+   },
+   "seatCountAfter": {
+    "type": "integer"
+   },
+   "sectionsAdded": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "sectionsRemoved": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "sectionsChanged": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "section": {
+       "type": "string"
+      },
+      "seatsBefore": {
+       "type": "integer"
+      },
+      "seatsAfter": {
+       "type": "integer"
+      },
+      "summary": {
+       "type": "string",
+       "description": "**One sentence a person reads** — *row H moved back two, two seats removed at the aisle.*"
+      }
+     }
+    }
+   },
+   "accessibleSeatsBefore": {
+    "type": "integer",
+    "nullable": true
+   },
+   "accessibleSeatsAfter": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**Called out separately because it is a compliance number, not a capacity one.** A reconfiguration that quietly loses two wheelchair spaces is the change nobody notices in a seat count."
+   }
+  }
+ },
+ "SeatMapSummary": {
+  "x-ticvai-persistence": "seating.seat_map",
+  "type": "object",
+  "required": [
+   "id",
+   "name",
+   "venueId",
+   "status",
+   "seatCount"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "status": {
+    "$ref": "#/components/schemas/SeatMapStatus"
+   },
+   "seatCount": {
+    "type": "integer"
+   },
+   "sectionCount": {
+    "type": "integer"
+   },
+   "hasGeometry": {
+    "type": "boolean",
+    "description": "False when only a manifest has been imported. Such a map can be sold from a list but not rendered.\n"
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "SeatMapTemplate": {
+  "x-ticvai-persistence": "seating.seat_map_template",
+  "type": "object",
+  "required": [
+   "id",
+   "name",
+   "seatCount",
+   "sectionCount"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "seatCount": {
+    "type": "integer"
+   },
+   "sectionCount": {
+    "type": "integer"
+   },
+   "hasGeometry": {
+    "type": "boolean"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "Section": {
+  "x-ticvai-persistence": "seating.section",
+  "type": "object",
+  "required": [
+   "code",
+   "name",
+   "rowCount",
+   "seatCount"
+  ],
+  "properties": {
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "rowCount": {
+    "type": "integer"
+   },
+   "seatCount": {
+    "type": "integer"
+   },
+   "boundary": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Point"
+    },
+    "description": "Polygon for rendering. Absent without geometry."
+   },
+   "viewAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "assets.MediaAsset",
+    "description": "**The view of the stage from this section, as a photo**, uploaded through `assets` like any other media (decided 29 September, rev 3 23SEP-14). Optional: where it is null the client renders the view from the imported geometry (the section `boundary`, the map's `stagePosition` and the seat positions), so a closer section shows a larger stage and fewer rows ahead. Set with `updateSeatMap` `sectionViews`, which is allowed on a published map because a photo does not change the map's shape.\n"
+   },
+   "rows": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "label",
+      "seatCount"
+     ],
+     "properties": {
+      "label": {
+       "type": "string"
+      },
+      "seatCount": {
+       "type": "integer"
+      },
+      "numberingDirection": {
+       "type": "string",
+       "enum": [
+        "leftToRight",
+        "rightToLeft"
+       ],
+       "description": "Which end row numbering starts from. Not recoverable from a manifest and must be stated — it determines whether a guest finds their seat.\n"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "ValidationFinding": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "kind",
+   "severity",
+   "message"
+  ],
+  "properties": {
+   "kind": {
+    "$ref": "#/components/schemas/ValidationFindingKind"
+   },
+   "severity": {
+    "$ref": "#/components/schemas/ValidationSeverity"
+   },
+   "message": {
+    "type": "string"
+   },
+   "sectionCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "rowLabel": {
+    "type": "string",
+    "nullable": true
+   },
+   "seatNumbers": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "affectedCount": {
+    "type": "integer"
+   }
+  }
+ },
+ "ValidationReport": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "seatMapId",
+   "passed",
+   "errorCount",
+   "warningCount",
+   "findings"
+  ],
+  "properties": {
+   "seatMapId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "passed": {
+    "type": "boolean",
+    "description": "False when any finding has severity `error`."
+   },
+   "errorCount": {
+    "type": "integer"
+   },
+   "warningCount": {
+    "type": "integer"
+   },
+   "findings": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ValidationFinding"
+    }
+   }
+  }
+ }
+}

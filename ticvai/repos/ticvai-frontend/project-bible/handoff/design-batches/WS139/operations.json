@@ -1,0 +1,154 @@
+{
+ "activateJourney": {
+  "method": "POST",
+  "path": "/journeys/{journeyId}/activate",
+  "contract": "marketing-crm",
+  "summary": "Start it, or stop it",
+  "permission": "MARKETING_SEND",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Journey"
+ },
+ "createJourney": {
+  "method": "POST",
+  "path": "/journeys",
+  "contract": "marketing-crm",
+  "summary": "Define an automated journey",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Journey",
+  "responds": "Journey"
+ },
+ "getJourneyPerformance": {
+  "method": "GET",
+  "path": "/journeys/{journeyId}/performance",
+  "contract": "marketing-crm",
+  "summary": "Entrants, completions, goals reached",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "JourneyPerformance"
+ },
+ "listAbandonedCarts": {
+  "method": "GET",
+  "path": "/carts/abandoned",
+  "contract": "orders",
+  "summary": "Carts that lapsed without checking out",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "since",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "minValue",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listJourneys": {
+  "method": "GET",
+  "path": "/journeys",
+  "contract": "marketing-crm",
+  "summary": "Automated journeys",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMessageTriggers": {
+  "method": "GET",
+  "path": "/message-triggers",
+  "contract": "marketing-crm",
+  "summary": "What fires a message, and when",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "setMessageTrigger": {
+  "method": "POST",
+  "path": "/message-triggers",
+  "contract": "marketing-crm",
+  "summary": "Fire a message from a platform event",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MessageTrigger",
+  "responds": "MessageTrigger"
+ }
+}

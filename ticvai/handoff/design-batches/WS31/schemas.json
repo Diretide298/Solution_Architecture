@@ -5,66 +5,54 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Capacity Reservation & Inventory Commitment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "temporaryAvailabilityProtection": {
+   "inventoryType": {
     "type": "string",
-    "description": "Temporary availability protection"
+    "enum": [
+     "generalAdmissionCapacity",
+     "seatInventory",
+     "timeslotCapacity",
+     "eventCapacity",
+     "productInventory",
+     "rentalInventory",
+     "fBRetailInventoryWhereApplicable"
+    ],
+    "description": "Inventory the commitment is against."
    },
-   "confirmedInventoryConsumption": {
+   "releaseReason": {
     "type": "string",
-    "description": "Confirmed inventory consumption"
+    "enum": [
+     "holdExpires",
+     "reservationCancels",
+     "paymentFailsAccordingToPolicy",
+     "orderFails",
+     "authorizedAmendmentRemovesProduct"
+    ],
+    "description": "Why the inventory was released."
    },
-   "generalAdmissionCapacity": {
+   "commitmentType": {
+    "type": "string",
+    "enum": [
+     "temporaryHold",
+     "confirmedConsumption"
+    ],
+    "description": "Temporary availability protection or confirmed consumption"
+   },
+   "orderId": {
+    "type": "string",
+    "description": "Order ID"
+   },
+   "reservationId": {
+    "type": "string",
+    "description": "Reservation ID"
+   },
+   "quantity": {
     "type": "integer",
-    "description": "General Admission Capacity"
+    "description": "Quantity committed"
    },
-   "seatInventory": {
-    "type": "string",
-    "description": "Seat Inventory"
-   },
-   "timeslotCapacity": {
-    "type": "integer",
-    "description": "Timeslot Capacity"
-   },
-   "eventCapacity": {
-    "type": "integer",
-    "description": "Event Capacity"
-   },
-   "productInventory": {
-    "type": "string",
-    "description": "Product Inventory"
-   },
-   "rentalInventory": {
-    "type": "string",
-    "description": "Rental Inventory"
-   },
-   "fBRetailInventoryWhereApplicable": {
-    "type": "string",
-    "description": "F&B/Retail inventory where applicable"
-   },
-   "returnAControlledException": {
-    "type": "string",
-    "description": "return a controlled exception"
-   },
-   "holdExpires": {
+   "expiresAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Hold Expires"
-   },
-   "reservationCancels": {
-    "type": "string",
-    "description": "Reservation Cancels"
-   },
-   "paymentFailsAccordingToPolicy": {
-    "type": "string",
-    "description": "Payment Fails according to policy"
-   },
-   "orderFails": {
-    "type": "string",
-    "description": "Order Fails"
-   },
-   "authorizedAmendmentRemovesProduct": {
-    "type": "string",
-    "description": "Authorized amendment removes product"
+    "description": "When a temporary hold ends"
    }
   }
  },
@@ -74,34 +62,6 @@
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Customer, Guest & Account Assignment submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "guestCheckout": {
-    "type": "string",
-    "description": "Guest Checkout"
-   },
-   "registeredCustomer": {
-    "type": "string",
-    "description": "Registered Customer"
-   },
-   "member": {
-    "type": "string",
-    "description": "Member"
-   },
-   "corporateAccount": {
-    "type": "string",
-    "description": "Corporate Account"
-   },
-   "b2bAccount": {
-    "type": "string",
-    "description": "B2B Account"
-   },
-   "groupOrganizer": {
-    "type": "string",
-    "description": "Group Organizer"
-   },
-   "anonymousSaleWherePermitted": {
-    "type": "string",
-    "description": "Anonymous Sale where permitted"
-   },
    "name": {
     "type": "string",
     "description": "Name"
@@ -143,18 +103,6 @@
     "type": "string",
     "description": "Tax Details"
    },
-   "from": {
-    "type": "string",
-    "description": "from"
-   },
-   "continueGuest": {
-    "type": "string",
-    "description": "Continue Guest"
-   },
-   "dependingOnPolicy": {
-    "type": "string",
-    "description": "depending on policy"
-   },
    "partner": {
     "type": "string",
     "description": "Partner"
@@ -167,9 +115,26 @@
     "type": "string",
     "description": "Agent"
    },
-   "costCenterWhereApplicable": {
+   "anonymousSale": {
+    "type": "string",
+    "description": "Anonymous Sale where permitted"
+   },
+   "costCenter": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Cost Center where applicable"
+   },
+   "customerType": {
+    "type": "string",
+    "enum": [
+     "guestCheckout",
+     "registeredCustomer",
+     "member",
+     "corporateAccount",
+     "b2bAccount",
+     "groupOrganizer",
+     "anonymousSale"
+    ],
+    "description": "How the order is attributed."
    }
   }
  },
@@ -179,34 +144,6 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Customer, Guest & Account Assignment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "guestCheckout": {
-    "type": "string",
-    "description": "Guest Checkout"
-   },
-   "registeredCustomer": {
-    "type": "string",
-    "description": "Registered Customer"
-   },
-   "member": {
-    "type": "string",
-    "description": "Member"
-   },
-   "corporateAccount": {
-    "type": "string",
-    "description": "Corporate Account"
-   },
-   "b2bAccount": {
-    "type": "string",
-    "description": "B2B Account"
-   },
-   "groupOrganizer": {
-    "type": "string",
-    "description": "Group Organizer"
-   },
-   "anonymousSaleWherePermitted": {
-    "type": "string",
-    "description": "Anonymous Sale where permitted"
-   },
    "name": {
     "type": "string",
     "description": "Name"
@@ -248,18 +185,6 @@
     "type": "string",
     "description": "Tax Details"
    },
-   "from": {
-    "type": "string",
-    "description": "from"
-   },
-   "continueGuest": {
-    "type": "string",
-    "description": "Continue Guest"
-   },
-   "dependingOnPolicy": {
-    "type": "string",
-    "description": "depending on policy"
-   },
    "partner": {
     "type": "string",
     "description": "Partner"
@@ -272,9 +197,26 @@
     "type": "string",
     "description": "Agent"
    },
-   "costCenterWhereApplicable": {
+   "anonymousSale": {
+    "type": "string",
+    "description": "Anonymous Sale where permitted"
+   },
+   "costCenter": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Cost Center where applicable"
+   },
+   "customerType": {
+    "type": "string",
+    "enum": [
+     "guestCheckout",
+     "registeredCustomer",
+     "member",
+     "corporateAccount",
+     "b2bAccount",
+     "groupOrganizer",
+     "anonymousSale"
+    ],
+    "description": "How the order is attributed."
    }
   }
  },
@@ -284,58 +226,6 @@
   "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.channel_allocation at 3%, so this is not an update to anything the package stores today and no new table has been decided",
   "description": "**What Order Creation & Source/Channel Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "b2cWeb": {
-    "type": "string",
-    "description": "B2C Web"
-   },
-   "mobileApp": {
-    "type": "string",
-    "description": "Mobile App"
-   },
-   "pos": {
-    "type": "string",
-    "description": "POS"
-   },
-   "mobileFlyingPos": {
-    "type": "string",
-    "description": "Mobile/Flying POS"
-   },
-   "kiosk": {
-    "type": "string",
-    "description": "Kiosk"
-   },
-   "callCenter": {
-    "type": "string",
-    "description": "Call Center"
-   },
-   "boxOffice": {
-    "type": "string",
-    "description": "Box Office"
-   },
-   "b2bPortal": {
-    "type": "string",
-    "description": "B2B Portal"
-   },
-   "reseller": {
-    "type": "string",
-    "description": "Reseller"
-   },
-   "ota": {
-    "type": "string",
-    "description": "OTA"
-   },
-   "api": {
-    "type": "string",
-    "description": "API"
-   },
-   "administrativeBackend": {
-    "type": "string",
-    "description": "Administrative Backend"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
    "subChannel": {
     "type": "string",
     "description": "Sub-Channel"
@@ -376,53 +266,52 @@
     "type": "string",
     "description": "External Reference"
    },
-   "globalSequence": {
-    "type": "string",
-    "description": "Global Sequence"
-   },
-   "tenantSequence": {
-    "type": "string",
-    "description": "Tenant Sequence"
-   },
-   "venueSequence": {
-    "type": "string",
-    "description": "Venue Sequence"
-   },
-   "channelPrefix": {
-    "type": "string",
-    "description": "Channel Prefix"
-   },
-   "yearMonthPrefix": {
-    "type": "string",
-    "description": "Year/Month Prefix"
-   },
-   "customPattern": {
-    "type": "string",
-    "description": "Custom Pattern"
-   },
-   "otaBookingReference": {
-    "type": "string",
-    "description": "OTA Booking Reference"
-   },
-   "resellerOrderId": {
-    "type": "string",
-    "description": "Reseller Order ID"
-   },
-   "erpReference": {
-    "type": "string",
-    "description": "ERP Reference"
-   },
-   "externalCrmReference": {
-    "type": "string",
-    "description": "External CRM Reference"
-   },
    "holdInventory": {
     "type": "string",
     "description": "Hold Inventory"
    },
-   "repeatedRequests": {
+   "source": {
     "type": "string",
-    "description": "repeated requests"
+    "enum": [
+     "b2cWeb",
+     "mobileApp",
+     "pos",
+     "mobileFlyingPos",
+     "kiosk",
+     "callCenter",
+     "boxOffice",
+     "b2bPortal",
+     "reseller",
+     "ota",
+     "api",
+     "administrativeBackend"
+    ],
+    "description": "Order source."
+   },
+   "numberingRule": {
+    "type": "string",
+    "enum": [
+     "globalSequence",
+     "tenantSequence",
+     "venueSequence",
+     "yearMonthPrefix",
+     "customPattern"
+    ],
+    "description": "Order numbering rule."
+   },
+   "channelPrefix": {
+    "type": "string",
+    "description": "Channel prefix for the order number"
+   },
+   "partnerReferenceType": {
+    "type": "string",
+    "enum": [
+     "otaBookingReference",
+     "resellerOrderId",
+     "erpReference",
+     "externalCrmReference"
+    ],
+    "description": "Kind of partner identifier held in externalReference"
    }
   }
  },
@@ -432,58 +321,6 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Order Creation & Source/Channel Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "b2cWeb": {
-    "type": "string",
-    "description": "B2C Web"
-   },
-   "mobileApp": {
-    "type": "string",
-    "description": "Mobile App"
-   },
-   "pos": {
-    "type": "string",
-    "description": "POS"
-   },
-   "mobileFlyingPos": {
-    "type": "string",
-    "description": "Mobile/Flying POS"
-   },
-   "kiosk": {
-    "type": "string",
-    "description": "Kiosk"
-   },
-   "callCenter": {
-    "type": "string",
-    "description": "Call Center"
-   },
-   "boxOffice": {
-    "type": "string",
-    "description": "Box Office"
-   },
-   "b2bPortal": {
-    "type": "string",
-    "description": "B2B Portal"
-   },
-   "reseller": {
-    "type": "string",
-    "description": "Reseller"
-   },
-   "ota": {
-    "type": "string",
-    "description": "OTA"
-   },
-   "api": {
-    "type": "string",
-    "description": "API"
-   },
-   "administrativeBackend": {
-    "type": "string",
-    "description": "Administrative Backend"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
    "subChannel": {
     "type": "string",
     "description": "Sub-Channel"
@@ -524,53 +361,52 @@
     "type": "string",
     "description": "External Reference"
    },
-   "globalSequence": {
-    "type": "string",
-    "description": "Global Sequence"
-   },
-   "tenantSequence": {
-    "type": "string",
-    "description": "Tenant Sequence"
-   },
-   "venueSequence": {
-    "type": "string",
-    "description": "Venue Sequence"
-   },
-   "channelPrefix": {
-    "type": "string",
-    "description": "Channel Prefix"
-   },
-   "yearMonthPrefix": {
-    "type": "string",
-    "description": "Year/Month Prefix"
-   },
-   "customPattern": {
-    "type": "string",
-    "description": "Custom Pattern"
-   },
-   "otaBookingReference": {
-    "type": "string",
-    "description": "OTA Booking Reference"
-   },
-   "resellerOrderId": {
-    "type": "string",
-    "description": "Reseller Order ID"
-   },
-   "erpReference": {
-    "type": "string",
-    "description": "ERP Reference"
-   },
-   "externalCrmReference": {
-    "type": "string",
-    "description": "External CRM Reference"
-   },
    "holdInventory": {
     "type": "string",
     "description": "Hold Inventory"
    },
-   "repeatedRequests": {
+   "source": {
     "type": "string",
-    "description": "repeated requests"
+    "enum": [
+     "b2cWeb",
+     "mobileApp",
+     "pos",
+     "mobileFlyingPos",
+     "kiosk",
+     "callCenter",
+     "boxOffice",
+     "b2bPortal",
+     "reseller",
+     "ota",
+     "api",
+     "administrativeBackend"
+    ],
+    "description": "Order source."
+   },
+   "numberingRule": {
+    "type": "string",
+    "enum": [
+     "globalSequence",
+     "tenantSequence",
+     "venueSequence",
+     "yearMonthPrefix",
+     "customPattern"
+    ],
+    "description": "Order numbering rule."
+   },
+   "channelPrefix": {
+    "type": "string",
+    "description": "Channel prefix for the order number"
+   },
+   "partnerReferenceType": {
+    "type": "string",
+    "enum": [
+     "otaBookingReference",
+     "resellerOrderId",
+     "erpReference",
+     "externalCrmReference"
+    ],
+    "description": "Kind of partner identifier held in externalReference"
    }
   }
  },
@@ -580,62 +416,70 @@
   "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is orders.cart_line at 14%, so this is not an update to anything the package stores today and no new table has been decided",
   "description": "**What Order Detail & Transaction Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *Each line should display* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
   "properties": {
-   "product": {
+   "orderNumber": {
     "type": "string",
-    "description": "Product"
+    "description": "Order number"
    },
-   "ticketType": {
-    "type": "string",
-    "description": "Ticket Type"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "performance": {
-    "type": "string",
-    "description": "Performance"
-   },
-   "date": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date"
-   },
-   "timeslot": {
-    "type": "string",
-    "description": "Timeslot"
-   },
-   "quantity": {
-    "type": "integer",
-    "description": "Quantity"
-   },
-   "personType": {
-    "type": "string",
-    "description": "Person Type"
-   },
-   "seat": {
-    "type": "string",
-    "description": "Seat"
-   },
-   "unitPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Unit Price"
-   },
-   "discount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount"
-   },
-   "tax": {
-    "type": "string",
-    "description": "Tax"
-   },
-   "fee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fee"
-   },
-   "ticketStatus": {
-    "type": "string",
-    "description": "Ticket Status"
+   "lines": {
+    "type": "array",
+    "description": "Order lines",
+    "items": {
+     "type": "object",
+     "properties": {
+      "product": {
+       "type": "string",
+       "description": "Product"
+      },
+      "ticketType": {
+       "type": "string",
+       "description": "Ticket type"
+      },
+      "event": {
+       "type": "string",
+       "description": "Event"
+      },
+      "performance": {
+       "type": "string",
+       "description": "Performance"
+      },
+      "timeslot": {
+       "type": "string",
+       "description": "Timeslot"
+      },
+      "quantity": {
+       "type": "integer",
+       "description": "Quantity"
+      },
+      "personType": {
+       "type": "string",
+       "description": "Person type"
+      },
+      "seat": {
+       "type": "string",
+       "description": "Seat"
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Unit price"
+      },
+      "discount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Discount"
+      },
+      "tax": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Tax"
+      },
+      "fee": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Fee"
+      },
+      "ticketStatus": {
+       "type": "string",
+       "description": "Ticket status"
+      }
+     }
+    }
    }
   },
   "x-ticvai-record-definition": "Each line should display"
@@ -700,62 +544,10 @@
     "type": "integer",
     "description": "Fulfillment Status"
    },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "ticketType": {
-    "type": "string",
-    "description": "Ticket Type"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "performance": {
-    "type": "string",
-    "description": "Performance"
-   },
    "date": {
     "type": "string",
     "format": "date-time",
     "description": "Date"
-   },
-   "timeslot": {
-    "type": "string",
-    "description": "Timeslot"
-   },
-   "quantity": {
-    "type": "integer",
-    "description": "Quantity"
-   },
-   "personType": {
-    "type": "string",
-    "description": "Person Type"
-   },
-   "seat": {
-    "type": "string",
-    "description": "Seat"
-   },
-   "unitPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Unit Price"
-   },
-   "discount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount"
-   },
-   "tax": {
-    "type": "string",
-    "description": "Tax"
-   },
-   "fee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fee"
-   },
-   "ticketStatus": {
-    "type": "string",
-    "description": "Ticket Status"
    },
    "tickets": {
     "type": "integer",
@@ -792,6 +584,67 @@
    "relatedOrders": {
     "type": "integer",
     "description": "Related Orders"
+   },
+   "lines": {
+    "type": "array",
+    "description": "Order lines",
+    "items": {
+     "type": "object",
+     "properties": {
+      "product": {
+       "type": "string",
+       "description": "Product"
+      },
+      "ticketType": {
+       "type": "string",
+       "description": "Ticket type"
+      },
+      "event": {
+       "type": "string",
+       "description": "Event"
+      },
+      "performance": {
+       "type": "string",
+       "description": "Performance"
+      },
+      "timeslot": {
+       "type": "string",
+       "description": "Timeslot"
+      },
+      "quantity": {
+       "type": "integer",
+       "description": "Quantity"
+      },
+      "personType": {
+       "type": "string",
+       "description": "Person type"
+      },
+      "seat": {
+       "type": "string",
+       "description": "Seat"
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Unit price"
+      },
+      "discount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Discount"
+      },
+      "tax": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Tax"
+      },
+      "fee": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Fee"
+      },
+      "ticketStatus": {
+       "type": "string",
+       "description": "Ticket status"
+      }
+     }
+    }
    }
   }
  },
@@ -838,58 +691,18 @@
     "type": "string",
     "description": "Result"
    },
-   "stuckOrder": {
+   "exceptionType": {
     "type": "string",
-    "description": "Stuck Order"
-   },
-   "orphanReservation": {
-    "type": "string",
-    "description": "Orphan Reservation"
-   },
-   "paymentOrderMismatch": {
-    "type": "string",
-    "description": "Payment/Order Mismatch"
-   },
-   "capacityMismatch": {
-    "type": "integer",
-    "description": "Capacity Mismatch"
-   },
-   "missingCustomerData": {
-    "type": "string",
-    "description": "Missing Customer Data"
-   },
-   "fulfillmentFailure": {
-    "type": "string",
-    "description": "Fulfillment Failure"
-   },
-   "externalSynchronizationFailure": {
-    "type": "string",
-    "description": "External Synchronization Failure"
-   },
-   "revalidate": {
-    "type": "string",
-    "description": "Revalidate"
-   },
-   "reprocessFulfillment": {
-    "type": "string",
-    "description": "Reprocess Fulfillment"
-   },
-   "importantArchitectureDecisionsToFreeze": {
-    "type": "string",
-    "description": "Important Architecture Decisions to Freeze"
-   },
-   "governedCommercialTransaction": {
-    "type": "string",
-    "description": "governed commercial transaction"
-   },
-   "board2AmendmentsCancellations": {
-    "type": "string",
-    "description": "Board 2 — Amendments, Cancellations"
-   },
-   "created": {
-    "type": "string",
-    "format": "date-time",
-    "description": "created"
+    "enum": [
+     "stuckOrder",
+     "orphanReservation",
+     "paymentOrderMismatch",
+     "capacityMismatch",
+     "missingCustomerData",
+     "fulfillmentFailure",
+     "externalSynchronizationFailure"
+    ],
+    "description": "Exception detected."
    }
   }
  },
@@ -899,50 +712,6 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Order Line, Product & Entitlement Composition displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "tickets": {
-    "type": "string",
-    "description": "Tickets"
-   },
-   "memberships": {
-    "type": "string",
-    "description": "Memberships"
-   },
-   "addOns": {
-    "type": "string",
-    "description": "Add-Ons"
-   },
-   "fB": {
-    "type": "string",
-    "description": "F&B"
-   },
-   "retail": {
-    "type": "string",
-    "description": "Retail"
-   },
-   "rental": {
-    "type": "string",
-    "description": "Rental"
-   },
-   "parking": {
-    "type": "string",
-    "description": "Parking"
-   },
-   "experiences": {
-    "type": "string",
-    "description": "Experiences"
-   },
-   "packages": {
-    "type": "string",
-    "description": "Packages"
-   },
-   "vouchers": {
-    "type": "string",
-    "description": "Vouchers"
-   },
-   "otherConfiguredProducts": {
-    "type": "string",
-    "description": "Other configured products"
-   },
    "product": {
     "type": "string",
     "description": "Product"
@@ -993,7 +762,7 @@
     "description": "Discount"
    },
    "tax": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Tax"
    },
    "fee": {
@@ -1004,29 +773,22 @@
     "type": "string",
     "description": "Fulfillment Method"
    },
-   "productLimits": {
+   "lineType": {
     "type": "string",
-    "description": "Product Limits"
-   },
-   "channelLimits": {
-    "type": "string",
-    "description": "Channel Limits"
-   },
-   "customerLimits": {
-    "type": "string",
-    "description": "Customer Limits"
-   },
-   "eventLimits": {
-    "type": "string",
-    "description": "Event Limits"
-   },
-   "capacity": {
-    "type": "integer",
-    "description": "Capacity"
-   },
-   "moment": {
-    "type": "string",
-    "description": "moment"
+    "enum": [
+     "tickets",
+     "memberships",
+     "addOns",
+     "fB",
+     "retail",
+     "rental",
+     "parking",
+     "experiences",
+     "packages",
+     "vouchers",
+     "otherConfiguredProducts"
+    ],
+    "description": "What the line sells."
    }
   }
  },
@@ -1092,10 +854,6 @@
     "type": "string",
     "description": "Reservation ID"
    },
-   "customer": {
-    "type": "string",
-    "description": "Customer"
-   },
    "channel": {
     "type": "string",
     "description": "Channel"
@@ -1103,10 +861,6 @@
    "venue": {
     "type": "string",
     "description": "Venue"
-   },
-   "productEvent": {
-    "type": "string",
-    "description": "Product/Event"
    },
    "orderValue": {
     "type": "string",
@@ -1137,10 +891,6 @@
    "ownerAgent": {
     "type": "string",
     "description": "Owner/Agent"
-   },
-   "collectPayment": {
-    "type": "string",
-    "description": "Collect Payment"
    }
   }
  },
@@ -1255,106 +1005,55 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Reservation Confirmation, Expiry & Fulfillment Readiness displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "paymentComplete": {
+   "confirmationConditions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "paymentComplete",
+      "depositReceived",
+      "creditApproved",
+      "capacityConfirmed",
+      "customerDataComplete",
+      "requiredWaiverComplete",
+      "requiredApprovalComplete",
+      "partnerConfirmationReceived"
+     ]
+    },
+    "description": "Conditions that confirm the reservation."
+   },
+   "failedIssueChecks": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "orderConfirmed",
+      "paymentConditionMet",
+      "requiredCustomerData",
+      "entitlementValid",
+      "waiverRequirement",
+      "credentialConfiguration",
+      "deliveryMethod"
+     ]
+    },
+    "description": "Checks before issuing ticket/media that fail."
+   },
+   "reservationId": {
     "type": "string",
-    "description": "Payment Complete"
+    "description": "Reservation ID"
    },
-   "depositReceived": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Deposit Received"
-   },
-   "creditApproved": {
+   "orderId": {
     "type": "string",
-    "description": "Credit Approved"
+    "description": "Order ID"
    },
-   "capacityConfirmed": {
-    "type": "integer",
-    "description": "Capacity Confirmed"
-   },
-   "customerDataComplete": {
+   "status": {
     "type": "string",
-    "description": "Customer Data Complete"
+    "description": "Reservation status (states/reservation.yaml)"
    },
-   "requiredWaiverComplete": {
-    "type": "string",
-    "description": "Required Waiver Complete"
-   },
-   "requiredApprovalComplete": {
-    "type": "string",
-    "description": "Required Approval Complete"
-   },
-   "partnerConfirmationReceived": {
-    "type": "string",
-    "description": "Partner Confirmation Received"
-   },
-   "exampleB2c": {
-    "type": "string",
-    "description": "Example — B2C"
-   },
-   "exampleB2b": {
-    "type": "string",
-    "description": "Example — B2B"
-   },
-   "partnerAuthorized": {
-    "type": "string",
-    "description": "Partner Authorized"
-   },
-   "orderConfirmed": {
-    "type": "string",
-    "description": "Order Confirmed"
-   },
-   "paymentConditionMet": {
-    "type": "string",
-    "description": "Payment Condition Met"
-   },
-   "requiredCustomerData": {
-    "type": "string",
-    "description": "Required Customer Data"
-   },
-   "entitlementValid": {
-    "type": "string",
-    "description": "Entitlement Valid"
-   },
-   "waiverRequirement": {
-    "type": "string",
-    "description": "Waiver Requirement"
-   },
-   "credentialConfiguration": {
-    "type": "string",
-    "description": "Credential Configuration"
-   },
-   "deliveryMethod": {
-    "type": "string",
-    "description": "Delivery Method"
-   },
-   "expire": {
+   "expiresAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Expire"
-   },
-   "preserveHistory": {
-    "type": "string",
-    "description": "Preserve history"
-   },
-   "ticketMedia": {
-    "type": "string",
-    "description": "Ticket Media"
-   },
-   "walletPass": {
-    "type": "string",
-    "description": "Wallet Pass"
-   },
-   "rfidNfc": {
-    "type": "string",
-    "description": "RFID/NFC"
-   },
-   "emailDelivery": {
-    "type": "string",
-    "description": "Email Delivery"
-   },
-   "otherCredentialServices": {
-    "type": "string",
-    "description": "Other credential services"
+    "description": "Expiry"
    }
   }
  },
@@ -1364,46 +1063,6 @@
   "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.channel_allocation at 3%, so this is not an update to anything the package stores today and no new table has been decided",
   "description": "**What Reservation & Hold Policy Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "cartHold": {
-    "type": "string",
-    "description": "Cart Hold"
-   },
-   "checkoutHold": {
-    "type": "string",
-    "description": "Checkout Hold"
-   },
-   "agentReservation": {
-    "type": "string",
-    "description": "Agent Reservation"
-   },
-   "groupReservation": {
-    "type": "string",
-    "description": "Group Reservation"
-   },
-   "b2bReservation": {
-    "type": "string",
-    "description": "B2B Reservation"
-   },
-   "corporateReservation": {
-    "type": "string",
-    "description": "Corporate Reservation"
-   },
-   "manualHold": {
-    "type": "string",
-    "description": "Manual Hold"
-   },
-   "paymentHold": {
-    "type": "string",
-    "description": "Payment Hold"
-   },
-   "seatHold": {
-    "type": "string",
-    "description": "Seat Hold"
-   },
-   "inventoryHold": {
-    "type": "string",
-    "description": "Inventory Hold"
-   },
    "channel": {
     "type": "string",
     "description": "Channel"
@@ -1432,10 +1091,6 @@
     "type": "string",
     "description": "Reservation Type"
    },
-   "maintainAuditRecord": {
-    "type": "string",
-    "description": "Maintain Audit Record"
-   },
    "extensionAllowed": {
     "type": "boolean",
     "description": "Extension Allowed"
@@ -1457,29 +1112,53 @@
     "type": "string",
     "description": "Approval Requirement"
    },
-   "admissionCapacity": {
-    "type": "integer",
-    "description": "Admission Capacity"
-   },
-   "seat": {
+   "holdType": {
     "type": "string",
-    "description": "Seat"
+    "enum": [
+     "cartHold",
+     "checkoutHold",
+     "agentReservation",
+     "groupReservation",
+     "b2bReservation",
+     "corporateReservation",
+     "manualHold",
+     "paymentHold",
+     "seatHold",
+     "inventoryHold"
+    ],
+    "description": "Kind of hold."
    },
-   "inventory": {
-    "type": "string",
-    "description": "Inventory"
+   "lockedCapacity": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "admissionCapacity",
+      "seat",
+      "inventory",
+      "timeslotCapacity",
+      "entitlementCapacity"
+     ]
+    },
+    "description": "What the reservation locks through the central capacity services."
    },
-   "timeslotCapacity": {
+   "holdDurationMinutes": {
     "type": "integer",
-    "description": "Timeslot Capacity"
+    "description": "Hold duration in minutes"
    },
-   "entitlementCapacity": {
-    "type": "integer",
-    "description": "Entitlement Capacity"
-   },
-   "throughTheCentralCapacityInventoryServices": {
-    "type": "integer",
-    "description": "through the central capacity/inventory services"
+   "onExpiry": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "releaseInventory",
+      "releaseSeats",
+      "cancelReservation",
+      "notifyCustomer",
+      "notifyAgent"
+     ]
+    },
+    "description": "What happens on expiry"
    }
   }
  },
@@ -1489,46 +1168,6 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Reservation & Hold Policy Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "cartHold": {
-    "type": "string",
-    "description": "Cart Hold"
-   },
-   "checkoutHold": {
-    "type": "string",
-    "description": "Checkout Hold"
-   },
-   "agentReservation": {
-    "type": "string",
-    "description": "Agent Reservation"
-   },
-   "groupReservation": {
-    "type": "string",
-    "description": "Group Reservation"
-   },
-   "b2bReservation": {
-    "type": "string",
-    "description": "B2B Reservation"
-   },
-   "corporateReservation": {
-    "type": "string",
-    "description": "Corporate Reservation"
-   },
-   "manualHold": {
-    "type": "string",
-    "description": "Manual Hold"
-   },
-   "paymentHold": {
-    "type": "string",
-    "description": "Payment Hold"
-   },
-   "seatHold": {
-    "type": "string",
-    "description": "Seat Hold"
-   },
-   "inventoryHold": {
-    "type": "string",
-    "description": "Inventory Hold"
-   },
    "channel": {
     "type": "string",
     "description": "Channel"
@@ -1557,10 +1196,6 @@
     "type": "string",
     "description": "Reservation Type"
    },
-   "maintainAuditRecord": {
-    "type": "string",
-    "description": "Maintain Audit Record"
-   },
    "extensionAllowed": {
     "type": "boolean",
     "description": "Extension Allowed"
@@ -1582,29 +1217,53 @@
     "type": "string",
     "description": "Approval Requirement"
    },
-   "admissionCapacity": {
-    "type": "integer",
-    "description": "Admission Capacity"
-   },
-   "seat": {
+   "holdType": {
     "type": "string",
-    "description": "Seat"
+    "enum": [
+     "cartHold",
+     "checkoutHold",
+     "agentReservation",
+     "groupReservation",
+     "b2bReservation",
+     "corporateReservation",
+     "manualHold",
+     "paymentHold",
+     "seatHold",
+     "inventoryHold"
+    ],
+    "description": "Kind of hold."
    },
-   "inventory": {
-    "type": "string",
-    "description": "Inventory"
+   "lockedCapacity": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "admissionCapacity",
+      "seat",
+      "inventory",
+      "timeslotCapacity",
+      "entitlementCapacity"
+     ]
+    },
+    "description": "What the reservation locks through the central capacity services."
    },
-   "timeslotCapacity": {
+   "holdDurationMinutes": {
     "type": "integer",
-    "description": "Timeslot Capacity"
+    "description": "Hold duration in minutes (e.g. B2C checkout 10, call centre 20, B2B group 2,880)"
    },
-   "entitlementCapacity": {
-    "type": "integer",
-    "description": "Entitlement Capacity"
-   },
-   "throughTheCentralCapacityInventoryServices": {
-    "type": "integer",
-    "description": "through the central capacity/inventory services"
+   "onExpiry": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "releaseInventory",
+      "releaseSeats",
+      "cancelReservation",
+      "notifyCustomer",
+      "notifyAgent"
+     ]
+    },
+    "description": "What happens on expiry; an audit record is always kept"
    }
   }
  }

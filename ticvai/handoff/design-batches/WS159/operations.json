@@ -1,0 +1,237 @@
+{
+ "allocateResources": {
+  "method": "POST",
+  "path": "/resource-allocations",
+  "contract": "resources",
+  "summary": "Fill a requirement from the pool, rotating rather than repeating",
+  "permission": "RESOURCE_BOOK",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceBooking"
+ },
+ "createResourcePackage": {
+  "method": "POST",
+  "path": "/resource-packages",
+  "contract": "resources",
+  "summary": "Define a reusable combination",
+  "permission": "RESOURCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourcePackage",
+  "responds": "ResourcePackage"
+ },
+ "getExperienceResourceRequirements": {
+  "method": "GET",
+  "path": "/experiences/{experienceId}/resource-requirements",
+  "contract": "resources",
+  "summary": "What an experience needs before it can run",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResourceRequirement"
+ },
+ "getResourceAllocationPolicy": {
+  "method": "GET",
+  "path": "/resource-allocation-policy",
+  "contract": "resources",
+  "summary": "How the platform chooses between equally valid resources",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResourceAllocationPolicy"
+ },
+ "getResourceUtilisation": {
+  "method": "GET",
+  "path": "/resource-utilisation",
+  "contract": "resources",
+  "summary": "How much of each resource's available time was used",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceUtilisation"
+ },
+ "listResourcePackages": {
+  "method": "GET",
+  "path": "/resource-packages",
+  "contract": "resources",
+  "summary": "Predefined combinations assigned as one",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResourcePackage"
+ },
+ "replaceResourceAllocation": {
+  "method": "POST",
+  "path": "/resource-allocations/{bookingId}/replace",
+  "contract": "resources",
+  "summary": "Swap in a substitute when the allocated resource falls through",
+  "permission": "RESOURCE_BOOK",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceBooking"
+ },
+ "setExperienceResourceRequirements": {
+  "method": "PUT",
+  "path": "/experiences/{experienceId}/resource-requirements",
+  "contract": "resources",
+  "summary": "Bind resource requirements to an experience",
+  "permission": "RESOURCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceRequirement"
+ },
+ "setResourceAllocationPolicy": {
+  "method": "PUT",
+  "path": "/resource-allocation-policy",
+  "contract": "resources",
+  "summary": "Rotation, priority and scoring",
+  "permission": "RESOURCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourceAllocationPolicy",
+  "responds": "ResourceAllocationPolicy"
+ },
+ "setResourceQualifications": {
+  "method": "PUT",
+  "path": "/resources/{resourceId}/qualifications",
+  "contract": "resources",
+  "summary": "What a person resource is certified to do, and until when",
+  "permission": "RESOURCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Qualification"
+ },
+ "setResourceSelectionPolicy": {
+  "method": "PUT",
+  "path": "/resource-selection-policy",
+  "contract": "resources",
+  "summary": "Whether the guest may choose the resource, per ticket type",
+  "permission": "RESOURCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourceSelectionPolicy",
+  "responds": null
+ },
+ "suggestResources": {
+  "method": "GET",
+  "path": "/resource-suggestions",
+  "contract": "resources",
+  "summary": "Resources matching a requirement, by attribute",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "resourceTypeId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "attributes",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Resource"
+ }
+}

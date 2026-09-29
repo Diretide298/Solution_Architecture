@@ -1,0 +1,59 @@
+{
+ "createApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests",
+  "contract": "approvals",
+  "summary": "Raise a request",
+  "permission": "APPROVAL_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateApprovalRequest",
+  "responds": "ApprovalRequest"
+ },
+ "rescheduleEvent": {
+  "method": "POST",
+  "path": "/events/{eventId}/reschedule",
+  "contract": "catalogue",
+  "summary": "Move or cancel, and decide what happens to the people who bought",
+  "permission": "PERFORMANCE_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EventReschedule",
+  "responds": null
+ },
+ "setEventLifecycleState": {
+  "method": "POST",
+  "path": "/events/{eventId}/lifecycle",
+  "contract": "catalogue",
+  "summary": "Draft, planned, on sale, live, closed, cancelled",
+  "permission": "EVENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ }
+}

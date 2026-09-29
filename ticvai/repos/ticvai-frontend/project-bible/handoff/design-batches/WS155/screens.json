@@ -1,0 +1,1997 @@
+[
+ {
+  "id": "BO-854",
+  "name": "Resource Management Command Center",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "1",
+   "number": "01",
+   "page": 5
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/resource-management-command-center-bo-854",
+   "component": "apps/venue-management-web/src/routes/rentals/ResourceManagementCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-855",
+    "BO-856",
+    "BO-857",
+    "BO-858",
+    "BO-859",
+    "BO-860",
+    "BO-861",
+    "BO-862",
+    "BO-863"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-855",
+     "trigger": "Resource Type Configuration",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "resourceTypeId"
+     ]
+    },
+    {
+     "to": "BO-856",
+     "trigger": "Resource Category Management",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-857",
+     "trigger": "Resource Creation & Profile",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "resourceId"
+     ]
+    },
+    {
+     "to": "BO-858",
+     "trigger": "Configurable Attribute Builder",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-859",
+     "trigger": "Resource Hierarchy & Parent–Child Relationships",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "resourceId"
+     ]
+    },
+    {
+     "to": "BO-860",
+     "trigger": "Resource Dependency Rules",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "resourceId"
+     ]
+    },
+    {
+     "to": "BO-861",
+     "trigger": "Resource Package & Bundle Configuration",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-862",
+     "trigger": "Multi-Venue Resource Assignment",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "resourceId"
+     ]
+    },
+    {
+     "to": "BO-863",
+     "trigger": "Resource Lifecycle, Governance & Audit",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "resourceId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Backend Configuration) and no display directory — it is settings, not a population",
+  "purpose": "Provide administrators and operational managers with the main entry point for Resource Management and an instant overview of the organization's complete resource inventory.",
+  "purposeNote": "Authorized users can view the complete permitted resource estate, filter and search resources, identify configuration issues, and launch governed resource-management actions directly from the command center.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Total active resources",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Resources by type",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Resources by venue",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Available resources",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Assigned resources",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reserved resources",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Resources under maintenance",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Suspended resources",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Retired resources",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "textField",
+       "label": "Resources with expiring certifications",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "textField",
+       "label": "Resources with unresolved configuration issues",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Recently created resources",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Recently modified resources",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tenant",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Business unit",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Country",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Resource type",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Category",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Status",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Owner",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Department",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tags",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Availability status",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Effective date",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Create resource",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Create resource type",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Create category",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Import resources",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Duplicate resource",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 5 §Backend Configuration"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resource configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the resource untouched.",
+   "emptyFirstRun": "No resource configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "listResources",
+    "contract": "resources",
+    "purpose": "Resources at this venue",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listResourceTypes",
+    "contract": "resources",
+    "purpose": "Resources by type",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getResourceUtilisation",
+    "contract": "resources",
+    "purpose": "Utilisation across the estate",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-854",
+   "workshopBoard": "wireframes/WS126 Resource Management Configuration Board 1.dc.html#bo-854"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 5. 0 of 0 labels bound to a contract property; 39 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-855",
+  "name": "Resource Type Configuration",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "1",
+   "number": "02",
+   "page": 6
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/resource-type-configuration-bo-855",
+   "component": "apps/venue-management-web/src/routes/rentals/ResourceTypeConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-854"
+   ],
+   "exitTo": [
+    "BO-854"
+   ],
+   "transitions": [
+    {
+     "to": "BO-854",
+     "trigger": "Back to Resource Management Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Backend Configuration) and no display directory — it is settings, not a population",
+  "purpose": "Allow administrators to define the different classes of resources supported by the organization without requiring software development.",
+  "purposeNote": "Administrators can create reusable resource types and define which operational capabilities and attributes apply to each type without code changes.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Staff",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 6 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Instructor",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 6 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Security personnel",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 6 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 6 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Room",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 6 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Hall",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 6 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Area",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 6 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Cabana",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 6 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Equipment",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 6 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Asset",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 6 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Rental item",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 6 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Vehicle",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 6 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Locker",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 6 §Backend Configuration"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resource type configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the resource type untouched.",
+   "emptyFirstRun": "No resource type configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "listResourceTypes",
+    "contract": "resources",
+    "purpose": "The classes defined so far",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createResourceType",
+    "contract": "resources",
+    "purpose": "Define a class",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listResourceTypes"
+    ]
+   },
+   {
+    "operationId": "updateResourceType",
+    "contract": "resources",
+    "purpose": "Change a class",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listResourceTypes"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-855",
+   "workshopBoard": "wireframes/WS126 Resource Management Configuration Board 1.dc.html#bo-855"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 6. 0 of 0 labels bound to a contract property; 13 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "resourceTypeId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-856",
+  "name": "Resource Category Management",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "1",
+   "number": "03",
+   "page": 7
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/resource-category-management-bo-856",
+   "component": "apps/venue-management-web/src/routes/rentals/ResourceCategoryManagement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-854"
+   ],
+   "exitTo": [
+    "BO-854"
+   ],
+   "transitions": [
+    {
+     "to": "BO-854",
+     "trigger": "Back to Resource Management Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Backend Configuration) and no display directory — it is settings, not a population",
+  "purpose": "Provide a flexible classification structure beneath resource types so resources can be organized, searched, reported, and governed consistently.",
+  "purposeNote": "Resources can be grouped into configurable hierarchical categories and subcategories that can subsequently be used throughout search, scheduling, reporting, automation, and integrations.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Equipment",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 7 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "AV",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 7 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Lighting",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 7 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Sound",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 7 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Furniture",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 7 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Staff",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 7 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Instructor",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 7 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Operations",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 7 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Security",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 7 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Technical Crew",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 7 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Rental",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 7 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Towels",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 7 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Strollers",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 7 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Lockers",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 7 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Cabanas",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 7 §Backend Configuration"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resource category configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the resource category untouched.",
+   "emptyFirstRun": "No resource category configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "listResourceCategories",
+    "contract": "resources",
+    "purpose": "The classification tree",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createResourceCategory",
+    "contract": "resources",
+    "purpose": "Add a category",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listResourceCategories"
+    ]
+   },
+   {
+    "operationId": "updateResourceCategory",
+    "contract": "resources",
+    "purpose": "Change a category",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listResourceCategories"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-856",
+   "workshopBoard": "wireframes/WS126 Resource Management Configuration Board 1.dc.html#bo-856"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 15 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "categoryId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-857",
+  "name": "Resource Creation & Profile",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "1",
+   "number": "04",
+   "page": 8
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/resource-creation-profile-bo-857",
+   "component": "apps/venue-management-web/src/routes/rentals/ResourceCreationProfile.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-854"
+   ],
+   "exitTo": [
+    "BO-854"
+   ],
+   "transitions": [
+    {
+     "to": "BO-854",
+     "trigger": "Back to Resource Management Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Backend Configuration; Operational Configuration) and no display directory — it is settings, not a population",
+  "purpose": "Provide the principal workspace for creating and maintaining an individual resource.",
+  "purposeNote": "Authorized users can create and maintain a complete resource profile, save it as draft, validate its configuration, submit it through governance, and activate it for downstream use.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Resource Creation & Profile declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Active status",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reservable status",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Rentable status",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Capacity",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Unit of measure",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer selectable",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Priority",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Availability mode",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Scheduling mode",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Default duration",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Minimum booking duration",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum booking duration",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resource creation profile configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the resource creation profile untouched.",
+   "emptyFirstRun": "No resource creation profile configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "getResource",
+    "contract": "resources",
+    "purpose": "The resource being edited",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createResource",
+    "contract": "resources",
+    "purpose": "Create it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listResources"
+    ]
+   },
+   {
+    "operationId": "updateResource",
+    "contract": "resources",
+    "purpose": "Save the profile",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getResource",
+     "listResources"
+    ]
+   },
+   {
+    "operationId": "setResourceLifecycleState",
+    "contract": "resources",
+    "purpose": "Submit, activate, suspend or retire",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getResource",
+     "listResources",
+     "getResourceAuditTrail"
+    ]
+   },
+   {
+    "operationId": "cloneResource",
+    "contract": "resources",
+    "purpose": "Copy it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listResources"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-857",
+   "workshopBoard": "wireframes/WS126 Resource Management Configuration Board 1.dc.html#bo-857"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 12 of 63 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "resourceId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-858",
+  "name": "Configurable Attribute Builder",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "1",
+   "number": "05",
+   "page": 10
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/configurable-attribute-builder-bo-858",
+   "component": "apps/venue-management-web/src/routes/rentals/ConfigurableAttributeBuilder.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-854"
+   ],
+   "exitTo": [
+    "BO-854"
+   ],
+   "transitions": [
+    {
+     "to": "BO-854",
+     "trigger": "Back to Resource Management Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Backend Configuration) and no display directory — it is settings, not a population",
+  "purpose": "Allow customers to extend resource records with their own attributes without changing the core application.",
+  "purposeNote": "Administrators can extend resource records with reusable, validated, type-specific attributes without requiring application development.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Configurable Attribute Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Skill level",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 10 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Height",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 10 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Weight",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 10 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Seating capacity",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 10 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Equipment model",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 10 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Serial number",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 10 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Size",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 10 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Manufacturer",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 10 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Color",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 10 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Power requirement",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 10 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Warranty expiry",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 10 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum occupancy",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 10 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Language",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 10 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Certification level",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 10 §Backend Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Rental condition",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 10 §Backend Configuration"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The configurable attribute configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the configurable attribute untouched.",
+   "emptyFirstRun": "No configurable attribute configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "listResourceAttributes",
+    "contract": "resources",
+    "purpose": "Attributes defined so far",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createResourceAttribute",
+    "contract": "resources",
+    "purpose": "Define an attribute",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listResourceAttributes"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-858",
+   "workshopBoard": "wireframes/WS126 Resource Management Configuration Board 1.dc.html#bo-858"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 15 of 52 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-859",
+  "name": "Resource Hierarchy & Parent–Child Relationships",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "1",
+   "number": "06",
+   "page": 11
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/resource-hierarchy-parent-child-relationships-bo-859",
+   "component": "apps/venue-management-web/src/routes/rentals/ResourceHierarchyParentChildRelationships.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-854"
+   ],
+   "exitTo": [
+    "BO-854"
+   ],
+   "transitions": [
+    {
+     "to": "BO-854",
+     "trigger": "Back to Resource Management Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Represent physical and operational relationships between resources.",
+  "purposeNote": "Administrators can create and manage multi-level resource hierarchies, and the platform validates those relationships before they are used operationally.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 11"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 11"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getResourceHierarchy",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setResourceHierarchy",
+       "label": "Save resource hierarchy",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setResourceHierarchy"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resource hierarchy parent–child list.",
+   "error": "Could not load. Names which read failed and leaves the resource hierarchy parent–child untouched.",
+   "emptyFirstRun": "No resource hierarchy parent–child yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the resource hierarchy parent–child are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getResourceHierarchy",
+    "contract": "resources",
+    "purpose": "The tree",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setResourceHierarchy",
+    "contract": "resources",
+    "purpose": "Re-parent or attach",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getResourceHierarchy"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-859",
+   "workshopBoard": "wireframes/WS126 Resource Management Configuration Board 1.dc.html#bo-859"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 0 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "resourceId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-860",
+  "name": "Resource Dependency Rules",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "1",
+   "number": "07",
+   "page": 13
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/resource-dependency-rules-bo-860",
+   "component": "apps/venue-management-web/src/routes/rentals/ResourceDependencyRules.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-854"
+   ],
+   "exitTo": [
+    "BO-854"
+   ],
+   "transitions": [
+    {
+     "to": "BO-854",
+     "trigger": "Back to Resource Management Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§The system shall display) and no metric row",
+  "purpose": "Define operational relationships where one resource requires, depends upon, conflicts with, or influences another resource.",
+  "purposeNote": "Administrators can define reusable dependency rules, and the system validates those dependencies before affected resources can be reserved or assigned.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 13 §The system shall display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every resource dependency rules",
+       "columns": [
+        "Missing dependencies",
+        "Resource conflicts",
+        "Circular dependency warnings",
+        "Unavailable dependent resources"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 13 §The system shall display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected resource dependency rules",
+       "bindsTo": null,
+       "columns": [
+        "Missing dependencies",
+        "Resource conflicts",
+        "Circular dependency warnings",
+        "Unavailable dependent resources"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Private Ski Lesson”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 13 §The system shall display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resource dependency rules list.",
+   "error": "Could not load. Names which read failed and leaves the resource dependency rules untouched.",
+   "emptyFirstRun": "No resource dependency rules yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the resource dependency rules are still there. The pack's own statuses are Sound System A — the state names which is selected.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getResourceDependencies",
+    "contract": "resources",
+    "purpose": "Rules in force",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setResourceDependencies",
+    "contract": "resources",
+    "purpose": "Define what must come with it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getResourceDependencies"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Missing dependencies",
+    "Resource conflicts",
+    "Circular dependency warnings",
+    "Unavailable dependent resources"
+   ],
+   "params": [
+    {
+     "name": "resourceId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-860",
+   "workshopBoard": "wireframes/WS126 Resource Management Configuration Board 1.dc.html#bo-860"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 13. 0 of 4 labels bound to a contract property; 15 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-861",
+  "name": "Resource Package & Bundle Configuration",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "1",
+   "number": "08",
+   "page": 14
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/resource-package-bundle-configuration-bo-861",
+   "component": "apps/venue-management-web/src/routes/rentals/ResourcePackageBundleConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-854"
+   ],
+   "exitTo": [
+    "BO-854"
+   ],
+   "transitions": [
+    {
+     "to": "BO-854",
+     "trigger": "Back to Resource Management Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Administrators shall configure) and no display directory — it is settings, not a population",
+  "purpose": "Allow commonly used combinations of resources to be predefined and assigned as a single operational package.",
+  "purposeNote": "Administrators can create reusable resource packages containing fixed or dynamically selected resources and use those packages later during experience, event, reservation, and operational allocation.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Package code",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Package name",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Description",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Applicable venues",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Included resources",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Included resource types",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Required quantities",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Mandatory/optional components",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Substitute resources",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Allocation priority",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Effective dates",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Minimum/maximum duration",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Approval requirement",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Internal package cost",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resource package bundle configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the resource package bundle untouched.",
+   "emptyFirstRun": "No resource package bundle configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "listResourcePackages",
+    "contract": "resources",
+    "purpose": "The packages",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createResourcePackage",
+    "contract": "resources",
+    "purpose": "Define one",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listResourcePackages"
+    ]
+   },
+   {
+    "operationId": "updateResourcePackage",
+    "contract": "resources",
+    "purpose": "Change one",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listResourcePackages"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-861",
+   "workshopBoard": "wireframes/WS126 Resource Management Configuration Board 1.dc.html#bo-861"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 14 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "packageId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-862",
+  "name": "Multi-Venue Resource Assignment",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "1",
+   "number": "09",
+   "page": 15
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/multi-venue-resource-assignment-bo-862",
+   "component": "apps/venue-management-web/src/routes/rentals/MultiVenueResourceAssignment.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-854"
+   ],
+   "exitTo": [
+    "BO-854"
+   ],
+   "transitions": [
+    {
+     "to": "BO-854",
+     "trigger": "Back to Resource Management Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Control where resources may operate and whether they can be shared across venues.",
+  "purposeNote": "Resources can be assigned to one or multiple venues under controlled rules, with conflicts and transfer constraints validated before operational allocation.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 15"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 15"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setResourceVenueAssignment",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getResource",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setResourceVenueAssignment"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The multi-venue resource list.",
+   "error": "Could not load. Names which read failed and leaves the multi-venue resource untouched.",
+   "emptyFirstRun": "No multi-venue resource yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the multi-venue resource are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setResourceVenueAssignment",
+    "contract": "resources",
+    "purpose": "Where it may operate",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getResource"
+    ]
+   },
+   {
+    "operationId": "getResource",
+    "contract": "resources",
+    "purpose": "The resource being assigned",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-862",
+   "workshopBoard": "wireframes/WS126 Resource Management Configuration Board 1.dc.html#bo-862"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "resourceId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-863",
+  "name": "Resource Lifecycle, Governance & Audit",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "1",
+   "number": "10",
+   "page": 16
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/resource-lifecycle-governance-audit-bo-863",
+   "component": "apps/venue-management-web/src/routes/rentals/ResourceLifecycleGovernanceAudit.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-854"
+   ],
+   "exitTo": [
+    "BO-854"
+   ],
+   "transitions": [
+    {
+     "to": "BO-854",
+     "trigger": "Back to Resource Management Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Administrators shall configure) and no display directory — it is settings, not a population",
+  "purpose": "Manage the entire operational lifecycle of a resource from creation through retirement while maintaining full traceability. Provide TICVAI with a centralized, real-time Resource Scheduling & Availability Engine where authorized users can visually see when resources are available, reserved, assigned, unavailable, under maintenance, or in conflict and can allocate or reassign them directly from the calendar. The calendar must operate as an interactive operational workspace, not simply a calendar display.",
+  "purposeNote": "The complete lifecycle of every resource is governed by permissions and configurable workflows, while every material configuration change remains permanently traceable through immutable audit history.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Allowed status transitions",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 16 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Approval requirements",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 16 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Effective dates",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 16 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Retirement reason",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 16 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Suspension reason",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 16 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Replacement resource",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 16 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Disposal information",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 16 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Depreciation reference",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 16 §Administrators shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Asset-retirement information",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 16 §Administrators shall configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Maker-checker approval",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 16 §Actions may require"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Manager approval",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 16 §Actions may require"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Finance approval",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 16 §Actions may require"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Operations approval",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 16 §Actions may require"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 16 §Actions may require"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Edit",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 16 §Actions may require"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Approve",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 16 §Actions may require"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Activate",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 16 §Actions may require"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resource lifecycle governance configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the resource lifecycle governance untouched.",
+   "emptyFirstRun": "No resource lifecycle governance configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "getResourceAuditTrail",
+    "contract": "resources",
+    "purpose": "The immutable timeline",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setResourceLifecycleState",
+    "contract": "resources",
+    "purpose": "Move it through its lifecycle",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getResource",
+     "listResources",
+     "getResourceAuditTrail"
+    ]
+   },
+   {
+    "operationId": "setApprovalControlPolicy",
+    "contract": "approvals",
+    "purpose": "Require maker-checker (four-eyes) on resource changes",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Maker-checker approval; Manager approval, Finance approval, Operations approval; Create; Edit"
+   },
+   {
+    "operationId": "setApprovalMatrix",
+    "contract": "approvals",
+    "purpose": "Route resource changes to manager, finance or operations approvers",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Maker-checker approval; Manager approval, Finance approval, Operations approval; Create; Edit"
+   },
+   {
+    "operationId": "createResource",
+    "contract": "resources",
+    "purpose": "Create a resource",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Maker-checker approval; Manager approval, Finance approval, Operations approval; Create; Edit",
+    "invalidates": [
+     "getResourceAuditTrail"
+    ]
+   },
+   {
+    "operationId": "updateResource",
+    "contract": "resources",
+    "purpose": "Edit a resource",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Maker-checker approval; Manager approval, Finance approval, Operations approval; Create; Edit",
+    "invalidates": [
+     "getResourceAuditTrail"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-863",
+   "workshopBoard": "wireframes/WS126 Resource Management Configuration Board 1.dc.html#bo-863"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 29 of 101 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Approve, Activate … are choices sent by `setResourceLifecycleState` (state approved|active (list continues through the lifecycle enum)); Maker-checker approval: `setApprovalControlPolicy`; Manager approval, Finance approval, Operations approval: `setApprovalMatrix`; Create: `createResource`; Edit: `updateResource`.",
+  "entryState": {
+   "params": [
+    {
+     "name": "resourceId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

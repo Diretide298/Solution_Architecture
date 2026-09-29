@@ -1,0 +1,192 @@
+{
+ "activateAudience": {
+  "method": "POST",
+  "path": "/audience-activations",
+  "contract": "marketing-crm",
+  "summary": "Push an audience to a campaign, journey or external platform",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AudienceActivation",
+  "responds": null
+ },
+ "createSegment": {
+  "method": "POST",
+  "path": "/segments",
+  "contract": "marketing-crm",
+  "summary": "Create a segment",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateSegmentRequest",
+  "responds": "Segment"
+ },
+ "getAudienceOverlap": {
+  "method": "GET",
+  "path": "/audience-overlap",
+  "contract": "marketing-crm",
+  "summary": "How much audiences overlap, and how many are reachable",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "segmentIds",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AudienceOverlap"
+ },
+ "importAudienceList": {
+  "method": "POST",
+  "path": "/audience-lists",
+  "contract": "marketing-crm",
+  "summary": "Load a supplied list, matched against the guest master",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AudienceList",
+  "responds": "AudienceList"
+ },
+ "listAudienceActivations": {
+  "method": "GET",
+  "path": "/audience-activations",
+  "contract": "marketing-crm",
+  "summary": "Where audiences are being used, and whether they are still in sync",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAudienceDiscoveryTargeting": {
+  "method": "GET",
+  "path": "/audience-discovery-targeting",
+  "contract": "promotions",
+  "summary": "AI Audience Discovery & Targeting Optimization",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiAudienceDiscoveryTargetingOptimizationView"
+ },
+ "listAudienceLists": {
+  "method": "GET",
+  "path": "/audience-lists",
+  "contract": "marketing-crm",
+  "summary": "Static and imported audiences",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSegments": {
+  "method": "GET",
+  "path": "/segments",
+  "contract": "marketing-crm",
+  "summary": "List segments",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "previewSegment": {
+  "method": "POST",
+  "path": "/segments/{segmentId}/preview",
+  "contract": "marketing-crm",
+  "summary": "Estimate segment size and reachability",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SegmentPreview"
+ }
+}

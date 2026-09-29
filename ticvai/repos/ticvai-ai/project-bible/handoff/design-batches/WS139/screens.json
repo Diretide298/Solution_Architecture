@@ -1,0 +1,1250 @@
+[
+ {
+  "id": "BO-774",
+  "name": "Journey Automation Center",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "5",
+   "number": "01",
+   "page": 26
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/journey-automation-center-bo-774",
+   "component": "apps/venue-management-web/src/routes/engagement-support/JourneyAutomationCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-775",
+    "BO-776",
+    "BO-777",
+    "BO-778",
+    "BO-779",
+    "BO-780",
+    "BO-781",
+    "BO-782",
+    "BO-783"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-775",
+     "trigger": "Visual Journey Builder",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "carries": [
+      "journeyId"
+     ]
+    },
+    {
+     "to": "BO-776",
+     "trigger": "Trigger Event Catalog",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-777",
+     "trigger": "Decision Logic & Timing",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-778",
+     "trigger": "Abandoned Cart Recovery",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-779",
+     "trigger": "Lifecycle Journeys",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-780",
+     "trigger": "Guest Engagement Journeys",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-781",
+     "trigger": "Cross-Sell & Service Recovery",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "carries": [
+      "journeyId"
+     ]
+    },
+    {
+     "to": "BO-782",
+     "trigger": "AI Journey Optimization",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-783",
+     "trigger": "Journey Analytics & Audit",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Monitor the health and value of automated customer journeys. Show active journeys, enrolled guests, conversions, recovered revenue, exits, errors and upcoming actions. Compare journey performance by objective, lifecycle, brand, venue, audience, channel and owner. Surface paused nodes, delivery failures, SLA risk and data or consent problems requiring intervention. Provide drill-down and explainable optimization opportunities without automatically changing live flows. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 26"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 26"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listJourneys",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The journey automation list.",
+   "error": "Could not load. Names which read failed and leaves the journey automation untouched.",
+   "emptyFirstRun": "No journey automation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the journey automation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listJourneys",
+    "contract": "marketing-crm",
+    "purpose": "Journeys running",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-774",
+   "workshopBoard": "wireframes/WS74 Marketing CRM Configuration Reference v1.0 Board 5.dc.html#bo-774"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 26. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-775",
+  "name": "Visual Journey Builder",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "5",
+   "number": "02",
+   "page": 26
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/visual-journey-builder-bo-775",
+   "component": "apps/venue-management-web/src/routes/engagement-support/VisualJourneyBuilder.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-774"
+   ],
+   "exitTo": [
+    "BO-774"
+   ],
+   "transitions": [
+    {
+     "to": "BO-774",
+     "trigger": "Back to Journey Automation Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Create multi-step journeys through a visual no-code canvas. Provide trigger, audience, decision, wait, message, offer, case, task, webhook and goal nodes. Support branches, merges, reusable subflows, annotations, zoom, validation and realistic test execution. Show node configuration, eligible count, dependencies and errors without leaving the canvas. Version drafts, compare changes and require approval before a published journey is replaced. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Visual Journey Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 26"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 26"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createJourney",
+       "label": "Create journey",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createJourney"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Starts enrolling guests who match**, from now. Guests already in the journey continue on the version they entered.",
+       "provenance": "authored — required by check-screens, 19 September 2026"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The visual journey list.",
+   "error": "Could not load. Names which read failed and leaves the visual journey untouched.",
+   "emptyFirstRun": "No visual journey yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the visual journey are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "createJourney",
+    "contract": "marketing-crm",
+    "purpose": "Build a journey",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "activateJourney",
+    "contract": "marketing-crm",
+    "purpose": "Activate it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-775",
+   "workshopBoard": "wireframes/WS74 Marketing CRM Configuration Reference v1.0 Board 5.dc.html#bo-775"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 26. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "journeyId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-776",
+  "name": "Trigger Event Catalog",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "5",
+   "number": "03",
+   "page": 26
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/trigger-event-catalog-bo-776",
+   "component": "apps/venue-management-web/src/routes/engagement-support/TriggerEventCatalog.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-774"
+   ],
+   "exitTo": [
+    "BO-774"
+   ],
+   "transitions": [
+    {
+     "to": "BO-774",
+     "trigger": "Back to Journey Automation Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Govern the events that can start, update or stop a journey. Configure purchase, cart abandonment, first visit, membership expiry, loyalty milestone, wallet top-up, birthday, reservation and case events. Configuration Scope of Work | Version 1.0 26 Define source, event schema, required attributes, deduplication, freshness, eligibility and sample payload. Support API/webhook events and scheduled conditions with authentication and retry controls. Version and test event definitions and display consuming journeys before deactivation or change. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 26"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 26"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMessageTriggers",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setMessageTrigger",
+       "label": "Save message trigger",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setMessageTrigger"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The trigger event catalog list.",
+   "error": "Could not load. Names which read failed and leaves the trigger event catalog untouched.",
+   "emptyFirstRun": "No trigger event catalog yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the trigger event catalog are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listMessageTriggers",
+    "contract": "marketing-crm",
+    "purpose": "The trigger catalogue",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setMessageTrigger",
+    "contract": "marketing-crm",
+    "purpose": "Define one",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-776",
+   "workshopBoard": "wireframes/WS74 Marketing CRM Configuration Reference v1.0 Board 5.dc.html#bo-776"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 26. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-777",
+  "name": "Decision Logic & Timing",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "5",
+   "number": "04",
+   "page": 27
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/decision-logic-timing-bo-777",
+   "component": "apps/venue-management-web/src/routes/engagement-support/DecisionLogicTiming.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-774"
+   ],
+   "exitTo": [
+    "BO-774"
+   ],
+   "transitions": [
+    {
+     "to": "BO-774",
+     "trigger": "Back to Journey Automation Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Control journey branching, timing and re-entry. Build nested AND/OR conditions using guest, event, segment, transaction, product, channel and engagement data. Configure waits, dates, timezones, send windows, blackout periods, frequency limits and expiry. Define re-entry, concurrency, suppression, exit and goal conditions and behavior when data is missing. Simulate paths for representative guests and block publication when a branch has no safe outcome. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 27"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 27"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createJourney",
+       "label": "Create journey",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createJourney"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The decision logic timing list.",
+   "error": "Could not load. Names which read failed and leaves the decision logic timing untouched.",
+   "emptyFirstRun": "No decision logic timing yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the decision logic timing are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "createJourney",
+    "contract": "marketing-crm",
+    "purpose": "Decision logic and timing",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-777",
+   "workshopBoard": "wireframes/WS74 Marketing CRM Configuration Reference v1.0 Board 5.dc.html#bo-777"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 27. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-778",
+  "name": "Abandoned Cart Recovery",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "5",
+   "number": "05",
+   "page": 27
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/abandoned-cart-recovery-bo-778",
+   "component": "apps/venue-management-web/src/routes/engagement-support/AbandonedCartRecovery.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-774"
+   ],
+   "exitTo": [
+    "BO-774"
+   ],
+   "transitions": [
+    {
+     "to": "BO-774",
+     "trigger": "Back to Journey Automation Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure automated recovery of incomplete ticketing and commerce transactions. Define abandonment event, cart-value threshold, product/inventory checks, eligibility and recovery window. Configure staged reminders across email, SMS, WhatsApp and push with fallback and frequency limits. Apply approved incentives through the Promotion Engine and prevent discount leakage or expired inventory offers. Track recovered cart, revenue, margin, attribution and exit when purchase or cancellation occurs. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 27"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 27"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAbandonedCarts",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The abandoned cart recovery list.",
+   "error": "Could not load. Names which read failed and leaves the abandoned cart recovery untouched.",
+   "emptyFirstRun": "No abandoned cart recovery yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the abandoned cart recovery are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAbandonedCarts",
+    "contract": "orders",
+    "purpose": "Carts that lapsed without checking out",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-778",
+   "workshopBoard": "wireframes/WS74 Marketing CRM Configuration Reference v1.0 Board 5.dc.html#bo-778"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 27. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-779",
+  "name": "Lifecycle Journeys",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "5",
+   "number": "06",
+   "page": 27
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/lifecycle-journeys-bo-779",
+   "component": "apps/venue-management-web/src/routes/engagement-support/LifecycleJourneys.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-774"
+   ],
+   "exitTo": [
+    "BO-774"
+   ],
+   "transitions": [
+    {
+     "to": "BO-774",
+     "trigger": "Back to Journey Automation Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Manage reusable membership, loyalty and wallet lifecycle automations. Provide onboarding, benefit-awareness, renewal, expiry, lapse, freeze and upgrade membership journeys. Provide loyalty enrollment, tier movement, milestone, reward availability and points-expiry journeys. Provide wallet onboarding, top-up, low-balance, dormancy and bonus-credit journeys. Configure eligibility, channels, goals, stop conditions, ownership, versions and lifecycle-specific KPIs. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history. Configuration Scope of Work | Version 1.0 27",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 27"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 27"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createJourney",
+       "label": "Create journey",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createJourney"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The lifecycle journeys list.",
+   "error": "Could not load. Names which read failed and leaves the lifecycle journeys untouched.",
+   "emptyFirstRun": "No lifecycle journeys yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the lifecycle journeys are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "createJourney",
+    "contract": "marketing-crm",
+    "purpose": "Lifecycle journeys",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-779",
+   "workshopBoard": "wireframes/WS74 Marketing CRM Configuration Reference v1.0 Board 5.dc.html#bo-779"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 27. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-780",
+  "name": "Guest Engagement Journeys",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "5",
+   "number": "07",
+   "page": 28
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/guest-engagement-journeys-bo-780",
+   "component": "apps/venue-management-web/src/routes/engagement-support/GuestEngagementJourneys.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-774"
+   ],
+   "exitTo": [
+    "BO-774"
+   ],
+   "transitions": [
+    {
+     "to": "BO-774",
+     "trigger": "Back to Journey Automation Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure recurring guest relationship journeys. Support birthdays, anniversaries, welcome/onboarding, first-visit follow-up, inactivity and re- engagement. Personalize by profile, language, interests, visit history, loyalty, membership and preferred channel. Apply quiet hours, consent, frequency and household/minor rules before every communication. Measure engagement, conversion, return visits, retention and incremental value by journey. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 28"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 28"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "bindsTo": "Journey",
+       "operation": "listJourneys",
+       "derived": true,
+       "impliedBy": "listJourneys",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The guest engagement journeys list.",
+   "error": "Could not load. Names which read failed and leaves the guest engagement journeys untouched.",
+   "emptyFirstRun": "No guest engagement journeys yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the guest engagement journeys are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listJourneys",
+    "contract": "marketing-crm",
+    "purpose": "Every guest engagement journey",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, readiness close-out (QA wiring note)"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-780",
+   "workshopBoard": "wireframes/WS74 Marketing CRM Configuration Reference v1.0 Board 5.dc.html#bo-780"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 28. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-781",
+  "name": "Cross-Sell & Service Recovery",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "5",
+   "number": "08",
+   "page": 28
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/cross-sell-service-recovery-bo-781",
+   "component": "apps/venue-management-web/src/routes/engagement-support/CrossSellServiceRecovery.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-774"
+   ],
+   "exitTo": [
+    "BO-774"
+   ],
+   "transitions": [
+    {
+     "to": "BO-774",
+     "trigger": "Back to Journey Automation Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Coordinate revenue-growth and recovery actions after guest events. Recommend and automate eligible cross-sell or upsell offers after purchase, booking or visit. Trigger reservation follow-up, survey request, complaint recovery and post-case resolution journeys. Create cases, tasks, refunds, vouchers, loyalty points or wallet credit subject to approval limits. Stop or alter a journey when sentiment, case status, refund, opt-out or service outcome changes. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 28"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 28"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getJourneyPerformance",
+       "notes": "One record, read-only."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The cross-sell service recovery list.",
+   "error": "Could not load. Names which read failed and leaves the cross-sell service recovery untouched.",
+   "emptyFirstRun": "No cross-sell service recovery yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the cross-sell service recovery are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getJourneyPerformance",
+    "contract": "marketing-crm",
+    "purpose": "Journey analytics",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-781",
+   "workshopBoard": "wireframes/WS74 Marketing CRM Configuration Reference v1.0 Board 5.dc.html#bo-781"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 28. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "journeyId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-782",
+  "name": "AI Journey Optimization",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "5",
+   "number": "09",
+   "page": 28
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/ai-journey-optimization-bo-782",
+   "component": "apps/venue-management-web/src/routes/engagement-support/AiJourneyOptimization.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-774"
+   ],
+   "exitTo": [
+    "BO-774"
+   ],
+   "transitions": [
+    {
+     "to": "BO-774",
+     "trigger": "Back to Journey Automation Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Use explainable AI to improve paths, content, offers and timing. Recommend branch order, wait duration, channel, message, offer and send time with expected uplift. Display supporting evidence, confidence, affected audience, risks and policy constraints. Allow scenario comparison, selective approval and rollback and prevent AI from editing live journeys directly. Monitor applied recommendation results and retain model/version, reviewer feedback and realized impact. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 28"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 28"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listJourneys",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The journey optimization list.",
+   "error": "Could not load. Names which read failed and leaves the journey optimization untouched.",
+   "emptyFirstRun": "No journey optimization yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the journey optimization are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listJourneys",
+    "contract": "marketing-crm",
+    "purpose": "Automated journeys",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-782",
+   "workshopBoard": "wireframes/WS74 Marketing CRM Configuration Reference v1.0 Board 5.dc.html#bo-782"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 28. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-783",
+  "name": "Journey Analytics & Audit",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "5",
+   "number": "10",
+   "page": 28
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/journey-analytics-audit-bo-783",
+   "component": "apps/venue-management-web/src/routes/engagement-support/JourneyAnalyticsAudit.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-774"
+   ],
+   "exitTo": [
+    "BO-774"
+   ],
+   "transitions": [
+    {
+     "to": "BO-774",
+     "trigger": "Back to Journey Automation Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Measure journey behavior at node and end-goal level. Show triggered, eligible, enrolled, reached, clicked, converted, exited and failed stages. Analyze node drop-off, branch performance, time-to-conversion, revenue, attribution and cost. Provide error log, delivery trace, suppression reason, version comparison and guest-level path where authorized. Audit creation, edits, approvals, publication, pauses, AI recommendations and administrative actions. Configuration Scope of Work | Version 1.0 28 Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history. Configuration Scope of Work | Version 1.0 29 Board 6 - Newsletter, Notifications & Message Delivery Figure 6. High-definition configuration board with all 10 screens. Configuration Scope of Work | Version 1.0 30",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 28"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 28"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listJourneys",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The journey analytics audit list.",
+   "error": "Could not load. Names which read failed and leaves the journey analytics audit untouched.",
+   "emptyFirstRun": "No journey analytics audit yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the journey analytics audit are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listJourneys",
+    "contract": "marketing-crm",
+    "purpose": "Automated journeys",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-783",
+   "workshopBoard": "wireframes/WS74 Marketing CRM Configuration Reference v1.0 Board 5.dc.html#bo-783"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 28. 0 of 0 labels bound to a contract property; 0 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

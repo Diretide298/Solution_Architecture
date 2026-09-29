@@ -1,0 +1,66 @@
+id: LLD-Partner change request
+title: Partner change request — 6 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/partner-change-request.yaml
+entity: Partner change request
+contract: subscription
+enum: PartnerChangeRequest.status
+enumKind: inline
+enumSchema: PartnerChangeRequest
+enumProperty: status
+owner: subscription
+initial:
+- requested
+terminal:
+- rejected
+- processed
+transitions:
+- from: requested
+  to: approved
+  operation: createPartnerChangeRequest
+  trigger: operation
+  guard: 'Evaluated in the same call that creates it: within the agreement''s cancellation terms and
+    the partner''s `cancellationLimitPercent` (`control.partner_booking_limit`). No approval is needed
+    (decided 29 September, writers pass; DM4)'
+- from: requested
+  to: pendingApproval
+  operation: createPartnerChangeRequest
+  trigger: operation
+  guard: 'Evaluated in the same call: allowed only with approval (outside the cancellation limit, a
+    non-refundable product, a fee waiver asked for). An `approvals.request` is raised and its id recorded
+    (decided 29 September, writers pass; DM4)'
+- from: requested
+  to: rejected
+  operation: createPartnerChangeRequest
+  trigger: operation
+  guard: 'Evaluated in the same call: the policy does not allow it at all (performance past, ticket
+    already scanned, product not amendable); the evaluation says why (decided 29 September, writers
+    pass; DM4)'
+- from: pendingApproval
+  to: approved
+  operation: decideApprovalRequest
+  trigger: operation
+  requiresApproval: true
+  guard: Approved at the last level in the approvals engine
+- from: pendingApproval
+  to: rejected
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Refused in the approvals engine
+- from: approved
+  to: processed
+  trigger: cascade
+  guard: 'The order change is carried out: the refund or credit through `orders` (`createRefund`, an
+    `orders.refund`), the amendment through `setOrderAmendment`, the allocation released and the commission
+    line adjusted'
+notes: '**The request is not the refund** (decided 29 September, writers pass). This row is what the
+  partner asked for and what the policy said about it: allowed or not, the fee, the refund or credit,
+  and the allocation and commission impact. The money moves in `orders` (`orders.refund`), which has
+  its own lifecycle.
+
+
+
+  **createPartnerChangeRequest creates and evaluates it in one call** (decided 29 September, writers
+  pass; DM4), so the status it returns is the evaluated one; `requested` is what a `dryRun` evaluation
+  shows. A rejected request is never reopened: the partner asks again.'

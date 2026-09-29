@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `queue`, `maintenance`, `resources`, `venue-map`, `assets`, `games`, `rental`, `transport` |
 | Schemas owned | `queue`, `maintenance`, `resources`, `venuemap`, `assets`, `games`, `rental`, `transport` |
-| Operations in the slice | 56 of 270 |
+| Operations in the slice | 62 of 274 |
 | Scale | Low and steady. Queue readings are the only frequent write. |
 | If it is down | Down degrades venue operations. Selling and admitting continue. |
 
@@ -57,14 +57,20 @@
 | queue | [`listQueues`](#listqueues) | GET | `/queues` | core | 2 | BO-001, BO-002, BO-004, BO-005, BO-038, BO-221 … |
 | queue | [`updateQueue`](#updatequeue) | PATCH | `/queues/{queueId}` | setup | 1 | BO-001, BO-002, BO-004, BO-005, BO-038, BO-221 |
 | resources | [`createResource`](#createresource) | POST | `/resources` | setup | 2 | BO-095, BO-857, BO-863 |
+| resources | [`createResourceBlock`](#createresourceblock) | POST | `/resource-blocks` | setup | 3 | BO-864, BO-870, BO-880, BO-910 |
 | resources | [`createResourceHold`](#createresourcehold) | POST | `/resource-holds` | core | 3 | GST-074, WEB-047 |
+| resources | [`createResourcePackage`](#createresourcepackage) | POST | `/resource-packages` | setup | 3 | BO-861, BO-895, BO-918 |
 | resources | [`extendResourceHold`](#extendresourcehold) | POST | `/resource-holds/{holdId}/extend` | core | 3 | GST-074, WEB-047 |
 | resources | [`getMapResourceAvailability`](#getmapresourceavailability) | GET | `/resource-availability` | core | 3 | GST-074, WEB-047 |
 | resources | [`getResourceAvailability`](#getresourceavailability) | GET | `/resources/{resourceId}/availability` | core | 2 | BO-096, WEB-031 |
 | resources | [`getResourceHold`](#getresourcehold) | GET | `/resource-holds/{holdId}` | core | 1 | GST-041, GST-074, WEB-010, WEB-047 |
 | resources | [`listProductStartTimes`](#listproductstarttimes) | GET | `/resource-start-times` | core | 3 | GST-075, WEB-048 |
+| resources | [`releaseResourceBlock`](#releaseresourceblock) | DELETE | `/resource-blocks/{blockId}` | setup | 3 | BO-870 |
 | resources | [`relinquishResourceHold`](#relinquishresourcehold) | DELETE | `/resource-holds/{holdId}` | core | 3 | GST-074, WEB-047 |
+| resources | [`setExperienceResourceRequirements`](#setexperienceresourcerequirements) | PUT | `/experiences/{experienceId}/resource-requirements` | setup | 3 | BO-877, BO-893 |
+| resources | [`setResourceSchedule`](#setresourceschedule) | PUT | `/resources/{resourceId}/schedule` | setup | 3 | BO-866, BO-867, BO-878 |
 | resources | [`updateResource`](#updateresource) | PUT | `/resources/{resourceId}` | setup | 2 | BO-857, BO-863 |
+| resources | [`updateResourcePackage`](#updateresourcepackage) | PUT | `/resource-packages/{packageId}` | setup | 3 | BO-861 |
 | rights | [`getExpiringRights`](#getexpiringrights) | GET | `/media/rights-expiring` | core | 2 | CMS-010, CMS-081, CMS-088, CMS-090 |
 | route | [`createTransportRoute`](#createtransportroute) | POST | `/transport/routes` | setup | 3 | BO-1184 |
 | route | [`getTransportRoute`](#gettransportroute) | GET | `/transport/routes/{routeId}` | core | 3 | BO-1184, GST-077, WEB-049 |
@@ -164,6 +170,7 @@ Returns every generated size and every place the asset is referenced. Usage is w
 | customMetadata | object |  | BL-178. (nullable) |
 | sharedWithTenantIds | array of string (uuid) |  | BL-178. |
 | tags | array of string |  |  |
+| categoryId | string (uuid) |  | The asset's category, one of MediaTaxonomy.categories[].id; null while unclassified. (nullable) |
 | venueId | string (uuid) |  | (nullable) |
 | url | string |  | Signed and expiring for private assets; stable CDN URL for public ones. |
 | thumbnailUrl | string |  | (nullable) |
@@ -219,6 +226,7 @@ Returns every generated size and every place the asset is referenced. Usage is w
 
 The reference is stable, so every surface using it updates at once. This is how a brand refresh happens without editing thirty screens.
 Derivatives regenerate. The previous version is retained for rollback.
+**The fingerprint is recomputed with them**: the asset's one `assets.media_fingerprint` row is replaced by the processing job for the new file (decided 29 September, writers pass; DM4), so similarity and duplicate checks compare what is actually served.
 
 |  |  |
 |---|---|
@@ -229,7 +237,7 @@ Derivatives regenerate. The previous version is retained for rollback.
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `assets.media_asset`, `cache:idempotency` |
-| Writes | `assets.media_asset`, `cache:idempotency` |
+| Writes | `assets.asset_version`, `assets.media_asset`, `assets.media_fingerprint`, `cache:idempotency` |
 | Called by | BO-027, CMS-010, CMS-076, CMS-095 |
 
 **Parameters**
@@ -266,6 +274,7 @@ Derivatives regenerate. The previous version is retained for rollback.
 | asset.customMetadata | object |  | BL-178. (nullable) |
 | asset.sharedWithTenantIds | array of string (uuid) |  | BL-178. |
 | asset.tags | array of string |  |  |
+| asset.categoryId | string (uuid) |  | The asset's category, one of MediaTaxonomy.categories[].id; null while unclassified. (nullable) |
 | asset.venueId | string (uuid) |  | (nullable) |
 | asset.url | string |  | Signed and expiring for private assets; stable CDN URL for public ones. |
 | asset.thumbnailUrl | string |  | (nullable) |
@@ -351,6 +360,7 @@ Filter by kind, tag, collection, venue or usage. `unusedOnly` surfaces assets no
 | items[].customMetadata | object |  | BL-178. (nullable) |
 | items[].sharedWithTenantIds | array of string (uuid) |  | BL-178. |
 | items[].tags | array of string |  |  |
+| items[].categoryId | string (uuid) |  | The asset's category, one of MediaTaxonomy.categories[].id; null while unclassified. (nullable) |
 | items[].venueId | string (uuid) |  | (nullable) |
 | items[].url | string |  | Signed and expiring for private assets; stable CDN URL for public ones. |
 | items[].thumbnailUrl | string |  | (nullable) |
@@ -453,6 +463,7 @@ A partial update: only the fields sent change. `collectionIds`, when sent, repla
 | customMetadata | object |  | BL-178. (nullable) |
 | sharedWithTenantIds | array of string (uuid) |  | BL-178. |
 | tags | array of string |  |  |
+| categoryId | string (uuid) |  | The asset's category, one of MediaTaxonomy.categories[].id; null while unclassified. (nullable) |
 | venueId | string (uuid) |  | (nullable) |
 | url | string |  | Signed and expiring for private assets; stable CDN URL for public ones. |
 | thumbnailUrl | string |  | (nullable) |
@@ -752,7 +763,7 @@ Folders — by campaign, venue, season or product line. An asset may sit in seve
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | - |
+| Reads | `transport.departure`, `transport.fare_matrix_cell`, `transport.fare_passenger_type`, `transport.fare_table`, `transport.route`, `transport.route_stop`, `transport.station`, `transport.timetable` |
 | Writes | - |
 | Called by | GST-076, WEB-049 |
 
@@ -813,7 +824,7 @@ Only departures `onSale` and before the route's booking cut-off are returned; a 
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | - |
+| Reads | `transport.departure`, `transport.fare_matrix_cell`, `transport.fare_passenger_type`, `transport.fare_table`, `transport.route`, `transport.route_stop`, `transport.station`, `transport.timetable` |
 | Writes | - |
 | Called by | GST-076, WEB-049 |
 
@@ -1175,7 +1186,7 @@ Fare: `stopCount` is `baseFare + perStopFare × stops travelled`; `matrix` reads
 | Wave | 3 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | - |
+| Reads | `transport.fare_matrix_cell`, `transport.fare_passenger_type`, `transport.fare_table`, `transport.pass_type`, `transport.route_stop` |
 | Writes | - |
 | Called by | BO-1185, GST-077, WEB-049 |
 
@@ -1347,8 +1358,8 @@ Replaces the route's fare table as a whole (decided 29 September, rev 3 REV3-21)
 | Wave | 3 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | - |
-| Writes | - |
+| Reads | `cache:idempotency`, `transport.favourite_route` |
+| Writes | `cache:idempotency`, `transport.favourite_route` |
 | Called by | GST-079, WEB-049 |
 
 **Parameters**
@@ -1622,7 +1633,7 @@ The Multi-trip tab (decided 29 September, rev 3 REV3-21): 5-trip and 10-trip car
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | - |
+| Reads | `transport.fare_matrix_cell`, `transport.fare_table`, `transport.pass_type`, `transport.route`, `transport.route_stop` |
 | Writes | - |
 | Called by | GST-078, WEB-049 |
 
@@ -2116,6 +2127,63 @@ Guest-facing when called with a guest token — returns only queues that are ope
 |---|---|---|
 | 201 |  | Created |
 
+### createResourceBlock
+
+**`POST /resource-blocks`**: Take a resource out of service for a window, with a reason
+
+Board 2.07. **A block is not a booking and the difference is operational.** An operator looking for something free needs to know whether to wait or to look elsewhere, so `getResourceAvailability` returns the reason — booked, setup, teardown, maintenance, blackout, closed — rather than a single "unavailable".
+
+|  |  |
+|---|---|
+| Permission | `RESOURCE_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, makes `resources.resource_block` non-empty |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `resources.resource_block` |
+| Writes | `resources.resource_block` |
+| Called by | BO-864, BO-870, BO-880, BO-910 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ResourceBlock`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  |  |
+| resourceId | string (uuid) | yes |  |
+| from | string (date-time) | yes |  |
+| to | string (date-time) | yes |  |
+| reason | enum (setup, teardown, maintenance, blackout, closed, operational, training) | yes |  |
+| note | string |  | (nullable) |
+| createdBy | string (uuid) |  | (nullable) |
+| scopePath | string |  |  |
+
+**Response**: `ResourceBlock`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  |  |
+| resourceId | string (uuid) | yes |  |
+| from | string (date-time) | yes |  |
+| to | string (date-time) | yes |  |
+| reason | enum (setup, teardown, maintenance, blackout, closed, operational, training) | yes |  |
+| note | string |  | (nullable) |
+| createdBy | string (uuid) |  | (nullable) |
+| scopePath | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Blocked |
+| 409 |  | Bookings already exist in the window. |
+
 ### createResourceHold
 
 **`POST /resource-holds`**: Hold a specific resource picked on the map
@@ -2191,6 +2259,98 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | Taken for some of the window, held by someone else, not placed on the published map, or marked not bookable. |
 | 422 |  | The party is larger than the resource's capacity (party-exceeds-capacity). |
+
+### createResourcePackage
+
+**`POST /resource-packages`**: Define a reusable combination
+
+|  |  |
+|---|---|
+| Permission | `RESOURCE_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `resources.resource_requirement` non-empty |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `resources.resource_package`, `resources.resource_requirement` |
+| Writes | `resources.resource_package`, `resources.resource_requirement` |
+| Called by | BO-861, BO-895, BO-918 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ResourcePackage`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  |  |
+| code | string | yes |  |
+| name | string | yes |  |
+| description | string |  | (nullable) |
+| applicableVenueIds | array of string (uuid) |  |  |
+| components | array of ResourceRequirement |  |  |
+| components[].id | string (uuid) |  |  |
+| components[].resourceTypeId | string (uuid) |  | (nullable) |
+| components[].categoryId | string (uuid) |  | (nullable) |
+| components[].resourceId | string (uuid) |  | A fixed component, and the exception rather than the rule. (nullable) |
+| components[].quantity | integer | yes | (default 1) |
+| components[].mandatory | boolean |  | (default True) |
+| components[].requiredQualifications | array of string |  |  |
+| components[].requiredAttributes | object |  |  |
+| components[].substituteResourceIds | array of string (uuid) |  |  |
+| components[].scopePath | string |  |  |
+| allocationPriority | integer |  | (default 0) |
+| effectiveFrom | string (date) |  | (nullable) |
+| effectiveTo | string (date) |  | (nullable) |
+| minimumMinutes | integer |  | (nullable) |
+| maximumMinutes | integer |  | (nullable) |
+| requiresApproval | boolean |  | (default False) |
+| internalCost | Money |  | On the wire this is three fields; in the database it is one column. |
+| internalCost.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| internalCost.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| internalCost.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| scopePath | string |  |  |
+
+**Response**: `ResourcePackage`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  |  |
+| code | string | yes |  |
+| name | string | yes |  |
+| description | string |  | (nullable) |
+| applicableVenueIds | array of string (uuid) |  |  |
+| components | array of ResourceRequirement |  |  |
+| components[].id | string (uuid) |  |  |
+| components[].resourceTypeId | string (uuid) |  | (nullable) |
+| components[].categoryId | string (uuid) |  | (nullable) |
+| components[].resourceId | string (uuid) |  | A fixed component, and the exception rather than the rule. (nullable) |
+| components[].quantity | integer | yes | (default 1) |
+| components[].mandatory | boolean |  | (default True) |
+| components[].requiredQualifications | array of string |  |  |
+| components[].requiredAttributes | object |  |  |
+| components[].substituteResourceIds | array of string (uuid) |  |  |
+| components[].scopePath | string |  |  |
+| allocationPriority | integer |  | (default 0) |
+| effectiveFrom | string (date) |  | (nullable) |
+| effectiveTo | string (date) |  | (nullable) |
+| minimumMinutes | integer |  | (nullable) |
+| maximumMinutes | integer |  | (nullable) |
+| requiresApproval | boolean |  | (default False) |
+| internalCost | Money |  | On the wire this is three fields; in the database it is one column. |
+| internalCost.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| internalCost.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| internalCost.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| scopePath | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created |
 
 ### extendResourceHold
 
@@ -2268,7 +2428,7 @@ For a guest still completing payment. **The same bounds as a seat hold**: `Venue
 | Conflict policy | serverWins |
 | Read routing | primary |
 | Guest callable | True |
-| Reads | - |
+| Reads | `maintenance.work_order`, `resources.booking`, `resources.resource`, `resources.resource_block`, `resources.resource_hold`, `venuemap.map`, `venuemap.map_version`, `venuemap.placed_resource` |
 | Writes | - |
 | Called by | GST-074, WEB-047 |
 
@@ -2439,7 +2599,7 @@ Start times fall on `stepMinutes` from the venue's opening on that date, and a w
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Guest callable | True |
-| Reads | - |
+| Reads | `resources.booking`, `resources.resource`, `resources.resource_block`, `resources.resource_hold`, `resources.resource_requirement`, `resources.resource_schedule` |
 | Writes | - |
 | Called by | GST-075, WEB-048 |
 
@@ -2473,6 +2633,35 @@ Start times fall on `stepMinutes` from the venue's opening on that date, and a w
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 422 |  | The product is not sold by time window, the variant is not one of its lengths, or it has no resource requirements (product-not-time-windowed, variant-has-no-duration, no-resource-requirements). |
 
+### releaseResourceBlock
+
+**`DELETE /resource-blocks/{blockId}`**: Put it back into service
+
+|  |  |
+|---|---|
+| Permission | `RESOURCE_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, makes `resources.resource_block` non-empty |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `resources.resource_block` |
+| Writes | `cache:idempotency`, `resources.resource_block` |
+| Called by | BO-870 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| blockId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 204 |  | Released |
+
 ### relinquishResourceHold
 
 **`DELETE /resource-holds/{holdId}`**: Give up a resource hold
@@ -2488,8 +2677,8 @@ The guest picked another cabana or left the map. The resource is free at once.
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | - |
-| Writes | - |
+| Reads | `cache:idempotency`, `resources.resource_hold` |
+| Writes | `cache:idempotency`, `resources.resource_hold` |
 | Called by | GST-074, WEB-047 |
 | State model | Resource hold ([states/resource-hold.yaml](../../../states/resource-hold.yaml)): moves `held` -> `released` |
 
@@ -2506,6 +2695,132 @@ The guest picked another cabana or left the map. The resource is free at once.
 |---|---|---|
 | 204 |  | Released |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### setExperienceResourceRequirements
+
+**`PUT /experiences/{experienceId}/resource-requirements`**: Bind resource requirements to an experience
+
+Board 5.01. **This is the join between the catalogue and the pool**, and it is what makes the 26 August rule enforceable: the guest buys a product, the product states what it needs, and `allocateResources` fills it. Without this the product has no way to reserve anything and the resource has no way to know it is spoken for.
+Requirements are stated as type and quantity with optional qualifications — *one instructor, one training zone* — never as named resources.
+
+|  |  |
+|---|---|
+| Permission | `RESOURCE_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `resources.resource_requirement` non-empty |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `resources.resource_requirement` |
+| Writes | `resources.resource_requirement` |
+| Called by | BO-877, BO-893 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| experienceId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| requirements | array of ResourceRequirement | yes |  |
+| requirements[].id | string (uuid) |  |  |
+| requirements[].resourceTypeId | string (uuid) |  | (nullable) |
+| requirements[].categoryId | string (uuid) |  | (nullable) |
+| requirements[].resourceId | string (uuid) |  | A fixed component, and the exception rather than the rule. (nullable) |
+| requirements[].quantity | integer | yes | (default 1) |
+| requirements[].mandatory | boolean |  | (default True) |
+| requirements[].requiredQualifications | array of string |  |  |
+| requirements[].requiredAttributes | object |  |  |
+| requirements[].substituteResourceIds | array of string (uuid) |  |  |
+| requirements[].scopePath | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set |
+
+### setResourceSchedule
+
+**`PUT /resources/{resourceId}/schedule`**: Operating hours, working pattern and bookable slots
+
+Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as concrete dates has to be rewritten every season and silently expires; a recurring pattern with exceptions does not.
+**Slot length is here and not on the product**, because the same instructor may teach a forty-minute private lesson and a ninety-minute group lesson, and the constraint being modelled is the resource's — how finely its time can be cut.
+
+|  |  |
+|---|---|
+| Permission | `RESOURCE_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `resources.resource_schedule` non-empty |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `resources.resource_schedule` |
+| Writes | `resources.resource_schedule` |
+| Called by | BO-866, BO-867, BO-878 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| resourceId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ResourceSchedule`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| resourceId | string (uuid) |  |  |
+| availabilityMode | enum (alwaysAvailable, scheduled, onRequest) |  |  |
+| windows | array of object |  |  |
+| windows[].daysOfWeek | array of string |  |  |
+| windows[].from | string |  | Local time of day, HH:MM. (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
+| windows[].to | string |  | Local time of day, HH:MM. (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
+| windows[].effectiveFrom | string (date) |  | (nullable) |
+| windows[].effectiveTo | string (date) |  | (nullable) |
+| slotMinutes | integer |  | How finely this resource's time can be cut, which is a property of the resource and not of the product sold against it. (nullable) |
+| minimumBookingMinutes | integer |  | (nullable) |
+| maximumBookingMinutes | integer |  | (nullable) |
+| advanceBookingDays | integer |  | (nullable) |
+| exceptions | array of object |  |  |
+| exceptions[].date | string (date) |  |  |
+| exceptions[].closed | boolean |  |  |
+| exceptions[].from | string |  | Local time of day, HH:MM. (pattern ^([01]\d\|2[0-3]):[0-5]\d$; nullable) |
+| exceptions[].to | string |  | Local time of day, HH:MM. (pattern ^([01]\d\|2[0-3]):[0-5]\d$; nullable) |
+| scopePath | string |  |  |
+
+**Response**: `ResourceSchedule`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| resourceId | string (uuid) |  |  |
+| availabilityMode | enum (alwaysAvailable, scheduled, onRequest) |  |  |
+| windows | array of object |  |  |
+| windows[].daysOfWeek | array of string |  |  |
+| windows[].from | string |  | Local time of day, HH:MM. (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
+| windows[].to | string |  | Local time of day, HH:MM. (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
+| windows[].effectiveFrom | string (date) |  | (nullable) |
+| windows[].effectiveTo | string (date) |  | (nullable) |
+| slotMinutes | integer |  | How finely this resource's time can be cut, which is a property of the resource and not of the product sold against it. (nullable) |
+| minimumBookingMinutes | integer |  | (nullable) |
+| maximumBookingMinutes | integer |  | (nullable) |
+| advanceBookingDays | integer |  | (nullable) |
+| exceptions | array of object |  |  |
+| exceptions[].date | string (date) |  |  |
+| exceptions[].closed | boolean |  |  |
+| exceptions[].from | string |  | Local time of day, HH:MM. (pattern ^([01]\d\|2[0-3]):[0-5]\d$; nullable) |
+| exceptions[].to | string |  | Local time of day, HH:MM. (pattern ^([01]\d\|2[0-3]):[0-5]\d$; nullable) |
+| scopePath | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set |
 
 ### updateResource
 
@@ -2575,6 +2890,99 @@ The guest picked another cabana or left the map. The resource is free at once.
 | depositAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | status | enum (available, booked, checkedOut, maintenance, retired) |  |  |
 | isActive | boolean |  | (default True) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Updated |
+
+### updateResourcePackage
+
+**`PUT /resource-packages/{packageId}`**: Change a combination
+
+|  |  |
+|---|---|
+| Permission | `RESOURCE_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `resources.resource_requirement` non-empty |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `resources.resource_package`, `resources.resource_requirement` |
+| Writes | `resources.resource_package`, `resources.resource_requirement` |
+| Called by | BO-861 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| packageId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ResourcePackage`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  |  |
+| code | string | yes |  |
+| name | string | yes |  |
+| description | string |  | (nullable) |
+| applicableVenueIds | array of string (uuid) |  |  |
+| components | array of ResourceRequirement |  |  |
+| components[].id | string (uuid) |  |  |
+| components[].resourceTypeId | string (uuid) |  | (nullable) |
+| components[].categoryId | string (uuid) |  | (nullable) |
+| components[].resourceId | string (uuid) |  | A fixed component, and the exception rather than the rule. (nullable) |
+| components[].quantity | integer | yes | (default 1) |
+| components[].mandatory | boolean |  | (default True) |
+| components[].requiredQualifications | array of string |  |  |
+| components[].requiredAttributes | object |  |  |
+| components[].substituteResourceIds | array of string (uuid) |  |  |
+| components[].scopePath | string |  |  |
+| allocationPriority | integer |  | (default 0) |
+| effectiveFrom | string (date) |  | (nullable) |
+| effectiveTo | string (date) |  | (nullable) |
+| minimumMinutes | integer |  | (nullable) |
+| maximumMinutes | integer |  | (nullable) |
+| requiresApproval | boolean |  | (default False) |
+| internalCost | Money |  | On the wire this is three fields; in the database it is one column. |
+| internalCost.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| internalCost.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| internalCost.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| scopePath | string |  |  |
+
+**Response**: `ResourcePackage`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  |  |
+| code | string | yes |  |
+| name | string | yes |  |
+| description | string |  | (nullable) |
+| applicableVenueIds | array of string (uuid) |  |  |
+| components | array of ResourceRequirement |  |  |
+| components[].id | string (uuid) |  |  |
+| components[].resourceTypeId | string (uuid) |  | (nullable) |
+| components[].categoryId | string (uuid) |  | (nullable) |
+| components[].resourceId | string (uuid) |  | A fixed component, and the exception rather than the rule. (nullable) |
+| components[].quantity | integer | yes | (default 1) |
+| components[].mandatory | boolean |  | (default True) |
+| components[].requiredQualifications | array of string |  |  |
+| components[].requiredAttributes | object |  |  |
+| components[].substituteResourceIds | array of string (uuid) |  |  |
+| components[].scopePath | string |  |  |
+| allocationPriority | integer |  | (default 0) |
+| effectiveFrom | string (date) |  | (nullable) |
+| effectiveTo | string (date) |  | (nullable) |
+| minimumMinutes | integer |  | (nullable) |
+| maximumMinutes | integer |  | (nullable) |
+| requiresApproval | boolean |  | (default False) |
+| internalCost | Money |  | On the wire this is three fields; in the database it is one column. |
+| internalCost.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| internalCost.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| internalCost.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| scopePath | string |  |  |
 
 **Responses**
 
@@ -2786,7 +3194,7 @@ The stop list from departure to arrival and the street map beside it (decided 29
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | - |
+| Reads | `transport.route`, `transport.route_stop`, `transport.station` |
 | Writes | - |
 | Called by | GST-077, WEB-049 |
 
@@ -3041,6 +3449,7 @@ The From and To station menus (decided 29 September, rev 3 REV3-21). A guest or 
 Verifies the transfer, reads dimensions and duration, generates derivatives, and registers the asset.
 Files are scanned before becoming available. An asset that fails scanning is quarantined, not published — a tenant uploading a compromised file must not have it served to guests.
 **Scanning and derivatives run after this call returns** (`states/media.yaml`). The 201 carries the asset in `processing`; the job moves it to `ready`, `quarantined` or `failed`. A failed scan is therefore an asset in `quarantined`, not a refusal here — a client reads `status` rather than assuming the file is servable.
+**The same job writes the asset's `assets.media_fingerprint` row** (perceptual hash and embedding, stamped with the model version) once the file passes scanning, so `findSimilarMediaAssets` sees a new asset without anyone asking for it (decided 29 September, writers pass; DM4). A quarantined file gets no fingerprint.
 
 |  |  |
 |---|---|
@@ -3050,8 +3459,8 @@ Files are scanned before becoming available. An asset that fails scanning is qua
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `assets.media_asset`, `cache:idempotency` |
-| Writes | `assets.media_asset`, `cache:idempotency` |
+| Reads | `assets.media_asset`, `assets.media_upload`, `cache:idempotency` |
+| Writes | `assets.media_asset`, `assets.media_fingerprint`, `cache:idempotency` |
 | Called by | BO-1189, BO-955, CMS-002, CMS-010, CMS-063 |
 | State model | Media asset ([states/media.yaml](../../../states/media.yaml)): created as `processing` |
 
@@ -3103,6 +3512,7 @@ Files are scanned before becoming available. An asset that fails scanning is qua
 | customMetadata | object |  | BL-178. (nullable) |
 | sharedWithTenantIds | array of string (uuid) |  | BL-178. |
 | tags | array of string |  |  |
+| categoryId | string (uuid) |  | The asset's category, one of MediaTaxonomy.categories[].id; null while unclassified. (nullable) |
 | venueId | string (uuid) |  | (nullable) |
 | url | string |  | Signed and expiring for private assets; stable CDN URL for public ones. |
 | thumbnailUrl | string |  | (nullable) |
@@ -3561,7 +3971,7 @@ A venue with no published bookable map is an empty `maps` list, not a 404.
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Guest callable | True |
-| Reads | - |
+| Reads | `venuemap.map`, `venuemap.map_version`, `venuemap.placed_resource` |
 | Writes | - |
 | Called by | GST-074, WEB-047 |
 
@@ -3863,6 +4273,22 @@ A guest who waits forty minutes for a fifteen-minute estimate deserves a system 
 
 Every table this service owns that the slice reads or writes, with its columns as derived into `backend/tenant/*.sql`.
 
+### `assets.asset_version`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| asset_id | uuid | no |  |
+| version | integer | no |  |
+| file_name | text | no |  |
+| size_bytes | integer | no |  |
+| checksum | text | no |  |
+| created_by | uuid | no |  |
+| created_at | timestamptz | no |  |
+| note | text | no |  |
+| is_current | boolean | no |  |
+| scope_path | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
 ### `assets.media_asset`
 
 | Column | Type | Required | Notes |
@@ -3882,6 +4308,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | custom_metadata | jsonb | no | BL-178. |
 | shared_with_tenant_ids | text[] | no | BL-178. |
 | tags | text[] | no |  |
+| category_id | uuid | no | The asset's category, one of MediaTaxonomy.categories[].id; null while unclassified. |
 | venue_id | uuid | no |  |
 | url | text | no | Signed and expiring for private assets; stable CDN URL for public ones. |
 | thumbnail_url | text | no |  |
@@ -3903,6 +4330,18 @@ Every table this service owns that the slice reads or writes, with its columns a
 | parent_collection_id | uuid | no |  |
 | asset_count | integer | yes |  |
 | cover_asset_id | uuid | no |  |
+
+### `assets.media_fingerprint`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| media_asset_id | uuid | yes | One fingerprint per asset. |
+| perceptual_hash | text | no |  |
+| embedding | text[] | no |  |
+| model_version | text | yes | Only fingerprints of the same model version are compared. |
+| computed_at | timestamptz | yes |  |
+| scope_path | text | no | The partition key (ADR-0005), written at venue scope. |
 
 ### `assets.media_upload`
 
@@ -4157,6 +4596,19 @@ Every table this service owns that the slice reads or writes, with its columns a
 | status | text | no |  |
 | is_active | boolean | no |  |
 
+### `resources.resource_block`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| resource_id | uuid | yes |  |
+| valid_from | timestamptz | yes |  |
+| valid_to | timestamptz | yes |  |
+| reason | text | yes |  |
+| note | text | no |  |
+| created_by | uuid | no |  |
+| scope_path | text | no |  |
+
 ### `resources.resource_hold`
 
 | Column | Type | Required | Notes |
@@ -4176,6 +4628,67 @@ Every table this service owns that the slice reads or writes, with its columns a
 | created_at | timestamptz | yes |  |
 | expires_at | timestamptz | yes |  |
 | scope_path | text | no | The partition key (ADR-0005), written at venue scope. |
+
+### `resources.resource_package`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| code | text | yes |  |
+| name | text | yes |  |
+| description | text | no |  |
+| applicable_venue_ids | text[] | no |  |
+| allocation_priority | integer | no |  |
+| effective_from | date | no |  |
+| effective_to | date | no |  |
+| minimum_minutes | integer | no |  |
+| maximum_minutes | integer | no |  |
+| requires_approval | boolean | no |  |
+| internal_cost | numeric(18,4) | no |  |
+| scope_path | text | no |  |
+
+### `resources.resource_requirement`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| resource_type_id | uuid | no |  |
+| category_id | uuid | no |  |
+| resource_id | uuid | no | A fixed component, and the exception rather than the rule. |
+| quantity | integer | yes |  |
+| is_mandatory | boolean | no |  |
+| required_qualifications | text[] | no |  |
+| required_attributes | jsonb | no |  |
+| substitute_resource_ids | text[] | no |  |
+| scope_path | text | no |  |
+
+### `resources.resource_schedule`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| resource_id | uuid | no |  |
+| availability_mode | text | no |  |
+| slot_minutes | integer | no | How finely this resource's time can be cut, which is a property of the resource and not of the product sold against it. |
+| minimum_booking_minutes | integer | no |  |
+| maximum_booking_minutes | integer | no |  |
+| advance_booking_days | integer | no |  |
+| scope_path | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
+### `transport.departure`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | jsonb | yes |  |
+| route_id | jsonb | yes |  |
+| timetable_id | jsonb | yes |  |
+| performance_id | uuid | yes | The catalogue performance this departure is sold as. |
+| service_date | date | yes |  |
+| departs_at | timestamptz | yes | At the route's first stop. |
+| status | text | yes |  |
+| seat_capacity | integer | yes |  |
+| vehicle_resource_id | uuid | no |  |
+| note | text | no |  |
 
 ### `transport.fare_matrix_cell`
 
@@ -4227,6 +4740,25 @@ Every table this service owns that the slice reads or writes, with its columns a
 | label | text | no |  |
 | created_at | timestamptz | yes |  |
 
+### `transport.pass_type`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| venue_id | uuid | yes |  |
+| code | text | yes |  |
+| name | jsonb | yes |  |
+| description | jsonb | no |  |
+| kind | text | yes |  |
+| trips | integer | no | Journeys included. |
+| fare_multiplier | numeric | yes | The pass price as a multiple of the single adult fare between its two stations. |
+| reference_trips | integer | yes | The single trips the saving is measured against — trips for a multi-trip card, an number the venue sets for unlimited (14 a week, 60 a month in the demo seed data). |
+| validity_days | integer | yes |  |
+| route_ids | text[] | no | Routes it is sold on. |
+| sort_order | integer | no |  |
+| id | jsonb | yes |  |
+| is_active | boolean | yes |  |
+| catalogue_product_id | uuid | no | The catalogue openDated product this pass is sold as. |
+
 ### `transport.route`
 
 | Column | Type | Required | Notes |
@@ -4269,6 +4801,23 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | jsonb | yes |  |
 | is_active | boolean | yes |  |
 
+### `transport.timetable`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| name | text | yes |  |
+| valid_from | date | yes |  |
+| valid_to | date | no |  |
+| release_horizon_days | integer | no | How many days ahead departures go on sale. |
+| seat_capacity | integer | yes | Seats per departure, unless a departure overrides it. |
+| seat_map_id | uuid | no | The coach seat map for Seat Selection (seating). |
+| id | jsonb | yes |  |
+| route_id | jsonb | yes |  |
+| status | text | yes |  |
+| published_at | timestamptz | no |  |
+| released_through | date | no | The last date whose departures have been generated. |
+| superseded_by_id | text | no |  |
+
 ### `venuemap.import_job`
 
 | Column | Type | Required | Notes |
@@ -4304,6 +4853,18 @@ Every table this service owns that the slice reads or writes, with its columns a
 | tile_set_ref | text | no | Where a base image is large enough to need zoom levels. |
 | bounds_geo_json | text | no |  |
 | graph_status | text | no | Whether every public point can actually be reached. |
+
+### `venuemap.map_version`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| map_id | uuid | yes |  |
+| version | integer | yes | One more than the version before it. |
+| published_at | timestamptz | yes |  |
+| published_by_principal_id | uuid | yes |  |
+| note | text | no | The note sent to publishVenueMap. |
+| snapshot | jsonb | yes | The points and paths as they were published, stored as one document. |
 
 ### `venuemap.path`
 
@@ -4358,7 +4919,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-214 operations, added to this service in later releases without changing any of the above.
+212 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -4368,7 +4929,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | entry | `callNextParties`, `listMyWaitingGuests`, `overrideWaitingGuest`, `redeemWaitingGuest` |
 | feed | `listQueueFeeds`, `submitQueueReading`, `testQueueFeed` |
 | game | `cloneGame`, `createGame`, `listGames`, `updateGame` |
-| games | `authoriseGameplay`, `cloneReaderConfiguration`, `createGameEntitlement`, `deployReaderConfiguration`, `getGameEligibility`, `getGamePricing`, `getGameplaySyncStatus`, `getGameplayValidationRules`, `listAttractionTypes`, `listGameEntitlements`, `listGameplayTransactions`, `listReaders`, `setAttractionType`, `setGameCardExpiryRules`, `setGameCardLifecycle`, `setGameKioskConfiguration`, `setGameOperationalConfiguration`, `setGamePricing`, `setGameplayValidationRules`, `setPrizeCost`, `setReaderConfiguration`, `setReaderProfile`, `setRedemptionRules`, `simulateGameplayAuthorisation`, `testReader`, `validateGameConfiguration` |
+| games | `authoriseGameplay`, `cloneReaderConfiguration`, `createGameEntitlement`, `deployReaderConfiguration`, `getGameEligibility`, `getGamePricing`, `getGameplaySyncStatus`, `getGameplayValidationRules`, `listAttractionTypes`, `listGameEntitlements`, `listGameplayTransactions`, `listReaders`, `reportReaderQueue`, `setAttractionType`, `setGameCardExpiryRules`, `setGameCardLifecycle`, `setGameKioskConfiguration`, `setGameOperationalConfiguration`, `setGamePricing`, `setGameplayValidationRules`, `setPrizeCost`, `setReaderConfiguration`, `setReaderProfile`, `setRedemptionRules`, `simulateGameplayAuthorisation`, `testReader`, `validateGameConfiguration` |
 | incident | `getIncident`, `listIncidents`, `recordAuthorityNotification`, `reportIncident`, `updateIncident` |
 | inspection | `createInspectionTemplate`, `listInspectionTemplates`, `listInspections`, `submitInspection` |
 | maintenance | `acceptWorkOrder`, `attachWorkOrderEvidence`, `closeWorkOrder`, `pauseWorkOrder`, `rejectWorkOrder`, `resumeWorkOrder`, `startWorkOrder` |
@@ -4379,7 +4940,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | prize | `createPrize`, `listPrizes`, `lookupPrize`, `redeemPrize` |
 | queue | `setQueueStatus` |
 | rental | `assessRentalDamage`, `assignRentalEquipment`, `checkOutRental`, `createRentalAgreement`, `createRentalBlackout`, `createRentalBooking`, `createRentalCategory`, `createRentalPricingProfile`, `createRentalProduct`, `explainRentalPrice`, `extendRental`, `getRentalAgreement`, `getRentalAvailability`, `getRentalBooking`, `getRentalProduct`, `importRentalCatalogue`, `listOverdueRentals`, `listRentalAgreements`, `listRentalBookings`, `listRentalCategories`, `listRentalPricingProfiles`, `listRentalProducts`, `publishRentalProduct`, `quoteRentalPrice`, `recordRentalInspection`, `reportRentalIncident`, `requestRentalCommercialOverride`, `returnRental`, `setRentalAgreementRequirements`, `setRentalAvailabilityRules`, `setRentalDepositPolicy`, `setRentalDurationRules`, `setRentalFeePolicy`, `setRentalInventoryModel`, `setRentalOperationalRules`, `setRentalProductLocations`, `signRentalAgreement`, `simulateRentalPricing`, `swapRentalEquipment`, `updateRentalBooking`, `updateRentalPricingProfile`, `updateRentalProduct`, `validateRentalProduct` |
-| resources | `allocateResources`, `bookResource`, `cancelResourceBooking`, `checkInResource`, `checkOutResource`, `cloneResource`, `createResourceAttribute`, `createResourceBlock`, `createResourceCategory`, `createResourcePackage`, `createResourceType`, `getExperienceResourceRequirements`, `getPerformanceManifest`, `getResource`, `getResourceAllocationPolicy`, `getResourceAuditTrail`, `getResourceCalendar`, `getResourceCostAnalytics`, `getResourceDependencies`, `getResourceHierarchy`, `getResourceQualifications`, `getResourceSchedule`, `getResourceUtilisation`, `listResourceAttributes`, `listResourceBlocks`, `listResourceBookings`, `listResourceCategories`, `listResourcePackages`, `listResourceTypes`, `listResources`, `raiseResourceRequest`, `releaseResourceBlock`, `reorderPerformanceManifest`, `replaceResourceAllocation`, `setExperienceResourceRequirements`, `setResourceAllocationPolicy`, `setResourceBookingProgress`, `setResourceDependencies`, `setResourceHierarchy`, `setResourceLifecycleState`, `setResourceQualifications`, `setResourceSchedule`, `setResourceSelectionPolicy`, `setResourceVenueAssignment`, `suggestResources`, `updateResourceBooking`, `updateResourceCategory`, `updateResourcePackage`, `updateResourceType` |
+| resources | `allocateResources`, `bookResource`, `cancelResourceBooking`, `checkInResource`, `checkOutResource`, `cloneResource`, `createResourceAttribute`, `createResourceCategory`, `createResourceCost`, `createResourceType`, `deleteResourceCost`, `getExperienceResourceRequirements`, `getPerformanceManifest`, `getResource`, `getResourceAllocationPolicy`, `getResourceAuditTrail`, `getResourceCalendar`, `getResourceCostAnalytics`, `getResourceDependencies`, `getResourceHierarchy`, `getResourceQualifications`, `getResourceSchedule`, `getResourceUtilisation`, `listResourceAttributes`, `listResourceBlocks`, `listResourceBookings`, `listResourceCategories`, `listResourceCosts`, `listResourcePackages`, `listResourceTypes`, `listResources`, `raiseResourceRequest`, `reorderPerformanceManifest`, `replaceResourceAllocation`, `setResourceAllocationPolicy`, `setResourceBookingProgress`, `setResourceDependencies`, `setResourceHierarchy`, `setResourceLifecycleState`, `setResourceQualifications`, `setResourceSelectionPolicy`, `setResourceVenueAssignment`, `suggestResources`, `updateResourceBooking`, `updateResourceCategory`, `updateResourceType` |
 | route | `setTransportRouteStatus` |
 | signage | `getSignageQueueBoard`, `getSignageQueueCalls` |
 | station | `createTransportStation`, `updateTransportStation` |

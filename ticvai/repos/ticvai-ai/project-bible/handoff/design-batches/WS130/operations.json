@@ -1,0 +1,101 @@
+{
+ "createRotaAssignment": {
+  "method": "POST",
+  "path": "/rota-assignments",
+  "contract": "workforce",
+  "summary": "Put someone on the rota",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RotaAssignment",
+  "responds": "RotaAssignment"
+ },
+ "getEventResourcePlan": {
+  "method": "GET",
+  "path": "/events/{eventId}/resource-plan",
+  "contract": "catalogue",
+  "summary": "Everything an event needs, and whether it has been secured",
+  "permission": "EVENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "EventResourcePlan"
+ },
+ "getStaffingCoverage": {
+  "method": "GET",
+  "path": "/staffing-coverage",
+  "contract": "workforce",
+  "summary": "Where the rota is short, and by how much",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "StaffingCoverage"
+ },
+ "setEventResourcePlan": {
+  "method": "PUT",
+  "path": "/events/{eventId}/resource-plan",
+  "contract": "catalogue",
+  "summary": "State what the event needs, by role and by kind",
+  "permission": "EVENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EventResourcePlan",
+  "responds": "EventResourcePlan"
+ },
+ "setShiftTemplate": {
+  "method": "PUT",
+  "path": "/shift-templates",
+  "contract": "workforce",
+  "summary": "Define a shift pattern, its breaks and its qualifications",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ShiftTemplate",
+  "responds": "ShiftTemplate"
+ }
+}

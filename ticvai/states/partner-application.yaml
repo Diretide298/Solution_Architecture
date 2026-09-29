@@ -1,0 +1,84 @@
+# Partner application — state model
+# Contract: subscription.PartnerApplication.status
+# Checked by tools/check-states.py. Added 29 September (writers pass; data model DM4).
+
+entity: Partner application
+contract: subscription
+enum: PartnerApplication.status
+enumKind: inline
+enumSchema: PartnerApplication
+enumProperty: status
+owner: subscription
+initial:
+- submitted
+terminal:
+- approved
+- rejected
+- withdrawn
+transitions:
+- from: submitted
+  to: inReview
+  operation: actOnPartnerApplicationReview
+  trigger: operation
+  guard: '`action: startReview`: the stage leaves `application` and the review tasks open; the partner moves
+    `applicant` -> `underReview` in the same call (states/partner.yaml) (decided 29 September, writers pass;
+    DM4)'
+- from: inReview
+  to: moreInformationRequested
+  operation: actOnPartnerApplicationReview
+  trigger: operation
+  guard: '`action: requestInformation`, with a `note` saying what is missing. The stage does not move back (decided
+    29 September, writers pass; DM4)'
+- from: moreInformationRequested
+  to: inReview
+  operation: actOnPartnerApplicationReview
+  trigger: operation
+  guard: '`action: supplyInformation` by the applicant; the review task resumes (decided 29 September, writers pass;
+    DM4)'
+- from: inReview
+  to: approved
+  operation: decideApprovalRequest
+  trigger: operation
+  requiresApproval: true
+  guard: '**Approved at the last level of the onboarding request.** `registerPartner` raises the `approvals.request`;
+    whether to trade with a company is a commercial decision, so the approval is the approvals engine and not this
+    row. The partner moves `underReview` -> `approved`'
+- from: inReview
+  to: rejected
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Refused in the approvals engine. The partner is archived (`approvePartnerStatuLifecycle`, action `archive`)
+    and kept for the duplicate check
+- from: submitted
+  to: withdrawn
+  operation: actOnPartnerApplicationReview
+  trigger: operation
+  guard: '`action: withdraw` before review; the partner is archived with it (decided 29 September, writers pass;
+    DM4)'
+- from: inReview
+  to: withdrawn
+  operation: actOnPartnerApplicationReview
+  trigger: operation
+  guard: '`action: withdraw` during review; open review tasks close and the partner is archived (decided 29
+    September, writers pass; DM4)'
+- from: moreInformationRequested
+  to: withdrawn
+  operation: actOnPartnerApplicationReview
+  trigger: operation
+  guard: '`action: withdraw`: the applicant never supplies what was asked, or staff withdraw it on their behalf
+    (decided 29 September, writers pass; DM4)'
+notes: '**The application is not the partner** (decided 29 September, writers pass). `PartnerAccountStatus` (states/partner.yaml)
+  says whether the company may trade; this says where its request to trade stands. `registerPartner` creates both,
+  the partner `applicant` and the application `submitted`; `stage` says which departmental review it is in and is
+  not a state.
+
+
+
+  **`approved` ends the application.** What follows (agreement, rates, credit, access) is the partner''s `configuration`
+  state, not more application. A refused or withdrawn application is never reopened: a company that applies again
+  is a new application against the same partner record.
+
+
+  **Writers (decided 29 September, writers pass; DM4).** registerPartner creates the row; actOnPartnerApplicationReview
+  moves it through review; the approval is decided in approvals (decideApprovalRequest), whose outcome writes
+  the application and the partner.'

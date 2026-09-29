@@ -1,0 +1,245 @@
+{
+ "CreditType": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.credit_type",
+  "description": "Board 1.6. **What value sits inside a wallet** — the second vocabulary, and the one the acceptance condition requires to be a table.\n",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "category": {
+    "type": "string",
+    "enum": [
+     "cash",
+     "refund",
+     "bonus",
+     "promotional",
+     "giftCard",
+     "membership",
+     "loyalty",
+     "ride",
+     "attraction",
+     "redemption",
+     "fnb",
+     "retail",
+     "parking",
+     "event",
+     "other"
+    ]
+   },
+   "monetary": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Loyalty points are not money.** A non-monetary credit has a conversion rate to money or it cannot be spent, and treating points as currency puts them on the balance sheet.\n"
+   },
+   "conversionRate": {
+    "type": "number",
+    "nullable": true
+   },
+   "refundable": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Promotional credit is not refundable and cash credit is.** A venue that refunds promotional credit to a card has converted marketing spend into cash.\n"
+   },
+   "transferable": {
+    "type": "boolean",
+    "default": false
+   },
+   "expires": {
+    "type": "boolean",
+    "default": false
+   },
+   "validityDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "breakageEligible": {
+    "type": "boolean",
+    "default": false
+   },
+   "ledgerAccountCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "priority": {
+    "type": "integer",
+    "default": 0
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "PerformanceTemplate": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.performance_template",
+  "description": "Event board 8. **An activity venue sells time, not seats.** Each slot the template produces is a Performance. Formerly `SessionTemplate` on `catalogue.session_template`: a session is a Performance (decided 28 September, audit R165).",
+  "required": [
+   "code"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "spaceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "slotMinutes": {
+    "type": "integer"
+   },
+   "turnaroundMinutes": {
+    "type": "integer",
+    "default": 0
+   },
+   "concurrentCapacity": {
+    "type": "integer"
+   },
+   "bands": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "offPeak",
+        "standard",
+        "peak",
+        "superPrime"
+       ]
+      },
+      "daysOfWeek": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "from": {
+       "type": "string"
+      },
+      "to": {
+       "type": "string"
+      },
+      "priceMultiplier": {
+       "type": "number",
+       "nullable": true
+      },
+      "minuteMultiplier": {
+       "type": "number",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "walkIn": {
+    "type": "object",
+    "description": "**Configured, not assumed.** It decides whether a family turning up on a Sunday is turned away.\n",
+    "properties": {
+     "allowed": {
+      "type": "boolean",
+      "default": true
+     },
+     "heldBackPercent": {
+      "type": "integer",
+      "default": 0
+     },
+     "cutoffMinutesBefore": {
+      "type": "integer",
+      "nullable": true
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "PrepaidMinutePackage": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.prepaid_minutes",
+  "description": "Event board 8.2. **Minutes are a `wallet` credit type; this is the product that sells them.**\n",
+  "required": [
+   "code",
+   "minutes"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "minutes": {
+    "type": "integer"
+   },
+   "price": {
+    "x-ticvai-column": "list_price",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "creditTypeId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The `wallet` credit type the minutes are issued into."
+   },
+   "roundingMinutes": {
+    "type": "integer",
+    "default": 1
+   },
+   "minimumDrawMinutes": {
+    "type": "integer",
+    "default": 0
+   },
+   "bandMultipliersApply": {
+    "type": "boolean",
+    "default": true,
+    "description": "**An hour at prime time drawing ninety minutes is a legitimate mechanic**, and a system that can only deduct elapsed time cannot express it.\n"
+   },
+   "validityMonths": {
+    "type": "integer",
+    "nullable": true
+   },
+   "transferableWithinHousehold": {
+    "type": "boolean",
+    "default": false
+   },
+   "applicableSpaceIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ }
+}

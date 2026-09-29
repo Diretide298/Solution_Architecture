@@ -1,6 +1,6 @@
 # WS76 — Digital Asset Management DAM board 3
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 10 operations · 14 schemas · 6 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `ASSET_LIBRARY_APPROVE, ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_SHARE, ASSET_LIBRARY_VIEW, PERMISSION_MANAGE, PERMISSION_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `CMS-081` | DAM Governance & Rights Command Center | listDetail | 0 | 0 | — |
-| `CMS-082` | Asset Ownership & Responsibility Management | listDetail | 0 | 0 | — |
-| `CMS-083` | Rights, License & Usage Policy Management | listDetail | 0 | 0 | — |
-| `CMS-084` | Asset Approval Workflow Management | approvalInbox | 0 | 1 | — |
-| `CMS-085` | Publication Eligibility & Governance Validation | listDetail | 0 | 0 | — |
-| `CMS-086` | Role-Based Asset Access & Permission Management | listDetail | 0 | 0 | — |
-| `CMS-087` | Secure Internal & External Sharing | listDetail | 0 | 1 | — |
-| `CMS-088` | Rights Expiry, Renewal & Usage Impact | listDetail | 0 | 0 | — |
-| `CMS-089` | Governance Audit Trail & Compliance Evidence | configEditor | 0 | 0 | — |
-| `CMS-090` | Governance Risk, Compliance & AI Recommendations | listDetail | 0 | 0 | — |
+| `CMS-081` | DAM Governance & Rights Command Center | listDetail | 2 | 0 | — |
+| `CMS-082` | Asset Ownership & Responsibility Management | listDetail | 2 | 0 | — |
+| `CMS-083` | Rights, License & Usage Policy Management | listDetail | 1 | 0 | — |
+| `CMS-084` | Asset Approval Workflow Management | approvalInbox | 1 | 1 | — |
+| `CMS-085` | Publication Eligibility & Governance Validation | listDetail | 1 | 0 | — |
+| `CMS-086` | Role-Based Asset Access & Permission Management | listDetail | 2 | 0 | — |
+| `CMS-087` | Secure Internal & External Sharing | listDetail | 1 | 1 | — |
+| `CMS-088` | Rights Expiry, Renewal & Usage Impact | listDetail | 2 | 0 | — |
+| `CMS-089` | Governance Audit Trail & Compliance Evidence | configEditor | 1 | 0 | — |
+| `CMS-090` | Governance Risk, Compliance & AI Recommendations | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 

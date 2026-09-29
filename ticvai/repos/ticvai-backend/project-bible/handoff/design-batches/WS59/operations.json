@@ -8,9 +8,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "virtualTicketId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "mediaType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "credentialReference",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CredentialIdentityTokenReferenceMappingView"
+  "responds": "Page"
  },
  "listEntitlementCrossMedia": {
   "method": "GET",
@@ -63,6 +89,19 @@
   "parameters": [],
   "requestBody": null,
   "responds": "MediaTypeCredentialTechnologyRegistryView"
+ },
+ "listMediaTypeTechnology": {
+  "method": "GET",
+  "path": "/media-type-technology",
+  "contract": "access",
+  "summary": "Media Type & Technology Library",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MediaTypeTechnologyLibraryView"
  },
  "listMultiMediaBinding": {
   "method": "GET",
@@ -126,23 +165,74 @@
     "name": "mediaType",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ticketType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "numberOfMedia",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "validity",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "usageStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "VirtualTicketCommandCenterView"
+  "responds": "Page"
  },
  "listVirtualTicketArchitecture": {
   "method": "GET",
   "path": "/virtual-ticket-architecture",
   "contract": "access",
   "summary": "Virtual Ticket Architecture Testing, Governance & Audit",
-  "permission": "SCOPE_VIEW",
+  "permission": "AUDIT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "changeType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "VirtualTicketArchitectureTestingGovernanceAuditView"
+  "responds": "Page"
  },
  "listVirtualTicketStatus": {
   "method": "GET",
@@ -157,6 +247,25 @@
   "requestBody": null,
   "responds": "VirtualTicketStatusLifecycleModelView"
  },
+ "setMediaReplacementRevocation": {
+  "method": "PUT",
+  "path": "/media-replacement-revocation",
+  "contract": "access",
+  "summary": "Save a media replacement rule",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MediaReplacementRevocationRebindingRulesInput",
+  "responds": "MediaReplacementRevocationRebindingRulesView"
+ },
  "setVirtualTicketIdentity": {
   "method": "PUT",
   "path": "/virtual-ticket-identity",
@@ -166,7 +275,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "VirtualTicketIdentityMasterRecordConfigurationInput",
   "responds": "VirtualTicketIdentityMasterRecordConfigurationView"
  }

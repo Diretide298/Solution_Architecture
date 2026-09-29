@@ -1,0 +1,111 @@
+# Access device health — state model
+# Contract: access.AccessAccessDevice.status
+# Checked by tools/check-states.py.
+
+entity: AccessDeviceHealth
+contract: access
+enum: AccessAccessDevice.status
+enumKind: inline
+enumSchema: AccessAccessDevice
+enumProperty: status
+owner: access
+description: The reported health of one access-control device, such as a turnstile, reader, handheld,
+  podium unit or BLE beacon (declared 29 September, writers pass). **Health as reported by the device or
+  vendor; TICVAI does not detect it.** Every move is the heartbeat ingest job recording the latest
+  report, so no operation appears here. Provisioning (`provisioningStage`) and whether the device is
+  configured on (`isActive`) are separate fields and are not modelled here.
+initial:
+- healthy
+- active
+- degraded
+- offline
+- localMode
+terminal: []
+transitions:
+- from: active
+  to: healthy
+  trigger: job
+  guard: The heartbeat reports every component (scanner, controller, camera) healthy
+- from: active
+  to: degraded
+  trigger: job
+  guard: The heartbeat reports a component degraded
+- from: active
+  to: offline
+  trigger: job
+  guard: The device or vendor reports it offline, or the heartbeat monitor records a missed heartbeat
+- from: active
+  to: localMode
+  trigger: job
+  guard: The device reports it is validating locally with its link to the platform down
+- from: healthy
+  to: active
+  trigger: job
+  guard: The heartbeat reports the device in service without component health
+- from: healthy
+  to: degraded
+  trigger: job
+  guard: The heartbeat reports a component degraded
+- from: healthy
+  to: offline
+  trigger: job
+  guard: Reported offline, or heartbeat missed
+- from: healthy
+  to: localMode
+  trigger: job
+  guard: Reported validating locally
+- from: degraded
+  to: healthy
+  trigger: job
+  guard: The heartbeat reports every component healthy again
+- from: degraded
+  to: active
+  trigger: job
+  guard: The heartbeat reports the device in service without component health
+- from: degraded
+  to: offline
+  trigger: job
+  guard: Reported offline, or heartbeat missed
+- from: degraded
+  to: localMode
+  trigger: job
+  guard: Reported validating locally
+- from: offline
+  to: healthy
+  trigger: job
+  guard: A heartbeat arrived reporting every component healthy
+- from: offline
+  to: active
+  trigger: job
+  guard: A heartbeat arrived reporting the device in service
+- from: offline
+  to: degraded
+  trigger: job
+  guard: A heartbeat arrived reporting a component degraded
+- from: offline
+  to: localMode
+  trigger: job
+  guard: The device reconnected and reports it ran in local mode while unreachable
+- from: localMode
+  to: healthy
+  trigger: job
+  guard: The link to the platform is back and every component is healthy; queued local decisions sync
+- from: localMode
+  to: active
+  trigger: job
+  guard: The link is back and the device reports in service
+- from: localMode
+  to: degraded
+  trigger: job
+  guard: The link is back with a component degraded
+- from: localMode
+  to: offline
+  trigger: job
+  guard: The device stopped reporting altogether
+openQuestions:
+- '`active` and `healthy` are both in the enum and the contract does not say how they differ. Modelled
+  as "in service, no component health reported" versus "every component reported healthy"; confirm with
+  the vendor adapters.'
+notes: '**No terminal state, by design** (`terminal: []`): health is a reading, not a lifecycle, and any
+  reading can follow any other. `status` is null until the first report, so every value is a possible
+  first state. A decommissioned device is recorded by `lifecycleStatus` and `isActive`, not here.'

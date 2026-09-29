@@ -1,5 +1,5 @@
 id: LLD-accreditation
-title: accreditation — 29 operations
+title: accreditation — 30 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -16,8 +16,13 @@ operations:
   offline: false
   reads:
   - accreditation.application
+  - accreditation.holder
+  - accreditation.identity_conflict
+  - cache:idempotency
   writes:
   - accreditation.application
+  - accreditation.identity_conflict
+  - cache:idempotency
 - operation: createAccreditationProgramme
   verb: POST
   path: /accreditation-programmes
@@ -72,8 +77,17 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - accreditation.access_profile
+  - accreditation.holder
+  - accreditation.identity_conflict
+  - accreditation.programme
+  - cache:idempotency
+  writes:
+  - accreditation.holder
+  - accreditation.holder_access
+  - accreditation.identity_conflict
+  - cache:idempotency
 - operation: issueAccreditationCredential
   verb: POST
   path: /accreditation-credentials
@@ -105,7 +119,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - accreditation.access_profile
+  - accreditation.credential
+  - accreditation.holder
   writes: []
 - operation: listAccreditationApplications
   verb: GET
@@ -159,7 +176,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - accreditation.holder
+  - accreditation.holder_access
+  - accreditation.identity_conflict
   writes: []
 - operation: listAccreditationProgrammes
   verb: GET
@@ -216,6 +236,28 @@ operations:
   reads:
   - accreditation.credential
   writes: []
+- operation: resolveIdentityConflict
+  verb: POST
+  path: /accreditation-identity-conflicts/{conflictId}/resolve
+  scope: venue
+  permission: ACCREDITATION_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.credential
+  - accreditation.holder
+  - accreditation.holder_access
+  - accreditation.identity_conflict
+  - cache:idempotency
+  writes:
+  - accreditation.application
+  - accreditation.credential
+  - accreditation.document
+  - accreditation.holder
+  - accreditation.holder_access
+  - accreditation.identity_conflict
+  - cache:idempotency
 - operation: setAccessProfile
   verb: PUT
   path: /accreditation-access-profiles

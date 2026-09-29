@@ -1,5 +1,5 @@
 id: LLD-reporting
-title: reporting — 44 operations
+title: reporting — 47 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -139,8 +139,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - reporting.dashboard
+  - reporting.dashboard_tile
+  writes:
+  - cache:idempotency
+  - reporting.dashboard
 - operation: deleteReport
   verb: DELETE
   path: /reports/{reportId}
@@ -192,7 +197,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - access.scan_event
+  - reporting.kpi_definition
+  - reporting.kpi_target
+  - reporting.semantic_model
+  - reporting.site_normalisation_basis
   writes: []
 - operation: getAnalyticsUsage
   verb: GET
@@ -202,7 +212,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - reporting.dashboard
+  - reporting.dashboard_tile
+  - reporting.dashboard_view
+  - reporting.execution
+  - reporting.report_definition
   writes: []
 - operation: getCommandCentre
   verb: GET
@@ -463,6 +478,31 @@ operations:
   reads:
   - reporting.report_definition
   writes: []
+- operation: listSiteNormalisationBases
+  verb: GET
+  path: /site-normalisation-bases
+  scope: tenant
+  permission: REPORT_VIEW_TENANT
+  audience:
+  - staff
+  offline: false
+  reads:
+  - reporting.site_normalisation_basis
+  writes: []
+- operation: recordDashboardView
+  verb: POST
+  path: /dashboards/{dashboardId}/views
+  scope: venue
+  permission: REPORT_VIEW_VENUE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - reporting.dashboard
+  writes:
+  - cache:idempotency
+  - reporting.dashboard_view
 - operation: runReport
   verb: POST
   path: /reports/{reportId}/run
@@ -543,6 +583,20 @@ operations:
   - reporting.semantic_model
   writes:
   - reporting.semantic_model
+- operation: setSiteNormalisationBasis
+  verb: PUT
+  path: /site-normalisation-bases
+  scope: venue
+  permission: REPORT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - reporting.site_normalisation_basis
+  writes:
+  - cache:idempotency
+  - reporting.site_normalisation_basis
 - operation: updateDashboard
   verb: PUT
   path: /dashboards/{dashboardId}

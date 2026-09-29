@@ -1894,9 +1894,86 @@ paths:
                 $ref: '#/components/schemas/Prize'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+  /readers/{readerId}/offline-queue:
+    parameters:
+    - name: readerId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: reportReaderQueue
+      x-ticvai-audience:
+      - device
+      x-ticvai-agreed: '29 September: writers pass; board 8.8 (pending count, value and oldest play per
+        reader); data model DM6 open item on games.reader_sync_status; shape follows syncGamePlays
+        (device audience, service or API-key auth)'
+      summary: A reader reports the plays it is still holding
+      description: '**The writer of `games.reader_sync_status`** (decided 29 September, writers pass). A
+        reader sends this on reconnect and on every heartbeat while it holds plays authorised offline:
+        how many, their total value and when the oldest was taken. **PUT semantics: the row for the
+        reader is replaced whole**, stamped `reportedAt` from the server clock; a report with
+        `pendingTransactions` 0 clears the queue (`pendingValue` zero, `oldestPendingAt` null).
+        `syncGamePlays` only stamps `lastSyncAt` on the same row, so the two never overwrite each other''s
+        fields. `getGameplaySyncStatus` reads it; a reader whose last report is older than its heartbeat
+        interval shows as `unreachable` there.
+
+        An unknown `readerId`, or one outside the calling device''s venue, is `404`.
+
+        '
+      tags:
+      - games
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - apiKeyAuth: []
+      - serviceAuth: []
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - pendingTransactions
+              properties:
+                pendingTransactions:
+                  type: integer
+                  minimum: 0
+                pendingValue:
+                  $ref: ../shared/common.yaml#/components/schemas/Money
+                oldestPendingAt:
+                  type: string
+                  format: date-time
+                  nullable: true
+                  description: Required when `pendingTransactions` is above 0.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReaderOfflineQueue'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '422':
+          description: '`oldestPendingAt` missing while `pendingTransactions` is above 0.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
 
 components:
   schemas:
+
     GameConfigurationHealth:
       x-ticvai-persistence: none — computed
       type: object
@@ -2455,6 +2532,9 @@ components:
       description: 'Board 5. **Priority is explicit**, because evaluation order is not a decision
         anybody made.
 
+        `groupPricing`, `peakPricing` and `calendarExceptions` are stored one row per entry in
+        `games.pricing_exception` (`GamePricingException`); the rest of this shape is `games.pricing`.
+
         '
       properties:
         gameId:
@@ -2517,6 +2597,66 @@ components:
             - vip
             - retry
             - standard
+        scopePath:
+          type: string
+    GamePricingException:
+      type: object
+      x-ticvai-persistence: games.pricing_exception
+      description: 'Board 5 (BO-436 group, BO-437 peak, BO-438 calendar). **One group, peak or calendar-exception price rule for a
+        game**, one row per entry of `GamePricing.groupPricing`, `peakPricing` and
+        `calendarExceptions`. Written by `setGamePricing`; read by `getGamePricing` and
+        `getGameEligibility` to resolve the effective price in `GamePricing.priority` order (data model,
+        29 September).
+
+        '
+      required:
+      - gameId
+      - kind
+      - scopePath
+      properties:
+        id:
+          type: string
+          format: uuid
+        gameId:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - group
+          - peak
+          - calendarException
+        minimumPlayers:
+          type: integer
+          nullable: true
+          minimum: 2
+          description: '`group` only.'
+        daysOfWeek:
+          type: array
+          nullable: true
+          items:
+            type: string
+          description: '`peak` only.'
+        fromTime:
+          type: string
+          nullable: true
+          description: '`peak` only. Local time, `HH:mm`.'
+        toTime:
+          type: string
+          nullable: true
+          description: '`peak` only. Local time, `HH:mm`.'
+        date:
+          type: string
+          format: date
+          nullable: true
+          description: '`calendarException` only.'
+        price:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+          description: Price per play; per player for `group`. Absent when `closed`.
+        closed:
+          type: boolean
+          default: false
+          description: '`calendarException` only: the game does not run that day.'
         scopePath:
           type: string
     GamePriceResolution:
@@ -2747,6 +2887,46 @@ components:
           - offline
           - degraded
           - unreachable
+    ReaderOfflineQueue:
+      type: object
+      x-ticvai-persistence: games.reader_sync_status
+      description: 'Board 8.8. **What a reader says it is still holding.** One row per reader, replaced
+        each time the reader reports its offline queue: the plays it authorised offline and has not
+        yet sent. Read by `getGameplaySyncStatus` (with `games.reader_deployment` for the edge package);
+        `syncGamePlays` updates `lastSyncAt` (data model, 29 September).
+
+        '
+      required:
+      - readerId
+      - pendingTransactions
+      - reportedAt
+      - scopePath
+      properties:
+        id:
+          type: string
+          format: uuid
+        readerId:
+          type: string
+          format: uuid
+          x-ticvai-unique: tenant
+        pendingTransactions:
+          type: integer
+          minimum: 0
+        pendingValue:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        oldestPendingAt:
+          type: string
+          format: date-time
+          nullable: true
+        lastSyncAt:
+          type: string
+          format: date-time
+          nullable: true
+        reportedAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
     GameEligibility:
       type: object
       description: 'Board 10.7 — *"What Can I Play?"*, and every fact in it lives somewhere different.'

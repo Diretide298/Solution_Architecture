@@ -206,8 +206,8 @@ screens:
       carries:
       - entitlementId
       - orderId
-      provenance: derived — GST-013 declares entryState.params entitlementId, orderId and GST-001 holds
-        entitlementId, orderId, so an edge into it carries them
+      provenance: derived — GST-013 declares entryState.params credentialId, entitlementId, orderId and
+        GST-001 holds entitlementId, orderId, so an edge into it carries them
     - to: GST-014
       trigger: Ticket Transfer
       carries:
@@ -351,8 +351,8 @@ screens:
       carries:
       - entitlementId
       - orderId
-      provenance: derived — GST-055 declares entryState.params entitlementId, orderId and GST-001 holds
-        entitlementId, orderId, so an edge into it carries them
+      provenance: derived — GST-055 declares entryState.params credentialId, entitlementId, orderId and
+        GST-001 holds entitlementId, orderId, so an edge into it carries them
     - to: GST-056
       trigger: Bundle Package
       provenance: derived — GST-056 declares entryState.params bundleId and GST-001 holds none of them,
@@ -2966,6 +2966,7 @@ screens:
       trigger: The QR rotates as they walk to the gate
       provenance: flow F50 step 5→6
       carries:
+      - credentialId
       - entitlementId
       - orderId
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
@@ -3042,6 +3043,12 @@ screens:
         label: Transfer order tickets
         operation: transferOrderTickets
         provenance: contract orders.yaml POST /orders/{orderId}/transfer
+      - kind: secondaryButton
+        label: Bind credential device
+        operation: bindCredentialDevice
+        notes: '**The guest app binds a mobile credential to the phone it is shown on** (P02 GST-055 Dynamic
+          QR Ticket), before the dynamic QR is displayed.'
+        provenance: contract access.yaml POST /my/credentials/{credentialId}/device-bindings
   states:
     loading: Availability is live, never cached
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
@@ -3070,12 +3077,23 @@ screens:
     contract: orders
     purpose: Transfer tickets to another guest
     trigger: onAction
+  - operationId: bindCredentialDevice
+    contract: access
+    purpose: Bind my credential to this device
+    trigger: onAction
+    invalidates:
+    - getEntitlement
+    - getEntitlementCredential
+    - getEntitlementHistory
   entryState:
     params:
     - name: entitlementId
       from: deepLink
     - name: orderId
       from: deepLink
+    - name: credentialId
+      from: navigation
+      optional: true
     coldEntry: '**A ticket link opened after the event.** Shows the entitlement with its status — expired,
       used, transferred — because *not found* to somebody holding a ticket is the wrong answer. **A guest
       opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or
@@ -3111,6 +3129,25 @@ screens:
       - recipient
       - message
     provenance: client-verified
+  - id: formBindCredentialDevice
+    component: modal
+    trigger: Bind credential device
+    body: '**Collects what `bindCredentialDevice` sends before it is called.** Required: `deviceId`. Optional:
+      `deviceReference`, `appInstallationId`, `os`, `otp`. Dismissing sends nothing; the screen behind
+      is unchanged.'
+    bindsTo: CredentialDeviceBindingInput
+    confirm:
+      label: Bind credential device
+      operation: bindCredentialDevice
+    dismiss:
+      label: Cancel
+      discards:
+      - deviceId
+      - deviceReference
+      - appInstallationId
+      - os
+      - otp
+    provenance: contract access.yaml POST /my/credentials/{credentialId}/device-bindings
 - id: GST-014
   name: Ticket Transfer
   module: Ticketing
@@ -10814,6 +10851,12 @@ screens:
         label: Transfer order tickets
         operation: transferOrderTickets
         provenance: contract orders.yaml POST /orders/{orderId}/transfer
+      - kind: secondaryButton
+        label: Bind credential device
+        operation: bindCredentialDevice
+        notes: '**The guest app binds a mobile credential to the phone it is shown on** (P02 GST-055 Dynamic
+          QR Ticket), before the dynamic QR is displayed.'
+        provenance: contract access.yaml POST /my/credentials/{credentialId}/device-bindings
     - name: contentBody
       slot: carried
       components:
@@ -10910,12 +10953,21 @@ screens:
     contract: orders
     purpose: Transfer tickets to another guest
     trigger: onAction
+  - operationId: bindCredentialDevice
+    contract: access
+    purpose: Bind my credential to this device
+    trigger: onAction
+    invalidates:
+    - listMyEntitlements
   entryState:
     params:
     - name: orderId
       from: deepLink
     - name: entitlementId
       from: navigation
+    - name: credentialId
+      from: navigation
+      optional: true
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
   wireframe:
@@ -10933,6 +10985,26 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formBindCredentialDevice
+    component: modal
+    trigger: Bind credential device
+    body: '**Collects what `bindCredentialDevice` sends before it is called.** Required: `deviceId`. Optional:
+      `deviceReference`, `appInstallationId`, `os`, `otp`. Dismissing sends nothing; the screen behind
+      is unchanged.'
+    bindsTo: CredentialDeviceBindingInput
+    confirm:
+      label: Bind credential device
+      operation: bindCredentialDevice
+    dismiss:
+      label: Cancel
+      discards:
+      - deviceId
+      - deviceReference
+      - appInstallationId
+      - os
+      - otp
+    provenance: contract access.yaml POST /my/credentials/{credentialId}/device-bindings
 - id: GST-056
   name: Bundle Package
   module: Booking & Selection

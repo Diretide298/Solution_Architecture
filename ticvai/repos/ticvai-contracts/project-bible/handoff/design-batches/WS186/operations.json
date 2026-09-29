@@ -1,0 +1,217 @@
+{
+ "createCreditType": {
+  "method": "POST",
+  "path": "/credit-types",
+  "contract": "wallet",
+  "summary": "Define a kind of credit, without a release",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreditType",
+  "responds": "CreditType"
+ },
+ "createWalletType": {
+  "method": "POST",
+  "path": "/wallet-types",
+  "contract": "wallet",
+  "summary": "Define a kind of wallet",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletType",
+  "responds": "WalletType"
+ },
+ "getWallet": {
+  "method": "GET",
+  "path": "/wallets/{subjectId}",
+  "contract": "wallet",
+  "summary": "Read a guest wallet",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Wallet"
+ },
+ "getWalletLiability": {
+  "method": "GET",
+  "path": "/wallet-liability",
+  "contract": "wallet",
+  "summary": "What is outstanding, and what is breakage",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "asOf",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletLiabilityRow"
+ },
+ "linkWalletCredential": {
+  "method": "POST",
+  "path": "/wallet-credentials",
+  "contract": "wallet",
+  "summary": "Bind a wristband, card or device to a wallet",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": true,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletCredential",
+  "responds": "WalletCredential"
+ },
+ "listCreditTypes": {
+  "method": "GET",
+  "path": "/credit-types",
+  "contract": "wallet",
+  "summary": "The kinds of value that may sit in a wallet",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CreditType"
+ },
+ "listSharedWallets": {
+  "method": "GET",
+  "path": "/shared-wallets",
+  "contract": "wallet",
+  "summary": "Family, household and corporate structures",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SharedWallet"
+ },
+ "listWalletTypes": {
+  "method": "GET",
+  "path": "/wallet-types",
+  "contract": "wallet",
+  "summary": "The kinds of wallet that may exist — who owns one",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WalletType"
+ },
+ "publishWalletConfiguration": {
+  "method": "POST",
+  "path": "/wallet-configuration/publish",
+  "contract": "wallet",
+  "summary": "Validate and publish the wallet configuration as a version",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletConfigurationVersion"
+ },
+ "setSharedWalletMembers": {
+  "method": "PUT",
+  "path": "/shared-wallets/{sharedWalletId}/members",
+  "contract": "wallet",
+  "summary": "Allowances, budgets and what each member may spend on",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SharedWalletMember"
+ },
+ "updateCreditType": {
+  "method": "PUT",
+  "path": "/credit-types/{creditTypeId}",
+  "contract": "wallet",
+  "summary": "Change a kind of credit",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreditType",
+  "responds": "CreditType"
+ },
+ "updateWalletType": {
+  "method": "PUT",
+  "path": "/wallet-types/{walletTypeId}",
+  "contract": "wallet",
+  "summary": "Change a kind of wallet",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletType",
+  "responds": "WalletType"
+ }
+}

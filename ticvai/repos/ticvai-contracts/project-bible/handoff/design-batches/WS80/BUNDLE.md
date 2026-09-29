@@ -1,6 +1,6 @@
 # WS80 — Game and Ride board 3
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 12 operations · 7 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `PRODUCT_CONFIGURE, PRODUCT_VIEW, WALLET_CONFIGURE, WALLET_OPERATE, WALLET_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-414` | Wallet & Credit Management Dashboard | commandCentre | 0 | 0 | — |
-| `BO-415` | Wallet & Credit Type Configuration | configEditor | 0 | 0 | — |
-| `BO-416` | Wallet Account & Balance View | listDetail | 0 | 0 | — |
-| `BO-417` | Top-Up Configuration | listDetail | 0 | 0 | — |
-| `BO-418` | Top-Up Bonus Rule Configuration | listDetail | 0 | 0 | — |
-| `BO-419` | Bonus Usage Restrictions | listDetail | 0 | 0 | — |
-| `BO-420` | Bonus Validity & Expiry Configuration | listDetail | 0 | 0 | — |
-| `BO-421` | Free Game & Ride Credit Management | configEditor | 0 | 0 | — |
-| `BO-422` | Refund, Adjustment & Manual Bonus Control | listDetail | 0 | 0 | — |
-| `BO-423` | Wallet Credit Transaction Ledger & Audit | listDetail | 0 | 0 | — |
+| `BO-414` | Wallet & Credit Management Dashboard | commandCentre | 2 | 0 | — |
+| `BO-415` | Wallet & Credit Type Configuration | configEditor | 2 | 0 | — |
+| `BO-416` | Wallet Account & Balance View | listDetail | 4 | 0 | — |
+| `BO-417` | Top-Up Configuration | listDetail | 1 | 0 | — |
+| `BO-418` | Top-Up Bonus Rule Configuration | listDetail | 1 | 0 | — |
+| `BO-419` | Bonus Usage Restrictions | listDetail | 1 | 0 | — |
+| `BO-420` | Bonus Validity & Expiry Configuration | listDetail | 1 | 0 | — |
+| `BO-421` | Free Game & Ride Credit Management | configEditor | 2 | 0 | — |
+| `BO-422` | Refund, Adjustment & Manual Bonus Control | listDetail | 1 | 0 | — |
+| `BO-423` | Wallet Credit Transaction Ledger & Audit | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -133,7 +132,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-416",
      "trigger": "Wallet Account & Balance View",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026"
+     "provenance": "structural — pack board 3 wiring, 11 September 2026",
+     "carries": [
+      "subjectId"
+     ]
     },
     {
      "to": "BO-417",
@@ -163,12 +165,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-422",
      "trigger": "Refund, Adjustment & Manual Bonus Control",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026"
+     "provenance": "structural — pack board 3 wiring, 11 September 2026",
+     "carries": [
+      "subjectId"
+     ]
     },
     {
      "to": "BO-423",
      "trigger": "Wallet Credit Transaction Ledger & Audit",
-     "provenance": "structural — pack board 3 wiring, 11 September 2026"
+     "provenance": "structural — pack board 3 wiring, 11 September 2026",
+     "carries": [
+      "subjectId"
+     ]
     }
    ]
   },
@@ -299,12 +307,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the wallet credit are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getWallet",
+    "contract": "wallet",
+    "purpose": "The game credit balance",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listWalletTransactions",
+    "contract": "wallet",
+    "purpose": "Recent movement",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-414"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-414",
+   "workshopBoard": "wireframes/WS60 Game and Ride Board 3.dc.html#bo-414"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 23. 0 of 7 labels bound to a contract property; 15 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -362,6 +394,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
+  "notes": "**Superseded by `BO-1088` Credit & Balance Type Configuration** from `Wallet_Configuration_Backend_Structure_v1.0.pdf`, 19 September 2026. This screen came from `Game_and_Ride_Module.pdf`, which describes the wallet incidentally; the wallet pack is the workshop dedicated to it and is backed by the 27 August MoM and matrix 4.3.28-4.3.35. It has zero components, so nothing rendered is lost. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "density": "compact",
   "purposeNote": "Administrators can define and maintain distinct wallet value types with controlled usage behavior. Redemption-credit accumulation and prize redemption will be configured in detail under Board 6, rather than duplicated here.",
   "pattern": "configEditor",
@@ -435,10 +468,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listCreditTypes",
+    "contract": "wallet",
+    "purpose": "The credit type library",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createCreditType",
+    "contract": "wallet",
+    "purpose": "Define one",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-415"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-415",
+   "workshopBoard": "wireframes/WS60 Game and Ride Board 3.dc.html#bo-415"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 24. 0 of 0 labels bound to a contract property; 10 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -494,7 +543,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-414",
      "trigger": "Back to Wallet & Credit Management Dashboard",
      "provenance": "structural — pack board 3 wiring, 11 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "subjectId"
+     ]
     }
    ]
   },
@@ -504,11 +556,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Allow authorized operators to inspect all value held in an individual guest wallet. The source requires stored credits to be viewable through operator and self-service kiosks.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: View Transactions, Add Credit — permission controlled, Add Bonus — permission controlled, View Entitlements, Block Wallet. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Game_and_Ride_Module.pdf, page 25 §Actions"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -553,6 +600,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Game_and_Ride_Module.pdf, page 25 §Actions"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -563,12 +614,63 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the wallet account balance are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getWallet",
+    "contract": "wallet",
+    "purpose": "Account and balance",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listCreditLots",
+    "contract": "wallet",
+    "purpose": "The lots behind it",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "adjustWallet",
+    "contract": "wallet",
+    "purpose": "Add credit or bonus to the wallet (permission controlled)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Add Credit — permission controlled, Add Bonus — permission controlled; Block Wallet",
+    "invalidates": [
+     "getWallet",
+     "listCreditLots"
+    ]
+   },
+   {
+    "operationId": "suspendWallet",
+    "contract": "wallet",
+    "purpose": "Block the wallet",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Add Credit — permission controlled, Add Bonus — permission controlled; Block Wallet",
+    "invalidates": [
+     "getWallet",
+     "listCreditLots"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-416"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-416",
+   "workshopBoard": "wireframes/WS60 Game and Ride Board 3.dc.html#bo-416"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 25. 0 of 0 labels bound to a contract property; 5 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 25. 0 of 0 labels bound to a contract property; 5 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Add Credit — permission controlled, Add Bonus — permission controlled: `adjustWallet`; Block Wallet: `suspendWallet`; View Transactions, View Entitlements dropped (navigation).",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "navigation"
+    },
+    {
+     "name": "walletId",
+     "from": "navigation"
+    }
+   ],
+   "coldEntry": "Opened from BO-414 with the wallet picked there. Opened cold (a bookmark or a refresh), it shows the list to pick from rather than an empty record, and says plainly if the wallet no longer exists."
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -626,6 +728,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
+  "notes": "**Superseded by `BO-1095` Top-Up Rule Configuration** from `Wallet_Configuration_Backend_Structure_v1.0.pdf`, 19 September 2026. This screen came from `Game_and_Ride_Module.pdf`, which describes the wallet incidentally; the wallet pack is the workshop dedicated to it and is backed by the 27 August MoM and matrix 4.3.28-4.3.35. It has zero components, so nothing rendered is lost. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "density": "compact",
   "purposeNote": "Administrators can define permitted wallet top-up values and their applicable channels/effective periods.",
   "pattern": "listDetail",
@@ -645,7 +748,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setWalletFundingRules",
+       "label": "Save wallet funding rules",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setWalletFundingRules"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The top-up list.",
@@ -654,10 +777,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the top-up are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setWalletFundingRules",
+    "contract": "wallet",
+    "purpose": "Top-up rules",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-417"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-417",
+   "workshopBoard": "wireframes/WS60 Game and Ride Board 3.dc.html#bo-417"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 26. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -717,6 +849,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
+  "notes": "**Superseded by `BO-1105` Credit Issuance Rule Configuration** from `Wallet_Configuration_Backend_Structure_v1.0.pdf`, 19 September 2026. This screen came from `Game_and_Ride_Module.pdf`, which describes the wallet incidentally; the wallet pack is the workshop dedicated to it and is backed by the 27 August MoM and matrix 4.3.28-4.3.35. It has zero components, so nothing rendered is lost. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "density": "compact",
   "purposeNote": "The system automatically calculates and allocates the correct bonus based on the configured top-up rule.",
   "pattern": "listDetail",
@@ -736,7 +869,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setWalletFundingRules",
+       "label": "Save wallet funding rules",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setWalletFundingRules"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The top-up bonus rule list.",
@@ -745,10 +898,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the top-up bonus rule are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setWalletFundingRules",
+    "contract": "wallet",
+    "purpose": "Top-up bonus rules",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-418"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-418",
+   "workshopBoard": "wireframes/WS60 Game and Ride Board 3.dc.html#bo-418"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 27. 0 of 0 labels bound to a contract property; 0 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -827,7 +989,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setCreditEligibilityRules",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setCreditEligibilityRules"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The bonus usage restrictions list.",
@@ -836,12 +1018,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the bonus usage restrictions are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setCreditEligibilityRules",
+    "contract": "wallet",
+    "purpose": "Bonus usage restrictions",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-419"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-419",
+   "workshopBoard": "wireframes/WS60 Game and Ride Board 3.dc.html#bo-419"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 27. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "creditTypeId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -899,6 +1098,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
+  "notes": "**Superseded by `BO-1108` Expiry & Validity Policy Configuration** from `Wallet_Configuration_Backend_Structure_v1.0.pdf`, 19 September 2026. This screen came from `Game_and_Ride_Module.pdf`, which describes the wallet incidentally; the wallet pack is the workshop dedicated to it and is backed by the 27 August MoM and matrix 4.3.28-4.3.35. It has zero components, so nothing rendered is lost. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "density": "compact",
   "purposeNote": "Every bonus allocation follows the configured validity rule and becomes unusable after expiry.",
   "pattern": "listDetail",
@@ -918,7 +1118,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateCreditType",
+       "label": "Save credit type",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateCreditType"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The bonus validity expiry list.",
@@ -927,12 +1147,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the bonus validity expiry are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "updateCreditType",
+    "contract": "wallet",
+    "purpose": "Bonus validity and expiry",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-420"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-420",
+   "workshopBoard": "wireframes/WS60 Game and Ride Board 3.dc.html#bo-420"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 28. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "creditTypeId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1053,10 +1290,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listGameEntitlements",
+    "contract": "games",
+    "purpose": "Free game and ride credit",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createGameEntitlement",
+    "contract": "games",
+    "purpose": "Grant free play",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listGameEntitlements"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-421"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-421",
+   "workshopBoard": "wireframes/WS60 Game and Ride Board 3.dc.html#bo-421"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 29. 0 of 0 labels bound to a contract property; 8 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1112,7 +1368,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-414",
      "trigger": "Back to Wallet & Credit Management Dashboard",
      "provenance": "structural — pack board 3 wiring, 11 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "subjectId"
+     ]
     }
    ]
   },
@@ -1135,7 +1394,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "adjustWallet",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "adjustWallet"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The refund adjustment manual list.",
@@ -1144,12 +1422,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the refund adjustment manual are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "adjustWallet",
+    "contract": "wallet",
+    "purpose": "Refund, adjust or grant bonus",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-422"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-422",
+   "workshopBoard": "wireframes/WS60 Game and Ride Board 3.dc.html#bo-422"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 30. 0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1203,7 +1498,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-414",
      "trigger": "Back to Wallet & Credit Management Dashboard",
      "provenance": "structural — pack board 3 wiring, 11 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "subjectId"
+     ]
     }
    ]
   },
@@ -1226,7 +1524,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listWalletTransactions",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The wallet credit transaction list.",
@@ -1235,12 +1545,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the wallet credit transaction are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listWalletTransactions",
+    "contract": "wallet",
+    "purpose": "The credit ledger",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-423"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-423",
+   "workshopBoard": "wireframes/WS60 Game and Ride Board 3.dc.html#bo-423"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 30. 0 of 0 labels bound to a contract property; 0 of 66 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1272,7 +1599,228 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
-{}
+{
+ "adjustWallet": {
+  "method": "POST",
+  "path": "/wallets/{subjectId}/adjust",
+  "contract": "wallet",
+  "summary": "Manually adjust a wallet balance",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Wallet"
+ },
+ "createCreditType": {
+  "method": "POST",
+  "path": "/credit-types",
+  "contract": "wallet",
+  "summary": "Define a kind of credit, without a release",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreditType",
+  "responds": "CreditType"
+ },
+ "createGameEntitlement": {
+  "method": "POST",
+  "path": "/game-entitlements",
+  "contract": "games",
+  "summary": "Define a pass, package or per-game entitlement",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GameEntitlement",
+  "responds": "GameEntitlement"
+ },
+ "getWallet": {
+  "method": "GET",
+  "path": "/wallets/{subjectId}",
+  "contract": "wallet",
+  "summary": "Read a guest wallet",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Wallet"
+ },
+ "listCreditLots": {
+  "method": "GET",
+  "path": "/credit-lots",
+  "contract": "wallet",
+  "summary": "The tranches behind a balance, with their expiry",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "walletId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "includeExhausted",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CreditLot"
+ },
+ "listCreditTypes": {
+  "method": "GET",
+  "path": "/credit-types",
+  "contract": "wallet",
+  "summary": "The kinds of value that may sit in a wallet",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CreditType"
+ },
+ "listGameEntitlements": {
+  "method": "GET",
+  "path": "/game-entitlements",
+  "contract": "games",
+  "summary": "Passes, packages and per-game entitlements",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GameEntitlement"
+ },
+ "listWalletTransactions": {
+  "method": "GET",
+  "path": "/wallets/{subjectId}/transactions",
+  "contract": "wallet",
+  "summary": "Wallet transaction history",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "setCreditEligibilityRules": {
+  "method": "PUT",
+  "path": "/credit-types/{creditTypeId}/eligibility",
+  "contract": "wallet",
+  "summary": "Where this credit may be spent, and on what",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreditEligibility",
+  "responds": "CreditEligibility"
+ },
+ "setWalletFundingRules": {
+  "method": "PUT",
+  "path": "/wallet-funding-rules",
+  "contract": "wallet",
+  "summary": "Amounts, channels, bonuses, limits and velocity",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletFundingRules",
+  "responds": "WalletFundingRules"
+ },
+ "suspendWallet": {
+  "method": "POST",
+  "path": "/wallets/{walletId}/suspend",
+  "contract": "wallet",
+  "summary": "Freeze a wallet",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Wallet"
+ },
+ "updateCreditType": {
+  "method": "PUT",
+  "path": "/credit-types/{creditTypeId}",
+  "contract": "wallet",
+  "summary": "Change a kind of credit",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreditType",
+  "responds": "CreditType"
+ }
+}
 ```
 
 ## `schemas.json`
@@ -1280,5 +1828,597 @@ Method, path, parameters, request and response for every operation these screens
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
-{}
+{
+ "CreditEligibility": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.credit_eligibility",
+  "description": "Board 3.4. **Where credit may be spent** — acceptance, not funding.",
+  "properties": {
+   "creditTypeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "allowedVenueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "allowedOutletKinds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "allowedProductCategoryIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "excludedProductIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "allowedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "minimumSpend": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "maximumPercentOfBasket": {
+    "type": "number",
+    "nullable": true,
+    "description": "**Caps how much of a purchase one credit type may cover.** A venue that lets promotional credit pay for everything has run a free day it did not intend.\n"
+   },
+   "validDaysOfWeek": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "CreditLot": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.credit_lot",
+  "description": "Board 3.7. **The tranche behind a balance.** Expiry belongs here, not on the wallet.",
+  "required": [
+   "id",
+   "walletId",
+   "creditTypeId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "walletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "creditTypeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "issuedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "remainingAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "sourceKind": {
+    "type": "string",
+    "enum": [
+     "topUp",
+     "refund",
+     "promotion",
+     "giftCard",
+     "membershipBenefit",
+     "loyaltyConversion",
+     "transfer",
+     "adjustment"
+    ]
+   },
+   "sourceReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "termsSnapshot": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "**The credit type's terms as they stood at issue.** Changing a credit type must not retro-expire credit already given, so the lot carries its own terms.\n**Open on purpose, and its shape lives in `CreditType`**: the snapshot is that credit type's properties copied at issue, so it follows `CreditType` as it stood then rather than as it stands now.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "exhausted",
+     "expired",
+     "forfeited",
+     "reversed"
+    ]
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "CreditType": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.credit_type",
+  "description": "Board 1.6. **What value sits inside a wallet** — the second vocabulary, and the one the acceptance condition requires to be a table.\n",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "category": {
+    "type": "string",
+    "enum": [
+     "cash",
+     "refund",
+     "bonus",
+     "promotional",
+     "giftCard",
+     "membership",
+     "loyalty",
+     "ride",
+     "attraction",
+     "redemption",
+     "fnb",
+     "retail",
+     "parking",
+     "event",
+     "other"
+    ]
+   },
+   "monetary": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Loyalty points are not money.** A non-monetary credit has a conversion rate to money or it cannot be spent, and treating points as currency puts them on the balance sheet.\n"
+   },
+   "conversionRate": {
+    "type": "number",
+    "nullable": true
+   },
+   "refundable": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Promotional credit is not refundable and cash credit is.** A venue that refunds promotional credit to a card has converted marketing spend into cash.\n"
+   },
+   "transferable": {
+    "type": "boolean",
+    "default": false
+   },
+   "expires": {
+    "type": "boolean",
+    "default": false
+   },
+   "validityDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "breakageEligible": {
+    "type": "boolean",
+    "default": false
+   },
+   "ledgerAccountCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "priority": {
+    "type": "integer",
+    "default": 0
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "GameEntitlement": {
+  "type": "object",
+  "x-ticvai-persistence": "games.entitlement",
+  "description": "Board 4. **A right to play, not money** — consumed before money is.",
+  "required": [
+   "code",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "allGamesPass",
+     "unlimitedSingleGame",
+     "limitedSingleGame",
+     "package",
+     "freePlay"
+    ]
+   },
+   "gameIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "attractionTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "playCount": {
+    "type": "integer",
+    "nullable": true,
+    "description": "For `limitedSingleGame` and `package`. Null means unlimited."
+   },
+   "validityKind": {
+    "type": "string",
+    "enum": [
+     "sameDay",
+     "days",
+     "untilDate",
+     "untilUsed"
+    ]
+   },
+   "validityDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "activationKind": {
+    "type": "string",
+    "enum": [
+     "onPurchase",
+     "onFirstUse",
+     "onDate"
+    ],
+    "default": "onFirstUse",
+    "description": "**On first use is what a guest expects from a day pass bought the night before.** On purchase is what a venue defaults to by accident, and it costs them a day.\n"
+   },
+   "dailyPlayCap": {
+    "type": "integer",
+    "nullable": true
+   },
+   "cooldownMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**Unlimited does not mean continuous.** A cooldown is how one child does not hold a popular ride all afternoon.\n"
+   },
+   "linkedProductId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Wallet": {
+  "x-ticvai-persistence": "wallet.wallet + wallet.credit_lot",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "balance",
+   "currency",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "balance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "credits": {
+    "type": "array",
+    "description": "4.3.5 and 4.3.19. **One balance and one bonus balance with one expiry could not express what the requirement asks for** — cash, bonus and redemption credit, each with its own expiry.\n**The expiries are the reason this is a list.** Cash a guest paid for should outlive a promotional credit they were given, and a single `expiresAt` either expires the money they paid or never expires the promotion.\n**Consumed first-expiry-first-out across all three** (4.3.19), which is also the order that is fairest to the guest — spend what is about to die before what is not.\n**One entry per `active` lot in `wallet.credit_lot`** for this wallet: `amount` is the lot's `remaining_amount`, `expiresAt` its `expires_at`, `sourceRef` its `source_reference`. `kind` and `isRefundable` are not stored on the lot; they come from the lot's credit type (`listCreditLots` returns the lots themselves).\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "amount"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "cash",
+        "bonus",
+        "redemption",
+        "refund",
+        "goodwill"
+       ],
+       "description": "**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability.\n",
+       "x-ticvai-persisted": false
+      },
+      "amount": {
+       "x-ticvai-column": "remaining_amount",
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "expiresAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "sourceRef": {
+       "type": "string",
+       "nullable": true,
+       "x-ticvai-column": "source_reference"
+      },
+      "isRefundable": {
+       "type": "boolean",
+       "default": false,
+       "x-ticvai-persisted": false,
+       "description": "**True only for `cash`.** A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice.\n"
+      }
+     }
+    }
+   },
+   "bonusBalance": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Promotional value. Typically non-refundable and spent first."
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "suspended",
+     "closed"
+    ]
+   },
+   "homeCellName": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where the authoritative balance lives. Present when the guest is linked across cells.\n"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastActivityAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "WalletFundingRules": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.funding_rules",
+  "description": "Board 2, which is the 27 August minute one screen for one.",
+  "properties": {
+   "walletTypeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "minimumTopUp": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "maximumTopUp": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "presetAmounts": {
+    "type": "array",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/Money"
+    }
+   },
+   "allowedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "allowedFundingSources": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "card",
+      "cash",
+      "bankTransfer",
+      "voucher",
+      "corporateAccount",
+      "loyaltyConversion"
+     ]
+    }
+   },
+   "bonusRules": {
+    "type": "array",
+    "description": "Board 2.3. *Top up 200, get 20.* **The bonus is a separate lot of a separate credit type**, which is how it can expire on different terms from the cash.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "minimumAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "bonusAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "bonusPercent": {
+       "type": "number",
+       "nullable": true
+      },
+      "bonusCreditTypeId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "validFrom": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      },
+      "validTo": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "autoReload": {
+    "type": "object",
+    "description": "Board 2.5, matrix 4.3.28. **Fires when the balance drops.**",
+    "properties": {
+     "enabled": {
+      "type": "boolean",
+      "default": false
+     },
+     "thresholdAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "reloadAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "maximumPerDay": {
+      "type": "integer",
+      "nullable": true
+     }
+    }
+   },
+   "recurringFunding": {
+    "type": "object",
+    "description": "Board 2.6, matrix 4.3.29 — ***\"distinct from auto-reload\"***. **Fires on a date**, which is what an allowance needs.\n",
+    "properties": {
+     "enabled": {
+      "type": "boolean",
+      "default": false
+     },
+     "cadence": {
+      "type": "string",
+      "enum": [
+       "daily",
+       "weekly",
+       "monthly"
+      ]
+     },
+     "amount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "dayOfWeek": {
+      "type": "string",
+      "nullable": true
+     },
+     "dayOfMonth": {
+      "type": "integer",
+      "nullable": true
+     }
+    }
+   },
+   "approvalAboveAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "velocityLimits": {
+    "type": "object",
+    "description": "**A fraud control, not a commercial one.** Ten top-ups of ninety-nine in an hour is a card being tested, and a daily cap in total value does not catch it.\n",
+    "properties": {
+     "maxTransactionsPerHour": {
+      "type": "integer",
+      "nullable": true
+     },
+     "maxTransactionsPerDay": {
+      "type": "integer",
+      "nullable": true
+     },
+     "maxAmountPerDay": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "maxAmountPerMonth": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ }
+}
 ```

@@ -1,0 +1,208 @@
+{
+ "assignSeats": {
+  "method": "POST",
+  "path": "/performances/{performanceId}/assign-seats",
+  "contract": "seating",
+  "summary": "Pick and hold the best available seats",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "createSeatHold": {
+  "method": "POST",
+  "path": "/seat-holds",
+  "contract": "seating",
+  "summary": "Hold specific seats",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateSeatHoldRequest",
+  "responds": "SeatHold"
+ },
+ "extendSeatHold": {
+  "method": "POST",
+  "path": "/seat-holds/{holdId}/extend",
+  "contract": "seating",
+  "summary": "Extend a hold",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatHold"
+ },
+ "getAccessibleSeating": {
+  "method": "GET",
+  "path": "/accessible-seating",
+  "contract": "seating",
+  "summary": "Accessible seats, their routes and who may buy them",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "seatMapId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessibleSeating"
+ },
+ "getSeatAvailability": {
+  "method": "GET",
+  "path": "/performances/{performanceId}/seat-availability",
+  "contract": "seating",
+  "summary": "Seat status for a performance",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "sectionCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "availableOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "mode",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatAvailability"
+ },
+ "getSeatHold": {
+  "method": "GET",
+  "path": "/seat-holds/{holdId}",
+  "contract": "seating",
+  "summary": "Read a hold",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SeatHold"
+ },
+ "getSeatingRules": {
+  "method": "GET",
+  "path": "/seat-maps/{seatMapId}/rules",
+  "contract": "seating",
+  "summary": "Read seating rules",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SeatingRules"
+ },
+ "listRealTimeAvailability": {
+  "method": "GET",
+  "path": "/real-time-availability",
+  "contract": "promotions",
+  "summary": "Real-Time Availability & Checkout Validation",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RealTimeAvailabilityCheckoutValidationView"
+ },
+ "recommendSeats": {
+  "method": "POST",
+  "path": "/performances/{performanceId}/seat-recommendations",
+  "contract": "seating",
+  "summary": "Recommend seats for a party",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SeatRecommendationRequest",
+  "responds": null
+ },
+ "relinquishSeatHold": {
+  "method": "DELETE",
+  "path": "/seat-holds/{holdId}",
+  "contract": "seating",
+  "summary": "Release a hold",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setSeatingRules": {
+  "method": "PUT",
+  "path": "/seat-maps/{seatMapId}/rules",
+  "contract": "seating",
+  "summary": "Set seating rules",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SeatingRules",
+  "responds": "SeatingRules"
+ }
+}

@@ -1,1 +1,517 @@
-{}
+{
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "MediaAsset": {
+  "x-ticvai-persistence": "assets.media_asset",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "status",
+   "filename",
+   "contentType",
+   "sizeBytes",
+   "referenceCount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MediaKind"
+   },
+   "status": {
+    "$ref": "#/components/schemas/MediaStatus"
+   },
+   "filename": {
+    "type": "string"
+   },
+   "contentType": {
+    "type": "string"
+   },
+   "sizeBytes": {
+    "type": "integer"
+   },
+   "title": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "description": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"
+   },
+   "altText": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "Required before use in a guest-facing surface. WCAG 2.2 AA."
+   },
+   "width": {
+    "type": "integer",
+    "nullable": true
+   },
+   "height": {
+    "type": "integer",
+    "nullable": true
+   },
+   "durationSeconds": {
+    "type": "number",
+    "nullable": true
+   },
+   "customMetadata": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": true,
+    "description": "BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"
+   },
+   "sharedWithTenantIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"
+   },
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "url": {
+    "type": "string",
+    "description": "Signed and expiring for private assets; stable CDN URL for public ones."
+   },
+   "thumbnailUrl": {
+    "type": "string",
+    "nullable": true
+   },
+   "referenceCount": {
+    "type": "integer",
+    "description": "How many surfaces reference this asset. Non-zero refuses deletion.\n"
+   },
+   "rights": {
+    "$ref": "#/components/schemas/MediaRights"
+   },
+   "isRightsExpired": {
+    "type": "boolean"
+   },
+   "version": {
+    "type": "integer"
+   },
+   "uploadedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "MediaAssetVersion": {
+  "type": "object",
+  "x-ticvai-persistence": "assets.asset_version",
+  "description": "Boards 2.6 and 2.7. **Usage impact belongs to the version read**, because replacing a logo is routine or an incident depending on where it appears.\n",
+  "properties": {
+   "assetId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "version": {
+    "type": "integer"
+   },
+   "fileName": {
+    "type": "string"
+   },
+   "sizeBytes": {
+    "type": "integer"
+   },
+   "checksum": {
+    "type": "string",
+    "nullable": true
+   },
+   "createdBy": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   },
+   "isCurrent": {
+    "type": "boolean"
+   },
+   "usageImpact": {
+    "type": "array",
+    "readOnly": true,
+    "items": {
+     "type": "object",
+     "properties": {
+      "surface": {
+       "type": "string",
+       "enum": [
+        "campaign",
+        "journey",
+        "ticketTemplate",
+        "screen",
+        "publishedPage",
+        "product",
+        "signage"
+       ]
+      },
+      "referenceId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "label": {
+       "type": "string"
+      },
+      "live": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "MediaKind": {
+  "type": "string",
+  "enum": [
+   "image",
+   "video",
+   "audio",
+   "document",
+   "vector",
+   "font",
+   "archive"
+  ]
+ },
+ "MediaRendition": {
+  "type": "object",
+  "x-ticvai-persistence": "assets.rendition",
+  "description": "Boards 2.8 and 2.9. **Readiness is the fact that matters**, not existence.",
+  "required": [
+   "preset"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "preset": {
+    "type": "string",
+    "description": "e.g. `thumbnail`, `web1600`, `printCmyk`, `hls720`."
+   },
+   "format": {
+    "type": "string",
+    "nullable": true
+   },
+   "width": {
+    "type": "integer",
+    "nullable": true
+   },
+   "height": {
+    "type": "integer",
+    "nullable": true
+   },
+   "sizeBytes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "queued",
+     "processing",
+     "ready",
+     "failed"
+    ]
+   },
+   "failureReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "url": {
+    "type": "string",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "MediaReplaceResult": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "asset",
+   "affectedSurfaces"
+  ],
+  "properties": {
+   "asset": {
+    "$ref": "#/components/schemas/MediaAsset"
+   },
+   "affectedSurfaces": {
+    "type": "integer",
+    "description": "How many surfaces now show the new file."
+   },
+   "liveSurfaces": {
+    "type": "integer",
+    "description": "Of those, how many are published to guests right now."
+   },
+   "derivativesRegenerating": {
+    "type": "boolean"
+   }
+  }
+ },
+ "MediaRights": {
+  "x-ticvai-persistence": "none — embedded in asset",
+  "type": "object",
+  "description": "Licensing terms. Tracked because an expired licence on a live surface is a legal exposure, not a housekeeping item.\n",
+  "properties": {
+   "licenceKind": {
+    "type": "string",
+    "enum": [
+     "owned",
+     "royaltyFree",
+     "rightsManaged",
+     "creativeCommons",
+     "editorialOnly",
+     "unknown"
+    ]
+   },
+   "licensor": {
+    "type": "string",
+    "nullable": true
+   },
+   "licenceReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "permittedUses": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "web",
+      "print",
+      "socialMedia",
+      "inVenue",
+      "advertising",
+      "internal"
+     ]
+    }
+   },
+   "attributionRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "attributionText": {
+    "type": "string",
+    "nullable": true
+   },
+   "permittedTerritories": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "ISO country or region codes. **Empty means unrestricted, which is a claim rather than an absence** — an unknown territory and a worldwide licence are not the same thing, and `licenceKind: unknown` is how the second is said.\n"
+   },
+   "permittedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Distribution channel codes, checked by `setMediaDistributionChannels`. Narrower than `permittedUses`, which describes the medium rather than the route.\n"
+   },
+   "modelReleaseHeld": {
+    "type": "boolean",
+    "default": false
+   },
+   "renewalOwner": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
+ "MediaSimilarity": {
+  "type": "object",
+  "description": "Boards 2.4 and 2.5. **Duplicate and related are one score at two thresholds.**",
+  "properties": {
+   "assetId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "similarity": {
+    "type": "number"
+   },
+   "relation": {
+    "type": "string",
+    "enum": [
+     "exactDuplicate",
+     "nearDuplicate",
+     "variant",
+     "related"
+    ]
+   },
+   "differingFields": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "MediaStatus": {
+  "type": "string",
+  "enum": [
+   "processing",
+   "ready",
+   "quarantined",
+   "failed",
+   "archived"
+  ]
+ },
+ "MediaTag": {
+  "type": "object",
+  "x-ticvai-persistence": "assets.tag",
+  "description": "Board 2.2. **A tag carries its origin and confidence**, so machine labels can be filtered without being deleted.\n",
+  "required": [
+   "value"
+  ],
+  "properties": {
+   "value": {
+    "type": "string"
+   },
+   "vocabulary": {
+    "type": "string",
+    "nullable": true
+   },
+   "source": {
+    "type": "string",
+    "enum": [
+     "human",
+     "autoTag",
+     "import",
+     "inherited"
+    ],
+    "default": "human"
+   },
+   "confidence": {
+    "type": "number",
+    "nullable": true
+   },
+   "accepted": {
+    "type": "boolean",
+    "default": true,
+    "description": "A proposed auto-tag below the promotion threshold sits here as false."
+   },
+   "addedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "addedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "MediaUsageRow": {
+  "type": "object",
+  "description": "Boards 1.10 and 4.9. **Assets never used is the number that justifies the library.**",
+  "properties": {
+   "key": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "assetCount": {
+    "type": "integer"
+   },
+   "storageBytes": {
+    "type": "integer"
+   },
+   "downloads": {
+    "type": "integer"
+   },
+   "views": {
+    "type": "integer"
+   },
+   "shares": {
+    "type": "integer"
+   },
+   "neverUsedCount": {
+    "type": "integer"
+   },
+   "unclassifiedCount": {
+    "type": "integer"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ }
+}

@@ -1,1 +1,189 @@
-{}
+{
+ "createRentalBlackout": {
+  "method": "POST",
+  "path": "/rental-blackouts",
+  "contract": "rental",
+  "summary": "Close a product, location or window",
+  "permission": "RENTAL_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalBlackout",
+  "responds": "RentalBlackout"
+ },
+ "getRentalAvailability": {
+  "method": "GET",
+  "path": "/rental-availability",
+  "contract": "rental",
+  "summary": "What can be rented, when, with turnaround already subtracted",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "quantity",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RentalAvailability"
+ },
+ "getResourceCalendar": {
+  "method": "GET",
+  "path": "/resource-calendar",
+  "contract": "resources",
+  "summary": "Every resource against time, with conflicts already marked",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "resourceTypeId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "granularity",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceCalendarRow"
+ },
+ "listRealTimeAvailability": {
+  "method": "GET",
+  "path": "/real-time-availability",
+  "contract": "promotions",
+  "summary": "Real-Time Availability & Checkout Validation",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RealTimeAvailabilityCheckoutValidationView"
+ },
+ "listRentalProducts": {
+  "method": "GET",
+  "path": "/rental-products",
+  "contract": "rental",
+  "summary": "Rental products across venues and locations",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "trackingModel",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RentalProduct"
+ },
+ "setRentalAvailabilityRules": {
+  "method": "PUT",
+  "path": "/rental-products/{productId}/availability-rules",
+  "contract": "rental",
+  "summary": "Operating hours, rental windows, buffers and release rules",
+  "permission": "RENTAL_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalAvailabilityRules",
+  "responds": "RentalAvailabilityRules"
+ },
+ "setRentalDurationRules": {
+  "method": "PUT",
+  "path": "/rental-products/{productId}/duration",
+  "contract": "rental",
+  "summary": "Minimum, maximum, increment, extension and turnaround",
+  "permission": "RENTAL_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalDurationRules",
+  "responds": "RentalDurationRules"
+ }
+}

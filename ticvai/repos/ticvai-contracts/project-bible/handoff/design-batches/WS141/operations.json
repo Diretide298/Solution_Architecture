@@ -1,0 +1,523 @@
+{
+ "claimConversation": {
+  "method": "POST",
+  "path": "/conversations/{conversationId}/claim",
+  "contract": "marketing-crm",
+  "summary": "An agent takes it",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Conversation"
+ },
+ "escalateCase": {
+  "method": "POST",
+  "path": "/cases/{caseId}/escalate",
+  "contract": "marketing-crm",
+  "summary": "Escalate a case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Case"
+ },
+ "getConversation": {
+  "method": "GET",
+  "path": "/conversations/{conversationId}",
+  "contract": "marketing-crm",
+  "summary": "One conversation and everything before it",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Conversation"
+ },
+ "getGuestTimeline": {
+  "method": "GET",
+  "path": "/guests/{guestId}/timeline",
+  "contract": "marketing-crm",
+  "summary": "Everything this guest did, in order, across the platform",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kinds",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestTimelineEvent"
+ },
+ "handoverToAgent": {
+  "method": "POST",
+  "path": "/conversations/{conversationId}/handover",
+  "contract": "marketing-crm",
+  "summary": "Pass an assistant conversation to a person",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Conversation"
+ },
+ "listAgentWorkloadAvailability": {
+  "method": "GET",
+  "path": "/agent-workload-availability",
+  "contract": "marketing-crm",
+  "summary": "Agent Workload, Availability & Workforce Control",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "queueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "team",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "skill",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listCaseCategories": {
+  "method": "GET",
+  "path": "/case-categories",
+  "contract": "marketing-crm",
+  "summary": "List case categories and subcategories",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "parentCategoryId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "topLevelOnly",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "isActive",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listConversations": {
+  "method": "GET",
+  "path": "/conversations",
+  "contract": "marketing-crm",
+  "summary": "The omnichannel inbox",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "state",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "assignedToMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listQualityAgentEvaluation": {
+  "method": "GET",
+  "path": "/quality-agent-evaluation",
+  "contract": "marketing-crm",
+  "summary": "Quality Management & Agent Evaluation",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "agentPrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "evaluatorPrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sourceType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "criticalFailureOnly",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listServiceQueues": {
+  "method": "GET",
+  "path": "/service-queues",
+  "contract": "marketing-crm",
+  "summary": "List customer-service queues",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "isActive",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listUnifiedInteractionCommunication": {
+  "method": "GET",
+  "path": "/unified-interaction-communication",
+  "contract": "marketing-crm",
+  "summary": "Unified Interaction & Communication History",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "keyword",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "agentPrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "caseId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ticketId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "sendConversationMessage": {
+  "method": "POST",
+  "path": "/conversations/{conversationId}/messages",
+  "contract": "marketing-crm",
+  "summary": "Say something, as a guest or an agent",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConversationMessage"
+ },
+ "setCallDisposition": {
+  "method": "POST",
+  "path": "/conversations/{conversationId}/disposition",
+  "contract": "marketing-crm",
+  "summary": "Why the conversation ended, and any callback",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CallDisposition",
+  "responds": "CallDisposition"
+ },
+ "setCustomerServiceCopilot": {
+  "method": "PUT",
+  "path": "/customer-service-copilot",
+  "contract": "marketing-crm",
+  "summary": "Configure the customer-service copilot",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AiCustomerServiceCopilotKnowledgeWorkspaceInput",
+  "responds": "AiCustomerServiceCopilotKnowledgeWorkspaceView"
+ },
+ "setIntelligentRoutingSkill": {
+  "method": "PUT",
+  "path": "/intelligent-routing-skill",
+  "contract": "marketing-crm",
+  "summary": "Create or change a case routing rule",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "IntelligentRoutingSkillsAssignmentEngineInput",
+  "responds": "IntelligentRoutingSkillsAssignmentEngineView"
+ },
+ "setOrderBookingTicket": {
+  "method": "PUT",
+  "path": "/order-booking-ticket",
+  "contract": "marketing-crm",
+  "summary": "Evaluate or perform a service action on an order from a case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "OrderBookingTicketServiceWorkspaceInput",
+  "responds": "OrderBookingTicketServiceWorkspaceView"
+ },
+ "setServiceQueueDefinition": {
+  "method": "PUT",
+  "path": "/service-queues",
+  "contract": "marketing-crm",
+  "summary": "Create or change a customer-service queue",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ServiceQueue",
+  "responds": "ServiceQueue"
+ },
+ "startKioskAssist": {
+  "method": "POST",
+  "path": "/kiosk-assists",
+  "contract": "marketing-crm",
+  "summary": "A staff member helps a guest at a kiosk, remotely",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KioskAssistSession"
+ }
+}

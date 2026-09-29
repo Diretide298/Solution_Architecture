@@ -1,6 +1,6 @@
 # WS86 — Game and Ride board 9
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 6 operations · 4 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `DEVELOPER_ADMIN, DEVICE_CONFIGURE, DEVICE_VIEW, PRODUCT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-474` | Reader Integration Command Center | commandCentre | 0 | 0 | — |
-| `BO-475` | Reader Manufacturer & Model Profile | configEditor | 0 | 0 | — |
-| `BO-476` | Communication Protocol Configuration | configEditor | 0 | 0 | — |
-| `BO-477` | Reader Command & Event Mapping | listDetail | 0 | 0 | — |
-| `BO-478` | Reader Configuration Deployment & Synchronization | listDetail | 0 | 0 | — |
-| `BO-479` | Game Trigger & I/O Control Mapping | listDetail | 0 | 0 | — |
-| `BO-480` | Reader Screen, LED & Sound Output Mapping | listDetail | 0 | 0 | — |
-| `BO-481` | Edge Cache & Offline Rule Package | listDetail | 0 | 0 | — |
-| `BO-482` | Device Diagnostics & Integration Logs | listDetail | 0 | 0 | — |
-| `BO-483` | Integration Certification & Test Console | listDetail | 0 | 0 | — |
+| `BO-474` | Reader Integration Command Center | commandCentre | 1 | 0 | — |
+| `BO-475` | Reader Manufacturer & Model Profile | configEditor | 1 | 0 | — |
+| `BO-476` | Communication Protocol Configuration | configEditor | 1 | 0 | — |
+| `BO-477` | Reader Command & Event Mapping | listDetail | 1 | 0 | — |
+| `BO-478` | Reader Configuration Deployment & Synchronization | listDetail | 1 | 0 | — |
+| `BO-479` | Game Trigger & I/O Control Mapping | listDetail | 1 | 0 | — |
+| `BO-480` | Reader Screen, LED & Sound Output Mapping | listDetail | 1 | 0 | — |
+| `BO-481` | Edge Cache & Offline Rule Package | listDetail | 1 | 0 | — |
+| `BO-482` | Device Diagnostics & Integration Logs | listDetail | 1 | 0 | — |
+| `BO-483` | Integration Certification & Test Console | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 

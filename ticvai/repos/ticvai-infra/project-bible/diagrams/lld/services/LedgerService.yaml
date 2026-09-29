@@ -20,7 +20,7 @@ schemas:
   tables: 20
   stores:
   - postgres
-  largestTable: ledger.settlement
+  largestTable: ledger.journal_entry
 operationsByContract:
 - contract: finance
   count: 57
@@ -207,8 +207,8 @@ operationsByContract:
     scope: region
     permission: SETTLEMENT_RECONCILE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: listAccountMappings
     verb: GET
     path: /account-mappings
@@ -705,7 +705,7 @@ tables:
   foreignWriters: null
 readsFrom:
 - service: OrderService
-  operations: 5
+  operations: 6
 - service: TenancyService
   operations: 3
 - service: CatalogueService
@@ -732,6 +732,17 @@ writesOutside:
   - operation: setFxProvider
     tables:
     - platform.region_settings
+- service: OrderService
+  operations: 1
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event OrderService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: ingestSettlementFile
+    tables:
+    - payments.provider_cost
 screens:
 - P01:WEB-035 Multi-Currency & Pricing
 - P02:GST-044 Multi-Currency & Pricing

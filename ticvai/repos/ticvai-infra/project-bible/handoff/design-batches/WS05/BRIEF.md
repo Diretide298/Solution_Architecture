@@ -1,6 +1,6 @@
 # WS05 — Access Control board 5
 
-**10 screens · 10 operations · 12 schemas · 2 permissions**
+**10 screens · 14 operations · 14 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, SCOPE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, AUDIT_VIEW, SCOPE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-184` | Biometric Access Command Center | listDetail | 1 | 0 | — |
+| `BO-184` | Biometric Access Command Center | listDetail | 3 | 0 | — |
 | `BO-185` | Biometric Verification Profile Builder | configEditor | 1 | 0 | — |
 | `BO-186` | Face Pass Enrollment Configuration | configEditor | 1 | 0 | — |
 | `BO-187` | Biometric Consent & Guardian Management | configEditor | 1 | 0 | — |
-| `BO-188` | Face Tag Temporary Enrollment | configEditor | 1 | 0 | — |
-| `BO-189` | Face Matching & Verification Thresholds | configEditor | 1 | 0 | — |
+| `BO-188` | Face Tag Temporary Enrollment | configEditor | 2 | 0 | — |
+| `BO-189` | Face Matching & Verification Thresholds | configEditor | 2 | 0 | — |
 | `BO-190` | Face Change, Re-enrollment & Identity Protection | listDetail | 1 | 0 | — |
-| `BO-191` | Biometric Validation at Gate | listDetail | 1 | 0 | — |
-| `BO-192` | Biometric Lifecycle, Retention & Deletion | configEditor | 1 | 0 | — |
-| `BO-193` | Biometric Simulation, Audit & Publication | listDetail | 1 | 0 | — |
+| `BO-191` | Biometric Validation at Gate | listDetail | 2 | 0 | — |
+| `BO-192` | Biometric Lifecycle, Retention & Deletion | configEditor | 2 | 0 | — |
+| `BO-193` | Biometric Simulation, Audit & Publication | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-184, BO-188, BO-190, BO-191 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-188, BO-190, BO-191 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

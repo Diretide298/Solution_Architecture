@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Order & Payment
   version: 0.1.0
-  x-ticvai-screen-count: 187
+  x-ticvai-screen-count: 196
   x-ticvai-tier: spine
   x-ticvai-module: 2 — Ticketing Sales
   x-ticvai-requirements: 343
@@ -293,6 +293,13 @@ paths:
 
         Starts `provisional`, or `namesPending` when `attendeeCaptureRequired` is set.
 
+        **Converting an accepted quote** (BO-272 Quote-to-Booking Conversion): with `groupQuoteId`, the
+        quote must be the current version of its `quoteNumber` and `sent` or `accepted`; conversion sets
+        the quote''s `groupBookingId`, moves a `sent` quote to `accepted` (sales recording the
+        customer''s acceptance, states/group-quote.yaml), and carries its guest count, payment schedule
+        and deposit onto the booking. A quote that is `draft`, `superseded`, `rejected`, `expired` or
+        already converted is refused 409 `quoteNotConvertible` (decided 29 September, writers pass).
+
         '
       tags:
       - orders
@@ -326,7 +333,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
           description: The order already has a group booking (`orderAlreadyGrouped`), or is voided
-            (`orderVoided`).
+            (`orderVoided`), or `groupQuoteId` names a quote that cannot be converted
+            (`quoteNotConvertible`).
           content:
             application/problem+json:
               schema:
@@ -917,6 +925,11 @@ paths:
         is a reconciliation nobody can do, so a partly-paid order refuses to split until the payment is
         allocated.
 
+        **Records the split in `orders.order_relationship`**: one `childOrder` row per resulting order
+        against the original, with `splitBasis` and the `amount` moved, and appends to
+        `orders.order_event` on every order touched. The merge is `mergeOrders` (decided 29 September,
+        writers pass).
+
         '
       tags:
       - orders
@@ -1163,6 +1176,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Revoked. The share, with `revokedAt` set.
           content:
             application/json:
@@ -3100,6 +3116,10 @@ paths:
         Only valid before capture. **A captured payment is refunded, not voided** — the money has moved
         and pretending otherwise loses the audit trail.
 
+        **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state
+        change it makes, with the previous and new state, the actor and the correlation id (decided 29
+        September, writers pass).
+
         '
       tags:
       - orders
@@ -3407,6 +3427,12 @@ paths:
         Offline-capable. The client writes to its local journal, acknowledges the cashier, and replays
         through `/sync/orders` on reconnect.
 
+        **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state
+        change it makes, with the previous and new state, the actor and the correlation id. **When it
+        prices the order it also writes `promotions.promotion_evaluation_trace`**: which promotions were
+        evaluated, which applied and why the others did not, so a disputed discount can be explained
+        later (decided 29 September, writers pass).
+
         '
       tags:
       - order
@@ -3680,6 +3706,10 @@ paths:
         the cashier who parked them has gone home. `label` and `holdUntil` are kept on the order
         (`Order.holdLabel`, `Order.heldUntil`) so the held-orders list can show and sort them.
 
+        **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state
+        change it makes, with the previous and new state, the actor and the correlation id (decided 29
+        September, writers pass).
+
         '
       tags:
       - order
@@ -3771,6 +3801,10 @@ paths:
         `changes` and never applied. Discarding voids the sale (`voidOrder`). There is no reprice in
         place: a cashier who wants current prices discards and rings the sale again. A line that cannot
         be kept at all (`soldOut`, `seatHoldExpired`, `productWithdrawn`) is removed whichever is chosen.
+
+        **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state
+        change it makes, with the previous and new state, the actor and the correlation id (decided 29
+        September, writers pass).
 
         '
       tags:
@@ -3910,6 +3944,10 @@ paths:
         **The reason comes from the void reason list** (`VoidReason`; decided 28 September, audit R125
         (4)), the one list every void takes, F&B included. `other` requires a `note` (audit R222); the
         notes are reviewed quarterly to add real reasons.
+
+        **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state
+        change it makes, with the previous and new state, the actor and the correlation id (decided 29
+        September, writers pass).
 
         '
       tags:
@@ -4057,6 +4095,10 @@ paths:
         holds for the venue, in the fiscal period open for the refund date (decided 28 September, audit
         R191).
 
+        **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state
+        change it makes, with the previous and new state, the actor and the correlation id (decided 29
+        September, writers pass).
+
         '
       tags:
       - refund
@@ -4115,6 +4157,11 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Approve a refund held for approval
+      description: '**Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state
+        change it makes, with the previous and new state, the actor and the correlation id (decided 29
+        September, writers pass).
+
+        '
       tags:
       - refund
       x-ticvai-permission: ORDER_REFUND_APPROVE
@@ -4180,6 +4227,10 @@ paths:
         **The selection criteria combine with AND** (decided 28 September, audit R096 (7)): an order is
         in the batch only when it matches every criterion sent in `scope` (performance, event, venue and
         the date range together). A criterion left out does not narrow the selection.
+
+        **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state
+        change it makes, with the previous and new state, the actor and the correlation id (decided 29
+        September, writers pass).
 
         '
       tags:
@@ -4441,6 +4492,12 @@ paths:
         the fiscal period that is open for the payment date. An offline cash payment replayed through
         `syncOrders` posts the same event, dated by its `recordedAt`.
 
+        **Writes one `payments.payment_attempt` row per provider call**, including a declined, errored
+        or abandoned attempt that never becomes a payment: `orders.payment` records what was taken, the
+        attempt records what was tried, and the provider health and payment performance reads count
+        them. Also appends to `orders.order_event` when the order''s payment state changes (decided 29
+        September, writers pass; DM6).
+
         '
       tags:
       - payment
@@ -4645,6 +4702,11 @@ paths:
       - staff
       - partner
       summary: Capture a previously authorised payment
+      description: 'Captures an authorised payment. **Writes one `payments.payment_attempt` row for the capture
+        call**, whatever its outcome, and appends to `orders.order_event` when the order''s payment
+        state changes (decided 29 September, writers pass; DM6).
+
+        '
       tags:
       - payment
       x-ticvai-permission: ORDER_CREATE
@@ -4705,6 +4767,11 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Convert a reservation into an order
+      description: '**Appends to `orders.order_event`** on both the reservation (`converted`) and the new order,
+        with the correlation id tying them, and writes `promotions.promotion_evaluation_trace` when the
+        order is priced (decided 29 September, writers pass).
+
+        '
       tags:
       - reservation
       x-ticvai-permission: ORDER_CREATE
@@ -4949,6 +5016,10 @@ paths:
 
         Lines whose entitlement has been redeemed cannot be removed. The guest has used it.
 
+        **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state
+        change it makes, with the previous and new state, the actor and the correlation id (decided 29
+        September, writers pass).
+
         '
       tags:
       - order
@@ -5135,6 +5206,10 @@ paths:
         many hours away (decided 28 September, audit R094). **Proposed default, client to correct (audit
         R094): 24 hours.**
 
+        **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state
+        change it makes, with the previous and new state, the actor and the correlation id (decided 29
+        September, writers pass).
+
         '
       tags:
       - order
@@ -5209,6 +5284,10 @@ paths:
         REV3-21): the prototype''s "Change your trip free up to two hours before departure" is the
         proposed value of a transport venue''s `rescheduleCutoffHours` (2, with no rescheduling fee),
         client to correct.
+
+        **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state
+        change it makes, with the previous and new state, the actor and the correlation id (decided 29
+        September, writers pass).
 
         '
       tags:
@@ -5737,6 +5816,10 @@ paths:
       description: 'A reservation is not an order. It holds capacity, expires, creates no entitlement
         and posts nothing to the ledger.
 
+        **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state
+        change it makes, with the previous and new state, the actor and the correlation id (decided 29
+        September, writers pass).
+
         '
       tags:
       - reservation
@@ -5816,8 +5899,12 @@ paths:
       - staff
       - guest
       summary: Cancel a reservation
-      description: Releases held capacity immediately rather than waiting for expiry. A guest cancels
+      description: 'Releases held capacity immediately rather than waiting for expiry. A guest cancels
         only a reservation held for them.
+
+        **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state
+        change it makes, with the previous and new state, the actor and the correlation id (decided 29
+        September, writers pass).'
       tags:
       - reservation
       x-ticvai-permission: ORDER_CANCEL
@@ -5860,6 +5947,10 @@ paths:
 
         **The maximum is the venue setting `reservationMaxExtensions`, with a tenant default** (decided 28
         September, audit R094). **Proposed default, client to correct (audit R094): 1 extension.**
+
+        **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state
+        change it makes, with the previous and new state, the actor and the correlation id (decided 29
+        September, writers pass).
 
         '
       tags:
@@ -6076,6 +6167,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - name: event
         in: query
         required: false
@@ -6178,6 +6270,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Upgrade & Conversion Path Builder
           content:
             application/json:
@@ -6188,6 +6283,8 @@ paths:
       operationId: listUpgradeEligibilityQualification
       x-ticvai-consumed-by:
         - "P09 ADM-310 Upgrade Eligibility & Qualification Rules"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.7; MoM 1 Sep 4.9 (paths, eligibility, pro-rata, guest-app upgrades, group upgrades by request); shape fixed (4 non-field properties removed; enums eligibleTicketStatuses; added ineligibilityReason)'
@@ -6234,6 +6331,8 @@ paths:
       operationId: listUpgradeTimingUsage
       x-ticvai-consumed-by:
         - "P09 ADM-311 Upgrade Timing, Usage & Ticket Status Rules"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.9; MoM 1 Sep 4.9 (paths, eligibility, pro-rata, guest-app upgrades, group upgrades by request); shape fixed (4 non-field properties removed; enums permittedWindows, originalTicketTreatment)'
@@ -6280,6 +6379,8 @@ paths:
       operationId: listUpgradeFinancialTreatment
       x-ticvai-consumed-by:
         - "P09 ADM-312 Upgrade Financial Treatment & Price Difference Rules"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.10; MoM 1 Sep 4.9 (paths, eligibility, pro-rata, guest-app upgrades, group upgrades by request); shape fixed (5 non-field properties removed; enums priceSource, carryForwardDiscounts; added financialMethod, dynamicPriceTreatment)'
@@ -6365,6 +6466,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Pro-Rata, Residual Value & Entitlement Credit Configuration
           content:
             application/json:
@@ -6375,6 +6479,8 @@ paths:
       operationId: listPersonTypeProduct
       x-ticvai-consumed-by:
         - "P09 ADM-314 Person-Type, Product & Entitlement Conversion Rules"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.14; MoM 1 Sep 4.9 (paths, eligibility, pro-rata, guest-app upgrades, group upgrades by request); shape fixed (3 non-field properties removed; enums conversionType, entitlementTreatment, targetRequirements; added sourceProduct, targetProduct)'
@@ -6456,6 +6562,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - name: order
         in: query
         required: false
@@ -6559,6 +6666,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Upgrade Execution, Credential Regeneration & Channel Controls
           content:
             application/json:
@@ -6598,6 +6708,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - name: ticket
         in: query
         required: false
@@ -6673,6 +6784,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-264 Group Sales Command Center"
         - "P08 BO-283 Group Sales Analytics & AI Intelligence Center"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Group_Sales___Corporate_Booking_Management_Reference.pdf p.4; MoM 31 Aug 4.7-4.8 (group flow, payment link, group check-in); MoM 1 Sep 4.12 (deposits); shape agreed as drafted'
@@ -6712,6 +6825,8 @@ paths:
       operationId: listGroupEnquiryOpportunity
       x-ticvai-consumed-by:
         - "P08 BO-265 Group Enquiry & Opportunity Capture"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Group_Sales___Corporate_Booking_Management_Reference.pdf p.5; MoM 31 Aug 4.7-4.8 (group flow, payment link, group check-in); MoM 1 Sep 4.12 (deposits); shape fixed (1 non-field properties removed; enums leadSource)'
@@ -6792,6 +6907,8 @@ paths:
       operationId: listGroupCustomerOrganization
       x-ticvai-consumed-by:
         - "P08 BO-266 Group Customer & Organization Profile"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Group_Sales___Corporate_Booking_Management_Reference.pdf p.6; MoM 31 Aug 4.7-4.8 (group flow, payment link, group check-in); MoM 1 Sep 4.12 (deposits); shape fixed (1 non-field properties removed; enums organizationType)'
@@ -6877,6 +6994,8 @@ paths:
       operationId: listGroupRequirementAvailability
       x-ticvai-consumed-by:
         - "P08 BO-267 Group Requirements, Availability & Capacity Planner"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Group_Sales___Corporate_Booking_Management_Reference.pdf p.8; MoM 31 Aug 4.7-4.8 (group flow, payment link, group check-in); MoM 1 Sep 4.12 (deposits); shape fixed (1 non-field properties removed; enums resourceChecks)'
@@ -6954,6 +7073,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Group Package & Experience Builder
           content:
             application/json:
@@ -7002,6 +7124,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Group Quotation Builder & Proposal Generation
           content:
             application/json:
@@ -7012,6 +7137,8 @@ paths:
       operationId: listQuoteRevisionNegotiation
       x-ticvai-consumed-by:
         - "P08 BO-270 Quote Revision, Negotiation & Version Management"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Group_Sales___Corporate_Booking_Management_Reference.pdf p.12; MoM 31 Aug 4.7-4.8 (group flow, payment link, group check-in); MoM 1 Sep 4.12 (deposits); shape fixed (4 non-field properties removed; added quoteNumber, version, versionStatus)'
@@ -7089,6 +7216,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Group Discount, Exception & Approval Workflow
           content:
             application/json:
@@ -7099,6 +7229,8 @@ paths:
       operationId: listQuoteBookingConversion
       x-ticvai-consumed-by:
         - "P08 BO-272 Quote-to-Booking Conversion & Confirmation"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Group_Sales___Corporate_Booking_Management_Reference.pdf p.15; MoM 31 Aug Key Decisions (unified inquiry to booking flow); shape fixed (1 non-field properties removed; enums failedChecks)'
@@ -7183,6 +7315,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Group Booking 360° & Handover Workspace
           content:
             application/json:
@@ -7193,6 +7328,8 @@ paths:
       operationId: listGroupBooking
       x-ticvai-consumed-by:
         - "P08 BO-274 Group Booking Operations Command Center"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Group_Sales___Corporate_Booking_Management_Reference.pdf p.20; MoM 31 Aug 4.7-4.8 (group flow, payment link, group check-in); MoM 1 Sep 4.12 (deposits); shape agreed as drafted'
@@ -7268,6 +7405,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Group Operational Planning & Task Workspace
           content:
             application/json:
@@ -7278,6 +7418,8 @@ paths:
       operationId: listParticipantGuestList
       x-ticvai-consumed-by:
         - "P08 BO-276 Participants, Guest Lists & Group Structure"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Group_Sales___Corporate_Booking_Management_Reference.pdf p.23; MoM 31 Aug 4.7-4.8 (group flow, payment link, group check-in); MoM 1 Sep 4.12 (deposits); shape fixed (1 non-field properties removed; enums captureSource, validationIssues)'
@@ -7320,6 +7462,8 @@ paths:
       operationId: listGroupPaymentDeposit
       x-ticvai-consumed-by:
         - "P08 BO-277 Group Payment, Deposit & Balance Management"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Group_Sales___Corporate_Booking_Management_Reference.pdf p.25; MoM 1 Sep Key Decisions (deposit for school and corporate bookings, balance on or before arrival); MoM 31 Aug 4.8 (payment link with configurable expiry); shape fixed (3 non-field properties removed; enums scheduleType, paymentMethods)'
@@ -7367,6 +7511,8 @@ paths:
       operationId: listGroupTicketSeat
       x-ticvai-consumed-by:
         - "P08 BO-278 Group Ticket, Seat & Entitlement Allocation"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Group_Sales___Corporate_Booking_Management_Reference.pdf p.26; MoM 31 Aug 4.7-4.8 (group flow, payment link, group check-in); MoM 1 Sep 4.12 (deposits); shape fixed (3 non-field properties removed; enums ticketModel, seatingPreferences, associatedAllocations)'
@@ -7408,6 +7554,8 @@ paths:
       operationId: listGroupTicketFulfillment
       x-ticvai-consumed-by:
         - "P08 BO-279 Group Ticket Fulfillment & Distribution"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Group_Sales___Corporate_Booking_Management_Reference.pdf p.27; MoM 31 Aug 4.7-4.8 (group flow, payment link, group check-in); MoM 1 Sep 4.12 (deposits); shape fixed (4 non-field properties removed; enums deliveryMethod; added distributionMode)'
@@ -7453,6 +7601,8 @@ paths:
       operationId: listGroupArrivalCheck
       x-ticvai-consumed-by:
         - "P08 BO-280 Group Arrival, Check-In & Admission Operations"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Group_Sales___Corporate_Booking_Management_Reference.pdf p.29; MoM 31 Aug Key Decisions (group check-in is a status distinct from the access scan); shape fixed (2 non-field properties removed; enums issues)'
@@ -7494,6 +7644,8 @@ paths:
       operationId: listGroupAmendmentCancellation
       x-ticvai-consumed-by:
         - "P08 BO-281 Group Amendments, Cancellation & Refund Operations"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Group_Sales___Corporate_Booking_Management_Reference.pdf p.30; MoM 1 Sep 4.12 (amendments checked against the configured policy); audit R127 (2); shape fixed (1 non-field properties removed; enums amendmentType, approvalReasons)'
@@ -7540,6 +7692,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-274 Group Booking Operations Command Center"
         - "P08 BO-282 Group Booking Reconciliation, Closure & Performance"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Group_Sales___Corporate_Booking_Management_Reference.pdf p.31; MoM 31 Aug 4.7-4.8 (group flow, payment link, group check-in); MoM 1 Sep 4.12 (deposits); shape fixed (3 non-field properties removed)'
@@ -7614,6 +7768,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - name: customerType
         in: query
         required: false
@@ -7720,6 +7875,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - name: orderNumber
         in: query
         required: false
@@ -7909,6 +8065,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Reservation & Hold Policy Configuration
           content:
             application/json:
@@ -7955,6 +8114,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Order & Reservation Status Lifecycle Configuration
           content:
             application/json:
@@ -8006,6 +8168,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Order Creation & Source/Channel Configuration
           content:
             application/json:
@@ -8054,6 +8219,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Customer, Guest & Account Assignment
           content:
             application/json:
@@ -8064,6 +8232,8 @@ paths:
       operationId: listOrderLineProduct
       x-ticvai-consumed-by:
         - "P08 BO-310 Order Line, Product & Entitlement Composition"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.13; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (6 non-field properties removed; enums lineType)'
@@ -8109,6 +8279,8 @@ paths:
       operationId: listCapacityReservationInventory
       x-ticvai-consumed-by:
         - "P08 BO-311 Capacity Reservation & Inventory Commitment"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.14; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (3 non-field properties removed; enums inventoryType, releaseReason; added commitmentType, orderId, reservationId, quantity, expiresAt)'
@@ -8155,6 +8327,8 @@ paths:
       operationId: listReservationConfirmationExpiry
       x-ticvai-consumed-by:
         - "P08 BO-312 Reservation Confirmation, Expiry & Fulfillment Readiness"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.15; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (10 non-field properties removed; enums confirmationConditions, failedIssueChecks; added reservationId, orderId, status, expiresAt)'
@@ -8201,6 +8375,8 @@ paths:
       operationId: listOrderLifecycleTimeline
       x-ticvai-consumed-by:
         - "P08 BO-313 Order Lifecycle Timeline, SLA, Exceptions & AI Operations"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.17; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (6 non-field properties removed; enums exceptionType)'
@@ -8275,6 +8451,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - name: venue
         in: query
         required: false
@@ -8392,6 +8569,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Order Amendment Workspace
           content:
             application/json:
@@ -8440,6 +8620,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Amendment Eligibility & Policy Rule Builder
           content:
             application/json:
@@ -8495,6 +8678,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Cancellation & Partial Cancellation Policy Configuration
           content:
             application/json:
@@ -8505,6 +8691,8 @@ paths:
       operationId: listVoidReversalSame
       x-ticvai-consumed-by:
         - "P08 BO-319 Void, Reversal & Same-Day Correction Management"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.29; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (7 non-field properties removed; enums voidType, reasonCode)'
@@ -8550,6 +8738,8 @@ paths:
       operationId: listTicketReissueFulfillment
       x-ticvai-consumed-by:
         - "P08 BO-027 Reissue & Media Replacement"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.30; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (2 non-field properties removed; enums reissueReason, credentialMedia, deliveryMethod; added reissueOption)'
@@ -8678,6 +8868,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Approval, Exception & Service Recovery Management
           content:
             application/json:
@@ -8721,6 +8914,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - name: venue
         in: query
         required: false
@@ -8805,6 +8999,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - name: venue
         in: query
         required: false
@@ -8845,6 +9040,8 @@ paths:
         - "P08 BO-325 Order Payment Detail & Transaction Ledger"
         - "P09 ADM-607 Mixed Tender Transaction Trace & Allocation Audit\t100"
         - "P09 ADM-617 Refund Transaction Trace & Audit Investigation\t124"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.41; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (22 non-field properties removed; added transactions)'
@@ -8905,7 +9102,15 @@ paths:
         pack page and the minutes: MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits). Shape:
         4 properties removed that were filters, actions, behaviour, roles, examples or prose
         fragments rather than fields; 6 one-value-per-field properties folded into enums
-        (allocationLevel).'
+        (allocationLevel).
+
+        **Writes `orders.payment_allocation_rule`, one row per match key** (channel, terminal, product,
+        order type, customer type); a save for a key that already has a row replaces it, narrowest match
+        wins, and a row naming nothing is the venue default. The allocation by channel, product and
+        terminal that DM6 found no table for is these columns of that table (DM5), so no new table was
+        added; `listPaymentAllocationRules` lists the rows, and `isActive` false retires one. The
+        handler maps the drafted `channel`, `terminal` and `product` strings to `channel`, `terminalId`
+        and `productId` (decided 29 September, writers pass).'
       tags:
       - drafted
       x-ticvai-permission: ORDER_CREATE
@@ -8923,6 +9128,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Multi-Payment, Split Tender & Payment Allocation Configuration
           content:
             application/json:
@@ -8933,6 +9141,8 @@ paths:
       operationId: listDepositPartialPayment
       x-ticvai-consumed-by:
         - "P08 BO-327 Deposit, Partial Payment & Outstanding Balance Management"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.44; MoM 1 Sep Key Decisions (20-30% deposit for school and corporate bookings, balance on or before arrival); shape fixed (1 non-field properties removed; enums appliesTo, paymentModel, reminderStage)'
@@ -8974,6 +9184,8 @@ paths:
       operationId: listOrderSplitMerge
       x-ticvai-consumed-by:
         - "P08 BO-328 Order Split, Merge & Transaction Relationship Management"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.46; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (10 non-field properties removed; enums splitBasis, relationshipType)'
@@ -9050,6 +9262,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - name: order
         in: query
         required: false
@@ -9106,6 +9319,8 @@ paths:
       operationId: listExternalPaymentPartner
       x-ticvai-consumed-by:
         - "P08 BO-330 External Payment, Partner & Settlement Reference Mapping"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.49; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (4 non-field properties removed; enums sourceSystem)'
@@ -9151,6 +9366,8 @@ paths:
       operationId: listPaymentReconciliationException
       x-ticvai-consumed-by:
         - "P08 BO-331 Payment Reconciliation & Exception Management"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.50; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (7 non-field properties removed; enums sourceSystem; added exceptionType, expectedAmount, actualAmount)'
@@ -9227,6 +9444,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - name: export
         in: query
         required: false
@@ -9280,6 +9498,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - name: venue
         in: query
         required: false
@@ -9370,6 +9589,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - name: event
         in: query
         required: false
@@ -9483,6 +9703,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Resale Eligibility Rule Configuration
           content:
             application/json:
@@ -9494,6 +9717,8 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-278 Resale Marketplace Command Center"
         - "P09 ADM-280 Resale Policy & Marketplace Settings"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.7; MoM 1 Sep 4.14 (admin-configured resale price range; own B2C site, hosted white-label portal, or API); shape fixed (2 non-field properties removed; added pricingMode)'
@@ -9576,6 +9801,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Listing Creation & Seller Configuration
           content:
             application/json:
@@ -9586,6 +9814,8 @@ paths:
       operationId: listResalePricingPrice
       x-ticvai-consumed-by:
         - "P09 ADM-282 Resale Pricing & Price Guardrails"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.10; MoM 1 Sep 4.14 (resale within an admin-configured price range); shape fixed (3 non-field properties removed; added maximumMarkupPercent)'
@@ -9630,6 +9860,8 @@ paths:
       operationId: listResaleFeeCommission
       x-ticvai-consumed-by:
         - "P09 ADM-283 Resale Fees, Commission & Seller Proceeds"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.12; MoM 1 Sep 4.14 (fees/commission configured per tenant; the market fee TICVAI retains shows on the resale summary); shape fixed (5 non-field properties removed; enums feeType; added rate, amount, payer)'
@@ -9716,6 +9948,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Listing Approval & Moderation
           content:
             application/json:
@@ -9726,6 +9961,8 @@ paths:
       operationId: listResaleInventoryAvailability
       x-ticvai-consumed-by:
         - "P09 ADM-285 Resale Inventory & Availability Management"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.15; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (1 non-field properties removed)'
@@ -9766,6 +10003,8 @@ paths:
       operationId: listListingLifecycleExpiry
       x-ticvai-consumed-by:
         - "P09 ADM-286 Listing Lifecycle, Expiry & Cancellation"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.16; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (10 non-field properties removed; enums closure, expiryRule, withdrawalPolicy, autoCancellationReason; added expiryOffset, listingId)'
@@ -9848,6 +10087,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: AI Resale Configuration & Marketplace Recommendations
           content:
             application/json:
@@ -9859,6 +10101,8 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-288 Resale Operations Command Center"
         - "P09 ADM-297 Resale Analytics & AI Intelligence"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.21; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (1 non-field properties removed)'
@@ -9903,6 +10147,8 @@ paths:
       operationId: listBuyerPurchaseResale
       x-ticvai-consumed-by:
         - "P09 ADM-289 Buyer Purchase & Resale Order Management"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.23; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape agreed as drafted'
@@ -9943,6 +10189,8 @@ paths:
       operationId: listTicketOwnershipTransfer
       x-ticvai-consumed-by:
         - "P09 ADM-290 Ticket Ownership Transfer Management"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.25; MoM 1 Sep 4.14 Decision (the virtual ticket ID is preserved; owner and media change; an ownership change log records each transfer); shape fixed (8 non-field properties removed)'
@@ -9990,6 +10238,8 @@ paths:
       operationId: listCredentialRevocationRegeneration
       x-ticvai-consumed-by:
         - "P09 ADM-291 Credential Revocation & Regeneration"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.26; MoM 1 Sep 4.14 Decision (only owner name and media such as the QR change); shape fixed (1 non-field properties removed; enums credentialMedia, deliveryMethod)'
@@ -10033,6 +10283,8 @@ paths:
       operationId: listResaleFraudDuplicate
       x-ticvai-consumed-by:
         - "P09 ADM-292 Resale Fraud & Duplicate Sale Protection"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.28; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (1 non-field properties removed; enums response)'
@@ -10075,6 +10327,8 @@ paths:
       operationId: listCapacityInventoryReconciliation
       x-ticvai-consumed-by:
         - "P09 ADM-293 Capacity & Inventory Reconciliation"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.29; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (5 non-field properties removed)'
@@ -10119,6 +10373,8 @@ paths:
       operationId: listSellerSettlementPayout
       x-ticvai-consumed-by:
         - "P09 ADM-294 Seller Settlement & Payout Management"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.30; MoM 1 Sep 4.14 (Board 2: settlement to the original seller); shape fixed (enums settlementTiming, holdReason)'
@@ -10247,6 +10503,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - name: ticketId
         in: query
         required: false
@@ -10355,6 +10612,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - name: venue
         in: query
         required: false
@@ -10418,6 +10676,8 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-278 Resale Marketplace Command Center"
         - "P09 ADM-298 My Tickets & Resale Marketplace Entry"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.40; MoM 1 Sep 4.14 (client''s B2C site, hosted white-label portal or API); shape fixed (8 non-field properties removed; added authenticationMethod)'
@@ -10460,6 +10720,8 @@ paths:
       operationId: listResaleEligibilityTicket
       x-ticvai-consumed-by:
         - "P09 ADM-299 Resale Eligibility & Ticket Selection"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.42; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (6 non-field properties removed; enums sellingMode)'
@@ -10501,6 +10763,8 @@ paths:
       operationId: listCreateListingResale
       x-ticvai-consumed-by:
         - "P09 ADM-300 Create Listing & Resale Price Selection"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.43; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (1 non-field properties removed; enums pricingMode; added recommendedPrice, minimumPrice, maximumPrice)'
@@ -10544,6 +10808,8 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-283 Resale Fees, Commission & Seller Proceeds"
         - "P09 ADM-301 Fees, Seller Proceeds & Listing Confirmation"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.45; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (12 non-field properties removed; added sellingPrice, fee, estimatedProceeds, termsVersion)'
@@ -10585,6 +10851,8 @@ paths:
       operationId: listResaleListingSeller
       x-ticvai-consumed-by:
         - "P09 ADM-302 My Resale Listings & Seller Dashboard"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.46; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (5 non-field properties removed)'
@@ -10627,6 +10895,8 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-278 Resale Marketplace Command Center"
         - "P09 ADM-303 Official Resale Marketplace & Buyer Discovery"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.48; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (2 non-field properties removed; enums inventoryFilter)'
@@ -10668,6 +10938,8 @@ paths:
       operationId: listResaleTicketDetail
       x-ticvai-consumed-by:
         - "P09 ADM-304 Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.49; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (5 non-field properties removed; added originalFaceValue, listingSource)'
@@ -10709,6 +10981,8 @@ paths:
       operationId: listBuyerCheckoutInventory
       x-ticvai-consumed-by:
         - "P09 ADM-305 Buyer Checkout, Inventory Hold & Secure Payment"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.51; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (1 non-field properties removed; added holdExpiresAt, total)'
@@ -10751,6 +11025,8 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-296 Resale Audit & Ownership History"
         - "P09 ADM-306 Resale Confirmation, Ownership Transfer & Ticket Delivery"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.52; MoM 1 Sep 4.14 Decision; shape fixed (7 non-field properties removed; added ticketId, currentOwner, previousOwner, settlementStatus)'
@@ -10792,6 +11068,8 @@ paths:
       operationId: listWhiteLabelMarketplace
       x-ticvai-consumed-by:
         - "P09 ADM-307 White-Label Marketplace Deployment & Experience Architecture"
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.54; MoM 1 Sep 4.14 (three access models); shape fixed (17 non-field properties removed; added deploymentModel, navigation)'
@@ -11916,9 +12194,671 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+  /resale-marketplace-config:
+    get:
+      operationId: getResaleMarketplaceConfig
+      x-ticvai-consumed-by:
+        - "P09 ADM-278 Resale Marketplace Command Center"
+        - "P09 ADM-280 Resale Policy & Marketplace Settings"
+        - "P09 ADM-282 Resale Pricing & Price Guardrails"
+      summary: How the venue's resale marketplace runs
+      description: '**The one row per venue in `orders.resale_marketplace_config`**: pricing mode and
+        guardrails, moderation, listing lifecycle, checkout hold, seller settlement timing and the
+        white-label deployment. Before a venue saves one, the response is the defaults the schema
+        declares with `isActive` false, so a marketplace is off until the venue turns it on
+        (decided 29 September, writers pass).
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '29 September: writers pass; MoM 1 Sep 4.14 (admin-configured resale price range; own B2C site, hosted white-label portal, or API); pack Resale screens ADM-280/ADM-282; shape follows getResaleFeePolicy'
+      responses:
+        '200':
+          description: The configuration in force, or the defaults when none is saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResaleMarketplaceConfig'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+    put:
+      operationId: setResaleMarketplaceConfig
+      x-ticvai-consumed-by:
+        - "P09 ADM-280 Resale Policy & Marketplace Settings"
+        - "P09 ADM-282 Resale Pricing & Price Guardrails"
+      summary: Set how the venue's resale marketplace runs
+      description: '**The writer `orders.resale_marketplace_config` lacked** (DM5 open item: nine
+        screens showed the row and none wrote it). One row per venue, replaced whole, as
+        `setResaleFeePolicy` is for fees. Fees and the price ceiling stay in `orders.resale_fee_policy`
+        and which tickets may be resold stays in `orders.resale_eligibility_rule`; this row is how the
+        marketplace behaves.
+
+        **A listing snapshots what it needs at creation**, so a change here applies to listings created
+        afterwards and never restates one already live. `settlementTiming` and `settlementDelayDays`
+        apply to settlements not yet `scheduled`.
+
+        Refused 400 when `expiryRule` is `xMinutesBeforeEvent`, `xHoursBeforeEvent` or
+        `atConfiguredDate` and `expiryOffset` is missing, or when `settlementTiming` is
+        `xDaysAfterResale` or `xDaysAfterEvent` and `settlementDelayDays` is missing (decided 29
+        September, writers pass).
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-agreed: '29 September: writers pass; MoM 1 Sep 4.14 (admin-configured resale price range; own B2C site, hosted white-label portal, or API); pack Resale screens ADM-280/ADM-282; shape follows setResaleFeePolicy'
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResaleMarketplaceConfig'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResaleMarketplaceConfig'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+  /resale-settlements/{resaleSettlementId}/hold:
+    parameters:
+    - name: resaleSettlementId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: holdResaleSettlement
+      x-ticvai-consumed-by:
+        - "P09 ADM-294 Seller Settlement & Payout Management"
+        - "P09 ADM-295 Refunds, Disputes & Resale Exceptions"
+      summary: Put a seller's resale payout on manual hold
+      description: '**A person stops a payout the job would otherwise make** (DM5 open item: the
+        settlement job writes `orders.resale_settlement` and no operation could hold or release one).
+        Moves a `pending` or `scheduled` settlement to `onHold` with `holdReason` `manualHold`
+        (states/resale-settlement.yaml). The reason is required and kept; the payout job skips a held
+        row. A settlement already `paid`, `failed` or `reversed` is refused 409 `notHoldable`
+        (decided 29 September, writers pass).
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: SETTLEMENT_RECONCILE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-agreed: '29 September: writers pass; MoM 1 Sep 4.14 and Board 2 (settlement to the original seller); screen ADM-294 Seller Settlement & Payout Management; shape follows the resale-listing actions'
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - reason
+              properties:
+                reason:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Held
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResaleSettlement'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The settlement is already `paid`, `failed` or `reversed` (`notHoldable`).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ResaleSettlementProblem'
+  /resale-settlements/{resaleSettlementId}/release:
+    parameters:
+    - name: resaleSettlementId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: releaseResaleSettlementHold
+      x-ticvai-consumed-by:
+        - "P09 ADM-294 Seller Settlement & Payout Management"
+        - "P09 ADM-295 Refunds, Disputes & Resale Exceptions"
+      summary: Release a manual or compliance hold on a seller's resale payout
+      description: '**The release the settlement state model had no operation for** (DM5 open item).
+        Moves an `onHold` settlement back to `scheduled` and clears `holdReason`; `expectedPayoutDate`
+        is recomputed from the venue''s `settlementTiming` and never lands in the past.
+
+        **Only `manualHold` and `complianceHold` are released by a person.** A `refundDisputeHold` is
+        released or reversed by the outcome of the refund or dispute (the settlement job), because a
+        person releasing it would pay a seller for a sale that may be undone; it is refused 409
+        `holdNotReleasable`. A release is recorded with the principal and the reason (decided 29
+        September, writers pass).
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: SETTLEMENT_RECONCILE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-agreed: '29 September: writers pass; MoM 1 Sep 4.14 and Board 2 (settlement to the original seller); screen ADM-294 Seller Settlement & Payout Management; shape follows holdResaleSettlement'
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - reason
+              properties:
+                reason:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Released and rescheduled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResaleSettlement'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The settlement is not `onHold` (`notOnHold`), or its hold is a
+            `refundDisputeHold` that only the refund or dispute outcome releases (`holdNotReleasable`).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ResaleSettlementProblem'
+  /group-bookings/{groupBookingId}/check-in:
+    parameters:
+    - name: groupBookingId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: recordGroupCheckIn
+      x-ticvai-consumed-by:
+        - "P08 BO-280 Group Arrival, Check-In & Admission Operations"
+      summary: Record a group's arrival at the venue
+      description: '**Group check-in is a status distinct from the access scan** (MoM 31 Aug Key
+        Decisions). This records the group''s arrival on `orders.group_visit_plan` (creating the row
+        if the booking has none yet): who arrived, how many, at which gate, and what went wrong. Each
+        guest is still admitted by their own entitlement scan, so `arrivedCount` is what the group
+        leader and the gate agree on and can differ from the scans.
+
+        **`checkInStatus` follows the counts**: `arrived` when
+        `arrivedCount` reaches the booking''s `expectedSize`, otherwise `partiallyArrived`; calling
+        again as more of the group arrives updates the same row, and `partiallyArrived` never moves back
+        to `expected`. `noShow` is set by the timer when the visit window closes with nobody checked
+        in, never by this call; a late group after that is recorded here and moves it on. Also appends an `orders.order_event` row (`eventType` `groupCheckIn`) to the
+        booking''s order. A `cancelled` booking is refused 409 `groupClosed` (decided 29 September,
+        writers pass).
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-agreed: '29 September: writers pass; MoM 31 Aug 4.7-4.8 and Key Decisions (group check-in is a status distinct from the access scan); pack Group_Sales___Corporate_Booking_Management_Reference.pdf p.29 (BO-280); shape follows setGroupBookingHandover'
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupCheckInRequest'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The group's visit plan with its check-in recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupVisitPlan'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The booking is cancelled (`groupClosed`).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/GroupBookingProblem'
+  /orders/{orderId}/merge:
+    parameters:
+    - name: orderId
+      in: path
+      required: true
+      description: The order the others are merged into; it survives.
+      schema:
+        type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+    post:
+      operationId: mergeOrders
+      x-ticvai-consumed-by:
+        - "P08 BO-328 Order Split, Merge & Transaction Relationship Management"
+      summary: Merge orders into one
+      description: '**The other half of `splitOrder`** (pack Order & Reservation Management p.46, BO-328
+        Order Split, Merge & Transaction Relationship Management). Moves every line and every payment
+        of each source order onto this one; each source order is closed as merged and keeps its id, so
+        a receipt, a payment callback or a partner reference that names it still resolves.
+
+        **Payments follow the lines they paid for**, as in a split: nothing is refunded or re-taken,
+        and the ledger records a transfer between orders, not a sale. Writes one
+        `orders.order_relationship` row per source order (`relationshipType` `mergedInto`, `amount`
+        the value moved) and an `orders.order_event` row on every order touched.
+
+        Refused 409 `mergeMismatch` when the orders differ in customer, venue or currency, and
+        `orderVoided` when any of them is voided (decided 29 September, writers pass).
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-agreed: '29 September: writers pass; pack Order___Reservation_Management_Reference.pdf p.46 (split, merge and relationships); shape follows splitOrder'
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - sourceOrderIds
+              properties:
+                sourceOrderIds:
+                  type: array
+                  minItems: 1
+                  maxItems: 20
+                  uniqueItems: true
+                  description: The orders merged into this one. Must not include it.
+                  items:
+                    type: string
+                    pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                reason:
+                  type: string
+                  maxLength: 500
+                  nullable: true
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Merged. The surviving order.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The orders differ in customer, venue or currency (`mergeMismatch`), or one is
+            voided (`orderVoided`).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/OrderRefusedProblem'
+  /orders/{orderId}/external-references:
+    parameters:
+    - name: orderId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+    get:
+      operationId: listExternalReferenceMappings
+      x-ticvai-consumed-by:
+        - "P08 BO-330 External Payment, Partner & Settlement Reference Mapping"
+      summary: The references other systems hold for this order
+      description: '**Every `orders.external_reference_mapping` row for the order**, ingested and
+        manual, newest first: partner, OTA, ERP and settlement-batch references and the manual
+        mappings with their reason. Gateway references already on the payment and refund are not
+        repeated here.
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '29 September: writers pass; pack Order___Reservation_Management_Reference.pdf (BO-330 External Payment, Partner & Settlement Reference Mapping); shape follows listReservations'
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Mappings, newest `createdAt` first, `id` as the tiebreak.
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ExternalReferenceMapping'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+    post:
+      operationId: recordExternalReference
+      x-ticvai-consumed-by:
+        - "P08 BO-330 External Payment, Partner & Settlement Reference Mapping"
+      summary: Map an order to a reference another system holds, by hand
+      description: '**The manual mapping `orders.external_reference_mapping` had no writer for** (DM5
+        open item). Ingested references (partner and OTA orders, ERP postings, settlement batches) are
+        written by their integration jobs with `isManual` false; this records the ones a person matched,
+        always with `isManual` true and a `reason`, and names who mapped it.
+
+        **A mapping is appended, never edited**: a wrong one is corrected by a new mapping whose reason
+        says what it corrects, so the trail the finance screens read (BO-330, BO-332) is never
+        rewritten. `paymentId` and `refundId`, when given, must belong to this order (400) (decided 29
+        September, writers pass).
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-agreed: '29 September: writers pass; pack Order___Reservation_Management_Reference.pdf (BO-330 External Payment, Partner & Settlement Reference Mapping); shape follows createReservation'
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExternalReferenceMappingRequest'
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Mapped
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalReferenceMapping'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+  /payment-allocation-rules:
+    get:
+      operationId: listPaymentAllocationRules
+      x-ticvai-consumed-by:
+        - "P08 BO-326 Multi-Payment, Split Tender & Payment Allocation Configuration"
+        - "P09 ADM-601 Split Payment & Tender Allocation Manager\t94"
+      summary: The venue's split-tender allocation rules
+      description: '**The rows `setMultiPaymentSplit` writes** in `orders.payment_allocation_rule`: at
+        what level a split-tender payment is allocated, per channel, terminal, product, order type and
+        customer type. Narrowest match wins; a row naming nothing is the venue default. Filter by any
+        match key; `isActive` defaults to true.
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '29 September: writers pass; pack Order___Reservation_Management_Reference.pdf p.43 (BO-326); shape follows listReservations'
+      parameters:
+      - name: channel
+        in: query
+        schema:
+          type: string
+          maxLength: 40
+      - name: terminalId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: productId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: isActive
+        in: query
+        schema:
+          type: boolean
+          default: true
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Rules, narrowest first, `id` as the tiebreak.
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/PaymentAllocationRule'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
 
 components:
   schemas:
+    ResaleSettlementProblem:
+      x-ticvai-persistence: none — error shape
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - notHoldable          # holdResaleSettlement: already paid, failed or reversed
+            - notOnHold            # releaseResaleSettlementHold
+            - holdNotReleasable    # releaseResaleSettlementHold: a refundDisputeHold is released by the refund or dispute outcome
+    GroupCheckInRequest:
+      type: object
+      x-ticvai-persistence: none — request only; lands in the check-in columns of `orders.group_visit_plan`
+      description: '**What the group check-in desk records** (BO-280). Counts are the running totals for
+        the group, not increments: a second call as the rest of the group arrives sends the new totals.'
+      required:
+      - arrivedCount
+      properties:
+        arrivedCount:
+          type: integer
+          minimum: 0
+          description: Members of the booked group who have arrived.
+        additionalGuests:
+          type: integer
+          minimum: 0
+          default: 0
+          description: People who arrived beyond the booked size; they still need entitlements to be admitted.
+        staffLeadersCount:
+          type: integer
+          minimum: 0
+          default: 0
+        arrivalGateId:
+          type: string
+          format: uuid
+          nullable: true
+        actualArrivalAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Defaults to now on the first call; later calls keep the first arrival time.
+        checkInIssues:
+          type: array
+          items:
+            type: string
+            enum:
+            - missingGuest
+            - extraGuest
+            - invalidTicket
+            - wrongDate
+            - lateArrival
+            - paymentHold
+            - missingCredential
+            - accessibilityRequirement
+    CreateExternalReferenceMappingRequest:
+      type: object
+      x-ticvai-persistence: none — request only; lands in `orders.external_reference_mapping` with `isManual` true
+      description: A manual mapping. `reason` is required because a manual mapping is only trusted with one.
+      required:
+      - sourceSystem
+      - reason
+      properties:
+        paymentId:
+          type: string
+          format: uuid
+          nullable: true
+        refundId:
+          type: string
+          format: uuid
+          nullable: true
+        sourceSystem:
+          type: string
+          enum:
+          - paymentGateways
+          - acquirers
+          - banks
+          - posTerminals
+          - b2bPartners
+          - resellers
+          - otas
+          - erp
+          - financeSystems
+          - walletProviders
+        provider:
+          type: string
+          maxLength: 60
+          nullable: true
+        merchantId:
+          type: string
+          maxLength: 60
+          nullable: true
+        externalTransactionId:
+          type: string
+          maxLength: 100
+          nullable: true
+        authorizationCode:
+          type: string
+          maxLength: 40
+          nullable: true
+        partnerOrderId:
+          type: string
+          maxLength: 100
+          nullable: true
+        settlementBatch:
+          type: string
+          maxLength: 100
+          nullable: true
+        settlementDate:
+          type: string
+          format: date
+          nullable: true
+        erpReference:
+          type: string
+          maxLength: 100
+          nullable: true
+        amount:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+        approvalReference:
+          type: string
+          maxLength: 100
+          nullable: true
     MemberExceptionInput:
       type: object
       x-ticvai-persistence: none — request only
@@ -12111,6 +13051,37 @@ components:
           type: string
           maxLength: 2000
           nullable: true
+        salesOwnerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The opportunity's owner. **An enquiry is the opportunity** (DM5, 29 September);
+            the pipeline fields live on it rather than on a second table that would copy it.
+        priority:
+          type: string
+          nullable: true
+          enum:
+          - low
+          - normal
+          - high
+        expectedValue:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+        probability:
+          type: integer
+          nullable: true
+          minimum: 0
+          maximum: 100
+          description: Percent.
+        expectedCloseDate:
+          type: string
+          format: date
+          nullable: true
+        nextActionAt:
+          type: string
+          format: date-time
+          nullable: true
     GroupEnquiryOpportunityView:
       type: object
       x-ticvai-persistence: orders.group_enquiry
@@ -12140,6 +13111,7 @@ components:
           - partner
           - manualEntry
         organisationId:
+          x-ticvai-references: orders.group_customer_organization
           type: string
           format: uuid
           nullable: true
@@ -12172,6 +13144,37 @@ components:
         requirements:
           type: string
           maxLength: 2000
+          nullable: true
+        salesOwnerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The opportunity's owner. **An enquiry is the opportunity** (DM5, 29 September);
+            the pipeline fields live on it rather than on a second table that would copy it.
+        priority:
+          type: string
+          nullable: true
+          enum:
+          - low
+          - normal
+          - high
+        expectedValue:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+        probability:
+          type: integer
+          nullable: true
+          minimum: 0
+          maximum: 100
+          description: Percent.
+        expectedCloseDate:
+          type: string
+          format: date
+          nullable: true
+        nextActionAt:
+          type: string
+          format: date-time
           nullable: true
         createdBy:
           type: string
@@ -12563,6 +13566,513 @@ components:
         updatedAt:
           type: string
           format: date-time
+          readOnly: true
+    GroupQuote:
+      type: object
+      x-ticvai-persistence: orders.group_quote + orders.group_quote_line
+      description: '**One version of a group quotation: the package being quoted, its priced lines,
+        its terms, and any discount exception on it** (DM5, 29 September: data model for the
+        agreed operations; MoM 31 Aug 4.7: quotation, versions, approval of extra discount).
+
+        **A revision is a new row, not an edit.** `quoteNumber` stays, `version` increments, and
+        the previous version becomes `superseded`, so the negotiation history the revision screen
+        shows is the rows themselves. **The package builder, the quotation builder, the discount
+        approval and the conversion screen all write or read this one record**; a package is only
+        ever priced as part of a quote.'
+      required:
+      - id
+      - quoteNumber
+      - version
+      - enquiryId
+      - guestCount
+      - status
+      - discountApproval
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        quoteNumber:
+          type: string
+          maxLength: 50
+        version:
+          type: integer
+          minimum: 1
+        enquiryId:
+          x-ticvai-references: orders.group_enquiry
+          type: string
+          format: uuid
+          description: The opportunity (`orders.group_enquiry`) this quote answers.
+        organisationId:
+          x-ticvai-references: orders.group_customer_organization
+          type: string
+          format: uuid
+          nullable: true
+        contactId:
+          x-ticvai-references: orders.group_customer_organization_contact
+          type: string
+          format: uuid
+          nullable: true
+          description: A contact of the organisation (`orders.group_customer_organization_contact`).
+        salesOwnerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        packageName:
+          type: string
+          maxLength: 150
+          nullable: true
+        template:
+          type: string
+          nullable: true
+          enum:
+          - schoolPackage
+          - corporatePackage
+          - birthdayPackage
+          - vipGroupPackage
+          - conferencePackage
+        groupPackageId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The catalogue group package the quote started from, if any.
+        componentTypes:
+          type: array
+          items:
+            type: string
+            enum:
+            - admissionTickets
+            - groupTicket
+            - guidedTour
+            - reservedSeating
+            - fB
+            - mealVoucher
+            - merchandise
+            - transportation
+            - parking
+            - workshop
+            - educationProgram
+            - meetingRoom
+            - vipExperience
+            - addOns
+            - rentalResources
+            - educationalWorkshop
+        quoteDate:
+          type: string
+          format: date
+        validUntil:
+          type: string
+          format: date
+          nullable: true
+        visitDate:
+          type: string
+          format: date
+          nullable: true
+        guestCount:
+          type: integer
+          minimum: 1
+        guestCountDeadline:
+          type: string
+          format: date-time
+          nullable: true
+        standardTotal:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          readOnly: true
+          description: The lines at standard rates.
+        total:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          readOnly: true
+          description: The lines at quoted rates, with tax and fees; what the lines sum to.
+        depositRequirement:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+        paymentScheduleType:
+          type: string
+          nullable: true
+          description: Carried into `GroupPaymentScheduleView.scheduleType` on conversion.
+          enum:
+          - depositThenBalance
+          - milestonePayment
+          - finalBalance
+          - customSchedule
+        cancellationPolicy:
+          type: string
+          maxLength: 2000
+          nullable: true
+        amendmentConditions:
+          type: string
+          maxLength: 2000
+          nullable: true
+        operationalTerms:
+          type: string
+          maxLength: 2000
+          nullable: true
+        deliveryFormats:
+          type: array
+          items:
+            type: string
+            enum:
+            - email
+            - pdf
+            - secureDigitalLink
+            - customerPortal
+        lines:
+          type: array
+          description: The priced lines. The rows of `orders.group_quote_line`.
+          items:
+            type: object
+            required:
+            - id
+            - description
+            - quantity
+            - standardRate
+            - groupRate
+            properties:
+              id:
+                type: string
+                format: uuid
+                readOnly: true
+              productId:
+                type: string
+                format: uuid
+                nullable: true
+                description: Null for a service with no catalogue product (a guide, a room).
+              componentType:
+                type: string
+                maxLength: 40
+                nullable: true
+              description:
+                type: string
+                maxLength: 300
+              quantity:
+                type: integer
+                minimum: 0
+              isComplimentary:
+                type: boolean
+                default: false
+              standardRate:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              groupRate:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              discount:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              tax:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              fee:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              total:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Money
+                readOnly: true
+        customerRequest:
+          type: string
+          maxLength: 2000
+          nullable: true
+          description: What the customer asked for that produced this version.
+        internalResponse:
+          type: string
+          maxLength: 2000
+          nullable: true
+        status:
+          type: string
+          enum:
+          - draft
+          - sent
+          - superseded
+          - accepted
+          - rejected
+          - expired
+        discountApproval:
+          type: string
+          default: notRequired
+          description: '**A quote whose discount exceeds the venue''s limit cannot be sent until this
+            is `approved`** (MoM 31 Aug 4.7: configurable approval for additional discounts).'
+          enum:
+          - notRequired
+          - pending
+          - approved
+          - rejected
+          - returnedForChange
+        discountPercent:
+          type: number
+          nullable: true
+          minimum: 0
+          maximum: 100
+        discountReason:
+          type: string
+          maxLength: 1000
+          nullable: true
+        discountDecidedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        discountDecidedAt:
+          type: string
+          format: date-time
+          nullable: true
+        discountDecisionComment:
+          type: string
+          maxLength: 1000
+          nullable: true
+        groupBookingId:
+          x-ticvai-references: orders.group_booking
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: Set when the accepted quote is converted into a group booking.
+        sentAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        respondedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        createdByPrincipalId:
+          type: string
+          format: uuid
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+    GroupVisitPlan:
+      type: object
+      x-ticvai-persistence: orders.group_visit_plan
+      description: '**The day-of-visit record for one group booking: the operational plan, the
+        sales-to-operations handover, and the group check-in** (DM5, 29 September: data model for
+        the agreed operations; MoM 31 Aug 4.7-4.8 and Key Decisions: group check-in is a status
+        distinct from the access scan).
+
+        **One row per group booking, beside it rather than on it**: operations writes this,
+        sales owns the booking, and the booking''s shape stays what its operations already
+        return. Tasks are `orders.group_task` rows against the same booking.
+
+        **Check-in here is the group''s arrival, not admission.** Each guest is still admitted by
+        their own entitlement scan; `arrivedCount` is what the group leader and the gate agree
+        on, which is why it can differ from the scans.'
+      required:
+      - id
+      - groupBookingId
+      - checkInStatus
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        groupBookingId:
+          x-ticvai-references: orders.group_booking
+          type: string
+          format: uuid
+          description: Unique; one plan per group booking.
+        arrivalAt:
+          type: string
+          format: date-time
+          nullable: true
+        arrivalLocation:
+          type: string
+          maxLength: 200
+          nullable: true
+        meetingPoint:
+          type: string
+          maxLength: 200
+          nullable: true
+        entryGateId:
+          type: string
+          format: uuid
+          nullable: true
+        departureAt:
+          type: string
+          format: date-time
+          nullable: true
+        groupLeaders:
+          type: string
+          maxLength: 500
+          nullable: true
+        contactId:
+          x-ticvai-references: orders.group_customer_organization_contact
+          type: string
+          format: uuid
+          nullable: true
+        ticketingMethod:
+          type: string
+          maxLength: 60
+          nullable: true
+        requirements:
+          type: object
+          nullable: true
+          description: 'Seating, guides, catering, transportation, parking, accessibility, equipment
+            and special requirements, as free text keyed by those names. **Free text on
+            purpose**: each is fulfilled by its own service (resources, F&B, transport), and
+            this is the brief they are fulfilled against, not the booking of them.'
+        operationalOwnerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        handoverNotes:
+          type: string
+          maxLength: 4000
+          nullable: true
+        handoverAttachmentIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        handoverAcknowledgedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        handoverAcknowledgedAt:
+          type: string
+          format: date-time
+          nullable: true
+        checkInStatus:
+          type: string
+          default: expected
+          enum:
+          - expected
+          - partiallyArrived
+          - arrived
+          - noShow
+        actualArrivalAt:
+          type: string
+          format: date-time
+          nullable: true
+        arrivalGateId:
+          type: string
+          format: uuid
+          nullable: true
+        arrivedCount:
+          type: integer
+          minimum: 0
+          default: 0
+        additionalGuests:
+          type: integer
+          minimum: 0
+          default: 0
+        staffLeadersCount:
+          type: integer
+          minimum: 0
+          default: 0
+        checkInIssues:
+          type: array
+          items:
+            type: string
+            enum:
+            - missingGuest
+            - extraGuest
+            - invalidTicket
+            - wrongDate
+            - lateArrival
+            - paymentHold
+            - missingCredential
+            - accessibilityRequirement
+        checkedInByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+    GroupTask:
+      type: object
+      x-ticvai-persistence: orders.group_task
+      description: '**One department task in a group''s operational plan** (DM5, 29 September: data
+        model for the agreed operations; written by `setGroupOperationalPlanning`). Against the
+        group booking, beside its `GroupVisitPlan`.'
+      required:
+      - id
+      - groupBookingId
+      - department
+      - task
+      - status
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        groupBookingId:
+          x-ticvai-references: orders.group_booking
+          type: string
+          format: uuid
+        department:
+          type: string
+          maxLength: 60
+        task:
+          type: string
+          maxLength: 300
+        ownerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        dueAt:
+          type: string
+          format: date-time
+          nullable: true
+        priority:
+          type: string
+          default: normal
+          enum:
+          - low
+          - normal
+          - high
+          - critical
+        dependsOnTaskId:
+          x-ticvai-references: orders.group_task
+          type: string
+          format: uuid
+          nullable: true
+        status:
+          type: string
+          enum:
+          - open
+          - inProgress
+          - done
+          - cancelled
+        notes:
+          type: string
+          maxLength: 2000
+          nullable: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
           readOnly: true
     GroupTicketAllocationInput:
       type: object
@@ -13423,9 +14933,12 @@ components:
           pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
         ruleId:
+          x-ticvai-references: orders.upgrade_rule
           type: string
           format: uuid
           nullable: true
+          description: The `UpgradeRule` (`orders.upgrade_rule`) this upgrade ran under; null for a
+            supervisor override outside any rule (DM5, 29 September).
         originalAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money
         newAmount:
@@ -13454,6 +14967,1312 @@ components:
           type: string
           format: date-time
           nullable: true
+    UpgradeRule:
+      type: object
+      x-ticvai-persistence: orders.upgrade_rule
+      description: '**One configured upgrade or conversion path, and everything that decides whether
+        and how it applies** (DM5, 29 September: data model for the agreed operations). The row
+        `OrdersUpgrade.ruleId` points at: an executed upgrade records which rule it ran under.
+
+        **One row per path, not one table per screen.** The path builder, eligibility, timing,
+        financial treatment, pro-rata, person-type conversion and credential screens are seven
+        views of the same rule (MoM 1 Sep 4.9: paths, eligibility, pro-rata, guest-app upgrades,
+        group upgrades by request). Column names follow the client''s backend workbook
+        (`catalogue.upgrade_rule`: from/to product and variant, priority, valid from/to); the
+        table lives in orders because the upgrade it governs is an order transaction.'
+      required:
+      - id
+      - name
+      - code
+      - transactionType
+      - fromProductId
+      - toProductId
+      - direction
+      - financialMethod
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        code:
+          type: string
+          maxLength: 50
+          description: Unique within the venue.
+        transactionType:
+          type: string
+          enum:
+          - upgrade
+          - downgrade
+          - exchange
+          - conversion
+          - personTypeConversion
+          - productConversion
+        fromProductId:
+          type: string
+          format: uuid
+        fromVariantId:
+          type: string
+          format: uuid
+          nullable: true
+        toProductId:
+          type: string
+          format: uuid
+        toVariantId:
+          type: string
+          format: uuid
+          nullable: true
+        eventId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Null applies the path to every event the products are sold for.
+        performanceId:
+          type: string
+          format: uuid
+          nullable: true
+        direction:
+          type: string
+          enum:
+          - oneWay
+          - bidirectional
+        chainedUpgradeAllowed:
+          type: boolean
+          default: false
+        allowedChannels:
+          type: array
+          items:
+            type: string
+            enum:
+            - b2cSelfService
+            - mobileApp
+            - pos
+            - callCenter
+            - boxOffice
+            - kiosk
+            - b2b
+            - reseller
+            - api
+        customerSegmentId:
+          type: string
+          format: uuid
+          nullable: true
+        priority:
+          type: integer
+          minimum: 0
+          default: 0
+          description: Where two rules match one ticket, the higher priority wins.
+        eligibleTicketStatuses:
+          type: array
+          items:
+            type: string
+            enum:
+            - valid
+            - unused
+            - partiallyUsed
+            - expired
+            - cancelled
+            - suspended
+        permittedWindows:
+          type: array
+          items:
+            type: string
+            enum:
+            - beforeFirstUse
+            - afterFirstUse
+            - beforeVisit
+            - duringVisit
+            - afterVisit
+            - beforeExpiry
+            - gracePeriod
+        supervisorExceptionAllowed:
+          type: boolean
+          default: false
+        originalTicketTreatment:
+          type: string
+          enum:
+          - invalidate
+          - supersede
+          - retainForHistory
+          - partiallyRetainEntitlement
+          default: supersede
+        conversionType:
+          type: string
+          nullable: true
+          description: Set when `transactionType` is `personTypeConversion`.
+          enum:
+          - childAdult
+          - juniorAdult
+          - seniorAdult
+          - residentTourist
+          - standardMember
+          - customPersonTypes
+        entitlementTreatment:
+          type: string
+          nullable: true
+          enum:
+          - retained
+          - replaced
+          - added
+          - removed
+          - alreadyConsumed
+        targetRequirements:
+          type: array
+          items:
+            type: string
+            enum:
+            - age
+            - residency
+            - corporateAssociation
+            - identityVerification
+            - otherEligibilityRules
+        financialMethod:
+          type: string
+          enum:
+          - fullDifference
+          - fixedUpgradeFee
+          - percentageUpgrade
+          - proRata
+          - creditBased
+          - noCredit
+          - complimentary
+        priceSource:
+          type: string
+          enum:
+          - currentSellingPrice
+          - originalDatePrice
+          - upgradeSpecificRate
+          - contractedRate
+          - membershipRate
+          - fixedUpgradePrice
+          default: currentSellingPrice
+        dynamicPriceTreatment:
+          type: string
+          nullable: true
+          enum:
+          - currentDynamicPrice
+          - protectedUpgradeRate
+          - configuredRate
+        upgradeAmount:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: The fixed fee or fixed price, when `financialMethod` or `priceSource` is fixed.
+        upgradePercent:
+          type: number
+          nullable: true
+          minimum: 0
+        carryForwardDiscounts:
+          type: array
+          items:
+            type: string
+            enum:
+            - promotion
+            - membershipDiscount
+            - voucher
+            - corporateDiscount
+        approvalRequirement:
+          type: string
+          maxLength: 200
+          nullable: true
+        proRataMethod:
+          type: string
+          nullable: true
+          description: Used when `financialMethod` is `proRata` (MoM 1 Sep 4.9, Key Decisions).
+          enum:
+          - timeBased
+          - usageBased
+          - valueBased
+          - entitlementBased
+          - fixedCredit
+        fixedCreditAmount:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+        maximumCreditPercent:
+          type: number
+          nullable: true
+          minimum: 0
+          maximum: 100
+        minimumUpgradeAmount:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+        creditExpiryDays:
+          type: integer
+          nullable: true
+          minimum: 0
+        nonCreditableComponents:
+          type: array
+          items:
+            type: string
+            maxLength: 60
+        excludeFeesFromCredit:
+          type: boolean
+          default: true
+        taxTreatment:
+          type: string
+          maxLength: 60
+          nullable: true
+        negativeDifferenceTreatment:
+          type: string
+          enum:
+          - noRefund
+          - refundDifference
+          - walletCredit
+          - voucherCredit
+          - supervisorApproval
+          default: noRefund
+        credentialTreatment:
+          type: string
+          enum:
+          - regenerateQr
+          - invalidateOldQr
+          - preserveExistingCredential
+          default: regenerateQr
+        generatedDocuments:
+          type: array
+          items:
+            type: string
+            enum:
+            - updatedTicket
+            - updatedReceipt
+            - updatedInvoice
+            - confirmationEmail
+            - smsWhatsapp
+            - walletPassUpdate
+        ownerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        validFrom:
+          type: string
+          format: date-time
+          nullable: true
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+        isActive:
+          type: boolean
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+    AfterSalePolicy:
+      type: object
+      x-ticvai-persistence: orders.after_sale_policy + orders.after_sale_policy_window
+      description: '**What may be changed, cancelled, voided or reissued after the sale, and on what
+        terms** (DM5, 29 September: data model for the agreed operations; MoM 1 Sep 4.11-4.12).
+        One row per scope, **the narrowest match wins** as `ResaleFeePolicy` does: a row naming no
+        product, event or channel is the venue default.
+
+        **It complements `RefundPolicy`, it does not replace it.** How much money goes back stays
+        in `orders.refund_policy` and its time bands; this row says whether the change is allowed
+        at all, what it costs, and who must approve it.'
+      required:
+      - id
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+          nullable: true
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+        eventId:
+          type: string
+          format: uuid
+          nullable: true
+        performanceId:
+          type: string
+          format: uuid
+          nullable: true
+        channel:
+          type: string
+          maxLength: 40
+          nullable: true
+        customerSegmentId:
+          type: string
+          format: uuid
+          nullable: true
+        permittedModifications:
+          type: array
+          description: What an amendment may change under this policy.
+          items:
+            type: string
+            enum:
+            - dateChange
+            - timeslotChange
+            - performanceChange
+            - quantityIncrease
+            - quantityReduction
+            - seatChange
+            - attendeeChange
+            - deliveryChange
+        eligibleTicketStatuses:
+          type: array
+          items:
+            type: string
+            enum:
+            - unused
+            - partiallyUsed
+            - fullyUsed
+            - expired
+            - cancelled
+            - suspended
+        maximumAmendmentsPerOrder:
+          type: integer
+          nullable: true
+          minimum: 0
+        maximumAmendmentsPerTicket:
+          type: integer
+          nullable: true
+          minimum: 0
+        maximumDateChanges:
+          type: integer
+          nullable: true
+          minimum: 0
+        coolingPeriodHours:
+          type: integer
+          nullable: true
+          minimum: 0
+          description: No amendment within this many hours of the purchase or of the last amendment.
+        permittedCancellationScopes:
+          type: array
+          items:
+            type: string
+            enum:
+            - entireOrder
+            - entireReservation
+            - individualTicket
+            - selectedOrderLines
+            - selectedQuantity
+            - addOnOnly
+            - groupMember
+            - packageComponent
+        evaluatedConditions:
+          type: array
+          items:
+            type: string
+            enum:
+            - orderStatus
+            - paymentStatus
+            - ticketStatus
+            - usage
+            - eventDate
+            - cancellationWindow
+            - product
+            - channel
+            - customerSegment
+        cancellationReasonCodes:
+          type: array
+          items:
+            type: string
+            enum:
+            - customerRequest
+            - eventCancelled
+            - operationalIssue
+            - duplicateOrder
+            - weather
+            - serviceRecovery
+            - fraudReview
+            - other
+        cancellationWindows:
+          type: array
+          description: Cancellation windows; thresholds ascend (audit R123 (6)). The rows of
+            `orders.after_sale_policy_window`.
+          items:
+            type: object
+            required:
+            - minHoursBefore
+            - outcome
+            properties:
+              minHoursBefore:
+                type: integer
+                minimum: 0
+              maxHoursBefore:
+                type: integer
+                nullable: true
+                description: Empty is no upper bound.
+              outcome:
+                type: string
+                enum:
+                - permitted
+                - permittedWithFee
+                - notPermitted
+              feePercent:
+                type: number
+                nullable: true
+                minimum: 0
+                maximum: 100
+              feeAmount:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Money
+                nullable: true
+              supervisorExceptionAllowed:
+                type: boolean
+                default: false
+        voidTypes:
+          type: array
+          items:
+            type: string
+            enum:
+            - orderVoid
+            - paymentVoidRequest
+            - ticketVoid
+            - accidentalSaleReversal
+            - sameDayCorrection
+            - failedTransactionCleanup
+        voidSameBusinessDayOnly:
+          type: boolean
+          default: true
+        voidBeforeSettlementOnly:
+          type: boolean
+          default: true
+        voidBeforeTicketUseOnly:
+          type: boolean
+          default: true
+        voidBeforeFiscalClosureOnly:
+          type: boolean
+          default: true
+        voidSupervisorRequired:
+          type: boolean
+          default: true
+        voidDualAuthorisation:
+          type: boolean
+          default: false
+        voidChannels:
+          type: array
+          items:
+            type: string
+            maxLength: 40
+        voidReasonCodes:
+          type: array
+          items:
+            type: string
+            enum:
+            - operatorError
+            - wrongProduct
+            - wrongQuantity
+            - wrongPayment
+            - technicalFailure
+        maximumReissues:
+          type: integer
+          nullable: true
+          minimum: 0
+        freeReissueCount:
+          type: integer
+          minimum: 0
+          default: 0
+        reissueSupervisorThreshold:
+          type: integer
+          nullable: true
+          minimum: 0
+          description: Reissues beyond this count need a supervisor.
+        defaultReissueOption:
+          type: string
+          enum:
+          - regenerateNew
+          - resendExisting
+          default: regenerateNew
+        isActive:
+          type: boolean
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+    AfterSaleRequest:
+      type: object
+      x-ticvai-persistence: orders.after_sale_request
+      description: '**One after-sale request: an amendment, cancellation, void, reissue or a
+        service-recovery exception, with what it changed and who approved it** (DM5, 29 September:
+        data model for the agreed operations; MoM 1 Sep 4.11-4.12).
+
+        **One table for both, on purpose.** An amendment outside policy and a service-recovery
+        exception are the same record: a request against an order, the policy''s answer, an
+        approval, and a before/after. The command centre, the audit explorer and the anomaly
+        analytics all read them as one list.
+
+        **The change itself still lands where it always did**: order lines through the amendment,
+        money through `createRefund`. This row is the request and its evidence.'
+      required:
+      - id
+      - orderId
+      - requestType
+      - status
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        number:
+          type: string
+          maxLength: 50
+          readOnly: true
+        orderId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        orderLineId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          nullable: true
+        reservationId:
+          type: string
+          format: uuid
+          nullable: true
+        groupBookingId:
+          x-ticvai-references: orders.group_booking
+          type: string
+          format: uuid
+          nullable: true
+        requestType:
+          type: string
+          enum:
+          - orderAmendment
+          - reservationAmendment
+          - dateChange
+          - timeslotChange
+          - performanceChange
+          - quantityChange
+          - attendeeChange
+          - seatChange
+          - deliveryChange
+          - cancellation
+          - partialCancellation
+          - void
+          - reissue
+          - serviceRecoveryException
+        channel:
+          type: string
+          maxLength: 40
+          nullable: true
+        reasonCode:
+          type: string
+          maxLength: 40
+          nullable: true
+        reason:
+          type: string
+          maxLength: 1000
+          nullable: true
+        before:
+          type: object
+          nullable: true
+          description: The order, line or reservation values before the change.
+        after:
+          type: object
+          nullable: true
+          description: The values the request asks for, and after completion the values applied.
+        afterSalePolicyId:
+          x-ticvai-references: orders.after_sale_policy
+          type: string
+          format: uuid
+          nullable: true
+          description: The policy row the request was evaluated against.
+        policyResult:
+          type: string
+          maxLength: 200
+          nullable: true
+          description: What the standard policy allowed, before any exception.
+        requestedException:
+          type: string
+          maxLength: 1000
+          nullable: true
+        remedy:
+          type: string
+          nullable: true
+          enum:
+          - complimentaryReissue
+          - feeWaiver
+          - partialRefund
+          - voucher
+          - walletCredit
+          - alternativeDate
+          - alternativeEvent
+          - complimentaryAddOn
+        financialImpact:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+        refundId:
+          type: string
+          format: uuid
+          nullable: true
+        status:
+          type: string
+          enum:
+          - requested
+          - pendingApproval
+          - approved
+          - rejected
+          - completed
+          - failed
+        escalatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        requestedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        decidedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        decidedAt:
+          type: string
+          format: date-time
+          nullable: true
+        decisionComment:
+          type: string
+          maxLength: 1000
+          nullable: true
+        failureReason:
+          type: string
+          maxLength: 500
+          nullable: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+    OrderEvent:
+      type: object
+      x-ticvai-persistence: orders.order_event
+      description: '**The order and reservation lifecycle log** (DM5, 29 September: data model for
+        the agreed operations). Append-only: one row per state change or integration step, with
+        the correlation id that ties a payment callback, a sync rejection and the order it touched
+        into one timeline. The current state stays on the order; this is how it got there.
+
+        **Written by every operation that changes an order''s or a reservation''s state** (decided 29
+        September, writers pass): `createOrder`, `modifyOrder`, `holdOrder`, `resumeOrder`, `voidOrder`,
+        `exchangeOrderLines`, `rescheduleOrder`, `splitOrder`, `mergeOrders`, `setOrderAmendment`,
+        `createUpgradeCredentialRegeneration`, `createReservation`, `extendReservation`,
+        `cancelReservation`, `convertReservation`, `createPayment`, `capturePayment`, `voidPayment`,
+        `createRefund`, `approveRefund`, `createBulkRefund` and `recordGroupCheckIn`; and by the jobs
+        that expire reservations, receive payment callbacks and sync partner orders, with `actorSystem`
+        set. Nothing updates or deletes a row.'
+      required:
+      - id
+      - orderId
+      - eventType
+      - occurredAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        orderId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        reservationId:
+          type: string
+          format: uuid
+          nullable: true
+        eventType:
+          type: string
+          maxLength: 60
+        previousState:
+          type: string
+          maxLength: 40
+          nullable: true
+        newState:
+          type: string
+          maxLength: 40
+          nullable: true
+        channel:
+          type: string
+          maxLength: 40
+          nullable: true
+        actorPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        actorSystem:
+          type: string
+          maxLength: 60
+          nullable: true
+          description: The integration or job, when no person acted.
+        relatedEntityType:
+          type: string
+          maxLength: 40
+          nullable: true
+        relatedEntityId:
+          type: string
+          maxLength: 40
+          nullable: true
+        correlationId:
+          type: string
+          maxLength: 100
+          nullable: true
+        result:
+          type: string
+          maxLength: 200
+          nullable: true
+        exceptionType:
+          type: string
+          nullable: true
+          enum:
+          - stuckOrder
+          - orphanReservation
+          - paymentOrderMismatch
+          - capacityMismatch
+          - missingCustomerData
+          - fulfillmentFailure
+          - externalSynchronizationFailure
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+        occurredAt:
+          type: string
+          format: date-time
+          readOnly: true
+    OrderRelationship:
+      type: object
+      x-ticvai-persistence: orders.order_relationship
+      description: '**An explicit link between two orders: a split, a merge, a replacement or a
+        conversion** (DM5, 29 September: data model for the agreed operations). Links that
+        already live on a row (an upgrade''s order, a refund''s payment, a reservation''s
+        `convertedOrderId`) are not copied here; this holds only the order-to-order links nothing
+        else records.
+
+        **Written by `splitOrder` (`childOrder`), `mergeOrders` (`mergedInto`) and
+        `setOrderAmendment` when an amendment replaces an order (`amendedFrom`,
+        `replacementOrder`)**; read by `listOrderSplitMerge` and `listRelatedOrderTransaction`
+        (decided 29 September, writers pass).'
+      required:
+      - id
+      - orderId
+      - relatedOrderId
+      - relationshipType
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        orderId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        relatedOrderId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        relationshipType:
+          type: string
+          enum:
+          - parentOrder
+          - childOrder
+          - mergedInto
+          - replacementOrder
+          - amendedFrom
+          - convertedFrom
+          - reissuedFrom
+        splitBasis:
+          type: string
+          nullable: true
+          enum:
+          - ticket
+          - attendee
+          - product
+          - orderLine
+          - paymentResponsibility
+          - department
+          - corporateCostCenter
+          - customer
+        amount:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: The value moved to the related order.
+        afterSaleRequestId:
+          x-ticvai-references: orders.after_sale_request
+          type: string
+          format: uuid
+          nullable: true
+        createdByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+    OrderSourceChannel:
+      type: object
+      x-ticvai-persistence: orders.order_source_channel
+      description: '**A configured order source: channel, sub-channel, prefix and numbering rule**
+        (DM5, 29 September: data model for the agreed operations; written by
+        `createOrderSourceChannel`). The per-order context (terminal, device, agent, partner,
+        campaign) is captured on the order when it is created, not configured here.'
+      required:
+      - id
+      - source
+      - numberingRule
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        source:
+          type: string
+          enum:
+          - b2cWeb
+          - mobileApp
+          - pos
+          - mobileFlyingPos
+          - kiosk
+          - callCenter
+          - boxOffice
+          - b2bPortal
+          - reseller
+          - ota
+          - api
+          - administrativeBackend
+        subChannel:
+          type: string
+          maxLength: 60
+          nullable: true
+        channelPrefix:
+          type: string
+          maxLength: 10
+          nullable: true
+        numberingRule:
+          type: string
+          enum:
+          - globalSequence
+          - tenantSequence
+          - venueSequence
+          - yearMonthPrefix
+          - customPattern
+        numberingPattern:
+          type: string
+          maxLength: 60
+          nullable: true
+          description: Required when `numberingRule` is `customPattern`.
+        partnerReferenceType:
+          type: string
+          nullable: true
+          enum:
+          - otaBookingReference
+          - resellerOrderId
+          - erpReference
+          - externalCrmReference
+        holdsInventory:
+          type: boolean
+          default: true
+          description: Whether an order from this source holds inventory before payment.
+        isActive:
+          type: boolean
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+    PaymentAllocationRule:
+      type: object
+      x-ticvai-persistence: orders.payment_allocation_rule
+      description: '**At what level a split-tender payment is allocated, per channel, terminal,
+        product, order type or customer type** (DM5, 29 September: data model for the agreed
+        operations; written by `setMultiPaymentSplit`). The tender limits themselves stay in
+        `payments.mixed_tender_rules`; this row says what each tender is allocated against.
+        Narrowest match wins; a row naming nothing is the venue default.'
+      required:
+      - id
+      - allocationLevel
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        channel:
+          type: string
+          maxLength: 40
+          nullable: true
+        terminalId:
+          type: string
+          format: uuid
+          nullable: true
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+        orderType:
+          type: string
+          maxLength: 40
+          nullable: true
+        customerType:
+          type: string
+          maxLength: 40
+          nullable: true
+        allocationLevel:
+          type: string
+          enum:
+          - orderLevel
+          - orderLineLevel
+          - productLevel
+          - taxFeeComponent
+          - specificTicket
+          - deposit
+        isActive:
+          type: boolean
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+    ReservationHoldPolicy:
+      type: object
+      x-ticvai-persistence: orders.reservation_hold_policy
+      description: '**How long a hold lasts, what it locks, whether it may be extended, and what
+        happens when it expires**, per hold type and scope (DM5, 29 September: data model for the
+        agreed operations; written by `setReservationHoldPolicy`; MoM 1 Sep 4.11-4.12). The holds
+        themselves stay in `catalogue.inventory_hold`; this is the rule that sets their
+        `expiresAt`. Narrowest match wins.'
+      required:
+      - id
+      - holdType
+      - holdDurationMinutes
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        holdType:
+          type: string
+          enum:
+          - cartHold
+          - checkoutHold
+          - agentReservation
+          - groupReservation
+          - b2bReservation
+          - corporateReservation
+          - manualHold
+          - paymentHold
+          - seatHold
+          - inventoryHold
+        channel:
+          type: string
+          maxLength: 40
+          nullable: true
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+        eventId:
+          type: string
+          format: uuid
+          nullable: true
+        performanceId:
+          type: string
+          format: uuid
+          nullable: true
+        ticketType:
+          type: string
+          maxLength: 40
+          nullable: true
+        customerSegmentId:
+          type: string
+          format: uuid
+          nullable: true
+        holdDurationMinutes:
+          type: integer
+          minimum: 1
+        lockedCapacity:
+          type: array
+          items:
+            type: string
+            enum:
+            - admissionCapacity
+            - seat
+            - inventory
+            - timeslotCapacity
+            - entitlementCapacity
+        onExpiry:
+          type: array
+          items:
+            type: string
+            enum:
+            - releaseInventory
+            - releaseSeats
+            - cancelReservation
+            - notifyCustomer
+            - notifyAgent
+        extensionAllowed:
+          type: boolean
+          default: false
+        maximumExtensions:
+          type: integer
+          nullable: true
+          minimum: 0
+        extensionDurationMinutes:
+          type: integer
+          nullable: true
+          minimum: 1
+        extensionPermission:
+          type: string
+          maxLength: 60
+          nullable: true
+          description: The permission a user needs to extend a hold of this type.
+        extensionRequiresApproval:
+          type: boolean
+          default: false
+        isActive:
+          type: boolean
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+    OrderStatusTransitionRule:
+      type: object
+      x-ticvai-persistence: orders.status_transition_rule
+      description: '**A governed move between two order or reservation statuses: who may make it and
+        what must hold** (DM5, 29 September: data model for the agreed operations; written by
+        `setOrderReservationStatus`). **It narrows `states/order.yaml` and
+        `states/reservation.yaml`, it cannot widen them**: a row naming a transition the state
+        model forbids is refused, because the state model is what the code enforces.'
+      required:
+      - id
+      - entity
+      - fromStatus
+      - toStatus
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        entity:
+          type: string
+          enum:
+          - order
+          - reservation
+        fromStatus:
+          type: string
+          maxLength: 40
+        toStatus:
+          type: string
+          maxLength: 40
+        requiredConditions:
+          type: string
+          maxLength: 1000
+          nullable: true
+        allowedPermission:
+          type: string
+          maxLength: 60
+          nullable: true
+        isSystemControlled:
+          type: boolean
+          default: false
+          description: Only the system makes this move; no user may.
+        integrationRequirement:
+          type: string
+          maxLength: 200
+          nullable: true
+        notification:
+          type: string
+          maxLength: 200
+          nullable: true
+        auditRequirement:
+          type: string
+          maxLength: 200
+          nullable: true
+        isActive:
+          type: boolean
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+    ExternalReferenceMapping:
+      type: object
+      x-ticvai-persistence: orders.external_reference_mapping
+      description: '**A reference another system holds for an order, payment or refund, and who
+        mapped it** (DM5, 29 September: data model for the agreed operations). Gateway references
+        already on `orders.payment` and `orders.refund` are not copied; this holds the partner,
+        OTA, ERP and settlement-batch references nothing else stores, and the manual mappings
+        with their reason.
+
+        **Written by the integration jobs** (partner and OTA order sync, ERP posting, settlement-file
+        ingestion) with `isManual` false, and by `recordExternalReference` with `isManual`
+        true; read by `listExternalReferenceMappings`, `listExternalPaymentPartner` and
+        `listFinancialTraceability`. Append-only (decided 29 September, writers pass).'
+      required:
+      - id
+      - orderId
+      - sourceSystem
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        orderId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        paymentId:
+          type: string
+          format: uuid
+          nullable: true
+        refundId:
+          type: string
+          format: uuid
+          nullable: true
+        sourceSystem:
+          type: string
+          enum:
+          - paymentGateways
+          - acquirers
+          - banks
+          - posTerminals
+          - b2bPartners
+          - resellers
+          - otas
+          - erp
+          - financeSystems
+          - walletProviders
+        provider:
+          type: string
+          maxLength: 60
+          nullable: true
+        merchantId:
+          type: string
+          maxLength: 60
+          nullable: true
+        externalTransactionId:
+          type: string
+          maxLength: 100
+          nullable: true
+        authorizationCode:
+          type: string
+          maxLength: 40
+          nullable: true
+        partnerOrderId:
+          type: string
+          maxLength: 100
+          nullable: true
+        settlementBatch:
+          type: string
+          maxLength: 100
+          nullable: true
+        settlementDate:
+          type: string
+          format: date
+          nullable: true
+        erpReference:
+          type: string
+          maxLength: 100
+          nullable: true
+        amount:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+        isManual:
+          type: boolean
+          default: false
+        reason:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: Required when `isManual` is true.
+        approvalReference:
+          type: string
+          maxLength: 100
+          nullable: true
+        createdByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
     DraftedRecord:
       type: object
       x-ticvai-provisional: true
@@ -13655,6 +16474,14 @@ components:
       - leaderSubjectId
       - expectedSize
       properties:
+        groupQuoteId:
+          x-ticvai-references: orders.group_quote
+          type: string
+          format: uuid
+          nullable: true
+          description: '**The quote this booking converts** (BO-272). Must be the current version and
+            `sent` or `accepted`; conversion sets its `groupBookingId` and moves a `sent` quote to
+            `accepted` (decided 29 September, writers pass).'
         kind:
           type: string
           enum:
@@ -14343,11 +17170,16 @@ components:
           type: string
           readOnly: true
           enum:
+          - pendingReview
           - listed
           - reserved
           - sold
           - withdrawn
           - expired
+          - rejected
+          description: '`pendingReview` and `rejected` added 29 September (DM5): a listing the
+            marketplace''s `moderationMode` sends to review waits there until `approveListingModeration`
+            lists or rejects it.'
         listedAt:
           type: string
           format: date-time
@@ -14355,6 +17187,39 @@ components:
         soldToSubjectId:
           type: string
           format: uuid
+          nullable: true
+          readOnly: true
+        reviewReasons:
+          type: array
+          readOnly: true
+          description: Why the listing was sent to review (DM5, 29 September).
+          items:
+            type: string
+            enum:
+            - highResalePrice
+            - unusualDiscount
+            - highValueTicket
+            - vipTicket
+            - sellerRisk
+            - newSeller
+            - multipleListings
+            - identityIssue
+            - paymentIssue
+            - ticketOwnershipConcern
+            - fraudIndicator
+        moderatedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        moderatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        moderationReason:
+          type: string
+          maxLength: 1000
           nullable: true
           readOnly: true
         payoutStatus:
@@ -14383,6 +17248,512 @@ components:
 
 
             **Operations write it at `venue` scope.**'
+    ResaleMarketplaceConfig:
+      type: object
+      x-ticvai-persistence: orders.resale_marketplace_config
+      description: '**How a venue''s resale marketplace runs: terms, pricing mode and guardrails,
+        moderation, listing lifecycle, buyer checkout hold, seller settlement timing, and the
+        white-label deployment** (DM5, 29 September: data model for the agreed operations; MoM 1
+        Sep 4.14: admin-configured resale price range; own B2C site, hosted white-label portal, or
+        API).
+
+        **One row per venue.** The resale model is four tables and they do not overlap: what a
+        resale costs is `orders.resale_fee_policy` (narrowable by event and product), which
+        tickets may be resold is `orders.resale_eligibility_rule` (narrowable the same way), how
+        the marketplace behaves is this row, and what each seller is owed is
+        `orders.resale_settlement`. The listing snapshots what it needs at creation.
+
+        **Written by `setResaleMarketplaceConfig` and read by `getResaleMarketplaceConfig`**
+        (decided 29 September, writers pass).'
+      required:
+      - id
+      - marketplaceName
+      - pricingMode
+      - moderationMode
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        marketplaceName:
+          type: string
+          maxLength: 150
+        pricingMode:
+          type: string
+          enum:
+          - faceValueOnly
+          - fixedPrice
+          - sellerSelectedPrice
+          - cappedPrice
+          - operatorControlled
+          - aiRecommendedPrice
+        maximumDiscountPercent:
+          type: number
+          nullable: true
+          minimum: 0
+          maximum: 100
+          description: The floor below face value, beside `ResaleFeePolicy.priceCapPercent` above it.
+        sellerCanEditPrice:
+          type: boolean
+          default: true
+        maximumPriceChanges:
+          type: integer
+          nullable: true
+          minimum: 0
+        minimumMinutesBetweenPriceChanges:
+          type: integer
+          nullable: true
+          minimum: 0
+        moderationMode:
+          type: string
+          default: automatic
+          description: '`reviewTriggers` sends a listing to `pendingReview` when `moderationMode` is
+            `riskBased`; `manual` reviews every listing.'
+          enum:
+          - automatic
+          - riskBased
+          - manual
+        reviewTriggers:
+          type: array
+          items:
+            type: string
+            enum:
+            - highResalePrice
+            - unusualDiscount
+            - highValueTicket
+            - vipTicket
+            - sellerRisk
+            - newSeller
+            - multipleListings
+            - identityIssue
+            - paymentIssue
+            - ticketOwnershipConcern
+            - fraudIndicator
+        expiryRule:
+          type: string
+          default: atEventStart
+          enum:
+          - xMinutesBeforeEvent
+          - xHoursBeforeEvent
+          - atEventStart
+          - atConfiguredDate
+        expiryOffset:
+          type: integer
+          nullable: true
+          minimum: 0
+          description: Minutes or hours, per `expiryRule`.
+        withdrawalPolicy:
+          type: string
+          default: sellerCannotWithdrawWhileReserved
+          enum:
+          - sellerCanWithdrawAnytime
+          - sellerCannotWithdrawWhileReserved
+        maximumWithdrawals:
+          type: integer
+          nullable: true
+          minimum: 0
+        cancellationFee:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+        checkoutHoldMinutes:
+          type: integer
+          minimum: 1
+          default: 10
+          description: How long a listing stays `reserved` for one buyer in checkout.
+        buyerIdentityVerificationRequired:
+          type: boolean
+          default: false
+        settlementTiming:
+          type: string
+          default: afterAccessValidation
+          description: '**Default `afterAccessValidation`**: the seller is paid after the buyer is
+            admitted, not after they pay (`ResaleListing.payoutStatus`).'
+          enum:
+          - immediatelyAfterResale
+          - xDaysAfterResale
+          - afterEventCompletion
+          - xDaysAfterEvent
+          - afterAccessValidation
+          - operatorDefinedSettlementCycle
+        settlementDelayDays:
+          type: integer
+          nullable: true
+          minimum: 0
+        minimumPayoutThreshold:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+        customerTerms:
+          type: string
+          maxLength: 20000
+          nullable: true
+        sellerTerms:
+          type: string
+          maxLength: 20000
+          nullable: true
+        buyerTerms:
+          type: string
+          maxLength: 20000
+          nullable: true
+        termsVersion:
+          type: string
+          maxLength: 20
+          nullable: true
+          description: The version a seller accepts at listing.
+        disclosures:
+          type: string
+          maxLength: 4000
+          nullable: true
+        resaleTicketLabel:
+          type: string
+          maxLength: 60
+          nullable: true
+        deploymentModel:
+          type: string
+          default: ticvaiHostedWhiteLabel
+          enum:
+          - embeddedWhiteLabel
+          - ticvaiHostedWhiteLabel
+          - headlessApi
+        navigation:
+          type: array
+          items:
+            type: string
+            enum:
+            - myTickets
+            - sell
+            - buy
+            - myListings
+            - transactions
+        authenticationMethod:
+          type: string
+          default: customerAccount
+          enum:
+          - customerAccount
+          - sso
+          - passwordlessLogin
+          - otp
+          - appAuthentication
+        branding:
+          type: object
+          nullable: true
+          description: 'Logo, colours, typography, support contact and legal links for the
+            marketplace pages. **A hosted white-label marketplace takes the venue''s white-label
+            theme when this is null**, so a venue sets it only to differ.'
+        domain:
+          type: string
+          maxLength: 253
+          nullable: true
+        languages:
+          type: array
+          items:
+            type: string
+            maxLength: 10
+        isActive:
+          type: boolean
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+    ResaleEligibilityRule:
+      type: object
+      x-ticvai-persistence: orders.resale_eligibility_rule
+      description: '**Which tickets may be resold, by whom and when** (DM5, 29 September: data model
+        for the agreed operations; written by `setResaleEligibilityRule`; MoM 31 Aug 4.12:
+        eligibility such as minimum time before validity, no expired tickets; MoM 1 Sep 4.14).
+        **The narrowest match wins**, as `ResaleFeePolicy` does: a rule naming no product, event
+        or channel is the venue default.'
+      required:
+      - id
+      - isResaleAllowed
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+        eventId:
+          type: string
+          format: uuid
+          nullable: true
+        performanceId:
+          type: string
+          format: uuid
+          nullable: true
+        ticketType:
+          type: string
+          maxLength: 40
+          nullable: true
+        salesChannel:
+          type: string
+          maxLength: 40
+          nullable: true
+        customerSegmentId:
+          type: string
+          format: uuid
+          nullable: true
+        isResaleAllowed:
+          type: boolean
+        requiredConditions:
+          type: array
+          items:
+            type: string
+            enum:
+            - fullyPaid
+            - notScanned
+            - notExpired
+            - eventNotStarted
+            - notRefunded
+            - notComplimentary
+            - notStaff
+            - notInternal
+            - notBlocked
+            - notUnderDispute
+        resaleOpensAt:
+          type: string
+          format: date-time
+          nullable: true
+        resaleClosesAt:
+          type: string
+          format: date-time
+          nullable: true
+        blackoutFrom:
+          type: string
+          format: date-time
+          nullable: true
+        blackoutTo:
+          type: string
+          format: date-time
+          nullable: true
+        minimumOwnershipHours:
+          type: integer
+          nullable: true
+          minimum: 0
+        resaleImmediatelyAfterPurchase:
+          type: boolean
+          default: false
+        maximumResaleAttempts:
+          type: integer
+          nullable: true
+          minimum: 1
+        maximumListingsPerCustomer:
+          type: integer
+          nullable: true
+          minimum: 1
+        identityVerificationRequired:
+          type: boolean
+          default: false
+        originalPurchaserOnly:
+          type: boolean
+          default: false
+        isActive:
+          type: boolean
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+    ResaleRecommendation:
+      type: object
+      x-ticvai-persistence: orders.resale_recommendation
+      description: '**An AI recommendation about the resale marketplace and the operator''s decision
+        on it** (DM5, 29 September: data model for the agreed operations; written by
+        `setResaleMarketplaceRecommendation`; MoM 14 Aug: AI is advisory in phase one). **Nothing
+        here changes a setting by itself**: an accepted or modified recommendation is applied
+        through the operation that owns the setting.'
+      required:
+      - id
+      - recommendationType
+      - recommendation
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        recommendationType:
+          type: string
+          enum:
+          - pricing
+          - demandPrediction
+          - listing
+          - sellerRisk
+          - expiry
+          - marketplaceOptimisation
+          - anomaly
+        eventId:
+          type: string
+          format: uuid
+          nullable: true
+        resaleListingId:
+          x-ticvai-references: orders.resale_listing
+          type: string
+          format: uuid
+          nullable: true
+        recommendation:
+          type: string
+          maxLength: 2000
+        recommendedValue:
+          type: object
+          nullable: true
+          description: The value proposed, in the shape of the setting it concerns.
+        decision:
+          type: string
+          nullable: true
+          description: Null until the operator decides.
+          enum:
+          - accept
+          - modify
+          - ignore
+        appliedValue:
+          type: object
+          nullable: true
+          description: What the operator applied, when the decision is `modify`.
+        decidedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        decidedAt:
+          type: string
+          format: date-time
+          nullable: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+    ResaleSettlement:
+      type: object
+      x-ticvai-persistence: orders.resale_settlement
+      description: '**What one seller is owed for one sold listing, and when and how it is paid**
+        (DM5, 29 September: data model for the agreed operations; MoM 1 Sep 4.14, Board 2:
+        settlement to the original seller). The amounts are fixed from the listing''s own fee
+        snapshot at sale. `ResaleListing.payoutStatus` is the seller-facing summary of this row.
+
+        **The seller is paid after the buyer is admitted, not after they pay**, so a dispute or a
+        refund lands on a settlement that is still `pending` or `onHold`, never on money already
+        paid out.'
+      required:
+      - id
+      - resaleListingId
+      - sellerSubjectId
+      - listingPrice
+      - sellerFee
+      - sellerProceeds
+      - status
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        resaleListingId:
+          x-ticvai-references: orders.resale_listing
+          type: string
+          format: uuid
+          description: Unique; one settlement per sold listing.
+        sellerSubjectId:
+          type: string
+          format: uuid
+        listingPrice:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        sellerFee:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        processingFee:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+        tax:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+        adjustments:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+        sellerProceeds:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        payoutMethod:
+          type: string
+          nullable: true
+          description: Proposed values, client to correct (DM5).
+          enum:
+          - originalPaymentMethod
+          - bankTransfer
+          - wallet
+        settlementBatch:
+          type: string
+          maxLength: 100
+          nullable: true
+        expectedPayoutDate:
+          type: string
+          format: date
+          nullable: true
+        status:
+          type: string
+          enum:
+          - pending
+          - scheduled
+          - onHold
+          - paid
+          - failed
+          - reversed
+        holdReason:
+          type: string
+          nullable: true
+          enum:
+          - manualHold
+          - complianceHold
+          - refundDisputeHold
+        paidAt:
+          type: string
+          format: date-time
+          nullable: true
+        failureReason:
+          type: string
+          maxLength: 500
+          nullable: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
     CreateResaleListingRequest:
       type: object
       x-ticvai-persistence: none — request only
@@ -17450,7 +20821,8 @@ components:
             - packageUnavailable      # requestGroupBooking
             - aboveParticipantLimit   # requestGroupBooking (422)
             - statusBackwards         # updateGroupBooking: status moves forward only
-            - groupClosed             # updateGroupBooking: already cancelled or complete; the setParticipantGuestList, setGroupPaymentSchedule, setGroupTicketAllocation and setGroupTicketFulfillment 409
+            - groupClosed             # updateGroupBooking: already cancelled or complete; the setParticipantGuestList, setGroupPaymentSchedule, setGroupTicketAllocation and setGroupTicketFulfillment 409; recordGroupCheckIn on a cancelled booking
+            - quoteNotConvertible     # createGroupBooking: the quote is draft, superseded, rejected, expired or already converted
     PaymentLinkView:
       type: object
       x-ticvai-persistence: none — projection of orders.payment_link for its holder
@@ -17850,6 +21222,7 @@ components:
             - alreadySettled            # voidOrder: a payment is captured; refund instead
             - shiftClosed               # voidOrder
             - paymentNotAllocated       # splitOrder
+            - mergeMismatch             # mergeOrders: the orders differ in customer, venue or currency
             - lineRedeemed              # modifyOrder, exchangeOrderLines
             - replacementUnavailable    # exchangeOrderLines
             - outsideExchangeWindow     # exchangeOrderLines
@@ -18139,8 +21512,7 @@ components:
     UpgradeConversionPathBuilderInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: none — request only; lands in `orders.upgrade_rule` (DM5, 29 September)
       description: '**What Upgrade & Conversion Path Builder submits.** The configurable fields from
         the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -18493,8 +21865,7 @@ components:
     ProRataResidualValueEntitlementCreditConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: none — request only; lands in the pro-rata columns of `orders.upgrade_rule` (DM5, 29 September)
       description: '**What Pro-Rata, Residual Value & Entitlement Credit Configuration submits.**
         The configurable fields from the pack''s directory for this screen; the metrics the screen
         displays are deliberately absent, because a figure the system computed is not a figure a client
@@ -18726,8 +22097,7 @@ components:
     UpgradeExecutionCredentialRegenerationChannelControlInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: none — request only; the execution lands in `orders.upgrade`, the credential treatment and channels come from `orders.upgrade_rule` (DM5, 29 September)
       description: '**What Upgrade Execution, Credential Regeneration & Channel Controls submits.**
         The configurable fields from the pack''s directory for this screen; the metrics the screen
         displays are deliberately absent, because a figure the system computed is not a figure a client
@@ -19347,8 +22717,7 @@ components:
     GroupPackageExperienceBuilderInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: none — request only; lands in the package columns of `orders.group_quote` (DM5, 29 September)
       description: '**What Group Package & Experience Builder submits.** The configurable fields from
         the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -19505,9 +22874,7 @@ components:
     GroupQuotationBuilderProposalGenerationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is orders.cart at 3%, so this is not an update to anything the package stores today and no
-        new table has been decided
+      x-ticvai-persistence: none — request only; lands in `orders.group_quote` and its `orders.group_quote_line` rows (DM5, 29 September)
       description: '**What Group Quotation Builder & Proposal Generation submits.** The configurable
         fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.
@@ -19736,9 +23103,7 @@ components:
     GroupDiscountExceptionApprovalWorkflowInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is orders.cash_movement at 5%, so this is not an update to anything the package stores today
-        and no new table has been decided
+      x-ticvai-persistence: none — request only; the decision lands in the discount columns of `orders.group_quote` (DM5, 29 September)
       description: '**What Group Discount, Exception & Approval Workflow submits.** The configurable
         fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'
@@ -19976,8 +23341,7 @@ components:
     GroupBooking360HandoverWorkspaceInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: none — request only; lands in the handover columns of `orders.group_visit_plan` (DM5, 29 September)
       description: '**What Group Booking 360° & Handover Workspace submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'
@@ -20184,9 +23548,7 @@ components:
     GroupOperationalPlanningTaskWorkspaceInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.price_list at 3%, so this is not an update to anything the package stores today
-        and no new table has been decided
+      x-ticvai-persistence: none — request only; lands in `orders.group_visit_plan` and `orders.group_task` (DM5, 29 September)
       description: '**What Group Operational Planning & Task Workspace submits.** The configurable
         fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.
@@ -21203,9 +24565,7 @@ components:
     ReservationHoldPolicyConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.channel_allocation at 3%, so this is not an update to anything the package stores
-        today and no new table has been decided
+      x-ticvai-persistence: none — request only; lands in `orders.reservation_hold_policy` (DM5, 29 September)
       description: '**What Reservation & Hold Policy Configuration submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'
@@ -21332,8 +24692,7 @@ components:
     OrderReservationStatusLifecycleConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: none — request only; lands in `orders.status_transition_rule` (DM5, 29 September)
       description: '**What Order & Reservation Status Lifecycle Configuration submits.** The configurable
         fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.
@@ -21459,9 +24818,7 @@ components:
     OrderCreationSourceChannelConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.channel_allocation at 3%, so this is not an update to anything the package stores
-        today and no new table has been decided
+      x-ticvai-persistence: none — request only; lands in `orders.order_source_channel` (DM5, 29 September)
       description: '**What Order Creation & Source/Channel Configuration submits.** The configurable
         fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'
@@ -22046,9 +25403,7 @@ components:
     OrderAmendmentWorkspaceInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.channel_capacity at 5%, so this is not an update to anything the package stores
-        today and no new table has been decided
+      x-ticvai-persistence: none — request only; lands in `orders.after_sale_request`, and the change itself in the order lines (DM5, 29 September)
       description: '**What Order Amendment Workspace submits.** The configurable fields from the pack''s
         directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -22190,9 +25545,7 @@ components:
     AmendmentEligibilityPolicyRuleBuilderInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.channel_allocation at 3%, so this is not an update to anything the package stores
-        today and no new table has been decided
+      x-ticvai-persistence: none — request only; lands in the amendment columns of `orders.after_sale_policy` (DM5, 29 September)
       description: '**What Amendment Eligibility & Policy Rule Builder submits.** The configurable
         fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'
@@ -22369,9 +25722,7 @@ components:
     CancellationPartialCancellationPolicyConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.channel_allocation at 6%, so this is not an update to anything the package stores
-        today and no new table has been decided
+      x-ticvai-persistence: none — request only; lands in `orders.after_sale_policy` and its `orders.after_sale_policy_window` rows (DM5, 29 September)
       description: '**What Cancellation & Partial Cancellation Policy Configuration submits.** The
         configurable fields from the pack''s directory for this screen; the metrics the screen displays
         are deliberately absent, because a figure the system computed is not a figure a client may
@@ -22711,9 +26062,7 @@ components:
     ApprovalExceptionServiceRecoveryManagementInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is orders.cash_movement at 6%, so this is not an update to anything the package stores today
-        and no new table has been decided
+      x-ticvai-persistence: none — request only; lands in `orders.after_sale_request` (DM5, 29 September)
       description: '**What Approval, Exception & Service Recovery Management submits.** The configurable
         fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'
@@ -23070,9 +26419,7 @@ components:
     MultiPaymentSplitTenderPaymentAllocationConfiguratioInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.channel_allocation at 6%, so this is not an update to anything the package stores
-        today and no new table has been decided
+      x-ticvai-persistence: none — request only; lands in `orders.payment_allocation_rule` (DM5, 29 September)
       description: '**What Multi-Payment, Split Tender & Payment Allocation Configuration submits.**
         The configurable fields from the pack''s directory for this screen; the metrics the screen
         displays are deliberately absent, because a figure the system computed is not a figure a client
@@ -23106,6 +26453,10 @@ components:
           - specificTicket
           - deposit
           description: What a payment is allocated against.
+        isActive:
+          type: boolean
+          default: true
+          description: False retires the rule for this match key (decided 29 September, writers pass).
     DepositPartialPaymentOutstandingBalanceManagementView:
       type: object
       x-ticvai-drafted-shape: true
@@ -23698,8 +27049,7 @@ components:
     ResaleEligibilityRuleConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: none — request only; lands in `orders.resale_eligibility_rule` (DM5, 29 September)
       description: '**What Resale Eligibility Rule Configuration submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'
@@ -24207,8 +27557,7 @@ components:
     ListingApprovalModerationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: none — request only; lands in the moderation columns of `orders.resale_listing` (DM5, 29 September)
       description: '**What Listing Approval & Moderation submits.** The configurable fields from the
         pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -24375,8 +27724,7 @@ components:
     AiResaleConfigurationMarketplaceRecommendationsInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: none — request only; lands in `orders.resale_recommendation` (DM5, 29 September)
       description: '**What AI Resale Configuration & Marketplace Recommendations submits.** The configurable
         fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'

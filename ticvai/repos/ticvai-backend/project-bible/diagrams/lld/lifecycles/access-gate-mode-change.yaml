@@ -1,0 +1,40 @@
+id: LLD-AccessGateModeChange
+title: AccessGateModeChange — 2 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/access-gate-mode-change.yaml
+entity: AccessGateModeChange
+contract: access
+enum: AccessGateModeChange.status
+enumKind: inline
+enumSchema: AccessGateModeChange
+enumProperty: status
+owner: access
+description: One gate mode change on an access point, pending or applied, with its from and target mode,
+  operator, reason and effective time (declared 29 September, writers pass). Append-only history. `setTurnstileMode`
+  writes the row **`applied` at once when no future `effectiveAt` is sent, and `pending` when one is**;
+  a timer applies a pending change at `effectiveAt`, and `cancelGateModeChange` withdraws one that has
+  not yet applied.
+initial:
+- pending
+- applied
+terminal:
+- applied
+- cancelled
+transitions:
+- from: pending
+  to: applied
+  trigger: timer
+  guard: '`effectiveAt` has come; the access point''s operating mode becomes the target mode'
+- from: pending
+  to: cancelled
+  operation: cancelGateModeChange
+  trigger: operation
+  guard: The change is still `pending` (`effectiveAt` in the future); an applied change is undone by
+    a new `setTurnstileMode`, not by cancelling
+  isReversal: true
+openQuestions:
+- A second future-dated `setTurnstileMode` for the same access point while one is pending is not modelled;
+  confirm whether it cancels the earlier pending change or both stay queued in time order.
+notes: '**`applied` and `cancelled` are terminal.** The history is append-only: reverting a gate is
+  a new change row, so an applied row is never edited.'

@@ -1,6 +1,6 @@
 # P08-access-venue-01 — P08 · Access & Venue (1 of 3)
 
-**10 screens · 62 operations · 57 schemas · 20 permissions**
+**10 screens · 64 operations · 70 schemas · 21 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 20 permissions apply here:
+- **Every control that can be refused must be gated.** 21 permissions apply here:
   `ACCESS_POINT_CONFIGURE, ASSET_MANAGE, ASSET_VIEW, EVENT_CONFIGURE, MAINTENANCE_APPROVE, MAINTENANCE_EXECUTE, MARKETING_MANAGE, MARKETING_SEND, MARKETING_VIEW, ORDER_REFUND_APPROVE, ORDER_REFUND_BULK, PARKING_CONFIGURE`…. A control nobody can use must say so,
   not sit enabled and fail.
-- **21 of these operations work offline**: acceptWorkOrder, attachWorkOrderEvidence, completeWorkOrder, createWorkOrder, getAsset, getPerformance, getQueue, getWaitTimes
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-001` | Queue Directory | listDetail | 19 | 0 | — |
-| `BO-002` | Queue Configuration | listDetail | 14 | 1 | — |
-| `BO-003` | Queue Integration Setup | listDetail | 4 | 0 | — |
-| `BO-004` | Manual Wait Time Entry | approvalInbox | 11 | 0 | — |
-| `BO-005` | Queue Monitor | listDetail | 19 | 1 | — |
-| `BO-006` | Parking Configuration | listDetail | 4 | 0 | — |
-| `BO-030` | Work Order Verification | listDetail | 9 | 2 | — |
-| `BO-031` | Asset Register | listDetail | 7 | 0 | — |
-| `BO-032` | Admission Profiles | listDetail | 3 | 0 | — |
-| `BO-033` | Blacklist Management | listDetail | 3 | 1 | — |
+| `BO-001` | Queue Directory | listDetail | 19 | 9 | — |
+| `BO-002` | Queue Configuration | listDetail | 14 | 8 | — |
+| `BO-003` | Queue Integration Setup | listDetail | 4 | 1 | — |
+| `BO-004` | Manual Wait Time Entry | approvalInbox | 11 | 7 | — |
+| `BO-005` | Queue Monitor | listDetail | 20 | 11 | — |
+| `BO-006` | Parking Configuration | listDetail | 4 | 2 | — |
+| `BO-030` | Work Order Verification | listDetail | 9 | 6 | — |
+| `BO-031` | Asset Register | listDetail | 7 | 3 | — |
+| `BO-032` | Admission Profiles | listDetail | 4 | 2 | — |
+| `BO-033` | Blacklist Management | listDetail | 3 | 2 | — |
 
 ---
 
@@ -98,43 +97,49 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "BO-002",
     "BO-003",
     "BO-004",
-    "BO-005"
+    "BO-005",
+    "BO-006"
    ],
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-002",
-     "trigger": "Cancels it and states the reason",
-     "provenance": "flow F09 step 1→2",
-     "operation": "listPerformances"
-    },
-    {
      "to": "BO-003",
      "trigger": "Queue Integration Setup",
      "carries": [
-      "feedId",
-      "orderId",
-      "venueId"
+      "feedId"
      ],
-     "provenance": "derived — BO-003 declares entryState.params feedId, orderId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-003 declares entryState.params feedId, orderId and BO-001 holds feedId, so an edge into it carries them"
     },
     {
      "to": "BO-004",
      "trigger": "Manual Wait Time Entry",
      "carries": [
-      "queueId",
-      "refundId"
+      "queueId"
      ],
-     "provenance": "derived — BO-004 declares entryState.params queueId, refundId, so an edge into it must carry them"
+     "provenance": "derived — BO-004 declares entryState.params queueId, refundId and BO-001 holds queueId, so an edge into it carries them"
     },
     {
      "to": "BO-005",
      "trigger": "Queue Monitor",
      "carries": [
-      "campaignId",
       "queueId"
      ],
-     "provenance": "derived — BO-005 declares entryState.params campaignId, queueId, so an edge into it must carry them"
+     "provenance": "derived — BO-005 declares entryState.params campaignId, queueId and BO-001 holds queueId, so an edge into it carries them"
+    },
+    {
+     "to": "BO-006",
+     "trigger": "Parking Configuration",
+     "provenance": "derived — BO-006 declares entryState.params accessPointId and BO-001 holds none of them, so the edge carries nothing and BO-006 opens cold"
+    },
+    {
+     "to": "BO-002",
+     "trigger": "Cancels it and states the reason",
+     "provenance": "flow F09 step 1→2",
+     "operation": "listPerformances",
+     "carries": [
+      "performanceId",
+      "queueId"
+     ]
     }
    ]
   },
@@ -143,13 +148,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listQueues` reads the population and `getEvent` reads one of them — list, select, act",
   "purpose": "See every queue in the venue and whether its data is arriving.",
-  "gaps": [
-   {
-    "operation": "listQueueFeeds",
-    "why": "**7 declared operations reach no component on this screen**: listQueueFeeds, listPerformances, getQueue, getQueueFeedHealth, getWaitTimes, listEvents, listQueueEntries. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -157,6 +155,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "name": "contentBody",
      "slot": "collection",
      "components": [
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listQueues",
+       "notes": "Sends `?venueId=` to `listQueues`.",
+       "provenance": "contract queue.yaml GET /queues"
+      },
+      {
+       "kind": "toggle",
+       "label": "Open only",
+       "operation": "listQueues",
+       "notes": "Sends `?openOnly=` to `listQueues`.",
+       "provenance": "contract queue.yaml GET /queues"
+      },
       {
        "kind": "dataTable",
        "label": "Every queue",
@@ -177,6 +189,90 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listQueues",
        "provenance": "contract queue.yaml GET /queues"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every queue feed",
+       "bindsTo": "QueueFeed",
+       "columns": [
+        "QueueFeed.id",
+        "QueueFeed.queueId",
+        "QueueFeed.adaptor",
+        "QueueFeed.adaptorName",
+        "QueueFeed.credentialsRef",
+        "QueueFeed.expectedIntervalSeconds",
+        "QueueFeed.isEnabled",
+        "QueueFeed.health"
+       ],
+       "operation": "listQueueFeeds",
+       "provenance": "contract queue.yaml GET /queue-feeds"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every performance",
+       "bindsTo": "Performance",
+       "columns": [
+        "Performance.id",
+        "Performance.eventId",
+        "Performance.startsAt",
+        "Performance.endsAt",
+        "Performance.approvalRequestId",
+        "Performance.requiresApprovalToCancel",
+        "Performance.status",
+        "Performance.admissionRulesId",
+        "Performance.seatMapId"
+       ],
+       "operation": "listPerformances",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every event",
+       "bindsTo": "Event",
+       "columns": [
+        "Event.id",
+        "Event.code",
+        "Event.name",
+        "Event.venueId",
+        "Event.scopePath",
+        "Event.parentEventId",
+        "Event.performanceCount",
+        "Event.isActive"
+       ],
+       "operation": "listEvents",
+       "provenance": "contract catalogue.yaml GET /events"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every waiting guest",
+       "bindsTo": "WaitingGuest",
+       "columns": [
+        "WaitingGuest.id",
+        "WaitingGuest.queueId",
+        "WaitingGuest.queueName",
+        "WaitingGuest.subjectId",
+        "WaitingGuest.partyNumber",
+        "WaitingGuest.partySize",
+        "WaitingGuest.status",
+        "WaitingGuest.positionInQueue",
+        "WaitingGuest.partiesAhead",
+        "WaitingGuest.estimatedCallAt",
+        "WaitingGuest.isFastPass",
+        "WaitingGuest.entitlementId"
+       ],
+       "operation": "listQueueEntries",
+       "provenance": "contract queue.yaml GET /queues/{queueId}/entries"
+      },
+      {
+       "kind": "dataTable",
+       "bindsTo": "Queue[]",
+       "notes": "Current wait, source, feed health, status",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "banner",
+       "notes": "Queues whose feed has gone quiet. The first thing a duty manager checks",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -187,6 +283,82 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "detailPanel",
        "label": "The selected queue",
+       "bindsTo": "Queue",
+       "columns": [
+        "Queue.code",
+        "Queue.name",
+        "Queue.venueId",
+        "Queue.attractionProductId",
+        "Queue.assetId",
+        "Queue.accessPointId",
+        "Queue.kind",
+        "Queue.operatingWindows",
+        "Queue.parentQueueId",
+        "Queue.loadBalanceWithQueueIds",
+        "Queue.inQueueOfferEnabled",
+        "Queue.notifyBeforeCallMinutes",
+        "Queue.capacityPerCycle",
+        "Queue.cycleMinutes",
+        "Queue.maxPartySize",
+        "Queue.returnWindowMinutes"
+       ],
+       "operation": "listQueues",
+       "provenance": "contract queue.yaml GET /queues"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The queue",
+       "bindsTo": "QueueDetail",
+       "columns": [
+        "QueueDetail.nowServingPartyNumber",
+        "QueueDetail.lastCalledAt",
+        "QueueDetail.throughputLastHour",
+        "QueueDetail.noShowRatePercent",
+        "QueueDetail.feed"
+       ],
+       "operation": "getQueue",
+       "provenance": "contract queue.yaml GET /queues/{queueId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The queue feed health",
+       "bindsTo": "QueueFeedHealth",
+       "columns": [
+        "QueueFeedHealth.feedId",
+        "QueueFeedHealth.adaptor",
+        "QueueFeedHealth.isHealthy",
+        "QueueFeedHealth.isQuiet",
+        "QueueFeedHealth.lastReadingAt",
+        "QueueFeedHealth.expectedIntervalSeconds",
+        "QueueFeedHealth.readingsLastHour",
+        "QueueFeedHealth.discardedLastHour"
+       ],
+       "operation": "getQueueFeedHealth",
+       "provenance": "contract queue.yaml GET /queue-feeds/{feedId}/health"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The wait time",
+       "bindsTo": "WaitTime",
+       "columns": [
+        "WaitTime.queueId",
+        "WaitTime.queueName",
+        "WaitTime.attractionProductId",
+        "WaitTime.attractionCategoryId",
+        "WaitTime.status",
+        "WaitTime.waitMinutes",
+        "WaitTime.source",
+        "WaitTime.isStale",
+        "WaitTime.heightRequirementCm",
+        "WaitTime.zone",
+        "WaitTime.asOf"
+       ],
+       "operation": "getWaitTimes",
+       "provenance": "contract queue.yaml GET /queues/wait-times"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The event",
        "bindsTo": "Event",
        "columns": [
         "Event.id",
@@ -209,80 +381,63 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Call",
+       "label": "Call next parties",
        "operation": "callNextParties",
        "provenance": "contract queue.yaml POST /queues/{queueId}/call-next"
       },
       {
        "kind": "secondaryButton",
-       "label": "Configure",
+       "label": "Configure queue feed",
        "operation": "configureQueueFeed",
        "provenance": "contract queue.yaml PUT /queue-feeds"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create event",
        "operation": "createEvent",
        "provenance": "contract catalogue.yaml POST /events"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create performances",
        "operation": "createPerformances",
        "provenance": "contract catalogue.yaml POST /events/{eventId}/performances"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create queue",
        "operation": "createQueue",
        "provenance": "contract queue.yaml POST /queues"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save queue status",
        "operation": "setQueueStatus",
        "provenance": "contract queue.yaml PUT /queues/{queueId}/status"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save wait time",
        "operation": "setWaitTime",
        "provenance": "contract queue.yaml PUT /queues/{queueId}/wait-time"
       },
       {
        "kind": "secondaryButton",
-       "label": "Test",
+       "label": "Test queue feed",
        "operation": "testQueueFeed",
        "provenance": "contract queue.yaml POST /queue-feeds/{feedId}/test"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save event",
        "operation": "updateEvent",
        "provenance": "contract catalogue.yaml PATCH /events/{eventId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save queue",
        "operation": "updateQueue",
        "provenance": "contract queue.yaml PATCH /queues/{queueId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "dataTable",
-       "bindsTo": "Queue[]",
-       "notes": "Current wait, source, feed health, status",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "banner",
-       "notes": "Queues whose feed has gone quiet. The first thing a duty manager checks",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -291,9 +446,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The queue list.",
    "error": "Could not load. Names which read failed and leaves the queue untouched.",
-   "emptyFirstRun": "No queue yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the queue are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No queue yet. Offers Create event (`createEvent`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on venueId, openOnly and the queue are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -312,7 +467,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "listPerformances",
     "contract": "catalogue",
     "purpose": "From the flow it appears in",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "callNextParties",
@@ -363,19 +518,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getEvent",
     "contract": "catalogue",
     "purpose": "Read an event",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getQueue",
     "contract": "queue",
     "purpose": "Read a queue with live position",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getQueueFeedHealth",
     "contract": "queue",
     "purpose": "Feed health",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getWaitTimes",
@@ -393,7 +548,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "listQueueEntries",
     "contract": "queue",
     "purpose": "List entries in a queue",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "setQueueStatus",
@@ -458,11 +613,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `eventId`, `feedId`, `queueId`.",
    "preloaded": [
-    "Event.id",
-    "Event.code",
-    "Event.name",
-    "Event.venueId",
-    "Event.scopePath"
+    "Queue.code",
+    "Queue.name",
+    "Queue.venueId",
+    "Queue.attractionProductId",
+    "Queue.assetId"
    ]
   },
   "wireframe": {
@@ -471,6 +626,209 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P08 Venue Management.dc.html#bo-001"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCallNextParties",
+    "component": "modal",
+    "trigger": "Call next parties",
+    "body": "**Collects what `callNextParties` sends before it is called.** Nothing in the body is required. Optional: `partyCount`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Call next parties",
+     "operation": "callNextParties"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "partyCount"
+     ]
+    },
+    "provenance": "contract queue.yaml POST /queues/{queueId}/call-next"
+   },
+   {
+    "id": "formConfigureQueueFeed",
+    "component": "modal",
+    "trigger": "Configure queue feed",
+    "body": "**Collects what `configureQueueFeed` sends before it is called.** Required: `id`, `queueId`, `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`, `health`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "QueueFeed",
+    "confirm": {
+     "label": "Configure queue feed",
+     "operation": "configureQueueFeed"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "queueId",
+      "adaptor",
+      "isEnabled",
+      "adaptorName",
+      "credentialsRef",
+      "expectedIntervalSeconds",
+      "health"
+     ]
+    },
+    "provenance": "contract queue.yaml PUT /queue-feeds"
+   },
+   {
+    "id": "formCreateEvent",
+    "component": "modal",
+    "trigger": "Create event",
+    "body": "**Collects what `createEvent` sends before it is called.** Required: `code`, `name`, `venueId`. Optional: `parentEventId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateEventRequest",
+    "confirm": {
+     "label": "Create event",
+     "operation": "createEvent"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "venueId",
+      "parentEventId"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /events"
+   },
+   {
+    "id": "formCreatePerformances",
+    "component": "modal",
+    "trigger": "Create performances",
+    "body": "**Collects what `createPerformances` sends before it is called.** Required: `startsAt`, `endsAt`. Optional: `admissionRulesId`, `seatMapId`, `recurrence`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreatePerformancesRequest",
+    "confirm": {
+     "label": "Create performances",
+     "operation": "createPerformances"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "startsAt",
+      "endsAt",
+      "admissionRulesId",
+      "seatMapId",
+      "recurrence"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /events/{eventId}/performances"
+   },
+   {
+    "id": "formCreateQueue",
+    "component": "modal",
+    "trigger": "Create queue",
+    "body": "**Collects what `createQueue` sends before it is called.** Required: `code`, `name`, `venueId`, `capacityPerCycle`, `cycleMinutes`. Optional: `attractionProductId`, `assetId`, `accessPointId`, `kind`, `operatingWindows`, `parentQueueId`, `loadBalanceWithQueueIds`, `inQueueOfferEnabled`, `notifyBeforeCallMinutes`, `maxPartySize`, `returnWindowMinutes`, `heightRequirementCm` and 2 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateQueueRequest",
+    "confirm": {
+     "label": "Create queue",
+     "operation": "createQueue"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "venueId",
+      "capacityPerCycle",
+      "cycleMinutes",
+      "attractionProductId",
+      "assetId",
+      "accessPointId",
+      "kind",
+      "operatingWindows",
+      "parentQueueId",
+      "loadBalanceWithQueueIds",
+      "inQueueOfferEnabled",
+      "notifyBeforeCallMinutes",
+      "maxPartySize",
+      "returnWindowMinutes",
+      "heightRequirementCm",
+      "fastPassAllocationPercent"
+     ]
+    },
+    "provenance": "contract queue.yaml POST /queues"
+   },
+   {
+    "id": "formSetQueueStatus",
+    "component": "modal",
+    "trigger": "Save queue status",
+    "body": "**Collects what `setQueueStatus` sends before it is called.** Required: `status`, `reason`. Optional: `guestMessage`, `expectedReopenAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save queue status",
+     "operation": "setQueueStatus"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "reason",
+      "guestMessage",
+      "expectedReopenAt"
+     ]
+    },
+    "provenance": "contract queue.yaml PUT /queues/{queueId}/status"
+   },
+   {
+    "id": "formSetWaitTime",
+    "component": "modal",
+    "trigger": "Save wait time",
+    "body": "**Collects what `setWaitTime` sends before it is called.** Required: `waitMinutes`. Optional: `expiresInMinutes`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save wait time",
+     "operation": "setWaitTime"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "waitMinutes",
+      "expiresInMinutes",
+      "note"
+     ]
+    },
+    "provenance": "contract queue.yaml PUT /queues/{queueId}/wait-time"
+   },
+   {
+    "id": "formUpdateEvent",
+    "component": "modal",
+    "trigger": "Save event",
+    "body": "**Collects what `updateEvent` sends before it is called.** Nothing in the body is required. Optional: `name`, `parentEventId`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save event",
+     "operation": "updateEvent"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "parentEventId",
+      "isActive"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PATCH /events/{eventId}"
+   },
+   {
+    "id": "formUpdateQueue",
+    "component": "modal",
+    "trigger": "Save queue",
+    "body": "**Collects what `updateQueue` sends before it is called.** Nothing in the body is required. Optional: `name`, `capacityPerCycle`, `cycleMinutes`, `maxPartySize`, `returnWindowMinutes`, `heightRequirementCm`, `fastPassAllocationPercent`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save queue",
+     "operation": "updateQueue"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "capacityPerCycle",
+      "cycleMinutes",
+      "maxPartySize",
+      "returnWindowMinutes",
+      "heightRequirementCm",
+      "fastPassAllocationPercent"
+     ]
+    },
+    "provenance": "contract queue.yaml PATCH /queues/{queueId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -534,26 +892,23 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "feedId",
       "queueId"
      ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-002 holds eventId, feedId, queueId, so an edge into it carries them"
     },
     {
      "to": "BO-003",
      "trigger": "Queue Integration Setup",
      "carries": [
-      "feedId",
-      "orderId",
-      "venueId"
+      "feedId"
      ],
-     "provenance": "derived — BO-003 declares entryState.params feedId, orderId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-003 declares entryState.params feedId, orderId and BO-002 holds feedId, so an edge into it carries them"
     },
     {
      "to": "BO-004",
      "trigger": "Manual Wait Time Entry",
      "carries": [
-      "queueId",
-      "refundId"
+      "queueId"
      ],
-     "provenance": "derived — BO-004 declares entryState.params queueId, refundId, so an edge into it must carry them"
+     "provenance": "derived — BO-004 declares entryState.params queueId, refundId and BO-002 holds queueId, so an edge into it carries them"
     }
    ]
   },
@@ -565,13 +920,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listQueueEntries` reads the population and `getPerformance` reads one of them — list, select, act",
   "purpose": "Create a queue and set how it behaves.",
-  "gaps": [
-   {
-    "operation": "getQueue",
-    "why": "**4 declared operations reach no component on this screen**: getQueue, getSeatAvailability, getWaitTimes, listQueues. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -580,8 +928,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listQueueEntries",
+       "notes": "Sends `?status=` to `listQueueEntries`.",
+       "provenance": "contract queue.yaml GET /queues/{queueId}/entries"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every queue",
+       "label": "Every waiting guest",
        "bindsTo": "WaitingGuest",
        "columns": [
         "WaitingGuest.id",
@@ -599,91 +954,28 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listQueueEntries",
        "provenance": "contract queue.yaml GET /queues/{queueId}/entries"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
+      },
       {
-       "kind": "detailPanel",
-       "label": "The selected queue",
-       "bindsTo": "Performance",
+       "kind": "dataTable",
+       "label": "Every queue",
+       "bindsTo": "Queue",
        "columns": [
-        "Performance.id",
-        "Performance.eventId",
-        "Performance.startsAt",
-        "Performance.endsAt",
-        "Performance.approvalRequestId",
-        "Performance.requiresApprovalToCancel",
-        "Performance.status",
-        "Performance.admissionRulesId",
-        "Performance.seatMapId"
+        "Queue.code",
+        "Queue.name",
+        "Queue.venueId",
+        "Queue.attractionProductId",
+        "Queue.assetId",
+        "Queue.accessPointId",
+        "Queue.kind",
+        "Queue.operatingWindows",
+        "Queue.parentQueueId",
+        "Queue.loadBalanceWithQueueIds",
+        "Queue.inQueueOfferEnabled",
+        "Queue.notifyBeforeCallMinutes"
        ],
-       "operation": "getPerformance",
-       "provenance": "contract catalogue.yaml GET /performances/{performanceId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createQueue",
-       "provenance": "contract queue.yaml POST /queues"
+       "operation": "listQueues",
+       "provenance": "contract queue.yaml GET /queues"
       },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updateQueue",
-       "provenance": "contract queue.yaml PATCH /queues/{queueId}"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Cancel",
-       "operation": "cancelPerformance",
-       "provenance": "contract catalogue.yaml POST /performances/{performanceId}/cancel"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Call",
-       "operation": "callNextParties",
-       "provenance": "contract queue.yaml POST /queues/{queueId}/call-next"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Recommend",
-       "operation": "recommendSeats",
-       "provenance": "contract seating.yaml POST /performances/{performanceId}/seat-recommendations"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setQueueStatus",
-       "provenance": "contract queue.yaml PUT /queues/{queueId}/status"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setWaitTime",
-       "provenance": "contract queue.yaml PUT /queues/{queueId}/wait-time"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updatePerformance",
-       "provenance": "contract catalogue.yaml PATCH /performances/{performanceId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
       {
        "kind": "textField",
        "label": "Name",
@@ -713,9 +1005,155 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      ]
     },
     {
-     "name": "actionBar",
-     "slot": "carried",
+     "name": "contextPanel",
+     "slot": "selection",
      "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected waiting guest",
+       "bindsTo": "WaitingGuest",
+       "columns": [
+        "WaitingGuest.id",
+        "WaitingGuest.queueId",
+        "WaitingGuest.queueName",
+        "WaitingGuest.subjectId",
+        "WaitingGuest.partyNumber",
+        "WaitingGuest.partySize",
+        "WaitingGuest.status",
+        "WaitingGuest.positionInQueue",
+        "WaitingGuest.partiesAhead",
+        "WaitingGuest.estimatedCallAt",
+        "WaitingGuest.isFastPass",
+        "WaitingGuest.entitlementId",
+        "WaitingGuest.calledAt",
+        "WaitingGuest.returnWindowEndsAt",
+        "WaitingGuest.redeemedAt",
+        "WaitingGuest.admittedCount"
+       ],
+       "operation": "listQueueEntries",
+       "provenance": "contract queue.yaml GET /queues/{queueId}/entries"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The queue",
+       "bindsTo": "QueueDetail",
+       "columns": [
+        "QueueDetail.nowServingPartyNumber",
+        "QueueDetail.lastCalledAt",
+        "QueueDetail.throughputLastHour",
+        "QueueDetail.noShowRatePercent",
+        "QueueDetail.feed"
+       ],
+       "operation": "getQueue",
+       "provenance": "contract queue.yaml GET /queues/{queueId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The seat availability",
+       "bindsTo": "SeatAvailability",
+       "columns": [
+        "SeatAvailability.performanceId",
+        "SeatAvailability.seatMapId",
+        "SeatAvailability.renderMode",
+        "SeatAvailability.totals",
+        "SeatAvailability.byCategory",
+        "SeatAvailability.seats"
+       ],
+       "operation": "getSeatAvailability",
+       "provenance": "contract seating.yaml GET /performances/{performanceId}/seat-availability"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The wait time",
+       "bindsTo": "WaitTime",
+       "columns": [
+        "WaitTime.queueId",
+        "WaitTime.queueName",
+        "WaitTime.attractionProductId",
+        "WaitTime.attractionCategoryId",
+        "WaitTime.status",
+        "WaitTime.waitMinutes",
+        "WaitTime.source",
+        "WaitTime.isStale",
+        "WaitTime.heightRequirementCm",
+        "WaitTime.zone",
+        "WaitTime.asOf"
+       ],
+       "operation": "getWaitTimes",
+       "provenance": "contract queue.yaml GET /queues/wait-times"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The performance",
+       "bindsTo": "Performance",
+       "columns": [
+        "Performance.id",
+        "Performance.eventId",
+        "Performance.startsAt",
+        "Performance.endsAt",
+        "Performance.approvalRequestId",
+        "Performance.requiresApprovalToCancel",
+        "Performance.status",
+        "Performance.admissionRulesId",
+        "Performance.seatMapId"
+       ],
+       "operation": "getPerformance",
+       "provenance": "contract catalogue.yaml GET /performances/{performanceId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create queue",
+       "operation": "createQueue",
+       "provenance": "contract queue.yaml POST /queues"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save queue",
+       "operation": "updateQueue",
+       "provenance": "contract queue.yaml PATCH /queues/{queueId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel performance",
+       "operation": "cancelPerformance",
+       "provenance": "contract catalogue.yaml POST /performances/{performanceId}/cancel"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Call next parties",
+       "operation": "callNextParties",
+       "provenance": "contract queue.yaml POST /queues/{queueId}/call-next"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Recommend seats",
+       "operation": "recommendSeats",
+       "provenance": "contract seating.yaml POST /performances/{performanceId}/seat-recommendations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save queue status",
+       "operation": "setQueueStatus",
+       "provenance": "contract queue.yaml PUT /queues/{queueId}/status"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save wait time",
+       "operation": "setWaitTime",
+       "provenance": "contract queue.yaml PUT /queues/{queueId}/wait-time"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save performance",
+       "operation": "updatePerformance",
+       "provenance": "contract catalogue.yaml PATCH /performances/{performanceId}"
+      },
       {
        "kind": "primaryButton",
        "label": "Save",
@@ -729,17 +1167,174 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmCancelPerformance",
     "component": "confirmDialog",
-    "trigger": "Cancel",
-    "body": "**Names what `cancelPerformance` changes and what it leaves alone**, in the consequence rather than the verb. A queue this affects should be identified in the dialog, not just counted.",
+    "trigger": "Cancel performance",
+    "body": "**Names what `cancelPerformance` changes and what it leaves alone**, in the consequence rather than the verb. A queue this affects should be identified in the dialog, not just counted. **Collects what `cancelPerformance` sends before it is called.** Required: `reason`. Optional: `guestMessage`, `refundPercentage`, `offerAlternativePerformanceId`, `dryRun`. **A real run needs a supervisor PIN on this device** (`supervisorStepUp` {principalId, credential}); a dry run does not (decided 28 September, audit R144).",
     "provenance": "contract catalogue.yaml POST /performances/{performanceId}/cancel"
+   },
+   {
+    "id": "formCreateQueue",
+    "component": "modal",
+    "trigger": "Create queue",
+    "body": "**Collects what `createQueue` sends before it is called.** Required: `code`, `name`, `venueId`, `capacityPerCycle`, `cycleMinutes`. Optional: `attractionProductId`, `assetId`, `accessPointId`, `kind`, `operatingWindows`, `parentQueueId`, `loadBalanceWithQueueIds`, `inQueueOfferEnabled`, `notifyBeforeCallMinutes`, `maxPartySize`, `returnWindowMinutes`, `heightRequirementCm` and 2 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateQueueRequest",
+    "confirm": {
+     "label": "Create queue",
+     "operation": "createQueue"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "venueId",
+      "capacityPerCycle",
+      "cycleMinutes",
+      "attractionProductId",
+      "assetId",
+      "accessPointId",
+      "kind",
+      "operatingWindows",
+      "parentQueueId",
+      "loadBalanceWithQueueIds",
+      "inQueueOfferEnabled",
+      "notifyBeforeCallMinutes",
+      "maxPartySize",
+      "returnWindowMinutes",
+      "heightRequirementCm",
+      "fastPassAllocationPercent"
+     ]
+    },
+    "provenance": "contract queue.yaml POST /queues"
+   },
+   {
+    "id": "formUpdateQueue",
+    "component": "modal",
+    "trigger": "Save queue",
+    "body": "**Collects what `updateQueue` sends before it is called.** Nothing in the body is required. Optional: `name`, `capacityPerCycle`, `cycleMinutes`, `maxPartySize`, `returnWindowMinutes`, `heightRequirementCm`, `fastPassAllocationPercent`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save queue",
+     "operation": "updateQueue"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "capacityPerCycle",
+      "cycleMinutes",
+      "maxPartySize",
+      "returnWindowMinutes",
+      "heightRequirementCm",
+      "fastPassAllocationPercent"
+     ]
+    },
+    "provenance": "contract queue.yaml PATCH /queues/{queueId}"
+   },
+   {
+    "id": "formCallNextParties",
+    "component": "modal",
+    "trigger": "Call next parties",
+    "body": "**Collects what `callNextParties` sends before it is called.** Nothing in the body is required. Optional: `partyCount`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Call next parties",
+     "operation": "callNextParties"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "partyCount"
+     ]
+    },
+    "provenance": "contract queue.yaml POST /queues/{queueId}/call-next"
+   },
+   {
+    "id": "formRecommendSeats",
+    "component": "modal",
+    "trigger": "Recommend seats",
+    "body": "**Collects what `recommendSeats` sends before it is called.** Required: `partySize`, `strategy`. Optional: `categoryIds`, `maxPrice`, `accessibleCount`, `maxOptions`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SeatRecommendationRequest",
+    "confirm": {
+     "label": "Recommend seats",
+     "operation": "recommendSeats"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "partySize",
+      "strategy",
+      "categoryIds",
+      "maxPrice",
+      "accessibleCount",
+      "maxOptions"
+     ]
+    },
+    "provenance": "contract seating.yaml POST /performances/{performanceId}/seat-recommendations"
+   },
+   {
+    "id": "formSetQueueStatus",
+    "component": "modal",
+    "trigger": "Save queue status",
+    "body": "**Collects what `setQueueStatus` sends before it is called.** Required: `status`, `reason`. Optional: `guestMessage`, `expectedReopenAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save queue status",
+     "operation": "setQueueStatus"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "reason",
+      "guestMessage",
+      "expectedReopenAt"
+     ]
+    },
+    "provenance": "contract queue.yaml PUT /queues/{queueId}/status"
+   },
+   {
+    "id": "formSetWaitTime",
+    "component": "modal",
+    "trigger": "Save wait time",
+    "body": "**Collects what `setWaitTime` sends before it is called.** Required: `waitMinutes`. Optional: `expiresInMinutes`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save wait time",
+     "operation": "setWaitTime"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "waitMinutes",
+      "expiresInMinutes",
+      "note"
+     ]
+    },
+    "provenance": "contract queue.yaml PUT /queues/{queueId}/wait-time"
+   },
+   {
+    "id": "formUpdatePerformance",
+    "component": "modal",
+    "trigger": "Save performance",
+    "body": "**Collects what `updatePerformance` sends before it is called.** Nothing in the body is required. Optional: `startsAt`, `endsAt`, `status`, `admissionRulesId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save performance",
+     "operation": "updatePerformance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "startsAt",
+      "endsAt",
+      "status",
+      "admissionRulesId"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PATCH /performances/{performanceId}"
    }
   ],
   "states": {
    "loading": "The queue list.",
    "error": "Could not load. Names which read failed and leaves the queue untouched.",
-   "emptyFirstRun": "No queue yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the queue are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No queue yet. Offers Create queue (`createQueue`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on status and the queue are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getPerformance` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -764,7 +1359,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "cancelPerformance",
     "contract": "catalogue",
     "purpose": "From the flow it appears in",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "callNextParties",
@@ -861,17 +1456,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "Performance.id",
-    "Performance.eventId",
-    "Performance.startsAt",
-    "Performance.endsAt",
-    "Performance.approvalRequestId"
+    "WaitingGuest.id",
+    "WaitingGuest.queueId",
+    "WaitingGuest.queueName",
+    "WaitingGuest.subjectId",
+    "WaitingGuest.partyNumber"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-002",
+   "derivedFrom": "wireframes/reference/Seat Board 2.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -927,29 +1523,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-001",
      "trigger": "Queue Directory",
      "carries": [
-      "eventId",
       "feedId",
       "queueId"
      ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-003 holds feedId, queueId, so an edge into it carries them"
     },
     {
      "to": "BO-002",
      "trigger": "Queue Configuration",
      "carries": [
-      "performanceId",
       "queueId"
      ],
-     "provenance": "derived — BO-002 declares entryState.params performanceId, queueId, so an edge into it must carry them"
+     "provenance": "derived — BO-002 declares entryState.params performanceId, queueId and BO-003 holds queueId, so an edge into it carries them"
     },
     {
      "to": "BO-004",
      "trigger": "Manual Wait Time Entry",
      "carries": [
-      "queueId",
-      "refundId"
+      "queueId"
      ],
-     "provenance": "derived — BO-004 declares entryState.params queueId, refundId, so an edge into it must carry them"
+     "provenance": "derived — BO-004 declares entryState.params queueId, refundId and BO-003 holds queueId, so an edge into it carries them"
     }
    ]
   },
@@ -967,7 +1560,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every queue integration",
+       "label": "Every queue feed",
        "bindsTo": "QueueFeed",
        "columns": [
         "QueueFeed.id",
@@ -980,63 +1573,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listQueueFeeds",
        "provenance": "contract queue.yaml GET /queue-feeds"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected queue integration",
-       "bindsTo": "QueueFeedHealth",
-       "columns": [
-        "QueueFeedHealth.feedId",
-        "QueueFeedHealth.adaptor",
-        "QueueFeedHealth.isHealthy",
-        "QueueFeedHealth.isQuiet",
-        "QueueFeedHealth.lastReadingAt",
-        "QueueFeedHealth.readingsLastHour",
-        "QueueFeedHealth.discardedLastHour"
-       ],
-       "operation": "getQueueFeedHealth",
-       "provenance": "contract queue.yaml GET /queue-feeds/{feedId}/health"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Configure",
-       "operation": "configureQueueFeed",
-       "provenance": "contract queue.yaml PUT /queue-feeds"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Test",
-       "operation": "testQueueFeed",
-       "provenance": "contract queue.yaml POST /queue-feeds/{feedId}/test"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
        "kind": "selectField",
-       "label": "Source",
-       "notes": "Manual, sensor API, webhook, MQTT, vendor poll, turnstile count, CV camera. Manual is the default and a valid end state",
-       "provenance": "carried from the previous definition"
+       "label": "Adaptor",
+       "bindsTo": "QueueFeed.adaptor",
+       "notes": "**Follows the contract's `QueueFeedAdaptor`** — generic (the inbound API that sensor APIs, webhooks, MQTT, turnstile counts and cameras all post to), mock, or vendorAdaptor (with `adaptorName`) (decided 28 September, audit R275 (e)). The pack's seven sources are not offered: Manual is not a feed — a queue with no enabled feed runs on figures set through Manual Wait Time Entry — and the five transports are all `generic`.",
+       "provenance": "contract queue.yaml QueueFeedAdaptor"
       },
       {
        "kind": "textField",
        "label": "Endpoint or topic",
-       "notes": "Hidden when the source is manual",
+       "notes": "Shown for generic and vendorAdaptor feeds",
        "provenance": "carried from the previous definition"
       },
       {
@@ -1072,9 +1620,61 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      ]
     },
     {
-     "name": "actionBar",
-     "slot": "carried",
+     "name": "contextPanel",
+     "slot": "selection",
      "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected queue feed",
+       "bindsTo": "QueueFeed",
+       "columns": [
+        "QueueFeed.id",
+        "QueueFeed.queueId",
+        "QueueFeed.adaptor",
+        "QueueFeed.adaptorName",
+        "QueueFeed.credentialsRef",
+        "QueueFeed.expectedIntervalSeconds",
+        "QueueFeed.isEnabled",
+        "QueueFeed.health"
+       ],
+       "operation": "listQueueFeeds",
+       "provenance": "contract queue.yaml GET /queue-feeds"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The queue feed health",
+       "bindsTo": "QueueFeedHealth",
+       "columns": [
+        "QueueFeedHealth.feedId",
+        "QueueFeedHealth.adaptor",
+        "QueueFeedHealth.isHealthy",
+        "QueueFeedHealth.isQuiet",
+        "QueueFeedHealth.lastReadingAt",
+        "QueueFeedHealth.expectedIntervalSeconds",
+        "QueueFeedHealth.readingsLastHour",
+        "QueueFeedHealth.discardedLastHour"
+       ],
+       "operation": "getQueueFeedHealth",
+       "provenance": "contract queue.yaml GET /queue-feeds/{feedId}/health"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Configure queue feed",
+       "operation": "configureQueueFeed",
+       "provenance": "contract queue.yaml PUT /queue-feeds"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Test queue feed",
+       "operation": "testQueueFeed",
+       "provenance": "contract queue.yaml POST /queue-feeds/{feedId}/test"
+      },
       {
        "kind": "primaryButton",
        "label": "Save",
@@ -1087,9 +1687,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The queue integration list.",
    "error": "Could not load. Names which read failed and leaves the queue integration untouched.",
-   "emptyFirstRun": "No queue integration yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the queue integration are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No queue integration yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listQueueFeeds` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `QUEUE_MANAGE`, which `getQueueFeedHealth` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1140,11 +1740,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
    "preloaded": [
-    "QueueFeedHealth.feedId",
-    "QueueFeedHealth.adaptor",
-    "QueueFeedHealth.isHealthy",
-    "QueueFeedHealth.isQuiet",
-    "QueueFeedHealth.lastReadingAt"
+    "QueueFeed.id",
+    "QueueFeed.queueId",
+    "QueueFeed.adaptor",
+    "QueueFeed.adaptorName",
+    "QueueFeed.credentialsRef"
    ]
   },
   "wireframe": {
@@ -1153,6 +1753,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P08 Venue Management.dc.html#bo-003"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formConfigureQueueFeed",
+    "component": "modal",
+    "trigger": "Configure queue feed",
+    "body": "**Collects what `configureQueueFeed` sends before it is called.** Required: `id`, `queueId`, `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`, `health`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "QueueFeed",
+    "confirm": {
+     "label": "Configure queue feed",
+     "operation": "configureQueueFeed"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "queueId",
+      "adaptor",
+      "isEnabled",
+      "adaptorName",
+      "credentialsRef",
+      "expectedIntervalSeconds",
+      "health"
+     ]
+    },
+    "provenance": "contract queue.yaml PUT /queue-feeds"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1204,39 +1831,38 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "fromFlows": true,
    "transitions": [
     {
-     "to": "BO-005",
-     "trigger": "Confirms guests were notified",
-     "provenance": "flow F09 step 4→5",
-     "operation": "createBulkRefund"
-    },
-    {
      "to": "BO-001",
      "trigger": "Queue Directory",
      "carries": [
-      "eventId",
       "feedId",
       "queueId"
      ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-004 holds feedId, queueId, so an edge into it carries them"
     },
     {
      "to": "BO-002",
      "trigger": "Queue Configuration",
      "carries": [
-      "performanceId",
       "queueId"
      ],
-     "provenance": "derived — BO-002 declares entryState.params performanceId, queueId, so an edge into it must carry them"
+     "provenance": "derived — BO-002 declares entryState.params performanceId, queueId and BO-004 holds queueId, so an edge into it carries them"
     },
     {
      "to": "BO-003",
      "trigger": "Queue Integration Setup",
      "carries": [
-      "feedId",
-      "orderId",
-      "venueId"
+      "feedId"
      ],
-     "provenance": "derived — BO-003 declares entryState.params feedId, orderId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-003 declares entryState.params feedId, orderId and BO-004 holds feedId, so an edge into it carries them"
+    },
+    {
+     "to": "BO-005",
+     "trigger": "Confirms guests were notified",
+     "provenance": "flow F09 step 4→5",
+     "operation": "createBulkRefund",
+     "carries": [
+      "queueId"
+     ]
     }
    ]
   },
@@ -1245,13 +1871,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "approvalInbox",
   "patternReason": "`approveRefund` decides items that `listQueues` queues — every row is waiting for a person, so the empty state is success",
   "purpose": "Set a wait time by hand, whether or not a feed exists.",
-  "gaps": [
-   {
-    "operation": "getWaitTimes",
-    "why": "**2 declared operations reach no component on this screen**: getWaitTimes, listQueueEntries. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1259,6 +1878,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "name": "contentBody",
      "slot": "queue",
      "components": [
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listQueues",
+       "notes": "Sends `?venueId=` to `listQueues`.",
+       "provenance": "contract queue.yaml GET /queues"
+      },
+      {
+       "kind": "toggle",
+       "label": "Open only",
+       "operation": "listQueues",
+       "notes": "Sends `?openOnly=` to `listQueues`.",
+       "provenance": "contract queue.yaml GET /queues"
+      },
       {
        "kind": "dataTable",
        "label": "Waiting for a decision",
@@ -1279,6 +1912,38 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listQueues",
        "provenance": "contract queue.yaml GET /queues"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every waiting guest",
+       "bindsTo": "WaitingGuest",
+       "columns": [
+        "WaitingGuest.id",
+        "WaitingGuest.queueId",
+        "WaitingGuest.queueName",
+        "WaitingGuest.subjectId",
+        "WaitingGuest.partyNumber",
+        "WaitingGuest.partySize",
+        "WaitingGuest.status",
+        "WaitingGuest.positionInQueue",
+        "WaitingGuest.partiesAhead",
+        "WaitingGuest.estimatedCallAt",
+        "WaitingGuest.isFastPass",
+        "WaitingGuest.entitlementId"
+       ],
+       "operation": "listQueueEntries",
+       "provenance": "contract queue.yaml GET /queues/{queueId}/entries"
+      },
+      {
+       "kind": "cardList",
+       "bindsTo": "Queue[]",
+       "notes": "One row per queue with a stepper and the current value",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "banner",
+       "notes": "Where a feed is live, a manual entry overrides it for a stated period and then reverts. A permanent silent override is how a broken sensor goes unnoticed for a season",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1288,7 +1953,52 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected manual wait time",
+       "label": "The selected queue",
+       "bindsTo": "Queue",
+       "columns": [
+        "Queue.code",
+        "Queue.name",
+        "Queue.venueId",
+        "Queue.attractionProductId",
+        "Queue.assetId",
+        "Queue.accessPointId",
+        "Queue.kind",
+        "Queue.operatingWindows",
+        "Queue.parentQueueId",
+        "Queue.loadBalanceWithQueueIds",
+        "Queue.inQueueOfferEnabled",
+        "Queue.notifyBeforeCallMinutes",
+        "Queue.capacityPerCycle",
+        "Queue.cycleMinutes",
+        "Queue.maxPartySize",
+        "Queue.returnWindowMinutes"
+       ],
+       "operation": "listQueues",
+       "provenance": "contract queue.yaml GET /queues"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The wait time",
+       "bindsTo": "WaitTime",
+       "columns": [
+        "WaitTime.queueId",
+        "WaitTime.queueName",
+        "WaitTime.attractionProductId",
+        "WaitTime.attractionCategoryId",
+        "WaitTime.status",
+        "WaitTime.waitMinutes",
+        "WaitTime.source",
+        "WaitTime.isStale",
+        "WaitTime.heightRequirementCm",
+        "WaitTime.zone",
+        "WaitTime.asOf"
+       ],
+       "operation": "getWaitTimes",
+       "provenance": "contract queue.yaml GET /queues/wait-times"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The queue",
        "bindsTo": "QueueDetail",
        "columns": [
         "QueueDetail.nowServingPartyNumber",
@@ -1308,69 +2018,46 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save wait time",
        "operation": "setWaitTime",
        "provenance": "contract queue.yaml PUT /queues/{queueId}/wait-time"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create bulk refund",
        "operation": "createBulkRefund",
        "provenance": "contract orders.yaml POST /refunds/bulk"
       },
       {
        "kind": "secondaryButton",
-       "label": "Approve",
+       "label": "Approve refund",
        "operation": "approveRefund",
        "provenance": "contract orders.yaml POST /refunds/{refundId}/approve"
       },
       {
        "kind": "secondaryButton",
-       "label": "Call",
+       "label": "Call next parties",
        "operation": "callNextParties",
        "provenance": "contract queue.yaml POST /queues/{queueId}/call-next"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create queue",
        "operation": "createQueue",
        "provenance": "contract queue.yaml POST /queues"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save queue status",
        "operation": "setQueueStatus",
        "provenance": "contract queue.yaml PUT /queues/{queueId}/status"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save queue",
        "operation": "updateQueue",
        "provenance": "contract queue.yaml PATCH /queues/{queueId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "cardList",
-       "bindsTo": "Queue[]",
-       "notes": "One row per queue with a stepper and the current value",
-       "provenance": "carried from the previous definition"
       },
-      {
-       "kind": "banner",
-       "notes": "Where a feed is live, a manual entry overrides it for a stated period and then reverts. A permanent silent override is how a broken sensor goes unnoticed for a season",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "carried",
-     "components": [
       {
        "kind": "primaryButton",
        "label": "Publish",
@@ -1384,8 +2071,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "loading": "The manual wait time list.",
    "error": "Could not load. Names which read failed and leaves the manual wait time untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
-   "emptyNoResults": "The filter narrowed it and the manual wait time are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoResults": "Nothing matches the filter on venueId, openOnly and the manual wait time are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1407,7 +2094,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "createBulkRefund",
     "contract": "orders",
     "purpose": "From the flow it appears in",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "approveRefund",
@@ -1486,11 +2173,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `refundId`.",
    "preloaded": [
-    "QueueDetail.nowServingPartyNumber",
-    "QueueDetail.lastCalledAt",
-    "QueueDetail.throughputLastHour",
-    "QueueDetail.noShowRatePercent",
-    "QueueDetail.feed"
+    "Queue.code",
+    "Queue.name",
+    "Queue.venueId",
+    "Queue.attractionProductId",
+    "Queue.assetId"
    ]
   },
   "wireframe": {
@@ -1499,6 +2186,159 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P08 Venue Management.dc.html#bo-004"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetWaitTime",
+    "component": "modal",
+    "trigger": "Save wait time",
+    "body": "**Collects what `setWaitTime` sends before it is called.** Required: `waitMinutes`. Optional: `expiresInMinutes`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save wait time",
+     "operation": "setWaitTime"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "waitMinutes",
+      "expiresInMinutes",
+      "note"
+     ]
+    },
+    "provenance": "contract queue.yaml PUT /queues/{queueId}/wait-time"
+   },
+   {
+    "id": "formCreateBulkRefund",
+    "component": "modal",
+    "trigger": "Create bulk refund",
+    "body": "**Collects what `createBulkRefund` sends before it is called.** Required: `scope`, `reason`. Optional: `percentage`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create bulk refund",
+     "operation": "createBulkRefund"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "scope",
+      "reason",
+      "percentage"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /refunds/bulk"
+   },
+   {
+    "id": "formApproveRefund",
+    "component": "modal",
+    "trigger": "Approve refund",
+    "body": "**Collects what `approveRefund` sends before it is called.** Nothing in the body is required. Optional: `note`, `overridePercentage`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Approve refund",
+     "operation": "approveRefund"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "note",
+      "overridePercentage"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /refunds/{refundId}/approve"
+   },
+   {
+    "id": "formCallNextParties",
+    "component": "modal",
+    "trigger": "Call next parties",
+    "body": "**Collects what `callNextParties` sends before it is called.** Nothing in the body is required. Optional: `partyCount`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Call next parties",
+     "operation": "callNextParties"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "partyCount"
+     ]
+    },
+    "provenance": "contract queue.yaml POST /queues/{queueId}/call-next"
+   },
+   {
+    "id": "formCreateQueue",
+    "component": "modal",
+    "trigger": "Create queue",
+    "body": "**Collects what `createQueue` sends before it is called.** Required: `code`, `name`, `venueId`, `capacityPerCycle`, `cycleMinutes`. Optional: `attractionProductId`, `assetId`, `accessPointId`, `kind`, `operatingWindows`, `parentQueueId`, `loadBalanceWithQueueIds`, `inQueueOfferEnabled`, `notifyBeforeCallMinutes`, `maxPartySize`, `returnWindowMinutes`, `heightRequirementCm` and 2 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateQueueRequest",
+    "confirm": {
+     "label": "Create queue",
+     "operation": "createQueue"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "venueId",
+      "capacityPerCycle",
+      "cycleMinutes",
+      "attractionProductId",
+      "assetId",
+      "accessPointId",
+      "kind",
+      "operatingWindows",
+      "parentQueueId",
+      "loadBalanceWithQueueIds",
+      "inQueueOfferEnabled",
+      "notifyBeforeCallMinutes",
+      "maxPartySize",
+      "returnWindowMinutes",
+      "heightRequirementCm",
+      "fastPassAllocationPercent"
+     ]
+    },
+    "provenance": "contract queue.yaml POST /queues"
+   },
+   {
+    "id": "formSetQueueStatus",
+    "component": "modal",
+    "trigger": "Save queue status",
+    "body": "**Collects what `setQueueStatus` sends before it is called.** Required: `status`, `reason`. Optional: `guestMessage`, `expectedReopenAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save queue status",
+     "operation": "setQueueStatus"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "reason",
+      "guestMessage",
+      "expectedReopenAt"
+     ]
+    },
+    "provenance": "contract queue.yaml PUT /queues/{queueId}/status"
+   },
+   {
+    "id": "formUpdateQueue",
+    "component": "modal",
+    "trigger": "Save queue",
+    "body": "**Collects what `updateQueue` sends before it is called.** Nothing in the body is required. Optional: `name`, `capacityPerCycle`, `cycleMinutes`, `maxPartySize`, `returnWindowMinutes`, `heightRequirementCm`, `fastPassAllocationPercent`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save queue",
+     "operation": "updateQueue"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "capacityPerCycle",
+      "cycleMinutes",
+      "maxPartySize",
+      "returnWindowMinutes",
+      "heightRequirementCm",
+      "fastPassAllocationPercent"
+     ]
+    },
+    "provenance": "contract queue.yaml PATCH /queues/{queueId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1551,30 +2391,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-001",
      "trigger": "Queue Directory",
      "carries": [
-      "eventId",
       "feedId",
       "queueId"
      ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-005 holds feedId, queueId, so an edge into it carries them"
     },
     {
      "to": "BO-002",
      "trigger": "Queue Configuration",
      "carries": [
-      "performanceId",
       "queueId"
      ],
-     "provenance": "derived — BO-002 declares entryState.params performanceId, queueId, so an edge into it must carry them"
+     "provenance": "derived — BO-002 declares entryState.params performanceId, queueId and BO-005 holds queueId, so an edge into it carries them"
     },
     {
      "to": "BO-003",
      "trigger": "Queue Integration Setup",
      "carries": [
-      "feedId",
-      "orderId",
-      "venueId"
+      "feedId"
      ],
-     "provenance": "derived — BO-003 declares entryState.params feedId, orderId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-003 declares entryState.params feedId, orderId and BO-005 holds feedId, so an edge into it carries them"
     },
     {
      "to": "EMP-032",
@@ -1582,7 +2418,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "provenance": "flow F21 step 3→4",
      "operation": "listQueues",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "queueId"
+     ]
     }
    ]
   },
@@ -1591,13 +2430,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listQueueEntries` reads the population and `getWaitTimes` reads one of them — list, select, act",
   "purpose": "Watch queues during operation and call parties forward.",
-  "gaps": [
-   {
-    "operation": "listCampaigns",
-    "why": "**5 declared operations reach no component on this screen**: listCampaigns, getCampaign, getCampaignPerformance, getQueue, listQueues. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1606,8 +2438,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listQueueEntries",
+       "notes": "Sends `?status=` to `listQueueEntries`.",
+       "provenance": "contract queue.yaml GET /queues/{queueId}/entries"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every queue",
+       "label": "Every waiting guest",
        "bindsTo": "WaitingGuest",
        "columns": [
         "WaitingGuest.id",
@@ -1625,6 +2464,74 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listQueueEntries",
        "provenance": "contract queue.yaml GET /queues/{queueId}/entries"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every campaign",
+       "bindsTo": "Campaign",
+       "columns": [
+        "Campaign.name",
+        "Campaign.kind",
+        "Campaign.channel",
+        "Campaign.venueId",
+        "Campaign.segmentId",
+        "Campaign.content",
+        "Campaign.trigger",
+        "Campaign.scheduledFor",
+        "Campaign.consentPurpose",
+        "Campaign.sendWindow",
+        "Campaign.id",
+        "Campaign.budgetCap"
+       ],
+       "operation": "listCampaigns",
+       "provenance": "contract marketing-crm.yaml GET /campaigns"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every queue",
+       "bindsTo": "Queue",
+       "columns": [
+        "Queue.code",
+        "Queue.name",
+        "Queue.venueId",
+        "Queue.attractionProductId",
+        "Queue.assetId",
+        "Queue.accessPointId",
+        "Queue.kind",
+        "Queue.operatingWindows",
+        "Queue.parentQueueId",
+        "Queue.loadBalanceWithQueueIds",
+        "Queue.inQueueOfferEnabled",
+        "Queue.notifyBeforeCallMinutes"
+       ],
+       "operation": "listQueues",
+       "provenance": "contract queue.yaml GET /queues"
+      },
+      {
+       "kind": "metricTile",
+       "notes": "Waiting, called, expired, average wait",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Takings and admissions today",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.code",
+        "KpiValue.name",
+        "KpiValue.value",
+        "KpiValue.period",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ],
+       "operation": "getKpiValues",
+       "notes": "**Takings and admissions**, from `getKpiValues?kpiCodes=takings,admissions`; with no `period` the period is today in the venue's time zone (decided 28 September, audit R283).",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      },
+      {
+       "kind": "chart",
+       "notes": "Wait over the day. Stale where the feed has gone quiet",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1634,12 +2541,82 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected queue",
+       "label": "The selected waiting guest",
+       "bindsTo": "WaitingGuest",
+       "columns": [
+        "WaitingGuest.id",
+        "WaitingGuest.queueId",
+        "WaitingGuest.queueName",
+        "WaitingGuest.subjectId",
+        "WaitingGuest.partyNumber",
+        "WaitingGuest.partySize",
+        "WaitingGuest.status",
+        "WaitingGuest.positionInQueue",
+        "WaitingGuest.partiesAhead",
+        "WaitingGuest.estimatedCallAt",
+        "WaitingGuest.isFastPass",
+        "WaitingGuest.entitlementId",
+        "WaitingGuest.calledAt",
+        "WaitingGuest.returnWindowEndsAt",
+        "WaitingGuest.redeemedAt",
+        "WaitingGuest.admittedCount"
+       ],
+       "operation": "listQueueEntries",
+       "provenance": "contract queue.yaml GET /queues/{queueId}/entries"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The campaign",
+       "bindsTo": "CampaignDetail",
+       "columns": [
+        "CampaignDetail.performance"
+       ],
+       "operation": "getCampaign",
+       "provenance": "contract marketing-crm.yaml GET /campaigns/{campaignId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The campaign performance",
+       "bindsTo": "CampaignPerformance",
+       "columns": [
+        "CampaignPerformance.campaignId",
+        "CampaignPerformance.sent",
+        "CampaignPerformance.delivered",
+        "CampaignPerformance.opened",
+        "CampaignPerformance.clicked",
+        "CampaignPerformance.bounced",
+        "CampaignPerformance.complained",
+        "CampaignPerformance.unsubscribed",
+        "CampaignPerformance.attributedOrders",
+        "CampaignPerformance.attributedRevenue",
+        "CampaignPerformance.attributionWindowDays"
+       ],
+       "operation": "getCampaignPerformance",
+       "provenance": "contract marketing-crm.yaml GET /campaigns/{campaignId}/performance"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The queue",
+       "bindsTo": "QueueDetail",
+       "columns": [
+        "QueueDetail.nowServingPartyNumber",
+        "QueueDetail.lastCalledAt",
+        "QueueDetail.throughputLastHour",
+        "QueueDetail.noShowRatePercent",
+        "QueueDetail.feed"
+       ],
+       "operation": "getQueue",
+       "provenance": "contract queue.yaml GET /queues/{queueId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The wait time",
        "bindsTo": "WaitTime",
        "columns": [
         "WaitTime.queueId",
         "WaitTime.queueName",
         "WaitTime.attractionProductId",
+        "WaitTime.attractionCategoryId",
         "WaitTime.status",
         "WaitTime.waitMinutes",
         "WaitTime.source",
@@ -1659,98 +2636,76 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Call",
+       "label": "Call next parties",
        "operation": "callNextParties",
        "provenance": "contract queue.yaml POST /queues/{queueId}/call-next"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create campaign",
        "operation": "createCampaign",
        "provenance": "contract marketing-crm.yaml POST /campaigns"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create queue",
        "operation": "createQueue",
        "provenance": "contract queue.yaml POST /queues"
       },
       {
        "kind": "secondaryButton",
-       "label": "Launch",
+       "label": "Launch campaign",
        "operation": "launchCampaign",
        "provenance": "contract marketing-crm.yaml POST /campaigns/{campaignId}/launch"
       },
       {
        "kind": "secondaryButton",
-       "label": "Pause",
+       "label": "Pause campaign",
        "operation": "pauseCampaign",
        "provenance": "contract marketing-crm.yaml POST /campaigns/{campaignId}/pause"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save queue status",
        "operation": "setQueueStatus",
        "provenance": "contract queue.yaml PUT /queues/{queueId}/status"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save wait time",
        "operation": "setWaitTime",
        "provenance": "contract queue.yaml PUT /queues/{queueId}/wait-time"
       },
       {
        "kind": "destructiveButton",
-       "label": "Stop",
+       "label": "Stop campaign",
        "operation": "stopCampaign",
        "provenance": "contract marketing-crm.yaml POST /campaigns/{campaignId}/stop"
       },
       {
        "kind": "secondaryButton",
-       "label": "Test",
+       "label": "Test send campaign",
        "operation": "testSendCampaign",
        "provenance": "contract marketing-crm.yaml POST /campaigns/{campaignId}/test-send"
       },
       {
        "kind": "secondaryButton",
-       "label": "Unschedule",
+       "label": "Unschedule campaign",
        "operation": "unscheduleCampaign",
        "provenance": "contract marketing-crm.yaml POST /campaigns/{campaignId}/unschedule"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save campaign",
        "operation": "updateCampaign",
        "provenance": "contract marketing-crm.yaml PATCH /campaigns/{campaignId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save queue",
        "operation": "updateQueue",
        "provenance": "contract queue.yaml PATCH /queues/{queueId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "metricTile",
-       "notes": "Waiting, called, expired, average wait",
-       "provenance": "carried from the previous definition"
       },
-      {
-       "kind": "chart",
-       "notes": "Wait over the day. Stale where the feed has gone quiet",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "carried",
-     "components": [
       {
        "kind": "primaryButton",
        "label": "Call next",
@@ -1764,19 +2719,239 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmStopCampaign",
     "component": "confirmDialog",
-    "trigger": "Stop",
-    "body": "**Names what `stopCampaign` changes and what it leaves alone**, in the consequence rather than the verb. A queue this affects should be identified in the dialog, not just counted.",
+    "trigger": "Stop campaign",
+    "body": "**Names what `stopCampaign` changes and what it leaves alone**, in the consequence rather than the verb. A queue this affects should be identified in the dialog, not just counted. **Collects what `stopCampaign` sends before it is called.** Required: `reason`.",
     "provenance": "contract marketing-crm.yaml POST /campaigns/{campaignId}/stop"
+   },
+   {
+    "id": "formCallNextParties",
+    "component": "modal",
+    "trigger": "Call next parties",
+    "body": "**Collects what `callNextParties` sends before it is called.** Nothing in the body is required. Optional: `partyCount`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Call next parties",
+     "operation": "callNextParties"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "partyCount"
+     ]
+    },
+    "provenance": "contract queue.yaml POST /queues/{queueId}/call-next"
+   },
+   {
+    "id": "formCreateCampaign",
+    "component": "modal",
+    "trigger": "Create campaign",
+    "body": "**Collects what `createCampaign` sends before it is called.** Required: `name`, `kind`, `channel`, `segmentId`, `content`. Optional: `venueId`, `trigger`, `scheduledFor`, `consentPurpose`, `sendWindow`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateCampaignRequest",
+    "confirm": {
+     "label": "Create campaign",
+     "operation": "createCampaign"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "kind",
+      "channel",
+      "segmentId",
+      "content",
+      "venueId",
+      "trigger",
+      "scheduledFor",
+      "consentPurpose",
+      "sendWindow"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /campaigns"
+   },
+   {
+    "id": "formCreateQueue",
+    "component": "modal",
+    "trigger": "Create queue",
+    "body": "**Collects what `createQueue` sends before it is called.** Required: `code`, `name`, `venueId`, `capacityPerCycle`, `cycleMinutes`. Optional: `attractionProductId`, `assetId`, `accessPointId`, `kind`, `operatingWindows`, `parentQueueId`, `loadBalanceWithQueueIds`, `inQueueOfferEnabled`, `notifyBeforeCallMinutes`, `maxPartySize`, `returnWindowMinutes`, `heightRequirementCm` and 2 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateQueueRequest",
+    "confirm": {
+     "label": "Create queue",
+     "operation": "createQueue"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "venueId",
+      "capacityPerCycle",
+      "cycleMinutes",
+      "attractionProductId",
+      "assetId",
+      "accessPointId",
+      "kind",
+      "operatingWindows",
+      "parentQueueId",
+      "loadBalanceWithQueueIds",
+      "inQueueOfferEnabled",
+      "notifyBeforeCallMinutes",
+      "maxPartySize",
+      "returnWindowMinutes",
+      "heightRequirementCm",
+      "fastPassAllocationPercent"
+     ]
+    },
+    "provenance": "contract queue.yaml POST /queues"
+   },
+   {
+    "id": "formLaunchCampaign",
+    "component": "modal",
+    "trigger": "Launch campaign",
+    "body": "**Collects what `launchCampaign` sends before it is called.** Nothing in the body is required. Optional: `scheduledFor`, `confirmAudienceSize`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Launch campaign",
+     "operation": "launchCampaign"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "scheduledFor",
+      "confirmAudienceSize"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /campaigns/{campaignId}/launch"
+   },
+   {
+    "id": "formPauseCampaign",
+    "component": "modal",
+    "trigger": "Pause campaign",
+    "body": "**Collects what `pauseCampaign` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Pause campaign",
+     "operation": "pauseCampaign"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /campaigns/{campaignId}/pause"
+   },
+   {
+    "id": "formSetQueueStatus",
+    "component": "modal",
+    "trigger": "Save queue status",
+    "body": "**Collects what `setQueueStatus` sends before it is called.** Required: `status`, `reason`. Optional: `guestMessage`, `expectedReopenAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save queue status",
+     "operation": "setQueueStatus"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "reason",
+      "guestMessage",
+      "expectedReopenAt"
+     ]
+    },
+    "provenance": "contract queue.yaml PUT /queues/{queueId}/status"
+   },
+   {
+    "id": "formSetWaitTime",
+    "component": "modal",
+    "trigger": "Save wait time",
+    "body": "**Collects what `setWaitTime` sends before it is called.** Required: `waitMinutes`. Optional: `expiresInMinutes`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save wait time",
+     "operation": "setWaitTime"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "waitMinutes",
+      "expiresInMinutes",
+      "note"
+     ]
+    },
+    "provenance": "contract queue.yaml PUT /queues/{queueId}/wait-time"
+   },
+   {
+    "id": "formTestSendCampaign",
+    "component": "modal",
+    "trigger": "Test send campaign",
+    "body": "**Collects what `testSendCampaign` sends before it is called.** Required: `recipients`. Optional: `sampleSubjectId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Test send campaign",
+     "operation": "testSendCampaign"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recipients",
+      "sampleSubjectId"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /campaigns/{campaignId}/test-send"
+   },
+   {
+    "id": "formUpdateCampaign",
+    "component": "modal",
+    "trigger": "Save campaign",
+    "body": "**Collects what `updateCampaign` sends before it is called.** Nothing in the body is required. Optional: `name`, `isPaused`, `scheduledFor`, `content`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save campaign",
+     "operation": "updateCampaign"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "isPaused",
+      "scheduledFor",
+      "content"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml PATCH /campaigns/{campaignId}"
+   },
+   {
+    "id": "formUpdateQueue",
+    "component": "modal",
+    "trigger": "Save queue",
+    "body": "**Collects what `updateQueue` sends before it is called.** Nothing in the body is required. Optional: `name`, `capacityPerCycle`, `cycleMinutes`, `maxPartySize`, `returnWindowMinutes`, `heightRequirementCm`, `fastPassAllocationPercent`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save queue",
+     "operation": "updateQueue"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "capacityPerCycle",
+      "cycleMinutes",
+      "maxPartySize",
+      "returnWindowMinutes",
+      "heightRequirementCm",
+      "fastPassAllocationPercent"
+     ]
+    },
+    "provenance": "contract queue.yaml PATCH /queues/{queueId}"
    }
   ],
   "states": {
    "loading": "The queue list.",
    "error": "Could not load. Names which read failed and leaves the queue untouched.",
-   "emptyFirstRun": "No queue yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the queue are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No queue yet. Offers Create campaign (`createCampaign`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on status and the queue are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `QUEUE_VIEW`, which `listQueueEntries` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Today's takings and admissions tiles — `kpiCodes=takings,admissions`, period defaulting to today (decided 28 September, audit R283)",
+    "trigger": "onLoad"
+   },
    {
     "operationId": "listQueueEntries",
     "contract": "queue",
@@ -1826,13 +3001,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getCampaign",
     "contract": "marketing-crm",
     "purpose": "Read a campaign with performance",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getCampaignPerformance",
     "contract": "marketing-crm",
     "purpose": "Delivery and engagement",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getQueue",
@@ -2002,12 +3177,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-001",
      "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-006 holds none of them, so the edge carries nothing and BO-001 opens cold"
     }
    ]
   },
@@ -2019,13 +3189,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listAccessPoints` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "Change how parking behaves here, and see which level the current value came from.",
-  "gaps": [
-   {
-    "operation": "listParkingFacilities",
-    "why": "**1 declared operation reach no component on this screen**: listParkingFacilities. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -2034,8 +3197,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listAccessPoints",
+       "notes": "Sends `?venueId=` to `listAccessPoints`.",
+       "provenance": "contract access.yaml GET /access-points"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every parking",
+       "label": "Every access point",
        "bindsTo": "AccessPoint",
        "columns": [
         "AccessPoint.id",
@@ -2053,6 +3223,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listAccessPoints",
        "provenance": "contract access.yaml GET /access-points"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every parking facility",
+       "bindsTo": "ParkingFacility",
+       "columns": [
+        "ParkingFacility.id",
+        "ParkingFacility.name",
+        "ParkingFacility.venueId",
+        "ParkingFacility.mode",
+        "ParkingFacility.capacity",
+        "ParkingFacility.takesPayment",
+        "ParkingFacility.vendorSwapTargetDays",
+        "ParkingFacility.vendorName",
+        "ParkingFacility.endpoint",
+        "ParkingFacility.credentialRef",
+        "ParkingFacility.pushLeadMinutes",
+        "ParkingFacility.accessPointIds"
+       ],
+       "operation": "listParkingFacilities",
+       "provenance": "contract access.yaml GET /parking-facilities"
+      },
+      {
+       "kind": "detailPanel",
+       "notes": "TODO",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -2062,7 +3258,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected parking",
+       "label": "The selected access point",
        "bindsTo": "AccessPoint",
        "columns": [
         "AccessPoint.id",
@@ -2091,48 +3287,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save access point",
        "operation": "updateAccessPoint",
        "provenance": "contract access.yaml PATCH /access-points/{accessPointId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save parking facility",
        "operation": "setParkingFacility",
        "provenance": "contract access.yaml PUT /parking-facilities"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "TODO",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAccessPoints",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "updateAccessPoint",
-       "label": "Save access point",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "updateAccessPoint",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -2141,9 +3304,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The parking list.",
    "error": "Could not load. Names which read failed and leaves the parking untouched.",
-   "emptyFirstRun": "No parking yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the parking are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No parking yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on venueId and the parking are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listAccessPoints` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2199,6 +3362,60 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P08 Venue Management.dc.html#bo-006"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formUpdateAccessPoint",
+    "component": "modal",
+    "trigger": "Save access point",
+    "body": "**Collects what `updateAccessPoint` sends before it is called.** Nothing in the body is required. Optional: `name`, `direction`, `antiPassbackEnabled`, `requiresExitBeforeReentry`, `isActive`, `driver`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save access point",
+     "operation": "updateAccessPoint"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "direction",
+      "antiPassbackEnabled",
+      "requiresExitBeforeReentry",
+      "isActive",
+      "driver"
+     ]
+    },
+    "provenance": "contract access.yaml PATCH /access-points/{accessPointId}"
+   },
+   {
+    "id": "formSetParkingFacility",
+    "component": "modal",
+    "trigger": "Save parking facility",
+    "body": "**Collects what `setParkingFacility` sends before it is called.** Required: `name`, `venueId`, `mode`. Optional: `id`, `capacity`, `takesPayment`, `vendorSwapTargetDays`, `vendorName`, `endpoint`, `credentialRef`, `pushLeadMinutes`, `accessPointIds`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ParkingFacility",
+    "confirm": {
+     "label": "Save parking facility",
+     "operation": "setParkingFacility"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "venueId",
+      "mode",
+      "id",
+      "capacity",
+      "takesPayment",
+      "vendorSwapTargetDays",
+      "vendorName",
+      "endpoint",
+      "credentialRef",
+      "pushLeadMinutes",
+      "accessPointIds",
+      "isActive"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /parking-facilities"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2237,55 +3454,28 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009",
-    "BO-031"
+    "BO-031",
+    "BO-070"
    ],
    "inferred": true,
    "fromFlows": true,
    "transitions": [
     {
+     "to": "BO-070",
+     "trigger": "Work Orders",
+     "provenance": "VM close-out 29 September: maintenance home",
+     "carries": [
+      "workOrderId"
+     ]
+    },
+    {
      "to": "BO-031",
      "trigger": "Asset returns to service",
      "provenance": "flow F12 step 4→5",
-     "operation": "verifyWorkOrder"
-    },
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
+     "operation": "verifyWorkOrder",
      "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+      "assetId"
+     ]
     }
    ]
   },
@@ -2302,8 +3492,43 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Assigned to principal id",
+       "operation": "listWorkOrders",
+       "notes": "Sends `?assignedToPrincipalId=` to `listWorkOrders`.",
+       "provenance": "contract maintenance.yaml GET /work-orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listWorkOrders",
+       "notes": "Sends `?status=` to `listWorkOrders`.",
+       "provenance": "contract maintenance.yaml GET /work-orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Priority",
+       "operation": "listWorkOrders",
+       "notes": "Sends `?priority=` to `listWorkOrders`.",
+       "provenance": "contract maintenance.yaml GET /work-orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Asset id",
+       "operation": "listWorkOrders",
+       "notes": "Sends `?assetId=` to `listWorkOrders`.",
+       "provenance": "contract maintenance.yaml GET /work-orders"
+      },
+      {
+       "kind": "toggle",
+       "label": "Overdue only",
+       "operation": "listWorkOrders",
+       "notes": "Sends `?overdueOnly=` to `listWorkOrders`.",
+       "provenance": "contract maintenance.yaml GET /work-orders"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every work order verification",
+       "label": "Every work order",
        "bindsTo": "WorkOrder",
        "columns": [
         "WorkOrder.downtimeMinutes",
@@ -2321,6 +3546,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listWorkOrders",
        "provenance": "contract maintenance.yaml GET /work-orders"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -2330,7 +3562,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected work order verification",
+       "label": "The selected work order",
+       "bindsTo": "WorkOrder",
+       "columns": [
+        "WorkOrder.downtimeMinutes",
+        "WorkOrder.rootCause",
+        "WorkOrder.rootCauseNote",
+        "WorkOrder.escalatedAt",
+        "WorkOrder.escalationLevel",
+        "WorkOrder.id",
+        "WorkOrder.workOrderNumber",
+        "WorkOrder.title",
+        "WorkOrder.venueId",
+        "WorkOrder.assetId",
+        "WorkOrder.assetName",
+        "WorkOrder.status",
+        "WorkOrder.priority",
+        "WorkOrder.kind",
+        "WorkOrder.assignedToPrincipalId",
+        "WorkOrder.raisedByPrincipalId"
+       ],
+       "operation": "listWorkOrders",
+       "provenance": "contract maintenance.yaml GET /work-orders"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The work order",
        "bindsTo": "WorkOrderDetail",
        "columns": [
         "WorkOrderDetail.downtimeMinutes",
@@ -2361,93 +3618,45 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Verify",
+       "label": "Verify work order",
        "operation": "verifyWorkOrder",
        "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/verify"
       },
       {
        "kind": "secondaryButton",
-       "label": "Accept",
+       "label": "Accept work order",
        "operation": "acceptWorkOrder",
        "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/accept"
       },
       {
        "kind": "secondaryButton",
-       "label": "Attach",
+       "label": "Attach work order evidence",
        "operation": "attachWorkOrderEvidence",
        "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/attachments"
       },
       {
        "kind": "destructiveButton",
-       "label": "Cancel",
+       "label": "Cancel work order",
        "operation": "cancelWorkOrder",
        "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/cancel"
       },
       {
        "kind": "destructiveButton",
-       "label": "Close",
+       "label": "Close work order",
        "operation": "closeWorkOrder",
        "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/close"
       },
       {
        "kind": "secondaryButton",
-       "label": "Complete",
+       "label": "Complete work order",
        "operation": "completeWorkOrder",
        "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/complete"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create work order",
        "operation": "createWorkOrder",
        "provenance": "contract maintenance.yaml POST /work-orders"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "verifyWorkOrder",
-       "label": "Verify work order",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "cancelWorkOrder",
-       "label": "Cancel work order",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listWorkOrders",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "verifyWorkOrder",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -2457,24 +3666,116 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmCancelWorkOrder",
     "component": "confirmDialog",
-    "trigger": "Cancel",
-    "body": "**Names what `cancelWorkOrder` changes and what it leaves alone**, in the consequence rather than the verb. A work order verification this affects should be identified in the dialog, not just counted.",
+    "trigger": "Cancel work order",
+    "body": "**Names what `cancelWorkOrder` changes and what it leaves alone**, in the consequence rather than the verb. A work order verification this affects should be identified in the dialog, not just counted. **Collects what `cancelWorkOrder` sends before it is called.** Required: `reason`. Optional: `note`, `supersededByWorkOrderId`.",
     "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/cancel"
    },
    {
     "id": "confirmCloseWorkOrder",
     "component": "confirmDialog",
-    "trigger": "Close",
-    "body": "**Names what `closeWorkOrder` changes and what it leaves alone**, in the consequence rather than the verb. A work order verification this affects should be identified in the dialog, not just counted.",
+    "trigger": "Close work order",
+    "body": "**Names what `closeWorkOrder` changes and what it leaves alone**, in the consequence rather than the verb. A work order verification this affects should be identified in the dialog, not just counted. **Collects what `closeWorkOrder` sends before it is called.** Required: `outcome`. Optional: `note`, `duplicateOfWorkOrderId`.",
     "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/close"
+   },
+   {
+    "id": "formVerifyWorkOrder",
+    "component": "modal",
+    "trigger": "Verify work order",
+    "body": "**Collects what `verifyWorkOrder` sends before it is called.** Required: `outcome`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Verify work order",
+     "operation": "verifyWorkOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "outcome",
+      "note"
+     ]
+    },
+    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/verify"
+   },
+   {
+    "id": "formAttachWorkOrderEvidence",
+    "component": "modal",
+    "trigger": "Attach work order evidence",
+    "body": "**Collects what `attachWorkOrderEvidence` sends before it is called.** Required: `kind`. Optional: `assetRef`, `text`, `capturedAt`, `stage`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Attach work order evidence",
+     "operation": "attachWorkOrderEvidence"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "assetRef",
+      "text",
+      "capturedAt",
+      "stage"
+     ]
+    },
+    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/attachments"
+   },
+   {
+    "id": "formCompleteWorkOrder",
+    "component": "modal",
+    "trigger": "Complete work order",
+    "body": "**Collects what `completeWorkOrder` sends before it is called.** Required: `resolution`, `recordedAt`. Optional: `resolutionCode`, `attachmentRefs`, `followUpRequired`, `followUpNote`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Complete work order",
+     "operation": "completeWorkOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "resolution",
+      "recordedAt",
+      "resolutionCode",
+      "attachmentRefs",
+      "followUpRequired",
+      "followUpNote"
+     ]
+    },
+    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/complete"
+   },
+   {
+    "id": "formCreateWorkOrder",
+    "component": "modal",
+    "trigger": "Create work order",
+    "body": "**Collects what `createWorkOrder` sends before it is called.** Required: `id`, `title`, `venueId`, `priority`, `recordedAt`. Optional: `description`, `assetId`, `locationDescription`, `kind`, `categoryId`, `assignedToPrincipalId`, `dueAt`, `attachmentRefs`, `takeAssetOutOfService`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateWorkOrderRequest",
+    "confirm": {
+     "label": "Create work order",
+     "operation": "createWorkOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "title",
+      "venueId",
+      "priority",
+      "recordedAt",
+      "description",
+      "assetId",
+      "locationDescription",
+      "kind",
+      "categoryId",
+      "assignedToPrincipalId",
+      "dueAt",
+      "attachmentRefs",
+      "takeAssetOutOfService"
+     ]
+    },
+    "provenance": "contract maintenance.yaml POST /work-orders"
    }
   ],
   "states": {
    "loading": "The work order verification list.",
    "error": "Could not load. Names which read failed and leaves the work order verification untouched.",
-   "emptyFirstRun": "No work order verification yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the work order verification are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No work order verification yet. Offers Create work order (`createWorkOrder`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on assignedToPrincipalId, status, priority, assetId, overdueOnly and the work order verification are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `WORK_ORDER_VIEW`, which `getWorkOrder` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2544,7 +3845,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getWorkOrder",
     "contract": "maintenance",
     "purpose": "Read a work order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listWorkOrders",
@@ -2566,11 +3867,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "A work order opened from a queue or an alert.",
    "preloaded": [
-    "WorkOrderDetail.downtimeMinutes",
-    "WorkOrderDetail.rootCause",
-    "WorkOrderDetail.rootCauseNote",
-    "WorkOrderDetail.escalatedAt",
-    "WorkOrderDetail.escalationLevel"
+    "WorkOrder.downtimeMinutes",
+    "WorkOrder.rootCause",
+    "WorkOrder.rootCauseNote",
+    "WorkOrder.escalatedAt",
+    "WorkOrder.escalationLevel"
    ]
   },
   "wireframe": {
@@ -2617,47 +3918,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+    "BO-001"
    ],
    "inferred": true,
    "transitions": [
     {
      "to": "BO-001",
      "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-031 holds none of them, so the edge carries nothing and BO-001 opens cold"
     }
    ]
   },
@@ -2666,13 +3934,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listAssets` reads the population and `getAsset` reads one of them — list, select, act",
   "purpose": "Define what a gate is and where it is.",
-  "gaps": [
-   {
-    "operation": "getAssetHistory",
-    "why": "**1 declared operation reach no component on this screen**: getAssetHistory. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -2681,8 +3942,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listAssets",
+       "notes": "Sends `?venueId=` to `listAssets`.",
+       "provenance": "contract maintenance.yaml GET /assets"
+      },
+      {
+       "kind": "textField",
+       "label": "Category id",
+       "operation": "listAssets",
+       "notes": "Sends `?categoryId=` to `listAssets`.",
+       "provenance": "contract maintenance.yaml GET /assets"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listAssets",
+       "notes": "Sends `?status=` to `listAssets`.",
+       "provenance": "contract maintenance.yaml GET /assets"
+      },
+      {
+       "kind": "toggle",
+       "label": "Maintenance due",
+       "operation": "listAssets",
+       "notes": "Sends `?maintenanceDue=` to `listAssets`.",
+       "provenance": "contract maintenance.yaml GET /assets"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every asset register",
+       "label": "Every asset",
        "bindsTo": "Asset",
        "columns": [
         "Asset.assetTag",
@@ -2700,6 +3989,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listAssets",
        "provenance": "contract maintenance.yaml GET /assets"
+      },
+      {
+       "kind": "searchField",
+       "derived": true,
+       "impliedBy": "lookupAsset",
+       "label": "Search",
+       "notes": "A search that returns nothing must say so differently from a search not yet run.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -2709,7 +4006,46 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected asset register",
+       "label": "The selected asset",
+       "bindsTo": "Asset",
+       "columns": [
+        "Asset.assetTag",
+        "Asset.name",
+        "Asset.venueId",
+        "Asset.categoryId",
+        "Asset.locationDescription",
+        "Asset.criticality",
+        "Asset.manufacturer",
+        "Asset.model",
+        "Asset.serialNumber",
+        "Asset.commissionedAt",
+        "Asset.warrantyExpiresAt",
+        "Asset.supplierId",
+        "Asset.linkedProductIds",
+        "Asset.linkedAccessPointId",
+        "Asset.requiresInspectionToReturn",
+        "Asset.documents"
+       ],
+       "operation": "listAssets",
+       "provenance": "contract maintenance.yaml GET /assets"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The asset history entry",
+       "bindsTo": "AssetHistoryEntry",
+       "columns": [
+        "AssetHistoryEntry.kind",
+        "AssetHistoryEntry.referenceId",
+        "AssetHistoryEntry.summary",
+        "AssetHistoryEntry.principalId",
+        "AssetHistoryEntry.occurredAt"
+       ],
+       "operation": "getAssetHistory",
+       "provenance": "contract maintenance.yaml GET /assets/{assetId}/history"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The asset",
        "bindsTo": "AssetDetail",
        "columns": [
         "AssetDetail.openWorkOrders",
@@ -2727,68 +4063,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save asset",
        "operation": "updateAsset",
        "provenance": "contract maintenance.yaml PATCH /assets/{assetId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create asset",
        "operation": "createAsset",
        "provenance": "contract maintenance.yaml POST /assets"
       },
       {
        "kind": "secondaryButton",
-       "label": "Lookup",
+       "label": "Lookup asset",
        "operation": "lookupAsset",
        "provenance": "contract maintenance.yaml GET /assets/lookup"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save asset status",
        "operation": "setAssetStatus",
        "provenance": "contract maintenance.yaml PUT /assets/{assetId}/status"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "updateAsset",
-       "label": "Save asset",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAssets",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "searchField",
-       "derived": true,
-       "impliedBy": "lookupAsset",
-       "label": "Search",
-       "notes": "A search that returns nothing must say so differently from a search not yet run.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "updateAsset",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -2797,9 +4092,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The asset register list.",
    "error": "Could not load. Names which read failed and leaves the asset register untouched.",
-   "emptyFirstRun": "No asset register yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the asset register are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No asset register yet. Offers Create asset (`createAsset`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on venueId, categoryId, status, maintenanceDue and the asset register are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ASSET_VIEW`, which `getAsset` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2824,13 +4119,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getAsset",
     "contract": "maintenance",
     "purpose": "Read an asset with history and documents",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getAssetHistory",
     "contract": "maintenance",
     "purpose": "Service history",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listAssets",
@@ -2842,7 +4137,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "lookupAsset",
     "contract": "maintenance",
     "purpose": "Find an asset by tag or QR",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "setAssetStatus",
@@ -2867,9 +4162,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "An asset opened from the register or a work order.",
    "preloaded": [
-    "AssetDetail.openWorkOrders",
-    "AssetDetail.maintenancePlans",
-    "AssetDetail.documents"
+    "Asset.assetTag",
+    "Asset.name",
+    "Asset.venueId",
+    "Asset.categoryId",
+    "Asset.locationDescription"
    ]
   },
   "wireframe": {
@@ -2878,6 +4175,87 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P08 Venue Management.dc.html#bo-031"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formUpdateAsset",
+    "component": "modal",
+    "trigger": "Save asset",
+    "body": "**Collects what `updateAsset` sends before it is called.** Nothing in the body is required. Optional: `name`, `locationDescription`, `categoryId`, `warrantyExpiresAt`, `supplierId`, `documents`, `documentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save asset",
+     "operation": "updateAsset"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "locationDescription",
+      "categoryId",
+      "warrantyExpiresAt",
+      "supplierId",
+      "documents",
+      "documentRefs"
+     ]
+    },
+    "provenance": "contract maintenance.yaml PATCH /assets/{assetId}"
+   },
+   {
+    "id": "formCreateAsset",
+    "component": "modal",
+    "trigger": "Create asset",
+    "body": "**Collects what `createAsset` sends before it is called.** Required: `assetTag`, `name`, `venueId`, `criticality`. Optional: `categoryId`, `locationDescription`, `manufacturer`, `model`, `serialNumber`, `commissionedAt`, `warrantyExpiresAt`, `supplierId`, `linkedProductIds`, `linkedAccessPointId`, `requiresInspectionToReturn`, `documents` and 1 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateAssetRequest",
+    "confirm": {
+     "label": "Create asset",
+     "operation": "createAsset"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "assetTag",
+      "name",
+      "venueId",
+      "criticality",
+      "categoryId",
+      "locationDescription",
+      "manufacturer",
+      "model",
+      "serialNumber",
+      "commissionedAt",
+      "warrantyExpiresAt",
+      "supplierId",
+      "linkedProductIds",
+      "linkedAccessPointId",
+      "requiresInspectionToReturn",
+      "documents",
+      "documentRefs"
+     ]
+    },
+    "provenance": "contract maintenance.yaml POST /assets"
+   },
+   {
+    "id": "formSetAssetStatus",
+    "component": "modal",
+    "trigger": "Save asset status",
+    "body": "**Collects what `setAssetStatus` sends before it is called.** Required: `status`, `reason`, `recordedAt`. Optional: `inspectionId`, `raiseWorkOrder`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SetAssetStatusRequest",
+    "confirm": {
+     "label": "Save asset status",
+     "operation": "setAssetStatus"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "reason",
+      "recordedAt",
+      "inspectionId",
+      "raiseWorkOrder"
+     ]
+    },
+    "provenance": "contract maintenance.yaml PUT /assets/{assetId}/status"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2916,47 +4294,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+    "BO-001"
    ],
    "inferred": true,
    "transitions": [
     {
      "to": "BO-001",
      "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-032 holds none of them, so the edge carries nothing and BO-001 opens cold"
     }
    ]
   },
@@ -2974,7 +4319,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every admission profiles",
+       "label": "Every admission rules",
        "bindsTo": "AdmissionRules",
        "columns": [
         "AdmissionRules.id",
@@ -3000,7 +4345,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected admission profiles",
+       "label": "The selected admission rules",
        "bindsTo": "AdmissionRules",
        "columns": [
         "AdmissionRules.id",
@@ -3026,48 +4371,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create admission rules",
        "operation": "createAdmissionRules",
        "provenance": "contract access.yaml POST /admission-rules"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save admission rules",
        "operation": "updateAdmissionRules",
        "provenance": "contract access.yaml PUT /admission-rules/{profileId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAdmissionRules",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createAdmissionRules",
-       "label": "Create admission profile",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createAdmissionRules",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -3076,9 +4388,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The admission profiles list.",
    "error": "Could not load. Names which read failed and leaves the admission profiles untouched.",
-   "emptyFirstRun": "No admission profiles yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the admission profiles are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No admission profiles yet. Offers Create admission rules (`createAdmissionRules`).",
+   "emptyNoResults": "Never shown: `listAdmissionRules` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listAdmissionRules` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -3104,6 +4416,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listAdmissionRules"
     ]
+   },
+   {
+    "operationId": "setEntryRulePoints",
+    "contract": "access",
+    "purpose": "Set the access points an admission rule covers",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listAdmissionRules"
+    ]
    }
   ],
   "entryState": {
@@ -3111,6 +4433,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "profileId",
      "from": "deepLink"
+    },
+    {
+     "name": "ruleId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `profileId`.",
@@ -3128,6 +4454,64 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P08 Venue Management.dc.html#bo-032"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateAdmissionRules",
+    "component": "modal",
+    "trigger": "Create admission rules",
+    "body": "**Collects what `createAdmissionRules` sends before it is called.** Required: `id`, `code`, `name`, `openMinutesBefore`, `closeMinutesAfter`. Optional: `perProductRules`, `maxDurationMinutes`, `requiresExitBeforeReentry`, `maxReentries`, `allowedAccessPointIds`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AdmissionRules",
+    "confirm": {
+     "label": "Create admission rules",
+     "operation": "createAdmissionRules"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "openMinutesBefore",
+      "closeMinutesAfter",
+      "perProductRules",
+      "maxDurationMinutes",
+      "requiresExitBeforeReentry",
+      "maxReentries",
+      "allowedAccessPointIds",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract access.yaml POST /admission-rules"
+   },
+   {
+    "id": "formUpdateAdmissionRules",
+    "component": "modal",
+    "trigger": "Save admission rules",
+    "body": "**Collects what `updateAdmissionRules` sends before it is called.** Required: `id`, `code`, `name`, `openMinutesBefore`, `closeMinutesAfter`. Optional: `perProductRules`, `maxDurationMinutes`, `requiresExitBeforeReentry`, `maxReentries`, `allowedAccessPointIds`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AdmissionRules",
+    "confirm": {
+     "label": "Save admission rules",
+     "operation": "updateAdmissionRules"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "openMinutesBefore",
+      "closeMinutesAfter",
+      "perProductRules",
+      "maxDurationMinutes",
+      "requiresExitBeforeReentry",
+      "maxReentries",
+      "allowedAccessPointIds",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /admission-rules/{profileId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -3166,47 +4550,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+    "BO-001"
    ],
    "inferred": true,
    "transitions": [
     {
      "to": "BO-001",
      "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-033 holds none of them, so the edge carries nothing and BO-001 opens cold"
     }
    ]
   },
@@ -3224,7 +4575,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every blacklist",
+       "label": "Every blacklist entry",
        "bindsTo": "BlacklistEntry",
        "columns": [
         "BlacklistEntry.mediaCode",
@@ -3236,6 +4587,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listBlacklist",
        "provenance": "contract access.yaml GET /blacklist"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -3245,7 +4603,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected blacklist",
+       "label": "The selected blacklist entry",
        "bindsTo": "BlacklistEntry",
        "columns": [
         "BlacklistEntry.mediaCode",
@@ -3266,63 +4624,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Add",
+       "label": "Add blacklist entry",
        "operation": "addBlacklistEntry",
        "provenance": "contract access.yaml POST /blacklist"
       },
       {
        "kind": "destructiveButton",
-       "label": "Remove",
+       "label": "Remove blacklist entry",
        "operation": "removeBlacklistEntry",
        "provenance": "contract access.yaml DELETE /blacklist/{mediaCode}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listBlacklist",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "addBlacklistEntry",
-       "label": "Add blacklist entry",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "removeBlacklistEntry",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "label": "Remove blacklist entry",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "addBlacklistEntry",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -3332,17 +4642,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmRemoveBlacklistEntry",
     "component": "confirmDialog",
-    "trigger": "Remove",
+    "trigger": "Remove blacklist entry",
     "body": "**Names what `removeBlacklistEntry` changes and what it leaves alone**, in the consequence rather than the verb. A blacklist this affects should be identified in the dialog, not just counted.",
     "provenance": "contract access.yaml DELETE /blacklist/{mediaCode}"
+   },
+   {
+    "id": "formAddBlacklistEntry",
+    "component": "modal",
+    "trigger": "Add blacklist entry",
+    "body": "**Collects what `addBlacklistEntry` sends before it is called.** Required: `mediaCode`, `reason`. Optional: `expiresAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Add blacklist entry",
+     "operation": "addBlacklistEntry"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "mediaCode",
+      "reason",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract access.yaml POST /blacklist"
    }
   ],
   "states": {
    "loading": "The blacklist list.",
    "error": "Could not load. Names which read failed and leaves the blacklist untouched.",
-   "emptyFirstRun": "No blacklist yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the blacklist are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No blacklist yet. Offers Add blacklist entry (`addBlacklistEntry`).",
+   "emptyNoResults": "Never shown: `listBlacklist` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listBlacklist` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -3842,6 +5171,45 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Event"
  },
+ "getKpiValues": {
+  "method": "GET",
+  "path": "/kpi-values",
+  "contract": "reporting",
+  "summary": "Current values, against target, with movement",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kpiIds",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kpiCodes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "compareTo",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KpiValue"
+ },
  "getPerformance": {
   "method": "GET",
   "path": "/performances/{performanceId}",
@@ -4150,11 +5518,16 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/parking-facilities",
   "contract": "access",
   "summary": "Car parks at a venue, and how each integrates",
-  "permission": "ACCESS_POINT_CONFIGURE",
+  "permission": "PARKING_CONFIGURE",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
    {
     "name": null,
     "in": null,
@@ -4167,7 +5540,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "ParkingFacility"
+  "responds": "Page"
  },
  "listPerformances": {
   "method": "GET",
@@ -4186,6 +5559,11 @@ Method, path, parameters, request and response for every operation these screens
    },
    {
     "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "language",
     "in": "query",
     "required": null
    },
@@ -4369,7 +5747,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Campaign"
  },
  "recommendSeats": {
   "method": "POST",
@@ -4380,7 +5758,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "SeatRecommendationRequest",
   "responds": null
  },
@@ -4421,6 +5805,30 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "SetAssetStatusRequest",
   "responds": "AssetStatusResult"
+ },
+ "setEntryRulePoints": {
+  "method": "PUT",
+  "path": "/admission-rules/{ruleId}/points",
+  "contract": "access",
+  "summary": "Set the access points an admission rule covers",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "ruleId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessEntryRulePoint",
+  "responds": "AccessEntryRulePoint"
  },
  "setParkingFacility": {
   "method": "PUT",
@@ -4553,7 +5961,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Campaign"
  },
  "updateAccessPoint": {
   "method": "PATCH",
@@ -4716,6 +6124,41 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AccessEntryRulePoint": {
+  "type": "object",
+  "x-ticvai-persistence": "access.entry_rule_point",
+  "description": "**Taken from the backend workbook, 20 September.** Maps the access points that are allowed for an admission profile.",
+  "required": [
+   "admissionProfileId",
+   "accessPointId",
+   "isActive",
+   "createdAt"
+  ],
+  "properties": {
+   "admissionProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   }
+  }
+ },
  "AccessPoint": {
   "x-ticvai-persistence": "access.access_point",
   "type": "object",
@@ -4724,7 +6167,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "code",
    "name",
    "venueId",
-   "mode",
+   "operatingMode",
    "isActive"
   ],
   "properties": {
@@ -4746,81 +6189,29 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string"
    },
    "externalCredentialSources": {
-    "type": "array",
-    "description": "BL-108. **A hotel room card admitting a guest to a water park** — externally issued, and the platform validates it without having sold it.\n**The entitlement is created on first use, not on check-in.** A hotel with 400 rooms does not want 400 entitlements a night for guests who never visit.\n",
-    "items": {
-     "type": "object",
-     "properties": {
-      "kind": {
-       "type": "string",
-       "enum": [
-        "hotelRoomCard",
-        "corporateBadge",
-        "cityPass",
-        "transitCard",
-        "partnerToken"
-       ]
-      },
-      "providerName": {
-       "type": "string"
-      },
-      "endpoint": {
-       "type": "string"
-      },
-      "credentialRef": {
-       "type": "string"
-      },
-      "grantsProductId": {
-       "type": "string",
-       "format": "uuid"
-      }
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExternalCredentialSourceList"
      }
-    }
+    ],
+    "description": "BL-108. **A hotel room card admitting a guest to a water park** — externally issued, and the platform validates it without having sold it.\n**The entitlement is created on first use, not on check-in.** A hotel with 400 rooms does not want 400 entitlements a night for guests who never visit.\n"
    },
    "scanAnomalyRules": {
-    "type": "array",
-    "description": "BL-104. **Rule-based scan anomalies, separated from the parked model-based engine** — device sharing, simultaneous entries at two gates, an impossible walking time between them.\n**These are deterministic and need no model**, which is why they are here and not in `ai`: two entries eight seconds apart at gates four hundred metres apart is arithmetic.\n",
-    "items": {
-     "type": "object",
-     "properties": {
-      "rule": {
-       "type": "string",
-       "enum": [
-        "simultaneousEntry",
-        "impossibleTravelTime",
-        "rapidReentry",
-        "sharedDevice",
-        "velocityBreach"
-       ]
-      },
-      "action": {
-       "type": "string",
-       "enum": [
-        "log",
-        "flag",
-        "requireSupervisor",
-        "deny"
-       ]
-      },
-      "thresholdSeconds": {
-       "type": "integer",
-       "nullable": true
-      }
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ScanAnomalyRuleList"
      }
-    }
+    ],
+    "description": "BL-104. **Rule-based scan anomalies, separated from the parked model-based engine** — device sharing, simultaneous entries at two gates, an impossible walking time between them.\n**These are deterministic and need no model**, which is why they are here and not in `ai`: two entries eight seconds apart at gates four hundred metres apart is arithmetic.\n"
    },
    "operatingMode": {
-    "type": "string",
-    "enum": [
-     "normal",
-     "freeFlow",
-     "dropArm",
-     "closed",
-     "podium",
-     "maintenance"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AccessPointOperatingMode"
+     }
     ],
     "default": "normal",
-    "description": "BL-107 and BL-109. **A closed turnstile and one in emergency drop-arm mode look the same in the model and are opposite in meaning.** Closed refuses everybody; drop-arm lets everybody through, and it is the state that exists for an evacuation.\n**`podium` is a supervised validation position** — a member of staff directing a group through a lane, validating by eye against a list. It scans nothing and it is how school parties actually enter.\n**`freeFlow` counts without validating.** Useful at a free event, and a mode that must be visibly distinct from a broken reader.\n"
+    "description": "**Set by the podium with `setTurnstileMode`, and it wins** (audit R221). BL-107 and BL-109. **A closed turnstile and one in emergency drop-arm mode look the same in the model and are opposite in meaning.** Closed refuses everybody; drop-arm lets everybody through, and it is the state that exists for an evacuation.\n**`podium` is a supervised validation position** — a member of staff directing a group through a lane, validating by eye against a list. It scans nothing and it is how school parties actually enter.\n**`freeFlow` counts without validating.** Useful at a free event, and a mode that must be visibly distinct from a broken reader.\n"
    },
    "vehicleLocationCapture": {
     "type": "boolean",
@@ -4828,13 +6219,43 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "BL-023. **Nothing helped a guest find their vehicle.** Where the access point is a car park entry, the level and zone are captured against the visit so the app can answer it — **the guest who cannot find their car at 11pm is the last impression of the day.**\n"
    },
    "mode": {
-    "$ref": "#/components/schemas/TurnstileMode"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/TurnstileMode"
+     }
+    ],
+    "nullable": true,
+    "description": "Narrows `operatingMode` only: `freeRotation` or `closed` within `normal` or `podium`, null otherwise and whenever the turnstile validates in its fixed `direction` (audit R221).\n"
    },
    "direction": {
-    "$ref": "#/components/schemas/Direction"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Direction"
+     }
+    ],
+    "description": "**Fixed per access point** (audit R221): set in the back office by `createAccessPoint` and `updateAccessPoint`, never by the podium.\n"
    },
    "antiPassbackEnabled": {
     "type": "boolean"
+   },
+   "requiresExitBeforeReentry": {
+    "type": "boolean",
+    "default": false,
+    "description": "Written by `createAccessPoint` and `updateAccessPoint`, and returned so the edit form reads back what it wrote."
+   },
+   "driver": {
+    "type": "string",
+    "nullable": true,
+    "description": "Driver identifier for the controller behind this access point, as written by `createAccessPoint` and `updateAccessPoint`. Where the reader speaks OSDP the driver is standards-based; the controller layer above it is vendor-specific.\n"
+   },
+   "geofence": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AccessPointGeofence"
+     }
+    ],
+    "nullable": true,
+    "description": "Written by `setAccessPointGeofence`; null until one is set. **One `jsonb` column on the access point row** (`access.access_point.geofence`), read with the point when a handheld validates against it.\n"
    },
    "isActive": {
     "type": "boolean"
@@ -4845,6 +6266,53 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true
    }
   }
+ },
+ "AccessPointGeofence": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "Where a handheld may validate for one access point, and what happens outside it. The body of `setAccessPointGeofence` and the value of `AccessPoint.geofence`.\n",
+  "required": [
+   "enforcement"
+  ],
+  "properties": {
+   "latitude": {
+    "type": "number"
+   },
+   "longitude": {
+    "type": "number"
+   },
+   "radiusMetres": {
+    "type": "integer",
+    "minimum": 5,
+    "maximum": 5000
+   },
+   "enforcement": {
+    "type": "string",
+    "enum": [
+     "off",
+     "warn",
+     "deny"
+    ],
+    "description": "`off` keeps the fence on record and checks nothing; `warn` lets a validation from outside the fence through with a warning; `deny` refuses it.\n"
+   },
+   "allowProximityBeacon": {
+    "type": "boolean",
+    "description": "Accept a BLE proximity assertion in place of GPS. Better indoors."
+   }
+  }
+ },
+ "AccessPointOperatingMode": {
+  "type": "string",
+  "description": "BL-107 and BL-109. **What the gate does, and what the podium sets** (`setTurnstileMode`, decided 28 September, audit R221). `closed` refuses everybody; `dropArm` lets everybody through and exists for an evacuation; `podium` is supervised validation by eye; `freeFlow` counts without validating; `maintenance` takes the lane out of use.\n",
+  "enum": [
+   "normal",
+   "freeFlow",
+   "dropArm",
+   "closed",
+   "podium",
+   "maintenance"
+  ]
  },
  "AdmissionRules": {
   "x-ticvai-persistence": "access.admission_rules",
@@ -4859,40 +6327,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Server-assigned.** Ignored in a `createAdmissionRules` or `updateAdmissionRules` body; on update the profile is the one the path names.\n"
    },
    "code": {
     "type": "string",
     "maxLength": 64
    },
    "perProductRules": {
-    "type": "array",
-    "description": "BL-059. **Transaction rules were per profile and a ticket type could not state its own.** An annual pass allowing one entry per day and a single ticket allowing one entry ever are different rules, and forcing a profile per product multiplies profiles instead.\n",
-    "items": {
-     "type": "object",
-     "properties": {
-      "productId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "entriesPerDay": {
-       "type": "integer",
-       "nullable": true
-      },
-      "minimumGapMinutes": {
-       "type": "integer",
-       "nullable": true,
-       "description": "**Anti-passback in minutes rather than a boolean.** A guest leaving for lunch and returning in forty minutes is normal; the same scan twice in ten seconds is a card being passed back over a fence.\n"
-      },
-      "allowedAccessPointIds": {
-       "type": "array",
-       "items": {
-        "type": "string",
-        "format": "uuid"
-       }
-      }
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/PerProductRuleList"
      }
-    }
+    ],
+    "description": "BL-059. **Transaction rules were per profile and a ticket type could not state its own.** An annual pass allowing one entry per day and a single ticket allowing one entry ever are different rules, and forcing a profile per product multiplies profiles instead.\n"
    },
    "name": {
     "type": "string",
@@ -4917,6 +6366,223 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "nullable": true
    },
+   "entryLimit": {
+    "type": "object",
+    "description": "**How many times the credential may enter** (decided 29 September, VM close-out). Pack 'Access Control Module' p.19 (BO-156, Entry, Exit & Re-entry Rules). Absent means `unlimited`.",
+    "required": [
+     "mode"
+    ],
+    "properties": {
+     "mode": {
+      "type": "string",
+      "enum": [
+       "unlimited",
+       "once",
+       "nTimes",
+       "nPerDay",
+       "nPerPeriod"
+      ],
+      "default": "unlimited"
+     },
+     "count": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "N for nTimes, nPerDay and nPerPeriod; required for those modes (`422` without it)"
+     },
+     "periodDays": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The period for nPerPeriod"
+     }
+    }
+   },
+   "exitScan": {
+    "type": "string",
+    "enum": [
+     "required",
+     "optional",
+     "none"
+    ],
+    "default": "optional",
+    "description": "(decided 29 September, VM close-out) `required`: re-entry needs a recorded exit. `optional`: exits run in free rotation and headcount is inferred. `none`: the exit has no reader."
+   },
+   "maxExits": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Null is unlimited (decided 29 September, VM close-out)"
+   },
+   "reEntryWindowMinutes": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Minutes after an exit within which re-entry is allowed; null is any time the credential is valid (decided 29 September, VM close-out)"
+   },
+   "sameDayOnly": {
+    "type": "boolean",
+    "default": true,
+    "description": "Re-entry only on the day of the exit (decided 29 September, VM close-out)"
+   },
+   "designatedAccessPointIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Re-entry only through these access points; empty is any allowed access point (decided 29 September, VM close-out)"
+   },
+   "validity": {
+    "type": "object",
+    "description": "**When the credential is valid** (decided 29 September, VM close-out). Pack 'Access Control Module' p.21 (BO-158, Access Validity & Time Rules). The admission window above still applies inside it.",
+    "required": [
+     "anchor"
+    ],
+    "properties": {
+     "anchor": {
+      "type": "string",
+      "enum": [
+       "fixedRange",
+       "afterSale",
+       "afterActivation",
+       "afterFirstUse"
+      ],
+      "description": "fixedRange uses from and to; the others count days from the event"
+     },
+     "days": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "N days after the anchor; required unless the anchor is fixedRange"
+     },
+     "from": {
+      "type": "string",
+      "format": "date"
+     },
+     "to": {
+      "type": "string",
+      "format": "date",
+      "description": "Inclusive. Must not be before from (`422`)"
+     },
+     "endOf": {
+      "type": "string",
+      "enum": [
+       "day",
+       "week",
+       "month",
+       "year"
+      ],
+      "nullable": true,
+      "description": "Validity runs to the end of the day, week, month or year the relative period ends in"
+     },
+     "daysOfWeek": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+       ]
+      },
+      "description": "Empty is every day"
+     },
+     "dayTypes": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "peakDates",
+        "offPeakDates",
+        "holidays",
+        "seasons",
+        "eventDates"
+       ]
+      },
+      "description": "Calendar day types on which access is allowed; empty is every day type"
+     },
+     "blackoutDates": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "date"
+      },
+      "description": "Dates on which access is refused whatever else allows it"
+     }
+    }
+   },
+   "crossover": {
+    "type": "object",
+    "nullable": true,
+    "description": "**Crossover between parks** (decided 29 September, VM close-out). Pack 'Access Control Module' p.23 (BO-160, Multi-Park & Crossover Rules); BO-220 uses the same block. Null means the profile admits to one park only.",
+    "required": [
+     "allowedParkOrgUnitIds"
+    ],
+    "properties": {
+     "allowedParkOrgUnitIds": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "parkOrder": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "description": "Required order of parks, if any; empty is any order"
+     },
+     "sameDayOnly": {
+      "type": "boolean",
+      "default": true
+     },
+     "differentDayAccess": {
+      "type": "boolean",
+      "default": false
+     },
+     "dayPattern": {
+      "type": "string",
+      "enum": [
+       "consecutiveFromFirstScan",
+       "flexibleWithinValidity"
+      ],
+      "default": "flexibleWithinValidity"
+     },
+     "maxParkEntries": {
+      "type": "integer",
+      "minimum": 1,
+      "nullable": true,
+      "description": "Null is unlimited"
+     },
+     "crossoverQuantity": {
+      "type": "integer",
+      "minimum": 1,
+      "nullable": true,
+      "description": "How many crossovers; null is unlimited"
+     },
+     "crossoverAfterTime": {
+      "type": "string",
+      "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+      "nullable": true,
+      "description": "Earliest venue-local time HH:MM a crossover is allowed"
+     },
+     "prerequisiteParkOrgUnitId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "The park that must be entered first"
+     },
+     "reEntryAfterCrossover": {
+      "type": "boolean",
+      "default": false
+     }
+    }
+   },
    "allowedAccessPointIds": {
     "type": "array",
     "items": {
@@ -4939,6 +6605,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    {
     "type": "object",
+    "x-ticvai-retired-columns": [
+     "is_maintenance_overdue",
+     "document_refs"
+    ],
     "required": [
      "id",
      "status"
@@ -4953,6 +6623,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "format": "uuid",
       "nullable": true,
       "description": "1.2.x. **Where this asset is also bookable.** An AV rig is an asset to maintain and a resource to allocate, and they are the same object seen from two sides.\n**`resources` owns the calendar and this owns the condition.** An asset out of service makes its resource unbookable, which is one link rather than two models of availability.\n"
+     },
+     "deviceId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "BL-160. **Where this asset is also a registered device.** A turnstile is an asset to maintain and a device to operate, and — exactly as with `resourceId` above — they are the same object seen from two sides.\n**Nothing joined them before this.** A turnstile controller reporting `needsAttention` could not raise a work order against itself, and an engineer closing one had no way back to the device whose firmware caused it.\n**Null for most assets and for most devices.** A chiller is not a device and a signature pad is not on the asset register; the link is sparse, and it lives here rather than on `platform.device` because `platform` is the foundation tier and a foreign key pointing from it into `maintenance` would invert the tiers — every cell running a spine would carry a column for a satellite it may not deploy.\n"
      },
      "acquisitionCost": {
       "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -5004,20 +6680,33 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "nullable": true
      },
      "openWorkOrderCount": {
-      "type": "integer"
+      "type": "integer",
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "Work orders on this asset whose status is `open`, `assigned`, `inProgress`, `paused` or `awaitingParts` — the same set `AssetDetail.openWorkOrders` returns. **Maintained on write**: `createWorkOrder` and every transition into or out of that set (complete, cancel, close, reject back to open) adjust it in the same transaction as the work-order row.\n"
      },
      "nextMaintenanceDueAt": {
       "type": "string",
       "format": "date-time",
-      "nullable": true
+      "nullable": true,
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "The earliest `nextDueAt` among this asset's active maintenance plans; null when none has one. **Maintained on write**: recomputed whenever one of those plans is created, amended, suspended or has its `nextDueAt` moved by a completed work order. `listAssets?maintenanceDue` filters on this column against the clock.\n"
      },
      "isMaintenanceOverdue": {
-      "type": "boolean"
+      "type": "boolean",
+      "readOnly": true,
+      "x-ticvai-persisted": false,
+      "x-ticvai-derived": "onRead",
+      "description": "`nextMaintenanceDueAt` is in the past at the moment of the read. **Computed on read and not stored** — it depends on the clock, so a stored copy is stale the minute after it is written.\n"
      },
      "lastInspectionAt": {
       "type": "string",
       "format": "date-time",
-      "nullable": true
+      "nullable": true,
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "`performedAt` of the latest inspection submitted against this asset. **Maintained on write** by `submitInspection`, in the same transaction as the inspection row; an inspection synced late with an earlier `performedAt` does not move it back.\n"
      },
      "usageCounter": {
       "type": "number",
@@ -5060,33 +6749,73 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "documents": {
       "type": "array",
-      "description": "Manuals, procedures, certificates. What a technician needs on site.",
+      "description": "Manuals, procedures, certificates. What a technician needs on site. Read from `maintenance.asset_document`.\n",
       "items": {
-       "type": "object",
-       "properties": {
-        "ref": {
-         "type": "string"
-        },
-        "name": {
-         "type": "string"
-        },
-        "kind": {
-         "type": "string",
-         "enum": [
-          "manual",
-          "sop",
-          "certificate",
-          "warranty",
-          "drawing",
-          "riskAssessment"
-         ]
-        }
-       }
+       "$ref": "#/components/schemas/AssetDocument"
       }
      }
     }
    }
   ]
+ },
+ "AssetDocument": {
+  "x-ticvai-persistence": "maintenance.asset_document",
+  "type": "object",
+  "description": "A document attached to an asset — manual, procedure, certificate — with the name and kind a technician needs on site. **One row per document**, because `AssetDetail.documents` returns a name and a kind for each and a `text[]` of refs has nowhere to hold either.\n",
+  "required": [
+   "id",
+   "assetId",
+   "ref"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "ref": {
+    "type": "string",
+    "description": "The document in the media store."
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "kind": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AssetDocumentKind"
+     }
+    ],
+    "nullable": true,
+    "description": "Null where the document arrived as a bare ref in `documentRefs`."
+   }
+  }
+ },
+ "AssetDocumentInput": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "ref",
+   "kind"
+  ],
+  "properties": {
+   "ref": {
+    "type": "string",
+    "description": "The document in the media store."
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "kind": {
+    "$ref": "#/components/schemas/AssetDocumentKind"
+   }
+  }
  },
  "AssetStatus": {
   "type": "string",
@@ -5129,6 +6858,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "workOrderId": {
       "type": "string",
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
       "nullable": true
      }
     }
@@ -5146,7 +6876,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "mediaCode": {
-    "type": "string"
+    "type": "string",
+    "x-ticvai-unique": "tenant",
+    "description": "**Unique within the tenant** (decided 28 September, audit R108): one entry per code. `addBlacklistEntry` refuses a second entry with `409 duplicate-code`."
    },
    "reason": {
     "type": "string"
@@ -5223,6 +6955,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "type": "string",
       "format": "date-time",
       "nullable": true
+     },
+     "sentCount": {
+      "type": "integer",
+      "readOnly": true,
+      "x-ticvai-persisted": false,
+      "description": "**How many messages went out**, counted from `marketing.message_dispatch` at read time rather than kept as a counter on the campaign row, so it cannot drift from the dispatch records it summarises. Test sends are not dispatches of the campaign and are not counted.\n"
      }
     }
    }
@@ -5247,7 +6985,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "mergeDefaults": {
     "type": "object",
-    "additionalProperties": true
+    "description": "Fallback values for the template's `mergeFields`, by name, used where a guest has no value.",
+    "additionalProperties": {
+     "type": "string"
+    }
    },
    "promotionId": {
     "type": "string",
@@ -5283,7 +7024,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ]
  },
  "CampaignPerformance": {
-  "x-ticvai-persistence": "none — aggregated from dispatch",
+  "x-ticvai-persistence": "none — aggregated from marketing.message_dispatch (isTest false)",
   "type": "object",
   "required": [
    "campaignId",
@@ -5323,7 +7064,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "attributionWindowDays": {
-    "type": "integer"
+    "type": "integer",
+    "minimum": 1,
+    "description": "The window these figures were attributed over, from `VenueSettings.marketing.attributionWindowDays` (proposed default 7, audit R094)."
    }
   }
  },
@@ -5389,7 +7132,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "assetTag": {
     "type": "string",
-    "maxLength": 64
+    "maxLength": 64,
+    "x-ticvai-unique": "venue",
+    "description": "**Unique per venue** (decided 28 September, audit R108). Two assets in one venue never share a tag; `createAsset` refuses a duplicate with `409` `duplicate-code`. Two venues may each have an `A-001`.\n"
    },
    "name": {
     "type": "string",
@@ -5453,8 +7198,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "default": false,
     "description": "True means a completed inspection is required before return to service. A technician cannot simply declare a ride safe.\n"
    },
+   "documents": {
+    "type": "array",
+    "description": "Manuals, procedures, certificates, each with its name and kind. Stored one row per document in `maintenance.asset_document`, which is where `AssetDetail.documents` reads them from.\n",
+    "items": {
+     "$ref": "#/components/schemas/AssetDocumentInput"
+    }
+   },
    "documentRefs": {
     "type": "array",
+    "x-ticvai-persisted": false,
+    "description": "**The refs alone, kept for callers that predate `documents`.** Each ref sent here is stored as an `asset_document` row with no name and no kind. Returned as the refs of `documents`, computed on read — there is no second copy to fall out of step.\n",
     "items": {
      "type": "string"
     }
@@ -5535,7 +7289,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "code": {
     "type": "string",
-    "maxLength": 64
+    "maxLength": 64,
+    "x-ticvai-unique": "tenant",
+    "description": "**Unique per tenant** (decided 28 September, audit R108). A code already used by any event in the tenant is refused with `409 duplicate-code`.\n"
    },
    "name": {
     "type": "string",
@@ -5574,9 +7330,22 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid"
    },
+   "language": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 35,
+    "pattern": "^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$",
+    "description": "As `Performance.language`; every performance of a generated series takes it (decided 29 September, rev 3 REV3-17)."
+   },
+   "format": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 40,
+    "description": "As `Performance.format` (decided 29 September, rev 3 REV3-17)."
+   },
    "recurrence": {
     "type": "object",
-    "description": "Generate a series rather than a single performance.",
+    "description": "Generate a series rather than a single performance. **Read in the region's time zone**: the Region owns the zone and every venue inherits it without override (tenancy), so `daysOfWeek` are the region's calendar days and `until` is compared on the region's clock.\n",
     "properties": {
      "intervalMinutes": {
       "type": "integer",
@@ -5651,9 +7420,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "operatingWindows": {
     "type": "array",
-    "description": "**When the queue runs, which is not when the venue is open.** A ride closing an hour early for maintenance leaves a queue accepting guests for a cycle that will not happen.\n",
+    "description": "**When the queue runs, which is not when the venue is open.** A ride closing an hour early for maintenance leaves a queue accepting guests for a cycle that will not happen.\nStored one row per window in `queue.queue_operating_window` (see `Queue`), not as a column on the queue.\n",
     "items": {
      "type": "object",
+     "required": [
+      "day",
+      "from",
+      "to"
+     ],
      "properties": {
       "day": {
        "type": "string",
@@ -5668,10 +7442,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        ]
       },
       "from": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+       "description": "Venue local time, 24-hour `HH:MM`, when the queue starts running."
       },
       "to": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+       "description": "Venue local time, 24-hour `HH:MM`, when the queue stops running."
       },
       "lastEntryMinutesBefore": {
        "type": "integer",
@@ -5736,6 +7514,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "zone": {
     "type": "string",
     "nullable": true
+   },
+   "fastPass": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/QueueFastPass"
+     }
+    ],
+    "nullable": true,
+    "description": "The lane's Fast Pass block (decided 29 September, VM close-out). Null on a queue that takes no Fast Pass.\n"
    }
   }
  },
@@ -5859,10 +7646,53 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "For grouped events."
    },
    "performanceCount": {
-    "type": "integer"
+    "type": "integer",
+    "readOnly": true,
+    "description": "How many performances the event has. Counted by the server; never sent by a client."
    },
    "isActive": {
     "type": "boolean"
+   }
+  }
+ },
+ "ExchangeRateDecimal": {
+  "type": "string",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,6)",
+  "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n",
+  "pattern": "^\\d+(\\.\\d{1,6})?$"
+ },
+ "ExternalCredentialSourceList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "**One `jsonb` column on the access point row** (`access.access_point.external_credential_sources`). Read with the access point when a credential is presented; a source is never queried on its own.\n",
+  "items": {
+   "type": "object",
+   "properties": {
+    "kind": {
+     "type": "string",
+     "enum": [
+      "hotelRoomCard",
+      "corporateBadge",
+      "cityPass",
+      "transitCard",
+      "partnerToken"
+     ]
+    },
+    "providerName": {
+     "type": "string"
+    },
+    "endpoint": {
+     "type": "string"
+    },
+    "credentialRef": {
+     "type": "string"
+    },
+    "grantsProductId": {
+     "type": "string",
+     "format": "uuid"
+    }
    }
   }
  },
@@ -5929,6 +7759,76 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "KpiValue": {
+  "type": "object",
+  "description": "BI board 10.3. **Value, target, variance, direction and freshness in one read.**",
+  "properties": {
+   "kpiId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "period": {
+    "type": "string"
+   },
+   "value": {
+    "$ref": "#/components/schemas/MetricValue"
+   },
+   "target": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   },
+   "comparison": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   },
+   "variancePercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "direction": {
+    "type": "string",
+    "enum": [
+     "up",
+     "down",
+     "flat"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "green",
+     "amber",
+     "red",
+     "noTarget"
+    ]
+   },
+   "asOf": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "stale": {
+    "type": "boolean",
+    "description": "**True when the pipeline behind it has not refreshed.** A number nobody flagged as stale is a number somebody will act on.\n"
+   }
+  }
+ },
  "LocalisedText": {
   "x-ticvai-persistence": "none — jsonb column",
   "type": "object",
@@ -5937,7 +7837,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   }
  },
  "MaintenancePlan": {
-  "x-ticvai-persistence": "maintenance.maintenance_plan",
+  "x-ticvai-persistence": "maintenance.preventive_plan",
   "type": "object",
   "required": [
    "id",
@@ -6037,6 +7937,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "post"
   ]
  },
+ "MetricValue": {
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**A reading of a metric or KPI, or a threshold on one.** A `Money` where the metric is money-valued — `MetricSource` lists those in `x-ticvai-money-valued`, and a KPI is when its `unit` is `currency` — and a plain number otherwise. naming-and-style 5.1: money is never a float, at any layer.\nStored as `numeric(18,4)` either way: a money value stores its amount, and currency and scale resolve from the scope as they do for every `Money`.\n",
+  "oneOf": [
+   {
+    "type": "number"
+   },
+   {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  ]
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -6068,7 +7980,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "id": {
     "type": "string",
     "format": "uuid",
-    "readOnly": true
+    "description": "**Server-assigned, and the upsert key of `setParkingFacility`.** Absent in a body, it creates; present, it names the facility being replaced. A client never mints one.\n"
    },
    "name": {
     "type": "string"
@@ -6082,7 +7994,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "capacity": {
     "type": "integer",
-    "nullable": true
+    "nullable": true,
+    "description": "**What \"full\" means in the first release** (decided 28 September, audit R166): the facility is full when the issued `ParkingEntitlement`s valid for a time reach this number. There is no live space count from the car park; a guest sees *full* only when capacity is reached, never an availability figure. Null means no limit is enforced.\n"
    },
    "takesPayment": {
     "type": "boolean",
@@ -6098,21 +8011,23 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "vendorName": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "Staff only — omitted from a guest's `listParkingFacilities` response."
    },
    "endpoint": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "Staff only — omitted from a guest's `listParkingFacilities` response."
    },
    "credentialRef": {
     "type": "string",
     "nullable": true,
-    "description": "A vault reference, never the credential."
+    "description": "A vault reference, never the credential. Staff only — omitted from a guest's `listParkingFacilities` response."
    },
    "pushLeadMinutes": {
     "type": "integer",
     "nullable": true,
-    "description": "How far ahead of the visit a plate is pushed. **Too early and the whitelist fills with cars that will not arrive; too late and the guest is at the barrier.**\n"
+    "description": "Staff only — omitted from a guest's `listParkingFacilities` response. How far ahead of the visit a plate is pushed. **Too early and the whitelist fills with cars that will not arrive; too late and the guest is at the barrier.**\n"
    },
    "accessPointIds": {
     "type": "array",
@@ -6135,6 +8050,51 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "plateWhitelist",
    "qrHandoff"
   ]
+ },
+ "PerProductRuleList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "**One `jsonb` column on the profile row** (`access.admission_rules.per_product_rules`). The rules are read with the profile and a rule is never queried on its own, so a child table would add a join for nothing.\n",
+  "items": {
+   "type": "object",
+   "properties": {
+    "productId": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "entriesPerDay": {
+     "type": "integer",
+     "nullable": true
+    },
+    "minimumGapMinutes": {
+     "type": "integer",
+     "nullable": true,
+     "description": "**Anti-passback in minutes rather than a boolean.** A guest leaving for lunch and returning in forty minutes is normal; the same scan twice in ten seconds is a card being passed back over a fence.\n"
+    },
+    "allowedAccessPointIds": {
+     "type": "array",
+     "items": {
+      "type": "string",
+      "format": "uuid"
+     }
+    },
+    "biometricPolicy": {
+     "allOf": [
+      {
+       "$ref": "#/components/schemas/BiometricPolicy"
+      }
+     ],
+     "description": "BL-105, 3.2.9. **The biometric check is a property of the product, not of the venue** — memberships checked, day tickets not. It sits here rather than on the profile because `perProductRules` is already where a ticket type states its own terms, and a profile per product would multiply profiles to carry one flag.\n**Absent means `disabled`**, and `disabled` is the answer for every product until somebody chooses otherwise. **Inert while `VenueSettings.biometrics.isEnabled` is false**, so a rules profile copied to another venue cannot begin capturing faces there.\n"
+    },
+    "maxPassesPerBiometricIdentity": {
+     "type": "integer",
+     "nullable": true,
+     "minimum": 1,
+     "description": "BL-096, 2.14.7. **The annual-pass quota, keyed to biometric identity.** `enrolFacePass` already answers 409 where a face is on another annual pass; the constant behind that refusal was one and was invisible. **Null means unlimited** and is the answer for every product that is not an annual pass — a quota applied where nobody asked for one turns a family sharing a day ticket into a fraud alert.\n"
+    }
+   }
+  }
  },
  "Performance": {
   "x-ticvai-persistence": "catalogue.performance",
@@ -6194,6 +8154,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "language": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 35,
+    "pattern": "^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$",
+    "description": "The language the performance is given in, as a BCP 47 tag (`en`, `ar`, `fr`, `de`, `zh`, `ru`, `ar-AE`). **A guided tour at 10:00 in French and one at 10:00 in Arabic are two performances**, so a guest who picks a language sees only the tours in it (`listPerformances` `language`). Null when the performance is not language-specific (decided 29 September, rev 3 REV3-17).\n"
+   },
+   "format": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 40,
+    "description": "How it is presented, free text the venue chooses, e.g. `2D`, `3D`, `IMAX`, `subtitled`. A cinema screening shows language and format together. Null when it does not apply (decided 29 September, rev 3 REV3-17).\n"
    }
   }
  },
@@ -6231,15 +8204,30 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "bulkRefundBatchId": {
     "type": "string",
     "nullable": true,
-    "description": "Queued for approval. Refunds are not issued automatically."
+    "description": "**Null on this response.** The refund batch is created by `orders` when it consumes `performance.cancelled` (F09), after this call has returned, and is queued there for approval — refunds are not issued automatically. Read it from orders, not from here.\n"
    },
    "notificationsQueued": {
     "type": "integer"
    }
   }
  },
+ "Point": {
+  "type": "object",
+  "required": [
+   "x",
+   "y"
+  ],
+  "properties": {
+   "x": {
+    "type": "number"
+   },
+   "y": {
+    "type": "number"
+   }
+  }
+ },
  "Queue": {
-  "x-ticvai-persistence": "queue.queue",
+  "x-ticvai-persistence": "queue.queue + queue.queue_operating_window",
   "allOf": [
    {
     "$ref": "#/components/schemas/CreateQueueRequest"
@@ -6275,6 +8263,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "waitTimeSource": {
       "$ref": "#/components/schemas/WaitTimeSource"
+     },
+     "waitTimeAsOf": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "description": "When `currentWaitMinutes` was last set, by whichever source set it. `WaitTime.asOf` reads this.\n"
+     },
+     "manualWaitExpiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "description": "Set by `setWaitTime` as now plus `expiresInMinutes`. Past it, the manual figure is dropped and the queue reverts to its sensor or throughput estimate. Null when the current figure is not manual.\n"
+     },
+     "manualWaitNote": {
+      "type": "string",
+      "maxLength": 200,
+      "nullable": true,
+      "readOnly": true,
+      "description": "The `note` given with the current manual figure. Cleared when it expires."
      },
      "expectedReopenAt": {
       "type": "string",
@@ -6316,6 +8325,46 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   ]
  },
+ "QueueFastPass": {
+  "x-ticvai-persistence": "queue.queue",
+  "type": "object",
+  "description": "**Which Fast Pass entitlements this lane accepts, and how** (decided 29 September, VM close-out; pack 'Access Control Module' p.109, BO-221 Fast Pass & Attraction Access Journey). Fast Pass stays an entitlement owned by Product & Entitlement; this block is the lane's side of it: which products it honours, the return window, a per-guest daily cap and the access points that redeem it. Stored on the queue row. Only meaningful where `kind` is `fastPass` or `fastPassAllocationPercent` is above 0.\n",
+  "required": [
+   "entitlementProductIds"
+  ],
+  "properties": {
+   "entitlementProductIds": {
+    "type": "array",
+    "minItems": 1,
+    "description": "Catalogue products whose entitlement admits to this lane.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "returnWindowMinutes": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 240,
+    "default": 60,
+    "description": "How long after the booked return time a Fast Pass holder may still enter. Proposed, our build plan.\n"
+   },
+   "maxPerGuestPerDay": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Fast Pass redemptions one guest may make on this lane per day; null is no cap."
+   },
+   "allowedAccessPointIds": {
+    "type": "array",
+    "description": "Access points that redeem Fast Pass for this lane; empty is the queue's own.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   }
+  }
+ },
  "QueueFeed": {
   "x-ticvai-persistence": "queue.feed",
   "type": "object",
@@ -6354,12 +8403,22 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "isEnabled": {
     "type": "boolean"
+   },
+   "health": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/QueueFeedHealth"
+     }
+    ],
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "Whether the feed is currently reporting, computed on read — what `listQueueFeeds` promises per row. Ignored on input to `configureQueueFeed`.\n"
    }
   }
  },
  "QueueFeedAdaptor": {
   "type": "string",
-  "description": "Vendor adaptors are bespoke work (ADR-0012). `generic` is the inbound API any system can post to; `mock` lets the feature be built and demonstrated with no vendor at all.\n",
+  "description": "Vendor adaptors are bespoke work (ADR-0012). `generic` is the inbound API any system can post to; `mock` lets the feature be built and demonstrated with no vendor at all.\n**`manual` is not an adaptor.** A queue with no enabled feed runs on figures an operator sets through `setWaitTime`, and its `WaitTimeSource` reads `manual` — that is the whole of the manual path, and there is no feed row for it. Transports a screen might list (sensor API, webhook, MQTT, turnstile count, camera) all post to the one inbound API, which is `generic`; anything that needs code of its own to fetch or translate is `vendorAdaptor`.\n",
   "enum": [
    "generic",
    "mock",
@@ -6383,7 +8442,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "$ref": "#/components/schemas/QueueFeedAdaptor"
    },
    "isHealthy": {
-    "type": "boolean"
+    "type": "boolean",
+    "description": "**Healthy means the last reading arrived within the feed's expected interval** (decided 28 September, audit R106 (1)): `lastReadingAt` is no older than `expectedIntervalSeconds`. It is the opposite of `isQuiet`, and nothing else (latency, discards) makes a reporting feed unhealthy.\n"
    },
    "isQuiet": {
     "type": "boolean",
@@ -6394,12 +8454,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "date-time",
     "nullable": true
    },
+   "expectedIntervalSeconds": {
+    "type": "integer",
+    "description": "The feed's `expectedIntervalSeconds` — the interval `isQuiet` is judged against, returned here so a health panel does not need the feed row as well.\n"
+   },
    "readingsLastHour": {
     "type": "integer"
    },
    "discardedLastHour": {
     "type": "integer",
-    "description": "Out-of-order or duplicate readings rejected."
+    "description": "Out-of-order readings rejected in the last hour — rows of `queue.reading` for this feed with `disposition: discardedOutOfOrder`. Duplicates are not counted here: a duplicate has no row, and `submitQueueReading` reports it in its own `duplicates`.\n"
    }
   }
  },
@@ -6416,6 +8480,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "id": {
     "type": "string",
     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "feedId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The feed that sent it, taken from the `submitQueueReading` body. Per-feed health counts by this, not by queue.\n"
+   },
+   "disposition": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "applied",
+     "discardedOutOfOrder"
+    ],
+    "description": "Set on receipt. A `discardedOutOfOrder` reading is kept so feed health can count it and never moves an estimate.\n"
    },
    "kind": {
     "type": "string",
@@ -6491,13 +8570,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "batchId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `RefundBatch` that raised this refund, where `createBulkRefund` did. Null for a refund raised on its own."
    },
    "fxRate": {
-    "type": "number",
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
     "nullable": true,
     "readOnly": true,
     "description": "**The rate on the original payment, not today's** (BL-087, CF-118).\n`Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the moment of sale, so the sale rate is always retrievable. **Refunding at today's rate repays a different amount of money than was taken** — a guest who paid 100 USD at 3.67 and is refunded at 3.72 gets back more AED than they gave, and the venue carries the difference on every refund.\nThe exposure runs both ways and neither direction is defensible: a guest short-changed by a moving rate has a complaint the venue cannot answer, because **the guest did nothing but wait.**\n"
@@ -6595,12 +8687,47 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "deferred"
   ]
  },
+ "ScanAnomalyRuleList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "**One `jsonb` column on the access point row** (`access.access_point.scan_anomaly_rules`). Read with the access point at validation, and a rule is never queried on its own.\n",
+  "items": {
+   "type": "object",
+   "properties": {
+    "rule": {
+     "type": "string",
+     "enum": [
+      "simultaneousEntry",
+      "impossibleTravelTime",
+      "rapidReentry",
+      "sharedDevice",
+      "velocityBreach"
+     ]
+    },
+    "action": {
+     "type": "string",
+     "enum": [
+      "log",
+      "flag",
+      "requireSupervisor",
+      "deny"
+     ]
+    },
+    "thresholdSeconds": {
+     "type": "integer",
+     "nullable": true
+    }
+   }
+  }
+ },
  "SeatAvailability": {
   "x-ticvai-persistence": "none — computed from seat, hold and block",
   "type": "object",
   "required": [
    "performanceId",
    "seatMapId",
+   "renderMode",
    "totals",
    "seats"
   ],
@@ -6612,6 +8739,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "seatMapId": {
     "type": "string",
     "format": "uuid"
+   },
+   "renderMode": {
+    "type": "string",
+    "enum": [
+     "graphical",
+     "list"
+    ],
+    "description": "The mode the server actually used. With `mode=auto` this is how a client knows what it got: `list` means the map has no geometry (the seat map's `noGeometry` state), so the client sells from categories and best-available groups and does not draw a plan. `graphical` means every seat carries `position`.\n"
    },
    "totals": {
     "type": "object",
@@ -6657,6 +8792,39 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      }
     }
    },
+   "sections": {
+    "type": "array",
+    "description": "The map's sections with what a guest screen needs to show the view from each (decided 29 September, rev 3 23SEP-14): the photo where the venue supplied one, otherwise null and the client renders the view from `boundary` and the seat positions. In this response so WEB-007 and GST-049 need no second call.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "code",
+      "name"
+     ],
+     "properties": {
+      "code": {
+       "type": "string"
+      },
+      "name": {
+       "type": "string"
+      },
+      "viewAssetId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "description": "As `Section.viewAssetId`. Null means render the view from geometry."
+      },
+      "boundary": {
+       "type": "array",
+       "nullable": true,
+       "items": {
+        "$ref": "#/components/schemas/Point"
+       },
+       "description": "As `Section.boundary`. Null when `renderMode` is `list`."
+      }
+     }
+    }
+   },
    "seats": {
     "type": "array",
     "items": {
@@ -6676,6 +8844,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        "type": "string",
        "format": "uuid",
        "nullable": true
+      },
+      "displayLabel": {
+       "type": "string",
+       "description": "What the guest sees, e.g. `A2-7-11`, as on `Seat`."
+      },
+      "position": {
+       "allOf": [
+        {
+         "$ref": "#/components/schemas/Point"
+        }
+       ],
+       "nullable": true,
+       "description": "The seat's coordinates on the map, as on `Seat`. Present when `renderMode` is `graphical`; null when it is `list`."
       }
      }
     }
@@ -6760,6 +8941,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "inspectionId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true,
     "description": "Required for return to service where the asset demands it."
    },
@@ -6775,11 +8957,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "TurnstileMode": {
   "type": "string",
+  "description": "**Reduced to two values — decided 28 September, audit R221.** Entry, exit, re-entry and crossover were the access point's `Direction` under another name, and two fields that could disagree left the gate to guess. Direction is fixed per access point; within `normal` or `podium` operation the turnstile may only be let spin free or held closed.\n",
   "enum": [
-   "entry",
-   "reentry",
-   "crossover",
-   "exit",
    "freeRotation",
    "closed"
   ]
@@ -6807,6 +8986,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid",
     "nullable": true
    },
+   "attractionCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The catalogue `ProductCategory` the attraction product is filed under — the value the `category` filter on `getWaitTimes` matches. Read from catalogue, not stored here.\n"
+   },
    "status": {
     "$ref": "#/components/schemas/QueueStatus"
    },
@@ -6820,7 +9005,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "isStale": {
     "type": "boolean",
-    "description": "The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as current.\n"
+    "description": "The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as current, and it is not hidden (decided 28 September, audit R080 (b)): the screen shows `waitMinutes` with its `asOf` and a stale marker.\n"
    },
    "heightRequirementCm": {
     "type": "integer",
@@ -6832,7 +9017,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "asOf": {
     "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "description": "When the figure was produced — the queue's `waitTimeAsOf`."
    }
   }
  },
@@ -6848,6 +9034,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "WorkOrder": {
   "x-ticvai-persistence": "maintenance.work_order",
+  "x-ticvai-retired-columns": [
+   "is_overdue"
+  ],
   "type": "object",
   "required": [
    "id",
@@ -6864,7 +9053,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "nullable": true,
     "readOnly": true,
-    "description": "**Measured from out-of-service to back-in-service, not from work start to work end.** A ride down for six hours of which two were spent working is down six hours, and the gap between the two numbers is the thing worth managing.\n"
+    "x-ticvai-derived": "onWrite",
+    "description": "**Measured from out-of-service to back-in-service, not from work start to work end.** A ride down for six hours of which two were spent working is down six hours, and the gap between the two numbers is the thing worth managing.\n**Maintained on write**: set when the asset returns to service, as the minutes from the `maintenance.asset_status_change` row that took it out carrying this work order's id to the asset's next change back to `inService`. Null while the asset is still out, and for a work order that never took it out.\n"
    },
    "rootCause": {
     "type": "string",
@@ -6897,10 +9087,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "**Escalation is a clock, not a decision.** A work order on a ride nobody has accepted after twenty minutes escalates itself, because the alternative is somebody noticing.\n"
    },
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "workOrderNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.\n"
    },
    "title": {
     "type": "string"
@@ -6916,7 +9109,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "assetName": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "The asset's name, copied when the work order is raised or its asset changes, and not updated when the asset is later renamed — the record reads as it was raised.\n"
    },
    "status": {
     "$ref": "#/components/schemas/WorkOrderStatus"
@@ -6936,11 +9132,29 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid"
    },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "As raised in `CreateWorkOrderRequest.categoryId`, amendable by `updateWorkOrder`. The category is what `completeWorkOrder` reads to decide whether completion photographs are required.\n"
+   },
+   "locationDescription": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "Where the fault is, as raised. Needed where there is no asset — a broken tile, a leak in a corridor.\n"
+   },
    "elapsedMinutes": {
-    "type": "integer"
+    "type": "integer",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Labour minutes accumulated up to the last pause or stop. **Maintained on write** by `recordWorkOrderTime`, `pauseWorkOrder` and `completeWorkOrder`; while `isTimerRunning` is true the interval since the last start is not yet included.\n"
    },
    "isTimerRunning": {
-    "type": "boolean"
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Maintained on write by `startWorkOrder`, `resumeWorkOrder`, `recordWorkOrderTime`, `pauseWorkOrder` and `completeWorkOrder`.\n"
    },
    "dueAt": {
     "type": "string",
@@ -6948,7 +9162,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true
    },
    "isOverdue": {
-    "type": "boolean"
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "`dueAt` is in the past and the status is still `open`, `assigned`, `inProgress`, `paused` or `awaitingParts`. **Computed on read and not stored** — it depends on the clock. `listWorkOrders?overdueOnly` applies the same test to `due_at`.\n"
    },
    "requiresVerification": {
     "type": "boolean"
@@ -6960,10 +9178,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "sourceInspectionId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "sourceIncidentId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "createdAt": {
@@ -7002,7 +9222,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "workOrderId": {
     "type": "string",
-    "format": "uuid"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "kind": {
     "type": "string",
@@ -7126,9 +9346,102 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      },
      "totalCost": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
+      "$ref": "../shared/common.yaml#/components/schemas/Money",
+      "x-ticvai-column": "net_cost_amount"
+     },
+     "completedByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "Who called `completeWorkOrder`. **What `verifyWorkOrder` compares against** — the verifier may not be the technician who completed the work, and the assignee is not necessarily that person.\n"
+     },
+     "followUpRequired": {
+      "type": "boolean",
+      "default": false
+     },
+     "followUpNote": {
+      "type": "string",
+      "maxLength": 1000,
+      "nullable": true
+     },
+     "verificationOutcome": {
+      "type": "string",
+      "enum": [
+       "verified",
+       "rejected"
+      ],
+      "nullable": true,
+      "description": "The latest `verifyWorkOrder` outcome."
+     },
+     "verificationNote": {
+      "type": "string",
+      "maxLength": 1000,
+      "nullable": true
+     },
+     "verifiedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
      },
      "verifiedByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "cancelReason": {
+      "type": "string",
+      "enum": [
+       "raisedInError",
+       "duplicate",
+       "superseded",
+       "noLongerRequired"
+      ],
+      "nullable": true
+     },
+     "cancelNote": {
+      "type": "string",
+      "maxLength": 300,
+      "nullable": true
+     },
+     "supersededByWorkOrderId": {
+      "type": "string",
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "nullable": true,
+      "description": "Set by `cancelWorkOrder` where the reason is `superseded`."
+     },
+     "cancelledAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "closeOutcome": {
+      "type": "string",
+      "enum": [
+       "completedAndVerified",
+       "notReproducible",
+       "supersededByReplacement",
+       "noLongerApplicable",
+       "duplicate"
+      ],
+      "nullable": true
+     },
+     "closeNote": {
+      "type": "string",
+      "maxLength": 500,
+      "nullable": true
+     },
+     "duplicateOfWorkOrderId": {
+      "type": "string",
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "nullable": true,
+      "description": "Set by `closeWorkOrder` where the outcome is `duplicate`."
+     },
+     "closedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "closedByPrincipalId": {
       "type": "string",
       "format": "uuid",
       "nullable": true

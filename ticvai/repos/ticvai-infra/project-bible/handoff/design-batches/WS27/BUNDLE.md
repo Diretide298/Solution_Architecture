@@ -1,6 +1,6 @@
 # WS27 — Group Sales   Corporate Booking Management board 1
 
-**10 screens · 10 operations · 14 schemas · 2 permissions**
+**10 screens · 15 operations · 22 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `ORDER_CREATE, ORDER_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, PRODUCT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,20 +60,20 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-264` | Group Sales Command Center | commandCentre | 1 | 0 | — |
-| `BO-265` | Group Enquiry & Opportunity Capture | configEditor | 1 | 0 | — |
-| `BO-266` | Group Customer & Organization Profile | listDetail | 1 | 0 | — |
+| `BO-264` | Group Sales Command Center | commandCentre | 2 | 0 | — |
+| `BO-265` | Group Enquiry & Opportunity Capture | configEditor | 2 | 0 | — |
+| `BO-266` | Group Customer & Organization Profile | listDetail | 2 | 0 | — |
 | `BO-267` | Group Requirements, Availability & Capacity Planner | listDetail | 1 | 0 | — |
 | `BO-268` | Group Package & Experience Builder | listDetail | 1 | 0 | — |
 | `BO-269` | Group Quotation Builder & Proposal Generation | configEditor | 1 | 0 | — |
 | `BO-270` | Quote Revision, Negotiation & Version Management | configEditor | 1 | 0 | — |
 | `BO-271` | Group Discount, Exception & Approval Workflow | listDetail | 1 | 0 | — |
-| `BO-272` | Quote-to-Booking Conversion & Confirmation | listDetail | 1 | 0 | — |
+| `BO-272` | Quote-to-Booking Conversion & Confirmation | listDetail | 3 | 0 | — |
 | `BO-273` | Group Booking 360° & Handover Workspace | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-266, BO-267, BO-268, BO-271, BO-272, BO-273 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-267, BO-271, BO-272, BO-273 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-264 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-265",
@@ -186,10 +182,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "The Group Sales team can manage its complete direct-sales pipeline and immediately identify opportunities requiring commercial action.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display; Show) and a per-row directory (§Each opportunity should display) — counts over a population, then the population",
   "purpose": "Provide the Group Sales team with a centralized commercial workspace showing the entire group-sales pipeline.",
-  "purposeNote": "The Group Sales team can manage its complete direct-sales pipeline and immediately identify opportunities requiring commercial action.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -365,6 +361,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "apis": [
    {
+    "operationId": "listGroupSale2",
+    "contract": "orders",
+    "purpose": "Group Sales Analytics & AI Intelligence Center",
+    "trigger": "onLoad"
+   },
+   {
     "operationId": "listGroupSale",
     "contract": "orders",
     "purpose": "Group Sales Command Center",
@@ -374,7 +376,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-264"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-264",
+   "workshopBoard": "wireframes/WS68 Group Sales   Corporate Booking Management Board 1.dc.html#bo-264"
   },
   "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 4. 28 of 28 labels bound to a contract property; 29 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -437,17 +440,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every group-sales request can be captured as a structured, owned and trackable opportunity without requiring a booking to exist yet.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture; Configure) and no display directory — it is settings, not a population",
   "purpose": "Capture a new group-sales enquiry and convert it into a structured sales opportunity.",
-  "purposeNote": "Every group-sales request can be captured as a structured, owned and trackable opportunity without requiring a booking to exist yet.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Sales Team, Campaign, Existing Customer. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 5 §Support"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -605,6 +601,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "Existing Customer",
        "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 5 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Manual Entry",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 5 §Support"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Capture enquiry",
+       "operation": "createGroupEnquiry",
+       "provenance": "contract orders.yaml POST /group-enquiry-opportunity (decided 29 September, VM close-out)"
       }
      ]
     }
@@ -622,14 +629,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "orders",
     "purpose": "Group Enquiry & Opportunity Capture",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "createGroupEnquiry",
+    "contract": "orders",
+    "purpose": "Capture enquiry",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-265"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-265",
+   "workshopBoard": "wireframes/WS68 Group Sales   Corporate Booking Management Board 1.dc.html#bo-265"
   },
-  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 5. 0 of 0 labels bound to a contract property; 29 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 5. 0 of 0 labels bound to a contract property; 30 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `createGroupEnquiry`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -690,10 +704,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Sales teams can see the complete relationship with a group customer while maintaining one governed customer record across TICVAI.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Maintain the customer or organization buying directly from TICVAI.",
-  "purposeNote": "Sales teams can see the complete relationship with a group customer while maintaining one governed customer record across TICVAI.",
   "layout": {
    "template": "split",
    "regions": [
@@ -742,6 +756,23 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 6 §Show"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Event Organizer",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 6 §Support"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save organisation profile",
+       "operation": "setGroupCustomerOrganization",
+       "provenance": "contract orders.yaml PUT /group-customer-organization (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -758,6 +789,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "orders",
     "purpose": "Group Customer & Organization Profile",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setGroupCustomerOrganization",
+    "contract": "orders",
+    "purpose": "Save organisation profile",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -773,9 +810,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-266"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-266",
+   "workshopBoard": "wireframes/WS68 Group Sales   Corporate Booking Management Board 1.dc.html#bo-266"
   },
-  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 6. 8 of 8 labels bound to a contract property; 19 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 6. 8 of 8 labels bound to a contract property; 20 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `setGroupCustomerOrganization`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -836,10 +874,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Sales teams can validate admission, schedule and required resource availability before making a commercial commitment to the customer.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Determine whether TICVAI can accommodate the requested group before preparing a quotation.",
-  "purposeNote": "Sales teams can validate admission, schedule and required resource availability before making a commercial commitment to the customer.",
   "layout": {
    "template": "split",
    "regions": [
@@ -917,7 +955,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-267"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-267",
+   "workshopBoard": "wireframes/WS68 Group Sales   Corporate Booking Management Board 1.dc.html#bo-267"
   },
   "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 8. 7 of 7 labels bound to a contract property; 22 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -980,10 +1019,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Sales teams can build a multi-product group package while consuming approved TICVAI products, pricing and resources rather than manually calculating the offer outside the platform.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Build a complete commercial package tailored to the group's requirements.",
-  "purposeNote": "Sales teams can build a multi-product group package while consuming approved TICVAI products, pricing and resources rather than manually calculating the offer outside the platform.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1043,6 +1082,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "primaryButton",
        "label": "Group Ticket",
        "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 9 §Allow combinations of"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Meal Voucher",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 9 §Allow combinations of"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "VIP Experience",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 9 §Allow combinations of"
       }
      ]
     }
@@ -1060,10 +1109,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setGroupPackageExperience",
     "contract": "orders",
     "purpose": "Group Package & Experience Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setGroupPackageExperience"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1079,9 +1125,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-268"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-268",
+   "workshopBoard": "wireframes/WS68 Group Sales   Corporate Booking Management Board 1.dc.html#bo-268"
   },
-  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 9. 9 of 9 labels bound to a contract property; 10 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 9. 9 of 9 labels bound to a contract property; 12 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Meal Voucher, VIP Experience are choices sent by `setGroupPackageExperience`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1142,10 +1189,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Sales teams can generate a controlled, branded and auditable group quotation directly from the approved package configuration.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture; Where configured, customer can) and no display directory — it is settings, not a population",
   "purpose": "Turn the configured group package into a professional customer quotation.",
-  "purposeNote": "Sales teams can generate a controlled, branded and auditable group quotation directly from the approved package configuration.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1234,16 +1281,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setGroupQuotationProposal",
     "contract": "orders",
     "purpose": "Group Quotation Builder & Proposal Generation",
-    "trigger": "onAction",
-    "invalidates": [
-     "setGroupQuotationProposal"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-269"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-269",
+   "workshopBoard": "wireframes/WS68 Group Sales   Corporate Booking Management Board 1.dc.html#bo-269"
   },
   "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 11 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1306,10 +1351,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every quotation revision and negotiation decision is retained with complete commercial history and impact visibility.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Manage the commercial negotiation process without losing historical versions.",
-  "purposeNote": "Every quotation revision and negotiation decision is retained with complete commercial history and impact visibility.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1378,7 +1423,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-270"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-270",
+   "workshopBoard": "wireframes/WS68 Group Sales   Corporate Booking Management Board 1.dc.html#bo-270"
   },
   "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 12. 0 of 0 labels bound to a contract property; 8 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1441,10 +1487,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "No quotation containing a controlled commercial exception can be issued or accepted without the appropriate approval.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Govern non-standard group pricing and commercial exceptions before a quote is committed.",
-  "purposeNote": "No quotation containing a controlled commercial exception can be issued or accepted without the appropriate approval.",
   "gaps": [
    {
     "operation": null,
@@ -1497,16 +1543,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "approveGroupDiscountException",
     "contract": "orders",
     "purpose": "Group Discount, Exception & Approval Workflow",
-    "trigger": "onAction",
-    "invalidates": [
-     "approveGroupDiscountException"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-271"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-271",
+   "workshopBoard": "wireframes/WS68 Group Sales   Corporate Booking Management Board 1.dc.html#bo-271"
   },
   "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 13. 0 of 0 labels bound to a contract property; 0 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1569,10 +1613,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "An approved and accepted quotation can become a confirmed group booking while preserving the exact commercial agreement and without duplicate data entry.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Convert an accepted quotation into a confirmed TICVAI group booking without re-entering the commercial configuration.",
-  "purposeNote": "An approved and accepted quotation can become a confirmed group booking while preserving the exact commercial agreement and without duplicate data entry.",
   "gaps": [
    {
     "operation": null,
@@ -1596,6 +1640,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "derived": true,
        "impliedBy": "listQuoteBookingConversion",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createGroupBooking",
+       "label": "Create group booking",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createGroupBooking"
       }
      ]
     }
@@ -1614,21 +1672,42 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "orders",
     "purpose": "Quote-to-Booking Conversion & Confirmation",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "createGroupBooking",
+    "contract": "orders",
+    "purpose": "Convert the accepted quote into a group booking",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listQuoteBookingConversion"
+    ]
+   },
+   {
+    "operationId": "updateGroupBooking",
+    "contract": "orders",
+    "purpose": "Confirm numbers or the leader on the converted booking",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listQuoteBookingConversion"
+    ]
    }
   ],
   "entryState": {
-   "preloaded": [
-    "QuoteToBookingConversionConfirmationView.quoteRemainsValid",
-    "QuoteToBookingConversionConfirmationView.capacityRemainsAvailable",
-    "QuoteToBookingConversionConfirmationView.resourcesRemainAvailable",
-    "QuoteToBookingConversionConfirmationView.priceRemainsApproved",
-    "QuoteToBookingConversionConfirmationView.approvalRemainsValid"
+   "preloaded": [],
+   "params": [
+    {
+     "name": "groupBookingId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-272"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-272",
+   "workshopBoard": "wireframes/WS68 Group Sales   Corporate Booking Management Board 1.dc.html#bo-272"
   },
   "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 0 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1683,10 +1762,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from BO-264, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Once a group sale is confirmed, Sales can hand over a complete and structured booking to Operations without relying on emails, spreadsheets or manual re-entry. Board 1 — Final Screen Register",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Show) and no metric row",
   "purpose": "Provide a consolidated view of the completed sales journey and hand the confirmed group cleanly from Sales to Operations. 360° Header Board 1 ended when the quotation was accepted and converted into a confirmed group booking. Board 2 takes over from confirmation until the group visit is completed and financially closed.",
-  "purposeNote": "Once a group sale is confirmed, Sales can hand over a complete and structured booking to Operations without relying on emails, spreadsheets or manual re-entry. Board 1 — Final Screen Register",
   "layout": {
    "template": "split",
    "regions": [
@@ -1719,7 +1798,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "GroupBooking360HandoverWorkspaceView.tickets",
         "GroupBooking360HandoverWorkspaceView.dateTime",
         "GroupBooking360HandoverWorkspaceView.capacity",
-        "GroupBooking360HandoverWorkspaceView.seatingWhereApplicable",
+        "GroupBooking360HandoverWorkspaceView.seating",
         "GroupBooking360HandoverWorkspaceView.packageComponents",
         "GroupBooking360HandoverWorkspaceView.organization",
         "GroupBooking360HandoverWorkspaceView.mainContact",
@@ -1762,7 +1841,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "GroupBooking360HandoverWorkspaceView.tickets",
         "GroupBooking360HandoverWorkspaceView.dateTime",
         "GroupBooking360HandoverWorkspaceView.capacity",
-        "GroupBooking360HandoverWorkspaceView.seatingWhereApplicable",
+        "GroupBooking360HandoverWorkspaceView.seating",
         "GroupBooking360HandoverWorkspaceView.packageComponents",
         "GroupBooking360HandoverWorkspaceView.organization",
         "GroupBooking360HandoverWorkspaceView.mainContact",
@@ -1799,10 +1878,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setGroupBookingHandover",
     "contract": "orders",
     "purpose": "Group Booking 360° & Handover Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setGroupBookingHandover"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1818,7 +1894,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-273"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-273",
+   "workshopBoard": "wireframes/WS68 Group Sales   Corporate Booking Management Board 1.dc.html#bo-273"
   },
   "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 16. 27 of 27 labels bound to a contract property; 27 of 90 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1862,9 +1939,53 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "GroupDiscountExceptionApprovalWorkflowInput",
   "responds": "GroupDiscountExceptionApprovalWorkflowView"
+ },
+ "createGroupBooking": {
+  "method": "POST",
+  "path": "/group-bookings",
+  "contract": "orders",
+  "summary": "Turn an order into a group booking",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateGroupBookingRequest",
+  "responds": "GroupBooking"
+ },
+ "createGroupEnquiry": {
+  "method": "POST",
+  "path": "/group-enquiry-opportunity",
+  "contract": "orders",
+  "summary": "Capture a group enquiry",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GroupEnquiryInput",
+  "responds": "GroupEnquiryOpportunityView"
  },
  "listGroupCustomerOrganization": {
   "method": "GET",
@@ -1918,6 +2039,70 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "GroupSalesCommandCenterView"
  },
+ "listGroupSale2": {
+  "method": "GET",
+  "path": "/group-sale-2",
+  "contract": "orders",
+  "summary": "Group Sales Analytics & AI Intelligence Center",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "customerType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "organization",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "salesOwner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "groupType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "campaign",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "market",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "GroupSalesAnalyticsAiIntelligenceCenterView"
+ },
  "listQuoteBookingConversion": {
   "method": "GET",
   "path": "/quote-booking-conversion",
@@ -1953,9 +2138,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "GroupBooking360HandoverWorkspaceInput",
   "responds": "GroupBooking360HandoverWorkspaceView"
+ },
+ "setGroupCustomerOrganization": {
+  "method": "PUT",
+  "path": "/group-customer-organization",
+  "contract": "orders",
+  "summary": "Save a group customer organisation's profile",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GroupCustomerOrganizationInput",
+  "responds": "GroupCustomerOrganizationView"
  },
  "setGroupPackageExperience": {
   "method": "PUT",
@@ -1966,7 +2176,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "GroupPackageExperienceBuilderInput",
   "responds": "GroupPackageExperienceBuilderView"
  },
@@ -1979,9 +2195,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "GroupQuotationBuilderProposalGenerationInput",
   "responds": "GroupQuotationBuilderProposalGenerationView"
+ },
+ "updateGroupBooking": {
+  "method": "PATCH",
+  "path": "/group-bookings/{groupBookingId}",
+  "contract": "orders",
+  "summary": "Confirm numbers, change the leader or cancel a group",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "UpdateGroupBookingRequest",
+  "responds": "GroupBooking"
  }
 }
 ```
@@ -1992,51 +2233,240 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "CreateGroupBookingRequest": {
+  "type": "object",
+  "description": "Request only. Persisted as `GroupBooking`.",
+  "required": [
+   "orderId",
+   "leaderSubjectId",
+   "expectedSize"
+  ],
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "general",
+     "school",
+     "corporate",
+     "party"
+    ],
+    "default": "general"
+   },
+   "packageProductId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The school-trip format or party package."
+   },
+   "yearGroup": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "accessAndDietaryNeeds": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "celebrantName": {
+    "type": "string",
+    "maxLength": 120,
+    "nullable": true,
+    "description": "The birthday child."
+   },
+   "celebrantTurningAge": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 18,
+    "nullable": true
+   },
+   "allergiesAndRequests": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "finalHeadcountDueBy": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "leaderSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The person who pays, is called if the coach is late, and collects the names."
+   },
+   "organisationName": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "expectedSize": {
+    "type": "integer",
+    "minimum": 2
+   },
+   "minimumSize": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true
+   },
+   "attendeeCaptureRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "attendeeCaptureDueBy": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "GroupBooking": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.group_booking",
+  "description": "BL-028. **`BO-026 Group Bookings` ran on generic order operations** — no group size, no quota, no leader, no per-attendee capture.\n**The leader is the point.** A school booking forty places has one person who pays, one who is called if the coach is late, and forty who need names collecting — and a generic order has one guest.\n",
+  "required": [
+   "id",
+   "orderId",
+   "leaderSubjectId",
+   "expectedSize",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "general",
+     "school",
+     "corporate",
+     "party"
+    ],
+    "default": "general"
+   },
+   "packageProductId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The school-trip format or party package."
+   },
+   "yearGroup": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "accessAndDietaryNeeds": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "celebrantName": {
+    "type": "string",
+    "maxLength": 120,
+    "nullable": true,
+    "description": "The birthday child."
+   },
+   "celebrantTurningAge": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 18,
+    "nullable": true
+   },
+   "allergiesAndRequests": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "finalHeadcountDueBy": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "quoteSentAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "riskAssessmentSentAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "preferredDate": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "The date the guest asked for on `requestGroupBooking` — what its `409 dateUnavailable` is checked against. Null for a group a member of staff built from an order."
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "leaderSubjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "organisationName": {
+    "type": "string",
+    "nullable": true
+   },
+   "expectedSize": {
+    "type": "integer"
+   },
+   "confirmedSize": {
+    "type": "integer",
+    "nullable": true
+   },
+   "minimumSize": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**Below which the group rate does not apply.** A booking for forty that arrives as twelve is a pricing question somebody has to answer at the gate, and stating the threshold means answering it at booking instead.\n"
+   },
+   "attendeeCaptureRequired": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Whether names are needed before admission.** A school trip usually needs them and a corporate day out usually does not, and the difference is a safeguarding requirement rather than a preference.\n"
+   },
+   "attendeeCaptureDueBy": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "provisional",
+     "confirmed",
+     "namesPending",
+     "complete",
+     "cancelled"
+    ]
+   }
+  }
+ },
  "GroupBooking360HandoverWorkspaceInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; lands in the handover columns of `orders.group_visit_plan` (DM5, 29 September)",
   "description": "**What Group Booking 360° & Handover Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "notes": {
     "type": "string",
     "description": "Notes"
    },
-   "tasks": {
-    "type": "string",
-    "description": "Tasks"
-   },
    "attachments": {
     "type": "string",
     "description": "Attachments"
    },
-   "departmentAssignments": {
-    "type": "string",
-    "description": "Department assignments"
-   },
-   "internalMentions": {
-    "type": "string",
-    "description": "Internal mentions"
-   },
    "handoverAcknowledgment": {
     "type": "string",
     "description": "Handover acknowledgment"
-   },
-   "creation": {
-    "type": "string",
-    "description": "creation"
-   },
-   "groupRequirementsAvailabilityCapacity": {
-    "type": "integer",
-    "description": "Group Requirements, Availability & Capacity"
-   },
-   "servicesTheGroup": {
-    "type": "string",
-    "description": "services the group"
-   },
-   "reconciliationPerformanceAi": {
-    "type": "string",
-    "description": "Reconciliation → Performance & AI"
    }
   }
  },
@@ -2131,10 +2561,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "Capacity"
    },
-   "seatingWhereApplicable": {
-    "type": "string",
-    "description": "Seating where applicable"
-   },
    "packageComponents": {
     "type": "integer",
     "description": "Package components"
@@ -2159,41 +2585,123 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Notes"
    },
-   "tasks": {
-    "type": "string",
-    "description": "Tasks"
-   },
    "attachments": {
     "type": "string",
     "description": "Attachments"
-   },
-   "departmentAssignments": {
-    "type": "string",
-    "description": "Department assignments"
-   },
-   "internalMentions": {
-    "type": "string",
-    "description": "Internal mentions"
    },
    "handoverAcknowledgment": {
     "type": "string",
     "description": "Handover acknowledgment"
    },
-   "creation": {
+   "seating": {
     "type": "string",
-    "description": "creation"
-   },
-   "groupRequirementsAvailabilityCapacity": {
-    "type": "integer",
-    "description": "Group Requirements, Availability & Capacity"
-   },
-   "servicesTheGroup": {
+    "description": "Seating where applicable"
+   }
+  }
+ },
+ "GroupCustomerOrganizationInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only",
+  "description": "What `setGroupCustomerOrganization` takes (decided 29 September, readiness close-out).",
+  "required": [
+   "name",
+   "organisationType"
+  ],
+  "properties": {
+   "organisationId": {
     "type": "string",
-    "description": "services the group"
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null creates the organisation; an id replaces that profile."
    },
-   "reconciliationPerformanceAi": {
+   "name": {
     "type": "string",
-    "description": "Reconciliation → Performance & AI"
+    "maxLength": 200
+   },
+   "organisationType": {
+    "type": "string",
+    "description": "What kind of buyer this is (decided 29 September, readiness close-out).",
+    "enum": [
+     "school",
+     "corporate",
+     "travelAgent",
+     "eventOrganizer",
+     "association",
+     "government",
+     "other"
+    ]
+   },
+   "contacts": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "role",
+      "name"
+     ],
+     "properties": {
+      "role": {
+       "type": "string",
+       "enum": [
+        "primary",
+        "booking",
+        "finance",
+        "eventDay",
+        "decisionMaker"
+       ]
+      },
+      "name": {
+       "type": "string",
+       "maxLength": 120
+      },
+      "email": {
+       "type": "string",
+       "format": "email",
+       "nullable": true
+      },
+      "phone": {
+       "type": "string",
+       "maxLength": 30,
+       "nullable": true
+      }
+     }
+    }
+   },
+   "billingDetails": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "billingName": {
+      "type": "string",
+      "maxLength": 200
+     },
+     "billingEmail": {
+      "type": "string",
+      "format": "email",
+      "nullable": true
+     },
+     "address": {
+      "type": "string",
+      "maxLength": 500,
+      "nullable": true
+     }
+    }
+   },
+   "taxDetails": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "taxRegistrationNumber": {
+      "type": "string",
+      "maxLength": 50,
+      "nullable": true
+     },
+     "taxCountry": {
+      "type": "string",
+      "pattern": "^[A-Z]{2}$",
+      "nullable": true
+     }
+    }
    }
   }
  },
@@ -2203,46 +2711,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Group Customer & Organization Profile displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "school": {
-    "type": "string",
-    "description": "School"
-   },
-   "university": {
-    "type": "string",
-    "description": "University"
-   },
-   "company": {
-    "type": "string",
-    "description": "Company"
-   },
-   "government": {
-    "type": "string",
-    "description": "Government"
-   },
-   "sportsClub": {
-    "type": "string",
-    "description": "Sports Club"
-   },
-   "association": {
-    "type": "string",
-    "description": "Association"
-   },
-   "tourGroup": {
-    "type": "string",
-    "description": "Tour Group"
-   },
-   "privateGroup": {
-    "type": "string",
-    "description": "Private Group"
-   },
-   "eventOrganizer": {
-    "type": "string",
-    "description": "Event Organizer"
-   },
-   "charity": {
-    "type": "string",
-    "description": "Charity"
-   },
    "organizationName": {
     "type": "string",
     "description": "Organization Name"
@@ -2250,14 +2718,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "customerId": {
     "type": "string",
     "description": "Customer ID"
-   },
-   "organizationType": {
-    "type": "string",
-    "description": "Organization Type"
-   },
-   "registrationDetailsWhereApplicable": {
-    "type": "string",
-    "description": "Registration Details where applicable"
    },
    "country": {
     "type": "string",
@@ -2338,27 +2798,145 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "futureBookings": {
     "type": "integer",
     "description": "Future bookings"
+   },
+   "registrationDetails": {
+    "type": "string",
+    "description": "Registration Details where applicable"
+   },
+   "organizationType": {
+    "type": "string",
+    "enum": [
+     "school",
+     "university",
+     "company",
+     "government",
+     "sportsClub",
+     "association",
+     "tourGroup",
+     "privateGroup",
+     "eventOrganizer",
+     "charity"
+    ],
+    "description": "Organisation type (configurable; MoM 31 Aug)."
+   }
+  }
+ },
+ "GroupCustomerOrganizationView": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.group_customer_organization + orders.group_customer_organization_contact",
+  "description": "**The organisation a group buys under.** Saved by `setGroupCustomerOrganization` (decided 29 September, readiness close-out); `listGroupCustomerOrganization` is the screen's projection over these.\n",
+  "required": [
+   "id",
+   "name",
+   "organisationType"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "organisationType": {
+    "type": "string",
+    "enum": [
+     "school",
+     "corporate",
+     "travelAgent",
+     "eventOrganizer",
+     "association",
+     "government",
+     "other"
+    ]
+   },
+   "contacts": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "role",
+      "name"
+     ],
+     "properties": {
+      "role": {
+       "type": "string",
+       "enum": [
+        "primary",
+        "booking",
+        "finance",
+        "eventDay",
+        "decisionMaker"
+       ]
+      },
+      "name": {
+       "type": "string",
+       "maxLength": 120
+      },
+      "email": {
+       "type": "string",
+       "format": "email",
+       "nullable": true
+      },
+      "phone": {
+       "type": "string",
+       "maxLength": 30,
+       "nullable": true
+      }
+     }
+    }
+   },
+   "billingDetails": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "billingName": {
+      "type": "string",
+      "maxLength": 200
+     },
+     "billingEmail": {
+      "type": "string",
+      "format": "email",
+      "nullable": true
+     },
+     "address": {
+      "type": "string",
+      "maxLength": 500,
+      "nullable": true
+     }
+    }
+   },
+   "taxDetails": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "taxRegistrationNumber": {
+      "type": "string",
+      "maxLength": 50,
+      "nullable": true
+     },
+     "taxCountry": {
+      "type": "string",
+      "pattern": "^[A-Z]{2}$",
+      "nullable": true
+     }
+    }
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
  "GroupDiscountExceptionApprovalWorkflowInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is orders.cash_movement at 5%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; the decision lands in the discount columns of `orders.group_quote` (DM5, 29 September)",
   "description": "**What Group Discount, Exception & Approval Workflow submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "standardGroupDiscount10": {
-    "type": "number",
-    "description": "Standard Group Discount: 10%"
-   },
-   "requested18": {
-    "type": "number",
-    "description": "Requested: 18%"
-   },
-   "approvalRequiredCommercialDirector": {
-    "type": "string",
-    "description": "Approval required — Commercial Director"
-   },
    "discount": {
     "type": "number",
     "description": "Discount %"
@@ -2426,6 +3004,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "capacityImpact": {
     "type": "integer",
     "description": "Capacity Impact"
+   },
+   "decision": {
+    "type": "string",
+    "enum": [
+     "approve",
+     "reject",
+     "returnForChange"
+    ],
+    "description": "Approver decision"
+   },
+   "comment": {
+    "type": "string",
+    "description": "Comment"
    }
   }
  },
@@ -2435,18 +3026,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Group Discount, Exception & Approval Workflow displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "standardGroupDiscount10": {
-    "type": "number",
-    "description": "Standard Group Discount: 10%"
-   },
-   "requested18": {
-    "type": "number",
-    "description": "Requested: 18%"
-   },
-   "approvalRequiredCommercialDirector": {
-    "type": "string",
-    "description": "Approval required — Commercial Director"
-   },
    "discount": {
     "type": "number",
     "description": "Discount %"
@@ -2514,6 +3093,129 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "capacityImpact": {
     "type": "integer",
     "description": "Capacity Impact"
+   },
+   "decision": {
+    "type": "string",
+    "enum": [
+     "approve",
+     "reject",
+     "returnForChange"
+    ],
+    "description": "Approver decision"
+   }
+  }
+ },
+ "GroupEnquiryInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only",
+  "description": "What `createGroupEnquiry` takes (decided 29 September, readiness close-out).",
+  "required": [
+   "source",
+   "contact",
+   "groupSize"
+  ],
+  "properties": {
+   "source": {
+    "type": "string",
+    "description": "Where the enquiry came from (decided 29 September, readiness close-out).",
+    "enum": [
+     "website",
+     "salesTeam",
+     "campaign",
+     "existingCustomer",
+     "partner",
+     "manualEntry"
+    ]
+   },
+   "organisationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "An organisation already on file; null when the enquirer is not yet one."
+   },
+   "contact": {
+    "type": "object",
+    "required": [
+     "name"
+    ],
+    "properties": {
+     "name": {
+      "type": "string",
+      "maxLength": 120
+     },
+     "email": {
+      "type": "string",
+      "format": "email",
+      "nullable": true
+     },
+     "phone": {
+      "type": "string",
+      "maxLength": 30,
+      "nullable": true
+     },
+     "organisationName": {
+      "type": "string",
+      "maxLength": 200,
+      "nullable": true,
+      "description": "Who they are, when `organisationId` is null."
+     }
+    }
+   },
+   "groupSize": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "preferredDates": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "date"
+    }
+   },
+   "requirements": {
+    "type": "string",
+    "maxLength": 2000,
+    "nullable": true
+   },
+   "salesOwnerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The opportunity's owner. **An enquiry is the opportunity** (DM5, 29 September); the pipeline fields live on it rather than on a second table that would copy it."
+   },
+   "priority": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "low",
+     "normal",
+     "high"
+    ]
+   },
+   "expectedValue": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "probability": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 100,
+    "description": "Percent."
+   },
+   "expectedCloseDate": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "nextActionAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
    }
   }
  },
@@ -2523,46 +3225,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Group Enquiry & Opportunity Capture displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "website": {
-    "type": "string",
-    "description": "Website"
-   },
-   "phone": {
-    "type": "string",
-    "description": "Phone"
-   },
-   "email": {
-    "type": "string",
-    "description": "Email"
-   },
-   "walkIn": {
-    "type": "string",
-    "description": "Walk-in"
-   },
-   "salesTeam": {
-    "type": "string",
-    "description": "Sales Team"
-   },
-   "crm": {
-    "type": "string",
-    "description": "CRM"
-   },
-   "referral": {
-    "type": "string",
-    "description": "Referral"
-   },
-   "campaign": {
-    "type": "string",
-    "description": "Campaign"
-   },
-   "existingCustomer": {
-    "type": "string",
-    "description": "Existing Customer"
-   },
-   "manualEntry": {
-    "type": "string",
-    "description": "Manual Entry"
-   },
    "enquiryId": {
     "type": "string",
     "description": "Enquiry ID"
@@ -2659,106 +3321,211 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "date-time",
     "description": "Expected Close Date"
    },
-   "leadSource": {
-    "type": "string",
-    "description": "Lead Source"
-   },
    "nextAction": {
     "type": "string",
     "format": "date-time",
     "description": "Next Action"
+   },
+   "leadSource": {
+    "type": "string",
+    "enum": [
+     "website",
+     "phone",
+     "email",
+     "walkIn",
+     "salesTeam",
+     "crm",
+     "referral",
+     "campaign",
+     "existingCustomer",
+     "manualEntry"
+    ],
+    "description": "Where the enquiry came from."
+   }
+  }
+ },
+ "GroupEnquiryOpportunityView": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.group_enquiry",
+  "description": "**One captured group enquiry.** Written by `createGroupEnquiry` (decided 29 September, readiness close-out); `listGroupEnquiryOpportunity` is the screen's projection over these.\n",
+  "required": [
+   "id",
+   "source",
+   "contact",
+   "groupSize",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "source": {
+    "type": "string",
+    "enum": [
+     "website",
+     "salesTeam",
+     "campaign",
+     "existingCustomer",
+     "partner",
+     "manualEntry"
+    ]
+   },
+   "organisationId": {
+    "x-ticvai-references": "orders.group_customer_organization",
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "contact": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "maxLength": 120
+     },
+     "email": {
+      "type": "string",
+      "format": "email",
+      "nullable": true
+     },
+     "phone": {
+      "type": "string",
+      "maxLength": 30,
+      "nullable": true
+     },
+     "organisationName": {
+      "type": "string",
+      "maxLength": 200,
+      "nullable": true
+     }
+    }
+   },
+   "groupSize": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "preferredDates": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "date"
+    }
+   },
+   "requirements": {
+    "type": "string",
+    "maxLength": 2000,
+    "nullable": true
+   },
+   "salesOwnerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The opportunity's owner. **An enquiry is the opportunity** (DM5, 29 September); the pipeline fields live on it rather than on a second table that would copy it."
+   },
+   "priority": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "low",
+     "normal",
+     "high"
+    ]
+   },
+   "expectedValue": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "probability": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 100,
+    "description": "Percent."
+   },
+   "expectedCloseDate": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "nextActionAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "createdBy": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
  "GroupPackageExperienceBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; lands in the package columns of `orders.group_quote` (DM5, 29 September)",
   "description": "**What Group Package & Experience Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "admissionTickets": {
-    "type": "string",
-    "description": "Admission Tickets"
+   "componentTypes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "admissionTickets",
+      "groupTicket",
+      "guidedTour",
+      "reservedSeating",
+      "fB",
+      "mealVoucher",
+      "merchandise",
+      "transportation",
+      "parking",
+      "workshop",
+      "educationProgram",
+      "meetingRoom",
+      "vipExperience",
+      "addOns",
+      "rentalResources",
+      "educationalWorkshop"
+     ]
+    },
+    "description": "What the package combines."
    },
-   "groupTicket": {
+   "template": {
     "type": "string",
-    "description": "Group Ticket"
+    "enum": [
+     "schoolPackage",
+     "corporatePackage",
+     "birthdayPackage",
+     "vipGroupPackage",
+     "conferencePackage"
+    ],
+    "description": "Reusable package template."
    },
-   "guidedTour": {
+   "packageName": {
     "type": "string",
-    "description": "Guided Tour"
+    "description": "Package name"
    },
-   "reservedSeating": {
-    "type": "string",
-    "description": "Reserved Seating"
+   "guestCount": {
+    "type": "integer",
+    "description": "Guests"
    },
-   "fB": {
-    "type": "string",
-    "description": "F&B"
-   },
-   "mealVoucher": {
-    "type": "string",
-    "description": "Meal Voucher"
-   },
-   "merchandise": {
-    "type": "string",
-    "description": "Merchandise"
-   },
-   "transportation": {
-    "type": "string",
-    "description": "Transportation"
-   },
-   "parking": {
-    "type": "string",
-    "description": "Parking"
-   },
-   "workshop": {
-    "type": "string",
-    "description": "Workshop"
-   },
-   "educationProgram": {
-    "type": "string",
-    "description": "Education Program"
-   },
-   "meetingRoom": {
-    "type": "string",
-    "description": "Meeting Room"
-   },
-   "vipExperience": {
-    "type": "string",
-    "description": "VIP Experience"
-   },
-   "addOns": {
-    "type": "string",
-    "description": "Add-ons"
-   },
-   "rentalResources": {
-    "type": "string",
-    "description": "Rental Resources"
-   },
-   "educationalWorkshop": {
-    "type": "string",
-    "description": "Educational Workshop"
-   },
-   "schoolPackage": {
-    "type": "string",
-    "description": "School Package"
-   },
-   "corporatePackage": {
-    "type": "string",
-    "description": "Corporate Package"
-   },
-   "birthdayPackage": {
-    "type": "string",
-    "description": "Birthday Package"
-   },
-   "vipGroupPackage": {
-    "type": "string",
-    "description": "VIP Group Package"
-   },
-   "conferencePackage": {
-    "type": "string",
-    "description": "Conference Package"
+   "components": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Products and services in the package"
    }
   }
  },
@@ -2768,70 +3535,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Group Package & Experience Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "admissionTickets": {
-    "type": "string",
-    "description": "Admission Tickets"
-   },
-   "groupTicket": {
-    "type": "string",
-    "description": "Group Ticket"
-   },
-   "guidedTour": {
-    "type": "string",
-    "description": "Guided Tour"
-   },
-   "reservedSeating": {
-    "type": "string",
-    "description": "Reserved Seating"
-   },
-   "fB": {
-    "type": "string",
-    "description": "F&B"
-   },
-   "mealVoucher": {
-    "type": "string",
-    "description": "Meal Voucher"
-   },
-   "merchandise": {
-    "type": "string",
-    "description": "Merchandise"
-   },
-   "transportation": {
-    "type": "string",
-    "description": "Transportation"
-   },
-   "parking": {
-    "type": "string",
-    "description": "Parking"
-   },
-   "workshop": {
-    "type": "string",
-    "description": "Workshop"
-   },
-   "educationProgram": {
-    "type": "string",
-    "description": "Education Program"
-   },
-   "meetingRoom": {
-    "type": "string",
-    "description": "Meeting Room"
-   },
-   "vipExperience": {
-    "type": "string",
-    "description": "VIP Experience"
-   },
-   "addOns": {
-    "type": "string",
-    "description": "Add-ons"
-   },
-   "rentalResources": {
-    "type": "string",
-    "description": "Rental Resources"
-   },
-   "educationalWorkshop": {
-    "type": "string",
-    "description": "Educational Workshop"
-   },
    "standardPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Standard Price"
@@ -2868,32 +3571,63 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Price Per Guest"
    },
-   "schoolPackage": {
-    "type": "string",
-    "description": "School Package"
+   "componentTypes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "admissionTickets",
+      "groupTicket",
+      "guidedTour",
+      "reservedSeating",
+      "fB",
+      "mealVoucher",
+      "merchandise",
+      "transportation",
+      "parking",
+      "workshop",
+      "educationProgram",
+      "meetingRoom",
+      "vipExperience",
+      "addOns",
+      "rentalResources",
+      "educationalWorkshop"
+     ]
+    },
+    "description": "What the package combines."
    },
-   "corporatePackage": {
+   "template": {
     "type": "string",
-    "description": "Corporate Package"
+    "enum": [
+     "schoolPackage",
+     "corporatePackage",
+     "birthdayPackage",
+     "vipGroupPackage",
+     "conferencePackage"
+    ],
+    "description": "Reusable package template."
    },
-   "birthdayPackage": {
+   "packageName": {
     "type": "string",
-    "description": "Birthday Package"
+    "description": "Package name"
    },
-   "vipGroupPackage": {
-    "type": "string",
-    "description": "VIP Group Package"
+   "guestCount": {
+    "type": "integer",
+    "description": "Guests"
    },
-   "conferencePackage": {
-    "type": "string",
-    "description": "Conference Package"
+   "components": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Products and services in the package"
    }
   }
  },
  "GroupQuotationBuilderProposalGenerationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is orders.cart at 3%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; lands in `orders.group_quote` and its `orders.group_quote_line` rows (DM5, 29 September)",
   "description": "**What Group Quotation Builder & Proposal Generation submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *For each line* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
   "properties": {
    "quoteNumber": {
@@ -2938,42 +3672,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Sales Owner"
    },
-   "productService": {
-    "type": "string",
-    "description": "Product/Service"
-   },
-   "description": {
-    "type": "string",
-    "description": "Description"
-   },
-   "quantity": {
-    "type": "integer",
-    "description": "Quantity"
-   },
-   "standardRate": {
-    "type": "number",
-    "description": "Standard Rate"
-   },
-   "groupRate": {
-    "type": "number",
-    "description": "Group Rate"
-   },
-   "discount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount"
-   },
-   "tax": {
-    "type": "string",
-    "description": "Tax"
-   },
-   "fee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fee"
-   },
-   "total": {
-    "type": "integer",
-    "description": "Total"
-   },
    "quoteValidity": {
     "type": "string",
     "description": "Quote validity"
@@ -3003,21 +3701,63 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Operational terms"
    },
-   "email": {
-    "type": "string",
-    "description": "Email"
+   "deliveryFormats": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "email",
+      "pdf",
+      "secureDigitalLink",
+      "customerPortal"
+     ]
+    },
+    "description": "How the proposal is delivered."
    },
-   "pdf": {
-    "type": "string",
-    "description": "PDF"
-   },
-   "customerPortal": {
-    "type": "string",
-    "description": "Customer portal"
-   },
-   "secureDigitalLink": {
-    "type": "string",
-    "description": "Secure digital link"
+   "lines": {
+    "type": "array",
+    "description": "Quote lines",
+    "items": {
+     "type": "object",
+     "properties": {
+      "productService": {
+       "type": "string",
+       "description": "Product/Service"
+      },
+      "description": {
+       "type": "string",
+       "description": "Description"
+      },
+      "quantity": {
+       "type": "integer",
+       "description": "Quantity"
+      },
+      "standardRate": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Standard rate"
+      },
+      "groupRate": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Group rate"
+      },
+      "discount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Discount"
+      },
+      "tax": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Tax"
+      },
+      "fee": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Fee"
+      },
+      "total": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Total"
+      }
+     }
+    }
    }
   },
   "x-ticvai-record-definition": "For each line"
@@ -3070,42 +3810,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Sales Owner"
    },
-   "productService": {
-    "type": "string",
-    "description": "Product/Service"
-   },
-   "description": {
-    "type": "string",
-    "description": "Description"
-   },
-   "quantity": {
-    "type": "integer",
-    "description": "Quantity"
-   },
-   "standardRate": {
-    "type": "number",
-    "description": "Standard Rate"
-   },
-   "groupRate": {
-    "type": "number",
-    "description": "Group Rate"
-   },
-   "discount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount"
-   },
-   "tax": {
-    "type": "string",
-    "description": "Tax"
-   },
-   "fee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fee"
-   },
-   "total": {
-    "type": "integer",
-    "description": "Total"
-   },
    "quoteValidity": {
     "type": "string",
     "description": "Quote validity"
@@ -3135,21 +3839,63 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Operational terms"
    },
-   "email": {
-    "type": "string",
-    "description": "Email"
+   "deliveryFormats": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "email",
+      "pdf",
+      "secureDigitalLink",
+      "customerPortal"
+     ]
+    },
+    "description": "How the proposal is delivered."
    },
-   "pdf": {
-    "type": "string",
-    "description": "PDF"
-   },
-   "customerPortal": {
-    "type": "string",
-    "description": "Customer portal"
-   },
-   "secureDigitalLink": {
-    "type": "string",
-    "description": "Secure digital link"
+   "lines": {
+    "type": "array",
+    "description": "Quote lines",
+    "items": {
+     "type": "object",
+     "properties": {
+      "productService": {
+       "type": "string",
+       "description": "Product/Service"
+      },
+      "description": {
+       "type": "string",
+       "description": "Description"
+      },
+      "quantity": {
+       "type": "integer",
+       "description": "Quantity"
+      },
+      "standardRate": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Standard rate"
+      },
+      "groupRate": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Group rate"
+      },
+      "discount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Discount"
+      },
+      "tax": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Tax"
+      },
+      "fee": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Fee"
+      },
+      "total": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Total"
+      }
+     }
+    }
    }
   }
  },
@@ -3250,29 +3996,102 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Timeslot Availability"
    },
-   "proposal": {
-    "type": "string",
-    "description": "proposal"
-   },
-   "rooms": {
-    "type": "string",
-    "description": "Rooms"
-   },
-   "equipment": {
-    "type": "string",
-    "description": "Equipment"
-   },
-   "vehicles": {
-    "type": "string",
-    "description": "Vehicles"
-   },
-   "meetingSpaces": {
-    "type": "string",
-    "description": "Meeting spaces"
-   },
    "cateringCapacity": {
     "type": "integer",
     "description": "Catering capacity"
+   },
+   "resourceChecks": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "rooms",
+      "equipment",
+      "vehicles",
+      "meetingSpaces"
+     ]
+    },
+    "description": "Resource Management checks run for the request."
+   }
+  }
+ },
+ "GroupSalesAnalyticsAiIntelligenceCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Group Sales Analytics & AI Intelligence Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "enquiries": {
+    "type": "string",
+    "description": "Enquiries"
+   },
+   "quotes": {
+    "type": "string",
+    "description": "Quotes"
+   },
+   "conversionRate": {
+    "type": "number",
+    "description": "Conversion Rate"
+   },
+   "groupBookings": {
+    "type": "string",
+    "description": "Group Bookings"
+   },
+   "guests": {
+    "type": "string",
+    "description": "Guests"
+   },
+   "revenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue"
+   },
+   "averageGroupSize": {
+    "type": "number",
+    "description": "Average Group Size"
+   },
+   "averageBookingValue": {
+    "type": "number",
+    "description": "Average Booking Value"
+   },
+   "discount": {
+    "type": "number",
+    "description": "Discount %"
+   },
+   "revenuePerGuest": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue per Guest"
+   },
+   "cancellationRate": {
+    "type": "number",
+    "description": "Cancellation Rate"
+   },
+   "noShowRate": {
+    "type": "number",
+    "description": "No-Show Rate"
+   },
+   "outstandingReceivables": {
+    "type": "string",
+    "description": "Outstanding Receivables"
+   },
+   "repeatCustomerRate": {
+    "type": "number",
+    "description": "Repeat Customer Rate"
+   },
+   "additionalGroups": {
+    "type": "string",
+    "description": "Additional groups"
+   },
+   "capacityUtilization": {
+    "type": "integer",
+    "description": "Capacity utilization"
+   },
+   "discountCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount cost"
+   },
+   "expectedContribution": {
+    "type": "string",
+    "description": "Expected contribution"
    }
   }
  },
@@ -3405,22 +4224,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Quote Revision, Negotiation & Version Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "v2": {
-    "type": "string",
-    "description": "v2"
-   },
-   "v3Accepted": {
-    "type": "string",
-    "description": "v3 — Accepted"
-   },
-   "v1V2V3": {
-    "type": "string",
-    "description": "v1 v2 v3"
-   },
-   "nt": {
-    "type": "string",
-    "description": "nt"
-   },
    "customerRequest": {
     "type": "string",
     "description": "Customer Request"
@@ -3453,6 +4256,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "user": {
     "type": "string",
     "description": "User"
+   },
+   "quoteNumber": {
+    "type": "string",
+    "description": "Quote number"
+   },
+   "version": {
+    "type": "integer",
+    "description": "Version"
+   },
+   "versionStatus": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "sent",
+     "superseded",
+     "accepted",
+     "rejected"
+    ],
+    "description": "Version status"
    }
   }
  },
@@ -3462,45 +4284,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Quote-to-Booking Conversion & Confirmation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "quoteRemainsValid": {
-    "type": "string",
-    "description": "Quote remains valid"
-   },
-   "capacityRemainsAvailable": {
-    "type": "integer",
-    "description": "Capacity remains available"
-   },
-   "resourcesRemainAvailable": {
-    "type": "string",
-    "description": "Resources remain available"
-   },
-   "priceRemainsApproved": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price remains approved"
-   },
-   "approvalRemainsValid": {
-    "type": "string",
-    "description": "Approval remains valid"
-   },
-   "customerDetailsComplete": {
-    "type": "string",
-    "description": "Customer details complete"
-   },
-   "paymentDepositRuleConfigured": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Payment/deposit rule configured"
-   },
-   "guestCountValid": {
-    "type": "integer",
-    "description": "Guest count valid"
-   },
    "groupBookingId": {
     "type": "string",
     "description": "Group Booking ID"
-   },
-   "ticvaiOrder": {
-    "type": "string",
-    "description": "TICVAI Order"
    },
    "customer": {
     "type": "string",
@@ -3534,10 +4320,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Sales Owner"
    },
-   "applicable": {
-    "type": "string",
-    "description": "applicable"
-   },
    "bookingConfirmation": {
     "type": "string",
     "description": "Booking Confirmation"
@@ -3550,14 +4332,117 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Deposit Request"
    },
-   "customerPortalLinkWhereApplicable": {
-    "type": "string",
-    "description": "Customer Portal Link where applicable"
-   },
    "nextSteps": {
     "type": "string",
     "format": "date-time",
     "description": "Next Steps"
+   },
+   "orderId": {
+    "type": "string",
+    "description": "TICVAI Order"
+   },
+   "customerPortalLink": {
+    "type": "string",
+    "description": "Customer Portal Link where applicable"
+   },
+   "failedChecks": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "quoteExpired",
+      "capacityUnavailable",
+      "resourcesUnavailable",
+      "priceNotApproved",
+      "approvalInvalid",
+      "customerDetailsIncomplete",
+      "depositRuleMissing",
+      "guestCountInvalid"
+     ]
+    },
+    "description": "Conversion checks that fail; empty means the quote converts."
+   }
+  }
+ },
+ "UpdateGroupBookingRequest": {
+  "type": "object",
+  "description": "Request only. Every field optional; absent means unchanged.",
+  "properties": {
+   "packageProductId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The school-trip format or party package."
+   },
+   "yearGroup": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "accessAndDietaryNeeds": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "celebrantName": {
+    "type": "string",
+    "maxLength": 120,
+    "nullable": true,
+    "description": "The birthday child."
+   },
+   "celebrantTurningAge": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 18,
+    "nullable": true
+   },
+   "allergiesAndRequests": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "finalHeadcountDueBy": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "leaderSubjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "organisationName": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "expectedSize": {
+    "type": "integer",
+    "minimum": 2
+   },
+   "confirmedSize": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "minimumSize": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true
+   },
+   "attendeeCaptureRequired": {
+    "type": "boolean"
+   },
+   "attendeeCaptureDueBy": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "confirmed",
+     "namesPending",
+     "complete",
+     "cancelled"
+    ]
    }
   }
  }

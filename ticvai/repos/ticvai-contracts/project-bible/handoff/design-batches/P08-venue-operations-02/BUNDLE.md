@@ -1,6 +1,6 @@
 # P08-venue-operations-02 — P08 · Venue Operations (2 of 2)
 
-**5 screens · 15 operations · 31 schemas · 10 permissions**
+**5 screens · 18 operations · 36 schemas · 11 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 10 permissions apply here:
-  `AI_AUDIT_VIEW, APPROVAL_DECIDE, DEVICE_VIEW, ORDER_CREATE, ORDER_VIEW, REPORT_MANAGE, REPORT_VIEW_VENUE, SCOPE_VIEW, TENANT_CONFIGURE, WORKSTATION_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 11 permissions apply here:
+  `APPROVAL_DECIDE, AUDIT_VIEW, DEVICE_MANAGE, DEVICE_VIEW, ORDER_CREATE, ORDER_VIEW, REPORT_MANAGE, REPORT_VIEW_VENUE, SCOPE_VIEW, TENANT_CONFIGURE, WORKSTATION_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **1 of these operations work offline**: createOrder
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,11 +60,11 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-129` | Software, Configuration & Version Management | listDetail | 6 | 0 | — |
-| `BO-130` | Offline Policy & Rules Configuration | listDetail | 4 | 0 | — |
+| `BO-129` | Software, Configuration & Version Management | listDetail | 9 | 4 | — |
+| `BO-130` | Offline Policy & Rules Configuration | listDetail | 4 | 3 | — |
 | `BO-131` | Connectivity & Auto-Switch Settings | configEditor | 1 | 0 | — |
-| `BO-132` | Offline Transaction Monitor & Sync Queue | listDetail | 2 | 0 | — |
-| `BO-133` | Offline Alerts, Limits & Audit | approvalInbox | 6 | 0 | — |
+| `BO-132` | Offline Transaction Monitor & Sync Queue | listDetail | 2 | 1 | — |
+| `BO-133` | Offline Alerts, Limits & Audit | approvalInbox | 6 | 3 | — |
 
 ---
 
@@ -89,11 +88,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "entryFrom": [
+    "BO-036",
     "BO-108",
-    "BO-128"
+    "BO-128",
+    "BO-130"
    ],
    "exitTo": [
+    "BO-037",
     "BO-108",
+    "BO-124",
     "BO-130"
    ],
    "inferred": false,
@@ -107,10 +110,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-108",
      "trigger": "Venue Operations",
+     "provenance": "derived — BO-108 declares entryState.params  and BO-129 holds none of them, so the edge carries nothing and BO-108 opens cold"
+    },
+    {
+     "to": "BO-037",
+     "trigger": "Each device's cached package is checked",
+     "provenance": "flow F89 step 2→3",
+     "operation": "setConnectivityThresholds",
      "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-108 declares entryState.params venueId, so an edge into it must carry them"
+      "version"
+     ]
+    },
+    {
+     "to": "BO-124",
+     "trigger": "Its sale board layout is built",
+     "provenance": "flow F79 step 2→3",
+     "carries": [
+      "profileId"
+     ]
     }
    ]
   },
@@ -125,8 +142,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": "getWorkstationHealth",
-    "why": "**1 declared operation reach no component on this screen**: getWorkstationHealth. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "why": "**`getWorkstationHealth` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
+    "source": "contract tenancy.yaml GET /workstations/{workstationId}/health"
    }
   ],
   "layout": {
@@ -137,8 +154,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listWorkstations",
+       "notes": "Sends `?venueId=` to `listWorkstations`.",
+       "provenance": "contract tenancy.yaml GET /workstations"
+      },
+      {
+       "kind": "textField",
+       "label": "Sale board kind",
+       "operation": "listWorkstations",
+       "notes": "Sends `?saleBoardKind=` to `listWorkstations`.",
+       "provenance": "contract tenancy.yaml GET /workstations"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every software version",
+       "label": "Every workstation",
        "bindsTo": "Workstation",
        "columns": [
         "Workstation.id",
@@ -156,49 +187,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listWorkstations",
        "provenance": "contract tenancy.yaml GET /workstations"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save changes",
-       "operation": "setConfigurationProfile",
-       "provenance": "contract tenancy.yaml PUT /configuration-profiles"
       },
-      {
-       "kind": "secondaryButton",
-       "label": "Deploy",
-       "operation": "deployConfigurationProfile",
-       "provenance": "contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Configure",
-       "operation": "configureWorkstation",
-       "provenance": "contract tenancy.yaml PUT /workstations/{workstationId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setConnectivityThresholds",
-       "provenance": "contract tenancy.yaml PUT /connectivity-policy"
-      },
-      {
-       "kind": "publishGate",
-       "label": "What publishing changes",
-       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
-       "provenance": "authored — required by check-screens"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
       {
        "kind": "searchField",
        "label": "Search software, configuration",
@@ -211,15 +200,64 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "carried from the previous definition"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save configuration profile",
+       "operation": "setConfigurationProfile",
+       "provenance": "contract tenancy.yaml PUT /configuration-profiles"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Deploy configuration profile",
+       "operation": "deployConfigurationProfile",
+       "provenance": "contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Configure workstation",
+       "operation": "configureWorkstation",
+       "provenance": "contract tenancy.yaml PUT /workstations/{workstationId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save connectivity thresholds",
+       "operation": "setConnectivityThresholds",
+       "provenance": "contract tenancy.yaml PUT /connectivity-policy"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
+       "provenance": "authored — required by check-screens"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "reads",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Workstation health",
+       "operation": "getWorkstationHealth",
+       "notes": "Shows `score`, `status`, `contributors` from `getWorkstationHealth`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
+       "provenance": "contract tenancy.yaml GET /workstations/{workstationId}/health"
+      }
+     ]
     }
    ]
   },
   "states": {
    "loading": "The software version list.",
    "error": "Could not load. Names which read failed and leaves the software version untouched.",
-   "emptyFirstRun": "No software version yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the software version are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No software version yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on venueId, saleBoardKind and the software version are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `DEVICE_VIEW`, which `getWorkstationHealth` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -253,7 +291,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getWorkstationHealth",
     "contract": "tenancy",
     "purpose": "getWorkstationHealth",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listWorkstations",
@@ -268,6 +306,37 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "trigger": "onAction",
     "invalidates": [
      "listWorkstations"
+    ]
+   },
+   {
+    "operationId": "listDeviceFirmware",
+    "contract": "tenancy",
+    "purpose": "Firmware versions per device fleet",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "startDeviceFirmwareRollout",
+    "contract": "tenancy",
+    "purpose": "Push an update to a fleet, in waves",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "getWorkstationHealth",
+     "listWorkstations",
+     "listDeviceFirmware"
+    ]
+   },
+   {
+    "operationId": "rollbackDeviceFirmware",
+    "contract": "tenancy",
+    "purpose": "Put the fleet back on the previous version",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "getWorkstationHealth",
+     "listWorkstations",
+     "listDeviceFirmware"
     ]
    }
   ],
@@ -284,6 +353,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "workstationId",
      "from": "deepLink"
+    },
+    {
+     "name": "rolloutId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first. Resolves from the session — a till is signed into."
@@ -292,10 +365,120 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-129",
+   "derivedFrom": "wireframes/reference/POS Board 5.dc.html",
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetConfigurationProfile",
+    "component": "modal",
+    "trigger": "Save configuration profile",
+    "body": "**Collects what `setConfigurationProfile` sends before it is called.** Required: `id`, `name`, `venueKindScope`, `status`. Optional: `scopePath`, `settings`, `deployedCount`, `publishedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ConfigurationProfile",
+    "confirm": {
+     "label": "Save configuration profile",
+     "operation": "setConfigurationProfile"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "name",
+      "venueKindScope",
+      "status",
+      "scopePath",
+      "settings",
+      "deployedCount",
+      "publishedAt"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /configuration-profiles"
+   },
+   {
+    "id": "formDeployConfigurationProfile",
+    "component": "modal",
+    "trigger": "Deploy configuration profile",
+    "body": "**Collects what `deployConfigurationProfile` sends before it is called.** Required: `id`, `profileId`, `status`. Optional: `targetWorkstationIds`, `targetFilter`, `strategy`, `succeededCount`, `failedCount`, `failureReasons`, `startedAt`, `completedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ProfileDeployment",
+    "confirm": {
+     "label": "Deploy configuration profile",
+     "operation": "deployConfigurationProfile"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "profileId",
+      "status",
+      "targetWorkstationIds",
+      "targetFilter",
+      "strategy",
+      "succeededCount",
+      "failedCount",
+      "failureReasons",
+      "startedAt",
+      "completedAt"
+     ]
+    },
+    "provenance": "contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy"
+   },
+   {
+    "id": "formConfigureWorkstation",
+    "component": "modal",
+    "trigger": "Configure workstation",
+    "body": "**Collects what `configureWorkstation` sends before it is called.** Required: `name`, `saleBoardId`. Optional: `cashierInputMode`, `guestDisplayContent`, `loadedMediaStockId`, `mediaStockRemaining`, `departmentId`, `accessPointId`, `devices`, `deploymentProfile`, `edgeNodeId`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ConfigureWorkstationRequest",
+    "confirm": {
+     "label": "Configure workstation",
+     "operation": "configureWorkstation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "saleBoardId",
+      "cashierInputMode",
+      "guestDisplayContent",
+      "loadedMediaStockId",
+      "mediaStockRemaining",
+      "departmentId",
+      "accessPointId",
+      "devices",
+      "deploymentProfile",
+      "edgeNodeId",
+      "isActive"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /workstations/{workstationId}"
+   },
+   {
+    "id": "formSetConnectivityThresholds",
+    "component": "modal",
+    "trigger": "Save connectivity thresholds",
+    "body": "**Collects what `setConnectivityThresholds` sends before it is called.** Required: `scopePath`. Optional: `id`, `failuresBeforeOffline`, `probeIntervalSeconds`, `probeTimeoutMs`, `successesBeforeOnline`, `minimumStableSeconds`, `autoSwitch`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ConnectivityPolicy",
+    "confirm": {
+     "label": "Save connectivity thresholds",
+     "operation": "setConnectivityThresholds"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "scopePath",
+      "id",
+      "failuresBeforeOffline",
+      "probeIntervalSeconds",
+      "probeTimeoutMs",
+      "successesBeforeOnline",
+      "minimumStableSeconds",
+      "autoSwitch"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /connectivity-policy"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -337,7 +520,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "BO-129"
    ],
    "exitTo": [
-    "BO-108"
+    "BO-108",
+    "BO-129"
    ],
    "inferred": false,
    "notes": "**Returns to BO-108.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
@@ -345,10 +529,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-108",
      "trigger": "Venue Operations",
+     "provenance": "derived — BO-108 declares entryState.params  and BO-130 holds none of them, so the edge carries nothing and BO-108 opens cold"
+    },
+    {
+     "to": "BO-129",
+     "trigger": "The connectivity thresholds are set",
+     "provenance": "flow F89 step 1→2",
+     "operation": "setOfflinePolicy",
      "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-108 declares entryState.params venueId, so an edge into it must carry them"
+      "workstationId"
+     ]
     }
    ]
   },
@@ -368,8 +558,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listSyncRejections",
+       "notes": "Sends `?workstationId=` to `listSyncRejections`.",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      },
+      {
+       "kind": "selectField",
+       "label": "Kind",
+       "operation": "listSyncRejections",
+       "notes": "Sends `?kind=` to `listSyncRejections`.",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      },
+      {
+       "kind": "toggle",
+       "label": "Resolved",
+       "operation": "listSyncRejections",
+       "notes": "Sends `?resolved=` to `listSyncRejections`.",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every offline policy rules",
+       "label": "Every sync rejection",
        "bindsTo": "SyncRejection",
        "columns": [
         "SyncRejection.id",
@@ -384,6 +595,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listSyncRejections",
        "provenance": "contract orders.yaml GET /sync/rejections"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search offline policy",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -393,7 +609,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected offline policy rules",
+       "label": "The selected sync rejection",
        "bindsTo": "SyncRejection",
        "columns": [
         "SyncRejection.id",
@@ -417,32 +633,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save offline policy",
        "operation": "setOfflinePolicy",
        "provenance": "contract tenancy.yaml PUT /offline-policy"
       },
       {
        "kind": "secondaryButton",
-       "label": "Sync",
+       "label": "Sync orders",
        "operation": "syncOrders",
        "provenance": "contract orders.yaml POST /sync/orders"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create order",
        "operation": "createOrder",
        "provenance": "contract orders.yaml POST /orders"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search offline policy",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -451,9 +656,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The offline policy rules list.",
    "error": "Could not load. Names which read failed and leaves the offline policy rules untouched.",
-   "emptyFirstRun": "No offline policy rules yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the offline policy rules are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No offline policy rules yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on workstationId, kind, resolved and the offline policy rules are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -510,10 +715,82 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-130",
+   "derivedFrom": "wireframes/reference/POS Board 5.dc.html",
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetOfflinePolicy",
+    "component": "modal",
+    "trigger": "Save offline policy",
+    "body": "**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional: `id`, `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "OfflinePolicy",
+    "confirm": {
+     "label": "Save offline policy",
+     "operation": "setOfflinePolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "scopePath",
+      "id",
+      "maxOfflineHours",
+      "allowedOffline",
+      "offlineValueCeiling",
+      "offlineTransactionCeiling",
+      "onCeilingBreach",
+      "requiresManagerToExtend"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /offline-policy"
+   },
+   {
+    "id": "formSyncOrders",
+    "component": "modal",
+    "trigger": "Sync orders",
+    "body": "**Collects what `syncOrders` sends before it is called.** Required: `deviceId`, `orders`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Sync orders",
+     "operation": "syncOrders"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "deviceId",
+      "orders"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /sync/orders"
+   },
+   {
+    "id": "formCreateOrder",
+    "component": "modal",
+    "trigger": "Create order",
+    "body": "**Collects what `createOrder` sends before it is called.** Required: `id`, `venueId`, `channel`, `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `guestLinkId`, `catalogueBundleVersion`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateOrderRequest",
+    "confirm": {
+     "label": "Create order",
+     "operation": "createOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "channel",
+      "lines",
+      "recordedAt",
+      "shiftId",
+      "subjectId",
+      "guestLinkId",
+      "catalogueBundleVersion"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -562,10 +839,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-108",
      "trigger": "Venue Operations",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-108 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-108 declares entryState.params  and BO-131 holds none of them, so the edge carries nothing and BO-108 opens cold"
     }
    ]
   },
@@ -628,6 +902,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "autoSwitch",
        "bindsTo": "ConnectivityPolicy.autoSwitch",
        "provenance": "contract tenancy.yaml PUT /connectivity-policy"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search connectivity",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -637,20 +916,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save connectivity thresholds",
        "operation": "setConnectivityThresholds",
        "provenance": "contract tenancy.yaml PUT /connectivity-policy"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search connectivity",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -659,8 +927,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The saved connectivity auto-switch settings.",
    "error": "Could not load. Names which read failed and leaves the connectivity auto-switch settings untouched.",
-   "emptyFirstRun": "No connectivity auto-switch settings configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No connectivity auto-switch settings configured. The form opens empty and `setConnectivityThresholds` saves the first one; it says what the platform does in the meantime.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `setConnectivityThresholds` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -733,10 +1001,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-108",
      "trigger": "Venue Operations",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-108 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-108 declares entryState.params  and BO-132 holds none of them, so the edge carries nothing and BO-108 opens cold"
     }
    ]
   },
@@ -753,8 +1018,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listSyncRejections",
+       "notes": "Sends `?workstationId=` to `listSyncRejections`.",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      },
+      {
+       "kind": "selectField",
+       "label": "Kind",
+       "operation": "listSyncRejections",
+       "notes": "Sends `?kind=` to `listSyncRejections`.",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      },
+      {
+       "kind": "toggle",
+       "label": "Resolved",
+       "operation": "listSyncRejections",
+       "notes": "Sends `?resolved=` to `listSyncRejections`.",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every offline transaction sync",
+       "label": "Every sync rejection",
        "bindsTo": "SyncRejection",
        "columns": [
         "SyncRejection.id",
@@ -769,6 +1055,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listSyncRejections",
        "provenance": "contract orders.yaml GET /sync/rejections"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search offline transaction monitor",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -778,7 +1069,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected offline transaction sync",
+       "label": "The selected sync rejection",
        "bindsTo": "SyncRejection",
        "columns": [
         "SyncRejection.id",
@@ -802,20 +1093,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Sync",
+       "label": "Sync orders",
        "operation": "syncOrders",
        "provenance": "contract orders.yaml POST /sync/orders"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search offline transaction monitor",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -824,9 +1104,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The offline transaction sync list.",
    "error": "Could not load. Names which read failed and leaves the offline transaction sync untouched.",
-   "emptyFirstRun": "No offline transaction sync yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the offline transaction sync are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No offline transaction sync yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on workstationId, kind, resolved and the offline transaction sync are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -867,6 +1147,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P08 Venue Management.dc.html#bo-132"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSyncOrders",
+    "component": "modal",
+    "trigger": "Sync orders",
+    "body": "**Collects what `syncOrders` sends before it is called.** Required: `deviceId`, `orders`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Sync orders",
+     "operation": "syncOrders"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "deviceId",
+      "orders"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /sync/orders"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -915,10 +1215,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-108",
      "trigger": "Venue Operations",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-108 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-108 declares entryState.params  and BO-133 holds none of them, so the edge carries nothing and BO-108 opens cold"
     },
     {
      "to": "POS-002",
@@ -937,13 +1234,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "approvalInbox",
   "patternReason": "`decideApprovalRequest` decides items that `listSyncRejections` queues — every row is waiting for a person, so the empty state is success",
   "purpose": "Offline Alerts, Limits & Audit — from the client design board, 20 August.",
-  "gaps": [
-   {
-    "operation": "listAlerts",
-    "why": "**2 declared operations reach no component on this screen**: listAlerts, listAuditRecords. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -951,6 +1241,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "name": "contentBody",
      "slot": "queue",
      "components": [
+      {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listSyncRejections",
+       "notes": "Sends `?workstationId=` to `listSyncRejections`.",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      },
+      {
+       "kind": "selectField",
+       "label": "Kind",
+       "operation": "listSyncRejections",
+       "notes": "Sends `?kind=` to `listSyncRejections`.",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      },
+      {
+       "kind": "toggle",
+       "label": "Resolved",
+       "operation": "listSyncRejections",
+       "notes": "Sends `?resolved=` to `listSyncRejections`.",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      },
       {
        "kind": "dataTable",
        "label": "Waiting for a decision",
@@ -968,6 +1279,48 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listSyncRejections",
        "provenance": "contract orders.yaml GET /sync/rejections"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every alert",
+       "bindsTo": "Alert",
+       "columns": [
+        "Alert.id",
+        "Alert.ruleId",
+        "Alert.ruleName",
+        "Alert.metric",
+        "Alert.raisedAt",
+        "Alert.severity",
+        "Alert.status",
+        "Alert.observedValue",
+        "Alert.threshold",
+        "Alert.scopePath",
+        "Alert.workstationId",
+        "Alert.shiftId"
+       ],
+       "operation": "listAlerts",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every audit",
+       "bindsTo": "AuditRecord",
+       "columns": [
+        "AuditRecord.id",
+        "AuditRecord.principalId",
+        "AuditRecord.orgUnitId",
+        "AuditRecord.workstationId",
+        "AuditRecord.action",
+        "AuditRecord.subjectRef",
+        "AuditRecord.occurredAt"
+       ],
+       "operation": "listAuditRecords",
+       "provenance": "contract tenancy.yaml GET /audit-records"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search offline alerts, limits",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -977,7 +1330,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected offline alerts limits",
+       "label": "The selected sync rejection",
        "bindsTo": "SyncRejection",
        "columns": [
         "SyncRejection.id",
@@ -1001,32 +1354,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Decide",
+       "label": "Decide approval request",
        "operation": "decideApprovalRequest",
        "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/decide"
       },
       {
        "kind": "secondaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
+       "notes": "**Runs the seeded report `voidsAndDiscounts`** — voided lines and discounts by operator, reason and approver (proposed, client to correct; decided 28 September, audit R282). `reportId` is the venue's seeded definition with that code, listed on `listSeededReports`.",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save alert rule",
        "operation": "setAlertRule",
        "provenance": "contract reporting.yaml PUT /alert-rules"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search offline alerts, limits",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1036,8 +1379,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "loading": "The offline alerts limits list.",
    "error": "Could not load. Names which read failed and leaves the offline alerts limits untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
-   "emptyNoResults": "The filter narrowed it and the offline alerts limits are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoResults": "Nothing matches the filter on workstationId, kind, resolved and the offline alerts limits are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1070,7 +1413,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "operationId": "runReport",
     "contract": "reporting",
-    "purpose": "Run a report",
+    "purpose": "Run the seeded report `voidsAndDiscounts` (proposed, audit R282)",
     "trigger": "onAction",
     "invalidates": [
      "listSyncRejections"
@@ -1114,10 +1457,86 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-133",
+   "derivedFrom": "wireframes/reference/POS Board 5.dc.html",
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formDecideApprovalRequest",
+    "component": "modal",
+    "trigger": "Decide approval request",
+    "body": "**Collects what `decideApprovalRequest` sends before it is called.** Required: `decision`. Optional: `comment`, `reason`, `stepUpToken`, `signature`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Decide approval request",
+     "operation": "decideApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "decision",
+      "comment",
+      "reason",
+      "stepUpToken",
+      "signature"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/decide"
+   },
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   },
+   {
+    "id": "formSetAlertRule",
+    "component": "modal",
+    "trigger": "Save alert rule",
+    "body": "**Collects what `setAlertRule` sends before it is called.** Required: `id`, `name`, `metric`, `comparator`, `threshold`, `severity`, `isActive`, `scopePath`. Optional: `thresholdUpper`, `windowMinutes`, `deliverTo`, `recipientRoleIds`, `cooldownMinutes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AlertRule",
+    "confirm": {
+     "label": "Save alert rule",
+     "operation": "setAlertRule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "name",
+      "metric",
+      "comparator",
+      "threshold",
+      "severity",
+      "isActive",
+      "scopePath",
+      "thresholdUpper",
+      "windowMinutes",
+      "deliverTo",
+      "recipientRoleIds",
+      "cooldownMinutes"
+     ]
+    },
+    "provenance": "contract reporting.yaml PUT /alert-rules"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1192,7 +1611,7 @@ Method, path, parameters, request and response for every operation these screens
   "method": "POST",
   "path": "/approval-requests/{requestId}/decide",
   "contract": "approvals",
-  "summary": "Approve or reject",
+  "summary": "Approve, reject, return or ask for information",
   "permission": "APPROVAL_DECIDE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -1253,6 +1672,26 @@ Method, path, parameters, request and response for every operation these screens
     "name": "status",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "severity",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "shiftId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "itemId",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -1263,7 +1702,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/audit-records",
   "contract": "tenancy",
   "summary": "Who did what, where, and when",
-  "permission": "AI_AUDIT_VIEW",
+  "permission": "AUDIT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -1294,6 +1733,11 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    },
    {
+    "name": "platformStaffGrantId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": "from",
     "in": "query",
     "required": null
@@ -1302,10 +1746,44 @@ Method, path, parameters, request and response for every operation these screens
     "name": "to",
     "in": "query",
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Page"
+ },
+ "listDeviceFirmware": {
+  "method": "GET",
+  "path": "/device-firmware",
+  "contract": "tenancy",
+  "summary": "Firmware and software versions, and what is running where",
+  "permission": "DEVICE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "deviceKind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "version",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DeviceFirmware"
  },
  "listSyncRejections": {
   "method": "GET",
@@ -1319,6 +1797,16 @@ Method, path, parameters, request and response for every operation these screens
   "parameters": [
    {
     "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "resolved",
     "in": "query",
     "required": null
    },
@@ -1369,6 +1857,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "rollbackDeviceFirmware": {
+  "method": "POST",
+  "path": "/device-firmware/rollouts/{rolloutId}/rollback",
+  "contract": "tenancy",
+  "summary": "Put the fleet back on the previous version",
+  "permission": "DEVICE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DeviceFirmwareRollout"
  },
  "runReport": {
   "method": "POST",
@@ -1465,6 +1972,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "OfflinePolicy",
   "responds": "OfflinePolicy"
  },
+ "startDeviceFirmwareRollout": {
+  "method": "POST",
+  "path": "/device-firmware/rollouts",
+  "contract": "tenancy",
+  "summary": "Push an update to a fleet, in waves",
+  "permission": "DEVICE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DeviceFirmwareRollout",
+  "responds": "DeviceFirmwareRollout"
+ },
  "syncOrders": {
   "method": "POST",
   "path": "/sync/orders",
@@ -1474,7 +2000,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "OrderSyncResult"
  }
@@ -1507,35 +2039,54 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid"
    },
+   "ruleName": {
+    "type": "string",
+    "description": "`AlertRule.name` as it stood when the alert was raised. **The line a person reads** — a list of rule ids is not an alert panel, and a screen should not need `listAlertRules` to label one.\n"
+   },
+   "metric": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricSource"
+     }
+    ],
+    "description": "The rule's metric, carried so the alert says what went out of range."
+   },
    "raisedAt": {
     "type": "string",
     "format": "date-time"
    },
    "severity": {
-    "type": "string",
-    "enum": [
-     "info",
-     "warning",
-     "critical"
-    ]
+    "$ref": "#/components/schemas/AlertSeverity"
    },
    "status": {
-    "type": "string",
-    "enum": [
-     "raised",
-     "acknowledged",
-     "resolved",
-     "expired"
-    ]
+    "$ref": "#/components/schemas/AlertStatus"
    },
    "observedValue": {
-    "type": "number"
+    "$ref": "#/components/schemas/MetricValue"
    },
    "threshold": {
-    "type": "number"
+    "$ref": "#/components/schemas/MetricValue"
    },
    "scopePath": {
     "type": "string"
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The workstation the reading was taken for, where the metric is measured per workstation (`salesByWorkstation`). Null otherwise. `listAlerts` filters on it."
+   },
+   "shiftId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The till shift (`orders.pos_shift`) the reading belongs to, where it was taken for a workstation with a shift open. Null otherwise. `listAlerts` filters on it."
+   },
+   "itemId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The inventory item the reading is about, where the metric is measured per item (`stockAgeing`, `stockTurnover`, `wastageRate`, `inventoryValuation`). Null otherwise. **What a replenishment screen prefills a requisition from.**\n"
    },
    "acknowledgedByPrincipalId": {
     "type": "string",
@@ -1546,6 +2097,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "acknowledgementNote": {
+    "type": "string",
+    "maxLength": 300,
+    "nullable": true,
+    "description": "The `note` given to `acknowledgeAlert`. Kept, because an acknowledgement that says what is being done about it is the one escalation can skip."
    },
    "resolvedAt": {
     "type": "string",
@@ -1572,7 +2129,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "comparator",
    "threshold",
    "severity",
-   "isActive"
+   "isActive",
+   "scopePath"
   ],
   "properties": {
    "id": {
@@ -1601,11 +2159,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ]
    },
    "threshold": {
-    "type": "number"
+    "$ref": "#/components/schemas/MetricValue"
    },
    "thresholdUpper": {
-    "type": "number",
-    "nullable": true
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true,
+    "description": "**Required when `comparator` is `outsideRange`** (decided 28 September, audit R158): the range is `threshold` to `thresholdUpper`, and a rule missing either, or with the upper not above the lower, is refused by `setAlertRule` with 400. Ignored for every other comparator.\n"
    },
    "windowMinutes": {
     "type": "integer",
@@ -1613,12 +2176,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "**The window is what stops an alert firing on noise.** A queue that spikes for ninety seconds is not a queue that needs a manager, and a rule with no window is a rule somebody mutes within a week.\n"
    },
    "severity": {
-    "type": "string",
-    "enum": [
-     "info",
-     "warning",
-     "critical"
-    ]
+    "$ref": "#/components/schemas/AlertSeverity"
    },
    "deliverTo": {
     "type": "array",
@@ -1650,9 +2208,28 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "scopePath": {
     "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**\n\n**Required, and it is the write target.** `setAlertRule` has no id in its path and a caller may hold several venues, so the rule names the venue it watches here — inside the caller's scope, or the write is refused."
    }
   }
+ },
+ "AlertSeverity": {
+  "type": "string",
+  "description": "How urgent an alert rule's breach is. Shared by `AlertRule`, `Alert` and the `listAlerts` filter.",
+  "enum": [
+   "info",
+   "warning",
+   "critical"
+  ]
+ },
+ "AlertStatus": {
+  "type": "string",
+  "description": "Where a raised alert is. Shared by `Alert` and the `listAlerts` filter.",
+  "enum": [
+   "raised",
+   "acknowledged",
+   "resolved",
+   "expired"
+  ]
  },
  "ApprovalDecision": {
   "type": "object",
@@ -1718,7 +2295,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "ApprovalKind": {
   "type": "string",
-  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n",
   "enum": [
    "refund",
    "priceOverride",
@@ -1728,12 +2305,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "accessPermissionChange",
    "configurationChange",
    "aiRecommendation",
-   "shiftVariance",
    "releasePromotion",
    "requisition",
    "stockWriteOff",
    "journalEntry",
+   "periodClose",
    "periodReopen",
+   "purchaseOrderCancel",
+   "purchaseOrderShortClose",
    "tenantMigration"
   ]
  },
@@ -1914,6 +2493,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "draft",
    "pending",
    "escalated",
+   "returned",
+   "informationRequested",
    "approved",
    "rejected",
    "withdrawn",
@@ -1997,7 +2578,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "version": {
     "type": "integer",
-    "description": "**Immutable once deployed anywhere.** A change makes a new version, and the old one stays readable — a workstation still running v2.3 must be able to say what v2.3 was.\n"
+    "readOnly": true,
+    "description": "**Immutable once deployed anywhere.** A change makes a new version, and the old one stays readable — a workstation still running v2.3 must be able to say what v2.3 was. Assigned by the server: 1 on create, and one more each time a change lands on a published version (see `setConfigurationProfile`).\n"
    },
    "settings": {
     "type": "object",
@@ -2012,7 +2594,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "deployed",
      "superseded",
      "rolledBack"
-    ]
+    ],
+    "description": "On input only `draft` or `published`; sending `published` publishes this version. The other four are set by deployment and refused on input.\n"
    },
    "deployedCount": {
     "type": "integer",
@@ -2021,7 +2604,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "publishedAt": {
     "type": "string",
     "format": "date-time",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true
    }
   }
  },
@@ -2112,40 +2696,53 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "ConnectivityPolicy": {
   "type": "object",
   "x-ticvai-persistence": "platform.connectivity_policy",
-  "description": "Board 5 of the client's POS set, and the second of the two genuine gaps. **Nothing in the package held a threshold**, so a device that flips offline on one dropped packet and one that waits five minutes were the same product.\n**Going offline and coming back need different thresholds.** Symmetric ones produce a workstation that flaps — offline, online, offline — across a marginal connection, and each flap is a sync.\n",
+  "description": "Board 5 of the client's POS set, and the second of the two genuine gaps. **Nothing in the package held a threshold**, so a device that flips offline on one dropped packet and one that waits five minutes were the same product.\n**Going offline and coming back need different thresholds.** Symmetric ones produce a workstation that flaps — offline, online, offline — across a marginal connection, and each flap is a sync.\n**One per scope node, keyed on `scopePath`.** `id` is server-owned and absent where `getConnectivityPolicy` returns the defaults for a node with nothing saved.\n**The `minimum` and `maximum` on each field are proposed, client to correct (decided 28 September, audit R129).** A value outside them, or a broken cross-field rule, is refused `400` with `errors[]` naming the field.\n",
   "required": [
-   "id",
    "scopePath"
   ],
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "scopePath": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$",
+    "description": "**The node these thresholds are for, and the key `setConnectivityThresholds` upserts on.** The body names its target here, because the path does not.\n"
    },
    "failuresBeforeOffline": {
     "type": "integer",
     "default": 3,
+    "minimum": 1,
+    "maximum": 10,
     "description": "**Consecutive, not cumulative.** One dropped request on a busy till is normal; three in a row is a network.\n"
    },
    "probeIntervalSeconds": {
     "type": "integer",
-    "default": 15
+    "default": 15,
+    "minimum": 5,
+    "maximum": 300
    },
    "probeTimeoutMs": {
     "type": "integer",
-    "default": 2000
+    "default": 2000,
+    "minimum": 500,
+    "maximum": 30000,
+    "description": "Shorter than `probeIntervalSeconds`, or the body is refused `400` (audit R129)."
    },
    "successesBeforeOnline": {
     "type": "integer",
     "default": 5,
-    "description": "**Higher than the offline threshold, deliberately.** Coming back is where the cost is — a workstation that returns online and immediately fails has resynced for nothing.\n"
+    "minimum": 1,
+    "maximum": 20,
+    "description": "**Higher than the offline threshold, deliberately.** Coming back is where the cost is — a workstation that returns online and immediately fails has resynced for nothing. **Never below `failuresBeforeOffline`**, or the body is refused `400` (audit R129).\n"
    },
    "minimumStableSeconds": {
     "type": "integer",
     "default": 30,
+    "minimum": 10,
+    "maximum": 600,
     "description": "How long the connection must hold before the workstation trusts it. **This is what stops the flapping**, and it is the field a venue with poor wifi will actually tune.\n"
    },
    "autoSwitch": {
@@ -2166,7 +2763,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID of the line. `lineIds` everywhere in this contract are these."
    },
    "variantId": {
     "type": "string",
@@ -2176,21 +2774,73 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid"
    },
+   "bookedWindow": {
+    "$ref": "#/components/schemas/BookedWindow"
+   },
    "inventoryHoldId": {
     "type": "string",
     "nullable": true,
-    "description": "Lease the units were drawn from. Absent for uncontended products."
+    "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products."
    },
    "seatIds": {
     "type": "array",
+    "maxItems": 50,
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     },
-    "description": "Seated products only. Not available offline."
+    "description": "Seated products only, as `seating.Seat.id`. Not available offline. **At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel** (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); **at most 10 per sale on staff and POS** (audit R080 (c)), across all the lines of one order for one performance. `createOrder` refuses more with 422 `seatLimitExceeded` (problem type `seat-limit-exceeded`)."
+   },
+   "resourceHoldId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant. `createOrder` converts the hold into a `ResourceBooking` without releasing it. Not available offline."
+   },
+   "attributes": {
+    "$ref": "#/components/schemas/OrderLineAttributes"
    },
    "quantity": {
     "type": "integer",
     "minimum": 1
+   },
+   "eligibilityDeclaration": {
+    "type": "array",
+    "nullable": true,
+    "x-ticvai-note": "One row per declared guest in `orders.order_line_eligibility` (named on `OrderLine`), because an array of objects is a child table's rows, not a column.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "ageBand": {
+       "type": "string",
+       "enum": [
+        "infant",
+        "child",
+        "junior",
+        "adult",
+        "senior"
+       ],
+       "description": "Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+."
+      },
+      "ageYears": {
+       "type": "integer",
+       "nullable": true
+      },
+      "heightBandIndex": {
+       "type": "integer",
+       "nullable": true
+      },
+      "confidentSwimmer": {
+       "type": "boolean",
+       "nullable": true,
+       "description": "**Derived, kept for the gate check** (decided 29 September, rev 3 REV3-26). The swim question is a consent: the answer is a `marketing.BookingConsentRecord` of kind `swim`, and this is filled from it (true for a `yes` covering this person, whether answered for them or once for the booking). A value sent that contradicts the record is ignored and the record wins. No longer the place a swim answer is captured.\n"
+      },
+      "guardianSigned": {
+       "type": "boolean"
+      }
+     }
+    },
+    "description": "What was declared for each guest on this line, kept as the record staff check at the gate."
    },
    "quotedUnitPrice": {
     "allOf": [
@@ -2206,7 +2856,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "dataMaskValues": {
     "type": "object",
-    "additionalProperties": true
+    "additionalProperties": true,
+    "description": "**Deliberately open.** Custom fields keyed by the venue's data mask: the field definitions travel in the catalogue bundle (`catalogue.CatalogueBundle.payload`), so the keys are the venue's to define, as on `catalogue`'s own `dataMaskValues`.\n"
    }
   }
  },
@@ -2223,7 +2874,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "id": {
     "type": "string",
     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID. Also the idempotency key."
+    "description": "Client-generated ULID. Also the idempotency key: it must equal the `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in `shared/common.yaml`. Offline replay through `syncOrders` carries no header, and this id alone deduplicates there.\n"
    },
    "venueId": {
     "type": "string",
@@ -2233,7 +2884,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "$ref": "#/components/schemas/Channel"
    },
    "shiftId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "subjectId": {
     "type": "string",
@@ -2299,6 +2951,155 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "DeviceFirmware": {
+  "type": "object",
+  "x-ticvai-persistence": "tenancy.device_firmware",
+  "description": "16.6.30 and 16.6.32. **A release, and how much of the fleet is on it.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "deviceKind": {
+    "type": "string"
+   },
+   "version": {
+    "type": "string"
+   },
+   "releaseNotes": {
+    "type": "string",
+    "nullable": true
+   },
+   "artefactAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "checksum": {
+    "type": "string",
+    "nullable": true
+   },
+   "minimumPreviousVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "**Some updates cannot be applied from any starting point.** Naming the floor is how a two-step upgrade stays possible instead of bricking the devices that skipped one.\n"
+   },
+   "releasedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "installedCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "released",
+     "deprecated",
+     "withdrawn"
+    ]
+   }
+  }
+ },
+ "DeviceFirmwareRollout": {
+  "type": "object",
+  "x-ticvai-persistence": "tenancy.device_rollout",
+  "description": "16.6.31, 16.6.33 and 16.6.34. **Staged, windowed and reversible.**",
+  "required": [
+   "firmwareId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "firmwareId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "targetScopePath": {
+    "type": "string",
+    "nullable": true
+   },
+   "targetDeviceIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "waves": {
+    "type": "array",
+    "description": "**A canary first.** Gate hardware failing across a venue at once is an evacuation problem rather than an IT one.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "percent": {
+       "type": "integer"
+      },
+      "startAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "haltOnFailurePercent": {
+       "type": "integer",
+       "default": 5
+      }
+     }
+    }
+   },
+   "maintenanceWindow": {
+    "type": "object",
+    "nullable": true,
+    "description": "**When a device may be updated.** `from` and `to` are wall-clock values read in the region's time zone, not UTC.\n",
+    "properties": {
+     "from": {
+      "type": "string"
+     },
+     "to": {
+      "type": "string"
+     }
+    }
+   },
+   "previousVersionRetained": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Rollback is only possible if the old image is still there**, so this is a property of the rollout rather than of the rollback.\n"
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "scheduled",
+     "running",
+     "paused",
+     "completed",
+     "halted",
+     "rolledBack"
+    ]
+   },
+   "succeededCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "failedCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true
+   }
+  }
+ },
  "FieldType": {
   "type": "string",
   "enum": [
@@ -2315,7 +3116,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "MetricSource": {
   "type": "string",
-  "description": "**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.waiting_guest.estimated_call_at` against `called_at` | | `throughput` | `queue.waiting_guest` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` is deliberately absent.** It needs the staff-assignment link that CL-01 covers, and naming a metric with no source is the defect this enum exists to prevent.\n",
+  "description": "**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.waiting_guest.estimated_call_at` against `called_at` | | `throughput` | `queue.waiting_guest` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` was deliberately absent from the first cut** because it needed the staff-assignment link CL-01 covers. It was added on 18 August once `resources.Resource` produced it — see `x-ticvai-extension-note` below. Naming a metric with no source is still the defect this enum exists to prevent.\n**Money-valued metrics are listed in `x-ticvai-money-valued`.** A reading or threshold on one of them is a `Money`, never a float (`MetricValue`).\n",
   "enum": [
    "occupancy",
    "capacityUtilisation",
@@ -2347,29 +3148,53 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "challengeCompletionRate",
    "attributedRevenue"
   ],
+  "x-ticvai-money-valued": [
+   "inventoryValuation",
+   "resaleCommission",
+   "revenuePerEntitlement",
+   "revenuePerVisitor",
+   "attributedRevenue"
+  ],
+  "x-ticvai-money-valued-note": "**`salesByOperator`, `salesByWorkstation` and `resaleVolume` are not listed because the package does not say whether they count sales or sum their value.** Until that is decided, a rule on them carries a plain number.\n",
   "x-ticvai-extended": "18 August 2026",
   "x-ticvai-extension-note": "**Nineteen metrics added when their upstream models landed**, which is how BL-053 was always going to close — not by changing `reporting` but by building the things it wanted to report on.\n`inventoryValuation`, `stockTurnover`, `stockAgeing` and `wastageRate` came from `inventory.StockBatch`; `resaleVolume` and `resaleCommission` from `orders.ResaleListing`; **`salesByInstructor` from `resources.Resource`, which was the one metric this enum deliberately refused to name in the morning** because nothing produced it. `allocationUtilisation` from `PartnerUser` and `ChannelListing`, `membershipChurn` from `Journey`, `supplierDeliveryPerformance` from `ProductionRun`, `assetDowntime` and `meanTimeToRepair` from `WorkOrder.downtimeMinutes`, `challengeCompletionRate` from `ChallengeProgress`, `attributedRevenue` from `AttributionTouch`.\n**Each was checked against the schema before being named.** That rule has not changed — naming a metric with no source is the defect this enum exists to prevent.\n"
+ },
+ "MetricValue": {
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**A reading of a metric or KPI, or a threshold on one.** A `Money` where the metric is money-valued — `MetricSource` lists those in `x-ticvai-money-valued`, and a KPI is when its `unit` is `currency` — and a plain number otherwise. naming-and-style 5.1: money is never a float, at any layer.\nStored as `numeric(18,4)` either way: a money value stores its amount, and currency and scale resolve from the scope as they do for every `Money`.\n",
+  "oneOf": [
+   {
+    "type": "number"
+   },
+   {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  ]
  },
  "OfflinePolicy": {
   "type": "object",
   "x-ticvai-persistence": "platform.offline_policy",
-  "description": "Board 5 of the client's POS set. **ADR-0013 makes the POS local-first and nothing configured the policy** — one of only two things in 36 board screens the package genuinely could not do.\nCF-115 reframed offline into three data classes: catalogue and policy always local, contended inventory leased, transactional facts journalled. **This is where a venue says how far that goes for them.**\n",
+  "description": "Board 5 of the client's POS set. **ADR-0013 makes the POS local-first and nothing configured the policy** — one of only two things in 36 board screens the package genuinely could not do.\nCF-115 reframed offline into three data classes: catalogue and policy always local, contended inventory leased, transactional facts journalled. **This is where a venue says how far that goes for them.**\n**One per scope node, keyed on `scopePath`** (pull audit R162). `id` is server-owned and absent where `getOfflinePolicy` returns the defaults for a node with nothing saved.\n**The `minimum` and `maximum` on each field are proposed, client to correct (decided 28 September, audit R129).** A value outside them is refused `400`, `errors[]` naming the field.\n",
   "required": [
-   "id",
    "scopePath"
   ],
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "scopePath": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$",
+    "description": "**The node this policy is for, and the key `setOfflinePolicy` upserts on.** The body names its target here, because the path does not.\n"
    },
    "maxOfflineHours": {
     "type": "integer",
     "default": 24,
-    "description": "**After which the workstation refuses to sell rather than keep journalling.** A till three days offline holding 900 unsynced sales is a reconciliation nobody can do and a fraud nobody can detect.\n"
+    "minimum": 1,
+    "maximum": 72,
+    "description": "**After which the workstation refuses to sell rather than keep journalling.** A till three days offline holding 900 unsynced sales is a reconciliation nobody can do and a fraud nobody can detect. Bounds 1 to 72 hours: proposed, client to correct (audit R129).\n"
    },
    "allowedOffline": {
     "type": "array",
@@ -2393,12 +3218,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     }
    },
    "offlineValueCeiling": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Above zero, and in the currency of the venue the policy resolves to; a ceiling in another currency is refused `400` (decided 28 September, audit R129).\n"
    },
    "offlineTransactionCeiling": {
     "type": "integer",
     "nullable": true,
-    "description": "**A ceiling on count as well as value.** Nine hundred small sales and one large one are different risks, and a value ceiling alone catches only the second.\n"
+    "minimum": 1,
+    "maximum": 5000,
+    "description": "**A ceiling on count as well as value.** Nine hundred small sales and one large one are different risks, and a value ceiling alone catches only the second. Bounds 1 to 5,000: proposed, client to correct (audit R129).\n"
    },
    "onCeilingBreach": {
     "type": "string",
@@ -2435,10 +3267,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The client ULID from `CreateOrderRequest.id`."
    },
    "orderNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "The number a guest reads and a cashier types. **Server-assigned: the venue prefix and a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till holds a reserved range of the venue sequence, so an order taken offline gets its number on the till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap, and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this number.\n"
    },
    "channel": {
     "allOf": [
@@ -2483,6 +3319,33 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "refundedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
+   "droppedPromotions": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Promotions left off this order at checkout because their budget cap would have been exceeded** (decided 28 September, audit R101 (8)). Empty when none was dropped. Returned by `checkoutCart` and `createOrder`, not stored.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "promotionId"
+     ],
+     "properties": {
+      "promotionId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "budgetCapReached"
+       ]
+      }
+     }
+    }
+   },
    "totalPriceVariance": {
     "allOf": [
      {
@@ -2513,12 +3376,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "shiftId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "subjectId": {
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "holdLabel": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `label` a cashier gave when parking it with `holdOrder` — how they find it again. Null on an order never held."
+   },
+   "heldUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."
    },
    "createdAt": {
     "type": "string",
@@ -2550,7 +3428,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ]
  },
  "OrderLine": {
-  "x-ticvai-persistence": "orders.order_line",
+  "x-ticvai-persistence": "orders.order_line + orders.order_line_eligibility",
   "allOf": [
    {
     "$ref": "#/components/schemas/CreateOrderLine"
@@ -2591,8 +3469,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "entitlementIds": {
       "type": "array",
+      "description": "The entitlements this line issued. **These are the ticket ids** — `transferOrderTickets.ticketIds` and `reprintOrder.reissuedTicketIds` take and return them.",
       "items": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
       }
      },
      "crossRegionRightIds": {
@@ -2601,6 +3481,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        "type": "string"
       },
       "description": "Redemption rights propagated to other cells for this line."
+     },
+     "reprintCount": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0,
+      "readOnly": true,
+      "description": "How many times this line's tickets were reprinted or resent. `reprintOrder` increments it; repeated reprints are the signal worth surfacing."
      }
     }
    }
@@ -2648,7 +3535,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      ],
      "properties": {
       "id": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "description": "The `OfflineOrder.id` this result is about."
       },
       "sequence": {
        "type": "integer"
@@ -2717,10 +3606,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -2739,7 +3630,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "The amount in `tenderCurrency`, at that currency's own scale."
    },
    "fxRate": {
-    "type": "number",
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
     "nullable": true,
     "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
    },
@@ -2814,14 +3709,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "profileId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true,
+    "description": "Taken from the path of `deployConfigurationProfile`."
    },
    "version": {
-    "type": "integer"
+    "type": "integer",
+    "description": "The published version to deploy."
    },
    "targetWorkstationIds": {
     "type": "array",
@@ -2833,8 +3732,30 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "targetFilter": {
     "type": "object",
     "nullable": true,
-    "description": "By department, type or venue, where the target is a set rather than a list.",
-    "additionalProperties": true
+    "description": "By department, type or venue, where the target is a set rather than a list.\n",
+    "properties": {
+     "venueIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "departmentIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "workstationTypes": {
+      "type": "array",
+      "description": "The same workstation-type values `ConfigurationProfile.venueKindScope` holds.",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
    },
    "strategy": {
     "type": "string",
@@ -2853,7 +3774,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "completed",
      "partiallyFailed",
      "rolledBack"
-    ]
+    ],
+    "readOnly": true
    },
    "succeededCount": {
     "type": "integer",
@@ -2865,6 +3787,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "failureReasons": {
     "type": "object",
+    "readOnly": true,
     "additionalProperties": {
      "type": "integer"
     },
@@ -2872,12 +3795,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "startedAt": {
     "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "readOnly": true
    },
    "completedAt": {
     "type": "string",
     "format": "date-time",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true
    }
   }
  },
@@ -2912,6 +3837,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "rows": {
     "type": "array",
+    "description": "**Open on purpose; the shape is `columns`.** Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a `Money`, dates, date-times and uuids as strings. A report's columns are chosen at run time, so no fixed schema can name them.\n",
     "items": {
      "type": "object",
      "additionalProperties": true
@@ -2919,7 +3845,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "totals": {
     "type": "object",
-    "additionalProperties": true
+    "additionalProperties": true,
+    "description": "Aggregated columns only, keyed and typed as a row is."
    },
    "rowCount": {
     "type": "integer"
@@ -2945,7 +3872,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "parameters": {
     "type": "object",
-    "additionalProperties": true
+    "additionalProperties": true,
+    "description": "**Open on purpose; its shape is the report's.** Keyed by `ReportParameter.key` of the definition being run, each value of that parameter's `type`. An `isRequired` parameter with no value here and no `defaultValue` is the `400` `runReport` lists.\n"
    },
    "venueId": {
     "type": "string",
@@ -2954,11 +3882,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "dateFrom": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158)."
    },
    "dateTo": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "Defaults to today in the venue's time zone when not sent (audit R158)."
    },
    "forceAsync": {
     "type": "boolean",
@@ -2978,11 +3908,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "Workstation": {
   "x-ticvai-persistence": "platform.workstation",
-  "parameters": [
-   {
-    "$ref": "../shared/common.yaml#/components/parameters/IdempotencyKey"
-   }
-  ],
   "type": "object",
   "required": [
    "id",
@@ -3088,7 +4013,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "minimum": 0,
     "maximum": 100,
     "readOnly": true,
-    "description": "Board 1 of the client's POS set. **A number a manager can sort by** — the package held `lastHeartbeatAt` and a heartbeat timestamp is not a score.\nThe client's board shows 1,248 workstations at 96% healthy, and **the value of that figure is that it ranks**: a fleet dashboard exists so somebody can open the worst one first.\n**Derived from its devices, its heartbeat age, its firmware currency and its error rate.** Read-only, because a workstation that could set its own score would.\n"
+    "description": "Board 1 of the client's POS set. **A number a manager can sort by** — the package held `lastHeartbeatAt` and a heartbeat timestamp is not a score.\nThe client's board shows 1,248 workstations at 96% healthy, and **the value of that figure is that it ranks**: a fleet dashboard exists so somebody can open the worst one first.\n**Derived from its devices, its heartbeat age, its firmware currency and its error rate.** Read-only, because a workstation that could set its own score would.\n**The formula, proposed, client to correct (audit R096 (2)):** score = 40% device online share (the share of its devices reporting online) + 25% heartbeat freshness (100 at one minute old or less, 0 at 15 minutes or more, linear between) + 20% firmware and profile currency (100 on the latest, 50 one version behind, 0 older) + 15% error rate (100 at 0 errors an hour, 0 at 10 or more, linear between), rounded to a whole number. **Below 80 is a warning and below 60 a failure.**\n"
    },
    "configurationProfileId": {
     "type": "string",

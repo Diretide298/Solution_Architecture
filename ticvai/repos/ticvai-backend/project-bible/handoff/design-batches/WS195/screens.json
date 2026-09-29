@@ -1,0 +1,2207 @@
+[
+ {
+  "id": "BO-1173",
+  "name": "Wallet Integration Command Center",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "10",
+   "number": "01",
+   "page": 115
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/wallet-integration-command-center-bo-1173",
+   "component": "apps/venue-management-web/src/routes/orders-money/WalletIntegrationCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-1174",
+    "BO-1175",
+    "BO-1176",
+    "BO-1177",
+    "BO-1178",
+    "BO-1179",
+    "BO-1180",
+    "BO-1181",
+    "BO-1182"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-1174",
+     "trigger": "Wallet API Catalogue & Endpoint Configuration",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1175",
+     "trigger": "Integration Profile & System Mapping",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1176",
+     "trigger": "Wallet Events, Webhooks & Notification Orchestration",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1177",
+     "trigger": "API Security, Access & Integration Permissions",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1178",
+     "trigger": "Synchronization, Retry & Resilience Configuration",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1179",
+     "trigger": "Integration Monitoring & Exception Workbench",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026",
+     "carries": [
+      "clientId",
+      "subscriptionId"
+     ]
+    },
+    {
+     "to": "BO-1180",
+     "trigger": "Wallet Configuration Governance & Version Control",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1181",
+     "trigger": "Approval, Publication & Change Management",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-1182",
+     "trigger": "Wallet Platform Health, Audit & Administration Center",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each integration displays) — counts over a population, then the population",
+  "purpose": "Provide administrators and technical operations teams with a centralized view of all Wallet integrations and API activity.",
+  "purposeNote": "Authorized administrators can monitor Wallet connectivity and identify failed, degraded or delayed integrations from a centralized workspace.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Each integration displays"
+   }
+  ],
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search wallet integration",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Filters"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Tenant",
+        "Venue",
+        "Integration",
+        "API",
+        "Environment",
+        "Status",
+        "Transaction type",
+        "Date/time"
+       ],
+       "notes": "The pack filters this screen by tenant, venue, integration, api, environment, status and 2 more — which are present is a decision the pack already made.",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Filters"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Takes effect at every till and reader immediately.** Credit types, consumption order and funding rules change for balances that already exist, not only for new ones.",
+       "provenance": "authored — required by check-screens, 19 September 2026"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active Integrations",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Display"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Connected TICVAI Modules",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Display"
+      },
+      {
+       "kind": "metricTile",
+       "label": "External Integrations",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Display"
+      },
+      {
+       "kind": "metricTile",
+       "label": "API Requests Today",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Display"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Successful API Requests",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Display"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Failed API Requests",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Display"
+      },
+      {
+       "kind": "metricTile",
+       "label": "API Success Rate",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Display"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Average Response Time",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Display"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Webhook Events",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Display"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Failed Webhooks",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Display"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Synchronization Failures",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Display"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Integration Alerts",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Display"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Connected TICVAI Domains",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "moduleTiles",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every wallet integration",
+       "columns": [
+        "Healthy",
+        "Degraded",
+        "Delayed",
+        "Failed",
+        "Suspended",
+        "Maintenance"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Each integration displays"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected wallet integration",
+       "bindsTo": null,
+       "columns": [
+        "Healthy",
+        "Degraded",
+        "Delayed",
+        "Failed",
+        "Suspended",
+        "Maintenance"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Display connectivity with”.",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Each integration displays"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create Integration",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "View API Health",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Retry Failed Event",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Open Error Log",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Quick Actions"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Suspend Integration",
+       "operation": "setApiClientStatus",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Test Connection",
+       "operation": "testWebhookSubscription",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Quick Actions"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmSuspendIntegration",
+    "component": "confirmDialog",
+    "trigger": "Suspend Integration",
+    "body": "**Suspend Integration on a wallet integration is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
+    "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Quick Actions"
+   }
+  ],
+  "states": {
+   "loading": "The wallet integration list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the wallet integration untouched.",
+   "emptyFirstRun": "No wallet integration yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the wallet integration are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "publishWalletConfiguration",
+    "contract": "wallet",
+    "purpose": "Configuration state",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listWalletTypes",
+     "listCreditTypes"
+    ]
+   },
+   {
+    "operationId": "createApiClient",
+    "contract": "public-api",
+    "purpose": "Register a new wallet integration with its scopes",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Create Integration; Retry Failed Event"
+   },
+   {
+    "operationId": "replayEvents",
+    "contract": "public-api",
+    "purpose": "Re-deliver failed wallet events",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Create Integration; Retry Failed Event"
+   },
+   {
+    "operationId": "listWebhookSubscriptions",
+    "contract": "public-api",
+    "purpose": "The webhook subscriptions to test or replay",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setApiClientStatus",
+    "contract": "public-api",
+    "purpose": "Suspend integration",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "testWebhookSubscription",
+    "contract": "public-api",
+    "purpose": "Test connection",
+    "trigger": "onAction"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1173",
+   "workshopBoard": "wireframes/WS195 Wallet Configuration Backend Structure v1.0 Board 10.dc.html#bo-1173"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 115. 0 of 14 labels bound to a contract property; 33 of 54 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Create Integration: `createApiClient`; Retry Failed Event: `replayEvents`; View API Health, Open Error Log dropped (navigation); still owed by a contract change: `setApiClientStatus`, `testWebhookSubscription`.",
+  "entryState": {
+   "params": [
+    {
+     "name": "clientId",
+     "from": "navigation"
+    },
+    {
+     "name": "subscriptionId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1174",
+  "name": "Wallet API Catalogue & Endpoint Configuration",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "10",
+   "number": "02",
+   "page": 117
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/wallet-api-catalogue-endpoint-configuration-bo-1174",
+   "component": "apps/venue-management-web/src/routes/orders-money/WalletApiCatalogueEndpointConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1173"
+   ],
+   "exitTo": [
+    "BO-1173"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1173",
+     "trigger": "Back to Wallet Integration Command Center",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure APIs for; For each API define) and no display directory — it is settings, not a population",
+  "purpose": "Define and govern the API services exposed by the TICVAI Wallet Engine. Requirement 4.3.34 explicitly requires APIs supporting wallet operations. Core Wallet APIs",
+  "purposeNote": "Every wallet capability exposed externally is registered, secured, versioned and governed through the Wallet API catalogue.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Wallet Management",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Create Wallet",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Retrieve Wallet",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Update Wallet",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Block Wallet",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Unblock Wallet",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Balance",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Balance Inquiry",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "textField",
+       "label": "Balance by Credit Type",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Available Balance",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reserved Balance",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Transactions",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Transaction History",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Transaction Detail",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Wallet Payment",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Wallet Redemption",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Funding",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Fund Wallet",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Top-Up",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Auto-Reload",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Transfers",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Wallet-to-Wallet Transfer",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Transfer Status",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Refunds",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Refund to Wallet",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Refund Status",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "textField",
+       "label": "Gift Cards / Benefits",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Gift Card Balance",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Voucher Validation",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Benefit Inquiry",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 117 §Configure APIs for"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The wallet api catalogue configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the wallet api catalogue untouched.",
+   "emptyFirstRun": "No wallet api catalogue configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "listWalletTypes",
+    "contract": "wallet",
+    "purpose": "What the API exposes",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1174",
+   "workshopBoard": "wireframes/WS195 Wallet Configuration Backend Structure v1.0 Board 10.dc.html#bo-1174"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 117. 0 of 0 labels bound to a contract property; 46 of 52 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1175",
+  "name": "Integration Profile & System Mapping",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "10",
+   "number": "03",
+   "page": 118
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/integration-profile-system-mapping-bo-1175",
+   "component": "apps/venue-management-web/src/routes/orders-money/IntegrationProfileSystemMapping.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1173"
+   ],
+   "exitTo": [
+    "BO-1173"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1173",
+     "trigger": "Back to Wallet Integration Command Center",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Configure how TICVAI Wallet communicates with internal modules and approved external systems. Requirement 4.3.20 requires wallet integration with both internal and external systems through APIs.",
+  "purposeNote": "Each connected platform has an explicit integration profile and controlled mapping to TICVAI wallet objects.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Integration name",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 118 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "System type",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 118 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Owner",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 118 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Environment",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 118 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Base endpoint",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 118 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Authentication profile",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 118 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Supported operations",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 118 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tenant",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 118 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 118 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Currency",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 118 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Timeout",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 118 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Retry policy",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 118 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Error handling",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 118 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Data mapping",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 118 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Effective dates",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 118 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Field mapping",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 118 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Currency mapping",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 118 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Status mapping",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 118 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Credit-type mapping",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 118 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Date/time mapping",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 118 §Support"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save mapping",
+       "operation": "setWalletIntegrationMapping",
+       "provenance": "contract wallet.yaml PUT /wallet-integration-mappings (decided 29 September, VM close-out)"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The integration profile system configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the integration profile system untouched.",
+   "emptyFirstRun": "No integration profile system configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "setWalletChannelRules",
+    "contract": "wallet",
+    "purpose": "Integration profile",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getWalletFundingRules"
+    ]
+   },
+   {
+    "operationId": "setWalletIntegrationMapping",
+    "contract": "wallet",
+    "purpose": "Save mapping",
+    "trigger": "onAction"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1175",
+   "workshopBoard": "wireframes/WS195 Wallet Configuration Backend Structure v1.0 Board 10.dc.html#bo-1175"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 118. 0 of 0 labels bound to a contract property; 20 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `setWalletIntegrationMapping`.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1176",
+  "name": "Wallet Events, Webhooks & Notification Orchestration",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "10",
+   "number": "04",
+   "page": 119
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/wallet-events-webhooks-notification-orchestration-bo-1176",
+   "component": "apps/venue-management-web/src/routes/orders-money/WalletEventsWebhooksNotificationOrchestration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1173"
+   ],
+   "exitTo": [
+    "BO-1173"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1173",
+     "trigger": "Back to Wallet Integration Command Center",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "clientId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§For each subscriber configure) and no display directory — it is settings, not a population",
+  "purpose": "Configure event-driven communication when something changes in Wallet.",
+  "purposeNote": "Wallet events are reliably distributed to authorized subscribing systems with complete delivery and retry history.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Event",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 119 §For each subscriber configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Destination",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 119 §For each subscriber configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Authentication",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 119 §For each subscriber configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Payload version",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 119 §For each subscriber configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tenant",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 119 §For each subscriber configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 119 §For each subscriber configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Retry count",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 119 §For each subscriber configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Retry interval",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 119 §For each subscriber configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Timeout",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 119 §For each subscriber configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Signing/security",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 119 §For each subscriber configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Failure behavior",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 119 §For each subscriber configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Wallet Created",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 119 §Support events such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Wallet Activated",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 119 §Support events such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Wallet Blocked",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 119 §Support events such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Wallet Unblocked",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 119 §Support events such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Balance Changed",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 119 §Support events such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Top-Up Failed",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 119 §Support events such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Payment Completed",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 119 §Support events such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Payment Declined",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 119 §Support events such as"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The wallet events webhooks configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the wallet events webhooks untouched.",
+   "emptyFirstRun": "No wallet events webhooks configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "setWalletRiskRules",
+    "contract": "wallet",
+    "purpose": "Events and notifications",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createWebhookSubscription",
+    "contract": "public-api",
+    "purpose": "Subscribe an integration to the chosen wallet events",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Wallet Created, Wallet Activated, Wallet Blocked, Wallet Unblocked, Balance Changed, Top-Up Failed, Payment Completed, Payment Declined …"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1176",
+   "workshopBoard": "wireframes/WS195 Wallet Configuration Backend Structure v1.0 Board 10.dc.html#bo-1176"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 119. 0 of 0 labels bound to a contract property; 29 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Wallet Created, Wallet Activated, Wallet Blocked, Wallet Unblocked, Balance Changed, Top-Up Failed, Payment Completed, Payment Declined …: `createWebhookSubscription`.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1177",
+  "name": "API Security, Access & Integration Permissions",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "10",
+   "number": "05",
+   "page": 120
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/api-security-access-integration-permissions-bo-1177",
+   "component": "apps/venue-management-web/src/routes/orders-money/ApiSecurityAccessIntegrationPermissions.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1173"
+   ],
+   "exitTo": [
+    "BO-1173"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1173",
+     "trigger": "Back to Wallet Integration Command Center",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "clientId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Ensure integrations receive only the wallet permissions and data required for their function.",
+  "purposeNote": "Every API request is authenticated and authorized against explicit integration, tenant, venue and operation-level permissions.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Integration identity",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Application/client",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tenant scope",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue scope",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "API scope",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Allowed operations",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Allowed wallet types",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum transaction",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Environment",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "IP/network restrictions where applicable",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Credential expiry",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Secret/key rotation",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "MFA for administration",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Certificate configuration",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Access Models",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Read Only",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Finance",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Partner",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Internal Service",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "High-Risk Operations",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Balance Adjustment",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Operations such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Wallet Block",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Operations such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "High-Value Refund",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Operations such as"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The api security access configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the api security access untouched.",
+   "emptyFirstRun": "No api security access configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "listAccessPolicies",
+    "contract": "identity",
+    "purpose": "API access and permissions",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createApiClient",
+    "contract": "public-api",
+    "purpose": "Grant an integration only the wallet scopes it needs",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Read Only, Finance, Partner, Internal Service, High-Risk Operations, Balance Adjustment, Wallet Block, High-Value Refund …"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1177",
+   "workshopBoard": "wireframes/WS195 Wallet Configuration Backend Structure v1.0 Board 10.dc.html#bo-1177"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 120. 0 of 0 labels bound to a contract property; 29 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Read Only, Finance, Partner, Internal Service, High-Risk Operations, Balance Adjustment, Wallet Block, High-Value Refund …: `createApiClient`.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1178",
+  "name": "Synchronization, Retry & Resilience Configuration",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "10",
+   "number": "06",
+   "page": 121
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/synchronization-retry-resilience-configuration-bo-1178",
+   "component": "apps/venue-management-web/src/routes/orders-money/SynchronizationRetryResilienceConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1173"
+   ],
+   "exitTo": [
+    "BO-1173"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1173",
+     "trigger": "Back to Wallet Integration Command Center",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Configure how Wallet behaves when dependent services or external systems are temporarily unavailable.",
+  "purposeNote": "Temporary integration failures do not cause duplicate financial transactions, lost wallet events or inconsistent wallet balances.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Retry attempts",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 121 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Retry interval",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 121 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Exponential backoff",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 121 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Timeout",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 121 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Idempotency",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 121 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Duplicate prevention",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 121 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Queue behavior",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 121 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Dead-letter queue",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 121 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Event retention",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 121 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Replay permission",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 121 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Dependency priority",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 121 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Example",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 121 §Configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The synchronization retry resilience configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the synchronization retry resilience untouched.",
+   "emptyFirstRun": "No synchronization retry resilience configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "getWalletReconciliation",
+    "contract": "wallet",
+    "purpose": "Synchronisation state",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1178",
+   "workshopBoard": "wireframes/WS195 Wallet Configuration Backend Structure v1.0 Board 10.dc.html#bo-1178"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 121. 0 of 0 labels bound to a contract property; 12 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1179",
+  "name": "Integration Monitoring & Exception Workbench",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "10",
+   "number": "07",
+   "page": 122
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/integration-monitoring-exception-workbench-bo-1179",
+   "component": "apps/venue-management-web/src/routes/orders-money/IntegrationMonitoringExceptionWorkbench.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1173"
+   ],
+   "exitTo": [
+    "BO-1173"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1173",
+     "trigger": "Back to Wallet Integration Command Center",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "clientId",
+      "subscriptionId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Give technical and operational teams a dedicated workspace for failed integrations.",
+  "purposeNote": "Every integration failure is traceable through a controlled exception workflow without modifying the original financial transaction.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every integration monitoring exception",
+       "columns": [
+        "Exception ID",
+        "Integration",
+        "Wallet",
+        "Transaction",
+        "Endpoint/event",
+        "Error code",
+        "Error message",
+        "Attempt count",
+        "First failure",
+        "Last retry",
+        "Priority",
+        "Owner",
+        "Status"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected integration monitoring exception",
+       "bindsTo": null,
+       "columns": [
+        "Exception ID",
+        "Integration",
+        "Wallet",
+        "Transaction",
+        "Endpoint/event",
+        "Error code",
+        "Error message",
+        "Attempt count",
+        "First failure",
+        "Last retry",
+        "Priority",
+        "Owner",
+        "Status"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Exception Categories”, “Workflow”.",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Retry",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Replay",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Correct mapping",
+       "operation": "setWalletIntegrationMapping",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reprocess",
+       "operation": "resolveWalletDispute",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Escalate",
+       "operation": "resolveWalletDispute",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Actions"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Suspend integration",
+       "operation": "setApiClientStatus",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Mark resolved",
+       "operation": "resolveWalletDispute",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Actions"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Withdraw dispute",
+       "operation": "withdrawWalletDispute",
+       "provenance": "contract wallet.yaml POST /wallet-disputes/{disputeId}/withdraw (decided 29 September, VM close-out)"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmSuspendIntegration",
+    "component": "confirmDialog",
+    "trigger": "Suspend integration",
+    "body": "**Suspend integration on a integration monitoring exception is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
+    "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Actions"
+   }
+  ],
+  "states": {
+   "loading": "The integration monitoring exception list.",
+   "error": "Could not load. Names which read failed and leaves the integration monitoring exception untouched.",
+   "emptyFirstRun": "No integration monitoring exception yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the integration monitoring exception are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listWalletDisputes",
+    "contract": "wallet",
+    "purpose": "Integration exceptions",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "replayEvents",
+    "contract": "public-api",
+    "purpose": "Retry or replay failed outbound wallet events",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Retry, Replay"
+   },
+   {
+    "operationId": "listApiClients",
+    "contract": "public-api",
+    "purpose": "The integrations whose exceptions are worked here",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listWebhookSubscriptions",
+    "contract": "public-api",
+    "purpose": "The webhook subscriptions whose events are replayed",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setWalletIntegrationMapping",
+    "contract": "wallet",
+    "purpose": "Correct mapping",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "resolveWalletDispute",
+    "contract": "wallet",
+    "purpose": "Resolve",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "withdrawWalletDispute",
+    "contract": "wallet",
+    "purpose": "Withdraw dispute",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "setApiClientStatus",
+    "contract": "public-api",
+    "purpose": "Suspend integration",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Exception ID",
+    "Integration",
+    "Wallet",
+    "Transaction",
+    "Endpoint/event",
+    "Error code"
+   ],
+   "params": [
+    {
+     "name": "clientId",
+     "from": "navigation"
+    },
+    {
+     "name": "disputeId",
+     "from": "navigation"
+    },
+    {
+     "name": "subscriptionId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1179",
+   "workshopBoard": "wireframes/WS195 Wallet Configuration Backend Structure v1.0 Board 10.dc.html#bo-1179"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 122. 0 of 13 labels bound to a contract property; 20 of 46 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Retry, Replay: `replayEvents`; still owed by a contract change: `resolveWalletDispute`, `setWalletIntegrationMapping`, `setApiClientStatus`.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1180",
+  "name": "Wallet Configuration Governance & Version Control",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "10",
+   "number": "08",
+   "page": 123
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/wallet-configuration-governance-version-control-bo-1180",
+   "component": "apps/venue-management-web/src/routes/orders-money/WalletConfigurationGovernanceVersionControl.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1173"
+   ],
+   "exitTo": [
+    "BO-1173"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1173",
+     "trigger": "Back to Wallet Integration Command Center",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "purpose": "Provide centralized governance for configuration changes across all ten Wallet boards. This screen becomes the master configuration governance layer for the entire Wallet module.",
+  "purposeNote": "Every material Wallet configuration change is version-controlled and historical configurations remain available for audit and investigation.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 123 §Show"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every wallet governance version",
+       "columns": [
+        "Cash Priority: 3 → 5",
+        "Bonus Priority: 2 → 1",
+        "FEFO: Enabled → Enabled",
+        "Gift Card Priority: 4 → 3"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 123 §Show"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Takes effect at every till and reader immediately.** Credit types, consumption order and funding rules change for balances that already exist, not only for new ones.",
+       "provenance": "authored — required by check-screens, 19 September 2026"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected wallet governance version",
+       "bindsTo": null,
+       "columns": [
+        "Cash Priority: 3 → 5",
+        "Bonus Priority: 2 → 1",
+        "FEFO: Enabled → Enabled",
+        "Gift Card Priority: 4 → 3"
+       ],
+       "notes": null,
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 123 §Show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The wallet governance version list.",
+   "error": "Could not load. Names which read failed and leaves the wallet governance version untouched.",
+   "emptyFirstRun": "No wallet governance version yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the wallet governance version are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "publishWalletConfiguration",
+    "contract": "wallet",
+    "purpose": "Governance and version control",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listWalletTypes",
+     "listCreditTypes"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Cash Priority: 3 → 5",
+    "Bonus Priority: 2 → 1",
+    "FEFO: Enabled → Enabled",
+    "Gift Card Priority: 4 → 3"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1180",
+   "workshopBoard": "wireframes/WS195 Wallet Configuration Backend Structure v1.0 Board 10.dc.html#bo-1180"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 123. 0 of 4 labels bound to a contract property; 36 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1181",
+  "name": "Approval, Publication & Change Management",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "10",
+   "number": "09",
+   "page": 124
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/approval-publication-change-management-bo-1181",
+   "component": "apps/venue-management-web/src/routes/orders-money/ApprovalPublicationChangeManagement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1173"
+   ],
+   "exitTo": [
+    "BO-1173"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1173",
+     "trigger": "Back to Wallet Integration Command Center",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Control how Wallet configuration moves safely from draft into production.",
+  "purposeNote": "No governed Wallet configuration enters production without satisfying its required validation, approval and publication workflow.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Immediate publication",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 124 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Scheduled publication",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 124 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tenant-specific rollout",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 124 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue-specific rollout",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 124 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Effective date",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 124 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Pilot rollout",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 124 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Emergency rollback",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 124 §Configure"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Takes effect at every till and reader immediately.** Credit types, consumption order and funding rules change for balances that already exist, not only for new ones.",
+       "provenance": "authored — required by check-screens, 19 September 2026"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The approval publication change configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the approval publication change untouched.",
+   "emptyFirstRun": "No approval publication change configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "publishWalletConfiguration",
+    "contract": "wallet",
+    "purpose": "Approval and publication",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listWalletTypes",
+     "listCreditTypes"
+    ]
+   },
+   {
+    "operationId": "createApprovalRequest",
+    "contract": "approvals",
+    "purpose": "Send for approval",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1181",
+   "workshopBoard": "wireframes/WS195 Wallet Configuration Backend Structure v1.0 Board 10.dc.html#bo-1181"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 124. 0 of 0 labels bound to a contract property; 17 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-1182",
+  "name": "Wallet Platform Health, Audit & Administration Center",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
+   "board": "10",
+   "number": "10",
+   "page": 125
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/wallet-platform-health-audit-administration-center-bo-1182",
+   "component": "apps/venue-management-web/src/routes/orders-money/WalletPlatformHealthAuditAdministrationCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-1173"
+   ],
+   "exitTo": [
+    "BO-1173"
+   ],
+   "transitions": [
+    {
+     "to": "BO-1173",
+     "trigger": "Back to Wallet Integration Command Center",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen both a metric directory (§Master Health KPIs) and a per-row directory (§Display) — counts over a population, then the population",
+  "purpose": "Provide the final master-administration screen for the entire TICVAI Wallet ecosystem. This should become the control tower for all ten Wallet boards.",
+  "purposeNote": "Authorized administrators can assess end-to-end Wallet health, trace material actions across the platform and navigate directly to affected configuration, transactions, integrations or exceptions. Board 10 — End-to-End Architecture The final integration architecture should look like: Customer / Employee / Corporate Account ↓ TICVAI Wallet Engine Wallet Foundation → Funding → Credit & Consumption → Family / Corporate → Gift Cards & Benefits → Channels & Wearables → Transfers & Refunds → Fraud & Risk → Finance & Liability ↓ Wallet API & Event Layer ↙︎ Ticketing ↙︎ Membership ↙︎ CRM ↙︎ Pricing &",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 125 §Display"
+   }
+  ],
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Wallet Service Availability",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 125 §Master Health KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "API Success Rate",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 125 §Master Health KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Average Authorization Time",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 125 §Master Health KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Failed Transactions",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 125 §Master Health KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending Events",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 125 §Master Health KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Reconciliation Exceptions",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 125 §Master Health KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Fraud Alerts",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 125 §Master Health KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Ledger Integrity",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 125 §Master Health KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Configuration Errors",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 125 §Master Health KPIs"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "moduleTiles",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every wallet platform health",
+       "columns": [
+        "Wallet Engine"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 125 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected wallet platform health",
+       "bindsTo": null,
+       "columns": [
+        "Wallet Engine"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Healthy”, “Search across”, “Every record should contain”, “Authorized super administrators can”.",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 125 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The wallet platform health list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the wallet platform health untouched.",
+   "emptyFirstRun": "No wallet platform health yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the wallet platform health are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getWalletLiability",
+    "contract": "wallet",
+    "purpose": "Platform health and audit",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1182",
+   "workshopBoard": "wireframes/WS195 Wallet Configuration Backend Structure v1.0 Board 10.dc.html#bo-1182"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 125. 0 of 1 labels bound to a contract property; 19 of 117 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

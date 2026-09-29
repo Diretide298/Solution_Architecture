@@ -14,10 +14,7 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
     "BO-008",
-    "BO-009",
     "BO-089"
    ],
    "inferred": true,
@@ -29,39 +26,9 @@
      "provenance": "flow F13 step 2→3"
     },
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-040 holds none of them, so the edge carries nothing and BO-008 opens cold"
     }
    ]
   },
@@ -70,13 +37,6 @@
   "pattern": "approvalInbox",
   "patternReason": "`approveShiftOpen` decides items that `listShifts` queues — every row is waiting for a person, so the empty state is success",
   "purpose": "Accept or refuse a till that did not balance.",
-  "gaps": [
-   {
-    "operation": "getShift",
-    "why": "**2 declared operations reach no component on this screen**: getShift, listCashMovements. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -84,6 +44,34 @@
      "name": "contentBody",
      "slot": "queue",
      "components": [
+      {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listShifts",
+       "notes": "Sends `?workstationId=` to `listShifts`.",
+       "provenance": "contract shift.yaml GET /shifts"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listShifts",
+       "notes": "Sends `?status=` to `listShifts`.",
+       "provenance": "contract shift.yaml GET /shifts"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Opened from",
+       "operation": "listShifts",
+       "notes": "Sends `?openedFrom=` to `listShifts`.",
+       "provenance": "contract shift.yaml GET /shifts"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Opened to",
+       "operation": "listShifts",
+       "notes": "Sends `?openedTo=` to `listShifts`.",
+       "provenance": "contract shift.yaml GET /shifts"
+      },
       {
        "kind": "dataTable",
        "label": "Waiting for a decision",
@@ -104,6 +92,27 @@
        ],
        "operation": "listShifts",
        "provenance": "contract shift.yaml GET /shifts"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every cash movement",
+       "bindsTo": "CashMovement",
+       "columns": [
+        "CashMovement.id",
+        "CashMovement.kind",
+        "CashMovement.amount",
+        "CashMovement.denominations",
+        "CashMovement.reference",
+        "CashMovement.reason",
+        "CashMovement.recordedAt",
+        "CashMovement.shiftId",
+        "CashMovement.depositBoxId",
+        "CashMovement.witnessPrincipalId",
+        "CashMovement.withdrawalReason",
+        "CashMovement.authorisedByPrincipalId"
+       ],
+       "operation": "listCashMovements",
+       "provenance": "contract shift.yaml GET /shifts/{shiftId}/cash-movements"
       }
      ]
     },
@@ -113,7 +122,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected variance approval",
+       "label": "The selected shift",
        "bindsTo": "Shift",
        "columns": [
         "Shift.id",
@@ -135,6 +144,31 @@
        ],
        "operation": "getCurrentShift",
        "provenance": "contract shift.yaml GET /shifts/current"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The shift",
+       "bindsTo": "Shift",
+       "columns": [
+        "Shift.id",
+        "Shift.workstationId",
+        "Shift.venueId",
+        "Shift.scopePath",
+        "Shift.principalId",
+        "Shift.principalDisplayName",
+        "Shift.incidents",
+        "Shift.status",
+        "Shift.currency",
+        "Shift.currencyScale",
+        "Shift.depositBoxCode",
+        "Shift.bagNumber",
+        "Shift.openingFloat",
+        "Shift.salesTotal",
+        "Shift.refundsTotal",
+        "Shift.liftsTotal"
+       ],
+       "operation": "getShift",
+       "provenance": "contract shift.yaml GET /shifts/{shiftId}"
       }
      ]
     },
@@ -144,90 +178,57 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Accept",
+       "label": "Accept shift variance",
        "operation": "acceptShiftVariance",
        "provenance": "contract shift.yaml POST /shifts/{shiftId}/accept-variance"
       },
       {
        "kind": "secondaryButton",
-       "label": "Approve",
+       "label": "Approve shift open",
        "operation": "approveShiftOpen",
        "provenance": "contract shift.yaml POST /shifts/{shiftId}/approve-open"
       },
       {
        "kind": "destructiveButton",
-       "label": "Close",
+       "label": "Close shift",
        "operation": "closeShift",
        "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create cash movement",
        "operation": "createCashMovement",
        "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
       },
       {
        "kind": "secondaryButton",
-       "label": "Open",
+       "label": "Open shift",
        "operation": "openShift",
        "provenance": "contract shift.yaml POST /shifts"
       },
       {
        "kind": "secondaryButton",
-       "label": "Record",
+       "label": "Record no sale",
        "operation": "recordNoSale",
        "provenance": "contract shift.yaml POST /shifts/{shiftId}/no-sale"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reopen",
+       "label": "Reopen shift",
        "operation": "reopenShift",
        "provenance": "contract shift.yaml POST /shifts/{shiftId}/reopen"
       },
       {
        "kind": "secondaryButton",
-       "label": "Resume",
+       "label": "Resume shift",
        "operation": "resumeShift",
        "provenance": "contract shift.yaml POST /shifts/{shiftId}/resume"
       },
       {
        "kind": "destructiveButton",
-       "label": "Suspend",
+       "label": "Suspend shift",
        "operation": "suspendShift",
        "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listShifts",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "acceptShiftVariance",
-       "label": "Accept shift variance",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "acceptShiftVariance",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -237,24 +238,160 @@
    {
     "id": "confirmCloseShift",
     "component": "confirmDialog",
-    "trigger": "Close",
-    "body": "**Names what `closeShift` changes and what it leaves alone**, in the consequence rather than the verb. A variance approval this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
+    "trigger": "Close shift",
+    "body": "**Names what `closeShift` changes and what it leaves alone**, in the consequence rather than the verb. A variance approval this affects should be identified in the dialog, not just counted. **Collects what `closeShift` sends before it is called.** Required: `countedCash`, `recordedAt`. Optional: `nonCashDeclared`, `notes`, `releaseHeldLeases`.",
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/close",
+    "bindsTo": "CloseShiftRequest"
    },
    {
     "id": "confirmSuspendShift",
     "component": "confirmDialog",
-    "trigger": "Suspend",
-    "body": "**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than the verb. A variance approval this affects should be identified in the dialog, not just counted.",
+    "trigger": "Suspend shift",
+    "body": "**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than the verb. A variance approval this affects should be identified in the dialog, not just counted. **Collects what `suspendShift` sends before it is called.** Required: `recordedAt`. Optional: `reason`.",
     "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
+   },
+   {
+    "id": "formAcceptShiftVariance",
+    "component": "modal",
+    "trigger": "Accept shift variance",
+    "body": "**Collects what `acceptShiftVariance` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Accept shift variance",
+     "operation": "acceptShiftVariance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/accept-variance"
+   },
+   {
+    "id": "formApproveShiftOpen",
+    "component": "modal",
+    "trigger": "Approve shift open",
+    "body": "**Collects what `approveShiftOpen` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Approve shift open",
+     "operation": "approveShiftOpen"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/approve-open"
+   },
+   {
+    "id": "formCreateCashMovement",
+    "component": "modal",
+    "trigger": "Create cash movement",
+    "body": "**Collects what `createCashMovement` sends before it is called.** Required: `id`, `kind`, `amount`, `recordedAt`. Optional: `denominations`, `reference`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateCashMovementRequest",
+    "confirm": {
+     "label": "Create cash movement",
+     "operation": "createCashMovement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "amount",
+      "recordedAt",
+      "denominations",
+      "reference",
+      "reason"
+     ]
+    },
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
+   },
+   {
+    "id": "formOpenShift",
+    "component": "modal",
+    "trigger": "Open shift",
+    "body": "**Collects what `openShift` sends before it is called.** Required: `workstationId`, `openingFloat`. Optional: `depositBoxCode`, `bagNumber`, `recordedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "OpenShiftRequest",
+    "confirm": {
+     "label": "Open shift",
+     "operation": "openShift"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "workstationId",
+      "openingFloat",
+      "depositBoxCode",
+      "bagNumber",
+      "recordedAt"
+     ]
+    },
+    "provenance": "contract shift.yaml POST /shifts"
+   },
+   {
+    "id": "formRecordNoSale",
+    "component": "modal",
+    "trigger": "Record no sale",
+    "body": "**Collects what `recordNoSale` sends before it is called.** Required: `id`, `reason`, `recordedAt`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Record no sale",
+     "operation": "recordNoSale"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "reason",
+      "recordedAt",
+      "note"
+     ]
+    },
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/no-sale"
+   },
+   {
+    "id": "formReopenShift",
+    "component": "modal",
+    "trigger": "Reopen shift",
+    "body": "**Collects what `reopenShift` sends before it is called.** Required: `reason` and `supervisorStepUp` — a supervisor who did not close the shift enters their staff PIN on this device (`principalId`, `credential`) (decided 28 September, audit R144). A refusal names which: the supervisor is the closer (403 approver-is-closer) or the PIN was refused (403 supervisor-step-up-refused). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reopen shift",
+     "operation": "reopenShift"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason",
+      "supervisorStepUp"
+     ]
+    },
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/reopen"
+   },
+   {
+    "id": "formResumeShift",
+    "component": "modal",
+    "trigger": "Resume shift",
+    "body": "**Collects what `resumeShift` sends before it is called.** Required: `recordedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Resume shift",
+     "operation": "resumeShift"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recordedAt"
+     ]
+    },
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/resume"
    }
   ],
   "states": {
    "loading": "The variance approval list.",
    "error": "Could not load. Names which read failed and leaves the variance approval untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
-   "emptyNoResults": "The filter narrowed it and the variance approval are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoResults": "Nothing matches the filter on workstationId, status, openedFrom, openedTo and the variance approval are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -423,62 +560,22 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+    "BO-008"
    ],
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-041 holds none of them, so the edge carries nothing and BO-008 opens cold"
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Kept separate from BO-042, each with its own operations (decided 28 September, audit R276)** — the two carried the same thirteen shift operations. This screen keeps cash lifts, adds and no-sales (`listCashMovements`, `createCashMovement`, `recordNoSale`) with the shift they belong to; opening, suspending, closing and reopening shifts stay on BO-039 and BO-040, and banking and safe drops are BO-042.",
   "density": "compact",
   "pattern": "approvalInbox",
-  "patternReason": "`approveShiftOpen` decides items that `listCashMovements` queues — every row is waiting for a person, so the empty state is success",
+  "patternReason": "`listCashMovements` queues a shift's lifts, adds and no-sales for review; the reviewer records a correcting lift or add with `createCashMovement` — every row is looked at, so the empty state is success",
   "purpose": "Track money in and out of a drawer that is not a sale.",
-  "gaps": [
-   {
-    "operation": "getShift",
-    "why": "**2 declared operations reach no component on this screen**: getShift, listShifts. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -505,6 +602,27 @@
        ],
        "operation": "listCashMovements",
        "provenance": "contract shift.yaml GET /shifts/{shiftId}/cash-movements"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every shift",
+       "bindsTo": "Shift",
+       "columns": [
+        "Shift.id",
+        "Shift.workstationId",
+        "Shift.venueId",
+        "Shift.scopePath",
+        "Shift.principalId",
+        "Shift.principalDisplayName",
+        "Shift.incidents",
+        "Shift.status",
+        "Shift.currency",
+        "Shift.currencyScale",
+        "Shift.depositBoxCode",
+        "Shift.bagNumber"
+       ],
+       "operation": "listShifts",
+       "provenance": "contract shift.yaml GET /shifts"
       }
      ]
     },
@@ -514,7 +632,30 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected cash movements",
+       "label": "The selected cash movement",
+       "bindsTo": "CashMovement",
+       "columns": [
+        "CashMovement.id",
+        "CashMovement.kind",
+        "CashMovement.amount",
+        "CashMovement.denominations",
+        "CashMovement.reference",
+        "CashMovement.reason",
+        "CashMovement.recordedAt",
+        "CashMovement.shiftId",
+        "CashMovement.depositBoxId",
+        "CashMovement.witnessPrincipalId",
+        "CashMovement.withdrawalReason",
+        "CashMovement.authorisedByPrincipalId",
+        "CashMovement.sequence",
+        "CashMovement.syncedAt"
+       ],
+       "operation": "listCashMovements",
+       "provenance": "contract shift.yaml GET /shifts/{shiftId}/cash-movements"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The shift",
        "bindsTo": "Shift",
        "columns": [
         "Shift.id",
@@ -534,8 +675,8 @@
         "Shift.refundsTotal",
         "Shift.liftsTotal"
        ],
-       "operation": "getCurrentShift",
-       "provenance": "contract shift.yaml GET /shifts/current"
+       "operation": "getShift",
+       "provenance": "contract shift.yaml GET /shifts/{shiftId}"
       }
      ]
     },
@@ -545,90 +686,15 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create cash movement",
        "operation": "createCashMovement",
        "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
       },
       {
        "kind": "secondaryButton",
-       "label": "Accept",
-       "operation": "acceptShiftVariance",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/accept-variance"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Approve",
-       "operation": "approveShiftOpen",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/approve-open"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Close",
-       "operation": "closeShift",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Open",
-       "operation": "openShift",
-       "provenance": "contract shift.yaml POST /shifts"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record",
+       "label": "Record no sale",
        "operation": "recordNoSale",
        "provenance": "contract shift.yaml POST /shifts/{shiftId}/no-sale"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reopen",
-       "operation": "reopenShift",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/reopen"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Resume",
-       "operation": "resumeShift",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/resume"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Suspend",
-       "operation": "suspendShift",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listCashMovements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createCashMovement",
-       "label": "Create cash movement",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createCashMovement",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -636,26 +702,56 @@
   },
   "overlays": [
    {
-    "id": "confirmCloseShift",
-    "component": "confirmDialog",
-    "trigger": "Close",
-    "body": "**Names what `closeShift` changes and what it leaves alone**, in the consequence rather than the verb. A cash movements this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
+    "id": "formCreateCashMovement",
+    "component": "modal",
+    "trigger": "Create cash movement",
+    "body": "**Collects what `createCashMovement` sends before it is called.** Required: `id`, `kind`, `amount`, `recordedAt`. Optional: `denominations`, `reference`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateCashMovementRequest",
+    "confirm": {
+     "label": "Create cash movement",
+     "operation": "createCashMovement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "amount",
+      "recordedAt",
+      "denominations",
+      "reference",
+      "reason"
+     ]
+    },
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
    },
    {
-    "id": "confirmSuspendShift",
-    "component": "confirmDialog",
-    "trigger": "Suspend",
-    "body": "**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than the verb. A cash movements this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
+    "id": "formRecordNoSale",
+    "component": "modal",
+    "trigger": "Record no sale",
+    "body": "**Collects what `recordNoSale` sends before it is called.** Required: `id`, `reason`, `recordedAt`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Record no sale",
+     "operation": "recordNoSale"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "reason",
+      "recordedAt",
+      "note"
+     ]
+    },
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/no-sale"
    }
   ],
   "states": {
    "loading": "The cash movements list.",
    "error": "Could not load. Names which read failed and leaves the cash movements untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
-   "emptyNoResults": "The filter narrowed it and the cash movements are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoResults": "Never shown: `listCashMovements` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listCashMovements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -674,39 +770,6 @@
     ]
    },
    {
-    "operationId": "acceptShiftVariance",
-    "contract": "shift",
-    "purpose": "Accept an over/short beyond the threshold",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCashMovements"
-    ]
-   },
-   {
-    "operationId": "approveShiftOpen",
-    "contract": "shift",
-    "purpose": "Approve a shift opening outside tolerance",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCashMovements"
-    ]
-   },
-   {
-    "operationId": "closeShift",
-    "contract": "shift",
-    "purpose": "Blind close-out",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCashMovements"
-    ]
-   },
-   {
-    "operationId": "getCurrentShift",
-    "contract": "shift",
-    "purpose": "The open or suspended shift on the session's workstation",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "getShift",
     "contract": "shift",
     "purpose": "Read a shift",
@@ -719,45 +782,9 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "openShift",
-    "contract": "shift",
-    "purpose": "Open a shift",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCashMovements"
-    ]
-   },
-   {
     "operationId": "recordNoSale",
     "contract": "shift",
     "purpose": "Open the drawer without a sale",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCashMovements"
-    ]
-   },
-   {
-    "operationId": "reopenShift",
-    "contract": "shift",
-    "purpose": "Reopen a shift closed in error",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCashMovements"
-    ]
-   },
-   {
-    "operationId": "resumeShift",
-    "contract": "shift",
-    "purpose": "Resume a suspended shift",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCashMovements"
-    ]
-   },
-   {
-    "operationId": "suspendShift",
-    "contract": "shift",
-    "purpose": "Suspend a shift so another user can log in",
     "trigger": "onAction",
     "invalidates": [
      "listCashMovements"
@@ -773,11 +800,11 @@
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "Shift.id",
-    "Shift.workstationId",
-    "Shift.venueId",
-    "Shift.scopePath",
-    "Shift.principalId"
+    "CashMovement.id",
+    "CashMovement.kind",
+    "CashMovement.amount",
+    "CashMovement.denominations",
+    "CashMovement.reference"
    ]
   },
   "wireframe": {
@@ -785,7 +812,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-041"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares (5 after the 28 September split from BO-042, audit R276), not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -824,62 +851,22 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+    "BO-008"
    ],
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-042 holds none of them, so the edge carries nothing and BO-008 opens cold"
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Kept separate from BO-041, each with its own operations (decided 28 September, audit R276)** — the two carried the same thirteen shift operations. This screen moves cash out of the tills — `listDepositBoxes` and `withdrawFromDepositBox` with reason banking or safeDrop — and reads the lifts that result; cash lifts and adds at a till are BO-041, and the shift lifecycle stays on BO-039 and BO-040.",
   "density": "compact",
   "pattern": "approvalInbox",
-  "patternReason": "`approveShiftOpen` decides items that `listCashMovements` queues — every row is waiting for a person, so the empty state is success",
+  "patternReason": "`listDepositBoxes` queues the boxes holding cash; a supervisor takes cash out of each for banking or the safe with `withdrawFromDepositBox` — every open box is waiting for a person, so the empty state is success",
   "purpose": "Move the day’s cash out of the tills.",
-  "gaps": [
-   {
-    "operation": "getShift",
-    "why": "**2 declared operations reach no component on this screen**: getShift, listShifts. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -887,6 +874,22 @@
      "name": "contentBody",
      "slot": "queue",
      "components": [
+      {
+       "kind": "dataTable",
+       "label": "Deposit boxes holding cash",
+       "bindsTo": "DepositBox",
+       "columns": [
+        "DepositBox.cashierName",
+        "DepositBox.workstationId",
+        "DepositBox.shiftId",
+        "DepositBox.status",
+        "DepositBox.openingFloat",
+        "DepositBox.withdrawnTotal"
+       ],
+       "operation": "listDepositBoxes",
+       "notes": "Sends `?openOnly=true` to `listDepositBoxes`. A box being counted (`closing`, `closed`, `reconciled`) takes nothing out and is shown without the action.",
+       "provenance": "contract shift.yaml GET /deposit-boxes"
+      },
       {
        "kind": "dataTable",
        "label": "Waiting for a decision",
@@ -906,6 +909,27 @@
        ],
        "operation": "listCashMovements",
        "provenance": "contract shift.yaml GET /shifts/{shiftId}/cash-movements"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every shift",
+       "bindsTo": "Shift",
+       "columns": [
+        "Shift.id",
+        "Shift.workstationId",
+        "Shift.venueId",
+        "Shift.scopePath",
+        "Shift.principalId",
+        "Shift.principalDisplayName",
+        "Shift.incidents",
+        "Shift.status",
+        "Shift.currency",
+        "Shift.currencyScale",
+        "Shift.depositBoxCode",
+        "Shift.bagNumber"
+       ],
+       "operation": "listShifts",
+       "provenance": "contract shift.yaml GET /shifts"
       }
      ]
     },
@@ -915,7 +939,30 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected banking safe",
+       "label": "The selected cash movement",
+       "bindsTo": "CashMovement",
+       "columns": [
+        "CashMovement.id",
+        "CashMovement.kind",
+        "CashMovement.amount",
+        "CashMovement.denominations",
+        "CashMovement.reference",
+        "CashMovement.reason",
+        "CashMovement.recordedAt",
+        "CashMovement.shiftId",
+        "CashMovement.depositBoxId",
+        "CashMovement.witnessPrincipalId",
+        "CashMovement.withdrawalReason",
+        "CashMovement.authorisedByPrincipalId",
+        "CashMovement.sequence",
+        "CashMovement.syncedAt"
+       ],
+       "operation": "listCashMovements",
+       "provenance": "contract shift.yaml GET /shifts/{shiftId}/cash-movements"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The shift",
        "bindsTo": "Shift",
        "columns": [
         "Shift.id",
@@ -935,8 +982,8 @@
         "Shift.refundsTotal",
         "Shift.liftsTotal"
        ],
-       "operation": "getCurrentShift",
-       "provenance": "contract shift.yaml GET /shifts/current"
+       "operation": "getShift",
+       "provenance": "contract shift.yaml GET /shifts/{shiftId}"
       }
      ]
     },
@@ -946,90 +993,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Accept",
-       "operation": "acceptShiftVariance",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/accept-variance"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Approve",
-       "operation": "approveShiftOpen",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/approve-open"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Close",
-       "operation": "closeShift",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createCashMovement",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Open",
-       "operation": "openShift",
-       "provenance": "contract shift.yaml POST /shifts"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record",
-       "operation": "recordNoSale",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/no-sale"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reopen",
-       "operation": "reopenShift",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/reopen"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Resume",
-       "operation": "resumeShift",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/resume"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Suspend",
-       "operation": "suspendShift",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listCashMovements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "acceptShiftVariance",
-       "label": "Accept shift variance",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "acceptShiftVariance",
-       "provenance": "carried from the previous definition"
+       "label": "Bank or safe-drop cash",
+       "operation": "withdrawFromDepositBox",
+       "provenance": "contract shift.yaml POST /deposit-boxes/{boxId}/withdraw"
       }
      ]
     }
@@ -1037,74 +1003,56 @@
   },
   "overlays": [
    {
-    "id": "confirmCloseShift",
-    "component": "confirmDialog",
-    "trigger": "Close",
-    "body": "**Names what `closeShift` changes and what it leaves alone**, in the consequence rather than the verb. A banking safe this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
-   },
-   {
-    "id": "confirmSuspendShift",
-    "component": "confirmDialog",
-    "trigger": "Suspend",
-    "body": "**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than the verb. A banking safe this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
+    "id": "formWithdrawFromDepositBox",
+    "component": "modal",
+    "trigger": "Bank or safe-drop cash",
+    "body": "**Collects what `withdrawFromDepositBox` sends before it is called.** Required: `id`, `amount`, `witnessPrincipalId` (the cashier the cash came from), `recordedAt`. Optional: `reason` (banking, safeDrop, changeOrder, other), `note`. The lift reduces the box's expected close figure, so it is never a variance. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Bank or safe-drop cash",
+     "operation": "withdrawFromDepositBox"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "amount",
+      "witnessPrincipalId",
+      "reason",
+      "note",
+      "recordedAt"
+     ]
+    },
+    "provenance": "contract shift.yaml POST /deposit-boxes/{boxId}/withdraw"
    }
   ],
   "states": {
    "loading": "The banking safe list.",
    "error": "Could not load. Names which read failed and leaves the banking safe untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
-   "emptyNoResults": "The filter narrowed it and the banking safe are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoResults": "Never shown: `listCashMovements` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listCashMovements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "listDepositBoxes",
+    "contract": "shift",
+    "purpose": "Cash boxes and who holds them — the cash to move out of the tills (audit R276)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "withdrawFromDepositBox",
+    "contract": "shift",
+    "purpose": "Take cash out of a box for banking or the safe",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDepositBoxes",
+     "listCashMovements"
+    ]
+   },
    {
     "operationId": "listCashMovements",
     "contract": "shift",
     "purpose": "Lifts, adds and the opening float",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "acceptShiftVariance",
-    "contract": "shift",
-    "purpose": "Accept an over/short beyond the threshold",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCashMovements"
-    ]
-   },
-   {
-    "operationId": "approveShiftOpen",
-    "contract": "shift",
-    "purpose": "Approve a shift opening outside tolerance",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCashMovements"
-    ]
-   },
-   {
-    "operationId": "closeShift",
-    "contract": "shift",
-    "purpose": "Blind close-out",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCashMovements"
-    ]
-   },
-   {
-    "operationId": "createCashMovement",
-    "contract": "shift",
-    "purpose": "Record a cash lift or add",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCashMovements"
-    ]
-   },
-   {
-    "operationId": "getCurrentShift",
-    "contract": "shift",
-    "purpose": "The open or suspended shift on the session's workstation",
     "trigger": "onLoad"
    },
    {
@@ -1118,51 +1066,6 @@
     "contract": "shift",
     "purpose": "List shifts",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "openShift",
-    "contract": "shift",
-    "purpose": "Open a shift",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCashMovements"
-    ]
-   },
-   {
-    "operationId": "recordNoSale",
-    "contract": "shift",
-    "purpose": "Open the drawer without a sale",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCashMovements"
-    ]
-   },
-   {
-    "operationId": "reopenShift",
-    "contract": "shift",
-    "purpose": "Reopen a shift closed in error",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCashMovements"
-    ]
-   },
-   {
-    "operationId": "resumeShift",
-    "contract": "shift",
-    "purpose": "Resume a suspended shift",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCashMovements"
-    ]
-   },
-   {
-    "operationId": "suspendShift",
-    "contract": "shift",
-    "purpose": "Suspend a shift so another user can log in",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCashMovements"
-    ]
    }
   ],
   "entryState": {
@@ -1170,15 +1073,19 @@
     {
      "name": "shiftId",
      "from": "session"
+    },
+    {
+     "name": "boxId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "Shift.id",
-    "Shift.workstationId",
-    "Shift.venueId",
-    "Shift.scopePath",
-    "Shift.principalId"
+    "CashMovement.id",
+    "CashMovement.kind",
+    "CashMovement.amount",
+    "CashMovement.denominations",
+    "CashMovement.reference"
    ]
   },
   "wireframe": {
@@ -1186,7 +1093,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-042"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares (split from BO-041 on 28 September, audit R276), not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1225,53 +1132,23 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
     "BO-008",
-    "BO-009",
     "BO-074"
    ],
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-074",
-     "trigger": "Chart of Accounts",
-     "provenance": "flow F98 step 1→2"
-    },
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-043 holds none of them, so the edge carries nothing and BO-008 opens cold"
     },
     {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
+     "to": "BO-074",
+     "trigger": "Chart of Accounts",
+     "provenance": "flow F98 step 1→2",
      "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+      "accountId"
+     ]
     }
    ]
   },
@@ -1280,13 +1157,6 @@
   "pattern": "listDetail",
   "patternReason": "`listSettlements` reads the population and `getTrialBalance` reads one of them — list, select, act",
   "purpose": "Prove the day balances before anyone goes home.",
-  "gaps": [
-   {
-    "operation": "getSettlement",
-    "why": "**3 declared operations reach no component on this screen**: getSettlement, listLedgerEntries, listSettlementExceptions. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1295,8 +1165,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Provider name",
+       "operation": "listSettlements",
+       "notes": "Sends `?providerName=` to `listSettlements`.",
+       "provenance": "contract finance.yaml GET /settlements"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listSettlements",
+       "notes": "Sends `?status=` to `listSettlements`.",
+       "provenance": "contract finance.yaml GET /settlements"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every daily reconciliation",
+       "label": "Every settlement",
        "bindsTo": "Settlement",
        "columns": [
         "Settlement.id",
@@ -1314,6 +1198,47 @@
        ],
        "operation": "listSettlements",
        "provenance": "contract finance.yaml GET /settlements"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every posting",
+       "bindsTo": "Posting",
+       "columns": [
+        "Posting.id",
+        "Posting.journalEntryId",
+        "Posting.accountId",
+        "Posting.accountCode",
+        "Posting.debit",
+        "Posting.credit",
+        "Posting.venueId",
+        "Posting.costCenterId",
+        "Posting.source",
+        "Posting.sourceId",
+        "Posting.description",
+        "Posting.postedAt"
+       ],
+       "operation": "listLedgerEntries",
+       "provenance": "contract finance.yaml GET /ledger/entries"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every settlement exception",
+       "bindsTo": "SettlementException",
+       "columns": [
+        "SettlementException.id",
+        "SettlementException.settlementId",
+        "SettlementException.kind",
+        "SettlementException.providerReference",
+        "SettlementException.paymentId",
+        "SettlementException.amount",
+        "SettlementException.expectedAmount",
+        "SettlementException.resolution",
+        "SettlementException.note",
+        "SettlementException.resolvedByPrincipalId",
+        "SettlementException.resolvedAt"
+       ],
+       "operation": "listSettlementExceptions",
+       "provenance": "contract finance.yaml GET /settlements/{settlementId}/exceptions"
       }
      ]
     },
@@ -1323,7 +1248,32 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected daily reconciliation",
+       "label": "The selected settlement",
+       "bindsTo": "Settlement",
+       "columns": [
+        "Settlement.id",
+        "Settlement.currencyCode",
+        "Settlement.providerName",
+        "Settlement.periodStart",
+        "Settlement.periodEnd",
+        "Settlement.fileReference",
+        "Settlement.format",
+        "Settlement.status",
+        "Settlement.lineCount",
+        "Settlement.matchedCount",
+        "Settlement.exceptionCount",
+        "Settlement.providerGross",
+        "Settlement.providerFees",
+        "Settlement.providerNet",
+        "Settlement.ledgerGross",
+        "Settlement.difference"
+       ],
+       "operation": "getSettlement",
+       "provenance": "contract finance.yaml GET /settlements/{settlementId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The trial balance",
        "bindsTo": "TrialBalance",
        "columns": [
         "TrialBalance.fiscalPeriodId",
@@ -1343,41 +1293,15 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Ingest",
+       "label": "Ingest settlement file",
        "operation": "ingestSettlementFile",
        "provenance": "contract finance.yaml POST /settlements"
       },
       {
        "kind": "secondaryButton",
-       "label": "Resolve",
+       "label": "Resolve settlement exception",
        "operation": "resolveSettlementException",
        "provenance": "contract finance.yaml POST /settlements/{settlementId}/exceptions"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listSettlements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "ingestSettlementFile",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1386,9 +1310,9 @@
   "states": {
    "loading": "The daily reconciliation list.",
    "error": "Could not load. Names which read failed and leaves the daily reconciliation untouched.",
-   "emptyFirstRun": "No daily reconciliation yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the daily reconciliation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No daily reconciliation yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on providerName, status and the daily reconciliation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `getTrialBalance` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1407,7 +1331,7 @@
     "operationId": "getSettlement",
     "contract": "finance",
     "purpose": "Settlement detail with match results",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "ingestSettlementFile",
@@ -1428,7 +1352,7 @@
     "operationId": "listSettlementExceptions",
     "contract": "finance",
     "purpose": "Unmatched or mismatched settlement lines",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "resolveSettlementException",
@@ -1449,11 +1373,11 @@
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `settlementId`.",
    "preloaded": [
-    "TrialBalance.fiscalPeriodId",
-    "TrialBalance.isBalanced",
-    "TrialBalance.totalDebit",
-    "TrialBalance.totalCredit",
-    "TrialBalance.accounts"
+    "Settlement.id",
+    "Settlement.currencyCode",
+    "Settlement.providerName",
+    "Settlement.periodStart",
+    "Settlement.periodEnd"
    ]
   },
   "wireframe": {
@@ -1462,6 +1386,49 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-043"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formIngestSettlementFile",
+    "component": "modal",
+    "trigger": "Ingest settlement file",
+    "body": "**Collects what `ingestSettlementFile` sends before it is called.** Required: `providerName`, `periodStart`, `periodEnd`, `fileReference`. Optional: `format`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Ingest settlement file",
+     "operation": "ingestSettlementFile"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "providerName",
+      "periodStart",
+      "periodEnd",
+      "fileReference",
+      "format"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /settlements"
+   },
+   {
+    "id": "formResolveSettlementException",
+    "component": "modal",
+    "trigger": "Resolve settlement exception",
+    "body": "**Collects what `resolveSettlementException` sends before it is called.** Required: `exceptionId`, `resolution`, `note`. Optional: `matchedPaymentId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Resolve settlement exception",
+     "operation": "resolveSettlementException"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "exceptionId",
+      "resolution",
+      "note",
+      "matchedPaymentId"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /settlements/{settlementId}/exceptions"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1500,47 +1467,14 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+    "BO-008"
    ],
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-047 holds none of them, so the edge carries nothing and BO-008 opens cold"
     }
    ]
   },
@@ -1549,13 +1483,6 @@
   "pattern": "listDetail",
   "patternReason": "`listOrders` reads the population and `getOrder` reads one of them — list, select, act",
   "purpose": "Fix an order that has gone wrong.",
-  "gaps": [
-   {
-    "operation": "getOrderStatement",
-    "why": "**2 declared operations reach no component on this screen**: getOrderStatement, listOrderRefunds. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1563,6 +1490,48 @@
      "name": "contentBody",
      "slot": "collection",
      "components": [
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listOrders",
+       "notes": "Sends `?venueId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Principal id",
+       "operation": "listOrders",
+       "notes": "Sends `?principalId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Shift id",
+       "operation": "listOrders",
+       "notes": "Sends `?shiftId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listOrders",
+       "notes": "Sends `?status=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created from",
+       "operation": "listOrders",
+       "notes": "Sends `?createdFrom=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created to",
+       "operation": "listOrders",
+       "notes": "Sends `?createdTo=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
       {
        "kind": "dataTable",
        "label": "Every order",
@@ -1578,6 +1547,34 @@
        ],
        "operation": "listOrders",
        "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every refund",
+       "bindsTo": "Refund",
+       "columns": [
+        "Refund.id",
+        "Refund.orderId",
+        "Refund.batchId",
+        "Refund.fxRate",
+        "Refund.taxReversalEntryId",
+        "Refund.settleTo",
+        "Refund.fxVariance",
+        "Refund.amount",
+        "Refund.appliedPercentage",
+        "Refund.status",
+        "Refund.reason",
+        "Refund.requestedByPrincipalId"
+       ],
+       "operation": "listOrderRefunds",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/refunds"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1588,6 +1585,42 @@
       {
        "kind": "detailPanel",
        "label": "The selected order",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount",
+        "OrderSummary.principalId",
+        "OrderSummary.holdLabel",
+        "OrderSummary.heldUntil"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The order statement",
+       "bindsTo": "OrderStatement",
+       "columns": [
+        "OrderStatement.orderId",
+        "OrderStatement.orderNumber",
+        "OrderStatement.currency",
+        "OrderStatement.currencyScale",
+        "OrderStatement.entries",
+        "OrderStatement.totalPaid",
+        "OrderStatement.totalRefunded",
+        "OrderStatement.currentBalance"
+       ],
+       "operation": "getOrderStatement",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/statement"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The order",
        "bindsTo": "Order",
        "columns": [
         "Order.id",
@@ -1618,111 +1651,63 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create order",
        "operation": "createOrder",
        "provenance": "contract orders.yaml POST /orders"
       },
       {
        "kind": "secondaryButton",
-       "label": "Apply",
+       "label": "Apply manual discount",
        "operation": "applyManualDiscount",
        "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create refund",
        "operation": "createRefund",
        "provenance": "contract orders.yaml POST /orders/{orderId}/refunds"
       },
       {
        "kind": "secondaryButton",
-       "label": "Exchange",
+       "label": "Exchange order lines",
        "operation": "exchangeOrderLines",
        "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
       },
       {
        "kind": "secondaryButton",
-       "label": "Hold",
+       "label": "Hold order",
        "operation": "holdOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
       },
       {
        "kind": "secondaryButton",
-       "label": "Modify",
+       "label": "Modify order",
        "operation": "modifyOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reprint",
+       "label": "Reprint order",
        "operation": "reprintOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reschedule",
+       "label": "Reschedule order",
        "operation": "rescheduleOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
       },
       {
        "kind": "secondaryButton",
-       "label": "Resume",
+       "label": "Resume order",
        "operation": "resumeOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
       },
       {
        "kind": "destructiveButton",
-       "label": "Void",
+       "label": "Void order",
        "operation": "voidOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listOrders",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createOrder",
-       "label": "Create order",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "voidOrder",
-       "label": "Void order",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createOrder",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1732,17 +1717,199 @@
    {
     "id": "confirmVoidOrder",
     "component": "confirmDialog",
-    "trigger": "Void",
-    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A order this affects should be identified in the dialog, not just counted.",
+    "trigger": "Void order",
+    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A order this affects should be identified in the dialog, not just counted. **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`. `reason` is the void reason list (`VoidReason`: guestChangedMind, enteredInError, itemUnavailable, qualityIssue, duplicate, other); **choosing Other makes `note` required** (decided 28 September, audit R125 (4), R222).",
     "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+   },
+   {
+    "id": "formCreateOrder",
+    "component": "modal",
+    "trigger": "Create order",
+    "body": "**Collects what `createOrder` sends before it is called.** Required: `id`, `venueId`, `channel`, `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `guestLinkId`, `catalogueBundleVersion`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateOrderRequest",
+    "confirm": {
+     "label": "Create order",
+     "operation": "createOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "channel",
+      "lines",
+      "recordedAt",
+      "shiftId",
+      "subjectId",
+      "guestLinkId",
+      "catalogueBundleVersion"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders"
+   },
+   {
+    "id": "formApplyManualDiscount",
+    "component": "modal",
+    "trigger": "Apply manual discount",
+    "body": "**Collects what `applyManualDiscount` sends before it is called.** Required: `id`, `reason`, `recordedAt`. Optional: `lineId`, `amount`, `percentage`, `reasonCode`, `approverPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ManualDiscountRequest",
+    "confirm": {
+     "label": "Apply manual discount",
+     "operation": "applyManualDiscount"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "reason",
+      "recordedAt",
+      "lineId",
+      "amount",
+      "percentage",
+      "reasonCode",
+      "approverPrincipalId"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
+   },
+   {
+    "id": "formCreateRefund",
+    "component": "modal",
+    "trigger": "Create refund",
+    "body": "**Collects what `createRefund` sends before it is called.** Required: `id`, `amount`, `reason`, `recordedAt`. Optional: `lineIds`, `secondaryAuthorisation`, `refundToOriginalTender`, `alternateTender`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateRefundRequest",
+    "confirm": {
+     "label": "Create refund",
+     "operation": "createRefund"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "amount",
+      "reason",
+      "recordedAt",
+      "lineIds",
+      "secondaryAuthorisation",
+      "refundToOriginalTender",
+      "alternateTender"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/refunds"
+   },
+   {
+    "id": "formExchangeOrderLines",
+    "component": "modal",
+    "trigger": "Exchange order lines",
+    "body": "**Collects what `exchangeOrderLines` sends before it is called.** Required: `id`, `outgoingLineIds`, `incomingLines`, `recordedAt`. Optional: `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ExchangeOrderRequest",
+    "confirm": {
+     "label": "Exchange order lines",
+     "operation": "exchangeOrderLines"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "outgoingLineIds",
+      "incomingLines",
+      "recordedAt",
+      "waiveFee",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
+   },
+   {
+    "id": "formHoldOrder",
+    "component": "modal",
+    "trigger": "Hold order",
+    "body": "**Collects what `holdOrder` sends before it is called.** Required: `recordedAt`. Optional: `label`, `holdUntil`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Hold order",
+     "operation": "holdOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recordedAt",
+      "label",
+      "holdUntil"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
+   },
+   {
+    "id": "formModifyOrder",
+    "component": "modal",
+    "trigger": "Modify order",
+    "body": "**Collects what `modifyOrder` sends before it is called.** Required: `id`, `recordedAt`. Optional: `addLines`, `removeLineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ModifyOrderRequest",
+    "confirm": {
+     "label": "Modify order",
+     "operation": "modifyOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "recordedAt",
+      "addLines",
+      "removeLineIds",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
+   },
+   {
+    "id": "formReprintOrder",
+    "component": "modal",
+    "trigger": "Reprint order",
+    "body": "**Collects what `reprintOrder` sends before it is called.** Required: `delivery`, `recordedAt`. Optional: `destination`, `lineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reprint order",
+     "operation": "reprintOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "delivery",
+      "recordedAt",
+      "destination",
+      "lineIds",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
+   },
+   {
+    "id": "formRescheduleOrder",
+    "component": "modal",
+    "trigger": "Reschedule order",
+    "body": "**Collects what `rescheduleOrder` sends before it is called.** Required: `targetPerformanceId`, `recordedAt`. Optional: `lineIds`, `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reschedule order",
+     "operation": "rescheduleOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "targetPerformanceId",
+      "recordedAt",
+      "lineIds",
+      "waiveFee",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
    }
   ],
   "states": {
    "loading": "The order list.",
    "error": "Could not load. Names which read failed and leaves the order untouched.",
-   "emptyFirstRun": "No order yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the order are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No order yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the order are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1755,7 +1922,7 @@
     "operationId": "getOrder",
     "contract": "orders",
     "purpose": "Read an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createOrder",
@@ -1797,7 +1964,7 @@
     "operationId": "getOrderStatement",
     "contract": "orders",
     "purpose": "Full financial history of an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "holdOrder",
@@ -1812,7 +1979,7 @@
     "operationId": "listOrderRefunds",
     "contract": "orders",
     "purpose": "List refunds against an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "modifyOrder",
@@ -1869,11 +2036,11 @@
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
    "preloaded": [
-    "Order.id",
-    "Order.orderNumber",
-    "Order.channel",
-    "Order.venueId",
-    "Order.scopePath"
+    "OrderSummary.id",
+    "OrderSummary.orderNumber",
+    "OrderSummary.status",
+    "OrderSummary.grossAmount",
+    "OrderSummary.refundedAmount"
    ]
   },
   "wireframe": {
@@ -1921,48 +2088,15 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+    "BO-008"
    ],
    "inferred": true,
    "fromFlows": true,
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-048 holds none of them, so the edge carries nothing and BO-008 opens cold"
     },
     {
      "to": "GST-026",
@@ -1987,8 +2121,36 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Outlet id",
+       "operation": "listMerchandise",
+       "notes": "Sends `?outletId=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "textField",
+       "label": "Category id",
+       "operation": "listMerchandise",
+       "notes": "Sends `?categoryId=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "toggle",
+       "label": "In stock only",
+       "operation": "listMerchandise",
+       "notes": "Sends `?inStockOnly=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "listMerchandise",
+       "notes": "Sends `?search=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every retail products",
+       "label": "Every merchandise",
        "bindsTo": "MerchandiseItem",
        "columns": [
         "MerchandiseItem.id",
@@ -2006,6 +2168,14 @@
        ],
        "operation": "listMerchandise",
        "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "searchField",
+       "derived": true,
+       "impliedBy": "lookupMerchandise",
+       "label": "Search",
+       "notes": "A search that returns nothing must say so differently from a search not yet run.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -2015,7 +2185,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected retail products",
+       "label": "The selected merchandise",
        "bindsTo": "MerchandiseItem",
        "columns": [
         "MerchandiseItem.id",
@@ -2045,62 +2215,21 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Lookup",
+       "label": "Lookup merchandise",
        "operation": "lookupMerchandise",
        "provenance": "contract retail.yaml GET /merchandise/lookup"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create merchandise",
        "operation": "createMerchandise",
        "provenance": "contract retail.yaml POST /merchandise"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save merchandise",
        "operation": "updateMerchandise",
        "provenance": "contract retail.yaml PATCH /merchandise/{merchandiseId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listMerchandise",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "searchField",
-       "derived": true,
-       "impliedBy": "lookupMerchandise",
-       "label": "Search",
-       "notes": "A search that returns nothing must say so differently from a search not yet run.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createMerchandise",
-       "label": "Create merchandise",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createMerchandise",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -2109,9 +2238,9 @@
   "states": {
    "loading": "The retail products list.",
    "error": "Could not load. Names which read failed and leaves the retail products untouched.",
-   "emptyFirstRun": "No retail products yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the retail products are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No retail products yet. Offers Create merchandise (`createMerchandise`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on outletId, categoryId, inStockOnly, search and the retail products are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listMerchandise` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2124,7 +2253,7 @@
     "operationId": "lookupMerchandise",
     "contract": "retail",
     "purpose": "Price and stock check by barcode",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createMerchandise",
@@ -2167,411 +2296,63 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-048"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-051",
-  "name": "Purchase Orders",
-  "module": "Orders & Money",
-  "requiresModule": "ticketing",
-  "wave": 2,
-  "capability": "C00",
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/venue-operations/purchase-orders",
-   "component": "apps/venue-management-web/src/routes/venue-operations/PurchaseOrdersDetail.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
-   ],
-   "inferred": true,
-   "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **createRefund removed 18 August** — attached by module resemblance, not by what this screen does. A screen that does not handle money should not be able to move it (CF-87's class).",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listOrders` reads the population and `getOrder` reads one of them — list, select, act",
-  "purpose": "Order more of what is running out.",
-  "gaps": [
-   {
-    "operation": "getOrderStatement",
-    "why": "**2 declared operations reach no component on this screen**: getOrderStatement, listOrderRefunds. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every purchase orders",
-       "bindsTo": "OrderSummary",
-       "columns": [
-        "OrderSummary.id",
-        "OrderSummary.orderNumber",
-        "OrderSummary.status",
-        "OrderSummary.grossAmount",
-        "OrderSummary.refundedAmount",
-        "OrderSummary.channel",
-        "OrderSummary.lineCount"
-       ],
-       "operation": "listOrders",
-       "provenance": "contract orders.yaml GET /orders"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected purchase orders",
-       "bindsTo": "Order",
-       "columns": [
-        "Order.id",
-        "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
-        "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
-        "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount",
-        "Order.totalPriceVariance",
-        "Order.lines",
-        "Order.payments",
-        "Order.principalId"
-       ],
-       "operation": "getOrder",
-       "provenance": "contract orders.yaml GET /orders/{orderId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createOrder",
-       "provenance": "contract orders.yaml POST /orders"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Apply",
-       "operation": "applyManualDiscount",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Exchange",
-       "operation": "exchangeOrderLines",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Hold",
-       "operation": "holdOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Modify",
-       "operation": "modifyOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reprint",
-       "operation": "reprintOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reschedule",
-       "operation": "rescheduleOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Resume",
-       "operation": "resumeOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Void",
-       "operation": "voidOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listOrders",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createOrder",
-       "label": "Create order",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "voidOrder",
-       "label": "Void order",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createOrder",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
   "overlays": [
    {
-    "id": "confirmVoidOrder",
-    "component": "confirmDialog",
-    "trigger": "Void",
-    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A purchase orders this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+    "id": "formCreateMerchandise",
+    "component": "modal",
+    "trigger": "Create merchandise",
+    "body": "**Collects what `createMerchandise` sends before it is called.** Required: `sku`, `name`, `outletId`, `variantId`. Optional: `barcode`, `description`, `categoryId`, `inventoryItemId`, `isReturnable`, `returnWindowDays`, `requiresSerialNumber`, `imageAssetRef`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateMerchandiseRequest",
+    "confirm": {
+     "label": "Create merchandise",
+     "operation": "createMerchandise"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "sku",
+      "name",
+      "outletId",
+      "variantId",
+      "barcode",
+      "description",
+      "categoryId",
+      "inventoryItemId",
+      "isReturnable",
+      "returnWindowDays",
+      "requiresSerialNumber",
+      "imageAssetRef"
+     ]
+    },
+    "provenance": "contract retail.yaml POST /merchandise"
+   },
+   {
+    "id": "formUpdateMerchandise",
+    "component": "modal",
+    "trigger": "Save merchandise",
+    "body": "**Collects what `updateMerchandise` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `barcode`, `categoryId`, `inventoryItemId`, `imageAssetRef`, `isReturnable`, `returnWindowDays`, `requiresSerialNumber`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save merchandise",
+     "operation": "updateMerchandise"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "description",
+      "barcode",
+      "categoryId",
+      "inventoryItemId",
+      "imageAssetRef",
+      "isReturnable",
+      "returnWindowDays",
+      "requiresSerialNumber",
+      "isActive"
+     ]
+    },
+    "provenance": "contract retail.yaml PATCH /merchandise/{merchandiseId}"
    }
   ],
-  "states": {
-   "loading": "The purchase orders list.",
-   "error": "Could not load. Names which read failed and leaves the purchase orders untouched.",
-   "emptyFirstRun": "No purchase orders yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the purchase orders are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listOrders",
-    "contract": "orders",
-    "purpose": "List orders",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getOrder",
-    "contract": "orders",
-    "purpose": "Read an order",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createOrder",
-    "contract": "orders",
-    "purpose": "Create an order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "applyManualDiscount",
-    "contract": "orders",
-    "purpose": "Apply a discount a cashier chose",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "exchangeOrderLines",
-    "contract": "orders",
-    "purpose": "Exchange lines for different products or dates",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "getOrderStatement",
-    "contract": "orders",
-    "purpose": "Full financial history of an order",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "holdOrder",
-    "contract": "orders",
-    "purpose": "Park a sale and free the till",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "listOrderRefunds",
-    "contract": "orders",
-    "purpose": "List refunds against an order",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "modifyOrder",
-    "contract": "orders",
-    "purpose": "Add or remove lines on an existing order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "reprintOrder",
-    "contract": "orders",
-    "purpose": "Reprint or resend tickets",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "rescheduleOrder",
-    "contract": "orders",
-    "purpose": "Move an order to another performance",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "resumeOrder",
-    "contract": "orders",
-    "purpose": "Bring a parked sale back to a till",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "voidOrder",
-    "contract": "orders",
-    "purpose": "Void an order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "orderId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
-   "preloaded": [
-    "Order.id",
-    "Order.orderNumber",
-    "Order.channel",
-    "Order.venueId",
-    "Order.scopePath"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-051"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2610,47 +2391,14 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+    "BO-008"
    ],
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-059 holds none of them, so the edge carries nothing and BO-008 opens cold"
     }
    ]
   },
@@ -2659,13 +2407,6 @@
   "pattern": "listDetail",
   "patternReason": "`listReports` reads the population and `getFinancialReport` reads one of them — list, select, act",
   "purpose": "See what sold, through which channel.",
-  "gaps": [
-   {
-    "operation": "getReport",
-    "why": "**1 declared operation reach no component on this screen**: getReport. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -2674,8 +2415,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Category",
+       "operation": "listReports",
+       "notes": "Sends `?category=` to `listReports`.",
+       "provenance": "contract reporting.yaml GET /reports"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "listReports",
+       "notes": "Sends `?search=` to `listReports`.",
+       "provenance": "contract reporting.yaml GET /reports"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every sales reports",
+       "label": "Every report definition",
        "bindsTo": "ReportDefinition",
        "columns": [
         "ReportDefinition.name",
@@ -2693,6 +2448,13 @@
        ],
        "operation": "listReports",
        "provenance": "contract reporting.yaml GET /reports"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -2702,7 +2464,32 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected sales reports",
+       "label": "The selected report definition",
+       "bindsTo": "ReportDefinition",
+       "columns": [
+        "ReportDefinition.name",
+        "ReportDefinition.description",
+        "ReportDefinition.category",
+        "ReportDefinition.dataSource",
+        "ReportDefinition.columns",
+        "ReportDefinition.filters",
+        "ReportDefinition.groupBy",
+        "ReportDefinition.parameters",
+        "ReportDefinition.requiredPermission",
+        "ReportDefinition.maxDateRangeDays",
+        "ReportDefinition.id",
+        "ReportDefinition.isSystem",
+        "ReportDefinition.isRetired",
+        "ReportDefinition.estimatedCost",
+        "ReportDefinition.createdByPrincipalId",
+        "ReportDefinition.lastRunAt"
+       ],
+       "operation": "getReport",
+       "provenance": "contract reporting.yaml GET /reports/{reportId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The financial report",
        "bindsTo": "FinancialReport",
        "columns": [
         "FinancialReport.report",
@@ -2724,87 +2511,40 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create report",
        "operation": "createReport",
        "provenance": "contract reporting.yaml POST /reports"
       },
       {
        "kind": "secondaryButton",
-       "label": "Ask",
+       "label": "Ask reporting question",
        "operation": "askReportingQuestion",
        "provenance": "contract reporting.yaml POST /reports/ask"
       },
       {
        "kind": "destructiveButton",
-       "label": "Delete",
+       "label": "Delete report",
        "operation": "deleteReport",
        "provenance": "contract reporting.yaml DELETE /reports/{reportId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
+       "notes": "**Runs the seeded report `salesByChannel`** — net sales per sales channel for the period (proposed, client to correct; decided 28 September, audit R282). `reportId` is the venue's seeded definition with that code, listed on `listSeededReports`.",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save",
+       "label": "Save natural language query",
        "operation": "saveNaturalLanguageQuery",
        "provenance": "contract reporting.yaml POST /reports/ask/{conversationId}/save"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save report",
        "operation": "updateReport",
        "provenance": "contract reporting.yaml PUT /reports/{reportId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listReports",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createReport",
-       "label": "Create report",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "deleteReport",
-       "label": "Delete report",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createReport",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -2814,17 +2554,130 @@
    {
     "id": "confirmDeleteReport",
     "component": "confirmDialog",
-    "trigger": "Delete",
+    "trigger": "Delete report",
     "body": "**Names what `deleteReport` changes and what it leaves alone**, in the consequence rather than the verb. A sales reports this affects should be identified in the dialog, not just counted.",
     "provenance": "contract reporting.yaml DELETE /reports/{reportId}"
+   },
+   {
+    "id": "formCreateReport",
+    "component": "modal",
+    "trigger": "Create report",
+    "body": "**Collects what `createReport` sends before it is called.** Required: `name`, `category`, `dataSource`, `columns`, `requiredPermission`. Optional: `description`, `filters`, `groupBy`, `parameters`, `maxDateRangeDays`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateReportRequest",
+    "confirm": {
+     "label": "Create report",
+     "operation": "createReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "category",
+      "dataSource",
+      "columns",
+      "requiredPermission",
+      "description",
+      "filters",
+      "groupBy",
+      "parameters",
+      "maxDateRangeDays"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports"
+   },
+   {
+    "id": "formAskReportingQuestion",
+    "component": "modal",
+    "trigger": "Ask reporting question",
+    "body": "**Collects what `askReportingQuestion` sends before it is called.** Required: `question`. Optional: `conversationId`, `venueId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Ask reporting question",
+     "operation": "askReportingQuestion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "question",
+      "conversationId",
+      "venueId"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/ask"
+   },
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   },
+   {
+    "id": "formSaveNaturalLanguageQuery",
+    "component": "modal",
+    "trigger": "Save natural language query",
+    "body": "**Collects what `saveNaturalLanguageQuery` sends before it is called.** Required: `name`. Optional: `category`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save natural language query",
+     "operation": "saveNaturalLanguageQuery"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "category"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/ask/{conversationId}/save"
+   },
+   {
+    "id": "formUpdateReport",
+    "component": "modal",
+    "trigger": "Save report",
+    "body": "**Collects what `updateReport` sends before it is called.** Required: `name`, `category`, `dataSource`, `columns`, `requiredPermission`. Optional: `description`, `filters`, `groupBy`, `parameters`, `maxDateRangeDays`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateReportRequest",
+    "confirm": {
+     "label": "Save report",
+     "operation": "updateReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "category",
+      "dataSource",
+      "columns",
+      "requiredPermission",
+      "description",
+      "filters",
+      "groupBy",
+      "parameters",
+      "maxDateRangeDays"
+     ]
+    },
+    "provenance": "contract reporting.yaml PUT /reports/{reportId}"
    }
   ],
   "states": {
    "loading": "The sales reports list.",
    "error": "Could not load. Names which read failed and leaves the sales reports untouched.",
-   "emptyFirstRun": "No sales reports yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the sales reports are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No sales reports yet. Offers Create report (`createReport`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on category, search and the sales reports are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2870,12 +2723,12 @@
     "operationId": "getReport",
     "contract": "reporting",
     "purpose": "Read a report definition",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "runReport",
     "contract": "reporting",
-    "purpose": "Run a report",
+    "purpose": "Run the seeded report `salesByChannel` (proposed, audit R282)",
     "trigger": "onAction",
     "invalidates": [
      "listReports"
@@ -2913,11 +2766,11 @@
    ],
    "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom.",
    "preloaded": [
-    "FinancialReport.report",
-    "FinancialReport.fiscalPeriodId",
-    "FinancialReport.legalEntityId",
-    "FinancialReport.currency",
-    "FinancialReport.currencyScale"
+    "ReportDefinition.name",
+    "ReportDefinition.description",
+    "ReportDefinition.category",
+    "ReportDefinition.dataSource",
+    "ReportDefinition.columns"
    ]
   },
   "wireframe": {
@@ -2964,10 +2817,7 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
     "BO-008",
-    "BO-009",
     "BO-060"
    ],
    "inferred": true,
@@ -2976,60 +2826,25 @@
    ],
    "transitions": [
     {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-061 holds none of them, so the edge carries nothing and BO-008 opens cold"
+    },
+    {
      "to": "BO-060",
      "trigger": "Attendance & Footfall",
      "provenance": "flow F107 step 2→3",
-     "operation": "updateReport"
-    },
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
      "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+      "reportId"
+     ]
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Rebound 28 September to report schedules (audit R254, R261)** — the screen carried report-definition and natural-language operations (`askReportingQuestion`, `saveNaturalLanguageQuery`, `getFinancialReport`, `deleteReport` and five more) that serve BO-058 and BO-060; it now lists, creates, changes and deletes schedules and shows each schedule's delivery history.",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "`listReports` reads the population and `getFinancialReport` reads one of them — list, select, act",
+  "patternReason": "`listReportSchedules` reads the population and `listReportExecutions` reads the delivery history of the selected one — list, select, act",
   "purpose": "Send a report to somebody without them asking.",
-  "gaps": [
-   {
-    "operation": "getReport",
-    "why": "**1 declared operation reach no component on this screen**: getReport. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -3039,24 +2854,22 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every scheduled reports",
-       "bindsTo": "ReportDefinition",
+       "label": "Every report schedule",
+       "bindsTo": "ReportSchedule",
        "columns": [
-        "ReportDefinition.name",
-        "ReportDefinition.description",
-        "ReportDefinition.category",
-        "ReportDefinition.dataSource",
-        "ReportDefinition.columns",
-        "ReportDefinition.filters",
-        "ReportDefinition.groupBy",
-        "ReportDefinition.parameters",
-        "ReportDefinition.requiredPermission",
-        "ReportDefinition.maxDateRangeDays",
-        "ReportDefinition.id",
-        "ReportDefinition.isSystem"
+        "ReportSchedule.name",
+        "ReportSchedule.reportId",
+        "ReportSchedule.cadence",
+        "ReportSchedule.recipients",
+        "ReportSchedule.format",
+        "ReportSchedule.isPaused",
+        "ReportSchedule.lastRunAt",
+        "ReportSchedule.lastRunStatus",
+        "ReportSchedule.nextRunAt",
+        "ReportSchedule.consecutiveFailures"
        ],
-       "operation": "listReports",
-       "provenance": "contract reporting.yaml GET /reports"
+       "operation": "listReportSchedules",
+       "provenance": "contract reporting.yaml GET /report-schedules"
       }
      ]
     },
@@ -3065,20 +2878,20 @@
      "slot": "selection",
      "components": [
       {
-       "kind": "detailPanel",
-       "label": "The selected scheduled reports",
-       "bindsTo": "FinancialReport",
+       "kind": "dataTable",
+       "label": "Delivery history",
+       "bindsTo": "ReportExecution",
        "columns": [
-        "FinancialReport.report",
-        "FinancialReport.fiscalPeriodId",
-        "FinancialReport.legalEntityId",
-        "FinancialReport.currency",
-        "FinancialReport.currencyScale",
-        "FinancialReport.generatedAt",
-        "FinancialReport.sections"
+        "ReportExecution.requestedAt",
+        "ReportExecution.completedAt",
+        "ReportExecution.status",
+        "ReportExecution.rowCount",
+        "ReportExecution.error",
+        "ReportExecution.expiresAt"
        ],
-       "operation": "getFinancialReport",
-       "provenance": "contract finance.yaml GET /reports/financial"
+       "operation": "listReportExecutions",
+       "notes": "Sends `?reportId=` of the selected schedule to `listReportExecutions`; each run the schedule made is a row, with its status and any error, so a recipient who says they never got it can be answered.",
+       "provenance": "contract reporting.yaml GET /report-executions"
       }
      ]
     },
@@ -3088,87 +2901,21 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createReport",
-       "provenance": "contract reporting.yaml POST /reports"
+       "label": "Create report schedule",
+       "operation": "createReportSchedule",
+       "provenance": "contract reporting.yaml POST /report-schedules"
       },
       {
        "kind": "secondaryButton",
-       "label": "Ask",
-       "operation": "askReportingQuestion",
-       "provenance": "contract reporting.yaml POST /reports/ask"
+       "label": "Save report schedule",
+       "operation": "updateReportSchedule",
+       "provenance": "contract reporting.yaml PATCH /report-schedules/{scheduleId}"
       },
       {
        "kind": "destructiveButton",
-       "label": "Delete",
-       "operation": "deleteReport",
-       "provenance": "contract reporting.yaml DELETE /reports/{reportId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Run",
-       "operation": "runReport",
-       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save",
-       "operation": "saveNaturalLanguageQuery",
-       "provenance": "contract reporting.yaml POST /reports/ask/{conversationId}/save"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updateReport",
-       "provenance": "contract reporting.yaml PUT /reports/{reportId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listReports",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createReport",
-       "label": "Create report",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "deleteReport",
-       "label": "Delete report",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createReport",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
+       "label": "Delete report schedule",
+       "operation": "deleteReportSchedule",
+       "provenance": "contract reporting.yaml DELETE /report-schedules/{scheduleId}"
       }
      ]
     }
@@ -3176,112 +2923,123 @@
   },
   "overlays": [
    {
-    "id": "confirmDeleteReport",
+    "id": "formCreateReportSchedule",
+    "component": "modal",
+    "trigger": "Create report schedule",
+    "body": "**Collects what `createReportSchedule` sends before it is called.** Required: `reportId`, `cadence`, `recipients`, `format`. Optional: `name`, `parameters`, `includePersonalData`, `skipIfEmpty`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateReportScheduleRequest",
+    "confirm": {
+     "label": "Create report schedule",
+     "operation": "createReportSchedule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reportId",
+      "name",
+      "cadence",
+      "parameters",
+      "recipients",
+      "format",
+      "includePersonalData",
+      "skipIfEmpty"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /report-schedules"
+   },
+   {
+    "id": "formUpdateReportSchedule",
+    "component": "modal",
+    "trigger": "Save report schedule",
+    "body": "**Collects what `updateReportSchedule` sends before it is called.** At least one of `isPaused`, `cadence`, `recipients`, `format`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save report schedule",
+     "operation": "updateReportSchedule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "isPaused",
+      "cadence",
+      "recipients",
+      "format"
+     ]
+    },
+    "provenance": "contract reporting.yaml PATCH /report-schedules/{scheduleId}"
+   },
+   {
+    "id": "confirmDeleteReportSchedule",
     "component": "confirmDialog",
-    "trigger": "Delete",
-    "body": "**Names what `deleteReport` changes and what it leaves alone**, in the consequence rather than the verb. A scheduled reports this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract reporting.yaml DELETE /reports/{reportId}"
+    "trigger": "Delete report schedule",
+    "body": "**Names the schedule and who stops receiving it.** Deleting stops future deliveries; the delivery history already made stays.",
+    "provenance": "contract reporting.yaml DELETE /report-schedules/{scheduleId}"
    }
   ],
   "states": {
-   "loading": "The scheduled reports list.",
-   "error": "Could not load. Names which read failed and leaves the scheduled reports untouched.",
-   "emptyFirstRun": "No scheduled reports yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the scheduled reports are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The report schedules.",
+   "error": "Could not load. Names which read failed and leaves the schedules untouched.",
+   "emptyFirstRun": "No report schedules yet. Offers Create report schedule (`createReportSchedule`).",
+   "emptyNoResults": "Never shown: `listReportSchedules` takes no filter here, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listReportSchedules` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "getFinancialReport",
-    "contract": "finance",
-    "purpose": "P&L, balance sheet or cash flow",
+    "operationId": "listReportSchedules",
+    "contract": "reporting",
+    "purpose": "Every scheduled delivery",
     "trigger": "onLoad"
    },
    {
-    "operationId": "listReports",
+    "operationId": "createReportSchedule",
     "contract": "reporting",
-    "purpose": "List available report definitions",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createReport",
-    "contract": "reporting",
-    "purpose": "Create a custom report definition",
+    "purpose": "Schedule a report to recipients",
     "trigger": "onAction",
     "invalidates": [
-     "listReports"
+     "listReportSchedules"
     ]
    },
    {
-    "operationId": "askReportingQuestion",
+    "operationId": "updateReportSchedule",
     "contract": "reporting",
-    "purpose": "Natural-language reporting query",
+    "purpose": "Pause, change cadence, recipients or format",
     "trigger": "onAction",
     "invalidates": [
-     "listReports"
+     "listReportSchedules"
     ]
    },
    {
-    "operationId": "deleteReport",
+    "operationId": "deleteReportSchedule",
     "contract": "reporting",
-    "purpose": "Retire a report definition",
+    "purpose": "Stop a scheduled delivery",
     "trigger": "onAction",
     "invalidates": [
-     "listReports"
+     "listReportSchedules"
     ]
    },
    {
-    "operationId": "getReport",
+    "operationId": "listReportExecutions",
     "contract": "reporting",
-    "purpose": "Read a report definition",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "runReport",
-    "contract": "reporting",
-    "purpose": "Run a report",
-    "trigger": "onAction",
-    "invalidates": [
-     "listReports"
-    ]
-   },
-   {
-    "operationId": "saveNaturalLanguageQuery",
-    "contract": "reporting",
-    "purpose": "Save a natural-language answer as a report definition",
-    "trigger": "onAction",
-    "invalidates": [
-     "listReports"
-    ]
-   },
-   {
-    "operationId": "updateReport",
-    "contract": "reporting",
-    "purpose": "Publish a new version of a definition",
-    "trigger": "onAction",
-    "invalidates": [
-     "listReports"
-    ]
+    "purpose": "Delivery history of a schedule",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "conversationId",
-     "from": "deepLink"
+     "name": "reportId",
+     "from": "deepLink",
+     "optional": true
     },
     {
-     "name": "reportId",
-     "from": "deepLink"
+     "name": "scheduleId",
+     "from": "navigation"
     }
    ],
-   "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom.",
+   "coldEntry": "A link to a report's schedules. Opens the list filtered to that report, or says the report no longer exists.",
    "preloaded": [
-    "FinancialReport.report",
-    "FinancialReport.fiscalPeriodId",
-    "FinancialReport.legalEntityId",
-    "FinancialReport.currency",
-    "FinancialReport.currencyScale"
+    "ReportSchedule.name",
+    "ReportSchedule.reportId",
+    "ReportSchedule.cadence"
    ]
   },
   "wireframe": {
@@ -3289,7 +3047,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-061"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 28 September 2026 on report schedules (audit R254, R261). The 9 report-definition and natural-language operations bound on 9 September served BO-058/BO-060, not scheduling, and were removed.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -3328,47 +3086,14 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+    "BO-008"
    ],
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-062 holds none of them, so the edge carries nothing and BO-008 opens cold"
     }
    ]
   },
@@ -3377,13 +3102,6 @@
   "pattern": "listDetail",
   "patternReason": "`listDiningOutlets` reads the population and `getRefundPolicy` reads one of them — list, select, act",
   "purpose": "The facts every other surface reads.",
-  "gaps": [
-   {
-    "operation": "listDeliveryLocations",
-    "why": "**1 declared operation reach no component on this screen**: listDeliveryLocations. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -3392,8 +3110,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "toggle",
+       "label": "Open now",
+       "operation": "listDiningOutlets",
+       "notes": "Sends `?openNow=` to `listDiningOutlets`.",
+       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
+      },
+      {
+       "kind": "textField",
+       "label": "Ordering method",
+       "operation": "listDiningOutlets",
+       "notes": "Sends `?orderingMethod=` to `listDiningOutlets`.",
+       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every venue profile",
+       "label": "Every dining outlet",
        "bindsTo": "DiningOutlet",
        "columns": [
         "DiningOutlet.outletId",
@@ -3411,6 +3143,26 @@
        ],
        "operation": "listDiningOutlets",
        "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every delivery location",
+       "bindsTo": "DeliveryLocation",
+       "columns": [
+        "DeliveryLocation.id",
+        "DeliveryLocation.venueId",
+        "DeliveryLocation.kind",
+        "DeliveryLocation.label",
+        "DeliveryLocation.zone",
+        "DeliveryLocation.tableId",
+        "DeliveryLocation.seatId",
+        "DeliveryLocation.servingOutletIds",
+        "DeliveryLocation.isServiceable",
+        "DeliveryLocation.unserviceableReason",
+        "DeliveryLocation.walkTimeMinutes"
+       ],
+       "operation": "listDeliveryLocations",
+       "provenance": "contract fnb.yaml GET /venues/{venueId}/delivery-locations"
       }
      ]
     },
@@ -3420,7 +3172,28 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected venue profile",
+       "label": "The selected dining outlet",
+       "bindsTo": "DiningOutlet",
+       "columns": [
+        "DiningOutlet.outletId",
+        "DiningOutlet.name",
+        "DiningOutlet.kind",
+        "DiningOutlet.zone",
+        "DiningOutlet.cuisine",
+        "DiningOutlet.isOpenNow",
+        "DiningOutlet.opensAt",
+        "DiningOutlet.closesAt",
+        "DiningOutlet.orderingMethod",
+        "DiningOutlet.estimatedWaitMinutes",
+        "DiningOutlet.imageAssetRef",
+        "DiningOutlet.menuId"
+       ],
+       "operation": "listDiningOutlets",
+       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The refund policy",
        "bindsTo": "RefundPolicy",
        "columns": [
         "RefundPolicy.id",
@@ -3444,42 +3217,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save refund policy",
        "operation": "setRefundPolicy",
        "provenance": "contract orders.yaml PUT /venues/{venueId}/refund-policy"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listDiningOutlets",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setRefundPolicy",
-       "label": "Save refund policy",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setRefundPolicy",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -3488,9 +3228,9 @@
   "states": {
    "loading": "The venue profile list.",
    "error": "Could not load. Names which read failed and leaves the venue profile untouched.",
-   "emptyFirstRun": "No venue profile yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the venue profile are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No venue profile yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on openNow, orderingMethod and the venue profile are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getRefundPolicy` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -3530,11 +3270,11 @@
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "RefundPolicy.id",
-    "RefundPolicy.venueId",
-    "RefundPolicy.selfAuthoriseLimit",
-    "RefundPolicy.requiresSecondUserAbove",
-    "RefundPolicy.requiresApprovalAbove"
+    "DiningOutlet.outletId",
+    "DiningOutlet.name",
+    "DiningOutlet.kind",
+    "DiningOutlet.zone",
+    "DiningOutlet.cuisine"
    ]
   },
   "wireframe": {
@@ -3543,6 +3283,369 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-062"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetRefundPolicy",
+    "component": "modal",
+    "trigger": "Save refund policy",
+    "body": "**Collects what `setRefundPolicy` sends before it is called.** Required: `venueId`, `selfAuthoriseLimit`, `requiresApprovalAbove`. Optional: `id`, `requiresSecondUserAbove`, `timeBands`, `allowPartial`, `refundWindowDays`, `varianceThreshold`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RefundPolicy",
+    "confirm": {
+     "label": "Save refund policy",
+     "operation": "setRefundPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "selfAuthoriseLimit",
+      "requiresApprovalAbove",
+      "id",
+      "requiresSecondUserAbove",
+      "timeBands",
+      "allowPartial",
+      "refundWindowDays",
+      "varianceThreshold"
+     ]
+    },
+    "provenance": "contract orders.yaml PUT /venues/{venueId}/refund-policy"
+   }
+  ],
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-065",
+  "name": "Venue Configuration",
+  "module": "Orders & Money",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/venue-configuration",
+   "component": "apps/venue-management-web/src/routes/venue-operations/VenueConfigurationDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-008"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-065 holds none of them, so the edge carries nothing and BO-008 opens cold"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listDiningOutlets` reads the population and `getRefundPolicy` reads one of them — list, select, act",
+  "purpose": "Set the venue-level values everything inherits from.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "toggle",
+       "label": "Open now",
+       "operation": "listDiningOutlets",
+       "notes": "Sends `?openNow=` to `listDiningOutlets`.",
+       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
+      },
+      {
+       "kind": "textField",
+       "label": "Ordering method",
+       "operation": "listDiningOutlets",
+       "notes": "Sends `?orderingMethod=` to `listDiningOutlets`.",
+       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every dining outlet",
+       "bindsTo": "DiningOutlet",
+       "columns": [
+        "DiningOutlet.outletId",
+        "DiningOutlet.name",
+        "DiningOutlet.kind",
+        "DiningOutlet.zone",
+        "DiningOutlet.cuisine",
+        "DiningOutlet.isOpenNow",
+        "DiningOutlet.opensAt",
+        "DiningOutlet.closesAt",
+        "DiningOutlet.orderingMethod",
+        "DiningOutlet.estimatedWaitMinutes",
+        "DiningOutlet.imageAssetRef",
+        "DiningOutlet.menuId"
+       ],
+       "operation": "listDiningOutlets",
+       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every delivery location",
+       "bindsTo": "DeliveryLocation",
+       "columns": [
+        "DeliveryLocation.id",
+        "DeliveryLocation.venueId",
+        "DeliveryLocation.kind",
+        "DeliveryLocation.label",
+        "DeliveryLocation.zone",
+        "DeliveryLocation.tableId",
+        "DeliveryLocation.seatId",
+        "DeliveryLocation.servingOutletIds",
+        "DeliveryLocation.isServiceable",
+        "DeliveryLocation.unserviceableReason",
+        "DeliveryLocation.walkTimeMinutes"
+       ],
+       "operation": "listDeliveryLocations",
+       "provenance": "contract fnb.yaml GET /venues/{venueId}/delivery-locations"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected dining outlet",
+       "bindsTo": "DiningOutlet",
+       "columns": [
+        "DiningOutlet.outletId",
+        "DiningOutlet.name",
+        "DiningOutlet.kind",
+        "DiningOutlet.zone",
+        "DiningOutlet.cuisine",
+        "DiningOutlet.isOpenNow",
+        "DiningOutlet.opensAt",
+        "DiningOutlet.closesAt",
+        "DiningOutlet.orderingMethod",
+        "DiningOutlet.estimatedWaitMinutes",
+        "DiningOutlet.imageAssetRef",
+        "DiningOutlet.menuId"
+       ],
+       "operation": "listDiningOutlets",
+       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The refund policy",
+       "bindsTo": "RefundPolicy",
+       "columns": [
+        "RefundPolicy.id",
+        "RefundPolicy.venueId",
+        "RefundPolicy.selfAuthoriseLimit",
+        "RefundPolicy.requiresSecondUserAbove",
+        "RefundPolicy.requiresApprovalAbove",
+        "RefundPolicy.timeBands",
+        "RefundPolicy.allowPartial",
+        "RefundPolicy.refundWindowDays",
+        "RefundPolicy.varianceThreshold"
+       ],
+       "operation": "getRefundPolicy",
+       "provenance": "contract orders.yaml GET /venues/{venueId}/refund-policy"
+      },
+      {
+       "kind": "toggle",
+       "label": "Guest two-step verification",
+       "bindsTo": "VenueSettings.identity.guestTwoStep.enabled",
+       "operation": "setVenueSettings",
+       "notes": "**A venue option, off unless the venue enables it** (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of audit R167 \"no guest MFA\"; guests still never use enterprise SSO). On, a guest of this venue may enrol an authenticator app with email codes as the fallback, and an enrolled guest is asked for it at sign-in here. A guest's enrolment is one per tenant, so it is never asked at a venue that has this off. Left empty, the venue inherits the tenant default.",
+       "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Actions that ask again",
+       "bindsTo": "VenueSettings.identity.guestTwoStep.stepUpActions",
+       "operation": "setVenueSettings",
+       "notes": "The guest actions at this venue that ask an enrolled guest for the factor again, whatever the age of the session: change contact details, change password, manage payment methods, transfer tickets, delete account. Proposed default all but transfer tickets, client to correct (rev 3 GAP-B1).",
+       "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save refund policy",
+       "operation": "setRefundPolicy",
+       "provenance": "contract orders.yaml PUT /venues/{venueId}/refund-policy"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save venue settings",
+       "operation": "setVenueSettings",
+       "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The venue list.",
+   "error": "Could not load. Names which read failed and leaves the venue untouched.",
+   "emptyFirstRun": "No venue yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on openNow, orderingMethod and the venue are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getRefundPolicy` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getRefundPolicy",
+    "contract": "orders",
+    "purpose": "Read a venue's refund policy",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listDiningOutlets",
+    "contract": "fnb",
+    "purpose": "Where a guest can eat, right now",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setRefundPolicy",
+    "contract": "orders",
+    "purpose": "Set a venue's refund policy",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDiningOutlets"
+    ]
+   },
+   {
+    "operationId": "listDeliveryLocations",
+    "contract": "fnb",
+    "purpose": "Where an order can be delivered",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setVenueSettings",
+    "contract": "tenancy",
+    "purpose": "Save the venue's configuration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDiningOutlets"
+    ]
+   },
+   {
+    "operationId": "getVenueSettings",
+    "contract": "tenancy",
+    "purpose": "The venue's settings, with the tenant default each empty one inherits",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "DiningOutlet.outletId",
+    "DiningOutlet.name",
+    "DiningOutlet.kind",
+    "DiningOutlet.zone",
+    "DiningOutlet.cuisine"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-065"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetRefundPolicy",
+    "component": "modal",
+    "trigger": "Save refund policy",
+    "body": "**Collects what `setRefundPolicy` sends before it is called.** Required: `venueId`, `selfAuthoriseLimit`, `requiresApprovalAbove`. Optional: `id`, `requiresSecondUserAbove`, `timeBands`, `allowPartial`, `refundWindowDays`, `varianceThreshold`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RefundPolicy",
+    "confirm": {
+     "label": "Save refund policy",
+     "operation": "setRefundPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "selfAuthoriseLimit",
+      "requiresApprovalAbove",
+      "id",
+      "requiresSecondUserAbove",
+      "timeBands",
+      "allowPartial",
+      "refundWindowDays",
+      "varianceThreshold"
+     ]
+    },
+    "provenance": "contract orders.yaml PUT /venues/{venueId}/refund-policy"
+   },
+   {
+    "id": "formSetVenueSettings",
+    "component": "modal",
+    "trigger": "Save venue settings",
+    "body": "**Collects what `setVenueSettings` sends before it is called.** Nothing in the body is required. Optional: `id`, `venueId`, `currencyCode`, `currencyScale`, `supportHours`, `quietHours`, `biometrics`, `segregatedAccess`, `alerting`, and **the configured limits** — `displayCurrencies`, the cart, resale, exchange, reschedule and reservation limits, `shiftVarianceThreshold`, and the `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue` and `reporting` groups (decided 28 September, audit R094), and `identity`, which carries guest two-step verification for this venue (decided 29 September, rev 3 GAP-B1). `seating.maxSeatsPerGuestOrder` is set on BO-1063. **A limit left empty inherits the tenant default** (null = inherit); each field shows the default it would inherit. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "VenueSettings",
+    "confirm": {
+     "label": "Save venue settings",
+     "operation": "setVenueSettings"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "currencyCode",
+      "currencyScale",
+      "supportHours",
+      "quietHours",
+      "biometrics",
+      "segregatedAccess",
+      "alerting",
+      "displayCurrencies",
+      "catalogue",
+      "inventory",
+      "seating",
+      "promotions",
+      "fnb",
+      "queue",
+      "reporting",
+      "identity"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

@@ -1,5 +1,5 @@
 id: LLD-ReportingService
-title: ReportingService — 44 operations, 22 tables
+title: ReportingService — 47 operations, 24 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
@@ -9,21 +9,21 @@ why: '**Reads almost everything and writes only its own definitions.** Separate 
 scale: Analytical. Runs against the replica and the analytical store.
 ifDown: Down stops dashboards. **Nothing operational depends on it.**
 coverage:
-  operations: 44
+  operations: 47
   inAFlow: 17
-  percent: 39%
+  percent: 36%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: reporting
-  tables: 22
+  tables: 24
   stores:
   - derived
   - postgres
   largestTable: reporting.alert
 operationsByContract:
 - contract: reporting
-  count: 44
+  count: 47
   operations:
   - operation: acknowledgeAlert
     verb: POST
@@ -95,8 +95,8 @@ operationsByContract:
     scope: tenant
     permission: REPORT_MANAGE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 3
+    writes: 2
   - operation: deleteReport
     verb: DELETE
     path: /reports/{reportId}
@@ -127,7 +127,7 @@ operationsByContract:
     scope: tenant
     permission: REPORT_VIEW_TENANT
     offline: false
-    reads: 0
+    reads: 5
     writes: 0
   - operation: getAnalyticsUsage
     verb: GET
@@ -135,7 +135,7 @@ operationsByContract:
     scope: tenant
     permission: REPORT_VIEW_TENANT
     offline: false
-    reads: 0
+    reads: 5
     writes: 0
   - operation: getCommandCentre
     verb: GET
@@ -313,6 +313,22 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listSiteNormalisationBases
+    verb: GET
+    path: /site-normalisation-bases
+    scope: tenant
+    permission: REPORT_VIEW_TENANT
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: recordDashboardView
+    verb: POST
+    path: /dashboards/{dashboardId}/views
+    scope: venue
+    permission: REPORT_VIEW_VENUE
+    offline: false
+    reads: 2
+    writes: 2
   - operation: runReport
     verb: POST
     path: /reports/{reportId}/run
@@ -353,6 +369,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: setSiteNormalisationBasis
+    verb: PUT
+    path: /site-normalisation-bases
+    scope: venue
+    permission: REPORT_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
   - operation: updateDashboard
     verb: PUT
     path: /dashboards/{dashboardId}
@@ -396,12 +420,15 @@ tables:
   - createDashboard
   - createReport
   - createReportSchedule
+  - deleteDashboard
   - deleteReport
   - deleteReportSchedule
   - exportReportResult
+  - recordDashboardView
   - runReport
   - saveNaturalLanguageQuery
   - setAlertRule
+  - setSiteNormalisationBasis
   - updateDashboard
   - updateReport
   - updateReportSchedule
@@ -412,12 +439,15 @@ tables:
   - createDashboard
   - createReport
   - createReportSchedule
+  - deleteDashboard
   - deleteReport
   - deleteReportSchedule
   - exportReportResult
+  - recordDashboardView
   - runReport
   - saveNaturalLanguageQuery
   - setAlertRule
+  - setSiteNormalisationBasis
   - updateDashboard
   - updateReport
   - updateReportSchedule
@@ -450,6 +480,13 @@ tables:
   foreignWriters: null
 - table: reporting.dashboard_tile
   columns: 8
+  store: postgres
+  parent: reporting.dashboard
+  writtenBy:
+  - reporting
+  foreignWriters: null
+- table: reporting.dashboard_view
+  columns: 5
   store: postgres
   parent: reporting.dashboard
   writtenBy:
@@ -562,6 +599,13 @@ tables:
   writtenBy:
   - reporting
   foreignWriters: null
+- table: reporting.site_normalisation_basis
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - reporting
+  foreignWriters: null
 - table: reporting.subscription
   columns: 9
   store: postgres
@@ -574,6 +618,8 @@ readsFrom:
   operations: 2
 - service: IdentityService
   operations: 2
+- service: AccessService
+  operations: 1
 - service: InventoryService
   operations: 1
 writesOutside:

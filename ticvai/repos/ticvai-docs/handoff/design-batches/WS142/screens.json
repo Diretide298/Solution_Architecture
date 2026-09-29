@@ -1,0 +1,1508 @@
+[
+ {
+  "id": "BO-804",
+  "name": "Case Command Center",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "8",
+   "number": "01",
+   "page": 41
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/case-command-center-bo-804",
+   "component": "apps/venue-management-web/src/routes/engagement-support/CaseCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-805",
+    "BO-806",
+    "BO-807",
+    "BO-808",
+    "BO-809",
+    "BO-810",
+    "BO-811",
+    "BO-812",
+    "BO-813"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-805",
+     "trigger": "Case Queue & Search",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-806",
+     "trigger": "Case Creation",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-807",
+     "trigger": "Classification & Workflow",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-808",
+     "trigger": "Assignment & Workload",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-809",
+     "trigger": "SLA Policy Configuration",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-810",
+     "trigger": "Escalation Rules",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-811",
+     "trigger": "Case Workspace",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "carries": [
+      "caseId"
+     ]
+    },
+    {
+     "to": "BO-812",
+     "trigger": "Service Recovery",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-813",
+     "trigger": "Case Analytics & Audit",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide a role-specific overview of service operations. Show new, open, pending, resolved, overdue and SLA-risk cases with escalations, response time, resolution time and CSAT. Visualize volume, priority, category, channel, venue, owner, aging and trend. Surface major incidents, repeated issues, overloaded queues and high-value guests requiring attention. Provide drill-down to saved queues and allow supervisors to take governed corrective action. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 41"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 41"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMyCases",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The case list.",
+   "error": "Could not load. Names which read failed and leaves the case untouched.",
+   "emptyFirstRun": "No case yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the case are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listMyCases",
+    "contract": "marketing-crm",
+    "purpose": "The cases this guest raised",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCases",
+    "contract": "marketing-crm",
+    "purpose": "List service cases",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-804",
+   "workshopBoard": "wireframes/WS77 Marketing CRM Configuration Reference v1.0 Board 8.dc.html#bo-804"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 41. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-805",
+  "name": "Case Queue & Search",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "8",
+   "number": "02",
+   "page": 41
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/case-queue-search-bo-805",
+   "component": "apps/venue-management-web/src/routes/engagement-support/CaseQueueSearch.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-804"
+   ],
+   "exitTo": [
+    "BO-804"
+   ],
+   "transitions": [
+    {
+     "to": "BO-804",
+     "trigger": "Back to Case Command Center",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide a complete, searchable work queue for service cases. Search by case, guest, contact, transaction, ticket, booking, keyword or external reference. Filter by category, subcategory, priority, channel, venue, status, owner, SLA, date and guest tier. Support saved views, configurable columns, controlled bulk assignment/status actions and export. Display live SLA clocks and role-based action availability without exposing restricted guest data. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 41"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 41"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listCases",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "textField",
+       "label": "Parent category id",
+       "operation": "listCaseCategories",
+       "notes": "Sends `?parentCategoryId=` to `listCaseCategories`.",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "toggle",
+       "label": "Top level only",
+       "operation": "listCaseCategories",
+       "notes": "Sends `?topLevelOnly=` to `listCaseCategories`.",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is active",
+       "operation": "listCaseCategories",
+       "notes": "Sends `?isActive=` to `listCaseCategories`.",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every case category",
+       "bindsTo": "CaseCategory",
+       "columns": [
+        "CaseCategory.id",
+        "CaseCategory.code",
+        "CaseCategory.name",
+        "CaseCategory.parentCategoryId",
+        "CaseCategory.defaultPriority",
+        "CaseCategory.isActive",
+        "CaseCategory.scopePath"
+       ],
+       "operation": "listCaseCategories",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is active",
+       "operation": "listServiceQueues",
+       "notes": "Sends `?isActive=` to `listServiceQueues`.",
+       "provenance": "contract marketing-crm.yaml GET /service-queues"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every service queue",
+       "bindsTo": "ServiceQueue",
+       "columns": [
+        "ServiceQueue.id",
+        "ServiceQueue.code",
+        "ServiceQueue.name",
+        "ServiceQueue.overflowWaitSeconds",
+        "ServiceQueue.isActive",
+        "ServiceQueue.scopePath"
+       ],
+       "operation": "listServiceQueues",
+       "provenance": "contract marketing-crm.yaml GET /service-queues"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The case queue search list.",
+   "error": "Could not load. Names which read failed and leaves the case queue search untouched.",
+   "emptyFirstRun": "No case queue search yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the case queue search are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCases",
+    "contract": "marketing-crm",
+    "purpose": "The queue",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listCaseCategories",
+    "contract": "marketing-crm",
+    "purpose": "List case categories and subcategories",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listServiceQueues",
+    "contract": "marketing-crm",
+    "purpose": "List customer-service queues",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-805",
+   "workshopBoard": "wireframes/WS77 Marketing CRM Configuration Reference v1.0 Board 8.dc.html#bo-805"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 41. 0 of 0 labels bound to a contract property; 0 of 7 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-806",
+  "name": "Case Creation",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "8",
+   "number": "03",
+   "page": 41
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/case-creation-bo-806",
+   "component": "apps/venue-management-web/src/routes/engagement-support/CaseCreation.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-804"
+   ],
+   "exitTo": [
+    "BO-804"
+   ],
+   "transitions": [
+    {
+     "to": "BO-804",
+     "trigger": "Back to Case Command Center",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Create a complete case from any service touchpoint. Create manually or from chatbot, conversation, survey, review, transaction, incident or API event. Capture guest, category, priority, channel, venue, subject, details, attachments and linked records. Apply defaults, mandatory fields, duplicate detection, suggested classification and SLA preview. Allow draft and submit workflows and record source, creator, timestamp and initial evidence. Configuration Scope of Work | Version 1.0 41 Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Case Creation declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 41"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 41"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createCase",
+       "label": "Create case",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createCase"
+      },
+      {
+       "kind": "textField",
+       "label": "Parent category id",
+       "operation": "listCaseCategories",
+       "notes": "Sends `?parentCategoryId=` to `listCaseCategories`.",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "toggle",
+       "label": "Top level only",
+       "operation": "listCaseCategories",
+       "notes": "Sends `?topLevelOnly=` to `listCaseCategories`.",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is active",
+       "operation": "listCaseCategories",
+       "notes": "Sends `?isActive=` to `listCaseCategories`.",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every case category",
+       "bindsTo": "CaseCategory",
+       "columns": [
+        "CaseCategory.id",
+        "CaseCategory.code",
+        "CaseCategory.name",
+        "CaseCategory.parentCategoryId",
+        "CaseCategory.defaultPriority",
+        "CaseCategory.isActive",
+        "CaseCategory.scopePath"
+       ],
+       "operation": "listCaseCategories",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The case creation list.",
+   "error": "Could not load. Names which read failed and leaves the case creation untouched.",
+   "emptyFirstRun": "No case creation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the case creation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "createCase",
+    "contract": "marketing-crm",
+    "purpose": "Raise a service case",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listCaseCategories",
+    "contract": "marketing-crm",
+    "purpose": "List case categories and subcategories",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-806",
+   "workshopBoard": "wireframes/WS77 Marketing CRM Configuration Reference v1.0 Board 8.dc.html#bo-806"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 41. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-807",
+  "name": "Classification & Workflow",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "8",
+   "number": "04",
+   "page": 42
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/classification-workflow-bo-807",
+   "component": "apps/venue-management-web/src/routes/engagement-support/ClassificationWorkflow.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-804"
+   ],
+   "exitTo": [
+    "BO-804"
+   ],
+   "transitions": [
+    {
+     "to": "BO-804",
+     "trigger": "Back to Case Command Center",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure case taxonomies and lifecycle states. Maintain categories, subcategories, reason codes, outcomes, severity, priority and applicable business units. Configure status model, stage transitions, mandatory fields, validation and conditional steps. Use a visual workflow for assignment, work, approval, escalation, resolution and closure. Version and approve configurations and show affected open cases before activating changes. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 42"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 42"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setCaseInvestigationResolution",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setCaseInvestigationResolution"
+      },
+      {
+       "kind": "textField",
+       "label": "Parent category id",
+       "operation": "listCaseCategories",
+       "notes": "Sends `?parentCategoryId=` to `listCaseCategories`.",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "toggle",
+       "label": "Top level only",
+       "operation": "listCaseCategories",
+       "notes": "Sends `?topLevelOnly=` to `listCaseCategories`.",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is active",
+       "operation": "listCaseCategories",
+       "notes": "Sends `?isActive=` to `listCaseCategories`.",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every case category",
+       "bindsTo": "CaseCategory",
+       "columns": [
+        "CaseCategory.id",
+        "CaseCategory.code",
+        "CaseCategory.name",
+        "CaseCategory.parentCategoryId",
+        "CaseCategory.defaultPriority",
+        "CaseCategory.isActive",
+        "CaseCategory.scopePath"
+       ],
+       "operation": "listCaseCategories",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save case category definition",
+       "operation": "setCaseCategoryDefinition",
+       "permission": "CASE_MANAGE",
+       "notes": "**An upsert keyed on `code`**, which is unique in the venue and never changes once created.",
+       "provenance": "contract marketing-crm.yaml PUT /case-categories"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The classification workflow list.",
+   "error": "Could not load. Names which read failed and leaves the classification workflow untouched.",
+   "emptyFirstRun": "No classification workflow yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the classification workflow are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setCaseInvestigationResolution",
+    "contract": "marketing-crm",
+    "purpose": "Classification and workflow",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listCaseCategories",
+    "contract": "marketing-crm",
+    "purpose": "List case categories and subcategories",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setCaseCategoryDefinition",
+    "contract": "marketing-crm",
+    "purpose": "Create or change a case category or subcategory",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCaseCategories"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-807",
+   "workshopBoard": "wireframes/WS77 Marketing CRM Configuration Reference v1.0 Board 8.dc.html#bo-807"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 42. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetCaseCategoryDefinition",
+    "component": "modal",
+    "trigger": "Save case category definition",
+    "body": "**Collects what `setCaseCategoryDefinition` sends before it is called.** Required: `id`, `code`, `name`, `isActive`. Optional: `parentCategoryId`, `defaultPriority`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CaseCategory",
+    "confirm": {
+     "label": "Save case category definition",
+     "operation": "setCaseCategoryDefinition"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "isActive",
+      "parentCategoryId",
+      "defaultPriority",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml PUT /case-categories"
+   }
+  ],
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-808",
+  "name": "Assignment & Workload",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "8",
+   "number": "05",
+   "page": 42
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/assignment-workload-bo-808",
+   "component": "apps/venue-management-web/src/routes/engagement-support/AssignmentWorkload.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-804"
+   ],
+   "exitTo": [
+    "BO-804"
+   ],
+   "transitions": [
+    {
+     "to": "BO-804",
+     "trigger": "Back to Case Command Center",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Assign cases to the best available team or agent. Route by skill, department, venue, language, category, guest tier, priority and operating hours. Configure round robin, least load, ownership continuity, named team and manual assignment methods. Display capacity, utilization, open workload, absence and assignment recommendation. Require approval for restricted reassignment and retain assignment reason and history. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 42"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 42"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAgentWorkloadAvailability",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "toggle",
+       "label": "Is active",
+       "operation": "listServiceQueues",
+       "notes": "Sends `?isActive=` to `listServiceQueues`.",
+       "provenance": "contract marketing-crm.yaml GET /service-queues"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every service queue",
+       "bindsTo": "ServiceQueue",
+       "columns": [
+        "ServiceQueue.id",
+        "ServiceQueue.code",
+        "ServiceQueue.name",
+        "ServiceQueue.overflowWaitSeconds",
+        "ServiceQueue.isActive",
+        "ServiceQueue.scopePath"
+       ],
+       "operation": "listServiceQueues",
+       "provenance": "contract marketing-crm.yaml GET /service-queues"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The workload list.",
+   "error": "Could not load. Names which read failed and leaves the workload untouched.",
+   "emptyFirstRun": "No workload yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the workload are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAgentWorkloadAvailability",
+    "contract": "marketing-crm",
+    "purpose": "Assignment and workload",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listServiceQueues",
+    "contract": "marketing-crm",
+    "purpose": "List customer-service queues",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-808",
+   "workshopBoard": "wireframes/WS77 Marketing CRM Configuration Reference v1.0 Board 8.dc.html#bo-808"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 42. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-809",
+  "name": "SLA Policy Configuration",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "8",
+   "number": "06",
+   "page": 42
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/sla-policy-configuration-bo-809",
+   "component": "apps/venue-management-web/src/routes/engagement-support/SlaPolicyConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-804"
+   ],
+   "exitTo": [
+    "BO-804"
+   ],
+   "transitions": [
+    {
+     "to": "BO-804",
+     "trigger": "Back to Case Command Center",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Define measurable service commitments and pause rules. Configure first-response and resolution targets by case type, priority, venue, channel and guest tier. Apply operating calendars, holidays, 24/7 rules, pause conditions, dependency states and warning thresholds. Define target hierarchy, precedence, exceptions and behavior when multiple SLAs apply. Simulate policies before activation and version, approve and audit every change. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 42"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 42"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listSlaPolicyService",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setApprovalSlaPolicy",
+       "label": "Save approval SLA policy",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setApprovalSlaPolicy"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The sla policy list.",
+   "error": "Could not load. Names which read failed and leaves the sla policy untouched.",
+   "emptyFirstRun": "No sla policy yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the sla policy are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listSlaPolicyService",
+    "contract": "marketing-crm",
+    "purpose": "SLA policies",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setApprovalSlaPolicy",
+    "contract": "approvals",
+    "purpose": "Configure a target and its consequence",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setSlaPolicy",
+    "contract": "marketing-crm",
+    "purpose": "Define a case SLA policy",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listSlaPolicyService"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-809",
+   "workshopBoard": "wireframes/WS77 Marketing CRM Configuration Reference v1.0 Board 8.dc.html#bo-809"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 42. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-810",
+  "name": "Escalation Rules",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "8",
+   "number": "07",
+   "page": 42
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/escalation-rules-bo-810",
+   "component": "apps/venue-management-web/src/routes/engagement-support/EscalationRules.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-804"
+   ],
+   "exitTo": [
+    "BO-804"
+   ],
+   "transitions": [
+    {
+     "to": "BO-804",
+     "trigger": "Back to Case Command Center",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Automate tiered escalation before or after service risk materializes. Create time-based and condition-based triggers for response, resolution, priority, sentiment, repeat contact and compliance risk. Define escalation level, recipients, notification channel, required action, approval and acknowledgement deadline. Configure supervisor, manager, specialist and executive paths, compensation limits and override controls. Prevent escalation loops and record trigger, evaluated conditions, recipients, actions and closure. Configuration Scope of Work | Version 1.0 42 Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 42"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 42"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listEscalationCriticalCase",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The escalation rules list.",
+   "error": "Could not load. Names which read failed and leaves the escalation rules untouched.",
+   "emptyFirstRun": "No escalation rules yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the escalation rules are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listEscalationCriticalCase",
+    "contract": "marketing-crm",
+    "purpose": "Escalation rules in force",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-810",
+   "workshopBoard": "wireframes/WS77 Marketing CRM Configuration Reference v1.0 Board 8.dc.html#bo-810"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 42. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-811",
+  "name": "Case Workspace",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "8",
+   "number": "08",
+   "page": 43
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/case-workspace-bo-811",
+   "component": "apps/venue-management-web/src/routes/engagement-support/CaseWorkspace.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-804"
+   ],
+   "exitTo": [
+    "BO-804"
+   ],
+   "transitions": [
+    {
+     "to": "BO-804",
+     "trigger": "Back to Case Command Center",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide one place to investigate, communicate and resolve a case. Display guest 360, case details, SLA, timeline, messages, notes, tasks, attachments and linked transactions. Support email, SMS, WhatsApp and chat responses using approved templates and complete history. Allow assignment, status, priority, task, approval, related-case and resolution actions by authority. Require reason and evidence for sensitive changes and preserve immutable history after closure. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 43"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 43"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getCase",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "addCaseMessage",
+       "label": "Add case message",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "addCaseMessage"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The case list.",
+   "error": "Could not load. Names which read failed and leaves the case untouched.",
+   "emptyFirstRun": "No case yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the case are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getCase",
+    "contract": "marketing-crm",
+    "purpose": "The case workspace",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "addCaseMessage",
+    "contract": "marketing-crm",
+    "purpose": "Reply",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "updateCase",
+    "contract": "marketing-crm",
+    "purpose": "Update it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-811",
+   "workshopBoard": "wireframes/WS77 Marketing CRM Configuration Reference v1.0 Board 8.dc.html#bo-811"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 43. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "caseId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-812",
+  "name": "Service Recovery",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "8",
+   "number": "09",
+   "page": 43
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/service-recovery-bo-812",
+   "component": "apps/venue-management-web/src/routes/engagement-support/ServiceRecovery.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-804"
+   ],
+   "exitTo": [
+    "BO-804"
+   ],
+   "transitions": [
+    {
+     "to": "BO-804",
+     "trigger": "Back to Case Command Center",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure and approve fair, consistent recovery actions. Maintain compensation matrices by issue, severity, guest tier, value and business unit. Support refund, voucher, loyalty points, wallet credit, upgrade, replacement and follow-up journey actions. Apply auto-approval and manager-approval thresholds, budget limits, fraud checks and segregation of duties. Track recovery cost, delivery, redemption, guest response and effect on satisfaction and retention. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 43"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 43"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setRefundCompensationService",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setRefundCompensationService"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The service recovery list.",
+   "error": "Could not load. Names which read failed and leaves the service recovery untouched.",
+   "emptyFirstRun": "No service recovery yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the service recovery are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setRefundCompensationService",
+    "contract": "marketing-crm",
+    "purpose": "Service recovery",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-812",
+   "workshopBoard": "wireframes/WS77 Marketing CRM Configuration Reference v1.0 Board 8.dc.html#bo-812"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 43. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-813",
+  "name": "Case Analytics & Audit",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "board": "8",
+   "number": "10",
+   "page": 43
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/engagement-support/case-analytics-audit-bo-813",
+   "component": "apps/venue-management-web/src/routes/engagement-support/CaseAnalyticsAudit.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-804"
+   ],
+   "exitTo": [
+    "BO-804"
+   ],
+   "transitions": [
+    {
+     "to": "BO-804",
+     "trigger": "Back to Case Command Center",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Measure service quality, root causes and operational accountability. Report case volume, SLA achievement, aging, backlog, escalation, resolution, CSAT and recovery cost. Analyze category, root cause, channel, venue, product, guest tier, team and agent performance. Track repeat cases, lost revenue, compensation, recovery effectiveness and systemic improvement actions. Provide complete audit, secured export and traceability from reported issue to final resolution. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history. Configuration Scope of Work | Version 1.0 43 Board 9 - Surveys, Reviews & Voice of Customer Figure 9. High-definition configuration board with all 10 screens. Configuration Scope of Work | Version 1.0 44",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 43"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 43"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMyCases",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The case analytics audit list.",
+   "error": "Could not load. Names which read failed and leaves the case analytics audit untouched.",
+   "emptyFirstRun": "No case analytics audit yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the case analytics audit are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listMyCases",
+    "contract": "marketing-crm",
+    "purpose": "The cases this guest raised",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCases",
+    "contract": "marketing-crm",
+    "purpose": "List service cases",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-813",
+   "workshopBoard": "wireframes/WS77 Marketing CRM Configuration Reference v1.0 Board 8.dc.html#bo-813"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 43. 0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

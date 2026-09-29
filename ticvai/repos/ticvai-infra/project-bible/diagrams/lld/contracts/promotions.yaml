@@ -1,5 +1,5 @@
 id: LLD-promotions
-title: promotions — 146 operations
+title: promotions — 153 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -25,8 +25,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - promotions.promotion
+  writes:
+  - cache:idempotency
 - operation: approveDecision
   verb: PUT
   path: /decision
@@ -35,8 +38,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - promotions.promotion
+  writes:
+  - cache:idempotency
 - operation: assignCoupon
   verb: POST
   path: /coupon-codes/{code}/assign
@@ -51,6 +57,7 @@ operations:
   writes:
   - cache:idempotency
   - promotions.coupon_code
+  - promotions.promotion_audit
 - operation: concludeRecommendationExperiment
   verb: POST
   path: /recommendation-experiments/{experimentId}/conclude
@@ -84,6 +91,23 @@ operations:
   - promotions.bundle_choice_group
   - promotions.bundle_choice_option
   - promotions.bundle_component
+  - promotions.promotion_audit
+- operation: createCommercialCampaign
+  verb: POST
+  path: /commercial-campaigns
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - promotions.campaign
+  - promotions.campaign_budget
+  writes:
+  - cache:idempotency
+  - promotions.campaign
+  - promotions.promotion_audit
 - operation: createCouponCampaign
   verb: POST
   path: /coupon-campaigns
@@ -98,6 +122,7 @@ operations:
   writes:
   - cache:idempotency
   - promotions.coupon_campaign
+  - promotions.promotion_audit
 - operation: createPromotion
   verb: POST
   path: /promotions
@@ -113,6 +138,7 @@ operations:
   writes:
   - cache:idempotency
   - promotions.promotion
+  - promotions.promotion_audit
 - operation: createRecommendationExperiment
   verb: POST
   path: /recommendation-experiments
@@ -191,9 +217,12 @@ operations:
   reads:
   - cache:idempotency
   - promotions.promotion
+  - promotions.promotion_channel_publication
   writes:
   - cache:idempotency
   - promotions.promotion
+  - promotions.promotion_audit
+  - promotions.promotion_channel_publication
 - operation: evaluatePromotions
   verb: POST
   path: /promotions/evaluate
@@ -207,9 +236,12 @@ operations:
   reads:
   - cache:idempotency
   - catalogue.price_list
+  - promotions.coupon_code
   - promotions.promotion
+  - promotions.promotion_rule
   writes:
   - cache:idempotency
+  - promotions.promotion_evaluation_trace
 - operation: explainRecommendation
   verb: POST
   path: /recommendations/explain
@@ -218,7 +250,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.channel_capacity
+  - catalogue.product
+  - promotions.product_relationship
+  - promotions.promotion
+  - promotions.recommendation_outcome
+  - promotions.recommendation_strategy
+  - promotions.recommendation_suppression
+  - promotions.upsell_rule
   writes: []
 - operation: generateCouponCodes
   verb: POST
@@ -234,6 +274,8 @@ operations:
   writes:
   - cache:idempotency
   - promotions.coupon_code
+  - promotions.coupon_code_batch
+  - promotions.promotion_audit
 - operation: getBundle
   verb: GET
   path: /bundles/{bundleId}
@@ -281,7 +323,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.order_line
+  - orders.sales_order
+  - promotions.product_relationship
   writes: []
 - operation: getPromotion
   verb: GET
@@ -316,7 +361,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.order_line
+  - promotions.recommendation_experiment
+  - promotions.recommendation_outcome
   writes: []
 - operation: getRecommendations
   verb: POST
@@ -356,7 +404,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.discount
+  - promotions.promotion
   writes: []
 - operation: listAdvancedOfferGuardrail
   verb: GET
@@ -366,7 +416,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.promotion
   writes: []
 - operation: listAllocationSplits
   verb: GET
@@ -388,7 +439,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.guest_profile
+  - marketing.segment
+  - orders.discount
+  - orders.sales_order
+  - promotions.promotion
   writes: []
 - operation: listAudiencePreviewReach
   verb: GET
@@ -398,7 +454,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.guest_profile
+  - marketing.segment
+  - orders.discount
+  - orders.sales_order
+  - promotions.promotion
   writes: []
 - operation: listBehavioralTransactionTargeting
   verb: GET
@@ -408,7 +469,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.guest_profile
+  - orders.cart
+  - orders.discount
+  - orders.order_line
+  - orders.sales_order
+  - promotions.promotion
   writes: []
 - operation: listBestOfferCustomer
   verb: GET
@@ -418,7 +485,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.price
+  - promotions.promotion
   writes: []
 - operation: listBudgetConsumptionForecast
   verb: GET
@@ -428,7 +497,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.discount
+  - promotions.campaign_budget
+  - promotions.promotion
   writes: []
 - operation: listBundleAvailabilityCapacity
   verb: GET
@@ -438,7 +510,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.channel_capacity
+  - promotions.bundle
+  - promotions.bundle_choice_option
+  - promotions.bundle_component
   writes: []
 - operation: listBundleAvailabilityChannel
   verb: GET
@@ -448,7 +524,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.channel_capacity
+  - promotions.bundle
+  - promotions.bundle_capacity_policy
+  - promotions.bundle_component
   writes: []
 - operation: listBundleAvailabilityForecast
   verb: GET
@@ -458,7 +538,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.channel_capacity
+  - catalogue.inventory_hold
+  - orders.order_line
+  - orders.sales_order
+  - promotions.bundle
+  - promotions.bundle_component
   writes: []
 - operation: listBundleBogoAdvanced
   verb: GET
@@ -468,7 +554,25 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.discount
+  - orders.order_line
+  - orders.sales_order
+  - promotions.bundle
+  - promotions.bundle_component
+  - promotions.promotion
+  writes: []
+- operation: listBundleCapacityPolicies
+  verb: GET
+  path: /bundles/{bundleId}/capacity-policies
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - promotions.bundle
+  - promotions.bundle_capacity_policy
   writes: []
 - operation: listBundleCombo
   verb: GET
@@ -478,7 +582,26 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.discount
+  - orders.order_line
+  - orders.sales_order
+  - promotions.bundle
+  - promotions.bundle_choice_group
+  - promotions.bundle_component
+  writes: []
+- operation: listBundlePartnerProductMappings
+  verb: GET
+  path: /bundles/{bundleId}/partner-products
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - promotions.bundle
+  - promotions.bundle_component
+  - promotions.partner_bundle_product
   writes: []
 - operation: listBundlePricingCommercial
   verb: GET
@@ -488,7 +611,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.price
+  - promotions.allocation_component
+  - promotions.allocation_split
+  - promotions.bundle
   writes: []
 - operation: listBundleSellabilityDependency
   verb: GET
@@ -498,7 +625,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.bundle
+  - promotions.bundle_choice_group
+  - promotions.bundle_component
   writes: []
 - operation: listBundleValidityScheduling
   verb: GET
@@ -508,7 +638,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.bundle
+  - promotions.bundle_component
   writes: []
 - operation: listBundles
   verb: GET
@@ -533,7 +665,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.bundle
+  - promotions.campaign
+  - promotions.coupon_campaign
+  - promotions.promotion
   writes: []
 - operation: listCampaignExperimentTest
   verb: GET
@@ -543,7 +679,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.discount
+  - orders.sales_order
+  - promotions.promotion
+  - promotions.promotion_variant
   writes: []
 - operation: listCampaignFinancialCommercial
   verb: GET
@@ -553,7 +693,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.price
+  - orders.discount
+  - orders.sales_order
+  - promotions.campaign
+  - promotions.campaign_budget
+  - promotions.promotion
+  - promotions.promotion_variant
   writes: []
 - operation: listCampaignGovernanceBudget
   verb: GET
@@ -563,7 +710,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.discount
+  - orders.sales_order
+  - promotions.campaign
+  - promotions.campaign_budget
+  - promotions.coupon_campaign
+  - promotions.promotion
   writes: []
 - operation: listCampaignPromotionPerformance
   verb: GET
@@ -573,7 +726,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.discount
+  - orders.order_line
+  - orders.sales_order
+  - promotions.campaign
+  - promotions.coupon_campaign
+  - promotions.promotion
   writes: []
 - operation: listCapacityPoolReservation
   verb: GET
@@ -583,7 +742,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.channel_capacity
+  - catalogue.inventory_hold
+  - promotions.bundle
+  - promotions.bundle_capacity_policy
+  - promotions.bundle_component
   writes: []
 - operation: listCartTransactionThreshold
   verb: GET
@@ -593,7 +757,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.promotion
   writes: []
 - operation: listCheapestLowestValue
   verb: GET
@@ -603,7 +768,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.promotion
   writes: []
 - operation: listCodeEligibilityRestriction
   verb: GET
@@ -613,7 +779,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.coupon_campaign
+  - promotions.coupon_code
   writes: []
 - operation: listCodeSecurityFraud
   verb: GET
@@ -623,7 +791,22 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.discount
+  - promotions.coupon_code
+  - promotions.promotion_alert
+  writes: []
+- operation: listCommercialCampaigns
+  verb: GET
+  path: /commercial-campaigns
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - promotions.campaign
+  - promotions.campaign_budget
   writes: []
 - operation: listComponentInventoryAvailability
   verb: GET
@@ -633,7 +816,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.channel_capacity
+  - catalogue.inventory_hold
+  - promotions.bundle_component
   writes: []
 - operation: listConflict
   verb: GET
@@ -643,7 +829,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.price
+  - promotions.promotion
   writes: []
 - operation: listConflictDetectionResolution
   verb: GET
@@ -653,7 +841,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.promotion
+  - promotions.promotion_conflict
   writes: []
 - operation: listContextLocationChannel
   verb: GET
@@ -663,7 +853,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.promotion
   writes: []
 - operation: listCouponCampaigns
   verb: GET
@@ -695,7 +886,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.segment
+  - orders.discount
+  - promotions.promotion
   writes: []
 - operation: listCustomerMembershipSegment
   verb: GET
@@ -705,7 +899,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.programme_tier
+  - marketing.segment
+  - promotions.promotion
   writes: []
 - operation: listCustomerSegmentChannel
   verb: GET
@@ -715,7 +912,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.guest_profile
+  - marketing.segment
+  - orders.discount
+  - orders.order_line
+  - orders.sales_order
+  - promotions.campaign
+  - promotions.promotion
   writes: []
 - operation: listDiscountCalculationApplication
   verb: GET
@@ -725,7 +929,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.promotion
   writes: []
 - operation: listDiscountCapMaximum
   verb: GET
@@ -735,7 +940,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.promotion
   writes: []
 - operation: listDiscountLimitGuardrail
   verb: GET
@@ -745,7 +951,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.campaign_budget
+  - promotions.promotion
   writes: []
 - operation: listDiscountMarginProfitability
   verb: GET
@@ -755,7 +963,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.price
+  - orders.discount
+  - orders.order_line
+  - orders.sales_order
+  - promotions.promotion
   writes: []
 - operation: listDynamicBundle
   verb: GET
@@ -765,7 +978,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.channel_capacity
+  - catalogue.inventory_hold
+  - orders.order_line
+  - promotions.bundle
+  - promotions.bundle_component
   writes: []
 - operation: listDynamicBundle2
   verb: GET
@@ -775,7 +993,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.channel_capacity
+  - catalogue.price
+  - promotions.bundle
+  - promotions.bundle_choice_option
+  - promotions.bundle_component
   writes: []
 - operation: listDynamicBundleRule
   verb: GET
@@ -785,7 +1008,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.bundle
+  - promotions.bundle_choice_group
+  - promotions.bundle_choice_option
+  - promotions.bundle_component
+  - promotions.campaign
   writes: []
 - operation: listDynamicComponentSubstitution
   verb: GET
@@ -795,7 +1023,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.bundle_component
   writes: []
 - operation: listExecutivePromotionReporting
   verb: GET
@@ -805,7 +1034,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.discount
+  - orders.order_line
+  - orders.sales_order
+  - promotions.campaign
+  - promotions.coupon_campaign
+  - promotions.promotion
   writes: []
 - operation: listGovernanceRiskLaunch
   verb: GET
@@ -815,7 +1050,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.campaign_budget
+  - promotions.promotion
+  - promotions.promotion_audit
+  - promotions.promotion_variant
+  - promotions.stacking_rule
   writes: []
 - operation: listIncrementalityAttributionCannibalization
   verb: GET
@@ -825,7 +1065,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.discount
+  - orders.order_line
+  - orders.sales_order
+  - promotions.promotion
+  - promotions.promotion_variant
   writes: []
 - operation: listMembershipLoyaltyGuest
   verb: GET
@@ -835,7 +1080,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.loyalty_position
+  - marketing.programme_tier
+  - promotions.promotion
   writes: []
 - operation: listMultiBuyQuantity
   verb: GET
@@ -845,7 +1093,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.promotion
   writes: []
 - operation: listNextBestAction
   verb: GET
@@ -855,7 +1104,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.discount
+  - orders.sales_order
+  - promotions.promotion
+  - promotions.promotion_variant
+  - promotions.recommendation_outcome
   writes: []
 - operation: listOfferBasketTrace
   verb: GET
@@ -865,7 +1119,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.price
+  - promotions.promotion
   writes: []
 - operation: listPartnerExternalProduct
   verb: GET
@@ -875,7 +1131,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.bundle
+  - promotions.bundle_component
+  - promotions.partner_bundle_product
   writes: []
 - operation: listPartnerPaymentEligibility
   verb: GET
@@ -885,7 +1144,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.promotion
   writes: []
 - operation: listPaymentMethodBank
   verb: GET
@@ -895,7 +1155,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.campaign_budget
+  - promotions.promotion
   writes: []
 - operation: listPercentageFixedDiscount
   verb: GET
@@ -905,7 +1167,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.promotion
   writes: []
 - operation: listProductRelationships
   verb: GET
@@ -926,7 +1189,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.promotion
+  - promotions.promotion_audit
   writes: []
 - operation: listPromotionAlertException
   verb: GET
@@ -936,7 +1201,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.promotion
+  - promotions.promotion_alert
   writes: []
 - operation: listPromotionCampaign
   verb: GET
@@ -946,7 +1213,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.discount
+  - promotions.campaign
+  - promotions.coupon_campaign
+  - promotions.promotion
+  - promotions.promotion_audit
   writes: []
 - operation: listPromotionChannel
   verb: GET
@@ -956,7 +1228,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.coupon_campaign
+  - promotions.promotion
+  - promotions.promotion_channel_publication
   writes: []
 - operation: listPromotionDecisionTrace
   verb: GET
@@ -966,7 +1241,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.discount
+  - orders.order_line
+  - orders.sales_order
+  - promotions.promotion
+  - promotions.promotion_evaluation_trace
   writes: []
 - operation: listPromotionExclusionCompatibility
   verb: GET
@@ -976,7 +1256,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.promotion
+  - promotions.stacking_rule
   writes: []
 - operation: listPromotionHealthPerformance
   verb: GET
@@ -986,7 +1268,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.discount
+  - orders.order_line
+  - orders.sales_order
+  - promotions.campaign
+  - promotions.promotion
+  - promotions.promotion_variant
+  - promotions.recommendation_outcome
   writes: []
 - operation: listPromotionLifecycleStatus
   verb: GET
@@ -996,7 +1285,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.promotion
   writes: []
 - operation: listPromotionPerformance
   verb: GET
@@ -1006,7 +1296,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.discount
+  - orders.order_line
+  - orders.sales_order
+  - promotions.campaign
+  - promotions.promotion
   writes: []
 - operation: listPromotionPriorityHierarchy
   verb: GET
@@ -1016,7 +1311,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.campaign
+  - promotions.promotion
   writes: []
 - operation: listPromotions
   verb: GET
@@ -1039,7 +1336,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.channel_capacity
+  - catalogue.inventory_hold
+  - promotions.bundle
+  - promotions.bundle_component
   writes: []
 - operation: listRecommendationExperiments
   verb: GET
@@ -1071,7 +1372,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.discount
+  - orders.sales_order
+  - promotions.coupon_campaign
+  - promotions.coupon_code
+  - promotions.coupon_code_batch
+  - promotions.promotion_audit
   writes: []
 - operation: listRedemptionCodeLookup
   verb: GET
@@ -1081,7 +1388,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.discount
+  - orders.order_line
+  - orders.sales_order
+  - promotions.coupon_code
   writes: []
 - operation: listRedemptionConversionFunnel
   verb: GET
@@ -1091,7 +1402,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.cart
+  - orders.discount
+  - orders.sales_order
+  - promotions.coupon_code
+  - promotions.promotion
+  - promotions.recommendation_outcome
   writes: []
 - operation: listRedemptionDiscountExposure
   verb: GET
@@ -1101,7 +1418,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.promotion
   writes: []
 - operation: listRevenueAllocationCost
   verb: GET
@@ -1111,7 +1429,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.allocation_component
+  - promotions.allocation_split
+  - promotions.bundle
   writes: []
 - operation: listRewardSelectionSubstitution
   verb: GET
@@ -1121,7 +1442,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.promotion
   writes: []
 - operation: listSpecialPriceGuest
   verb: GET
@@ -1131,7 +1453,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.promotion
   writes: []
 - operation: listStackingConflict
   verb: GET
@@ -1141,7 +1464,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.discount
+  - promotions.promotion
+  - promotions.promotion_conflict
+  - promotions.stacking_rule
   writes: []
 - operation: listTargetingConflictFrequency
   verb: GET
@@ -1151,7 +1478,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.discount
+  - promotions.coupon_code
+  - promotions.promotion
   writes: []
 - operation: listTargetingEligibility
   verb: GET
@@ -1161,7 +1491,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - marketing.guest_profile
+  - marketing.segment
+  - orders.discount
+  - promotions.bundle
+  - promotions.promotion
+  - promotions.promotion_rule
   writes: []
 - operation: listThresholdActionAutomatic
   verb: GET
@@ -1171,7 +1507,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.campaign
+  - promotions.campaign_budget
+  - promotions.promotion
   writes: []
 - operation: listTimeBasedSeasonal
   verb: GET
@@ -1181,7 +1520,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.promotion
   writes: []
 - operation: listUniqueCodeGeneration
   verb: GET
@@ -1191,7 +1531,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.coupon_campaign
+  - promotions.coupon_code
+  - promotions.coupon_code_batch
   writes: []
 - operation: listUpsellCrossSell
   verb: GET
@@ -1201,7 +1544,12 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.order_line
+  - orders.sales_order
+  - promotions.product_relationship
+  - promotions.recommendation_outcome
+  - promotions.upsell_rule
   writes: []
 - operation: listUpsellRules
   verb: GET
@@ -1222,7 +1570,11 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.discount
+  - promotions.coupon_campaign
+  - promotions.coupon_code
+  - promotions.promotion
   writes: []
 - operation: listValidityDateTime
   verb: GET
@@ -1232,7 +1584,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.coupon_campaign
+  - promotions.promotion
   writes: []
 - operation: listVolumeBulkTier
   verb: GET
@@ -1242,7 +1596,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - promotions.promotion
   writes: []
 - operation: listVoucherBatches
   verb: GET
@@ -1267,9 +1622,12 @@ operations:
   reads:
   - cache:idempotency
   - promotions.promotion
+  - promotions.promotion_channel_publication
   writes:
   - cache:idempotency
   - promotions.promotion
+  - promotions.promotion_audit
+  - promotions.promotion_channel_publication
 - operation: previewAllocationSplit
   verb: POST
   path: /allocation-splits/preview
@@ -1297,9 +1655,12 @@ operations:
   reads:
   - cache:idempotency
   - promotions.promotion
+  - promotions.promotion_channel_publication
   writes:
   - cache:idempotency
   - promotions.promotion
+  - promotions.promotion_audit
+  - promotions.promotion_channel_publication
 - operation: recordRecommendationOutcome
   verb: POST
   path: /recommendations/outcomes
@@ -1326,6 +1687,22 @@ operations:
   writes:
   - cache:idempotency
   - promotions.voucher
+- operation: setBundleCapacityPolicy
+  verb: PUT
+  path: /bundles/{bundleId}/capacity-policies
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - promotions.bundle
+  - promotions.bundle_capacity_policy
+  writes:
+  - cache:idempotency
+  - promotions.bundle_capacity_policy
+  - promotions.promotion_audit
 - operation: setBundleComponent
   verb: PUT
   path: /bundle-component
@@ -1334,8 +1711,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - promotions.bundle
+  - promotions.bundle_component
+  writes:
+  - cache:idempotency
+  - promotions.bundle_component
+  - promotions.promotion_audit
 - operation: setBundleDefinition
   verb: PUT
   path: /bundle-definition
@@ -1344,8 +1727,31 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - promotions.bundle
+  - promotions.campaign
+  writes:
+  - cache:idempotency
+  - promotions.bundle
+  - promotions.promotion_audit
+- operation: setBundlePartnerProductMappings
+  verb: PUT
+  path: /bundles/{bundleId}/partner-products
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - promotions.bundle
+  - promotions.bundle_component
+  - promotions.partner_bundle_product
+  writes:
+  - cache:idempotency
+  - promotions.partner_bundle_product
+  - promotions.promotion_audit
 - operation: setBuyGetBogo
   verb: PUT
   path: /buy-get-bogo
@@ -1354,8 +1760,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - promotions.promotion
+  writes:
+  - cache:idempotency
+  - promotions.promotion
+  - promotions.promotion_audit
 - operation: setCampaignBudgetFinancial
   verb: PUT
   path: /campaign-budget-financial
@@ -1364,8 +1775,16 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - promotions.campaign
+  - promotions.campaign_budget
+  - promotions.promotion
+  writes:
+  - cache:idempotency
+  - promotions.campaign
+  - promotions.campaign_budget
+  - promotions.promotion_audit
 - operation: setCodeDistributionManager
   verb: PUT
   path: /code-distribution-manager
@@ -1374,8 +1793,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - promotions.coupon_code
+  - promotions.coupon_code_batch
+  writes:
+  - cache:idempotency
+  - promotions.coupon_code
+  - promotions.promotion_audit
 - operation: setCouponPromoCode
   verb: PUT
   path: /coupon-promo-code
@@ -1384,8 +1809,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - promotions.campaign
+  - promotions.coupon_campaign
+  writes:
+  - cache:idempotency
+  - promotions.coupon_campaign
+  - promotions.coupon_code
+  - promotions.promotion_audit
 - operation: setCrossCategoryPromotion
   verb: PUT
   path: /cross-category-promotion
@@ -1394,8 +1826,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - promotions.promotion
+  writes:
+  - cache:idempotency
+  - promotions.promotion
+  - promotions.promotion_audit
 - operation: setEligibilityRule
   verb: PUT
   path: /eligibility-rule
@@ -1404,8 +1841,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - promotions.promotion
+  - promotions.promotion_rule
+  writes:
+  - cache:idempotency
+  - promotions.promotion_audit
+  - promotions.promotion_rule
 - operation: setFixedPriceOffer
   verb: PUT
   path: /fixed-price-offer
@@ -1414,8 +1857,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - promotions.promotion
+  writes:
+  - cache:idempotency
+  - promotions.promotion
+  - promotions.promotion_audit
 - operation: setGiftFreeProduct
   verb: PUT
   path: /gift-free-product
@@ -1424,8 +1872,13 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - promotions.promotion
+  writes:
+  - cache:idempotency
+  - promotions.promotion
+  - promotions.promotion_audit
 - operation: setGuestChoiceBuild
   verb: PUT
   path: /guest-choice-build
@@ -1434,8 +1887,16 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - promotions.bundle
+  - promotions.bundle_choice_group
+  - promotions.bundle_choice_option
+  writes:
+  - cache:idempotency
+  - promotions.bundle_choice_group
+  - promotions.bundle_choice_option
+  - promotions.promotion_audit
 - operation: setProductRelationships
   verb: PUT
   path: /product-relationships
@@ -1456,8 +1917,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - promotions.promotion
+  - promotions.promotion_rule
+  writes:
+  - cache:idempotency
+  - promotions.promotion_audit
+  - promotions.promotion_rule
 - operation: setPromotionStackingRule
   verb: PUT
   path: /promotion-stacking-rule
@@ -1466,8 +1933,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - promotions.promotion
+  - promotions.stacking_rule
+  writes:
+  - cache:idempotency
+  - promotions.promotion_audit
+  - promotions.stacking_rule
 - operation: setPromotionVariants
   verb: PUT
   path: /promotions/{promotionId}/variants
@@ -1483,6 +1956,7 @@ operations:
   writes:
   - cache:idempotency
   - promotions.promotion
+  - promotions.promotion_audit
   - promotions.promotion_variant
 - operation: setRecommendationSuppression
   verb: PUT
@@ -1504,8 +1978,14 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - catalogue.price
+  - catalogue.product
+  - promotions.promotion
+  - promotions.promotion_variant
+  writes:
+  - cache:idempotency
 - operation: simulateBundlePreviewRecommendation
   verb: PUT
   path: /bundle-preview-recommendation
@@ -1514,8 +1994,18 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - catalogue.channel_capacity
+  - catalogue.price
+  - promotions.allocation_component
+  - promotions.allocation_split
+  - promotions.bundle
+  - promotions.bundle_choice_group
+  - promotions.bundle_choice_option
+  - promotions.bundle_component
+  writes:
+  - cache:idempotency
 - operation: simulatePromotion
   verb: POST
   path: /promotions/{promotionId}/simulate
@@ -1556,6 +2046,7 @@ operations:
   writes:
   - cache:idempotency
   - promotions.promotion
+  - promotions.promotion_audit
 - operation: updateBundle
   verb: PATCH
   path: /bundles/{bundleId}
@@ -1576,6 +2067,26 @@ operations:
   - promotions.allocation_component
   - promotions.bundle
   - promotions.bundle_component
+  - promotions.promotion_audit
+- operation: updateCommercialCampaign
+  verb: PATCH
+  path: /commercial-campaigns/{campaignId}
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - promotions.bundle
+  - promotions.campaign
+  - promotions.campaign_budget
+  - promotions.coupon_campaign
+  - promotions.promotion
+  writes:
+  - cache:idempotency
+  - promotions.campaign
+  - promotions.promotion_audit
 - operation: updatePromotion
   verb: PATCH
   path: /promotions/{promotionId}
@@ -1588,9 +2099,12 @@ operations:
   reads:
   - cache:idempotency
   - promotions.promotion
+  - promotions.promotion_channel_publication
   writes:
   - cache:idempotency
   - promotions.promotion
+  - promotions.promotion_audit
+  - promotions.promotion_channel_publication
 - operation: updateRecommendationStrategy
   verb: PUT
   path: /recommendation-strategies/{strategyId}
@@ -1617,6 +2131,7 @@ operations:
   writes:
   - cache:idempotency
   - promotions.coupon_code
+  - promotions.promotion_audit
 - operation: voidVoucher
   verb: POST
   path: /vouchers/{voucherId}/void

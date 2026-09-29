@@ -1,0 +1,1545 @@
+[
+ {
+  "id": "BO-963",
+  "name": "Import Command Center",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "2",
+   "number": "01",
+   "page": 10
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/import-command-center-bo-963",
+   "component": "apps/venue-management-web/src/routes/access-venue/ImportCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-964",
+    "BO-965",
+    "BO-966",
+    "BO-967",
+    "BO-968",
+    "BO-969",
+    "BO-970",
+    "BO-971",
+    "BO-972"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-964",
+     "trigger": "PDF & Image Import",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "jobId",
+      "seatMapId"
+     ]
+    },
+    {
+     "to": "BO-965",
+     "trigger": "SVG & CAD Import",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "jobId",
+      "seatMapId"
+     ]
+    },
+    {
+     "to": "BO-966",
+     "trigger": "CSV & Excel Import",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "jobId",
+      "seatMapId"
+     ]
+    },
+    {
+     "to": "BO-967",
+     "trigger": "AI Section Recognition",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "importId",
+      "seatMapId"
+     ]
+    },
+    {
+     "to": "BO-968",
+     "trigger": "AI Row & Seat Recognition",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "importId",
+      "seatMapId"
+     ]
+    },
+    {
+     "to": "BO-969",
+     "trigger": "AI Aisle, VIP & Accessibility",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "importId",
+      "seatMapId"
+     ]
+    },
+    {
+     "to": "BO-970",
+     "trigger": "AI Numbering & Labeling",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "seatMapId"
+     ]
+    },
+    {
+     "to": "BO-971",
+     "trigger": "Validation & Correction",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "importId",
+      "seatMapId"
+     ]
+    },
+    {
+     "to": "BO-972",
+     "trigger": "AI Venue Designer & Publish",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "jobId",
+      "seatMapId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Monitor every seat-map import from submission to publication. Show queued, processing, completed, failed and review-required jobs with source format, venue, owner and elapsed time. Display average confidence, issue counts, model version and jobs blocked by malware, unsupported content or validation failures. Support retry, cancel, duplicate, assign reviewer, open result and download controlled error reports. Retain source files, model/version, confidence, reviewer corrections and publication evidence; never allow AI output to bypass validation or approval. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 10"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 10"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getSeatMapImport",
+       "notes": "One record, read-only."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The import list.",
+   "error": "Could not load. Names which read failed and leaves the import untouched.",
+   "emptyFirstRun": "No import yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the import are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getSeatMapImport",
+    "contract": "seating",
+    "purpose": "How the import went",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getImportJob",
+    "contract": "seating",
+    "purpose": "Progress of a running import",
+    "trigger": "onAction"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-963",
+   "workshopBoard": "wireframes/WS141 Seat Management Venue Mapping Reference v1.0 Board 2.dc.html#bo-963"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 10. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "importId",
+     "from": "navigation"
+    },
+    {
+     "name": "jobId",
+     "from": "navigation"
+    },
+    {
+     "name": "seatMapId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-964",
+  "name": "PDF & Image Import",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "2",
+   "number": "02",
+   "page": 10
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/pdf-image-import-bo-964",
+   "component": "apps/venue-management-web/src/routes/access-venue/PdfImageImport.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-963"
+   ],
+   "exitTo": [
+    "BO-963"
+   ],
+   "transitions": [
+    {
+     "to": "BO-963",
+     "trigger": "Back to Import Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "jobId",
+      "seatMapId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Ingest PDF, PNG, JPG and supported scanned map sources. Provide drag-and-drop upload, page selection, preview, crop, rotation, de-skew, contrast and noise-reduction controls. Calibrate scale using known distance, dimensions or reference objects and capture venue orientation and focal point. Require file validation, malware scanning, size limits and a clear unsupported-or-low-quality recovery path. Retain source files, model/version, confidence, reviewer corrections and publication evidence; never allow AI output to bypass validation or approval. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 10"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 10"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "importSeatMap",
+       "label": "Import seat map",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getImportJob",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "importSeatMap"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The pdf image import list.",
+   "error": "Could not load. Names which read failed and leaves the pdf image import untouched.",
+   "emptyFirstRun": "No pdf image import yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the pdf image import are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "importSeatMap",
+    "contract": "seating",
+    "purpose": "Import from a plan or image",
+    "trigger": "onAction",
+    "invalidates": [
+     "getImportJob"
+    ]
+   },
+   {
+    "operationId": "getImportJob",
+    "contract": "seating",
+    "purpose": "Watch it run",
+    "trigger": "onAction"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-964",
+   "workshopBoard": "wireframes/WS141 Seat Management Venue Mapping Reference v1.0 Board 2.dc.html#bo-964"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 10. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "jobId",
+     "from": "navigation"
+    },
+    {
+     "name": "seatMapId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-965",
+  "name": "SVG & CAD Import",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "2",
+   "number": "03",
+   "page": 10
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/svg-cad-import-bo-965",
+   "component": "apps/venue-management-web/src/routes/access-venue/SvgCadImport.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-963"
+   ],
+   "exitTo": [
+    "BO-963"
+   ],
+   "transitions": [
+    {
+     "to": "BO-963",
+     "trigger": "Back to Import Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "jobId",
+      "seatMapId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Convert vector and CAD geometry while preserving useful source layers. Support approved SVG, DXF and DWG workflows with unit, scale, origin, coordinate and rotation mapping. Map source layers to sections, rows, seats, aisles, stage, text, amenities, obstructions and ignored content. Simplify excessive geometry, close open paths, remove duplicates and preview the transformed result before recognition. Configuration Scope of Work | Version 1.0 10 Retain source files, model/version, confidence, reviewer corrections and publication evidence; never allow AI output to bypass validation or approval. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 10"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 10"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "importSeatGeometry",
+       "label": "Import seat geometry",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getImportJob",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "importSeatGeometry"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The svg cad import list.",
+   "error": "Could not load. Names which read failed and leaves the svg cad import untouched.",
+   "emptyFirstRun": "No svg cad import yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the svg cad import are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "importSeatGeometry",
+    "contract": "seating",
+    "purpose": "Import vector geometry",
+    "trigger": "onAction",
+    "invalidates": [
+     "getImportJob"
+    ]
+   },
+   {
+    "operationId": "getImportJob",
+    "contract": "seating",
+    "purpose": "Watch it run",
+    "trigger": "onAction"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-965",
+   "workshopBoard": "wireframes/WS141 Seat Management Venue Mapping Reference v1.0 Board 2.dc.html#bo-965"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 10. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "jobId",
+     "from": "navigation"
+    },
+    {
+     "name": "seatMapId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-966",
+  "name": "CSV & Excel Import",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "2",
+   "number": "04",
+   "page": 11
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/csv-excel-import-bo-966",
+   "component": "apps/venue-management-web/src/routes/access-venue/CsvExcelImport.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-963"
+   ],
+   "exitTo": [
+    "BO-963"
+   ],
+   "transitions": [
+    {
+     "to": "BO-963",
+     "trigger": "Back to Import Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "jobId",
+      "seatMapId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Build maps or update seat master data from structured rows. Map columns for venue, level, section, row, seat, coordinates, type, category, price band, accessibility and status. Configure delimiter, header, encoding, sheet, data type, defaults and transformation rules with a sample-data preview. Detect missing identifiers, duplicates, invalid coordinates, inconsistent row sequences and unmapped values before import. Retain source files, model/version, confidence, reviewer corrections and publication evidence; never allow AI output to bypass validation or approval. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 11"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 11"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "importSeatManifest",
+       "label": "Import seat manifest",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getImportJob",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "importSeatManifest"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The csv excel import list.",
+   "error": "Could not load. Names which read failed and leaves the csv excel import untouched.",
+   "emptyFirstRun": "No csv excel import yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the csv excel import are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "importSeatManifest",
+    "contract": "seating",
+    "purpose": "Row and seat naming from a manifest",
+    "trigger": "onAction",
+    "invalidates": [
+     "getImportJob"
+    ]
+   },
+   {
+    "operationId": "getImportJob",
+    "contract": "seating",
+    "purpose": "Watch it run",
+    "trigger": "onAction"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-966",
+   "workshopBoard": "wireframes/WS141 Seat Management Venue Mapping Reference v1.0 Board 2.dc.html#bo-966"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 11. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "jobId",
+     "from": "navigation"
+    },
+    {
+     "name": "seatMapId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-967",
+  "name": "AI Section Recognition",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "2",
+   "number": "05",
+   "page": 11
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/ai-section-recognition-bo-967",
+   "component": "apps/venue-management-web/src/routes/access-venue/AiSectionRecognition.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-963"
+   ],
+   "exitTo": [
+    "BO-963"
+   ],
+   "transitions": [
+    {
+     "to": "BO-963",
+     "trigger": "Back to Import Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "importId",
+      "seatMapId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Recognize venue levels, sections and standing zones from source geometry. Display detected boundaries, labels, hierarchy, capacity estimate and per-object confidence on the source preview. Allow accept, reject, merge, split, rename and redraw with AI correction suggestions and reason capture. Flag ambiguous, overlapping, disconnected or unlabelled areas and prevent silent assignment to the wrong level. Retain source files, model/version, confidence, reviewer corrections and publication evidence; never allow AI output to bypass validation or approval. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 11"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 11"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getSeatMapImport",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "validateSeatMap",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "validateSeatMap"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The section recognition list.",
+   "error": "Could not load. Names which read failed and leaves the section recognition untouched.",
+   "emptyFirstRun": "No section recognition yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the section recognition are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getSeatMapImport",
+    "contract": "seating",
+    "purpose": "What the import recognised",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "validateSeatMap",
+    "contract": "seating",
+    "purpose": "Correct and confirm",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-967",
+   "workshopBoard": "wireframes/WS141 Seat Management Venue Mapping Reference v1.0 Board 2.dc.html#bo-967"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 11. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "importId",
+     "from": "navigation"
+    },
+    {
+     "name": "seatMapId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-968",
+  "name": "AI Row & Seat Recognition",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "2",
+   "number": "06",
+   "page": 11
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/ai-row-seat-recognition-bo-968",
+   "component": "apps/venue-management-web/src/routes/access-venue/AiRowSeatRecognition.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-963"
+   ],
+   "exitTo": [
+    "BO-963"
+   ],
+   "transitions": [
+    {
+     "to": "BO-963",
+     "trigger": "Back to Import Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "importId",
+      "seatMapId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Detect rows and individual seat positions at production scale. Recognize row curves, direction, gaps, seat dots, repeated symbols and wheelchair spaces with confidence heat maps. Allow threshold, gap, snap, spacing and symbol-class controls followed by selective reprocessing. Present detected counts by section and reconcile them with stated capacities, labels and expected patterns. Retain source files, model/version, confidence, reviewer corrections and publication evidence; never allow AI output to bypass validation or approval. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 11"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 11"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getSeatMapImport",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateSeats",
+       "label": "Save seats",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateSeats"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The row seat recognition list.",
+   "error": "Could not load. Names which read failed and leaves the row seat recognition untouched.",
+   "emptyFirstRun": "No row seat recognition yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the row seat recognition are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getSeatMapImport",
+    "contract": "seating",
+    "purpose": "Rows and seats recognised",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "updateSeats",
+    "contract": "seating",
+    "purpose": "Correct them",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-968",
+   "workshopBoard": "wireframes/WS141 Seat Management Venue Mapping Reference v1.0 Board 2.dc.html#bo-968"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 11. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "importId",
+     "from": "navigation"
+    },
+    {
+     "name": "seatMapId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-969",
+  "name": "AI Aisle, VIP & Accessibility",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "2",
+   "number": "07",
+   "page": 11
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/ai-aisle-vip-accessibility-bo-969",
+   "component": "apps/venue-management-web/src/routes/access-venue/AiAisleVipAccessibility.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-963"
+   ],
+   "exitTo": [
+    "BO-963"
+   ],
+   "transitions": [
+    {
+     "to": "BO-963",
+     "trigger": "Back to Import Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "importId",
+      "seatMapId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Recognize special geometry and operational attributes that affect seating. Detect aisles, entrances, exits, stages, VIP areas, suites, boxes, wheelchair positions and accessible routes. Show confidence, source evidence and conflicts where a detected object overlaps inventory or breaks route continuity. Allow the reviewer to change object class, boundary and attributes without restarting the full import. Configuration Scope of Work | Version 1.0 11 Retain source files, model/version, confidence, reviewer corrections and publication evidence; never allow AI output to bypass validation or approval. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 11"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 11"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getSeatMapImport",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setMapZones",
+       "label": "Save map zones",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setMapZones"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The aisle vip accessibility list.",
+   "error": "Could not load. Names which read failed and leaves the aisle vip accessibility untouched.",
+   "emptyFirstRun": "No aisle vip accessibility yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the aisle vip accessibility are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getSeatMapImport",
+    "contract": "seating",
+    "purpose": "Aisles, VIP and accessible areas",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setMapZones",
+    "contract": "seating",
+    "purpose": "Correct the zones",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-969",
+   "workshopBoard": "wireframes/WS141 Seat Management Venue Mapping Reference v1.0 Board 2.dc.html#bo-969"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 11. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "importId",
+     "from": "navigation"
+    },
+    {
+     "name": "seatMapId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-970",
+  "name": "AI Numbering & Labeling",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "2",
+   "number": "08",
+   "page": 12
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/ai-numbering-labeling-bo-970",
+   "component": "apps/venue-management-web/src/routes/access-venue/AiNumberingLabeling.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-963"
+   ],
+   "exitTo": [
+    "BO-963"
+   ],
+   "transitions": [
+    {
+     "to": "BO-963",
+     "trigger": "Back to Import Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "seatMapId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Generate consistent section, row and seat identifiers from recognized geometry. Configure alphabetic, numeric, alphanumeric, odd/even, continuous, reset-by-row and venue-specific numbering patterns. Preview before/after labels, direction, padding, skipped values, reserved labels and accessible-seat suffixes. Detect duplicates, gaps, reversals and conflicts with existing venue identifiers before applying changes. Retain source files, model/version, confidence, reviewer corrections and publication evidence; never allow AI output to bypass validation or approval. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 12"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 12"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateSeats",
+       "label": "Save seats",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateSeats"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The numbering labeling list.",
+   "error": "Could not load. Names which read failed and leaves the numbering labeling untouched.",
+   "emptyFirstRun": "No numbering labeling yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the numbering labeling are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "updateSeats",
+    "contract": "seating",
+    "purpose": "Numbering and labelling",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-970",
+   "workshopBoard": "wireframes/WS141 Seat Management Venue Mapping Reference v1.0 Board 2.dc.html#bo-970"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 12. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "seatMapId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-971",
+  "name": "Validation & Correction",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "2",
+   "number": "09",
+   "page": 12
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/validation-correction-bo-971",
+   "component": "apps/venue-management-web/src/routes/access-venue/ValidationCorrection.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-963"
+   ],
+   "exitTo": [
+    "BO-963"
+   ],
+   "transitions": [
+    {
+     "to": "BO-963",
+     "trigger": "Back to Import Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "importId",
+      "seatMapId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide one controlled workspace for resolving AI and import exceptions. Compare the source and generated map side by side with issue list, filters, severity and confidence. Offer manual draw, move, split, merge, add, delete, renumber, relabel and property-edit tools on a correction layer. Re-run selected recognizers, validate affected objects and preserve every AI suggestion, human edit and reviewer decision. Retain source files, model/version, confidence, reviewer corrections and publication evidence; never allow AI output to bypass validation or approval. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 12"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 12"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "validateSeatMap",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getSeatMapImport",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "validateSeatMap"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The validation correction list.",
+   "error": "Could not load. Names which read failed and leaves the validation correction untouched.",
+   "emptyFirstRun": "No validation correction yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the validation correction are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "validateSeatMap",
+    "contract": "seating",
+    "purpose": "Validate the draft",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getSeatMapImport",
+    "contract": "seating",
+    "purpose": "What the import produced",
+    "trigger": "onAction"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-971",
+   "workshopBoard": "wireframes/WS141 Seat Management Venue Mapping Reference v1.0 Board 2.dc.html#bo-971"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 12. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "importId",
+     "from": "navigation"
+    },
+    {
+     "name": "seatMapId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-972",
+  "name": "AI Venue Designer & Publish",
+  "module": "Access & Venue",
+  "requiresModule": "seating",
+  "wave": 3,
+  "source": {
+   "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "board": "2",
+   "number": "10",
+   "page": 12
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/ai-venue-designer-publish-bo-972",
+   "component": "apps/venue-management-web/src/routes/access-venue/AiVenueDesignerPublish.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-963"
+   ],
+   "exitTo": [
+    "BO-963"
+   ],
+   "transitions": [
+    {
+     "to": "BO-963",
+     "trigger": "Back to Import Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "jobId",
+      "seatMapId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Generate or refine a seat map from a natural-language brief and release the approved result. Accept venue type, dimensions, levels, target capacity, stage, section mix, accessibility and circulation requirements. Generate multiple explainable variants with capacity, sightline, accessible inventory and constraint summaries. Require full map validation, human review, approval and controlled one-click publication with version and rollback. Retain source files, model/version, confidence, reviewer corrections and publication evidence; never allow AI output to bypass validation or approval. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 12 Board 3 - Layouts, Templates & Versions Figure 3. High-definition configuration board with all 10 screens. Visual reference: information architecture and configuration coverage; detailed production behavior is defined in the following scope. Configuration Scope of Work | Version 1.0 13",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**AI Venue Designer & Publish declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 12"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 12"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "commitImportJob",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "commitImportJob"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Replaces the map every channel sells from.** Seats already sold keep their labels; seats that no longer exist in the new map are listed before this proceeds.",
+       "provenance": "authored — required by check-screens, 19 September 2026"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The venue designer publish list.",
+   "error": "Could not load. Names which read failed and leaves the venue designer publish untouched.",
+   "emptyFirstRun": "No venue designer publish yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the venue designer publish are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "commitImportJob",
+    "contract": "seating",
+    "purpose": "Accept the draft",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSeatMaps"
+    ]
+   },
+   {
+    "operationId": "publishSeatMap",
+    "contract": "seating",
+    "purpose": "Publish",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSeatMaps",
+     "getSeatMap"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-972",
+   "workshopBoard": "wireframes/WS141 Seat Management Venue Mapping Reference v1.0 Board 2.dc.html#bo-972"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 12. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "jobId",
+     "from": "navigation"
+    },
+    {
+     "name": "seatMapId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

@@ -1,0 +1,65 @@
+{
+ "listResources": {
+  "method": "GET",
+  "path": "/resources",
+  "contract": "resources",
+  "summary": "Resources at this venue",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "availableFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "availableTo",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Resource"
+ },
+ "suggestResources": {
+  "method": "GET",
+  "path": "/resource-suggestions",
+  "contract": "resources",
+  "summary": "Resources matching a requirement, by attribute",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "resourceTypeId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "attributes",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Resource"
+ }
+}

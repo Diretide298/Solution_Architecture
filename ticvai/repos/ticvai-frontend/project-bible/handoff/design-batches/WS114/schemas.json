@@ -1,0 +1,445 @@
+{
+ "AccreditationAuditRecord": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.audit",
+  "description": "Board 8.7. **Who gave this person access to that place, when, and on whose authority.**\n",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "action": {
+    "type": "string"
+   },
+   "actorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "previousValue": {
+    "nullable": true
+   },
+   "newValue": {
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "previousRecordHash": {
+    "type": "string",
+    "nullable": true
+   },
+   "recordHash": {
+    "type": "string"
+   },
+   "integrity": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "intact",
+     "broken",
+     "unverifiable"
+    ]
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "AccreditationHolder": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.holder",
+  "description": "**A subject who may never sign in to anything.** `identity` owns principals; this owns accredited people.\n",
+  "required": [
+   "id",
+   "fullName"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "accreditationNumber": {
+    "type": "string"
+   },
+   "fullName": {
+    "type": "string"
+   },
+   "photoAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "dateOfBirth": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "nationality": {
+    "type": "string",
+    "nullable": true
+   },
+   "identityDocumentVerified": {
+    "type": "boolean",
+    "default": false
+   },
+   "organisationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "affiliationRole": {
+    "type": "string",
+    "nullable": true
+   },
+   "programmeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "categoryCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "suspended",
+     "revoked",
+     "expired",
+     "archived"
+    ]
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "completenessPercent": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "AccreditationImportResult": {
+  "type": "object",
+  "description": "Board 7.8. **A bulk import is exactly where the same person gets accredited twice.**\n",
+  "properties": {
+   "rowsRead": {
+    "type": "integer"
+   },
+   "created": {
+    "type": "integer"
+   },
+   "updated": {
+    "type": "integer"
+   },
+   "rejected": {
+    "type": "integer"
+   },
+   "identityConflicts": {
+    "type": "integer"
+   },
+   "rows": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "row": {
+       "type": "integer"
+      },
+      "name": {
+       "type": "string"
+      },
+      "outcome": {
+       "type": "string"
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "committed": {
+    "type": "boolean"
+   }
+  }
+ },
+ "AccreditationNotificationRules": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.notification_rules",
+  "description": "Board 7.2. **Notices go to the organisation as well as the holder.**",
+  "properties": {
+   "programmeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "rules": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "event": {
+       "type": "string",
+       "enum": [
+        "applicationReceived",
+        "informationRequested",
+        "approved",
+        "rejected",
+        "credentialReady",
+        "expiringSoon",
+        "expired",
+        "suspended",
+        "revoked"
+       ]
+      },
+      "daysBefore": {
+       "type": "integer",
+       "nullable": true
+      },
+      "recipients": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "enum": [
+         "holder",
+         "organisation",
+         "sponsor",
+         "accreditationTeam"
+        ]
+       }
+      },
+      "channels": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "templateId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "LocalizationBrandingCustomerExperienceConfigurationInput": {
+  "description": "The request body of `setLocalizationBrandingCustomer`, the record itself; read-only properties are ignored.",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/LocalizationBrandingCustomerExperienceConfigurationView"
+   }
+  ]
+ },
+ "LocalizationBrandingCustomerExperienceConfigurationView": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.waiver_localisation",
+  "description": "Languages, branding and channels of one waiver version (pack 11.1.9), keyed on `formId` + `formVersion`.",
+  "required": [
+   "formId",
+   "formVersion",
+   "sourceLanguage",
+   "languages"
+  ],
+  "properties": {
+   "formId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "formVersion": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "sourceLanguage": {
+    "type": "string",
+    "maxLength": 10,
+    "description": "The language the legal text is written and reviewed in."
+   },
+   "languages": {
+    "type": "array",
+    "minItems": 1,
+    "description": "Every language the version is offered in, the source language included. Arabic renders right to left.",
+    "items": {
+     "type": "object",
+     "required": [
+      "language",
+      "required",
+      "translationStatus",
+      "approvalStatus"
+     ],
+     "properties": {
+      "language": {
+       "type": "string",
+       "maxLength": 10
+      },
+      "required": {
+       "type": "boolean",
+       "description": "Publication waits for this language's approval."
+      },
+      "translationStatus": {
+       "type": "string",
+       "enum": [
+        "notStarted",
+        "aiDrafted",
+        "inTranslation",
+        "inReview",
+        "complete"
+       ]
+      },
+      "translatorUserId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "reviewerUserId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "approvalStatus": {
+       "type": "string",
+       "enum": [
+        "pending",
+        "approved",
+        "rejected"
+       ]
+      },
+      "lastUpdated": {
+       "type": "string",
+       "format": "date-time",
+       "readOnly": true
+      }
+     }
+    }
+   },
+   "branding": {
+    "type": "object",
+    "properties": {
+     "brandLogoAssetId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "venueLogoAssetId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "themeId": {
+      "type": "string",
+      "nullable": true,
+      "description": "The white-label theme it takes colours and typography from."
+     },
+     "header": {
+      "$ref": "#/components/schemas/LocalisedText"
+     },
+     "footer": {
+      "$ref": "#/components/schemas/LocalisedText"
+     },
+     "customerInstructions": {
+      "$ref": "#/components/schemas/LocalisedText"
+     },
+     "confirmationMessage": {
+      "$ref": "#/components/schemas/LocalisedText"
+     },
+     "supportEmail": {
+      "type": "string",
+      "format": "email",
+      "nullable": true
+     },
+     "supportPhone": {
+      "type": "string",
+      "maxLength": 30,
+      "nullable": true
+     }
+    }
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "b2cWeb",
+      "mobileApp",
+      "emailLink",
+      "qrLink",
+      "kiosk",
+      "posFrontDesk",
+      "groupPortal"
+     ]
+    },
+    "description": "Where the waiver is offered; every channel renders the same version and rules."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ }
+}

@@ -1,0 +1,66 @@
+{
+ "listCreditTypes": {
+  "method": "GET",
+  "path": "/credit-types",
+  "contract": "wallet",
+  "summary": "The kinds of value that may sit in a wallet",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CreditType"
+ },
+ "listPerformanceTemplates": {
+  "method": "GET",
+  "path": "/performance-templates",
+  "contract": "catalogue",
+  "summary": "Slot templates, peak bands and walk-in rules",
+  "permission": "PERFORMANCE_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PerformanceTemplate"
+ },
+ "setPerformanceTemplate": {
+  "method": "PUT",
+  "path": "/performance-templates",
+  "contract": "catalogue",
+  "summary": "Define slot length, capacity, bands and walk-in policy",
+  "permission": "PERFORMANCE_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PerformanceTemplate",
+  "responds": "PerformanceTemplate"
+ },
+ "setPrepaidMinutePackage": {
+  "method": "PUT",
+  "path": "/prepaid-minute-packages",
+  "contract": "catalogue",
+  "summary": "Time bought in advance and drawn down per visit",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PrepaidMinutePackage",
+  "responds": "PrepaidMinutePackage"
+ }
+}

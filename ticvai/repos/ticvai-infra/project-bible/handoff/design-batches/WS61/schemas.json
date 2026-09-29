@@ -5,68 +5,6 @@
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Credential Delivery & Distribution Operations displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "email": {
-    "type": "string",
-    "description": "Email"
-   },
-   "smsLink": {
-    "type": "string",
-    "description": "SMS Link"
-   },
-   "whatsappIntegration": {
-    "type": "string",
-    "description": "WhatsApp integration"
-   },
-   "b2cAccount": {
-    "type": "string",
-    "description": "B2C Account"
-   },
-   "mobileApp": {
-    "type": "string",
-    "description": "Mobile App"
-   },
-   "appleWallet": {
-    "type": "string",
-    "description": "Apple Wallet"
-   },
-   "googleWallet": {
-    "type": "string",
-    "description": "Google Wallet"
-   },
-   "pos": {
-    "type": "string",
-    "description": "POS"
-   },
-   "boxOffice": {
-    "type": "string",
-    "description": "Box Office"
-   },
-   "kiosk": {
-    "type": "string",
-    "description": "Kiosk"
-   },
-   "groupPortal": {
-    "type": "string",
-    "description": "Group Portal"
-   },
-   "api": {
-    "type": "string",
-    "description": "API"
-   },
-   "physicalCollection": {
-    "type": "string",
-    "description": "Physical Collection"
-   },
-   "statesType": {
-    "type": "string",
-    "enum": [
-     "failed",
-     "bounced",
-     "expired",
-     "cancelled"
-    ],
-    "description": "Vocabulary listed under Alternative states."
-   },
    "virtualTicket": {
     "type": "string",
     "description": "Virtual Ticket"
@@ -81,240 +19,305 @@
    },
    "channel": {
     "type": "string",
-    "description": "Channel"
+    "enum": [
+     "email",
+     "smsLink",
+     "whatsapp",
+     "b2cAccount",
+     "mobileApp",
+     "download",
+     "appleWallet",
+     "googleWallet",
+     "pos",
+     "boxOffice",
+     "kiosk",
+     "groupPortal",
+     "api",
+     "physicalCollection"
+    ],
+    "description": "Delivery channel"
    },
    "destination": {
     "type": "string",
-    "description": "Destination"
+    "description": "Destination, masked"
    },
    "sentAt": {
     "type": "string",
+    "format": "date-time",
     "description": "Sent At"
    },
    "deliveredAt": {
     "type": "string",
+    "format": "date-time",
     "description": "Delivered At"
    },
    "openedDownloaded": {
     "type": "string",
-    "description": "Opened/Downloaded"
+    "format": "date-time",
+    "description": "When opened or downloaded"
    },
    "attempt": {
-    "type": "string",
+    "type": "integer",
     "description": "Attempt"
    },
    "status": {
-    "type": "integer",
-    "description": "Status"
-   },
-   "purchaser": {
     "type": "string",
-    "description": "Purchaser"
+    "enum": [
+     "notRequired",
+     "pending",
+     "sent",
+     "delivered",
+     "openedDownloaded",
+     "completed",
+     "failed",
+     "bounced",
+     "expired",
+     "cancelled"
+    ],
+    "description": "Delivery status"
    },
-   "ticketHolder": {
+   "recipientRole": {
     "type": "string",
-    "description": "Ticket Holder"
-   },
-   "participant": {
-    "type": "string",
-    "description": "Participant"
-   },
-   "guardian": {
-    "type": "string",
-    "description": "Guardian"
-   },
-   "groupLeader": {
-    "type": "string",
-    "description": "Group Leader"
-   },
-   "authorizedRecipient": {
-    "type": "string",
-    "description": "Authorized recipient"
-   },
-   "authentication": {
-    "type": "string",
-    "description": "Authentication"
-   },
-   "singleMultipleUse": {
-    "type": "string",
-    "description": "Single/multiple use"
-   },
-   "customerIdentity": {
-    "type": "string",
-    "description": "Customer identity"
-   },
-   "tokenSecurity": {
-    "type": "string",
-    "description": "Token security"
-   },
-   "dataMasking": {
-    "type": "string",
-    "description": "Data masking"
+    "enum": [
+     "purchaser",
+     "ticketHolder",
+     "participant",
+     "guardian",
+     "groupLeader",
+     "authorizedRecipient"
+    ],
+    "description": "Who the credential was delivered to"
    }
   }
  },
- "CredentialGenerationIssuanceMonitorView": {
+ "CredentialDeliveryInput": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Credential Generation & Issuance Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — request only (decided 29 September, VM close-out)",
+  "description": "Send, or send again, one credential over one channel (decided 29 September, VM close-out).",
+  "required": [
+   "id",
+   "channel"
+  ],
   "properties": {
-   "orderConfirmation": {
+   "id": {
     "type": "string",
-    "description": "Order Confirmation"
-   },
-   "ticketIssuance": {
-    "type": "string",
-    "description": "Ticket Issuance"
-   },
-   "membershipActivation": {
-    "type": "string",
-    "description": "Membership Activation"
-   },
-   "customerRequest": {
-    "type": "string",
-    "description": "Customer Request"
-   },
-   "staffAction": {
-    "type": "string",
-    "description": "Staff Action"
-   },
-   "rfidCollection": {
-    "type": "string",
-    "description": "RFID Collection"
-   },
-   "walletRequest": {
-    "type": "string",
-    "description": "Wallet Request"
-   },
-   "faceEnrollment": {
-    "type": "string",
-    "description": "Face Enrollment"
-   },
-   "api": {
-    "type": "string",
-    "description": "API"
-   },
-   "bulkOperation": {
-    "type": "string",
-    "description": "Bulk Operation"
-   },
-   "scheduledProcess": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Scheduled Process"
-   },
-   "requestId": {
-    "type": "string",
-    "description": "Request ID"
-   },
-   "virtualTicket": {
-    "type": "string",
-    "description": "Virtual Ticket"
-   },
-   "media": {
-    "type": "string",
-    "description": "Media"
-   },
-   "template": {
-    "type": "string",
-    "description": "Template"
-   },
-   "templateVersion": {
-    "type": "string",
-    "description": "Template Version"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "customer": {
-    "type": "string",
-    "description": "Customer"
-   },
-   "provider": {
-    "type": "string",
-    "description": "Provider"
-   },
-   "requestedAt": {
-    "type": "string",
-    "description": "Requested At"
-   },
-   "generatedAt": {
-    "type": "string",
-    "description": "Generated At"
-   },
-   "status": {
-    "type": "integer",
-    "description": "Status"
-   },
-   "error": {
-    "type": "string",
-    "description": "Error"
-   },
-   "brand": {
-    "type": "string",
-    "description": "Brand"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated delivery attempt id"
    },
    "channel": {
     "type": "string",
-    "description": "Channel"
+    "enum": [
+     "email",
+     "smsLink",
+     "whatsapp",
+     "download",
+     "appleWallet",
+     "googleWallet",
+     "pos",
+     "api",
+     "physicalCollection"
+    ]
    },
-   "language": {
+   "recipient": {
     "type": "string",
-    "description": "Language"
+    "maxLength": 320,
+    "description": "Email address, phone number or collection point; empty sends to the recipient already on the credential"
    },
-   "customerContext": {
+   "recipientRole": {
     "type": "string",
-    "description": "Customer context"
+    "enum": [
+     "purchaser",
+     "ticketHolder",
+     "participant",
+     "guardian",
+     "groupLeader",
+     "authorizedRecipient"
+    ],
+    "default": "ticketHolder"
    },
-   "supportControlledBulkOperations": {
+   "note": {
     "type": "string",
-    "description": "Support controlled bulk operations"
+    "maxLength": 300
+   }
+  }
+ },
+ "CredentialExceptionActionInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only (decided 29 September, VM close-out)",
+  "description": "One action on a credential exception in the failure queue (decided 29 September, VM close-out).",
+  "required": [
+   "action"
+  ],
+  "properties": {
+   "action": {
+    "type": "string",
+    "enum": [
+     "retry",
+     "regenerate",
+     "useFallback",
+     "escalate",
+     "assignOwner",
+     "openTechnicalCase"
+    ]
    },
-   "templateMissing": {
+   "ownerId": {
     "type": "string",
-    "description": "Template missing"
+    "description": "Required for assignOwner and escalate"
    },
-   "requiredDataMissing": {
+   "fallbackMediaKind": {
     "type": "string",
-    "description": "Required data missing"
+    "enum": [
+     "qr",
+     "pdf",
+     "printedTicket",
+     "rfidCard",
+     "wristband"
+    ],
+    "description": "Required for useFallback"
    },
-   "providerUnavailable": {
+   "note": {
     "type": "string",
-    "description": "Provider unavailable"
+    "maxLength": 500
+   }
+  }
+ },
+ "CredentialGenerationRetryInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only (decided 29 September, VM close-out)",
+  "description": "Retry failed credential generation, for selected requests or every eligible one (decided 29 September, VM close-out).",
+  "required": [
+   "scope"
+  ],
+  "properties": {
+   "scope": {
+    "type": "string",
+    "enum": [
+     "selected",
+     "allEligible"
+    ]
    },
-   "invalidPayload": {
-    "type": "string",
-    "description": "Invalid payload"
+   "requestIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "maxItems": 500,
+    "description": "The failed generation requests (`CredentialGenerationIssuanceMonitorView.requestId`); required for selected"
+   }
+  }
+ },
+ "CredentialGenerationRetryResult": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed (decided 29 September, VM close-out)",
+  "description": "What a retry queued and what it skipped (decided 29 September, VM close-out).",
+  "required": [
+   "queued",
+   "skipped"
+  ],
+  "properties": {
+   "queued": {
+    "type": "integer"
    },
-   "tokenGenerationFailure": {
-    "type": "string",
-    "description": "Token generation failure"
+   "skipped": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "requestId": {
+       "type": "string"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "notFailed",
+        "alreadyQueued",
+        "notRetryable"
+       ]
+      }
+     }
+    }
+   }
+  }
+ },
+ "CredentialIssuanceRetryPolicyInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only (decided 29 September, VM close-out)",
+  "description": "The tenant's automatic retry policy for failed credential generation (decided 29 September, VM close-out). Proposed defaults are ours (our build plan).",
+  "required": [
+   "automaticRetry"
+  ],
+  "properties": {
+   "automaticRetry": {
+    "type": "boolean",
+    "default": true
    },
-   "walletGenerationFailure": {
-    "type": "string",
-    "description": "Wallet generation failure"
+   "maxAttempts": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 10,
+    "default": 3
    },
-   "encoderUnavailable": {
-    "type": "string",
-    "description": "Encoder unavailable"
+   "backoffMinutes": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 240,
+    "default": 5,
+    "description": "Wait before the first retry; doubles on each attempt"
+   },
+   "escalateAfterAttempts": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 10,
+    "default": 3,
+    "description": "After this many failures the request becomes a credential exception with an owner; not more than maxAttempts"
+   }
+  }
+ },
+ "CredentialIssuanceRetryPolicyView": {
+  "type": "object",
+  "x-ticvai-persistence": "access.credential_issuance_retry_policy",
+  "description": "The automatic retry policy in force, one per venue (decided 29 September, VM close-out).",
+  "required": [
+   "venueId",
+   "automaticRetry",
+   "maxAttempts",
+   "backoffMinutes",
+   "escalateAfterAttempts"
+  ],
+  "properties": {
+   "venueId": {
+    "type": "string"
    },
    "automaticRetry": {
-    "type": "string",
-    "description": "Automatic Retry"
+    "type": "boolean",
+    "default": true
    },
-   "manualRetry": {
+   "maxAttempts": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 10,
+    "default": 3
+   },
+   "backoffMinutes": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 240,
+    "default": 5
+   },
+   "escalateAfterAttempts": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 10,
+    "default": 3
+   },
+   "updatedAt": {
     "type": "string",
-    "description": "Manual Retry"
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The partition key (ADR-0005). Written at venue scope"
    }
   }
  },
@@ -324,102 +327,6 @@
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Credential Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "virtualTicketsIssued": {
-    "type": "string",
-    "description": "Virtual Tickets Issued"
-   },
-   "credentialsGenerated": {
-    "type": "string",
-    "description": "Credentials Generated"
-   },
-   "activeCredentials": {
-    "type": "integer",
-    "description": "Active Credentials"
-   },
-   "pendingGeneration": {
-    "type": "integer",
-    "description": "Pending Generation"
-   },
-   "pendingDelivery": {
-    "type": "integer",
-    "description": "Pending Delivery"
-   },
-   "pendingBinding": {
-    "type": "integer",
-    "description": "Pending Binding"
-   },
-   "pendingActivation": {
-    "type": "integer",
-    "description": "Pending Activation"
-   },
-   "suspended": {
-    "type": "string",
-    "description": "Suspended"
-   },
-   "revoked": {
-    "type": "string",
-    "description": "Revoked"
-   },
-   "expired": {
-    "type": "integer",
-    "description": "Expired"
-   },
-   "failedGeneration": {
-    "type": "integer",
-    "description": "Failed Generation"
-   },
-   "failedDelivery": {
-    "type": "integer",
-    "description": "Failed Delivery"
-   },
-   "synchronizationExceptions": {
-    "type": "integer",
-    "description": "Synchronization Exceptions"
-   },
-   "multiMediaVirtualTickets": {
-    "type": "integer",
-    "description": "Multi-Media Virtual Tickets"
-   },
-   "dynamicQr": {
-    "type": "string",
-    "description": "Dynamic QR"
-   },
-   "barcode": {
-    "type": "string",
-    "description": "Barcode"
-   },
-   "pdf": {
-    "type": "string",
-    "description": "PDF"
-   },
-   "appleWallet": {
-    "type": "string",
-    "description": "Apple Wallet"
-   },
-   "googleWallet": {
-    "type": "string",
-    "description": "Google Wallet"
-   },
-   "rfid": {
-    "type": "string",
-    "description": "RFID"
-   },
-   "nfc": {
-    "type": "string",
-    "description": "NFC"
-   },
-   "faceRecognitionReference": {
-    "type": "string",
-    "description": "Face Recognition Reference"
-   },
-   "card": {
-    "type": "string",
-    "description": "Card"
-   },
-   "wristband": {
-    "type": "string",
-    "description": "Wristband"
-   },
    "virtualTicketId": {
     "type": "string",
     "description": "Virtual Ticket ID"
@@ -445,20 +352,54 @@
     "description": "Event"
    },
    "credentialStatus": {
-    "type": "integer",
-    "description": "Credential Status"
+    "type": "string",
+    "enum": [
+     "pendingGeneration",
+     "generated",
+     "pendingActivation",
+     "active",
+     "suspended",
+     "revoked",
+     "expired",
+     "failed"
+    ],
+    "description": "Credential status"
    },
    "deliveryStatus": {
-    "type": "integer",
-    "description": "Delivery Status"
+    "type": "string",
+    "enum": [
+     "notRequired",
+     "pending",
+     "sent",
+     "delivered",
+     "openedDownloaded",
+     "completed",
+     "failed",
+     "bounced",
+     "expired",
+     "cancelled"
+    ],
+    "description": "Delivery status (15.3.4)"
    },
    "activationStatus": {
-    "type": "integer",
-    "description": "Activation Status"
+    "type": "string",
+    "enum": [
+     "pending",
+     "scheduled",
+     "active",
+     "notRequired"
+    ],
+    "description": "Activation status"
    },
    "bindingStatus": {
-    "type": "integer",
-    "description": "Binding Status"
+    "type": "string",
+    "enum": [
+     "pending",
+     "bound",
+     "unbound",
+     "failed"
+    ],
+    "description": "Binding status"
    },
    "provider": {
     "type": "string",
@@ -476,14 +417,49 @@
    "owner": {
     "type": "string",
     "description": "Owner"
+   }
+  }
+ },
+ "CredentialReplacementInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only (decided 29 September, VM close-out)",
+  "description": "Replace the media of a credential while the Virtual Ticket stays the same (decided 29 September, VM close-out).",
+  "required": [
+   "reason"
+  ],
+  "properties": {
+   "reason": {
+    "type": "string",
+    "enum": [
+     "lost",
+     "stolen",
+     "damaged",
+     "compromised",
+     "customerChangedPhone",
+     "rfidFailure",
+     "wristbandReplacement",
+     "qrCompromise",
+     "walletReplacement",
+     "faceReEnrollment",
+     "incorrectAssignment"
+    ]
    },
-   "qrGeneration9998Healthy": {
-    "type": "number",
-    "description": "QR Generation — 99.98% Healthy"
+   "newMediaKind": {
+    "type": "string",
+    "description": "Media type of the replacement (`MediaTypeTechnologyLibraryView.mediaType`); empty keeps the current kind"
    },
-   "rfidEncoding987Healthy": {
-    "type": "number",
-    "description": "RFID Encoding — 98.7% Healthy"
+   "newMediaCode": {
+    "type": "string",
+    "description": "Code of the new physical media where one is encoded at the counter"
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The granted approval, where the replacement rule requires one"
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 500
    }
   }
  },
@@ -493,339 +469,58 @@
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Credential Replacement, Reissue, Revocation & Recovery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "lost": {
+   "reason": {
     "type": "string",
-    "description": "Lost"
-   },
-   "stolen": {
-    "type": "string",
-    "description": "Stolen"
-   },
-   "damaged": {
-    "type": "string",
-    "description": "Damaged"
-   },
-   "compromised": {
-    "type": "string",
-    "description": "Compromised"
-   },
-   "customerChangedPhone": {
-    "type": "string",
-    "description": "Customer changed phone"
-   },
-   "rfidFailure": {
-    "type": "string",
-    "description": "RFID failure"
-   },
-   "wristbandReplacement": {
-    "type": "string",
-    "description": "Wristband replacement"
-   },
-   "qrCompromise": {
-    "type": "string",
-    "description": "QR compromise"
-   },
-   "walletReplacement": {
-    "type": "string",
-    "description": "Wallet replacement"
-   },
-   "faceReEnrollment": {
-    "type": "string",
-    "description": "Face re-enrollment"
-   },
-   "incorrectAssignment": {
-    "type": "string",
-    "description": "Incorrect assignment"
-   },
-   "vt009821Active": {
-    "type": "integer",
-    "description": "VT-009821 — ACTIVE"
-   },
-   "rf88721Revoked": {
-    "type": "string",
-    "description": "RF-88721 — REVOKED"
-   },
-   "rf99211Active": {
-    "type": "integer",
-    "description": "RF-99211 — ACTIVE"
-   },
-   "qr": {
-    "type": "string",
-    "description": "QR"
-   },
-   "qr55128Active": {
-    "type": "integer",
-    "description": "QR-55128 — ACTIVE"
-   },
-   "theVirtualTicketRemainsUnchanged": {
-    "type": "string",
-    "description": "The Virtual Ticket remains unchanged"
-   },
-   "calculationsHere": {
-    "type": "string",
-    "description": "calculations here"
+    "enum": [
+     "lost",
+     "stolen",
+     "damaged",
+     "compromised",
+     "customerChangedPhone",
+     "rfidFailure",
+     "wristbandReplacement",
+     "qrCompromise",
+     "walletReplacement",
+     "faceReEnrollment",
+     "incorrectAssignment"
+    ],
+    "description": "Replacement reason this policy covers"
    },
    "immediateOldMediaRevocation": {
-    "type": "string",
+    "type": "boolean",
     "description": "Immediate old-media revocation"
    },
    "gracePeriod": {
     "type": "string",
-    "format": "date-time",
-    "description": "Grace period"
+    "description": "ISO 8601 duration, e.g. PT30M"
    },
    "maximumReplacements": {
-    "type": "string",
+    "type": "integer",
     "description": "Maximum replacements"
    },
    "identityVerification": {
-    "type": "string",
+    "type": "boolean",
     "description": "Identity verification"
    },
    "supervisorApproval": {
-    "type": "string",
+    "type": "boolean",
     "description": "Supervisor approval"
    },
    "reasonCodes": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Reason codes"
+   },
+   "recoveryAllowed": {
+    "type": "boolean",
+    "description": "A suspended credential may be restored under this policy"
    }
-  }
- },
- "CredentialSecurityAuditOperationalEvidenceView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Credential Security, Audit & Operational Evidence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "credentialRequested": {
-    "type": "string",
-    "description": "Credential Requested"
-   },
-   "generated": {
-    "type": "string",
-    "description": "Generated"
-   },
-   "bound": {
-    "type": "string",
-    "description": "Bound"
-   },
-   "delivered": {
-    "type": "string",
-    "description": "Delivered"
-   },
-   "activated": {
-    "type": "string",
-    "description": "Activated"
-   },
-   "updated": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Updated"
-   },
-   "presented": {
-    "type": "string",
-    "description": "Presented"
-   },
-   "suspended": {
-    "type": "string",
-    "description": "Suspended"
-   },
-   "reactivated": {
-    "type": "string",
-    "description": "Reactivated"
-   },
-   "replaced": {
-    "type": "string",
-    "description": "Replaced"
-   },
-   "revoked": {
-    "type": "string",
-    "description": "Revoked"
-   },
-   "expired": {
-    "type": "integer",
-    "description": "Expired"
-   },
-   "rebound": {
-    "type": "string",
-    "description": "Rebound"
-   },
-   "regenerated": {
-    "type": "string",
-    "description": "Regenerated"
-   },
-   "deletedWhereLegallyPermissiblyApplicable": {
-    "type": "string",
-    "description": "Deleted where legally/permissibly applicable"
-   },
-   "virtualTicket": {
-    "type": "string",
-    "description": "Virtual Ticket"
-   },
-   "credential": {
-    "type": "string",
-    "description": "Credential"
-   },
-   "media": {
-    "type": "string",
-    "description": "Media"
-   },
-   "action": {
-    "type": "string",
-    "description": "Action"
-   },
-   "before": {
-    "type": "string",
-    "description": "Before"
-   },
-   "after": {
-    "type": "string",
-    "description": "After"
-   },
-   "actor": {
-    "type": "string",
-    "description": "Actor"
-   },
-   "source": {
-    "type": "string",
-    "description": "Source"
-   },
-   "device": {
-    "type": "string",
-    "description": "Device"
-   },
-   "dateTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date/time"
-   },
-   "reason": {
-    "type": "string",
-    "description": "Reason"
-   },
-   "approval": {
-    "type": "string",
-    "description": "Approval"
-   },
-   "providerReference": {
-    "type": "string",
-    "description": "Provider reference"
-   },
-   "relatedTransaction": {
-    "type": "string",
-    "description": "Related transaction"
-   },
-   "lost": {
-    "type": "string",
-    "description": "↓ Lost"
-   },
-   "rfid1001Revoked": {
-    "type": "string",
-    "description": "RFID-1001 — Revoked"
-   },
-   "replacement": {
-    "type": "string",
-    "description": "↓ Replacement"
-   },
-   "rfid1057Active": {
-    "type": "integer",
-    "description": "RFID-1057 — Active"
-   },
-   "excessiveRegeneration": {
-    "type": "string",
-    "description": "Excessive regeneration"
-   },
-   "repeatedReplacement": {
-    "type": "string",
-    "description": "Repeated replacement"
-   },
-   "suspiciousRebinding": {
-    "type": "string",
-    "description": "Suspicious rebinding"
-   },
-   "multipleCredentialAssignments": {
-    "type": "string",
-    "description": "Multiple credential assignments"
-   },
-   "unexpectedProviderTokenChanges": {
-    "type": "string",
-    "description": "Unexpected provider/token changes"
-   },
-   "unauthorizedAdministrativeActions": {
-    "type": "string",
-    "description": "Unauthorized administrative actions"
-   },
-   "role": {
-    "type": "string",
-    "description": "Role"
-   }
-  }
- },
- "CredentialUsageCrossMediaTraceabilityView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Credential Usage & Cross-Media Traceability displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "virtualTicket": {
-    "type": "string",
-    "description": "Virtual Ticket"
-   },
-   "credential": {
-    "type": "string",
-    "description": "Credential"
-   },
-   "media": {
-    "type": "string",
-    "description": "Media"
-   },
-   "presentationTimestamp": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Presentation timestamp"
-   },
-   "location": {
-    "type": "string",
-    "description": "Location"
-   },
-   "device": {
-    "type": "string",
-    "description": "Device"
-   },
-   "externalSystem": {
-    "type": "string",
-    "description": "External system"
-   },
-   "transactionType": {
-    "type": "string",
-    "description": "Transaction type"
-   },
-   "result": {
-    "type": "string",
-    "description": "Result"
-   },
-   "entitlementImpact": {
-    "type": "string",
-    "description": "Entitlement impact"
-   },
-   "synchronizationStatus": {
-    "type": "string",
-    "description": "Synchronization status"
-   },
-   "where": {
-    "type": "string",
-    "description": "Where?"
-   },
-   "area16DecidesAdmission": {
-    "type": "string",
-    "description": "Area 16 decides admission"
-   },
-   "rfidRf10028Vt009821": {
-    "type": "string",
-    "description": "RFID RF-10028 → VT-009821"
-   }
-  }
+  },
+  "required": [
+   "reason"
+  ]
  },
  "FailedGenerationDeliveryCredentialExceptionManagemenView": {
   "type": "object",
@@ -833,65 +528,53 @@
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Failed Generation, Delivery & Credential Exception Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "generationFailed": {
-    "type": "integer",
-    "description": "Generation Failed"
-   },
-   "bindingFailed": {
-    "type": "integer",
-    "description": "Binding Failed"
-   },
-   "activationFailed": {
-    "type": "integer",
-    "description": "Activation Failed"
-   },
-   "deliveryFailed": {
-    "type": "integer",
-    "description": "Delivery Failed"
-   },
-   "walletFailure": {
+   "exceptionId": {
     "type": "string",
-    "description": "Wallet Failure"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The key `resolveCredentialException` acts on (decided 29 September, VM close-out)"
    },
-   "rfidEncodingFailure": {
+   "lastAction": {
     "type": "string",
-    "description": "RFID Encoding Failure"
+    "enum": [
+     "retry",
+     "regenerate",
+     "useFallback",
+     "escalate",
+     "assignOwner",
+     "openTechnicalCase"
+    ],
+    "description": "The last action taken through `resolveCredentialException`"
    },
-   "invalidToken": {
+   "failureType": {
     "type": "string",
-    "description": "Invalid Token"
-   },
-   "providerFailure": {
-    "type": "string",
-    "description": "Provider Failure"
-   },
-   "synchronizationFailure": {
-    "type": "string",
-    "description": "Synchronization Failure"
-   },
-   "missingTemplate": {
-    "type": "string",
-    "description": "Missing Template"
-   },
-   "missingRequiredData": {
-    "type": "string",
-    "description": "Missing Required Data"
-   },
-   "expiredCredential": {
-    "type": "integer",
-    "description": "Expired Credential"
-   },
-   "mappingFailure": {
-    "type": "string",
-    "description": "Mapping Failure"
-   },
-   "unknownCredential": {
-    "type": "string",
-    "description": "Unknown Credential"
+    "enum": [
+     "generationFailed",
+     "bindingFailed",
+     "activationFailed",
+     "deliveryFailed",
+     "walletFailure",
+     "rfidEncodingFailure",
+     "duplicateCredential",
+     "invalidToken",
+     "providerFailure",
+     "synchronizationFailure",
+     "missingTemplate",
+     "missingRequiredData",
+     "expiredCredential",
+     "mappingFailure",
+     "unknownCredential"
+    ],
+    "description": "Failure category"
    },
    "severity": {
     "type": "string",
-    "description": "Severity"
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "description": "Severity, weighted by event proximity, arrival time, affected tickets, fallback availability, VIP and access impact"
    },
    "virtualTicket": {
     "type": "string",
@@ -930,50 +613,9 @@
     "type": "string",
     "description": "Owner"
    },
-   "eventProximity": {
+   "retryStatus": {
     "type": "string",
-    "description": "Event proximity"
-   },
-   "customerArrivalTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Customer arrival time"
-   },
-   "numberOfAffectedTickets": {
-    "type": "integer",
-    "description": "Number of affected tickets"
-   },
-   "noAlternativeMedia": {
-    "type": "string",
-    "description": "No alternative media"
-   },
-   "vipCustomerServiceImpact": {
-    "type": "string",
-    "description": "VIP/customer-service impact"
-   },
-   "accessImpact": {
-    "type": "string",
-    "description": "Access impact"
-   },
-   "providerOutage": {
-    "type": "string",
-    "description": "Provider outage"
-   },
-   "regenerate": {
-    "type": "string",
-    "description": "Regenerate"
-   },
-   "rebind": {
-    "type": "string",
-    "description": "Rebind"
-   },
-   "switchMedia": {
-    "type": "string",
-    "description": "Switch Media"
-   },
-   "useFallback": {
-    "type": "string",
-    "description": "Use Fallback"
+    "description": "Retry status"
    }
   }
  },
@@ -983,59 +625,63 @@
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Media Binding, Activation & Assignment Operations submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "rfid": {
+   "credentialIdUid": {
     "type": "string",
-    "description": "RFID"
+    "description": "Credential ID or UID read from the medium; for face, the biometric provider reference"
    },
-   "nfc": {
+   "virtualTicketId": {
     "type": "string",
-    "description": "NFC"
+    "description": "Virtual Ticket the medium is bound to"
    },
-   "wristbands": {
+   "mediaKind": {
     "type": "string",
-    "description": "Wristbands"
+    "enum": [
+     "rfid",
+     "nfc",
+     "wristband",
+     "physicalCard",
+     "faceRecognition",
+     "temporaryCredential"
+    ],
+    "description": "Medium being bound"
    },
-   "physicalCards": {
+   "captureMethod": {
     "type": "string",
-    "description": "Physical cards"
+    "enum": [
+     "scan",
+     "tap",
+     "manualLookup",
+     "batchAssignment",
+     "encoderAssignment"
+    ],
+    "description": "How the medium was read or assigned"
    },
-   "faceRecognition": {
+   "activationMode": {
     "type": "string",
-    "description": "Face recognition"
+    "enum": [
+     "activateNow",
+     "schedule",
+     "activateOnFirstUse",
+     "activateOnCollection",
+     "temporaryActivation"
+    ],
+    "description": "When the bound medium becomes active"
    },
-   "temporaryCredentials": {
+   "provider": {
     "type": "string",
-    "description": "Temporary credentials"
+    "description": "Provider"
    },
-   "scan": {
+   "scheduledAt": {
     "type": "string",
-    "description": "Scan"
-   },
-   "tap": {
-    "type": "string",
-    "description": "Tap"
-   },
-   "manualLookupWhereAuthorized": {
-    "type": "string",
-    "description": "Manual lookup where authorized"
-   },
-   "batchAssignment": {
-    "type": "string",
-    "description": "Batch assignment"
-   },
-   "encoderAssignment": {
-    "type": "string",
-    "description": "Encoder assignment"
-   },
-   "rawBiometricData": {
-    "type": "string",
-    "description": "raw biometric data"
-   },
-   "temporaryActivation": {
-    "type": "string",
-    "description": "Temporary Activation"
+    "format": "date-time",
+    "description": "Activation time when scheduled"
    }
-  }
+  },
+  "required": [
+   "virtualTicketId",
+   "mediaKind",
+   "credentialIdUid"
+  ]
  },
  "MediaBindingActivationAssignmentOperationsView": {
   "type": "object",
@@ -1043,29 +689,21 @@
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Media Binding, Activation & Assignment Operations displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "rfid": {
+   "virtualTicketId": {
     "type": "string",
-    "description": "RFID"
+    "description": "Virtual Ticket the medium is bound to"
    },
-   "nfc": {
+   "mediaKind": {
     "type": "string",
-    "description": "NFC"
-   },
-   "wristbands": {
-    "type": "string",
-    "description": "Wristbands"
-   },
-   "physicalCards": {
-    "type": "string",
-    "description": "Physical cards"
-   },
-   "faceRecognition": {
-    "type": "string",
-    "description": "Face recognition"
-   },
-   "temporaryCredentials": {
-    "type": "string",
-    "description": "Temporary credentials"
+    "enum": [
+     "rfid",
+     "nfc",
+     "wristband",
+     "physicalCard",
+     "faceRecognition",
+     "temporaryCredential"
+    ],
+    "description": "Medium being bound"
    },
    "virtualTicket": {
     "type": "string",
@@ -1083,10 +721,6 @@
     "type": "string",
     "description": "Existing Media"
    },
-   "newMediaType": {
-    "type": "integer",
-    "description": "New Media Type"
-   },
    "credentialIdUid": {
     "type": "string",
     "description": "Credential ID / UID"
@@ -1095,9 +729,16 @@
     "type": "string",
     "description": "Provider"
    },
-   "activation": {
+   "activationMode": {
     "type": "string",
-    "description": "Activation"
+    "enum": [
+     "activateNow",
+     "schedule",
+     "activateOnFirstUse",
+     "activateOnCollection",
+     "temporaryActivation"
+    ],
+    "description": "When the bound medium becomes active"
    },
    "validity": {
     "type": "string",
@@ -1107,33 +748,45 @@
     "type": "string",
     "description": "Binding Rule"
    },
-   "scan": {
+   "captureMethod": {
     "type": "string",
-    "description": "Scan"
+    "enum": [
+     "scan",
+     "tap",
+     "manualLookup",
+     "batchAssignment",
+     "encoderAssignment"
+    ],
+    "description": "How the medium was read or assigned"
    },
-   "tap": {
+   "scheduledAt": {
     "type": "string",
-    "description": "Tap"
+    "format": "date-time",
+    "description": "Activation time when scheduled"
+   }
+  },
+  "required": [
+   "virtualTicketId",
+   "mediaKind",
+   "credentialIdUid"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
    },
-   "manualLookupWhereAuthorized": {
-    "type": "string",
-    "description": "Manual lookup where authorized"
+   "nextCursor": {
+    "type": "string"
    },
-   "batchAssignment": {
-    "type": "string",
-    "description": "Batch assignment"
-   },
-   "encoderAssignment": {
-    "type": "string",
-    "description": "Encoder assignment"
-   },
-   "rawBiometricData": {
-    "type": "string",
-    "description": "raw biometric data"
-   },
-   "temporaryActivation": {
-    "type": "string",
-    "description": "Temporary Activation"
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },
@@ -1144,7 +797,7 @@
   "description": "**What Ticket Media Analytics & AI Operations Intelligence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "credentialsGenerated": {
-    "type": "string",
+    "type": "integer",
     "description": "Credentials Generated"
    },
    "generationSuccess": {
@@ -1160,20 +813,20 @@
     "description": "Activation %"
    },
    "walletAdoption": {
-    "type": "string",
-    "description": "Wallet Adoption"
+    "type": "number",
+    "description": "Percent"
    },
    "rfidAdoption": {
-    "type": "string",
-    "description": "RFID Adoption"
+    "type": "number",
+    "description": "Percent"
    },
    "faceCredentialAdoption": {
-    "type": "string",
-    "description": "Face Credential Adoption"
+    "type": "number",
+    "description": "Percent"
    },
    "multiMediaAdoption": {
-    "type": "string",
-    "description": "Multi-Media Adoption"
+    "type": "number",
+    "description": "Percent"
    },
    "replacementRate": {
     "type": "number",
@@ -1192,70 +845,51 @@
     "description": "Delivery Failure %"
    },
    "averageGenerationTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Average Generation Time"
+    "type": "number",
+    "description": "Seconds"
    },
    "averageResolutionTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Average Resolution Time"
+    "type": "number",
+    "description": "Seconds"
    },
    "mediaUsageDistribution": {
-    "type": "string",
-    "description": "Media Usage Distribution"
-   },
-   "mobileQr78": {
-    "type": "number",
-    "description": "Mobile QR — 78%"
-   },
-   "appleWallet31": {
-    "type": "number",
-    "description": "Apple Wallet — 31%"
-   },
-   "googleWallet22": {
-    "type": "number",
-    "description": "Google Wallet — 22%"
-   },
-   "rfid18": {
-    "type": "number",
-    "description": "RFID — 18%"
-   },
-   "face12": {
-    "type": "number",
-    "description": "Face — 12%"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Share of eligible customers per media type; may exceed 100% in total"
    },
    "providerUptime": {
-    "type": "string",
-    "description": "Provider uptime"
+    "type": "number",
+    "description": "Percent"
    },
    "generationFailures": {
-    "type": "string",
+    "type": "integer",
     "description": "Generation failures"
    },
    "encodingFailures": {
-    "type": "string",
+    "type": "integer",
     "description": "Encoding failures"
    },
    "deliveryFailures": {
-    "type": "string",
+    "type": "integer",
     "description": "Delivery failures"
    },
    "synchronizationDelay": {
-    "type": "string",
-    "description": "Synchronization delay"
+    "type": "number",
+    "description": "Seconds"
    },
    "replacementFrequency": {
-    "type": "string",
+    "type": "number",
     "description": "Replacement frequency"
    },
    "credentialFailureRisk": {
     "type": "string",
-    "description": "Credential failure risk"
+    "description": "Predicted; advisory"
    },
    "deliveryFailureProbability": {
-    "type": "string",
-    "description": "Delivery failure probability"
+    "type": "number",
+    "description": "Predicted, 0 to 1; advisory"
    },
    "mediaDemandForUpcomingEvents": {
     "type": "string",
@@ -1270,40 +904,8 @@
     "description": "Operational workload"
    },
    "likelyOnSiteReplacementVolumes": {
-    "type": "string",
-    "description": "Likely on-site replacement volumes"
-   },
-   "qrDynamicQr": {
-    "type": "string",
-    "description": "↙ QR / Dynamic QR"
-   },
-   "appleWallet": {
-    "type": "string",
-    "description": "↙ Apple Wallet"
-   },
-   "googleWallet": {
-    "type": "string",
-    "description": "↙ Google Wallet"
-   },
-   "rfidNfc": {
-    "type": "string",
-    "description": "↙ RFID / NFC"
-   },
-   "cardWristband": {
-    "type": "string",
-    "description": "↙ Card / Wristband"
-   },
-   "faceRecognitionReference": {
-    "type": "string",
-    "description": "↙ Face Recognition Reference"
-   },
-   "futureMedia": {
-    "type": "string",
-    "description": "↙ Future Media"
-   },
-   "sameTicket": {
-    "type": "string",
-    "description": "same ticket"
+    "type": "integer",
+    "description": "Predicted; advisory"
    }
   }
  },
@@ -1313,33 +915,20 @@
   "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is access.entitlement at 9%, so this is not an update to anything the package stores today and no new table has been decided",
   "description": "**What Virtual Ticket & Credential 360° Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *For each media show* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
   "properties": {
-   "showAllAssociatedCredentials": {
+   "virtualTicketId": {
     "type": "string",
-    "description": "Show all associated credentials"
+    "description": "Virtual Ticket ID"
    },
-   "al": {
+   "mediaRole": {
     "type": "string",
-    "description": "al"
-   },
-   "primary": {
-    "type": "string",
-    "description": "Primary"
-   },
-   "secondary": {
-    "type": "string",
-    "description": "Secondary"
-   },
-   "fallback": {
-    "type": "string",
-    "description": "Fallback"
-   },
-   "temporary": {
-    "type": "string",
-    "description": "Temporary"
-   },
-   "revokedHistoricalMedia": {
-    "type": "string",
-    "description": "Revoked historical media"
+    "enum": [
+     "primary",
+     "secondary",
+     "fallback",
+     "temporary",
+     "revokedHistorical"
+    ],
+    "description": "Role of the medium on the ticket"
    },
    "bindingId": {
     "type": "string",
@@ -1355,22 +944,27 @@
    },
    "issued": {
     "type": "string",
+    "format": "date-time",
     "description": "Issued"
    },
    "delivered": {
     "type": "string",
+    "format": "date-time",
     "description": "Delivered"
    },
    "activated": {
     "type": "string",
+    "format": "date-time",
     "description": "Activated"
    },
    "validFrom": {
     "type": "string",
+    "format": "date-time",
     "description": "Valid From"
    },
    "validTo": {
     "type": "string",
+    "format": "date-time",
     "description": "Valid To"
    },
    "lastUpdate": {
@@ -1394,26 +988,20 @@
    },
    "status": {
     "type": "string",
-    "description": "Status"
-   },
-   "bindRfid": {
-    "type": "string",
-    "description": "Bind RFID"
-   },
-   "initiateFaceEnrollment": {
-    "type": "string",
-    "description": "Initiate Face Enrollment"
-   },
-   "refresh": {
-    "type": "string",
-    "description": "Refresh"
-   },
-   "diagnose": {
-    "type": "string",
-    "description": "Diagnose"
+    "enum": [
+     "pending",
+     "active",
+     "suspended",
+     "revoked",
+     "expired"
+    ],
+    "description": "Medium status"
    }
   },
-  "x-ticvai-record-definition": "For each media show"
+  "x-ticvai-record-definition": "For each media show",
+  "required": [
+   "virtualTicketId"
+  ]
  },
  "VirtualTicketCredential360WorkspaceView": {
   "type": "object",
@@ -1458,56 +1046,54 @@
     "description": "Order"
    },
    "ticketStatus": {
-    "type": "integer",
-    "description": "Ticket Status"
+    "type": "string",
+    "enum": [
+     "created",
+     "pendingFulfillment",
+     "active",
+     "partiallyUsed",
+     "used",
+     "expired",
+     "suspended",
+     "cancelled",
+     "voided",
+     "reissuedSuperseded",
+     "refunded",
+     "transferred",
+     "blocked"
+    ],
+    "description": "Virtual Ticket status"
    },
    "usageStatus": {
-    "type": "integer",
-    "description": "Usage Status"
+    "type": "string",
+    "enum": [
+     "unused",
+     "partiallyUsed",
+     "used"
+    ],
+    "description": "Usage status"
    },
    "validity": {
     "type": "string",
     "description": "Validity"
    },
    "entitlements": {
-    "type": "integer",
-    "description": "Entitlements"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Entitlements on the ticket"
    },
-   "showAllAssociatedCredentials": {
+   "mediaRole": {
     "type": "string",
-    "description": "Show all associated credentials"
-   },
-   "al": {
-    "type": "string",
-    "description": "al"
-   },
-   "dynamicQrActive": {
-    "type": "integer",
-    "description": "Dynamic QR Active (the pack shows 88721)"
-   },
-   "appleWalletActive": {
-    "type": "integer",
-    "description": "Apple Wallet Active (the pack shows 55321, 43 | Pag e)"
-   },
-   "primary": {
-    "type": "string",
-    "description": "Primary"
-   },
-   "secondary": {
-    "type": "string",
-    "description": "Secondary"
-   },
-   "fallback": {
-    "type": "string",
-    "description": "Fallback"
-   },
-   "temporary": {
-    "type": "string",
-    "description": "Temporary"
-   },
-   "revokedHistoricalMedia": {
-    "type": "string",
-    "description": "Revoked historical media"
+    "enum": [
+     "primary",
+     "secondary",
+     "fallback",
+     "temporary",
+     "revokedHistorical"
+    ],
+    "description": "Role of the medium on the ticket"
    },
    "bindingId": {
     "type": "string",
@@ -1523,22 +1109,27 @@
    },
    "issued": {
     "type": "string",
+    "format": "date-time",
     "description": "Issued"
    },
    "delivered": {
     "type": "string",
+    "format": "date-time",
     "description": "Delivered"
    },
    "activated": {
     "type": "string",
+    "format": "date-time",
     "description": "Activated"
    },
    "validFrom": {
     "type": "string",
+    "format": "date-time",
     "description": "Valid From"
    },
    "validTo": {
     "type": "string",
+    "format": "date-time",
     "description": "Valid To"
    },
    "lastUpdate": {
@@ -1562,24 +1153,18 @@
    },
    "status": {
     "type": "string",
-    "description": "Status"
-   },
-   "bindRfid": {
-    "type": "string",
-    "description": "Bind RFID"
-   },
-   "initiateFaceEnrollment": {
-    "type": "string",
-    "description": "Initiate Face Enrollment"
-   },
-   "refresh": {
-    "type": "string",
-    "description": "Refresh"
-   },
-   "diagnose": {
-    "type": "string",
-    "description": "Diagnose"
+    "enum": [
+     "pending",
+     "active",
+     "suspended",
+     "revoked",
+     "expired"
+    ],
+    "description": "Medium status"
    }
-  }
+  },
+  "required": [
+   "virtualTicketId"
+  ]
  }
 }

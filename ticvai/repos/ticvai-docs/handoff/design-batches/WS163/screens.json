@@ -1,0 +1,1634 @@
+[
+ {
+  "id": "BO-933",
+  "name": "My Resource Operations Home",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "9",
+   "number": "01",
+   "page": 136
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/my-resource-operations-home-bo-933",
+   "component": "apps/venue-management-web/src/routes/rentals/MyResourceOperationsHome.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-934",
+    "BO-935",
+    "BO-936",
+    "BO-937",
+    "BO-938",
+    "BO-939",
+    "BO-940",
+    "BO-941",
+    "BO-942"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-934",
+     "trigger": "My Schedule & Assignment Calendar",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-935",
+     "trigger": "Assignment Detail & Operational Brief",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "carries": [
+      "resourceId"
+     ]
+    },
+    {
+     "to": "BO-936",
+     "trigger": "Mobile Staff Check-In & Check-Out",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-937",
+     "trigger": "Resource Collection, Handover & Return",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-938",
+     "trigger": "Employee Requests & Resource Support",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-939",
+     "trigger": "Shift Change, Swap, Pickup & Release",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-940",
+     "trigger": "Manager Mobile Approval Center",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-941",
+     "trigger": "Operational Notifications & Live Alerts",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-942",
+     "trigger": "Mobile Operations Control & Offline Sync",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§The screen shall display) and no metric row",
+  "purpose": "Provide each employee with a personalized operational landing screen showing what requires their attention now and next.",
+  "purposeNote": "Employees can immediately understand their current operational status and next required action without navigating through multiple screens.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 136 §The screen shall display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every resource operations home",
+       "columns": [
+        "Current shift",
+        "Current assignment",
+        "Next assignment",
+        "Today's schedule",
+        "Assigned venue",
+        "Check-in status",
+        "Break status",
+        "Pending tasks",
+        "Resource handovers",
+        "Employee requests",
+        "Notifications",
+        "Manager messages",
+        "Smart Operational Card",
+        "“What am I supposed to do now?”"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 136 §The screen shall display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected resource operations home",
+       "bindsTo": null,
+       "columns": [
+        "Current shift",
+        "Current assignment",
+        "Next assignment",
+        "Today's schedule",
+        "Assigned venue",
+        "Check-in status",
+        "Break status",
+        "Pending tasks",
+        "Resource handovers",
+        "Employee requests",
+        "Notifications",
+        "Manager messages",
+        "Smart Operational Card",
+        "“What am I supposed to do now?”"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Private Ski Lesson”, “Group Ski Lesson”, “Zone B”, “The employee may ask”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 136 §The screen shall display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resource operations home list.",
+   "error": "Could not load. Names which read failed and leaves the resource operations home untouched.",
+   "emptyFirstRun": "No resource operations home yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the resource operations home are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listResourceBookings",
+    "contract": "resources",
+    "purpose": "Today's assignments",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Current shift",
+    "Current assignment",
+    "Next assignment",
+    "Today's schedule",
+    "Assigned venue",
+    "Check-in status"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-933",
+   "workshopBoard": "wireframes/WS134 Resource Management Configuration Board 9.dc.html#bo-933"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 136. 0 of 14 labels bound to a contract property; 14 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-934",
+  "name": "My Schedule & Assignment Calendar",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "9",
+   "number": "02",
+   "page": 137
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/my-schedule-assignment-calendar-bo-934",
+   "component": "apps/venue-management-web/src/routes/rentals/MyScheduleAssignmentCalendar.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-933"
+   ],
+   "exitTo": [
+    "BO-933"
+   ],
+   "transitions": [
+    {
+     "to": "BO-933",
+     "trigger": "Back to My Resource Operations Home",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Provide employees with a mobile view of their working schedule and operational assignments.",
+  "purposeNote": "Employees can view their complete operational schedule and receive synchronized updates whenever assignments change.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 137 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every schedule calendar",
+       "columns": [
+        "Upcoming",
+        "Confirmed",
+        "In Progress",
+        "Completed",
+        "Changed",
+        "Cancelled",
+        "Requires Attention",
+        "Live Updates"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 137 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected schedule calendar",
+       "bindsTo": null,
+       "columns": [
+        "Upcoming",
+        "Confirmed",
+        "In Progress",
+        "Completed",
+        "Changed",
+        "Cancelled",
+        "Requires Attention",
+        "Live Updates"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Zone A”, “Zone C”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 137 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Schedule Timeline",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 137 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The schedule calendar list.",
+   "error": "Could not load. Names which read failed and leaves the schedule calendar untouched.",
+   "emptyFirstRun": "No schedule calendar yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the schedule calendar are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getResourceCalendar",
+    "contract": "resources",
+    "purpose": "My schedule",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Upcoming",
+    "Confirmed",
+    "In Progress",
+    "Completed",
+    "Changed",
+    "Cancelled"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-934",
+   "workshopBoard": "wireframes/WS134 Resource Management Configuration Board 9.dc.html#bo-934"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 137. 0 of 8 labels bound to a contract property; 9 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Schedule Timeline dropped (view heading; the timeline renders getResourceCalendar).",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-935",
+  "name": "Assignment Detail & Operational Brief",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "9",
+   "number": "03",
+   "page": 138
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/assignment-detail-operational-brief-bo-935",
+   "component": "apps/venue-management-web/src/routes/rentals/AssignmentDetailOperationalBrief.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-933"
+   ],
+   "exitTo": [
+    "BO-933"
+   ],
+   "transitions": [
+    {
+     "to": "BO-933",
+     "trigger": "Back to My Resource Operations Home",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Give the employee all information required to execute a specific assignment.",
+  "purposeNote": "Employees can access all permitted operational information needed to execute an assignment from one mobile screen.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 138 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every detail operational brief",
+       "columns": [
+        "Assignment",
+        "Date",
+        "Start/end",
+        "Venue",
+        "Zone/location",
+        "Role",
+        "Status",
+        "Priority",
+        "Operational Information"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 138 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected detail operational brief",
+       "bindsTo": null,
+       "columns": [
+        "Assignment",
+        "Date",
+        "Start/end",
+        "Venue",
+        "Zone/location",
+        "Role",
+        "Status",
+        "Priority",
+        "Operational Information"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Depending on assignment type”, “Where appropriate, provide”, “Equipment Required”, “Customer Information”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 138 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Start assignment",
+       "operation": "setResourceBookingProgress",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 138 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Check in",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 138 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Contact supervisor",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 138 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Report issue",
+       "operation": "raiseResourceRequest",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 138 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request replacement",
+       "operation": "raiseResourceRequest",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 138 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "View checklist",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 138 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Complete assignment",
+       "operation": "setResourceBookingProgress",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 138 §Quick Actions"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The detail operational brief list.",
+   "error": "Could not load. Names which read failed and leaves the detail operational brief untouched.",
+   "emptyFirstRun": "No detail operational brief yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the detail operational brief are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getResource",
+    "contract": "resources",
+    "purpose": "The resource for this assignment",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listResourceBookings",
+    "contract": "resources",
+    "purpose": "The assignment itself",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "recordAttendance",
+    "contract": "workforce",
+    "purpose": "Check in to the assignment",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Check in; Report issue"
+   },
+   {
+    "operationId": "reportIncident",
+    "contract": "maintenance",
+    "purpose": "Report an issue on the assignment",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Check in; Report issue"
+   },
+   {
+    "operationId": "setResourceBookingProgress",
+    "contract": "resources",
+    "purpose": "Start or complete",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "raiseResourceRequest",
+    "contract": "resources",
+    "purpose": "Raise request",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Assignment",
+    "Date",
+    "Start/end",
+    "Venue",
+    "Zone/location",
+    "Role"
+   ],
+   "params": [
+    {
+     "name": "resourceId",
+     "from": "navigation"
+    },
+    {
+     "name": "bookingId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-935",
+   "workshopBoard": "wireframes/WS134 Resource Management Configuration Board 9.dc.html#bo-935"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 138. 0 of 9 labels bound to a contract property; 16 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Check in: `recordAttendance`; Report issue: `reportIncident`; Contact supervisor dropped (phone/chat link to the supervisor, no API action); View checklist dropped (navigation); still owed by a contract change: `setResourceBookingProgress`, `raiseResourceRequest`.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-936",
+  "name": "Mobile Staff Check-In & Check-Out",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "9",
+   "number": "04",
+   "page": 139
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/mobile-staff-check-in-check-out-bo-936",
+   "component": "apps/venue-management-web/src/routes/rentals/MobileStaffCheckInCheckOut.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-933"
+   ],
+   "exitTo": [
+    "BO-933"
+   ],
+   "transitions": [
+    {
+     "to": "BO-933",
+     "trigger": "Back to My Resource Operations Home",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Allow employees to record attendance and assignment presence from the Employee App.",
+  "purposeNote": "Employees can record shift and assignment attendance from the mobile application with configurable validation and full audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 139 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every mobile staff check-in",
+       "columns": [
+        "Shift",
+        "08:00–16:00",
+        "Venue",
+        "Ski School",
+        "Current Time",
+        "07:56",
+        "Status",
+        "Ready to Check In",
+        "[CHECK IN]"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 139 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected mobile staff check-in",
+       "bindsTo": null,
+       "columns": [
+        "Shift",
+        "08:00–16:00",
+        "Venue",
+        "Ski School",
+        "Current Time",
+        "07:56",
+        "Status",
+        "Ready to Check In",
+        "[CHECK IN]"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Check-In”, “Assignment Check-In”, “On checkout, display”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 139 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The mobile staff check-in list.",
+   "error": "Could not load. Names which read failed and leaves the mobile staff check-in untouched.",
+   "emptyFirstRun": "No mobile staff check-in yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the mobile staff check-in are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "recordAttendance",
+    "contract": "workforce",
+    "purpose": "Check in or out",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Shift",
+    "08:00–16:00",
+    "Venue",
+    "Ski School",
+    "Current Time",
+    "07:56"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-936",
+   "workshopBoard": "wireframes/WS134 Resource Management Configuration Board 9.dc.html#bo-936"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 139. 0 of 9 labels bound to a contract property; 15 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-937",
+  "name": "Resource Collection, Handover & Return",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "9",
+   "number": "05",
+   "page": 141
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/resource-collection-handover-return-bo-937",
+   "component": "apps/venue-management-web/src/routes/rentals/ResourceCollectionHandoverReturn.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-933"
+   ],
+   "exitTo": [
+    "BO-933"
+   ],
+   "transitions": [
+    {
+     "to": "BO-933",
+     "trigger": "Back to My Resource Operations Home",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
+  "purpose": "Digitally manage physical resources transferred between employees, departments, or operational locations.",
+  "purposeNote": "Physical-resource custody can be digitally tracked through scan-driven collection, handover, and return workflows.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Good",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 141 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Minor damage",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 141 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Damaged",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 141 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Missing component",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 141 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Return",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 141 §Capture"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resource collection handover configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the resource collection handover untouched.",
+   "emptyFirstRun": "No resource collection handover configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "checkOutResource",
+    "contract": "resources",
+    "purpose": "Hand it over",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "checkInResource",
+    "contract": "resources",
+    "purpose": "Take it back",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-937",
+   "workshopBoard": "wireframes/WS134 Resource Management Configuration Board 9.dc.html#bo-937"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 141. 0 of 0 labels bound to a contract property; 5 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "bookingId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-938",
+  "name": "Employee Requests & Resource Support",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "9",
+   "number": "06",
+   "page": 142
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/employee-requests-resource-support-bo-938",
+   "component": "apps/venue-management-web/src/routes/rentals/EmployeeRequestsResourceSupport.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-933"
+   ],
+   "exitTo": [
+    "BO-933"
+   ],
+   "transitions": [
+    {
+     "to": "BO-933",
+     "trigger": "Back to My Resource Operations Home",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow frontline employees to submit operational resource-related requests directly from the Employee App.",
+  "purposeNote": "Employees can report operational resource issues and requests digitally, and those requests can trigger the appropriate backend workflow.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 142"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 142"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Replacement resource",
+       "operation": "raiseResourceRequest",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 142 §Support configurable requests such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Additional equipment",
+       "operation": "raiseResourceRequest",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 142 §Support configurable requests such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resource issue",
+       "operation": "raiseResourceRequest",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 142 §Support configurable requests such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Maintenance request",
+       "operation": "raiseResourceRequest",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 142 §Support configurable requests such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Assignment change",
+       "operation": "raiseResourceRequest",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 142 §Support configurable requests such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Venue change request",
+       "operation": "raiseResourceRequest",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 142 §Support configurable requests such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Schedule clarification",
+       "operation": "raiseResourceRequest",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 142 §Support configurable requests such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Custom operational request",
+       "operation": "raiseResourceRequest",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 142 §Support configurable requests such as"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The employee requests resource list.",
+   "error": "Could not load. Names which read failed and leaves the employee requests resource untouched.",
+   "emptyFirstRun": "No employee requests resource yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the employee requests resource are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "raiseMyCase",
+    "contract": "marketing-crm",
+    "purpose": "Raise a request",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "raiseResourceRequest",
+    "contract": "resources",
+    "purpose": "Raise request",
+    "trigger": "onAction"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-938",
+   "workshopBoard": "wireframes/WS134 Resource Management Configuration Board 9.dc.html#bo-938"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 142. 0 of 0 labels bound to a contract property; 8 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `raiseResourceRequest`.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-939",
+  "name": "Shift Change, Swap, Pickup & Release",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "9",
+   "number": "07",
+   "page": 143
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/shift-change-swap-pickup-release-bo-939",
+   "component": "apps/venue-management-web/src/routes/rentals/ShiftChangeSwapPickupRelease.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-933"
+   ],
+   "exitTo": [
+    "BO-933"
+   ],
+   "transitions": [
+    {
+     "to": "BO-933",
+     "trigger": "Back to My Resource Operations Home",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Expose the Board 4 Shift Marketplace capabilities through the Employee App. This screen does not recreate shift rules; it consumes the workforce rules already configured in Board 4.",
+  "purposeNote": "Employees can manage permitted shift changes through mobile self-service while all qualification, compliance, and approval rules remain enforced centrally.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 143"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 143"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "requestShiftSwap",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listShiftSwapRequests",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "requestShiftSwap"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The shift change swap list.",
+   "error": "Could not load. Names which read failed and leaves the shift change swap untouched.",
+   "emptyFirstRun": "No shift change swap yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the shift change swap are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "requestShiftSwap",
+    "contract": "workforce",
+    "purpose": "Swap, pick up or release",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listShiftSwapRequests",
+    "contract": "workforce",
+    "purpose": "Requests outstanding",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-939",
+   "workshopBoard": "wireframes/WS134 Resource Management Configuration Board 9.dc.html#bo-939"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 143. 0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "assignmentId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-940",
+  "name": "Manager Mobile Approval Center",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "9",
+   "number": "08",
+   "page": 144
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/manager-mobile-approval-center-bo-940",
+   "component": "apps/venue-management-web/src/routes/rentals/ManagerMobileApprovalCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-933"
+   ],
+   "exitTo": [
+    "BO-933"
+   ],
+   "transitions": [
+    {
+     "to": "BO-933",
+     "trigger": "Back to My Resource Operations Home",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow authorized supervisors and managers to approve operational requests without requiring access to the desktop backend.",
+  "purposeNote": "Authorized managers can review and action operational approvals from mobile with sufficient validation context to make an informed decision.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Manager Mobile Approval Center declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 144"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 144"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listApprovalRequests",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "decideApprovalRequest",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "decideApprovalRequest"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The mobile approval list.",
+   "error": "Could not load. Names which read failed and leaves the mobile approval untouched.",
+   "emptyFirstRun": "No mobile approval yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the mobile approval are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listApprovalRequests",
+    "contract": "approvals",
+    "purpose": "Approvals on mobile",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "decideApprovalRequest",
+    "contract": "approvals",
+    "purpose": "Decide",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-940",
+   "workshopBoard": "wireframes/WS134 Resource Management Configuration Board 9.dc.html#bo-940"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 144. 0 of 0 labels bound to a contract property; 0 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "requestId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-941",
+  "name": "Operational Notifications & Live Alerts",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "9",
+   "number": "09",
+   "page": 145
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/operational-notifications-live-alerts-bo-941",
+   "component": "apps/venue-management-web/src/routes/rentals/OperationalNotificationsLiveAlerts.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-933"
+   ],
+   "exitTo": [
+    "BO-933"
+   ],
+   "transitions": [
+    {
+     "to": "BO-933",
+     "trigger": "Back to My Resource Operations Home",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide employees and managers with timely, prioritized operational notifications.",
+  "purposeNote": "Operational changes and critical resource events are communicated to the correct users with configurable priority, acknowledgement, and escalation behavior.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 145"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 145"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Assignment",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 145 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Schedule",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 145 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resource",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 145 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Event",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 145 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Attendance",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 145 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Approval",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 145 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Emergency/critical operations",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 145 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "AI recommendation",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 145 §Support"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The operational notifications live list.",
+   "error": "Could not load. Names which read failed and leaves the operational notifications live untouched.",
+   "emptyFirstRun": "No operational notifications live yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the operational notifications live are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAnnouncements",
+    "contract": "workforce",
+    "purpose": "Live alerts and notices",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-941",
+   "workshopBoard": "wireframes/WS134 Resource Management Configuration Board 9.dc.html#bo-941"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 145. 0 of 0 labels bound to a contract property; 8 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Assignment, Schedule, Resource, Event, Attendance, Approval, Emergency/critical operations are choices sent by `listAnnouncements` (field gap: add kind filter and extend AnnouncementKind with assignment|schedule|resource|event|attendance|approval (emergency exists)); AI recommendation dropped (AI design pending review).",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-942",
+  "name": "Mobile Operations Control & Offline Sync",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "9",
+   "number": "10",
+   "page": 146
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/mobile-operations-control-offline-sync-bo-942",
+   "component": "apps/venue-management-web/src/routes/rentals/MobileOperationsControlOfflineSync.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-933"
+   ],
+   "exitTo": [
+    "BO-933"
+   ],
+   "transitions": [
+    {
+     "to": "BO-933",
+     "trigger": "Back to My Resource Operations Home",
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure and monitor how Resource Management operates on mobile devices, particularly where connectivity is unreliable. Provide TICVAI with the executive and administrative control layer for the entire Resource Management ecosystem. Board 10 shall consolidate information from all previous boards to answer four fundamental questions: 1. Are our resources being used efficiently? 2. Are they generating the expected operational and financial value? 3. Are resource decisions compliant, controlled, and auditable? 4. What should management change to improve future performance?",
+  "purposeNote": "The Employee App can support configured resource operations during temporary connectivity loss and safely synchronize transactions when connectivity returns without compromising the authoritative resource state. Board 9 — Role-Based Mobile Experience Board 9 should not show every employee the same application. The mobile interface shall adapt based on role.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 146"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 146"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Board 9 — Smart Mobile Home Principle",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 146 §Operations Manager"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The mobile operations offline list.",
+   "error": "Could not load. Names which read failed and leaves the mobile operations offline untouched.",
+   "emptyFirstRun": "No mobile operations offline yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the mobile operations offline are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getGameplaySyncStatus",
+    "contract": "games",
+    "purpose": "Offline sync state",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-942",
+   "workshopBoard": "wireframes/WS134 Resource Management Configuration Board 9.dc.html#bo-942"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 146. 0 of 0 labels bound to a contract property; 1 of 156 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Board 9 — Smart Mobile Home Principle dropped (board heading).",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

@@ -3,16 +3,16 @@
  "generated": "2026-09-29",
  "note": "Derived on every run by tools/build-status.py. A hand-maintained status page is worse than none, because somebody plans against it.",
  "counts": {
-  "operations": 2298,
+  "operations": 2405,
   "contracts": 33,
-  "tables": 771,
+  "tables": 983,
   "stores": 5,
-  "foreignKeys": 640,
-  "indexes": 1695,
-  "tablesWritten": 767,
-  "relationships": 1661,
-  "states": 134,
-  "events": 29,
+  "foreignKeys": 675,
+  "indexes": 2494,
+  "tablesWritten": 979,
+  "relationships": 2586,
+  "states": 186,
+  "events": 30,
   "flows": 96,
   "flowsDerived": 192,
   "adrs": 48,
@@ -26,15 +26,15 @@
   "design": [
    {
     "name": "API data lineage resolved",
-    "done": 1642,
-    "total": 2298,
-    "percent": 71,
+    "done": 2395,
+    "total": 2405,
+    "percent": 100,
     "note": "Every operation maps to the tables it reads and writes."
    },
    {
     "name": "Operations declaring an auth model",
-    "done": 2298,
-    "total": 2298,
+    "done": 2405,
+    "total": 2405,
     "percent": 100,
     "note": "A permission, an auth mode, or a declared audience. None may be silent."
    },
@@ -68,16 +68,16 @@
    },
    {
     "name": "State models",
-    "done": 134,
-    "total": 265,
-    "percent": 51,
+    "done": 186,
+    "total": 329,
+    "percent": 57,
     "note": "The denominator is status enums in contracts. Some models describe behaviour with no enum, so this can exceed 100%."
    },
    {
     "name": "Tables with a relationship",
-    "done": 690,
-    "total": 780,
-    "percent": 88,
+    "done": 910,
+    "total": 992,
+    "percent": 92,
     "note": "The remainder are partitions, platform-written tables and caches, each stating why."
    },
    {
@@ -103,8 +103,8 @@
    },
    {
     "name": "Operations reaching a screen",
-    "done": 2080,
-    "total": 2298,
+    "done": 2187,
+    "total": 2405,
     "percent": 91,
     "note": "Not a defect on its own \u2014 sync, webhook and job operations have no screen."
    },
@@ -126,9 +126,9 @@
   "build": [
    {
     "name": "Tables written",
-    "done": 767,
-    "total": 771,
-    "percent": 99,
+    "done": 979,
+    "total": 983,
+    "percent": 100,
     "note": "Counted from backend/. ADR-0024 said DDL waits for the design to settle; ADR-0038 and ADR-0039 settled it."
    },
    {
@@ -172,7 +172,7 @@
   }
  },
  "headline": {
-  "design": 91,
+  "design": 95,
   "build": 33
  },
  "waves": {

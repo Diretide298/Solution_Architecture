@@ -9138,6 +9138,11 @@ screens:
     trigger: onAction
     invalidates:
     - listDashboards
+  - operationId: recordDashboardView
+    contract: reporting
+    purpose: Record that a dashboard was opened — fired once when the dashboard renders; nothing on the
+      screen waits for it.
+    trigger: background
   entryState:
     params:
     - name: dashboardId
@@ -12295,6 +12300,15 @@ screens:
         impliedBy: listPriceCategoryRate
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save price category rate type
+        operation: setPriceCategoryRateType
+        permission: PRICE_CONFIGURE
+        notes: '**The tenant''s library of price categories and rate types** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /price-categories
   states:
     loading: The price category rate list.
     error: Could not load. Names which read failed and leaves the price category rate untouched.
@@ -12309,6 +12323,12 @@ screens:
     contract: catalogue
     purpose: Price Category & Rate Type Library
     trigger: onLoad
+  - operationId: setPriceCategoryRateType
+    contract: catalogue
+    purpose: Create or update a price category or rate type
+    trigger: onAction
+    invalidates:
+    - listPriceCategoryRate
   entryState:
     preloaded: []
   wireframe:
@@ -12320,6 +12340,36 @@ screens:
     0 labels bound to a contract property; 0 of 49 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formSetPriceCategoryRateType
+    component: modal
+    trigger: Save price category rate type
+    body: '**Collects what `setPriceCategoryRateType` sends before it is called.** Required: `id`, `scopePath`,
+      `entryKind`, `code`, `name`, `isActive`. Optional: `description`, `categoryFamily`, `displayName`,
+      `localizedDisplayNames`, `iconLabel`, `parentId`, `isStandard`, `sortOrder`. Dismissing sends nothing;
+      the screen behind is unchanged.'
+    bindsTo: PriceCategory
+    confirm:
+      label: Save price category rate type
+      operation: setPriceCategoryRateType
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - entryKind
+      - code
+      - name
+      - isActive
+      - description
+      - categoryFamily
+      - displayName
+      - localizedDisplayNames
+      - iconLabel
+      - parentId
+      - isStandard
+      - sortOrder
+    provenance: contract catalogue.yaml PUT /price-categories
 - id: ADM-051
   name: Rate Structure Builder
   module: Commercial
@@ -12578,12 +12628,6 @@ screens:
   purpose: Provide dedicated commercial structures for products containing multiple components. This is
     separate from the Product Relationship/Bundle module. Product Catalogue defines what the bundle contains.
     Pricing defines how that bundle is priced.
-  gaps:
-  - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Fixed
-      Package Price, Component Override. Each needs an operation, or needs removing from the screen; this
-      is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
-    source: pack Pricing___Revenue_Management_Reference.pdf, page 14 §Support
   layout:
     template: form
     regions:
@@ -12635,6 +12679,12 @@ screens:
       - kind: secondaryButton
         label: Component Override
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 14 §Support
+      - kind: secondaryButton
+        label: Save package pricing definition
+        operation: setPackagePricingDefinition
+        permission: PRICE_CONFIGURE
+        notes: '**The pricing model of a package, bundle or add-on** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /package-pricing
   states:
     loading: The package bundle add-on configuration as saved.
     error: Could not load. Names which read failed and leaves the package bundle add-on untouched.
@@ -12647,6 +12697,12 @@ screens:
     contract: catalogue
     purpose: Package, Bundle & Add-On Pricing
     trigger: onLoad
+  - operationId: setPackagePricingDefinition
+    contract: catalogue
+    purpose: Set how a package, bundle or add-on is priced
+    trigger: onAction
+    invalidates:
+    - listPackageBundleAdd
   wireframe:
     status: notStarted
     provenance: generated
@@ -12656,6 +12712,34 @@ screens:
     0 labels bound to a contract property; 13 of 28 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formSetPackagePricingDefinition
+    component: modal
+    trigger: Save package pricing definition
+    body: '**Collects what `setPackagePricingDefinition` sends before it is called.** Required: `id`,
+      `scopePath`, `productId`, `recordKind`, `pricingModel`, `status`. Optional: `name`, `priceListId`,
+      `addOnType`, `packagePrice`, `components`, `componentPriceVisibility`. Dismissing sends nothing;
+      the screen behind is unchanged.'
+    bindsTo: PackagePricing
+    confirm:
+      label: Save package pricing definition
+      operation: setPackagePricingDefinition
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - productId
+      - recordKind
+      - pricingModel
+      - status
+      - name
+      - priceListId
+      - addOnType
+      - packagePrice
+      - components
+      - componentPriceVisibility
+    provenance: contract catalogue.yaml PUT /package-pricing
 - id: ADM-054
   name: Market, Venue & Currency Pricing Structure
   module: Commercial
@@ -12720,6 +12804,15 @@ screens:
       - kind: textField
         label: AED 250 ≈ SAR 255
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 15 §FX-Assisted Setup
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save market pricing configuration
+        operation: setMarketPricingConfiguration
+        permission: PRICE_CONFIGURE
+        notes: '**Global, country, region, market or venue** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /pricing-markets
   states:
     loading: The market venue currency configuration as saved.
     error: Could not load. Names which read failed and leaves the market venue currency untouched.
@@ -12732,6 +12825,12 @@ screens:
     contract: catalogue
     purpose: Market, Venue & Currency Pricing Structure
     trigger: onLoad
+  - operationId: setMarketPricingConfiguration
+    contract: catalogue
+    purpose: Create or update a node of the market pricing structure
+    trigger: onAction
+    invalidates:
+    - listMarketVenueCurrency
   wireframe:
     status: notStarted
     provenance: generated
@@ -12741,6 +12840,39 @@ screens:
     0 labels bound to a contract property; 8 of 32 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formSetMarketPricingConfiguration
+    component: modal
+    trigger: Save market pricing configuration
+    body: '**Collects what `setMarketPricingConfiguration` sends before it is called.** Required: `id`,
+      `scopePath`, `hierarchyLevel`. Optional: `parentId`, `countryCode`, `marketCode`, `region`, `venueId`,
+      `brand`, `legalEntityId`, `baseCurrency`, `sellingCurrency`, `roundingProfileId`, `displayFormat`,
+      `priceListId` and 2 more. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: PricingMarket
+    confirm:
+      label: Save market pricing configuration
+      operation: setMarketPricingConfiguration
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - hierarchyLevel
+      - parentId
+      - countryCode
+      - marketCode
+      - region
+      - venueId
+      - brand
+      - legalEntityId
+      - baseCurrency
+      - sellingCurrency
+      - roundingProfileId
+      - displayFormat
+      - priceListId
+      - inheritsFromParent
+      - fxReferenceRate
+    provenance: contract catalogue.yaml PUT /pricing-markets
 - id: ADM-055
   name: Price Hierarchy & Inheritance Configuration
   module: Commercial
@@ -12921,6 +13053,12 @@ screens:
       - kind: secondaryButton
         label: Market Structure
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 18 §Allow cloning
+      - kind: secondaryButton
+        label: Save configuration template
+        operation: setConfigurationTemplate
+        permission: PRODUCT_CONFIGURE
+        notes: '**One template library for products and price lists** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /configuration-templates
   states:
     loading: The price list templates configuration as saved.
     error: Could not load. Names which read failed and leaves the price list templates untouched.
@@ -12933,6 +13071,12 @@ screens:
     contract: catalogue
     purpose: Price List Templates, Clone & Reuse
     trigger: onLoad
+  - operationId: setConfigurationTemplate
+    contract: catalogue
+    purpose: Create or update a product or price-list template
+    trigger: onAction
+    invalidates:
+    - listPriceListTemplate
   wireframe:
     status: notStarted
     provenance: generated
@@ -12942,6 +13086,37 @@ screens:
     0 labels bound to a contract property; 10 of 39 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formSetConfigurationTemplate
+    component: modal
+    trigger: Save configuration template
+    body: '**Collects what `setConfigurationTemplate` sends before it is called.** Required: `id`, `scopePath`,
+      `subject`, `name`, `status`. Optional: `description`, `templateKind`, `productKind`, `venueId`,
+      `sourceProductId`, `sourcePriceListId`, `includedComponents`, `reviewFields`, `isAiDrafted`, `ownerPrincipalId`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: ConfigurationTemplate
+    confirm:
+      label: Save configuration template
+      operation: setConfigurationTemplate
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - subject
+      - name
+      - status
+      - description
+      - templateKind
+      - productKind
+      - venueId
+      - sourceProductId
+      - sourcePriceListId
+      - includedComponents
+      - reviewFields
+      - isAiDrafted
+      - ownerPrincipalId
+    provenance: contract catalogue.yaml PUT /configuration-templates
 - id: ADM-057
   name: Commercial Pricing Structure Validation
   module: Commercial
@@ -14685,10 +14860,11 @@ screens:
   purpose: Create standardized reusable non-base-price charges.
   gaps:
   - operation: null
-    why: '**The pack names 18 actions on this screen and the screen declares 1 operation.** Unserved:
+    why: '**The pack names 18 actions on this screen; 8 are served since the writers pass (29 September):
       Booking Fee, Transaction Fee, Service Fee, Convenience Fee, Delivery Fee, Handling Fee, Modification
-      Fee, Rescheduling Fee …. Each needs an operation, or needs removing from the screen; this is the
-      Phase 3 reconciliation seen from the screen side rather than the contract side.'
+      Fee, Rescheduling Fee by `setFeeDefinition`.** Still unserved: the rest of the pack list past the
+      eight shown here. Each needs an operation, or needs removing from the screen; this is the Phase
+      3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Pricing___Revenue_Management_Reference.pdf, page 43 §Support
   layout:
     template: form
@@ -14772,6 +14948,12 @@ screens:
       - kind: secondaryButton
         label: Rescheduling Fee
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 43 §Support
+      - kind: secondaryButton
+        label: Save fee definition
+        operation: setFeeDefinition
+        permission: PRICE_CONFIGURE
+        notes: '**The fee and surcharge library** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /fees
   states:
     loading: The fee surcharge configuration as saved.
     error: Could not load. Names which read failed and leaves the fee surcharge untouched.
@@ -14784,6 +14966,12 @@ screens:
     contract: catalogue
     purpose: Fee & Surcharge Library
     trigger: onLoad
+  - operationId: setFeeDefinition
+    contract: catalogue
+    purpose: Create or update a fee or surcharge
+    trigger: onAction
+    invalidates:
+    - listFeeSurcharge
   wireframe:
     status: notStarted
     provenance: generated
@@ -14793,6 +14981,39 @@ screens:
     0 labels bound to a contract property; 33 of 43 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formSetFeeDefinition
+    component: modal
+    trigger: Save fee definition
+    body: '**Collects what `setFeeDefinition` sends before it is called.** Required: `id`, `scopePath`,
+      `code`, `name`, `feeType`, `valueType`, `chargeBasis`, `status`. Optional: `description`, `amount`,
+      `percentage`, `tiers`, `taxTreatment`, `refundability`, `visibility`, `effectiveFrom`, `effectiveTo`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: PricingFee
+    confirm:
+      label: Save fee definition
+      operation: setFeeDefinition
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - code
+      - name
+      - feeType
+      - valueType
+      - chargeBasis
+      - status
+      - description
+      - amount
+      - percentage
+      - tiers
+      - taxTreatment
+      - refundability
+      - visibility
+      - effectiveFrom
+      - effectiveTo
+    provenance: contract catalogue.yaml PUT /fees
 - id: ADM-072
   name: Fee Applicability & Charging Rule Builder
   module: Commercial
@@ -15094,6 +15315,15 @@ screens:
       - kind: selectField
         label: Output
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 47 §Each step should define
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save price calculation policy
+        operation: setPriceCalculationPolicy
+        permission: PRICE_CONFIGURE
+        notes: '**The ordered steps that turn a rate into a payable amount** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /calculation-profiles
   states:
     loading: The price calculation sequence configuration as saved.
     error: Could not load. Names which read failed and leaves the price calculation sequence untouched.
@@ -15106,6 +15336,12 @@ screens:
     contract: catalogue
     purpose: Price Calculation Sequence & Formula Engine
     trigger: onLoad
+  - operationId: setPriceCalculationPolicy
+    contract: catalogue
+    purpose: Save a price calculation sequence, whole
+    trigger: onAction
+    invalidates:
+    - listPriceCalculationSequence
   wireframe:
     status: notStarted
     provenance: generated
@@ -15115,6 +15351,30 @@ screens:
     0 labels bound to a contract property; 7 of 43 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formSetPriceCalculationPolicy
+    component: modal
+    trigger: Save price calculation policy
+    body: '**Collects what `setPriceCalculationPolicy` sends before it is called.** Required: `id`, `scopePath`,
+      `code`, `name`, `status`. Optional: `isDefault`, `effectiveFrom`, `effectiveTo`, `steps`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    bindsTo: CalculationProfile
+    confirm:
+      label: Save price calculation policy
+      operation: setPriceCalculationPolicy
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - code
+      - name
+      - status
+      - isDefault
+      - effectiveFrom
+      - effectiveTo
+      - steps
+    provenance: contract catalogue.yaml PUT /calculation-profiles
 - id: ADM-075
   name: Currency Precision, Rounding & Monetary Rules
   module: Commercial
@@ -15179,6 +15439,12 @@ screens:
       - kind: primaryButton
         label: Round Down
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 49 §Support
+      - kind: secondaryButton
+        label: Save currency rounding rule
+        operation: setCurrencyRoundingRule
+        permission: PRICE_CONFIGURE
+        notes: '**One rounding profile per currency the tenant sells in** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /rounding-profiles
   states:
     loading: The currency precision rounding list.
     error: Could not load. Names which read failed and leaves the currency precision rounding untouched.
@@ -15193,6 +15459,12 @@ screens:
     contract: catalogue
     purpose: Currency Precision, Rounding & Monetary Rules
     trigger: onLoad
+  - operationId: setCurrencyRoundingRule
+    contract: catalogue
+    purpose: Set precision and rounding for a currency
+    trigger: onAction
+    invalidates:
+    - listCurrencyPrecisionRounding
   entryState:
     preloaded:
     - AED 199.50
@@ -15205,6 +15477,35 @@ screens:
     1 labels bound to a contract property; 13 of 28 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formSetCurrencyRoundingRule
+    component: modal
+    trigger: Save currency rounding rule
+    body: '**Collects what `setCurrencyRoundingRule` sends before it is called.** Required: `id`, `scopePath`,
+      `currency`, `decimalPlaces`, `roundingMethod`, `roundingStage`, `status`. Optional: `code`, `name`,
+      `minimumMonetaryUnit`, `displayPrecision`, `calculationPrecision`, `cashRoundingIncrement`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    bindsTo: RoundingProfile
+    confirm:
+      label: Save currency rounding rule
+      operation: setCurrencyRoundingRule
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - currency
+      - decimalPlaces
+      - roundingMethod
+      - roundingStage
+      - status
+      - code
+      - name
+      - minimumMonetaryUnit
+      - displayPrecision
+      - calculationPrecision
+      - cashRoundingIncrement
+    provenance: contract catalogue.yaml PUT /rounding-profiles
 - id: ADM-076
   name: Price Breakdown, Calculation Simulation & Explainability
   module: Commercial
@@ -15436,12 +15737,6 @@ screens:
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-078 holds none of them, so the
         edge carries nothing and ADM-002 opens cold
-    - to: ADM-079
-      trigger: Works in Pricing Change Request & Workspace
-      provenance: flow F146 step 1→2
-      operation: listPricingGovernance
-      carries:
-      - changeId
     - to: ADM-080
       trigger: Works in Bulk Pricing Update, Import & Mass Maintenance
       provenance: flow F146 step 3→4
@@ -15474,6 +15769,12 @@ screens:
       trigger: Works in Pricing History, Audit & Compliance Explorer
       provenance: flow F146 step 17→18
       operation: listPricingGovernance
+    - to: ADM-079
+      trigger: Works in Pricing Change Request & Workspace
+      provenance: flow F146 step 1→2
+      operation: listPricingGovernance
+      carries:
+      - changeId
   density: compact
   purposeNote: Authorized administrators can monitor and control the complete pricing-change lifecycle
     from a centralized governance workspace.
@@ -16490,10 +16791,11 @@ screens:
     commercial impact.
   gaps:
   - operation: null
-    why: '**The pack names 9 actions on this screen and the screen declares 1 operation.** Unserved: Previous
-      Version, Selected Version, Previous Price, Commercial Baseline, Selected Products, Selected Venue,
-      Selected Market, Selected Channel …. Each needs an operation, or needs removing from the screen;
-      this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 9 actions on this screen; 8 are served since the writers pass (29 September):
+      Previous Version, Selected Version, Previous Price, Commercial Baseline, Selected Products, Selected
+      Venue, Selected Market, Selected Channel by `requestPricingRollback`.** Still unserved: the rest
+      of the pack list past the eight shown here. Each needs an operation, or needs removing from the
+      screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Pricing___Revenue_Management_Reference.pdf, page 69 §Support
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -16543,6 +16845,18 @@ screens:
           or the screen needs the control.'
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 69 §Authorized users should
           have
+      - kind: secondaryButton
+        label: Request pricing rollback
+        operation: requestPricingRollback
+        permission: PRICE_CONFIGURE
+        notes: '**A pricing rollback or emergency action, as a record first** (29 September, writers pass).'
+        provenance: contract catalogue.yaml POST /pricing-rollback-emergency
+      - kind: destructiveButton
+        label: Cancel pricing rollback
+        operation: cancelPricingRollback
+        permission: PRICE_CONFIGURE
+        notes: '**Only before it runs** (29 September, writers pass).'
+        provenance: contract catalogue.yaml POST /pricing-rollback-emergency/{actionId}/cancel
     - name: contentBody
       components: []
   states:
@@ -16559,10 +16873,25 @@ screens:
     contract: catalogue
     purpose: Pricing Rollback & Emergency Control Center
     trigger: onLoad
+  - operationId: requestPricingRollback
+    contract: catalogue
+    purpose: Roll pricing back, or take an emergency pricing action
+    trigger: onAction
+    invalidates:
+    - listPricingRollbackEmergency
+  - operationId: cancelPricingRollback
+    contract: catalogue
+    purpose: Cancel a rollback that has not started
+    trigger: onAction
+    invalidates:
+    - listPricingRollbackEmergency
   entryState:
     preloaded:
     - PricingRollbackEmergencyControlCenterView.rollbackTarget
     - PricingRollbackEmergencyControlCenterView.rollbackScope
+    params:
+    - name: actionId
+      from: navigation
   wireframe:
     status: notStarted
     provenance: generated
@@ -16572,6 +16901,49 @@ screens:
     0 labels bound to a contract property; 15 of 39 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formRequestPricingRollback
+    component: modal
+    trigger: Request pricing rollback
+    body: '**Collects what `requestPricingRollback` sends before it is called.** Required: `id`, `scopePath`,
+      `subject`, `actionType`, `reason`, `status`, `requestedByPrincipalId`, `requestedAt`. Optional:
+      `productId`, `priceListId`, `fromVersion`, `toVersion`, `productScope`, `rollbackTarget`, `rollbackScope`,
+      `scopeIds`, `dependencies`, `executionMode`, `isEmergency`, `scheduledAt` and 6 more. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    bindsTo: CatalogueRollbackAction
+    confirm:
+      label: Request pricing rollback
+      operation: requestPricingRollback
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - subject
+      - actionType
+      - reason
+      - status
+      - requestedByPrincipalId
+      - requestedAt
+      - productId
+      - priceListId
+      - fromVersion
+      - toVersion
+      - productScope
+      - rollbackTarget
+      - rollbackScope
+      - scopeIds
+      - dependencies
+      - executionMode
+    provenance: contract catalogue.yaml POST /pricing-rollback-emergency
+  - id: confirmCancelPricingRollback
+    component: confirmDialog
+    trigger: Cancel pricing rollback
+    body: '**Names what `cancelPricingRollback` changes and what it leaves alone**, in the consequence
+      rather than the verb. A catalogue rollback action this affects should be identified in the dialog,
+      not just counted. **Collects what `cancelPricingRollback` sends before it is called.** Required:
+      `reason`.'
+    provenance: contract catalogue.yaml POST /pricing-rollback-emergency/{actionId}/cancel
 - id: ADM-087
   name: Pricing History, Audit & Compliance Explorer
   module: Commercial
@@ -16727,10 +17099,6 @@ screens:
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-088 holds none of them, so the
         edge carries nothing and ADM-002 opens cold
-    - to: ADM-089
-      trigger: Works in Dynamic Pricing Strategy Builder
-      provenance: flow F147 step 1→2
-      operation: listDynamicPricingStrategy
     - to: ADM-090
       trigger: Works in Demand, Occupancy & Availability Rule Builder
       provenance: flow F147 step 3→4
@@ -16747,10 +17115,6 @@ screens:
       trigger: Works in Channel, Customer Segment & Location Dynamic Rules
       provenance: flow F147 step 9→10
       operation: listDynamicPricingStrategy
-    - to: ADM-094
-      trigger: Works in Dynamic Price Bands, Ladders & Adjustment Matrix
-      provenance: flow F147 step 11→12
-      operation: listDynamicPricingStrategy
     - to: ADM-095
       trigger: Works in Dynamic Pricing Guardrails & Commercial Protection
       provenance: flow F147 step 13→14
@@ -16763,6 +17127,18 @@ screens:
       trigger: Works in Rule Priority, Conflict Resolution & Dynamic Pricing Test Console
       provenance: flow F147 step 17→18
       operation: listDynamicPricingStrategy
+    - to: ADM-089
+      trigger: Works in Dynamic Pricing Strategy Builder
+      provenance: flow F147 step 1→2
+      operation: listDynamicPricingStrategy
+      carries:
+      - strategyId
+    - to: ADM-094
+      trigger: Works in Dynamic Price Bands, Ladders & Adjustment Matrix
+      provenance: flow F147 step 11→12
+      operation: listDynamicPricingStrategy
+      carries:
+      - strategyId
   density: compact
   purposeNote: Authorized users can view and manage the complete dynamic-pricing strategy portfolio from
     one centralized workspace.
@@ -16903,6 +17279,12 @@ screens:
       - kind: secondaryButton
         label: Open
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 75 §Quick Actions
+      - kind: secondaryButton
+        label: Transition dynamic pricing strategy
+        operation: transitionDynamicPricingStrategy
+        permission: PRICE_CONFIGURE
+        notes: '**The strategy''s status moves, as calls** (29 September, writers pass).'
+        provenance: contract catalogue.yaml POST /dynamic-pricing-strategies/{strategyId}/lifecycle
   states:
     loading: The dynamic pricing strategy list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the dynamic pricing strategy untouched.
@@ -16917,6 +17299,12 @@ screens:
     contract: catalogue
     purpose: Dynamic Pricing Strategy Command Center
     trigger: onLoad
+  - operationId: transitionDynamicPricingStrategy
+    contract: catalogue
+    purpose: Activate, pause, resume or retire a dynamic pricing strategy
+    trigger: onAction
+    invalidates:
+    - listDynamicPricingStrategy
   wireframe:
     status: notStarted
     provenance: generated
@@ -16926,6 +17314,26 @@ screens:
     25 labels bound to a contract property; 38 of 55 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formTransitionDynamicPricingStrategy
+    component: modal
+    trigger: Transition dynamic pricing strategy
+    body: '**Collects what `transitionDynamicPricingStrategy` sends before it is called.** Required: `action`.
+      Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Transition dynamic pricing strategy
+      operation: transitionDynamicPricingStrategy
+    dismiss:
+      label: Cancel
+      discards:
+      - action
+      - reason
+    provenance: contract catalogue.yaml POST /dynamic-pricing-strategies/{strategyId}/lifecycle
+  entryState:
+    params:
+    - name: strategyId
+      from: navigation
+      optional: true
 - id: ADM-089
   name: Dynamic Pricing Strategy Builder
   module: Commercial
@@ -16954,6 +17362,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F147 step 2→3
       operation: setDynamicPricingStrategy
+      carries:
+      - strategyId
   density: compact
   purposeNote: Administrators can create reusable dynamic-pricing strategies linked to governed commercial
     base prices and clearly defined product/event scopes.
@@ -17039,6 +17449,12 @@ screens:
       - kind: primaryButton
         label: Save changes
         provenance: contract operation setDynamicPricingStrategy
+      - kind: secondaryButton
+        label: Transition dynamic pricing strategy
+        operation: transitionDynamicPricingStrategy
+        permission: PRICE_CONFIGURE
+        notes: '**The strategy''s status moves, as calls** (29 September, writers pass).'
+        provenance: contract catalogue.yaml POST /dynamic-pricing-strategies/{strategyId}/lifecycle
   states:
     loading: The dynamic pricing strategy configuration as saved.
     error: Could not load. Names which read failed and leaves the dynamic pricing strategy untouched.
@@ -17051,6 +17467,10 @@ screens:
     contract: catalogue
     purpose: Dynamic Pricing Strategy Builder
     trigger: onAction
+  - operationId: transitionDynamicPricingStrategy
+    contract: catalogue
+    purpose: Activate, pause, resume or retire a dynamic pricing strategy
+    trigger: onAction
   wireframe:
     status: notStarted
     provenance: generated
@@ -17060,6 +17480,26 @@ screens:
     0 labels bound to a contract property; 22 of 45 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formTransitionDynamicPricingStrategy
+    component: modal
+    trigger: Transition dynamic pricing strategy
+    body: '**Collects what `transitionDynamicPricingStrategy` sends before it is called.** Required: `action`.
+      Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Transition dynamic pricing strategy
+      operation: transitionDynamicPricingStrategy
+    dismiss:
+      label: Cancel
+      discards:
+      - action
+      - reason
+    provenance: contract catalogue.yaml POST /dynamic-pricing-strategies/{strategyId}/lifecycle
+  entryState:
+    params:
+    - name: strategyId
+      from: navigation
+      optional: true
 - id: ADM-090
   name: Demand, Occupancy & Availability Rule Builder
   module: Commercial
@@ -17088,6 +17528,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F147 step 4→5
       operation: setDemandOccupancyAvailability
+      carries:
+      - strategyId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -17174,6 +17616,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F147 step 6→7
       operation: setBookingVelocityTime
+      carries:
+      - strategyId
   density: compact
   purposeNote: Dynamic pricing can respond to both booking pace and remaining selling time rather than
     relying solely on current occupancy.
@@ -17281,6 +17725,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F147 step 8→9
       operation: listSeasonalCalendarDay
+      carries:
+      - strategyId
   density: compact
   purposeNote: performances, and timeslots without creating conflicting temporal rules.
   pattern: listDetail
@@ -17309,6 +17755,15 @@ screens:
         impliedBy: listSeasonalCalendarDay
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save demand signal configuration
+        operation: setDemandSignalConfiguration
+        permission: PRICE_CONFIGURE
+        notes: '**The person''s half of `catalogue.demand_signal`** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /demand-signals/{signalId}
   states:
     loading: The seasonal calendar day list.
     error: Could not load. Names which read failed and leaves the seasonal calendar day untouched.
@@ -17323,6 +17778,12 @@ screens:
     contract: catalogue
     purpose: Seasonal, Calendar, Day & Timeslot Dynamic Rules
     trigger: onLoad
+  - operationId: setDemandSignalConfiguration
+    contract: catalogue
+    purpose: Enter a calendar signal or configure how a demand signal is used
+    trigger: onAction
+    invalidates:
+    - listSeasonalCalendarDay
   entryState:
     preloaded:
     - SeasonalCalendarDayTimeslotDynamicRulesView.season
@@ -17330,6 +17791,10 @@ screens:
     - SeasonalCalendarDayTimeslotDynamicRulesView.week
     - SeasonalCalendarDayTimeslotDynamicRulesView.dateRange
     - SeasonalCalendarDayTimeslotDynamicRulesView.dimension
+    params:
+    - name: signalId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -17339,6 +17804,40 @@ screens:
     0 labels bound to a contract property; 0 of 33 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formSetDemandSignalConfiguration
+    component: modal
+    trigger: Save demand signal configuration
+    body: '**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`,
+      `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`,
+      `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and
+      11 more. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: DemandSignal
+    confirm:
+      label: Save demand signal configuration
+      operation: setDemandSignalConfiguration
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - signalKind
+      - source
+      - signalType
+      - name
+      - venueId
+      - productId
+      - geography
+      - marketCode
+      - periodStart
+      - periodEnd
+      - currentValue
+      - unit
+      - reading
+      - configuration
+      - weight
+      - reliability
+    provenance: contract catalogue.yaml PUT /demand-signals/{signalId}
 - id: ADM-093
   name: Channel, Customer Segment & Location Dynamic Rules
   module: Commercial
@@ -17367,6 +17866,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F147 step 10→11
       operation: listChannelCustomerSegment
+      carries:
+      - strategyId
   density: compact
   purposeNote: Dynamic pricing can vary appropriately by channel, customer segment, and location without
     violating protected commercial agreements.
@@ -17462,6 +17963,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F147 step 12→13
       operation: listDynamicPriceBand
+      carries:
+      - strategyId
   density: compact
   purposeNote: Dynamic prices move through controlled commercial price bands or adjustment ranges rather
     than generating arbitrary uncontrolled selling prices.
@@ -17470,12 +17973,6 @@ screens:
     — it is settings, not a population
   purpose: Define the controlled monetary steps through which prices can move. This is preferable to allowing
     unrestricted price generation for many products.
-  gaps:
-  - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Fixed
-      Price Bands, Continuous Range where permitted. Each needs an operation, or needs removing from the
-      screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
-    source: pack Pricing___Revenue_Management_Reference.pdf, page 84 §Support
   layout:
     template: form
     regions:
@@ -17509,6 +18006,12 @@ screens:
       - kind: secondaryButton
         label: Continuous Range where permitted
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 84 §Support
+      - kind: secondaryButton
+        label: Save price ladder matrix
+        operation: setPriceLadderMatrix
+        permission: PRICE_CONFIGURE
+        notes: '**The bands a strategy''s price moves between, and how fast** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /dynamic-pricing-strategies/{strategyId}/price-ladder
   states:
     loading: The dynamic price bands configuration as saved.
     error: Could not load. Names which read failed and leaves the dynamic price bands untouched.
@@ -17521,6 +18024,12 @@ screens:
     contract: catalogue
     purpose: Dynamic Price Bands, Ladders & Adjustment Matrix
     trigger: onLoad
+  - operationId: setPriceLadderMatrix
+    contract: catalogue
+    purpose: Set a strategy's price ladder
+    trigger: onAction
+    invalidates:
+    - listDynamicPriceBand
   wireframe:
     status: notStarted
     provenance: generated
@@ -17530,6 +18039,46 @@ screens:
     0 labels bound to a contract property; 8 of 40 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formSetPriceLadderMatrix
+    component: modal
+    trigger: Save price ladder matrix
+    body: '**Collects what `setPriceLadderMatrix` sends before it is called.** Required: `id`, `scopePath`,
+      `dynamicPricingStrategyId`, `adjustmentModel`. Optional: `basePriceSource`, `bands`, `baseBandCode`,
+      `stepAmount`, `minimumPrice`, `basePrice`, `maximumPrice`, `allowUpward`, `allowDownward`, `maxIncreasePercentPerAdjustment`,
+      `maxDecreasePercentPerAdjustment`, `maximumBandsPerMovement` and 4 more. Dismissing sends nothing;
+      the screen behind is unchanged.'
+    bindsTo: PriceLadder
+    confirm:
+      label: Save price ladder matrix
+      operation: setPriceLadderMatrix
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - dynamicPricingStrategyId
+      - adjustmentModel
+      - basePriceSource
+      - bands
+      - baseBandCode
+      - stepAmount
+      - minimumPrice
+      - basePrice
+      - maximumPrice
+      - allowUpward
+      - allowDownward
+      - maxIncreasePercentPerAdjustment
+      - maxDecreasePercentPerAdjustment
+      - maximumBandsPerMovement
+      - minimumMinutesBetweenMovements
+      - cooldownMinutes
+    provenance: contract catalogue.yaml PUT /dynamic-pricing-strategies/{strategyId}/price-ladder
+  entryState:
+    params:
+    - name: strategyId
+      from: navigation
+      optional: true
 - id: ADM-095
   name: Dynamic Pricing Guardrails & Commercial Protection
   module: Commercial
@@ -17616,6 +18165,12 @@ screens:
           Freeze Product, Freeze Event, Freeze Performance, Freeze Strategy, Freeze Venue, Return to Base
           Price. Each needs attaching to the control it gates, or the screen needs the control.'
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 86 §Authorized users can
+      - kind: primaryButton
+        label: Save dynamic pricing guardrail policy
+        operation: setDynamicPricingGuardrailPolicy
+        permission: PRICE_CONFIGURE
+        notes: '**Guardrails and automation policy, one row per scope** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /dynamic-pricing-controls
   states:
     loading: The dynamic pricing guardrails configuration as saved.
     error: Could not load. Names which read failed and leaves the dynamic pricing guardrails untouched.
@@ -17628,6 +18183,12 @@ screens:
     contract: catalogue
     purpose: Dynamic Pricing Guardrails & Commercial Protection
     trigger: onLoad
+  - operationId: setDynamicPricingGuardrailPolicy
+    contract: catalogue
+    purpose: Set the guardrails and automation level of dynamic pricing at one scope
+    trigger: onAction
+    invalidates:
+    - listDynamicPricingGuardrail
   wireframe:
     status: notStarted
     provenance: generated
@@ -17637,6 +18198,41 @@ screens:
     0 labels bound to a contract property; 18 of 32 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formSetDynamicPricingGuardrailPolicy
+    component: modal
+    trigger: Save dynamic pricing guardrail policy
+    body: '**Collects what `setDynamicPricingGuardrailPolicy` sends before it is called.** Required: `id`,
+      `scopePath`, `scopeLevel`, `automationLevel`. Optional: `scopeId`, `absoluteMinimumPrice`, `absoluteMaximumPrice`,
+      `minimumMarginPercent`, `maximumUpliftPercent`, `maximumReductionPercent`, `maximumSingleChangePercent`,
+      `maximumDailyChangePercent`, `maximumWeeklyChangePercent`, `minimumChangeIntervalMinutes`, `maximumChangesPerDay`,
+      `minimumInventory` and 21 more. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: DynamicPricingControl
+    confirm:
+      label: Save dynamic pricing guardrail policy
+      operation: setDynamicPricingGuardrailPolicy
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - scopeLevel
+      - automationLevel
+      - scopeId
+      - absoluteMinimumPrice
+      - absoluteMaximumPrice
+      - minimumMarginPercent
+      - maximumUpliftPercent
+      - maximumReductionPercent
+      - maximumSingleChangePercent
+      - maximumDailyChangePercent
+      - maximumWeeklyChangePercent
+      - minimumChangeIntervalMinutes
+      - maximumChangesPerDay
+      - minimumInventory
+      - maximumOccupancyTriggerPercent
+      - protectedRateTypes
+    provenance: contract catalogue.yaml PUT /dynamic-pricing-controls
 - id: ADM-096
   name: Dynamic Pricing Automation Policy & Control
   module: Commercial
@@ -17730,6 +18326,15 @@ screens:
       - kind: selectField
         label: Return Behavior
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 87 §Capture
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save dynamic pricing guardrail policy
+        operation: setDynamicPricingGuardrailPolicy
+        permission: PRICE_CONFIGURE
+        notes: '**Guardrails and automation policy, one row per scope** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /dynamic-pricing-controls
   states:
     loading: The dynamic pricing automation configuration as saved.
     error: Could not load. Names which read failed and leaves the dynamic pricing automation untouched.
@@ -17742,6 +18347,12 @@ screens:
     contract: catalogue
     purpose: Dynamic Pricing Automation Policy & Control
     trigger: onLoad
+  - operationId: setDynamicPricingGuardrailPolicy
+    contract: catalogue
+    purpose: Set the guardrails and automation level of dynamic pricing at one scope
+    trigger: onAction
+    invalidates:
+    - listDynamicPricingAutomation
   wireframe:
     status: notStarted
     provenance: generated
@@ -17751,6 +18362,41 @@ screens:
     0 labels bound to a contract property; 15 of 41 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formSetDynamicPricingGuardrailPolicy
+    component: modal
+    trigger: Save dynamic pricing guardrail policy
+    body: '**Collects what `setDynamicPricingGuardrailPolicy` sends before it is called.** Required: `id`,
+      `scopePath`, `scopeLevel`, `automationLevel`. Optional: `scopeId`, `absoluteMinimumPrice`, `absoluteMaximumPrice`,
+      `minimumMarginPercent`, `maximumUpliftPercent`, `maximumReductionPercent`, `maximumSingleChangePercent`,
+      `maximumDailyChangePercent`, `maximumWeeklyChangePercent`, `minimumChangeIntervalMinutes`, `maximumChangesPerDay`,
+      `minimumInventory` and 21 more. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: DynamicPricingControl
+    confirm:
+      label: Save dynamic pricing guardrail policy
+      operation: setDynamicPricingGuardrailPolicy
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - scopeLevel
+      - automationLevel
+      - scopeId
+      - absoluteMinimumPrice
+      - absoluteMaximumPrice
+      - minimumMarginPercent
+      - maximumUpliftPercent
+      - maximumReductionPercent
+      - maximumSingleChangePercent
+      - maximumDailyChangePercent
+      - maximumWeeklyChangePercent
+      - minimumChangeIntervalMinutes
+      - maximumChangesPerDay
+      - minimumInventory
+      - maximumOccupancyTriggerPercent
+      - protectedRateTypes
+    provenance: contract catalogue.yaml PUT /dynamic-pricing-controls
 - id: ADM-097
   name: Rule Priority, Conflict Resolution & Dynamic Pricing Test Console
   module: Commercial
@@ -17774,6 +18420,11 @@ screens:
     inferred: false
     notes: '**Reached from ADM-088, the hub of its workshop board.** Stated on 4 September: the pack groups
       its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    transitions:
+    - to: ADM-088
+      trigger: Dynamic Pricing Strategy Command Center
+      provenance: derived — ADM-088 declares entryState.params strategyId and ADM-097 holds none of them,
+        so the edge carries nothing and ADM-088 opens cold
   density: compact
   purposeNote: 'For any configured commercial scenario, TICVAI can deterministically calculate, test,
     and explain the final dynamic price before the strategy is activated. Board 5 — Final Screen Register
@@ -18231,12 +18882,6 @@ screens:
     over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's
   purpose: Allow TICVAI to understand how weather conditions affect demand for different venues and experiences.
     This should be much more sophisticated than simply connecting a weather API.
-  gaps:
-  - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Hourly
-      Forecast, Daily Forecast. Each needs an operation, or needs removing from the screen; this is the
-      Phase 3 reconciliation seen from the screen side rather than the contract side.'
-    source: pack Pricing___Revenue_Management_Reference.pdf, page 97 §Support
   layout:
     template: dashboard
     regions:
@@ -18260,6 +18905,12 @@ screens:
       - kind: secondaryButton
         label: Daily Forecast
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 97 §Support
+      - kind: secondaryButton
+        label: Save demand signal configuration
+        operation: setDemandSignalConfiguration
+        permission: PRICE_CONFIGURE
+        notes: '**The person''s half of `catalogue.demand_signal`** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /demand-signals/{signalId}
   states:
     loading: The weather intelligence demand list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the weather intelligence demand untouched.
@@ -18274,10 +18925,20 @@ screens:
     contract: catalogue
     purpose: Weather Intelligence & Demand Impact Configuration
     trigger: onLoad
+  - operationId: setDemandSignalConfiguration
+    contract: catalogue
+    purpose: Enter a calendar signal or configure how a demand signal is used
+    trigger: onAction
+    invalidates:
+    - listWeatherDemandImpact
   entryState:
     preloaded:
     - WeatherIntelligenceDemandImpactConfigurationView.weatherForecastConfidence
     - WeatherIntelligenceDemandImpactConfigurationView.estimatedDemandImpactMin
+    params:
+    - name: signalId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -18287,6 +18948,40 @@ screens:
     2 labels bound to a contract property; 4 of 39 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formSetDemandSignalConfiguration
+    component: modal
+    trigger: Save demand signal configuration
+    body: '**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`,
+      `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`,
+      `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and
+      11 more. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: DemandSignal
+    confirm:
+      label: Save demand signal configuration
+      operation: setDemandSignalConfiguration
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - signalKind
+      - source
+      - signalType
+      - name
+      - venueId
+      - productId
+      - geography
+      - marketCode
+      - periodStart
+      - periodEnd
+      - currentValue
+      - unit
+      - reading
+      - configuration
+      - weight
+      - reliability
+    provenance: contract catalogue.yaml PUT /demand-signals/{signalId}
 - id: ADM-101
   name: Nearby Event, Exhibition & Local Demand Intelligence
   module: Commercial
@@ -18394,6 +19089,15 @@ screens:
       - kind: selectField
         label: Confidence
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 99 §Capture
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save demand signal configuration
+        operation: setDemandSignalConfiguration
+        permission: PRICE_CONFIGURE
+        notes: '**The person''s half of `catalogue.demand_signal`** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /demand-signals/{signalId}
   states:
     loading: The nearby event exhibition configuration as saved.
     error: Could not load. Names which read failed and leaves the nearby event exhibition untouched.
@@ -18406,6 +19110,12 @@ screens:
     contract: catalogue
     purpose: Nearby Event, Exhibition & Local Demand Intelligence
     trigger: onLoad
+  - operationId: setDemandSignalConfiguration
+    contract: catalogue
+    purpose: Enter a calendar signal or configure how a demand signal is used
+    trigger: onAction
+    invalidates:
+    - listNearbyEventExhibition
   wireframe:
     status: notStarted
     provenance: generated
@@ -18415,6 +19125,45 @@ screens:
     0 labels bound to a contract property; 22 of 47 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formSetDemandSignalConfiguration
+    component: modal
+    trigger: Save demand signal configuration
+    body: '**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`,
+      `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`,
+      `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and
+      11 more. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: DemandSignal
+    confirm:
+      label: Save demand signal configuration
+      operation: setDemandSignalConfiguration
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - signalKind
+      - source
+      - signalType
+      - name
+      - venueId
+      - productId
+      - geography
+      - marketCode
+      - periodStart
+      - periodEnd
+      - currentValue
+      - unit
+      - reading
+      - configuration
+      - weight
+      - reliability
+    provenance: contract catalogue.yaml PUT /demand-signals/{signalId}
+  entryState:
+    params:
+    - name: signalId
+      from: navigation
+      optional: true
 - id: ADM-102
   name: Competitor Pricing & Market Position Intelligence
   module: Commercial
@@ -18488,6 +19237,15 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “AED 275”, “Comparable Product
           Mapping”, “General Admission”, “Historical Correlation”, “Ethical/Legal Controls”.'
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 100 §Track
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save demand signal configuration
+        operation: setDemandSignalConfiguration
+        permission: PRICE_CONFIGURE
+        notes: '**The person''s half of `catalogue.demand_signal`** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /demand-signals/{signalId}
   states:
     loading: The competitor pricing market list.
     error: Could not load. Names which read failed and leaves the competitor pricing market untouched.
@@ -18502,6 +19260,12 @@ screens:
     contract: catalogue
     purpose: Competitor Pricing & Market Position Intelligence
     trigger: onLoad
+  - operationId: setDemandSignalConfiguration
+    contract: catalogue
+    purpose: Enter a calendar signal or configure how a demand signal is used
+    trigger: onAction
+    invalidates:
+    - listCompetitorPricingMarket
   entryState:
     preloaded:
     - CompetitorPricingMarketPositionIntelligenceView.publishedPrice
@@ -18510,6 +19274,10 @@ screens:
     - CompetitorPricingMarketPositionIntelligenceView.peakPrice
     - CompetitorPricingMarketPositionIntelligenceView.residentPrice
     - CompetitorPricingMarketPositionIntelligenceView.memberPriceWherePubliclyAvailable
+    params:
+    - name: signalId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -18519,6 +19287,40 @@ screens:
     9 labels bound to a contract property; 18 of 30 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formSetDemandSignalConfiguration
+    component: modal
+    trigger: Save demand signal configuration
+    body: '**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`,
+      `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`,
+      `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and
+      11 more. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: DemandSignal
+    confirm:
+      label: Save demand signal configuration
+      operation: setDemandSignalConfiguration
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - signalKind
+      - source
+      - signalType
+      - name
+      - venueId
+      - productId
+      - geography
+      - marketCode
+      - periodStart
+      - periodEnd
+      - currentValue
+      - unit
+      - reading
+      - configuration
+      - weight
+      - reliability
+    provenance: contract catalogue.yaml PUT /demand-signals/{signalId}
 - id: ADM-103
   name: Market, Tourism, Holiday & Contextual Signal Hub
   module: Commercial
@@ -18575,6 +19377,15 @@ screens:
         impliedBy: listMarketTourismHoliday
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save demand signal configuration
+        operation: setDemandSignalConfiguration
+        permission: PRICE_CONFIGURE
+        notes: '**The person''s half of `catalogue.demand_signal`** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /demand-signals/{signalId}
   states:
     loading: The market tourism holiday list.
     error: Could not load. Names which read failed and leaves the market tourism holiday untouched.
@@ -18589,9 +19400,19 @@ screens:
     contract: catalogue
     purpose: Market, Tourism, Holiday & Contextual Signal Hub
     trigger: onLoad
+  - operationId: setDemandSignalConfiguration
+    contract: catalogue
+    purpose: Enter a calendar signal or configure how a demand signal is used
+    trigger: onAction
+    invalidates:
+    - listMarketTourismHoliday
   entryState:
     preloaded:
     - MarketTourismHolidayContextualSignalHubView.signalType
+    params:
+    - name: signalId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -18601,6 +19422,40 @@ screens:
     0 labels bound to a contract property; 0 of 38 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formSetDemandSignalConfiguration
+    component: modal
+    trigger: Save demand signal configuration
+    body: '**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`,
+      `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`,
+      `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and
+      11 more. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: DemandSignal
+    confirm:
+      label: Save demand signal configuration
+      operation: setDemandSignalConfiguration
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - signalKind
+      - source
+      - signalType
+      - name
+      - venueId
+      - productId
+      - geography
+      - marketCode
+      - periodStart
+      - periodEnd
+      - currentValue
+      - unit
+      - reading
+      - configuration
+      - weight
+      - reliability
+    provenance: contract catalogue.yaml PUT /demand-signals/{signalId}
 - id: ADM-104
   name: AI Demand Forecasting & Booking Curve Studio
   module: Commercial
@@ -19033,6 +19888,12 @@ screens:
           Forecasting, Recommendations, Simulation, Automated Pricing. Each needs attaching to the control
           it gates, or the screen needs the control.'
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 108 §AI Use Permission
+      - kind: primaryButton
+        label: Save signal registry policy
+        operation: setSignalRegistryPolicy
+        permission: AI_CONFIGURE
+        notes: '**AI governance of signals and models** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /signal-registry
   states:
     loading: The signal registry data list.
     error: Could not load. Names which read failed and leaves the signal registry data untouched.
@@ -19047,6 +19908,12 @@ screens:
     contract: catalogue
     purpose: AI Signal Registry, Data Quality & Model Governance
     trigger: onLoad
+  - operationId: setSignalRegistryPolicy
+    contract: catalogue
+    purpose: Register a signal or model and set how far AI may trust it
+    trigger: onAction
+    invalidates:
+    - listSignalDataQuality
   entryState:
     preloaded:
     - AiSignalRegistryDataQualityModelGovernanceView.signal
@@ -19064,6 +19931,40 @@ screens:
     of 24 labels bound to a contract property; 32 of 121 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formSetSignalRegistryPolicy
+    component: modal
+    trigger: Save signal registry policy
+    body: '**Collects what `setSignalRegistryPolicy` sends before it is called.** Required: `id`, `scopePath`,
+      `registryKind`, `name`, `trustLevel`. Optional: `category`, `provider`, `source`, `internalExternal`,
+      `marketCode`, `refreshFrequency`, `aiUsePermissions`, `fallbackPolicy`, `status`, `ownerPrincipalId`,
+      `purpose`, `deployedAt` and 5 more. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: SignalRegistryEntry
+    confirm:
+      label: Save signal registry policy
+      operation: setSignalRegistryPolicy
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - registryKind
+      - name
+      - trustLevel
+      - category
+      - provider
+      - source
+      - internalExternal
+      - marketCode
+      - refreshFrequency
+      - aiUsePermissions
+      - fallbackPolicy
+      - status
+      - ownerPrincipalId
+      - purpose
+      - deployedAt
+      - trainingWindow
+    provenance: contract catalogue.yaml PUT /signal-registry
 - id: ADM-108
   name: Revenue Optimization Command Center
   module: Commercial
@@ -19118,12 +20019,6 @@ screens:
       trigger: Works in Revenue & Demand Impact Forecasting
       provenance: flow F149 step 7→8
       operation: listRevenue
-    - to: ADM-113
-      trigger: Works in AI Recommendation Review & Decision Queue
-      provenance: flow F149 step 9→10
-      operation: listRevenue
-      carries:
-      - recommendationId
     - to: ADM-114
       trigger: Works in Automation Policy & Autonomous Pricing Orchestrator
       provenance: flow F149 step 11→12
@@ -19140,6 +20035,12 @@ screens:
       trigger: Works in AI Learning, Model Performance & Optimization Feedback
       provenance: flow F149 step 17→18
       operation: listRevenue
+    - to: ADM-113
+      trigger: Works in AI Recommendation Review & Decision Queue
+      provenance: flow F149 step 9→10
+      operation: listRevenue
+      carries:
+      - recommendationId
   density: compact
   purposeNote: Revenue teams can monitor and act on pricing optimization opportunities across the organization
     from one centralized workspace.
@@ -19976,6 +20877,15 @@ screens:
       - kind: textField
         label: Maximum Changes per Day
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 123 §Configure
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save dynamic pricing guardrail policy
+        operation: setDynamicPricingGuardrailPolicy
+        permission: PRICE_CONFIGURE
+        notes: '**Guardrails and automation policy, one row per scope** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /dynamic-pricing-controls
   states:
     loading: The automation policy autonomous configuration as saved.
     error: Could not load. Names which read failed and leaves the automation policy autonomous untouched.
@@ -19988,6 +20898,12 @@ screens:
     contract: catalogue
     purpose: Automation Policy & Autonomous Pricing Orchestrator
     trigger: onLoad
+  - operationId: setDynamicPricingGuardrailPolicy
+    contract: catalogue
+    purpose: Set the guardrails and automation level of dynamic pricing at one scope
+    trigger: onAction
+    invalidates:
+    - listAutomationPolicyAutonomous
   wireframe:
     status: notStarted
     provenance: generated
@@ -19997,6 +20913,41 @@ screens:
     0 labels bound to a contract property; 12 of 34 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formSetDynamicPricingGuardrailPolicy
+    component: modal
+    trigger: Save dynamic pricing guardrail policy
+    body: '**Collects what `setDynamicPricingGuardrailPolicy` sends before it is called.** Required: `id`,
+      `scopePath`, `scopeLevel`, `automationLevel`. Optional: `scopeId`, `absoluteMinimumPrice`, `absoluteMaximumPrice`,
+      `minimumMarginPercent`, `maximumUpliftPercent`, `maximumReductionPercent`, `maximumSingleChangePercent`,
+      `maximumDailyChangePercent`, `maximumWeeklyChangePercent`, `minimumChangeIntervalMinutes`, `maximumChangesPerDay`,
+      `minimumInventory` and 21 more. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: DynamicPricingControl
+    confirm:
+      label: Save dynamic pricing guardrail policy
+      operation: setDynamicPricingGuardrailPolicy
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - scopeLevel
+      - automationLevel
+      - scopeId
+      - absoluteMinimumPrice
+      - absoluteMaximumPrice
+      - minimumMarginPercent
+      - maximumUpliftPercent
+      - maximumReductionPercent
+      - maximumSingleChangePercent
+      - maximumDailyChangePercent
+      - maximumWeeklyChangePercent
+      - minimumChangeIntervalMinutes
+      - maximumChangesPerDay
+      - minimumInventory
+      - maximumOccupancyTriggerPercent
+      - protectedRateTypes
+    provenance: contract catalogue.yaml PUT /dynamic-pricing-controls
 - id: ADM-115
   name: Live Dynamic Price Execution & Deployment Monitor
   module: Commercial
@@ -20346,6 +21297,15 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Situation”, “Signals”,
           “Human/Automation Decision”, “Actual Price”, “Actual Demand”, “Actual Revenue”.'
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 128 §Forecast
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save signal registry policy
+        operation: setSignalRegistryPolicy
+        permission: AI_CONFIGURE
+        notes: '**AI governance of signals and models** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /signal-registry
   states:
     loading: The learning model performance list.
     error: Could not load. Names which read failed and leaves the learning model performance untouched.
@@ -20360,6 +21320,12 @@ screens:
     contract: catalogue
     purpose: AI Learning, Model Performance & Optimization Feedback
     trigger: onLoad
+  - operationId: setSignalRegistryPolicy
+    contract: catalogue
+    purpose: Register a signal or model and set how far AI may trust it
+    trigger: onAction
+    invalidates:
+    - listLearningModelPerformance
   entryState:
     preloaded:
     - ↓
@@ -20377,6 +21343,40 @@ screens:
     8 labels bound to a contract property; 8 of 96 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formSetSignalRegistryPolicy
+    component: modal
+    trigger: Save signal registry policy
+    body: '**Collects what `setSignalRegistryPolicy` sends before it is called.** Required: `id`, `scopePath`,
+      `registryKind`, `name`, `trustLevel`. Optional: `category`, `provider`, `source`, `internalExternal`,
+      `marketCode`, `refreshFrequency`, `aiUsePermissions`, `fallbackPolicy`, `status`, `ownerPrincipalId`,
+      `purpose`, `deployedAt` and 5 more. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: SignalRegistryEntry
+    confirm:
+      label: Save signal registry policy
+      operation: setSignalRegistryPolicy
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - registryKind
+      - name
+      - trustLevel
+      - category
+      - provider
+      - source
+      - internalExternal
+      - marketCode
+      - refreshFrequency
+      - aiUsePermissions
+      - fallbackPolicy
+      - status
+      - ownerPrincipalId
+      - purpose
+      - deployedAt
+      - trainingWindow
+    provenance: contract catalogue.yaml PUT /signal-registry
 - id: ADM-118
   name: Product Lifecycle Command Center
   module: Catalogue
@@ -21213,6 +22213,15 @@ screens:
         label: Relationships
         provenance: pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 11 §Duplication
           Options
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save configuration template
+        operation: setConfigurationTemplate
+        permission: PRODUCT_CONFIGURE
+        notes: '**One template library for products and price lists** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /configuration-templates
   states:
     loading: The product duplication template configuration as saved.
     error: Could not load. Names which read failed and leaves the product duplication template untouched.
@@ -21225,6 +22234,12 @@ screens:
     contract: catalogue
     purpose: Product Duplication & Template Library
     trigger: onLoad
+  - operationId: setConfigurationTemplate
+    contract: catalogue
+    purpose: Create or update a product or price-list template
+    trigger: onAction
+    invalidates:
+    - listProductDuplicationTemplate
   wireframe:
     status: notStarted
     provenance: generated
@@ -21234,6 +22249,37 @@ screens:
     11. 0 of 0 labels bound to a contract property; 13 of 39 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formSetConfigurationTemplate
+    component: modal
+    trigger: Save configuration template
+    body: '**Collects what `setConfigurationTemplate` sends before it is called.** Required: `id`, `scopePath`,
+      `subject`, `name`, `status`. Optional: `description`, `templateKind`, `productKind`, `venueId`,
+      `sourceProductId`, `sourcePriceListId`, `includedComponents`, `reviewFields`, `isAiDrafted`, `ownerPrincipalId`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: ConfigurationTemplate
+    confirm:
+      label: Save configuration template
+      operation: setConfigurationTemplate
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - subject
+      - name
+      - status
+      - description
+      - templateKind
+      - productKind
+      - venueId
+      - sourceProductId
+      - sourcePriceListId
+      - includedComponents
+      - reviewFields
+      - isAiDrafted
+      - ownerPrincipalId
+    provenance: contract catalogue.yaml PUT /configuration-templates
 - id: ADM-127
   name: AI Catalogue Builder & Configuration Review
   module: Catalogue
@@ -21376,14 +22422,6 @@ screens:
       trigger: Works in Rollback & Recovery Management
       provenance: flow F153 step 7→8
       operation: listProductGovernance
-    - to: ADM-133
-      trigger: Works in Change Impact Analysis
-      provenance: flow F153 step 9→10
-      operation: listProductGovernance
-    - to: ADM-134
-      trigger: Works in Change Propagation & Dependency Control
-      provenance: flow F153 step 11→12
-      operation: listProductGovernance
     - to: ADM-135
       trigger: Works in Product Retirement, Suspension & Archive
       provenance: flow F153 step 13→14
@@ -21392,10 +22430,24 @@ screens:
       trigger: Works in Product Audit Trail & Change History
       provenance: flow F153 step 15→16
       operation: listProductGovernance
+    - to: ADM-133
+      trigger: Works in Change Impact Analysis
+      provenance: flow F153 step 9→10
+      operation: listProductGovernance
+      carries:
+      - productId
+    - to: ADM-134
+      trigger: Works in Change Propagation & Dependency Control
+      provenance: flow F153 step 11→12
+      operation: listProductGovernance
+      carries:
+      - productId
     - to: ADM-137
       trigger: Works in Governance Risk, AI Monitoring & Control Center
       provenance: flow F153 step 17→18
       operation: listProductGovernance
+      carries:
+      - findingId
   density: compact
   purposeNote: Authorized users can identify every product requiring governance attention and prioritize
     actions from a single dashboard.
@@ -21530,6 +22582,16 @@ screens:
         notes: null
         provenance: pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 15 §The dashboard
           shall display
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Decide catalogue AI finding
+        operation: decideCatalogueAiFinding
+        permission: AI_APPROVE
+        notes: '**The human control on a governance risk or a channel recommendation** (29 September,
+          writers pass).'
+        provenance: contract catalogue.yaml POST /ai-findings/{findingId}/decision
   states:
     loading: The product governance list.
     error: Could not load. Names which read failed and leaves the product governance untouched.
@@ -21544,6 +22606,12 @@ screens:
     contract: catalogue
     purpose: Product Governance Command Center
     trigger: onLoad
+  - operationId: decideCatalogueAiFinding
+    contract: catalogue
+    purpose: Acknowledge, accept, dismiss or resolve an AI finding
+    trigger: onAction
+    invalidates:
+    - listProductGovernance
   entryState:
     preloaded:
     - ProductGovernanceCommandCenterSummary.productsAwaitingApproval
@@ -21552,6 +22620,10 @@ screens:
     - ProductGovernanceCommandCenterSummary.productsWithGovernanceWarnings
     - ProductGovernanceCommandCenterSummary.scheduledChanges
     - ProductGovernanceCommandCenterSummary.productsWithUnpublishedChanges
+    params:
+    - name: findingId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -21561,6 +22633,24 @@ screens:
     15. 26 of 34 labels bound to a contract property; 34 of 41 pack bullets carried onto the screen —
     the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the
     contracts rather than here.
+  overlays:
+  - id: formDecideCatalogueAiFinding
+    component: modal
+    trigger: Decide catalogue AI finding
+    body: '**Collects what `decideCatalogueAiFinding` sends before it is called.** Required: `decision`.
+      Optional: `comment`, `ownerPrincipalId`, `dueDate`. Dismissing sends nothing; the screen behind
+      is unchanged.'
+    confirm:
+      label: Decide catalogue AI finding
+      operation: decideCatalogueAiFinding
+    dismiss:
+      label: Cancel
+      discards:
+      - decision
+      - comment
+      - ownerPrincipalId
+      - dueDate
+    provenance: contract catalogue.yaml POST /ai-findings/{findingId}/decision
 - id: ADM-129
   name: Approval Workflow Designer
   module: Catalogue
@@ -22044,6 +23134,15 @@ screens:
         impliedBy: listChangeImpactAnalysis
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save product links
+        operation: setProductLinks
+        permission: PRODUCT_CONFIGURE
+        notes: '**Set whole, per source product** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /products/{productId}/links
   states:
     loading: The change impact analysis list.
     error: Could not load. Names which read failed and leaves the change impact analysis untouched.
@@ -22058,9 +23157,19 @@ screens:
     contract: catalogue
     purpose: Change Impact Analysis
     trigger: onLoad
+  - operationId: setProductLinks
+    contract: catalogue
+    purpose: Replace what depends on a product
+    trigger: onAction
+    invalidates:
+    - listChangeImpactAnalysis
   entryState:
     preloaded:
     - ChangeImpactAnalysisView.area
+    params:
+    - name: productId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -22129,6 +23238,15 @@ screens:
         impliedBy: listChangePropagationDependency
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save product links
+        operation: setProductLinks
+        permission: PRODUCT_CONFIGURE
+        notes: '**Set whole, per source product** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /products/{productId}/links
   states:
     loading: The change propagation dependency list.
     error: Could not load. Names which read failed and leaves the change propagation dependency untouched.
@@ -22143,9 +23261,19 @@ screens:
     contract: catalogue
     purpose: Change Propagation & Dependency Control
     trigger: onLoad
+  - operationId: setProductLinks
+    contract: catalogue
+    purpose: Replace what depends on a product
+    trigger: onAction
+    invalidates:
+    - listChangePropagationDependency
   entryState:
     preloaded:
     - ChangePropagationDependencyControlView.dependencyType
+    params:
+    - name: productId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -22466,6 +23594,13 @@ screens:
     inferred: false
     notes: '**Reached from ADM-128, the hub of its workshop board.** Stated on 4 September: the pack groups
       its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    transitions:
+    - to: ADM-128
+      trigger: Product Governance Command Center
+      carries:
+      - findingId
+      provenance: derived — ADM-128 declares entryState.params findingId and ADM-137 holds findingId,
+        so an edge into it carries them
   density: compact
   purposeNote: Administrators receive proactive governance intelligence with clear explanations and recommended
     actions while material product decisions remain controlled by the configured authorization framework.
@@ -22515,6 +23650,16 @@ screens:
           “Governance warning”, “Backend Screen Primary Responsibility”, “Restore previous”, “Pre-change
           impact”.'
         provenance: pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 26 §Display
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Decide catalogue AI finding
+        operation: decideCatalogueAiFinding
+        permission: AI_APPROVE
+        notes: '**The human control on a governance risk or a channel recommendation** (29 September,
+          writers pass).'
+        provenance: contract catalogue.yaml POST /ai-findings/{findingId}/decision
   states:
     loading: The governance risk monitoring list.
     error: Could not load. Names which read failed and leaves the governance risk monitoring untouched.
@@ -22529,6 +23674,12 @@ screens:
     contract: catalogue
     purpose: Governance Risk, AI Monitoring & Control Center
     trigger: onLoad
+  - operationId: decideCatalogueAiFinding
+    contract: catalogue
+    purpose: Acknowledge, accept, dismiss or resolve an AI finding
+    trigger: onAction
+    invalidates:
+    - listGovernanceRiskMonitoring
   entryState:
     preloaded:
     - Critical / High / Medium / Low
@@ -22537,6 +23688,10 @@ screens:
     - GovernanceRiskAiMonitoringControlCenterView.venue
     - GovernanceRiskAiMonitoringControlCenterView.businessImpact
     - GovernanceRiskAiMonitoringControlCenterView.recommendedAction
+    params:
+    - name: findingId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -22546,6 +23701,24 @@ screens:
     26. 8 of 9 labels bound to a contract property; 9 of 55 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formDecideCatalogueAiFinding
+    component: modal
+    trigger: Decide catalogue AI finding
+    body: '**Collects what `decideCatalogueAiFinding` sends before it is called.** Required: `decision`.
+      Optional: `comment`, `ownerPrincipalId`, `dueDate`. Dismissing sends nothing; the screen behind
+      is unchanged.'
+    confirm:
+      label: Decide catalogue AI finding
+      operation: decideCatalogueAiFinding
+    dismiss:
+      label: Cancel
+      discards:
+      - decision
+      - comment
+      - ownerPrincipalId
+      - dueDate
+    provenance: contract catalogue.yaml POST /ai-findings/{findingId}/decision
 - id: ADM-138
   name: Promotion Command Center Dashboard
   module: Commercial
@@ -22619,6 +23792,8 @@ screens:
     - to: ADM-139
       trigger: Works in Promotion & Campaign Directory
       provenance: flow F154 step 1→2
+      carries:
+      - campaignId
   notes: '**Given its section''s own operations on 4 September.** It sat on `getVenueSettings` alone,
     which made it identical to every other section landing page — a hub that shows nothing of its section
     is a menu item, not a screen.'
@@ -22817,6 +23992,42 @@ screens:
         notes: The pack filters this screen by promotion type, campaign, product, product category, venue,
           attraction and 13 more — which are present is a decision the pack already made.
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 8 §Allow filtering by
+      - kind: textField
+        label: Venue id
+        operation: listCommercialCampaigns
+        notes: Sends `?venueId=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: datePicker
+        label: Active at
+        operation: listCommercialCampaigns
+        notes: Sends `?activeAt=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: textField
+        label: Owner principal id
+        operation: listCommercialCampaigns
+        notes: Sends `?ownerPrincipalId=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: searchField
+        label: Q
+        operation: listCommercialCampaigns
+        notes: Sends `?q=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: dataTable
+        label: Every commercial campaign
+        bindsTo: CommercialCampaign
+        columns:
+        - CommercialCampaign.id
+        - CommercialCampaign.venueId
+        - CommercialCampaign.code
+        - CommercialCampaign.name
+        - CommercialCampaign.description
+        - CommercialCampaign.ownerPrincipalId
+        - CommercialCampaign.legalEntityId
+        - CommercialCampaign.validFrom
+        - CommercialCampaign.validTo
+        - CommercialCampaign.budgets
+        operation: listCommercialCampaigns
+        provenance: contract promotions.yaml GET /commercial-campaigns
     - name: contentBody
       slot: collection
       components:
@@ -22886,6 +24097,20 @@ screens:
           Activate, Pause, Extend, Duplicate, Archive, Export, Assign owner, Submit for approval. Each
           needs attaching to the control it gates, or the screen needs the control.'
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 8 §Authorized users may
+      - kind: primaryButton
+        label: Create commercial campaign
+        operation: createCommercialCampaign
+        permission: PRICE_CONFIGURE
+        notes: Creates the campaign header (`promotions.campaign`) without budget lines, so a promotion,
+          coupon campaign or bundle can name it by `campaignId` before its budget is set.
+        provenance: contract promotions.yaml POST /commercial-campaigns
+      - kind: secondaryButton
+        label: Save commercial campaign
+        operation: updateCommercialCampaign
+        permission: PRICE_CONFIGURE
+        notes: 'Amends the campaign header (`promotions.campaign`): name, code, description, owner, business
+          entity and dates.'
+        provenance: contract promotions.yaml PATCH /commercial-campaigns/{campaignId}
   states:
     loading: The promotion campaign list.
     error: Could not load. Names which read failed and leaves the promotion campaign untouched.
@@ -22904,6 +24129,26 @@ screens:
     contract: promotions
     purpose: Campaign & Promotion Performance Explorer
     trigger: onLoad
+  - operationId: listCommercialCampaigns
+    contract: promotions
+    purpose: List commercial campaigns
+    trigger: onLoad
+  - operationId: createCommercialCampaign
+    contract: promotions
+    purpose: Create a commercial campaign
+    trigger: onAction
+    invalidates:
+    - listPromotionCampaign
+    - listCampaignPromotionPerformance
+    - listCommercialCampaigns
+  - operationId: updateCommercialCampaign
+    contract: promotions
+    purpose: Amend a commercial campaign
+    trigger: onAction
+    invalidates:
+    - listPromotionCampaign
+    - listCampaignPromotionPerformance
+    - listCommercialCampaigns
   entryState:
     preloaded:
     - PromotionCampaignDirectoryView.promotionId
@@ -22912,6 +24157,9 @@ screens:
     - PromotionCampaignDirectoryView.campaign
     - PromotionCampaignDirectoryView.status
     - PromotionCampaignDirectoryView.businessEntity
+    params:
+    - name: campaignId
+      from: navigation
   wireframe:
     status: notStarted
     provenance: generated
@@ -22921,6 +24169,49 @@ screens:
     of 40 labels bound to a contract property; 48 of 63 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formCreateCommercialCampaign
+    component: modal
+    trigger: Create commercial campaign
+    body: '**Collects what `createCommercialCampaign` sends before it is called.** Required: `venueId`,
+      `name`. Optional: `code`, `description`, `ownerPrincipalId`, `legalEntityId`, `validFrom`, `validTo`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: CreateCommercialCampaignRequest
+    confirm:
+      label: Create commercial campaign
+      operation: createCommercialCampaign
+    dismiss:
+      label: Cancel
+      discards:
+      - venueId
+      - name
+      - code
+      - description
+      - ownerPrincipalId
+      - legalEntityId
+      - validFrom
+      - validTo
+    provenance: contract promotions.yaml POST /commercial-campaigns
+  - id: formUpdateCommercialCampaign
+    component: modal
+    trigger: Save commercial campaign
+    body: '**Collects what `updateCommercialCampaign` sends before it is called.** Nothing in the body
+      is required. Optional: `code`, `name`, `description`, `ownerPrincipalId`, `legalEntityId`, `validFrom`,
+      `validTo`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save commercial campaign
+      operation: updateCommercialCampaign
+    dismiss:
+      label: Cancel
+      discards:
+      - code
+      - name
+      - description
+      - ownerPrincipalId
+      - legalEntityId
+      - validFrom
+      - validTo
+    provenance: contract promotions.yaml PATCH /commercial-campaigns/{campaignId}
 - id: ADM-140
   name: Promotion Overview
   module: Commercial
@@ -23224,6 +24515,42 @@ screens:
         bindsTo: CampaignCalendarTimelineView
         operation: listCampaignCalendarTimeline
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 12 §Identify
+      - kind: textField
+        label: Venue id
+        operation: listCommercialCampaigns
+        notes: Sends `?venueId=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: datePicker
+        label: Active at
+        operation: listCommercialCampaigns
+        notes: Sends `?activeAt=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: textField
+        label: Owner principal id
+        operation: listCommercialCampaigns
+        notes: Sends `?ownerPrincipalId=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: searchField
+        label: Q
+        operation: listCommercialCampaigns
+        notes: Sends `?q=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: dataTable
+        label: Every commercial campaign
+        bindsTo: CommercialCampaign
+        columns:
+        - CommercialCampaign.id
+        - CommercialCampaign.venueId
+        - CommercialCampaign.code
+        - CommercialCampaign.name
+        - CommercialCampaign.description
+        - CommercialCampaign.ownerPrincipalId
+        - CommercialCampaign.legalEntityId
+        - CommercialCampaign.validFrom
+        - CommercialCampaign.validTo
+        - CommercialCampaign.budgets
+        operation: listCommercialCampaigns
+        provenance: contract promotions.yaml GET /commercial-campaigns
     - name: contextPanel
       slot: selection
       components:
@@ -23248,6 +24575,10 @@ screens:
   - operationId: listCampaignCalendarTimeline
     contract: promotions
     purpose: Campaign Calendar & Timeline
+    trigger: onLoad
+  - operationId: listCommercialCampaigns
+    contract: promotions
+    purpose: List commercial campaigns
     trigger: onLoad
   entryState:
     preloaded:
@@ -27296,6 +28627,42 @@ screens:
       - kind: selectField
         label: Sales status
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 65 §Configure
+      - kind: textField
+        label: Venue id
+        operation: listCommercialCampaigns
+        notes: Sends `?venueId=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: datePicker
+        label: Active at
+        operation: listCommercialCampaigns
+        notes: Sends `?activeAt=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: textField
+        label: Owner principal id
+        operation: listCommercialCampaigns
+        notes: Sends `?ownerPrincipalId=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: searchField
+        label: Q
+        operation: listCommercialCampaigns
+        notes: Sends `?q=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: dataTable
+        label: Every commercial campaign
+        bindsTo: CommercialCampaign
+        columns:
+        - CommercialCampaign.id
+        - CommercialCampaign.venueId
+        - CommercialCampaign.code
+        - CommercialCampaign.name
+        - CommercialCampaign.description
+        - CommercialCampaign.ownerPrincipalId
+        - CommercialCampaign.legalEntityId
+        - CommercialCampaign.validFrom
+        - CommercialCampaign.validTo
+        - CommercialCampaign.budgets
+        operation: listCommercialCampaigns
+        provenance: contract promotions.yaml GET /commercial-campaigns
     - name: actionBar
       slot: publish
       components:
@@ -27314,6 +28681,10 @@ screens:
     contract: promotions
     purpose: Bundle Definition & Setup
     trigger: onAction
+  - operationId: listCommercialCampaigns
+    contract: promotions
+    purpose: List commercial campaigns
+    trigger: onLoad
   wireframe:
     status: notStarted
     provenance: generated
@@ -27779,13 +29150,6 @@ screens:
   purpose: Allow TICVAI bundles to include products or services owned by external operators. The matrix
     requires combinations with external products/services and bundles across different destinations, including
     systems that may use different databases.
-  gaps:
-  - operation: null
-    why: '**Partner & External Product Bundle Manager declares no operation that writes anything** — its
-      only declared call is `listPartnerExternalProduct`, a read. The name promises authoring and the
-      contract offers none, so either the write operations are missing or this screen is a view of something
-      another screen builds.'
-    source: contract — the screen's declared operations
   layout:
     template: split
     regions:
@@ -27799,6 +29163,24 @@ screens:
         bindsTo: PartnerExternalProductBundleManagerView
         operation: listPartnerExternalProduct
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 71 §Show
+      - kind: dataTable
+        label: Every partner bundle product
+        bindsTo: PartnerBundleProduct
+        columns:
+        - PartnerBundleProduct.id
+        - PartnerBundleProduct.bundleComponentId
+        - PartnerBundleProduct.partnerId
+        - PartnerBundleProduct.externalProductId
+        - PartnerBundleProduct.productName
+        - PartnerBundleProduct.apiSource
+        - PartnerBundleProduct.availabilitySource
+        - PartnerBundleProduct.externalPrice
+        - PartnerBundleProduct.sellingPrice
+        - PartnerBundleProduct.commission
+        - PartnerBundleProduct.settlementRule
+        - PartnerBundleProduct.cancellationRule
+        operation: listBundlePartnerProductMappings
+        provenance: contract promotions.yaml GET /bundles/{bundleId}/partner-products
     - name: contextPanel
       slot: selection
       components:
@@ -27809,6 +29191,16 @@ screens:
         - PartnerExternalProductBundleManagerView.connectionStatus
         notes: 'The pack groups this record''s detail under its own headings: “Dubai Weekend Package”.'
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 71 §Show
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save bundle partner product mappings
+        operation: setBundlePartnerProductMappings
+        permission: PRODUCT_CONFIGURE
+        notes: 'Replaces the bundle''s `promotions.partner_bundle_product` rows with the set sent: a row
+          sent with an `id` is updated, one without is created, and a stored row not sent is removed.'
+        provenance: contract promotions.yaml PUT /bundles/{bundleId}/partner-products
   states:
     loading: The partner external product list.
     error: Could not load. Names which read failed and leaves the partner external product untouched.
@@ -27823,9 +29215,23 @@ screens:
     contract: promotions
     purpose: Partner & External Product Bundle Manager
     trigger: onLoad
+  - operationId: listBundlePartnerProductMappings
+    contract: promotions
+    purpose: List a bundle's partner product mappings
+    trigger: onLoad
+  - operationId: setBundlePartnerProductMappings
+    contract: promotions
+    purpose: Set a bundle's partner product mappings
+    trigger: onAction
+    invalidates:
+    - listPartnerExternalProduct
+    - listBundlePartnerProductMappings
   entryState:
     preloaded:
     - PartnerExternalProductBundleManagerView.connectionStatus
+    params:
+    - name: bundleId
+      from: navigation
   wireframe:
     status: notStarted
     provenance: generated
@@ -27835,6 +29241,20 @@ screens:
     of 6 labels bound to a contract property; 17 of 33 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formSetBundlePartnerProductMappings
+    component: modal
+    trigger: Save bundle partner product mappings
+    body: '**Collects what `setBundlePartnerProductMappings` sends before it is called.** Required: `mappings`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save bundle partner product mappings
+      operation: setBundlePartnerProductMappings
+    dismiss:
+      label: Cancel
+      discards:
+      - mappings
+    provenance: contract promotions.yaml PUT /bundles/{bundleId}/partner-products
 - id: ADM-186
   name: Revenue Allocation, Cost & Settlement Rules
   module: Commercial
@@ -28408,13 +29828,6 @@ screens:
   purpose: Manage how bundle sales consume capacity from underlying products. This is particularly important
     because a bundle must not create artificial inventory separate from the actual attraction/product
     capacity.
-  gaps:
-  - operation: null
-    why: '**Capacity Pool & Reservation Manager declares no operation that writes anything** — its only
-      declared call is `listCapacityPoolReservation`, a read. The name promises authoring and the contract
-      offers none, so either the write operations are missing or this screen is a view of something another
-      screen builds.'
-    source: contract — the screen's declared operations
   layout:
     template: form
     regions:
@@ -28442,6 +29855,34 @@ screens:
       - kind: selectField
         label: Waitlist behavior
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 81 §Configure
+      - kind: dataTable
+        label: Every bundle capacity policy
+        bindsTo: BundleCapacityPolicy
+        columns:
+        - BundleCapacityPolicy.id
+        - BundleCapacityPolicy.bundleId
+        - BundleCapacityPolicy.channel
+        - BundleCapacityPolicy.venueId
+        - BundleCapacityPolicy.partnerId
+        - BundleCapacityPolicy.capacitySource
+        - BundleCapacityPolicy.allocationMode
+        - BundleCapacityPolicy.capacityCeiling
+        - BundleCapacityPolicy.holdDurationMinutes
+        - BundleCapacityPolicy.bookingCutoffMinutes
+        - BundleCapacityPolicy.allowOverbooking
+        - BundleCapacityPolicy.allowWaitlist
+        operation: listBundleCapacityPolicies
+        provenance: contract promotions.yaml GET /bundles/{bundleId}/capacity-policies
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save bundle capacity policy
+        operation: setBundleCapacityPolicy
+        permission: PRODUCT_CONFIGURE
+        notes: 'Replaces the bundle''s `promotions.bundle_capacity_policy` rows with the set sent: a row
+          sent with an `id` is updated, one without is created, and a stored row not sent is removed.'
+        provenance: contract promotions.yaml PUT /bundles/{bundleId}/capacity-policies
   states:
     loading: The capacity pool reservation configuration as saved.
     error: Could not load. Names which read failed and leaves the capacity pool reservation untouched.
@@ -28454,6 +29895,17 @@ screens:
     contract: promotions
     purpose: Capacity Pool & Reservation Manager
     trigger: onLoad
+  - operationId: listBundleCapacityPolicies
+    contract: promotions
+    purpose: List a bundle's capacity policies
+    trigger: onLoad
+  - operationId: setBundleCapacityPolicy
+    contract: promotions
+    purpose: Set a bundle's capacity policies
+    trigger: onAction
+    invalidates:
+    - listCapacityPoolReservation
+    - listBundleCapacityPolicies
   wireframe:
     status: notStarted
     provenance: generated
@@ -28463,6 +29915,24 @@ screens:
     of 0 labels bound to a contract property; 7 of 26 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: bundleId
+      from: navigation
+  overlays:
+  - id: formSetBundleCapacityPolicy
+    component: modal
+    trigger: Save bundle capacity policy
+    body: '**Collects what `setBundleCapacityPolicy` sends before it is called.** Required: `policies`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save bundle capacity policy
+      operation: setBundleCapacityPolicy
+    dismiss:
+      label: Cancel
+      discards:
+      - policies
+    provenance: contract promotions.yaml PUT /bundles/{bundleId}/capacity-policies
 - id: ADM-192
   name: Dynamic Component Substitution Engine
   module: Commercial
@@ -28763,6 +30233,34 @@ screens:
       - kind: selectField
         label: Sales location
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 85 §Configure
+      - kind: dataTable
+        label: Every bundle capacity policy
+        bindsTo: BundleCapacityPolicy
+        columns:
+        - BundleCapacityPolicy.id
+        - BundleCapacityPolicy.bundleId
+        - BundleCapacityPolicy.channel
+        - BundleCapacityPolicy.venueId
+        - BundleCapacityPolicy.partnerId
+        - BundleCapacityPolicy.capacitySource
+        - BundleCapacityPolicy.allocationMode
+        - BundleCapacityPolicy.capacityCeiling
+        - BundleCapacityPolicy.holdDurationMinutes
+        - BundleCapacityPolicy.bookingCutoffMinutes
+        - BundleCapacityPolicy.allowOverbooking
+        - BundleCapacityPolicy.allowWaitlist
+        operation: listBundleCapacityPolicies
+        provenance: contract promotions.yaml GET /bundles/{bundleId}/capacity-policies
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save bundle capacity policy
+        operation: setBundleCapacityPolicy
+        permission: PRODUCT_CONFIGURE
+        notes: 'Replaces the bundle''s `promotions.bundle_capacity_policy` rows with the set sent: a row
+          sent with an `id` is updated, one without is created, and a stored row not sent is removed.'
+        provenance: contract promotions.yaml PUT /bundles/{bundleId}/capacity-policies
   states:
     loading: The bundle availability channel configuration as saved.
     error: Could not load. Names which read failed and leaves the bundle availability channel untouched.
@@ -28775,6 +30273,17 @@ screens:
     contract: promotions
     purpose: Bundle Availability by Channel, Venue & Partner
     trigger: onLoad
+  - operationId: listBundleCapacityPolicies
+    contract: promotions
+    purpose: List a bundle's capacity policies
+    trigger: onLoad
+  - operationId: setBundleCapacityPolicy
+    contract: promotions
+    purpose: Set a bundle's capacity policies
+    trigger: onAction
+    invalidates:
+    - listBundleAvailabilityChannel
+    - listBundleCapacityPolicies
   wireframe:
     status: notStarted
     provenance: generated
@@ -28784,6 +30293,24 @@ screens:
     of 0 labels bound to a contract property; 5 of 23 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: bundleId
+      from: navigation
+  overlays:
+  - id: formSetBundleCapacityPolicy
+    component: modal
+    trigger: Save bundle capacity policy
+    body: '**Collects what `setBundleCapacityPolicy` sends before it is called.** Required: `policies`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save bundle capacity policy
+      operation: setBundleCapacityPolicy
+    dismiss:
+      label: Cancel
+      discards:
+      - policies
+    provenance: contract promotions.yaml PUT /bundles/{bundleId}/capacity-policies
 - id: ADM-196
   name: Bundle Availability Forecast, Alerts & Recovery
   module: Commercial
@@ -31256,6 +32783,42 @@ screens:
       - kind: selectField
         label: Funding source
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 126 §Configuration
+      - kind: textField
+        label: Venue id
+        operation: listCommercialCampaigns
+        notes: Sends `?venueId=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: datePicker
+        label: Active at
+        operation: listCommercialCampaigns
+        notes: Sends `?activeAt=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: textField
+        label: Owner principal id
+        operation: listCommercialCampaigns
+        notes: Sends `?ownerPrincipalId=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: searchField
+        label: Q
+        operation: listCommercialCampaigns
+        notes: Sends `?q=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: dataTable
+        label: Every commercial campaign
+        bindsTo: CommercialCampaign
+        columns:
+        - CommercialCampaign.id
+        - CommercialCampaign.venueId
+        - CommercialCampaign.code
+        - CommercialCampaign.name
+        - CommercialCampaign.description
+        - CommercialCampaign.ownerPrincipalId
+        - CommercialCampaign.legalEntityId
+        - CommercialCampaign.validFrom
+        - CommercialCampaign.validTo
+        - CommercialCampaign.budgets
+        operation: listCommercialCampaigns
+        provenance: contract promotions.yaml GET /commercial-campaigns
     - name: actionBar
       slot: publish
       components:
@@ -31265,6 +32828,20 @@ screens:
       - kind: secondaryButton
         label: Venue budget
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 126 §Support
+      - kind: secondaryButton
+        label: Create commercial campaign
+        operation: createCommercialCampaign
+        permission: PRICE_CONFIGURE
+        notes: Creates the campaign header (`promotions.campaign`) without budget lines, so a promotion,
+          coupon campaign or bundle can name it by `campaignId` before its budget is set.
+        provenance: contract promotions.yaml POST /commercial-campaigns
+      - kind: secondaryButton
+        label: Save commercial campaign
+        operation: updateCommercialCampaign
+        permission: PRICE_CONFIGURE
+        notes: 'Amends the campaign header (`promotions.campaign`): name, code, description, owner, business
+          entity and dates.'
+        provenance: contract promotions.yaml PATCH /commercial-campaigns/{campaignId}
   states:
     loading: The campaign budget financial configuration as saved.
     error: Could not load. Names which read failed and leaves the campaign budget financial untouched.
@@ -31277,6 +32854,22 @@ screens:
     contract: promotions
     purpose: Campaign Budget & Financial Limit Setup
     trigger: onAction
+  - operationId: listCommercialCampaigns
+    contract: promotions
+    purpose: List commercial campaigns
+    trigger: onLoad
+  - operationId: createCommercialCampaign
+    contract: promotions
+    purpose: Create a commercial campaign
+    trigger: onAction
+    invalidates:
+    - listCommercialCampaigns
+  - operationId: updateCommercialCampaign
+    contract: promotions
+    purpose: Amend a commercial campaign
+    trigger: onAction
+    invalidates:
+    - listCommercialCampaigns
   wireframe:
     status: notStarted
     provenance: generated
@@ -31286,6 +32879,53 @@ screens:
     0 of 0 labels bound to a contract property; 12 of 31 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formCreateCommercialCampaign
+    component: modal
+    trigger: Create commercial campaign
+    body: '**Collects what `createCommercialCampaign` sends before it is called.** Required: `venueId`,
+      `name`. Optional: `code`, `description`, `ownerPrincipalId`, `legalEntityId`, `validFrom`, `validTo`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: CreateCommercialCampaignRequest
+    confirm:
+      label: Create commercial campaign
+      operation: createCommercialCampaign
+    dismiss:
+      label: Cancel
+      discards:
+      - venueId
+      - name
+      - code
+      - description
+      - ownerPrincipalId
+      - legalEntityId
+      - validFrom
+      - validTo
+    provenance: contract promotions.yaml POST /commercial-campaigns
+  - id: formUpdateCommercialCampaign
+    component: modal
+    trigger: Save commercial campaign
+    body: '**Collects what `updateCommercialCampaign` sends before it is called.** Nothing in the body
+      is required. Optional: `code`, `name`, `description`, `ownerPrincipalId`, `legalEntityId`, `validFrom`,
+      `validTo`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save commercial campaign
+      operation: updateCommercialCampaign
+    dismiss:
+      label: Cancel
+      discards:
+      - code
+      - name
+      - description
+      - ownerPrincipalId
+      - legalEntityId
+      - validFrom
+      - validTo
+    provenance: contract promotions.yaml PATCH /commercial-campaigns/{campaignId}
+  entryState:
+    params:
+    - name: campaignId
+      from: navigation
 - id: ADM-220
   name: Redemption, Discount & Exposure Limit Manager
   module: Commercial
@@ -32363,6 +34003,42 @@ screens:
         impliedBy: listCampaignPromotionPerformance
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+      - kind: textField
+        label: Venue id
+        operation: listCommercialCampaigns
+        notes: Sends `?venueId=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: datePicker
+        label: Active at
+        operation: listCommercialCampaigns
+        notes: Sends `?activeAt=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: textField
+        label: Owner principal id
+        operation: listCommercialCampaigns
+        notes: Sends `?ownerPrincipalId=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: searchField
+        label: Q
+        operation: listCommercialCampaigns
+        notes: Sends `?q=` to `listCommercialCampaigns`.
+        provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: dataTable
+        label: Every commercial campaign
+        bindsTo: CommercialCampaign
+        columns:
+        - CommercialCampaign.id
+        - CommercialCampaign.venueId
+        - CommercialCampaign.code
+        - CommercialCampaign.name
+        - CommercialCampaign.description
+        - CommercialCampaign.ownerPrincipalId
+        - CommercialCampaign.legalEntityId
+        - CommercialCampaign.validFrom
+        - CommercialCampaign.validTo
+        - CommercialCampaign.budgets
+        operation: listCommercialCampaigns
+        provenance: contract promotions.yaml GET /commercial-campaigns
   states:
     loading: The campaign promotion performance list.
     error: Could not load. Names which read failed and leaves the campaign promotion performance untouched.
@@ -32384,6 +34060,10 @@ screens:
   - operationId: listPromotionCampaign
     contract: promotions
     purpose: Promotion & Campaign Directory
+    trigger: onLoad
+  - operationId: listCommercialCampaigns
+    contract: promotions
+    purpose: List commercial campaigns
     trigger: onLoad
   entryState:
     preloaded: []
@@ -34984,6 +36664,12 @@ screens:
           Open Source Record. Each needs attaching to the control it gates, or the screen needs the control.'
         provenance: pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 27 §Subject
           to permissions
+      - kind: primaryButton
+        label: Act on workflow instance
+        operation: actOnWorkflowInstance
+        permission: APPROVAL_ACT
+        notes: '**The monitors'' action buttons, as one operation** (decided 29 September, writers pass).'
+        provenance: contract approvals.yaml POST /workflow-instances/{instanceId}/actions
   states:
     loading: The workflow instance process list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the workflow instance process untouched.
@@ -34998,6 +36684,12 @@ screens:
     contract: approvals
     purpose: Workflow Instance Monitor & Process Timeline
     trigger: onLoad
+  - operationId: actOnWorkflowInstance
+    contract: approvals
+    purpose: An operator's intervention in a running workflow
+    trigger: onAction
+    invalidates:
+    - listWorkflowInstanceProcess
   wireframe:
     status: notStarted
     provenance: generated
@@ -35007,6 +36699,36 @@ screens:
     page 27. 20 of 20 labels bound to a contract property; 27 of 52 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  overlays:
+  - id: formActOnWorkflowInstance
+    component: modal
+    trigger: Act on workflow instance
+    body: '**Collects what `actOnWorkflowInstance` sends before it is called.** Required: `action`, `reason`.
+      Optional: `workflowStepExecutionId`, `workflowExceptionId`, `assigneePrincipalId`, `alternativeNodeId`,
+      `correctedInput`, `extendByMinutes`, `priority`. Dismissing sends nothing; the screen behind is
+      unchanged.'
+    bindsTo: WorkflowInstanceActionInput
+    confirm:
+      label: Act on workflow instance
+      operation: actOnWorkflowInstance
+    dismiss:
+      label: Cancel
+      discards:
+      - action
+      - reason
+      - workflowStepExecutionId
+      - workflowExceptionId
+      - assigneePrincipalId
+      - alternativeNodeId
+      - correctedInput
+      - extendByMinutes
+      - priority
+    provenance: contract approvals.yaml POST /workflow-instances/{instanceId}/actions
+  entryState:
+    params:
+    - name: instanceId
+      from: navigation
+      optional: true
 - id: ADM-251
   name: Workflow Exception, Failure & Recovery Center
   module: Platform
@@ -35120,6 +36842,12 @@ screens:
       - kind: secondaryButton
         label: Configuration Error
         provenance: pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Support
+      - kind: secondaryButton
+        label: Act on workflow instance
+        operation: actOnWorkflowInstance
+        permission: APPROVAL_ACT
+        notes: '**The monitors'' action buttons, as one operation** (decided 29 September, writers pass).'
+        provenance: contract approvals.yaml POST /workflow-instances/{instanceId}/actions
   states:
     loading: The workflow exception failure list.
     error: Could not load. Names which read failed and leaves the workflow exception failure untouched.
@@ -35134,6 +36862,12 @@ screens:
     contract: approvals
     purpose: Workflow Exception, Failure & Recovery Center
     trigger: onLoad
+  - operationId: actOnWorkflowInstance
+    contract: approvals
+    purpose: An operator's intervention in a running workflow
+    trigger: onAction
+    invalidates:
+    - listWorkflowExceptionFailure
   entryState:
     preloaded:
     - WorkflowExceptionFailureRecoveryCenterView.exceptionId
@@ -35142,6 +36876,10 @@ screens:
     - WorkflowExceptionFailureRecoveryCenterView.module
     - WorkflowExceptionFailureRecoveryCenterView.failedStep
     - WorkflowExceptionFailureRecoveryCenterView.errorType
+    params:
+    - name: instanceId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -35151,6 +36889,31 @@ screens:
     page 28. 10 of 11 labels bound to a contract property; 26 of 46 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  overlays:
+  - id: formActOnWorkflowInstance
+    component: modal
+    trigger: Act on workflow instance
+    body: '**Collects what `actOnWorkflowInstance` sends before it is called.** Required: `action`, `reason`.
+      Optional: `workflowStepExecutionId`, `workflowExceptionId`, `assigneePrincipalId`, `alternativeNodeId`,
+      `correctedInput`, `extendByMinutes`, `priority`. Dismissing sends nothing; the screen behind is
+      unchanged.'
+    bindsTo: WorkflowInstanceActionInput
+    confirm:
+      label: Act on workflow instance
+      operation: actOnWorkflowInstance
+    dismiss:
+      label: Cancel
+      discards:
+      - action
+      - reason
+      - workflowStepExecutionId
+      - workflowExceptionId
+      - assigneePrincipalId
+      - alternativeNodeId
+      - correctedInput
+      - extendByMinutes
+      - priority
+    provenance: contract approvals.yaml POST /workflow-instances/{instanceId}/actions
 - id: ADM-252
   name: SLA, Escalation & Bottleneck Monitor
   module: Platform
@@ -35283,6 +37046,12 @@ screens:
           the control it gates, or the screen needs the control.'
         provenance: pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 30 §Authorized
           users can
+      - kind: primaryButton
+        label: Act on workflow instance
+        operation: actOnWorkflowInstance
+        permission: APPROVAL_ACT
+        notes: '**The monitors'' action buttons, as one operation** (decided 29 September, writers pass).'
+        provenance: contract approvals.yaml POST /workflow-instances/{instanceId}/actions
   states:
     loading: The sla escalation bottleneck list.
     error: Could not load. Names which read failed and leaves the sla escalation bottleneck untouched.
@@ -35297,6 +37066,12 @@ screens:
     contract: approvals
     purpose: SLA, Escalation & Bottleneck Monitor
     trigger: onLoad
+  - operationId: actOnWorkflowInstance
+    contract: approvals
+    purpose: An operator's intervention in a running workflow
+    trigger: onAction
+    invalidates:
+    - listSlaEscalationBottleneck
   entryState:
     preloaded:
     - SlaEscalationBottleneckMonitorViewSummary.withinSla
@@ -35305,6 +37080,10 @@ screens:
     - SlaEscalationBottleneckMonitorViewSummary.escalated
     - SlaEscalationBottleneckMonitorViewSummary.averageProcessingTime
     - SlaEscalationBottleneckMonitorViewSummary.averageApprovalTime
+    params:
+    - name: instanceId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -35314,6 +37093,31 @@ screens:
     page 30. 21 of 21 labels bound to a contract property; 26 of 39 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  overlays:
+  - id: formActOnWorkflowInstance
+    component: modal
+    trigger: Act on workflow instance
+    body: '**Collects what `actOnWorkflowInstance` sends before it is called.** Required: `action`, `reason`.
+      Optional: `workflowStepExecutionId`, `workflowExceptionId`, `assigneePrincipalId`, `alternativeNodeId`,
+      `correctedInput`, `extendByMinutes`, `priority`. Dismissing sends nothing; the screen behind is
+      unchanged.'
+    bindsTo: WorkflowInstanceActionInput
+    confirm:
+      label: Act on workflow instance
+      operation: actOnWorkflowInstance
+    dismiss:
+      label: Cancel
+      discards:
+      - action
+      - reason
+      - workflowStepExecutionId
+      - workflowExceptionId
+      - assigneePrincipalId
+      - alternativeNodeId
+      - correctedInput
+      - extendByMinutes
+      - priority
+    provenance: contract approvals.yaml POST /workflow-instances/{instanceId}/actions
 - id: ADM-253
   name: Automation Execution & Autonomous Action Monitor
   module: Platform
@@ -35903,18 +37707,6 @@ screens:
       trigger: Works in Inventory, Capacity & Channel Allocation
       provenance: flow F166 step 7→8
       operation: listSaleChannel
-    - to: ADM-263
-      trigger: Works in Channel Sales Schedule & Availability Windows
-      provenance: flow F166 step 9→10
-      operation: listSaleChannel
-    - to: ADM-264
-      trigger: Works in Customer & Eligibility Rules by Channel
-      provenance: flow F166 step 11→12
-      operation: listSaleChannel
-    - to: ADM-265
-      trigger: Works in Channel Sales Rules, Limits & Restrictions
-      provenance: flow F166 step 13→14
-      operation: listSaleChannel
     - to: ADM-266
       trigger: Works in Channel Fees, Payment & Fulfillment Configuration
       provenance: flow F166 step 15→16
@@ -35923,6 +37715,24 @@ screens:
       trigger: Works in Channel Publication, Readiness & AI Validation
       provenance: flow F166 step 17→18
       operation: listSaleChannel
+    - to: ADM-263
+      trigger: Works in Channel Sales Schedule & Availability Windows
+      provenance: flow F166 step 9→10
+      operation: listSaleChannel
+      carries:
+      - ruleId
+    - to: ADM-264
+      trigger: Works in Customer & Eligibility Rules by Channel
+      provenance: flow F166 step 11→12
+      operation: listSaleChannel
+      carries:
+      - ruleId
+    - to: ADM-265
+      trigger: Works in Channel Sales Rules, Limits & Restrictions
+      provenance: flow F166 step 13→14
+      operation: listSaleChannel
+      carries:
+      - ruleId
   density: compact
   purposeNote: An administrator can see every configured sales channel, its status, scope, product coverage
     and configuration issues from one central workspace.
@@ -36623,6 +38433,15 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Channel-Specific Scheduling”,
           “Automated Actions”.'
         provenance: pack Sales_Channel_Management_Reference.pdf, page 11 §Display
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save channel sales rule
+        operation: setChannelSalesRule
+        permission: PRODUCT_CONFIGURE
+        notes: '**One rule on a channel** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /channel-sales-rules/{ruleId}
   states:
     loading: The channel sales schedule list.
     error: Could not load. Names which read failed and leaves the channel sales schedule untouched.
@@ -36637,6 +38456,12 @@ screens:
     contract: catalogue
     purpose: Channel Sales Schedule & Availability Windows
     trigger: onLoad
+  - operationId: setChannelSalesRule
+    contract: catalogue
+    purpose: Create or replace a channel sales window, limit or eligibility rule
+    trigger: onAction
+    invalidates:
+    - listChannelSaleSchedule
   entryState:
     preloaded:
     - ChannelSalesScheduleAvailabilityWindowsSummary.activeSellingPeriods
@@ -36645,6 +38470,10 @@ screens:
     - ChannelSalesScheduleAvailabilityWindowsSummary.blackouts
     - ChannelSalesScheduleAvailabilityWindowsSummary.conflicts
     - ChannelSalesScheduleAvailabilityWindowsSummary.eventDates
+    params:
+    - name: ruleId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -36654,6 +38483,40 @@ screens:
     bound to a contract property; 15 of 32 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetChannelSalesRule
+    component: modal
+    trigger: Save channel sales rule
+    body: '**Collects what `setChannelSalesRule` sends before it is called.** Required: `id`, `scopePath`,
+      `salesChannelId`, `ruleKind`, `isActive`. Optional: `productId`, `name`, `ruleLevel`, `overridesProductRule`,
+      `effectiveFrom`, `effectiveTo`, `salesStartDate`, `salesStartTime`, `salesEndDate`, `salesEndTime`,
+      `timeZone`, `daysOfWeek` and 31 more. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: ChannelSalesRule
+    confirm:
+      label: Save channel sales rule
+      operation: setChannelSalesRule
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - salesChannelId
+      - ruleKind
+      - isActive
+      - productId
+      - name
+      - ruleLevel
+      - overridesProductRule
+      - effectiveFrom
+      - effectiveTo
+      - salesStartDate
+      - salesStartTime
+      - salesEndDate
+      - salesEndTime
+      - timeZone
+      - daysOfWeek
+      - hoursOfOperation
+    provenance: contract catalogue.yaml PUT /channel-sales-rules/{ruleId}
 - id: ADM-264
   name: Customer & Eligibility Rules by Channel
   module: Commercial
@@ -36709,6 +38572,15 @@ screens:
       - kind: selectField
         label: Identity verification required
         provenance: pack Sales_Channel_Management_Reference.pdf, page 12 §Configure
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save channel sales rule
+        operation: setChannelSalesRule
+        permission: PRODUCT_CONFIGURE
+        notes: '**One rule on a channel** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /channel-sales-rules/{ruleId}
   states:
     loading: The customer eligibility rules configuration as saved.
     error: Could not load. Names which read failed and leaves the customer eligibility rules untouched.
@@ -36721,6 +38593,12 @@ screens:
     contract: catalogue
     purpose: Customer & Eligibility Rules by Channel
     trigger: onLoad
+  - operationId: setChannelSalesRule
+    contract: catalogue
+    purpose: Create or replace a channel sales window, limit or eligibility rule
+    trigger: onAction
+    invalidates:
+    - listCustomerEligibilityRule
   wireframe:
     status: notStarted
     provenance: generated
@@ -36730,6 +38608,45 @@ screens:
     bound to a contract property; 5 of 29 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetChannelSalesRule
+    component: modal
+    trigger: Save channel sales rule
+    body: '**Collects what `setChannelSalesRule` sends before it is called.** Required: `id`, `scopePath`,
+      `salesChannelId`, `ruleKind`, `isActive`. Optional: `productId`, `name`, `ruleLevel`, `overridesProductRule`,
+      `effectiveFrom`, `effectiveTo`, `salesStartDate`, `salesStartTime`, `salesEndDate`, `salesEndTime`,
+      `timeZone`, `daysOfWeek` and 31 more. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: ChannelSalesRule
+    confirm:
+      label: Save channel sales rule
+      operation: setChannelSalesRule
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - salesChannelId
+      - ruleKind
+      - isActive
+      - productId
+      - name
+      - ruleLevel
+      - overridesProductRule
+      - effectiveFrom
+      - effectiveTo
+      - salesStartDate
+      - salesStartTime
+      - salesEndDate
+      - salesEndTime
+      - timeZone
+      - daysOfWeek
+      - hoursOfOperation
+    provenance: contract catalogue.yaml PUT /channel-sales-rules/{ruleId}
+  entryState:
+    params:
+    - name: ruleId
+      from: navigation
+      optional: true
 - id: ADM-265
   name: Channel Sales Rules, Limits & Restrictions
   module: Commercial
@@ -36822,6 +38739,15 @@ screens:
       - kind: selectField
         label: Reschedule permitted
         provenance: pack Sales_Channel_Management_Reference.pdf, page 13 §Configure
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save channel sales rule
+        operation: setChannelSalesRule
+        permission: PRODUCT_CONFIGURE
+        notes: '**One rule on a channel** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /channel-sales-rules/{ruleId}
   states:
     loading: The channel sales rules configuration as saved.
     error: Could not load. Names which read failed and leaves the channel sales rules untouched.
@@ -36834,6 +38760,12 @@ screens:
     contract: catalogue
     purpose: Channel Sales Rules, Limits & Restrictions
     trigger: onLoad
+  - operationId: setChannelSalesRule
+    contract: catalogue
+    purpose: Create or replace a channel sales window, limit or eligibility rule
+    trigger: onAction
+    invalidates:
+    - listChannelSaleRule
   wireframe:
     status: notStarted
     provenance: generated
@@ -36843,6 +38775,45 @@ screens:
     bound to a contract property; 17 of 33 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetChannelSalesRule
+    component: modal
+    trigger: Save channel sales rule
+    body: '**Collects what `setChannelSalesRule` sends before it is called.** Required: `id`, `scopePath`,
+      `salesChannelId`, `ruleKind`, `isActive`. Optional: `productId`, `name`, `ruleLevel`, `overridesProductRule`,
+      `effectiveFrom`, `effectiveTo`, `salesStartDate`, `salesStartTime`, `salesEndDate`, `salesEndTime`,
+      `timeZone`, `daysOfWeek` and 31 more. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: ChannelSalesRule
+    confirm:
+      label: Save channel sales rule
+      operation: setChannelSalesRule
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - salesChannelId
+      - ruleKind
+      - isActive
+      - productId
+      - name
+      - ruleLevel
+      - overridesProductRule
+      - effectiveFrom
+      - effectiveTo
+      - salesStartDate
+      - salesStartTime
+      - salesEndDate
+      - salesEndTime
+      - timeZone
+      - daysOfWeek
+      - hoursOfOperation
+    provenance: contract catalogue.yaml PUT /channel-sales-rules/{ruleId}
+  entryState:
+    params:
+    - name: ruleId
+      from: navigation
+      optional: true
 - id: ADM-266
   name: Channel Fees, Payment & Fulfillment Configuration
   module: Commercial
@@ -37273,19 +39244,6 @@ screens:
     directory — it is settings, not a population
   purpose: Configure and manage the technical connection between TICVAI and external or internal sales
     channels.
-  gaps:
-  - operation: null
-    why: '**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: TICVAI
-      Native, REST API, Webhook, Reseller API, Partner API, File/SFTP where required. Each needs an operation,
-      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
-      rather than the contract side.'
-    source: pack Sales_Channel_Management_Reference.pdf, page 22 §Support
-  - operation: null
-    why: '**Channel Connection & Integration Manager declares no operation that writes anything** — its
-      only declared call is `listChannelConnectionIntegration`, a read. The name promises authoring and
-      the contract offers none, so either the write operations are missing or this screen is a view of
-      something another screen builds.'
-    source: contract — the screen's declared operations
   layout:
     template: form
     regions:
@@ -37355,6 +39313,18 @@ screens:
       - kind: secondaryButton
         label: File/SFTP where required
         provenance: pack Sales_Channel_Management_Reference.pdf, page 22 §Support
+      - kind: secondaryButton
+        label: Save channel connection configuration
+        operation: setChannelConnectionConfiguration
+        permission: PRODUCT_CONFIGURE
+        notes: '**How TICVAI reaches one channel, per environment** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /channel-connections
+      - kind: secondaryButton
+        label: Test channel connection
+        operation: testChannelConnection
+        permission: PRODUCT_CONFIGURE
+        notes: '**Runs the connection tests and records the result** (29 September, writers pass).'
+        provenance: contract catalogue.yaml POST /channel-connections/{connectionId}/test
   states:
     loading: The channel connection integration configuration as saved.
     error: Could not load. Names which read failed and leaves the channel connection integration untouched.
@@ -37367,6 +39337,18 @@ screens:
     contract: catalogue
     purpose: Channel Connection & Integration Manager
     trigger: onLoad
+  - operationId: setChannelConnectionConfiguration
+    contract: catalogue
+    purpose: Create or update a channel connection
+    trigger: onAction
+    invalidates:
+    - listChannelConnectionIntegration
+  - operationId: testChannelConnection
+    contract: catalogue
+    purpose: Test a channel connection now
+    trigger: onAction
+    invalidates:
+    - listChannelConnectionIntegration
   wireframe:
     status: notStarted
     provenance: generated
@@ -37376,6 +39358,58 @@ screens:
     bound to a contract property; 20 of 43 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetChannelConnectionConfiguration
+    component: modal
+    trigger: Save channel connection configuration
+    body: '**Collects what `setChannelConnectionConfiguration` sends before it is called.** Required:
+      `id`, `scopePath`, `salesChannelId`, `connectorName`, `environment`, `connectionType`. Optional:
+      `partner`, `direction`, `endpoint`, `apiVersion`, `authenticationType`, `credentialsReference`,
+      `certificateReference`, `certificateExpiresAt`, `timeoutMs`, `rateLimitPerMinute`, `ipRestrictions`,
+      `retryPolicy` and 3 more. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: ChannelConnection
+    confirm:
+      label: Save channel connection configuration
+      operation: setChannelConnectionConfiguration
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - salesChannelId
+      - connectorName
+      - environment
+      - connectionType
+      - partner
+      - direction
+      - endpoint
+      - apiVersion
+      - authenticationType
+      - credentialsReference
+      - certificateReference
+      - certificateExpiresAt
+      - timeoutMs
+      - rateLimitPerMinute
+      - ipRestrictions
+      - retryPolicy
+    provenance: contract catalogue.yaml PUT /channel-connections
+  - id: formTestChannelConnection
+    component: modal
+    trigger: Test channel connection
+    body: '**Collects what `testChannelConnection` sends before it is called.** Nothing in the body is
+      required. Optional: `tests`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Test channel connection
+      operation: testChannelConnection
+    dismiss:
+      label: Cancel
+      discards:
+      - tests
+    provenance: contract catalogue.yaml POST /channel-connections/{connectionId}/test
+  entryState:
+    params:
+    - name: connectionId
+      from: navigation
 - id: ADM-270
   name: Product, Price & Availability Synchronization
   module: Commercial
@@ -37412,10 +39446,10 @@ screens:
     updates.
   gaps:
   - operation: null
-    why: '**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Channel
-      → TICVAI, Sync Now, Retry Failed, Compare, Reprocess, Pause Sync, Resume, Export Error. Each needs
-      an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the
-      screen side rather than the contract side.'
+    why: '**The pack names 8 actions on this screen; 1 are served since the writers pass (29 September):
+      Channel → TICVAI by `setChannelSyncSetting`.** Still unserved: Sync Now, Retry Failed, Compare,
+      Reprocess, Pause Sync, Resume, Export Error. Each needs an operation, or needs removing from the
+      screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Sales_Channel_Management_Reference.pdf, page 23 §Support as appropriate
   layout:
     template: split
@@ -37482,6 +39516,12 @@ screens:
       - kind: secondaryButton
         label: Export Error
         provenance: pack Sales_Channel_Management_Reference.pdf, page 23 §Actions
+      - kind: secondaryButton
+        label: Save channel sync setting
+        operation: setChannelSyncSetting
+        permission: PRODUCT_CONFIGURE
+        notes: '**The person''s half of `catalogue.channel_sync`** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PUT /channel-syncs
   states:
     loading: The product price availability list.
     error: Could not load. Names which read failed and leaves the product price availability untouched.
@@ -37496,6 +39536,12 @@ screens:
     contract: catalogue
     purpose: Product, Price & Availability Synchronization
     trigger: onLoad
+  - operationId: setChannelSyncSetting
+    contract: catalogue
+    purpose: Set how one kind of data synchronises with a channel
+    trigger: onAction
+    invalidates:
+    - listProductPriceAvailability
   entryState:
     preloaded:
     - ProductPriceAvailabilitySynchronizationView.lastSuccessfulSync
@@ -37513,6 +39559,39 @@ screens:
     bound to a contract property; 21 of 39 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetChannelSyncSetting
+    component: modal
+    trigger: Save channel sync setting
+    body: '**Collects what `setChannelSyncSetting` sends before it is called.** Required: `id`, `scopePath`,
+      `salesChannelId`, `domain`. Optional: `channelConnectionId`, `direction`, `frequency`, `isPaused`,
+      `lastSuccessfulSyncAt`, `nextSyncAt`, `recordsProcessed`, `successful`, `failed`, `pending`, `warnings`,
+      `durationMs` and 1 more. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: ChannelSync
+    confirm:
+      label: Save channel sync setting
+      operation: setChannelSyncSetting
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - scopePath
+      - salesChannelId
+      - domain
+      - channelConnectionId
+      - direction
+      - frequency
+      - isPaused
+      - lastSuccessfulSyncAt
+      - nextSyncAt
+      - recordsProcessed
+      - successful
+      - failed
+      - pending
+      - warnings
+      - durationMs
+      - mismatchCount
+    provenance: contract catalogue.yaml PUT /channel-syncs
 - id: ADM-271
   name: Real-Time Channel Availability & Inventory Monitor
   module: Commercial
@@ -37845,6 +39924,18 @@ screens:
       - kind: secondaryButton
         label: Partner Error
         provenance: pack Sales_Channel_Management_Reference.pdf, page 27 §Support
+      - kind: secondaryButton
+        label: Save channel incident
+        operation: updateChannelIncident
+        permission: PRODUCT_CONFIGURE
+        notes: '**The person''s moves on a channel incident** (29 September, writers pass).'
+        provenance: contract catalogue.yaml PATCH /channel-incidents/{incidentId}
+      - kind: secondaryButton
+        label: Retry channel incident
+        operation: retryChannelIncident
+        permission: PRODUCT_CONFIGURE
+        notes: '**Retry, as a call** (29 September, writers pass).'
+        provenance: contract catalogue.yaml POST /channel-incidents/{incidentId}/retry
   states:
     loading: The channel exceptions incidents configuration as saved.
     error: Could not load. Names which read failed and leaves the channel exceptions incidents untouched.
@@ -37857,6 +39948,18 @@ screens:
     contract: catalogue
     purpose: Channel Exceptions, Incidents & Recovery
     trigger: onLoad
+  - operationId: updateChannelIncident
+    contract: catalogue
+    purpose: Own, investigate, resolve or close a channel incident
+    trigger: onAction
+    invalidates:
+    - listChannelExceptionIncident
+  - operationId: retryChannelIncident
+    contract: catalogue
+    purpose: Retry the failed channel call behind an incident
+    trigger: onAction
+    invalidates:
+    - listChannelExceptionIncident
   wireframe:
     status: notStarted
     provenance: generated
@@ -37866,6 +39969,29 @@ screens:
     bound to a contract property; 20 of 49 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formUpdateChannelIncident
+    component: modal
+    trigger: Save channel incident
+    body: '**Collects what `updateChannelIncident` sends before it is called.** Nothing in the body is
+      required. Optional: `status`, `ownerPrincipalId`, `slaDueAt`, `resolutionNote`. Dismissing sends
+      nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save channel incident
+      operation: updateChannelIncident
+    dismiss:
+      label: Cancel
+      discards:
+      - status
+      - ownerPrincipalId
+      - slaDueAt
+      - resolutionNote
+    provenance: contract catalogue.yaml PATCH /channel-incidents/{incidentId}
+  entryState:
+    params:
+    - name: incidentId
+      from: navigation
+      optional: true
 - id: ADM-274
   name: Channel Performance & Commercial Analytics
   module: Commercial
@@ -38284,6 +40410,13 @@ screens:
       - kind: secondaryButton
         label: Risk
         provenance: pack Sales_Channel_Management_Reference.pdf, page 33 §Allow management to ask
+      - kind: secondaryButton
+        label: Decide catalogue AI finding
+        operation: decideCatalogueAiFinding
+        permission: AI_APPROVE
+        notes: '**The human control on a governance risk or a channel recommendation** (29 September,
+          writers pass).'
+        provenance: contract catalogue.yaml POST /ai-findings/{findingId}/decision
   states:
     loading: The channel optimization intelligence list.
     error: Could not load. Names which read failed and leaves the channel optimization intelligence untouched.
@@ -38302,9 +40435,20 @@ screens:
     contract: catalogue
     purpose: Channel Operations Command Center
     trigger: onLoad
+  - operationId: decideCatalogueAiFinding
+    contract: catalogue
+    purpose: Acknowledge, accept, dismiss or resolve an AI finding
+    trigger: onAction
+    invalidates:
+    - listChannel2
+    - listChannel
   entryState:
     preloaded:
     - AiChannelOptimizationIntelligenceCenterView.signals
+    params:
+    - name: findingId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -38314,6 +40458,24 @@ screens:
     labels bound to a contract property; 19 of 70 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formDecideCatalogueAiFinding
+    component: modal
+    trigger: Decide catalogue AI finding
+    body: '**Collects what `decideCatalogueAiFinding` sends before it is called.** Required: `decision`.
+      Optional: `comment`, `ownerPrincipalId`, `dueDate`. Dismissing sends nothing; the screen behind
+      is unchanged.'
+    confirm:
+      label: Decide catalogue AI finding
+      operation: decideCatalogueAiFinding
+    dismiss:
+      label: Cancel
+      discards:
+      - decision
+      - comment
+      - ownerPrincipalId
+      - dueDate
+    provenance: contract catalogue.yaml POST /ai-findings/{findingId}/decision
 - id: ADM-278
   name: Resale Marketplace Command Center
   module: Commercial
@@ -38420,6 +40582,28 @@ screens:
         notes: The pack filters this screen by venue, event, product, seller, date, listing status and
           4 more — which are present is a decision the pack already made.
         provenance: pack Ticket Resale Marketplace_Reference.pdf, page 4 §Filter by
+      - kind: detailPanel
+        label: The resale marketplace config
+        bindsTo: ResaleMarketplaceConfig
+        columns:
+        - ResaleMarketplaceConfig.id
+        - ResaleMarketplaceConfig.marketplaceName
+        - ResaleMarketplaceConfig.pricingMode
+        - ResaleMarketplaceConfig.maximumDiscountPercent
+        - ResaleMarketplaceConfig.sellerCanEditPrice
+        - ResaleMarketplaceConfig.maximumPriceChanges
+        - ResaleMarketplaceConfig.minimumMinutesBetweenPriceChanges
+        - ResaleMarketplaceConfig.moderationMode
+        - ResaleMarketplaceConfig.reviewTriggers
+        - ResaleMarketplaceConfig.expiryRule
+        - ResaleMarketplaceConfig.expiryOffset
+        - ResaleMarketplaceConfig.withdrawalPolicy
+        - ResaleMarketplaceConfig.maximumWithdrawals
+        - ResaleMarketplaceConfig.cancellationFee
+        - ResaleMarketplaceConfig.checkoutHoldMinutes
+        - ResaleMarketplaceConfig.buyerIdentityVerificationRequired
+        operation: getResaleMarketplaceConfig
+        provenance: contract orders.yaml GET /resale-marketplace-config
     - name: contentBody
       slot: headline
       components:
@@ -38546,6 +40730,10 @@ screens:
   - operationId: listOfficialResaleMarketplace
     contract: orders
     purpose: Official Resale Marketplace & Buyer Discovery
+    trigger: onLoad
+  - operationId: getResaleMarketplaceConfig
+    contract: orders
+    purpose: How the venue's resale marketplace runs
     trigger: onLoad
   wireframe:
     status: notStarted
@@ -38800,6 +40988,38 @@ screens:
       - kind: selectField
         label: Purchase limits
         provenance: pack Ticket Resale Marketplace_Reference.pdf, page 7 §Configure
+      - kind: detailPanel
+        label: The resale marketplace config
+        bindsTo: ResaleMarketplaceConfig
+        columns:
+        - ResaleMarketplaceConfig.id
+        - ResaleMarketplaceConfig.marketplaceName
+        - ResaleMarketplaceConfig.pricingMode
+        - ResaleMarketplaceConfig.maximumDiscountPercent
+        - ResaleMarketplaceConfig.sellerCanEditPrice
+        - ResaleMarketplaceConfig.maximumPriceChanges
+        - ResaleMarketplaceConfig.minimumMinutesBetweenPriceChanges
+        - ResaleMarketplaceConfig.moderationMode
+        - ResaleMarketplaceConfig.reviewTriggers
+        - ResaleMarketplaceConfig.expiryRule
+        - ResaleMarketplaceConfig.expiryOffset
+        - ResaleMarketplaceConfig.withdrawalPolicy
+        - ResaleMarketplaceConfig.maximumWithdrawals
+        - ResaleMarketplaceConfig.cancellationFee
+        - ResaleMarketplaceConfig.checkoutHoldMinutes
+        - ResaleMarketplaceConfig.buyerIdentityVerificationRequired
+        operation: getResaleMarketplaceConfig
+        provenance: contract orders.yaml GET /resale-marketplace-config
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save resale marketplace config
+        operation: setResaleMarketplaceConfig
+        permission: PRODUCT_CONFIGURE
+        notes: '**The writer `orders.resale_marketplace_config` lacked** (DM5 open item: nine screens
+          showed the row and none wrote it).'
+        provenance: contract orders.yaml PUT /resale-marketplace-config
   states:
     loading: The resale policy marketplace configuration as saved.
     error: Could not load. Names which read failed and leaves the resale policy marketplace untouched.
@@ -38812,6 +41032,17 @@ screens:
     contract: orders
     purpose: Resale Policy & Marketplace Settings
     trigger: onLoad
+  - operationId: getResaleMarketplaceConfig
+    contract: orders
+    purpose: How the venue's resale marketplace runs
+    trigger: onLoad
+  - operationId: setResaleMarketplaceConfig
+    contract: orders
+    purpose: Set how the venue's resale marketplace runs
+    trigger: onAction
+    invalidates:
+    - listResalePolicyMarketplace
+    - getResaleMarketplaceConfig
   wireframe:
     status: notStarted
     provenance: generated
@@ -38821,6 +41052,41 @@ screens:
     bound to a contract property; 23 of 32 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formSetResaleMarketplaceConfig
+    component: modal
+    trigger: Save resale marketplace config
+    body: '**Collects what `setResaleMarketplaceConfig` sends before it is called.** Required: `id`, `marketplaceName`,
+      `pricingMode`, `moderationMode`, `isActive`. Optional: `maximumDiscountPercent`, `sellerCanEditPrice`,
+      `maximumPriceChanges`, `minimumMinutesBetweenPriceChanges`, `reviewTriggers`, `expiryRule`, `expiryOffset`,
+      `withdrawalPolicy`, `maximumWithdrawals`, `cancellationFee`, `checkoutHoldMinutes`, `buyerIdentityVerificationRequired`
+      and 16 more. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: ResaleMarketplaceConfig
+    confirm:
+      label: Save resale marketplace config
+      operation: setResaleMarketplaceConfig
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - marketplaceName
+      - pricingMode
+      - moderationMode
+      - isActive
+      - maximumDiscountPercent
+      - sellerCanEditPrice
+      - maximumPriceChanges
+      - minimumMinutesBetweenPriceChanges
+      - reviewTriggers
+      - expiryRule
+      - expiryOffset
+      - withdrawalPolicy
+      - maximumWithdrawals
+      - cancellationFee
+      - checkoutHoldMinutes
+      - buyerIdentityVerificationRequired
+      - settlementTiming
+    provenance: contract orders.yaml PUT /resale-marketplace-config
 - id: ADM-281
   name: Listing Creation & Seller Configuration
   module: Commercial
@@ -39041,6 +41307,38 @@ screens:
       - kind: selectField
         label: 'Maximum: AED 240'
         provenance: pack Ticket Resale Marketplace_Reference.pdf, page 10 §Configured resale policy
+      - kind: detailPanel
+        label: The resale marketplace config
+        bindsTo: ResaleMarketplaceConfig
+        columns:
+        - ResaleMarketplaceConfig.id
+        - ResaleMarketplaceConfig.marketplaceName
+        - ResaleMarketplaceConfig.pricingMode
+        - ResaleMarketplaceConfig.maximumDiscountPercent
+        - ResaleMarketplaceConfig.sellerCanEditPrice
+        - ResaleMarketplaceConfig.maximumPriceChanges
+        - ResaleMarketplaceConfig.minimumMinutesBetweenPriceChanges
+        - ResaleMarketplaceConfig.moderationMode
+        - ResaleMarketplaceConfig.reviewTriggers
+        - ResaleMarketplaceConfig.expiryRule
+        - ResaleMarketplaceConfig.expiryOffset
+        - ResaleMarketplaceConfig.withdrawalPolicy
+        - ResaleMarketplaceConfig.maximumWithdrawals
+        - ResaleMarketplaceConfig.cancellationFee
+        - ResaleMarketplaceConfig.checkoutHoldMinutes
+        - ResaleMarketplaceConfig.buyerIdentityVerificationRequired
+        operation: getResaleMarketplaceConfig
+        provenance: contract orders.yaml GET /resale-marketplace-config
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save resale marketplace config
+        operation: setResaleMarketplaceConfig
+        permission: PRODUCT_CONFIGURE
+        notes: '**The writer `orders.resale_marketplace_config` lacked** (DM5 open item: nine screens
+          showed the row and none wrote it).'
+        provenance: contract orders.yaml PUT /resale-marketplace-config
   states:
     loading: The resale pricing price configuration as saved.
     error: Could not load. Names which read failed and leaves the resale pricing price untouched.
@@ -39053,6 +41351,17 @@ screens:
     contract: orders
     purpose: Resale Pricing & Price Guardrails
     trigger: onLoad
+  - operationId: getResaleMarketplaceConfig
+    contract: orders
+    purpose: How the venue's resale marketplace runs
+    trigger: onLoad
+  - operationId: setResaleMarketplaceConfig
+    contract: orders
+    purpose: Set how the venue's resale marketplace runs
+    trigger: onAction
+    invalidates:
+    - listResalePricingPrice
+    - getResaleMarketplaceConfig
   wireframe:
     status: notStarted
     provenance: generated
@@ -39062,6 +41371,41 @@ screens:
     labels bound to a contract property; 17 of 38 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formSetResaleMarketplaceConfig
+    component: modal
+    trigger: Save resale marketplace config
+    body: '**Collects what `setResaleMarketplaceConfig` sends before it is called.** Required: `id`, `marketplaceName`,
+      `pricingMode`, `moderationMode`, `isActive`. Optional: `maximumDiscountPercent`, `sellerCanEditPrice`,
+      `maximumPriceChanges`, `minimumMinutesBetweenPriceChanges`, `reviewTriggers`, `expiryRule`, `expiryOffset`,
+      `withdrawalPolicy`, `maximumWithdrawals`, `cancellationFee`, `checkoutHoldMinutes`, `buyerIdentityVerificationRequired`
+      and 16 more. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: ResaleMarketplaceConfig
+    confirm:
+      label: Save resale marketplace config
+      operation: setResaleMarketplaceConfig
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - marketplaceName
+      - pricingMode
+      - moderationMode
+      - isActive
+      - maximumDiscountPercent
+      - sellerCanEditPrice
+      - maximumPriceChanges
+      - minimumMinutesBetweenPriceChanges
+      - reviewTriggers
+      - expiryRule
+      - expiryOffset
+      - withdrawalPolicy
+      - maximumWithdrawals
+      - cancellationFee
+      - checkoutHoldMinutes
+      - buyerIdentityVerificationRequired
+      - settlementTiming
+    provenance: contract orders.yaml PUT /resale-marketplace-config
 - id: ADM-283
   name: Resale Fees, Commission & Seller Proceeds
   module: Commercial
@@ -40400,10 +42744,10 @@ screens:
   purpose: Manage the financial amount owed to sellers following successful resale.
   gaps:
   - operation: null
-    why: '**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Payment
-      account verification, Manual hold, Compliance hold, Refund/dispute hold. Each needs an operation,
-      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
-      rather than the contract side.'
+    why: '**The pack names 4 actions on this screen; 1 are served since the writers pass (29 September):
+      Manual hold by `holdResaleSettlement`.** Still unserved: Payment account verification, Compliance
+      hold, Refund/dispute hold. Each needs an operation, or needs removing from the screen; this is the
+      Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Ticket Resale Marketplace_Reference.pdf, page 30 §Support
   layout:
     template: split
@@ -40470,6 +42814,19 @@ screens:
       - kind: secondaryButton
         label: Refund/dispute hold
         provenance: pack Ticket Resale Marketplace_Reference.pdf, page 30 §Support
+      - kind: secondaryButton
+        label: Hold resale settlement
+        operation: holdResaleSettlement
+        permission: SETTLEMENT_RECONCILE
+        notes: '**A person stops a payout the job would otherwise make** (DM5 open item: the settlement
+          job writes `orders.resale_settlement` and no operation could hold or release one).'
+        provenance: contract orders.yaml POST /resale-settlements/{resaleSettlementId}/hold
+      - kind: secondaryButton
+        label: Release resale settlement hold
+        operation: releaseResaleSettlementHold
+        permission: SETTLEMENT_RECONCILE
+        notes: '**The release the settlement state model had no operation for** (DM5 open item).'
+        provenance: contract orders.yaml POST /resale-settlements/{resaleSettlementId}/release
   states:
     loading: The seller settlement payout list.
     error: Could not load. Names which read failed and leaves the seller settlement payout untouched.
@@ -40484,6 +42841,18 @@ screens:
     contract: orders
     purpose: Seller Settlement & Payout Management
     trigger: onLoad
+  - operationId: holdResaleSettlement
+    contract: orders
+    purpose: Put a seller's resale payout on manual hold
+    trigger: onAction
+    invalidates:
+    - listSellerSettlementPayout
+  - operationId: releaseResaleSettlementHold
+    contract: orders
+    purpose: Release a manual or compliance hold on a seller's resale payout
+    trigger: onAction
+    invalidates:
+    - listSellerSettlementPayout
   entryState:
     preloaded:
     - SellerSettlementPayoutManagementView.settlementId
@@ -40492,6 +42861,10 @@ screens:
     - SellerSettlementPayoutManagementView.listingPrice
     - SellerSettlementPayoutManagementView.sellerFee
     - SellerSettlementPayoutManagementView.commission
+    params:
+    - name: resaleSettlementId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -40501,6 +42874,33 @@ screens:
     labels bound to a contract property; 24 of 38 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formHoldResaleSettlement
+    component: modal
+    trigger: Hold resale settlement
+    body: '**Collects what `holdResaleSettlement` sends before it is called.** Required: `reason`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Hold resale settlement
+      operation: holdResaleSettlement
+    dismiss:
+      label: Cancel
+      discards:
+      - reason
+    provenance: contract orders.yaml POST /resale-settlements/{resaleSettlementId}/hold
+  - id: formReleaseResaleSettlementHold
+    component: modal
+    trigger: Release resale settlement hold
+    body: '**Collects what `releaseResaleSettlementHold` sends before it is called.** Required: `reason`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Release resale settlement hold
+      operation: releaseResaleSettlementHold
+    dismiss:
+      label: Cancel
+      discards:
+      - reason
+    provenance: contract orders.yaml POST /resale-settlements/{resaleSettlementId}/release
 - id: ADM-295
   name: Refunds, Disputes & Resale Exceptions
   module: Commercial
@@ -40592,6 +42992,19 @@ screens:
           transaction, Return ownership, Provide replacement ticket, Escalate. Each needs attaching to
           the control it gates, or the screen needs the control.'
         provenance: pack Ticket Resale Marketplace_Reference.pdf, page 32 §Depending on permission
+      - kind: secondaryButton
+        label: Hold resale settlement
+        operation: holdResaleSettlement
+        permission: SETTLEMENT_RECONCILE
+        notes: '**A person stops a payout the job would otherwise make** (DM5 open item: the settlement
+          job writes `orders.resale_settlement` and no operation could hold or release one).'
+        provenance: contract orders.yaml POST /resale-settlements/{resaleSettlementId}/hold
+      - kind: secondaryButton
+        label: Release resale settlement hold
+        operation: releaseResaleSettlementHold
+        permission: SETTLEMENT_RECONCILE
+        notes: '**The release the settlement state model had no operation for** (DM5 open item).'
+        provenance: contract orders.yaml POST /resale-settlements/{resaleSettlementId}/release
     - name: contentBody
       components: []
   states:
@@ -40608,9 +43021,25 @@ screens:
     contract: orders
     purpose: Refunds, Disputes & Resale Exceptions
     trigger: onLoad
+  - operationId: holdResaleSettlement
+    contract: orders
+    purpose: Put a seller's resale payout on manual hold
+    trigger: onAction
+    invalidates:
+    - listRefundDisputeResale
+  - operationId: releaseResaleSettlementHold
+    contract: orders
+    purpose: Release a manual or compliance hold on a seller's resale payout
+    trigger: onAction
+    invalidates:
+    - listRefundDisputeResale
   entryState:
     preloaded:
     - RefundsDisputesResaleExceptionsView.issueType
+    params:
+    - name: resaleSettlementId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -40620,6 +43049,33 @@ screens:
     labels bound to a contract property; 20 of 47 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  overlays:
+  - id: formHoldResaleSettlement
+    component: modal
+    trigger: Hold resale settlement
+    body: '**Collects what `holdResaleSettlement` sends before it is called.** Required: `reason`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Hold resale settlement
+      operation: holdResaleSettlement
+    dismiss:
+      label: Cancel
+      discards:
+      - reason
+    provenance: contract orders.yaml POST /resale-settlements/{resaleSettlementId}/hold
+  - id: formReleaseResaleSettlementHold
+    component: modal
+    trigger: Release resale settlement hold
+    body: '**Collects what `releaseResaleSettlementHold` sends before it is called.** Required: `reason`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Release resale settlement hold
+      operation: releaseResaleSettlementHold
+    dismiss:
+      label: Cancel
+      discards:
+      - reason
+    provenance: contract orders.yaml POST /resale-settlements/{resaleSettlementId}/release
 - id: ADM-296
   name: Resale Audit & Ownership History
   module: Commercial
@@ -68342,6 +70798,41 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: setMultiPaymentSplit
+      - kind: textField
+        label: Channel
+        operation: listPaymentAllocationRules
+        notes: Sends `?channel=` to `listPaymentAllocationRules`.
+        provenance: contract orders.yaml GET /payment-allocation-rules
+      - kind: textField
+        label: Terminal id
+        operation: listPaymentAllocationRules
+        notes: Sends `?terminalId=` to `listPaymentAllocationRules`.
+        provenance: contract orders.yaml GET /payment-allocation-rules
+      - kind: textField
+        label: Product id
+        operation: listPaymentAllocationRules
+        notes: Sends `?productId=` to `listPaymentAllocationRules`.
+        provenance: contract orders.yaml GET /payment-allocation-rules
+      - kind: toggle
+        label: Is active
+        operation: listPaymentAllocationRules
+        notes: Sends `?isActive=` to `listPaymentAllocationRules`.
+        provenance: contract orders.yaml GET /payment-allocation-rules
+      - kind: dataTable
+        label: Every payment allocation rule
+        bindsTo: PaymentAllocationRule
+        columns:
+        - PaymentAllocationRule.id
+        - PaymentAllocationRule.channel
+        - PaymentAllocationRule.terminalId
+        - PaymentAllocationRule.productId
+        - PaymentAllocationRule.orderType
+        - PaymentAllocationRule.customerType
+        - PaymentAllocationRule.allocationLevel
+        - PaymentAllocationRule.isActive
+        - PaymentAllocationRule.scopePath
+        operation: listPaymentAllocationRules
+        provenance: contract orders.yaml GET /payment-allocation-rules
   states:
     loading: The split payment tender list.
     error: Could not load. Names which read failed and leaves the split payment tender untouched.
@@ -68363,6 +70854,10 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id013
+  - operationId: listPaymentAllocationRules
+    contract: orders
+    purpose: The venue's split-tender allocation rules
+    trigger: onLoad
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-601

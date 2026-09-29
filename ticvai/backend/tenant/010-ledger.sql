@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS ledger.fx_provider_assignment (
 
 -- configured rates with effective windows. A rate change is a new row; the old is never edited
 -- Hangs off: reaches ledger.account through its keys; references identity.principal,
--- platform.scope. Reached by: 14 operations read it and 2 write it; 1 tables reference it.
+-- platform.scope. Reached by: 17 operations read it and 2 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS ledger.fx_rate (
     id                                uuid PRIMARY KEY,
     from_currency                     text NOT NULL,
@@ -199,8 +199,8 @@ CREATE TABLE IF NOT EXISTS ledger.legal_entity (
 -- One side of a double-entry movement. Renamed from entry, which sat beside journal_entry and
 -- journal_line — three things called entry in one schema is a schema nobody reads twice. Hangs
 -- off: reaches ledger.account through its keys; references ledger.account, ledger.cost_center,
--- ledger.journal_entry. Reached by: 7 operations read it and 10 write it; written by 3 contracts —
--- finance, orders, shift.
+-- ledger.journal_entry. Reached by: 13 operations read it and 11 write it; written by 3 contracts
+-- — finance, orders, shift.
 CREATE TABLE IF NOT EXISTS ledger.posting (
     id                                text PRIMARY KEY NOT NULL,
     journal_entry_id                  text NOT NULL,
@@ -310,7 +310,8 @@ CREATE TABLE IF NOT EXISTS ledger.tax_code (
 );
 
 -- Who does not pay, and on what evidence. Hangs off: reaches ledger.account through its keys;
--- references ledger.tax_code. Reached by: 3 operations read it and 1 write it.
+-- references accreditation.document, ledger.tax_code. Reached by: 3 operations read it and 1 write
+-- it.
 CREATE TABLE IF NOT EXISTS ledger.tax_exemption (
     id                                uuid PRIMARY KEY NOT NULL,
     scope                             text NOT NULL CONSTRAINT tax_exemption_scope_chk CHECK (scope IN ('account', 'productKind', 'channel', 'legalEntity')),

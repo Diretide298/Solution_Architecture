@@ -39,10 +39,7 @@
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-174 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-175",
@@ -101,10 +98,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrator has one central view of all access credential and media technologies.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Central management page for every media and verification technology supported by Access Control.",
-  "purposeNote": "Administrator has one central view of all access credential and media technologies.",
   "layout": {
    "template": "split",
    "regions": [
@@ -121,10 +118,93 @@
        "kind": "multiSelect",
        "label": "Filter by",
        "columns": [
-        "MediaCredentialCommandCenterView.ai"
+        "MediaCredentialCommandCenterViewSummary.ai"
        ],
        "notes": "The pack filters this screen by ai — which are present is a decision the pack already made.",
        "provenance": "pack Access Control Module_Reference.pdf, page 44 §Filters"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active Media Profiles",
+       "bindsTo": "MediaCredentialCommandCenterViewSummary.activeMediaProfiles",
+       "operation": "listMediaCredential",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "QR Credentials",
+       "bindsTo": "MediaCredentialCommandCenterViewSummary.qrCredentials",
+       "operation": "listMediaCredential",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "RFID Credentials",
+       "bindsTo": "MediaCredentialCommandCenterViewSummary.rfidCredentials",
+       "operation": "listMediaCredential",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "NFC Credentials",
+       "bindsTo": "MediaCredentialCommandCenterViewSummary.nfcCredentials",
+       "operation": "listMediaCredential",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Wallet Credentials",
+       "bindsTo": "MediaCredentialCommandCenterViewSummary.walletCredentials",
+       "operation": "listMediaCredential",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Biometric Credentials",
+       "bindsTo": "MediaCredentialCommandCenterViewSummary.biometricCredentials",
+       "operation": "listMediaCredential",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "External Credentials",
+       "bindsTo": "MediaCredentialCommandCenterViewSummary.externalCredentials",
+       "operation": "listMediaCredential",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Media Swaps Today",
+       "bindsTo": "MediaCredentialCommandCenterViewSummary.mediaSwapsToday",
+       "operation": "listMediaCredential",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Failed Media Reads",
+       "bindsTo": "MediaCredentialCommandCenterViewSummary.failedMediaReads",
+       "operation": "listMediaCredential",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Unknown Credentials",
+       "bindsTo": "MediaCredentialCommandCenterViewSummary.unknownCredentials",
+       "operation": "listMediaCredential",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Verification Exceptions",
+       "bindsTo": "MediaCredentialCommandCenterViewSummary.verificationExceptions",
+       "operation": "listMediaCredential",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
       }
      ]
     },
@@ -135,19 +215,6 @@
       {
        "kind": "dataTable",
        "label": "Every media credential",
-       "columns": [
-        "MediaCredentialCommandCenterView.activeMediaProfiles",
-        "MediaCredentialCommandCenterView.qrCredentials",
-        "MediaCredentialCommandCenterView.rfidCredentials",
-        "MediaCredentialCommandCenterView.nfcCredentials",
-        "MediaCredentialCommandCenterView.walletCredentials",
-        "MediaCredentialCommandCenterView.biometricCredentials",
-        "MediaCredentialCommandCenterView.externalCredentials",
-        "MediaCredentialCommandCenterView.mediaSwapsToday",
-        "MediaCredentialCommandCenterView.failedMediaReads",
-        "MediaCredentialCommandCenterView.unknownCredentials",
-        "MediaCredentialCommandCenterView.verificationExceptions"
-       ],
        "bindsTo": "MediaCredentialCommandCenterView",
        "operation": "listMediaCredential",
        "provenance": "pack Access Control Module_Reference.pdf, page 44 §Show"
@@ -162,19 +229,6 @@
        "kind": "detailPanel",
        "label": "The selected media credential",
        "bindsTo": "MediaCredentialCommandCenterView",
-       "columns": [
-        "MediaCredentialCommandCenterView.activeMediaProfiles",
-        "MediaCredentialCommandCenterView.qrCredentials",
-        "MediaCredentialCommandCenterView.rfidCredentials",
-        "MediaCredentialCommandCenterView.nfcCredentials",
-        "MediaCredentialCommandCenterView.walletCredentials",
-        "MediaCredentialCommandCenterView.biometricCredentials",
-        "MediaCredentialCommandCenterView.externalCredentials",
-        "MediaCredentialCommandCenterView.mediaSwapsToday",
-        "MediaCredentialCommandCenterView.failedMediaReads",
-        "MediaCredentialCommandCenterView.unknownCredentials",
-        "MediaCredentialCommandCenterView.verificationExceptions"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “Media Directory”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 44 §Show"
       }
@@ -195,22 +249,35 @@
     "contract": "access",
     "purpose": "Media & Credential Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listVirtualCredentialMedia",
+    "contract": "access",
+    "purpose": "Virtual Credential & Media Association",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listMediaTypeCredential",
+    "contract": "access",
+    "purpose": "Media Type & Credential Technology Registry",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
    "preloaded": [
-    "MediaCredentialCommandCenterView.activeMediaProfiles",
-    "MediaCredentialCommandCenterView.qrCredentials",
-    "MediaCredentialCommandCenterView.rfidCredentials",
-    "MediaCredentialCommandCenterView.nfcCredentials",
-    "MediaCredentialCommandCenterView.walletCredentials",
-    "MediaCredentialCommandCenterView.biometricCredentials"
+    "MediaCredentialCommandCenterViewSummary.activeMediaProfiles",
+    "MediaCredentialCommandCenterViewSummary.qrCredentials",
+    "MediaCredentialCommandCenterViewSummary.rfidCredentials",
+    "MediaCredentialCommandCenterViewSummary.nfcCredentials",
+    "MediaCredentialCommandCenterViewSummary.walletCredentials",
+    "MediaCredentialCommandCenterViewSummary.biometricCredentials"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-174"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-174",
+   "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-174"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 44. 12 of 12 labels bound to a contract property; 12 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -273,10 +340,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "New media technologies can be added through configuration/integration rather than changing ticketing business logic.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Each profile defines) and no display directory — it is settings, not a population",
   "purpose": "Define reusable media technologies. The matrix expects support for linear barcode, two-dimensional codes, magnetic strips, contact/proximity RFID, NFC and biometric readers.",
-  "purposeNote": "New media technologies can be added through configuration/integration rather than changing ticketing business logic.",
   "layout": {
    "template": "form",
    "regions": [
@@ -320,6 +387,18 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 45 §Each profile defines"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save media type",
+       "operation": "setMediaTypeTechnology",
+       "provenance": "contract access.yaml PUT /media-type-technology (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -335,12 +414,19 @@
     "contract": "access",
     "purpose": "Media Type & Technology Library",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setMediaTypeTechnology",
+    "contract": "access",
+    "purpose": "Save media type",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-175"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-175",
+   "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-175"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 45. 0 of 0 labels bound to a contract property; 7 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -403,10 +489,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Different media representations resolve consistently to a single virtual credential and access state.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Associate one virtual ticket identity with its permitted media representations.",
-  "purposeNote": "Different media representations resolve consistently to a single virtual credential and access state.",
   "gaps": [
    {
     "operation": null,
@@ -452,17 +538,16 @@
   ],
   "entryState": {
    "preloaded": [
-    "VirtualCredentialMediaAssociationView.andThereforeToTheSame",
-    "VirtualCredentialMediaAssociationView.ticket",
-    "VirtualCredentialMediaAssociationView.guest",
-    "VirtualCredentialMediaAssociationView.entitlements",
-    "VirtualCredentialMediaAssociationView.accessHistory"
+    "VirtualCredentialMediaAssociationView.ticketId",
+    "VirtualCredentialMediaAssociationView.guestId",
+    "VirtualCredentialMediaAssociationView.entitlements"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-176"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-176",
+   "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-176"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 46. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -525,10 +610,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "The selected verification method follows configurable locking and authorized-override policies.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Control which verification method the guest chooses and when it becomes locked. The matrix specifies that although a ticket may technically support physical card, Dynamic QR, Face Pass and Face Tag, the customer should select one verification method. It may be changed before first successful verification, but after that the guest cannot change it; authorized venue operations may do so when necessary.",
-  "purposeNote": "The selected verification method follows configurable locking and authorized-override policies.",
   "gaps": [
    {
     "operation": null,
@@ -574,17 +659,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "VerificationMethodSelectionLockingView.dynamicQr",
-    "VerificationMethodSelectionLockingView.physicalCard",
-    "VerificationMethodSelectionLockingView.rfid",
-    "VerificationMethodSelectionLockingView.facePass",
-    "VerificationMethodSelectionLockingView.faceTag"
+    "VerificationMethodSelectionLockingView.availableMethods"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-177"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-177",
+   "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-177"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 47. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -647,10 +729,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every issued medium receives a unique and traceable credential identifier using its configured encoding profile.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Configure how ticket identity is written or encoded onto each medium. The source requires ticket IDs to be generated as 2D barcode, QR or RFID and requires randomized, always- unique identifiers to reduce fraud.",
-  "purposeNote": "Every issued medium receives a unique and traceable credential identifier using its configured encoding profile.",
   "layout": {
    "template": "split",
    "regions": [
@@ -689,6 +771,18 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 48 §Display"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save issuance and encoding profile",
+       "operation": "setMediaIssuanceEncoding",
+       "provenance": "contract access.yaml PUT /media-issuance-encoding (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -705,6 +799,12 @@
     "contract": "access",
     "purpose": "Media Issuance & Encoding Profile",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setMediaIssuanceEncoding",
+    "contract": "access",
+    "purpose": "Save issuance and encoding profile",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -717,7 +817,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-178"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-178",
+   "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-178"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 48. 2 of 3 labels bound to a contract property; 9 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -780,10 +881,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Media can be replaced without changing or duplicating the underlying ticket entitlement.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Transfer a ticket from one medium to another without changing the underlying virtual ticket. This directly covers the matrix requirement to swap RFID to barcode/QR or vice versa while transferring the attached information.",
-  "purposeNote": "Media can be replaced without changing or duplicating the underlying ticket entitlement.",
   "gaps": [
    {
     "operation": null,
@@ -828,18 +929,13 @@
    }
   ],
   "entryState": {
-   "preloaded": [
-    "MediaSwapReplacementView.to",
-    "MediaSwapReplacementView.ticket",
-    "MediaSwapReplacementView.guest",
-    "MediaSwapReplacementView.remainingEntitlements",
-    "MediaSwapReplacementView.entryHistory"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-179"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-179",
+   "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-179"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 49. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -902,10 +998,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "RFID/NFC technologies can be configured according to operational range, reader capability and access journey.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Provide dedicated configuration for proximity credentials. The matrix requires RFID—including ISO 15693—and NFC, as well as multi-range RFID scanning at near, medium and far ranges.",
-  "purposeNote": "RFID/NFC technologies can be configured according to operational range, reader capability and access journey.",
   "layout": {
    "template": "form",
    "regions": [
@@ -994,16 +1090,20 @@
     "operationId": "setRfidNfc",
     "contract": "access",
     "purpose": "RFID & NFC Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setRfidNfc"
-    ]
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "setRfidNfcCard",
+    "contract": "access",
+    "purpose": "RFID, NFC, Card & Wristband Media Designer",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-180"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-180",
+   "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-180"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 50. 0 of 0 labels bound to a contract property; 11 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1066,10 +1166,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Approved external ticket formats can be recognized and normalized into TICVAI's standard access transaction model.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Allow TICVAI Access Control to understand credentials generated by other systems. The matrix explicitly requires reading reseller/external partner ticket formats and barcodes generated by other systems.",
-  "purposeNote": "Approved external ticket formats can be recognized and normalized into TICVAI's standard access transaction model.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1123,7 +1223,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-181"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-181",
+   "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-181"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 51. 0 of 0 labels bound to a contract property; 5 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1186,10 +1287,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Hotel cards, supported wallet credentials and specialized external media can participate in standard TICVAI access journeys.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure specialized external credential ecosystems. The source specifically requires hotel room-card integration at access points and an interface to the hotel's property-management system for room billing.",
-  "purposeNote": "Hotel cards, supported wallet credentials and specialized external media can participate in standard TICVAI access journeys.",
   "gaps": [
    {
     "operation": null,
@@ -1215,6 +1316,18 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save integration",
+       "operation": "setHotelWalletExternal",
+       "provenance": "contract access.yaml PUT /hotel-wallet-external (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -1231,17 +1344,22 @@
     "contract": "access",
     "purpose": "Hotel, Wallet & External Media Integration",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setHotelWalletExternal",
+    "contract": "access",
+    "purpose": "Save integration",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
-   "preloaded": [
-    "HotelWalletExternalMediaIntegrationView.accessDecisionProceedsNormally"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-182"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-182",
+   "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-182"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 53. 0 of 0 labels bound to a contract property; 0 of 12 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1296,10 +1414,10 @@
    "notes": "**Reached from BO-174, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Media profiles cannot be deployed to incompatible access devices without an explicit warning/authorized exception. Board 4 — Final 10 Screens # Backend Screen Main Responsibility 4.1 Media & Credential Command Center Overall media estate 4.2 Media Type & Technology Library Barcode, QR, RFID, NFC, wallet, biometric, etc. 4.3 Virtual Credential & Media Association Connect multiple media to one ticket identity 4.4 Verification Method Selection & Locking Guest method selection and first-use lock 4.5 Media Issuance & Encoding Profile Unique identifier and encoding configuration 4.6 Media Swap & Rep",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Ensure that every configured medium works with the intended access-control hardware before deployment. This is particularly important because the matrix says the solution should operate with hardware selected by the venue, while hardware limitations must be highlighted and recommended equipment exposed for procurement decisions.",
-  "purposeNote": "Media profiles cannot be deployed to incompatible access devices without an explicit warning/authorized exception. Board 4 — Final 10 Screens # Backend Screen Main Responsibility 4.1 Media & Credential Command Center Overall media estate 4.2 Media Type & Technology Library Barcode, QR, RFID, NFC, wallet, biometric, etc. 4.3 Virtual Credential & Media Association Connect multiple media to one ticket identity 4.4 Verification Method Selection & Locking Guest method selection and first-use lock 4.5 Media Issuance & Encoding Profile Unique identifier and encoding configuration 4.6 Media Swap & Rep",
   "gaps": [
    {
     "operation": null,
@@ -1350,16 +1468,14 @@
     "operationId": "publishMediaCompatibilityTesting",
     "contract": "access",
     "purpose": "Media Compatibility, Testing & Publication",
-    "trigger": "onAction",
-    "invalidates": [
-     "publishMediaCompatibilityTesting"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-183"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-183",
+   "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-183"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 54. 0 of 0 labels bound to a contract property; 0 of 62 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

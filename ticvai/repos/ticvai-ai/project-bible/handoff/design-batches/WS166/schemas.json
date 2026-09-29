@@ -1,0 +1,680 @@
+{
+ "BulkUpdateSeatsRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "selection"
+  ],
+  "properties": {
+   "selection": {
+    "type": "object",
+    "description": "Seats to amend. Combine filters; an empty selection is rejected.",
+    "properties": {
+     "seatIds": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "sectionCodes": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "rowLabels": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "attribute": {
+    "$ref": "#/components/schemas/SeatAttribute"
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ImportGeometryRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "fileReference",
+   "format"
+  ],
+  "properties": {
+   "fileReference": {
+    "type": "string"
+   },
+   "format": {
+    "type": "string",
+    "enum": [
+     "svgPlan",
+     "pdfPlan"
+    ]
+   },
+   "layerMapping": {
+    "type": "object",
+    "description": "Named layers in the source. Layer-aware extraction is far more reliable than shape recognition, so it is preferred wherever the source supports it — **and the client's amphitheatre file confirms the bet**: `VC-Seats`, `VC-wheelchairseating` and `VC-Steps` map straight onto the three roles below.\n**Each role takes a list, not a name** (CF-122). The same file carries two distinct layers both named `Layer 1`, steps drawn on both `steps` and `VC-Steps`, and AutoCAD's default `0`. A single string silently kept one and dropped the rest.\n**Names are decoded before matching.** PDF layer names arrive UTF-16BE and read as mojibake if taken as bytes, so a role that looks unmatched may simply be undecoded.\n",
+    "properties": {
+     "seatsLayer": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "accessibleSeatsLayer": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "sectionBoundaryLayer": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "stepsLayer": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "stageLayer": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "unmappedLayers": {
+      "type": "array",
+      "readOnly": true,
+      "description": "Layers found in the source and claimed by no role. **Reported rather than ignored** — a plan with an unmapped layer is a plan where something was not extracted, and the operator is the only one who knows whether it mattered.\n",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "digitNormalisation": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Section codes carrying Arabic-Indic digits never join to the manifest** (CF-122). `A١` and `A1` are the same section to a person and two sections to a string comparison, and the failure is silent — the row simply does not match.\nNormalised before the join. Disable only where a venue genuinely uses both forms as distinct codes, which would be its own problem.\n"
+   },
+   "joinOn": {
+    "type": "string",
+    "enum": [
+     "sectionAndRow",
+     "labelText",
+     "ordinal"
+    ],
+    "default": "sectionAndRow",
+    "description": "How plan geometry is matched to manifest seats."
+   }
+  }
+ },
+ "ImportJob": {
+  "x-ticvai-persistence": "seating.import_job",
+  "type": "object",
+  "required": [
+   "id",
+   "seatMapId",
+   "kind",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "seatMapId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "manifest",
+     "geometry"
+    ]
+   },
+   "status": {
+    "$ref": "#/components/schemas/ImportJobStatus"
+   },
+   "parsedSeatCount": {
+    "type": "integer"
+   },
+   "matchedSeatCount": {
+    "type": "integer",
+    "description": "Geometry imports — seats successfully joined to the manifest."
+   },
+   "unmatchedSeatCount": {
+    "type": "integer",
+    "description": "Present in one source but not the other. A seat in the plan with no manifest entry is a finding, not a seat.\n"
+   },
+   "outcome": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "parsed",
+     "parsedWithFindings",
+     "noSeatsFound",
+     "noLayersMatched",
+     "unreadable"
+    ],
+    "description": "**All four CF-122 defects failed silently — an import that found nothing reported success.** A job that parses zero seats is not a parsed job, and the operator was left to notice an empty seat map later.\n`noLayersMatched` is the specific one worth separating: **the file was readable and no role claimed a layer**, which almost always means the names needed decoding or a role needed a second entry rather than that the file was wrong.\n"
+   },
+   "layersFound": {
+    "type": "array",
+    "readOnly": true,
+    "description": "Every layer name in the source, decoded. **Shown whether or not extraction worked**, so an operator can map a role by reading rather than by guessing.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "findings": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ValidationFinding"
+    }
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "ImportJobStatus": {
+  "type": "string",
+  "enum": [
+   "parsing",
+   "previewReady",
+   "committing",
+   "committed",
+   "failed"
+  ]
+ },
+ "ImportManifestRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "fileReference",
+   "format",
+   "columnMapping"
+  ],
+  "properties": {
+   "fileReference": {
+    "type": "string",
+    "description": "Object storage reference. The file is not posted through this API."
+   },
+   "format": {
+    "type": "string",
+    "enum": [
+     "csvManifest",
+     "xlsxManifest"
+    ]
+   },
+   "sheetName": {
+    "type": "string",
+    "description": "Spreadsheets only. Trailing spaces in sheet names are common — quote exactly."
+   },
+   "headerRow": {
+    "type": "integer",
+    "default": 1
+   },
+   "columnMapping": {
+    "type": "object",
+    "description": "Which column holds what. Required because manifests arrive with different headings from every venue.\n",
+    "required": [
+     "sectionColumn",
+     "rowColumn",
+     "seatColumn"
+    ],
+    "properties": {
+     "sectionColumn": {
+      "type": "string"
+     },
+     "rowColumn": {
+      "type": "string"
+     },
+     "seatColumn": {
+      "type": "string"
+     },
+     "categoryColumn": {
+      "type": "string"
+     },
+     "attributeColumn": {
+      "type": "string"
+     }
+    }
+   },
+   "replaceExisting": {
+    "type": "boolean",
+    "default": false,
+    "description": "False merges. True replaces, and is refused where tickets are sold against the map.\n"
+   }
+  }
+ },
+ "MapZone": {
+  "type": "object",
+  "x-ticvai-persistence": "seating.zone",
+  "description": "BL-166. **`seating` is strong on everything that is a seat and the map itself was only seats.**\n**A standing area is a capacity without individual seats**, and modelling it as seats means inventing seat numbers nobody prints and a guest cannot find. A suite is the opposite — one sellable unit containing many seats, sold whole.\nNon-sellable zones matter too: **a stage, an entry and a sightline obstruction are not inventory and they change what the seats beside them are worth.**\n",
+  "required": [
+   "id",
+   "seatMapId",
+   "kind",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "seatMapId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "standing",
+     "suite",
+     "box",
+     "lounge",
+     "accessiblePlatform",
+     "stage",
+     "entry",
+     "exit",
+     "concourse",
+     "obstruction",
+     "camera",
+     "aisle"
+    ]
+   },
+   "name": {
+    "type": "string"
+   },
+   "capacity": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**For a standing zone this is the inventory** — sold as a count rather than as seats. Null for a stage or an obstruction, which sell nothing.\n"
+   },
+   "seatCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "containsSeatIds": {
+    "type": "array",
+    "description": "For a suite or box. **Sold whole, so the seats inside are held together** — selling one seat of a suite is not a thing a venue does.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "obstructsZoneIds": {
+    "type": "array",
+    "description": "What this blocks the view of. **A pillar is not inventory and it decides what the seats behind it are worth**, which is the only reason to draw it.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "geometry": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "Point": {
+  "type": "object",
+  "required": [
+   "x",
+   "y"
+  ],
+  "properties": {
+   "x": {
+    "type": "number"
+   },
+   "y": {
+    "type": "number"
+   }
+  }
+ },
+ "SeatAttribute": {
+  "type": "string",
+  "description": "BL-168. **Extended from eight values on 18 August.** Amenity and view filters needed attributes the original set did not carry, and a guest filtering for *aisle seat with power* was filtering on something the model could not express.\n",
+  "enum": [
+   "standard",
+   "accessible",
+   "companion",
+   "obstructedView",
+   "restrictedLegroom",
+   "premium",
+   "houseSeat",
+   "buffer",
+   "aisle",
+   "endOfRow",
+   "extraLegroom",
+   "powerOutlet",
+   "tableService",
+   "shaded",
+   "covered",
+   "nearExit",
+   "nearAccessibleWc",
+   "wheelchairTransfer",
+   "limitedRecline",
+   "sofa",
+   "beanbag"
+  ]
+ },
+ "SeatMap": {
+  "x-ticvai-persistence": "seating.seat_map",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/SeatMapSummary"
+   },
+   {
+    "type": "object",
+    "required": [
+     "sections"
+    ],
+    "properties": {
+     "description": {
+      "type": "string",
+      "nullable": true
+     },
+     "viewBox": {
+      "type": "object",
+      "description": "Coordinate space for rendering. Absent when there is no geometry.",
+      "nullable": true,
+      "properties": {
+       "width": {
+        "type": "number"
+       },
+       "height": {
+        "type": "number"
+       }
+      }
+     },
+     "stagePosition": {
+      "$ref": "#/components/schemas/Point"
+     },
+     "sections": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/Section"
+      }
+     },
+     "isActive": {
+      "type": "boolean"
+     }
+    }
+   }
+  ]
+ },
+ "SeatMapImportJob": {
+  "type": "object",
+  "description": "**AI-assisted import from a PDF, an image or a spreadsheet** (21 August decision). A venue arriving with a printed plan and a seat manifest should not rebuild 396 rows by hand.\n\n**It proposes and a person accepts — it never publishes.** ADR-0020: a suggestion proposes, a person decides. An imported map lands as a draft with its confidence and whatever it could not read, because **a seat map wrong by two rows is worse than one that took an afternoon.**",
+  "required": [
+   "id",
+   "status",
+   "source"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "queued",
+     "reading",
+     "proposed",
+     "accepted",
+     "rejected",
+     "failed"
+    ]
+   },
+   "source": {
+    "type": "string",
+    "enum": [
+     "pdf",
+     "image",
+     "excel",
+     "csv"
+    ]
+   },
+   "seatMapId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The draft it produced, once it has one."
+   },
+   "seatsDetected": {
+    "type": "integer",
+    "nullable": true
+   },
+   "sectionsDetected": {
+    "type": "integer",
+    "nullable": true
+   },
+   "confidence": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 1
+   },
+   "unreadable": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "**What it could not read, named.** A blank list and a low confidence are different problems: the first is a bad scan, the second is a plan it half-understood."
+   },
+   "basis": {
+    "type": "string",
+    "enum": [
+     "heuristic",
+     "model"
+    ],
+    "description": "ADR-0020 — the same abstraction as every other suggestion."
+   }
+  }
+ },
+ "SeatMapSummary": {
+  "x-ticvai-persistence": "seating.seat_map",
+  "type": "object",
+  "required": [
+   "id",
+   "name",
+   "venueId",
+   "status",
+   "seatCount"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "status": {
+    "$ref": "#/components/schemas/SeatMapStatus"
+   },
+   "seatCount": {
+    "type": "integer"
+   },
+   "sectionCount": {
+    "type": "integer"
+   },
+   "hasGeometry": {
+    "type": "boolean",
+    "description": "False when only a manifest has been imported. Such a map can be sold from a list but not rendered.\n"
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "Section": {
+  "x-ticvai-persistence": "seating.section",
+  "type": "object",
+  "required": [
+   "code",
+   "name",
+   "rowCount",
+   "seatCount"
+  ],
+  "properties": {
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "rowCount": {
+    "type": "integer"
+   },
+   "seatCount": {
+    "type": "integer"
+   },
+   "boundary": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Point"
+    },
+    "description": "Polygon for rendering. Absent without geometry."
+   },
+   "viewAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "assets.MediaAsset",
+    "description": "**The view of the stage from this section, as a photo**, uploaded through `assets` like any other media (decided 29 September, rev 3 23SEP-14). Optional: where it is null the client renders the view from the imported geometry (the section `boundary`, the map's `stagePosition` and the seat positions), so a closer section shows a larger stage and fewer rows ahead. Set with `updateSeatMap` `sectionViews`, which is allowed on a published map because a photo does not change the map's shape.\n"
+   },
+   "rows": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "label",
+      "seatCount"
+     ],
+     "properties": {
+      "label": {
+       "type": "string"
+      },
+      "seatCount": {
+       "type": "integer"
+      },
+      "numberingDirection": {
+       "type": "string",
+       "enum": [
+        "leftToRight",
+        "rightToLeft"
+       ],
+       "description": "Which end row numbering starts from. Not recoverable from a manifest and must be stated — it determines whether a guest finds their seat.\n"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "ValidationFinding": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "kind",
+   "severity",
+   "message"
+  ],
+  "properties": {
+   "kind": {
+    "$ref": "#/components/schemas/ValidationFindingKind"
+   },
+   "severity": {
+    "$ref": "#/components/schemas/ValidationSeverity"
+   },
+   "message": {
+    "type": "string"
+   },
+   "sectionCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "rowLabel": {
+    "type": "string",
+    "nullable": true
+   },
+   "seatNumbers": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "affectedCount": {
+    "type": "integer"
+   }
+  }
+ },
+ "ValidationReport": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "seatMapId",
+   "passed",
+   "errorCount",
+   "warningCount",
+   "findings"
+  ],
+  "properties": {
+   "seatMapId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "passed": {
+    "type": "boolean",
+    "description": "False when any finding has severity `error`."
+   },
+   "errorCount": {
+    "type": "integer"
+   },
+   "warningCount": {
+    "type": "integer"
+   },
+   "findings": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ValidationFinding"
+    }
+   }
+  }
+ }
+}

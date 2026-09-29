@@ -1,0 +1,244 @@
+{
+ "AccessibleSeating": {
+  "type": "object",
+  "x-ticvai-persistence": "seating.accessible",
+  "description": "Boards 7.6 to 7.8. **An accessible seat with no accessible route is not an accessible seat.**\n",
+  "properties": {
+   "seatMapId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "spaces": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "seatId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "wheelchairSpace",
+        "transferSeat",
+        "ambulant",
+        "easyAccess",
+        "assistanceDog",
+        "hearingLoop",
+        "visuallyImpaired"
+       ]
+      },
+      "routeDescription": {
+       "type": "string",
+       "nullable": true
+      },
+      "stepFree": {
+       "type": "boolean",
+       "default": true
+      },
+      "nearestAccessibleWc": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "eligibility": {
+    "type": "string",
+    "enum": [
+     "open",
+     "selfDeclared",
+     "verifiedOnce",
+     "verifiedEachTime"
+    ],
+    "default": "selfDeclared",
+    "description": "**Contested in both directions.** Open sale leaves none for the guests who need them; hard gating turns people away at the door.\n"
+   },
+   "minimumProvisionPercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "SeatReassignment": {
+  "type": "object",
+  "x-ticvai-persistence": "seating.reassignment",
+  "description": "Board 9.8. **Never silently downgrades.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "fromSeatIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "toSeatIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "reason": {
+    "type": "string"
+   },
+   "priceDifference": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundIssued": {
+    "type": "boolean",
+    "default": false
+   },
+   "guestNotifiedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "performedBy": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "SeatRecommendationRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "partySize",
+   "strategy"
+  ],
+  "properties": {
+   "partySize": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 50
+   },
+   "strategy": {
+    "$ref": "#/components/schemas/SeatRecommendationStrategy"
+   },
+   "categoryIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "maxPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "accessibleCount": {
+    "type": "integer",
+    "default": 0,
+    "description": "Wheelchair spaces in the party. Companions are added automatically."
+   },
+   "maxOptions": {
+    "type": "integer",
+    "default": 3,
+    "maximum": 10
+   }
+  }
+ },
+ "SeatRecommendationRules": {
+  "type": "object",
+  "x-ticvai-persistence": "seating.recommendation_rules",
+  "description": "Board 9, and the 21 August minute: *\"best-seat ranking… must be configurable per seat map/event.\"* **Five kinds, one scoring model** — five algorithms would eventually contradict each other.\n",
+  "properties": {
+   "seatMapId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "profiles": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "bestSeat",
+        "bestValue",
+        "closestToStage",
+        "familyTogether",
+        "accessible",
+        "upgrade"
+       ]
+      },
+      "weights": {
+       "type": "object",
+       "additionalProperties": {
+        "type": "number"
+       },
+       "description": "Sightline, distance, centrality, row, price, availability, aisle proximity, legroom.\n"
+      },
+      "preferredSectionIds": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       }
+      },
+      "avoidSectionIds": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       }
+      },
+      "contiguityWeight": {
+       "type": "number",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "reverseRowOrder": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Last-row-is-best against first-row-is-best**, which the minute names as the worked example and which differs by venue sightline.\n"
+   },
+   "explainToGuest": {
+    "type": "boolean",
+    "default": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "SeatRecommendationStrategy": {
+  "type": "string",
+  "enum": [
+   "bestAvailable",
+   "bestValue",
+   "closestToStage",
+   "accessible",
+   "contiguous"
+  ]
+ }
+}

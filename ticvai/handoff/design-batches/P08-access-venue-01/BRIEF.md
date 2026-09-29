@@ -1,6 +1,6 @@
 # P08-access-venue-01 — P08 · Access & Venue (1 of 3)
 
-**10 screens · 62 operations · 57 schemas · 20 permissions**
+**10 screens · 64 operations · 70 schemas · 21 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 20 permissions apply here:
+- **Every control that can be refused must be gated.** 21 permissions apply here:
   `ACCESS_POINT_CONFIGURE, ASSET_MANAGE, ASSET_VIEW, EVENT_CONFIGURE, MAINTENANCE_APPROVE, MAINTENANCE_EXECUTE, MARKETING_MANAGE, MARKETING_SEND, MARKETING_VIEW, ORDER_REFUND_APPROVE, ORDER_REFUND_BULK, PARKING_CONFIGURE`…. A control nobody can use must say so,
   not sit enabled and fail.
-- **21 of these operations work offline**: acceptWorkOrder, attachWorkOrderEvidence, completeWorkOrder, createWorkOrder, getAsset, getPerformance, getQueue, getWaitTimes
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,13 +60,13 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-001` | Queue Directory | listDetail | 19 | 0 | — |
-| `BO-002` | Queue Configuration | listDetail | 14 | 1 | — |
-| `BO-003` | Queue Integration Setup | listDetail | 4 | 0 | — |
-| `BO-004` | Manual Wait Time Entry | approvalInbox | 11 | 0 | — |
-| `BO-005` | Queue Monitor | listDetail | 19 | 1 | — |
-| `BO-006` | Parking Configuration | listDetail | 4 | 0 | — |
-| `BO-030` | Work Order Verification | listDetail | 9 | 2 | — |
-| `BO-031` | Asset Register | listDetail | 7 | 0 | — |
-| `BO-032` | Admission Profiles | listDetail | 3 | 0 | — |
-| `BO-033` | Blacklist Management | listDetail | 3 | 1 | — |
+| `BO-001` | Queue Directory | listDetail | 19 | 9 | — |
+| `BO-002` | Queue Configuration | listDetail | 14 | 8 | — |
+| `BO-003` | Queue Integration Setup | listDetail | 4 | 1 | — |
+| `BO-004` | Manual Wait Time Entry | approvalInbox | 11 | 7 | — |
+| `BO-005` | Queue Monitor | listDetail | 20 | 11 | — |
+| `BO-006` | Parking Configuration | listDetail | 4 | 2 | — |
+| `BO-030` | Work Order Verification | listDetail | 9 | 6 | — |
+| `BO-031` | Asset Register | listDetail | 7 | 3 | — |
+| `BO-032` | Admission Profiles | listDetail | 4 | 2 | — |
+| `BO-033` | Blacklist Management | listDetail | 3 | 2 | — |

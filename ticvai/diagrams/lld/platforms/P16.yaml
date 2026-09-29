@@ -40,7 +40,7 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: ReportingService
-  operationCalls: 103
+  operationCalls: 117
 - service: AiService
   operationCalls: 5
 - service: InventoryService
@@ -74,6 +74,7 @@ screens:
   - getCommandCentre
   - getDashboard
   - listAlerts
+  - recordDashboardView
   - requestSuggestion
   - runReport
   states:
@@ -126,6 +127,7 @@ screens:
   density: compact
   operations:
   - getDashboard
+  - recordDashboardView
   - runReport
   states:
   - emptyFirstRun
@@ -157,6 +159,7 @@ screens:
   - listAlerts
   - listDevices
   - listPrincipals
+  - recordDashboardView
   - runReport
   states:
   - emptyFirstRun
@@ -191,6 +194,7 @@ screens:
   operations:
   - getDashboard
   - listProducts
+  - recordDashboardView
   - runReport
   states:
   - emptyFirstRun
@@ -222,6 +226,7 @@ screens:
   operations:
   - getDashboard
   - getStockValuation
+  - recordDashboardView
   - runReport
   states:
   - emptyFirstRun
@@ -254,6 +259,7 @@ screens:
   - getCountVariance
   - getDashboard
   - listExpiringBatches
+  - recordDashboardView
   - runReport
   states:
   - emptyFirstRun
@@ -287,6 +293,7 @@ screens:
   - getDashboard
   - listSegments
   - previewSegment
+  - recordDashboardView
   - runReport
   states:
   - emptyFirstRun
@@ -318,6 +325,7 @@ screens:
   operations:
   - askReportingQuestion
   - getDashboard
+  - recordDashboardView
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -595,6 +603,7 @@ screens:
   density: compact
   operations:
   - getAnalyticsBenchmark
+  - listSiteNormalisationBases
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -627,6 +636,7 @@ screens:
   - createDashboard
   - getDashboard
   - listDashboards
+  - recordDashboardView
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -681,6 +691,7 @@ screens:
   operations:
   - deleteDashboard
   - getDashboard
+  - recordDashboardView
   - updateDashboard
   states:
   - emptyFirstRun
@@ -843,6 +854,7 @@ screens:
   operations:
   - getDashboard
   - listAnalyticsPipelines
+  - recordDashboardView
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1647,6 +1659,8 @@ screens:
   density: compact
   operations:
   - getAnalyticsBenchmark
+  - listSiteNormalisationBases
+  - setSiteNormalisationBasis
   states:
   - emptyFirstRun
   - emptyNoAccess

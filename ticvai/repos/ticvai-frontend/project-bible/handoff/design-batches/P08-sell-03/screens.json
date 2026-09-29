@@ -24,10 +24,7 @@
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-114 holds none of them, so the edge carries nothing and BO-102 opens cold"
     }
    ]
   },
@@ -47,8 +44,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Serial",
+       "operation": "listSerialisedItems",
+       "notes": "Sends `?serial=` to `listSerialisedItems`.",
+       "provenance": "contract inventory.yaml GET /serialised-items"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listSerialisedItems",
+       "notes": "Sends `?status=` to `listSerialisedItems`.",
+       "provenance": "contract inventory.yaml GET /serialised-items"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every variants attributes barcode",
+       "label": "Every serialised",
        "bindsTo": "SerialisedItem",
        "columns": [
         "SerialisedItem.id",
@@ -63,6 +74,11 @@
        ],
        "operation": "listSerialisedItems",
        "provenance": "contract inventory.yaml GET /serialised-items"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search variants, attributes, barcode",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -72,7 +88,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected variants attributes barcode",
+       "label": "The selected serialised",
        "bindsTo": "SerialisedItem",
        "columns": [
         "SerialisedItem.id",
@@ -96,20 +112,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Lookup",
+       "label": "Lookup merchandise",
        "operation": "lookupMerchandise",
        "provenance": "contract retail.yaml GET /merchandise/lookup"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search variants, attributes, barcode",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -118,9 +123,9 @@
   "states": {
    "loading": "The variants attributes barcode list.",
    "error": "Could not load. Names which read failed and leaves the variants attributes barcode untouched.",
-   "emptyFirstRun": "No variants attributes barcode yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the variants attributes barcode are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No variants attributes barcode yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on serial, status and the variants attributes barcode are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listSerialisedItems` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -133,7 +138,7 @@
     "operationId": "lookupMerchandise",
     "contract": "retail",
     "purpose": "Price and stock check by barcode",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -156,6 +161,7 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-114",
+   "derivedFrom": "wireframes/reference/Retail Board 4.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
@@ -207,17 +213,17 @@
    "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
     {
-     "to": "BO-116",
-     "trigger": "Merchandising & Product Presentation",
-     "provenance": "flow F86 step 1→2"
-    },
-    {
      "to": "BO-102",
      "trigger": "Sell",
+     "provenance": "derived — BO-102 declares entryState.params  and BO-115 holds none of them, so the edge carries nothing and BO-102 opens cold"
+    },
+    {
+     "to": "BO-116",
+     "trigger": "Merchandising & Product Presentation",
+     "provenance": "flow F86 step 1→2",
      "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+      "saleBoardId"
+     ]
     }
    ]
   },
@@ -229,13 +235,6 @@
   "pattern": "listDetail",
   "patternReason": "`listProductCategories` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "Category, Brand & Merchandise Hierarchy — from the client design board, 20 August.",
-  "gaps": [
-   {
-    "operation": "listSaleBoards",
-    "why": "**1 declared operation reach no component on this screen**: listSaleBoards. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -245,7 +244,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every category brand merchandise",
+       "label": "Every product category",
        "bindsTo": "ProductCategory",
        "columns": [
         "ProductCategory.id",
@@ -256,10 +255,32 @@
         "ProductCategory.scopePath",
         "ProductCategory.displayOrder",
         "ProductCategory.imageAssetId",
+        "ProductCategory.description",
         "ProductCategory.isActive"
        ],
        "operation": "listProductCategories",
        "provenance": "contract catalogue.yaml GET /product-categories"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every sale board",
+       "bindsTo": "SaleBoard",
+       "columns": [
+        "SaleBoard.id",
+        "SaleBoard.code",
+        "SaleBoard.name",
+        "SaleBoard.venueId",
+        "SaleBoard.kind",
+        "SaleBoard.pages",
+        "SaleBoard.isActive"
+       ],
+       "operation": "listSaleBoards",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search category, brand",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -269,7 +290,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected category brand merchandise",
+       "label": "The selected product category",
        "bindsTo": "ProductCategory",
        "columns": [
         "ProductCategory.id",
@@ -280,6 +301,7 @@
         "ProductCategory.scopePath",
         "ProductCategory.displayOrder",
         "ProductCategory.imageAssetId",
+        "ProductCategory.description",
         "ProductCategory.isActive"
        ],
        "operation": "listProductCategories",
@@ -293,32 +315,21 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save product categories",
        "operation": "setProductCategories",
        "provenance": "contract catalogue.yaml PUT /product-categories"
       },
       {
        "kind": "secondaryButton",
-       "label": "Request",
+       "label": "Request suggestion",
        "operation": "requestSuggestion",
        "provenance": "contract ai.yaml POST /ai/suggestions"
       },
       {
        "kind": "secondaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search category, brand",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -327,9 +338,9 @@
   "states": {
    "loading": "The category brand merchandise list.",
    "error": "Could not load. Names which read failed and leaves the category brand merchandise untouched.",
-   "emptyFirstRun": "No category brand merchandise yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the category brand merchandise are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No category brand merchandise yet. Offers Request suggestion (`requestSuggestion`).",
+   "emptyNoResults": "Never shown: `listProductCategories` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProductCategories` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -396,10 +407,72 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-115",
+   "derivedFrom": "wireframes/reference/POS Board 4.dc.html",
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetProductCategories",
+    "component": "modal",
+    "trigger": "Save product categories",
+    "body": "**Collects what `setProductCategories` sends before it is called.** Required: `categories`. Each category may carry a `description` per language: the short text under the option in the guest's \"Choose your experience\" list (decided 29 September, rev 3 REV3-19). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save product categories",
+     "operation": "setProductCategories"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "categories"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /product-categories"
+   },
+   {
+    "id": "formRequestSuggestion",
+    "component": "modal",
+    "trigger": "Request suggestion",
+    "body": "**Collects what `requestSuggestion` sends before it is called.** Required: `kind`. Optional: `subjectRef`, `horizon`, `context`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Request suggestion",
+     "operation": "requestSuggestion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "subjectRef",
+      "horizon",
+      "context"
+     ]
+    },
+    "provenance": "contract ai.yaml POST /ai/suggestions"
+   },
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -448,17 +521,17 @@
    "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
     {
-     "to": "BO-117",
-     "trigger": "Product Import, Governance & AI Configuration Assistant",
-     "provenance": "flow F86 step 2→3"
-    },
-    {
      "to": "BO-102",
      "trigger": "Sell",
+     "provenance": "derived — BO-102 declares entryState.params  and BO-116 holds none of them, so the edge carries nothing and BO-102 opens cold"
+    },
+    {
+     "to": "BO-117",
+     "trigger": "Product Import, Governance & AI Configuration Assistant",
+     "provenance": "flow F86 step 2→3",
      "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+      "saleBoardId"
+     ]
     }
    ]
   },
@@ -497,16 +570,38 @@
        "bindsTo": "Workstation",
        "operation": "listWorkstations",
        "provenance": "contract tenancy.yaml GET /workstations"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
+      },
+      {
+       "kind": "textField",
+       "label": "Outlet id",
+       "operation": "listMerchandise",
+       "notes": "Sends `?outletId=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "textField",
+       "label": "Category id",
+       "operation": "listMerchandise",
+       "notes": "Sends `?categoryId=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "toggle",
+       "label": "In stock only",
+       "operation": "listMerchandise",
+       "notes": "Sends `?inStockOnly=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "listMerchandise",
+       "notes": "Sends `?search=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
       {
        "kind": "dataTable",
-       "label": "Every merchandising product presentation",
+       "label": "Every merchandise",
        "bindsTo": "MerchandiseItem",
        "columns": [
         "MerchandiseItem.id",
@@ -524,6 +619,11 @@
        ],
        "operation": "listMerchandise",
        "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search merchandising",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -533,49 +633,38 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save merchandise",
        "operation": "updateMerchandise",
        "provenance": "contract retail.yaml PATCH /merchandise/{merchandiseId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save role permissions",
        "operation": "setRolePermissions",
        "provenance": "contract tenancy.yaml PUT /roles/{roleId}/permissions"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save venue settings",
        "operation": "setVenueSettings",
        "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save sale board",
        "operation": "updateSaleBoard",
        "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search merchandising",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The merchandising product presentation list.",
+   "loading": "The merchandising product presentation figures; each tile loads on its own.",
    "error": "Could not load. Names which read failed and leaves the merchandising product presentation untouched.",
-   "emptyFirstRun": "No merchandising product presentation yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the merchandising product presentation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No merchandising product presentation yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on outletId, categoryId, inStockOnly, search and the merchandising product presentation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listMerchandise` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -658,10 +747,107 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-116",
+   "derivedFrom": "wireframes/reference/POS Board 4.dc.html",
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formUpdateMerchandise",
+    "component": "modal",
+    "trigger": "Save merchandise",
+    "body": "**Collects what `updateMerchandise` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `barcode`, `categoryId`, `inventoryItemId`, `imageAssetRef`, `isReturnable`, `returnWindowDays`, `requiresSerialNumber`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save merchandise",
+     "operation": "updateMerchandise"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "description",
+      "barcode",
+      "categoryId",
+      "inventoryItemId",
+      "imageAssetRef",
+      "isReturnable",
+      "returnWindowDays",
+      "requiresSerialNumber",
+      "isActive"
+     ]
+    },
+    "provenance": "contract retail.yaml PATCH /merchandise/{merchandiseId}"
+   },
+   {
+    "id": "formSetRolePermissions",
+    "component": "modal",
+    "trigger": "Save role permissions",
+    "body": "**Collects what `setRolePermissions` sends before it is called.** Required: `permissions`. Optional: `inheritsFromRoleId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save role permissions",
+     "operation": "setRolePermissions"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "inheritsFromRoleId"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /roles/{roleId}/permissions"
+   },
+   {
+    "id": "formSetVenueSettings",
+    "component": "modal",
+    "trigger": "Save venue settings",
+    "body": "**Collects what `setVenueSettings` sends before it is called.** Nothing in the body is required. Optional: `id`, `venueId`, `currencyCode`, `currencyScale`, `supportHours`, `quietHours`, `biometrics`, `segregatedAccess`, `alerting`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "VenueSettings",
+    "confirm": {
+     "label": "Save venue settings",
+     "operation": "setVenueSettings"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "currencyCode",
+      "currencyScale",
+      "supportHours",
+      "quietHours",
+      "biometrics",
+      "segregatedAccess",
+      "alerting"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
+   },
+   {
+    "id": "formUpdateSaleBoard",
+    "component": "modal",
+    "trigger": "Save sale board",
+    "body": "**Collects what `updateSaleBoard` sends before it is called.** Required: `id`, `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SaleBoard",
+    "confirm": {
+     "label": "Save sale board",
+     "operation": "updateSaleBoard"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "venueId",
+      "kind",
+      "pages",
+      "isActive"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -710,17 +896,17 @@
    "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
     {
-     "to": "BO-118",
-     "trigger": "Campaign & Audience Management",
-     "provenance": "flow F86 step 3→4"
-    },
-    {
      "to": "BO-102",
      "trigger": "Sell",
+     "provenance": "derived — BO-102 declares entryState.params  and BO-117 holds none of them, so the edge carries nothing and BO-102 opens cold"
+    },
+    {
+     "to": "BO-118",
+     "trigger": "Campaign & Audience Management",
+     "provenance": "flow F86 step 3→4",
      "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+      "saleBoardId"
+     ]
     }
    ]
   },
@@ -740,8 +926,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listSaleBoards",
+       "notes": "Sends `?venueId=` to `listSaleBoards`.",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listSaleBoards",
+       "notes": "Sends `?kind=` to `listSaleBoards`.",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every product import governance",
+       "label": "Every sale board",
        "bindsTo": "SaleBoard",
        "columns": [
         "SaleBoard.id",
@@ -754,6 +954,11 @@
        ],
        "operation": "listSaleBoards",
        "provenance": "contract tenancy.yaml GET /sale-boards"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search product import, governance",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -763,7 +968,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected product import governance",
+       "label": "The selected sale board",
        "bindsTo": "SaleBoard",
        "columns": [
         "SaleBoard.id",
@@ -785,38 +990,27 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Import",
+       "label": "Import product catalogue",
        "operation": "importProductCatalogue",
        "provenance": "contract catalogue.yaml POST /products/import"
       },
       {
        "kind": "secondaryButton",
-       "label": "Generate",
+       "label": "Generate configuration",
        "operation": "generateConfiguration",
        "provenance": "contract ai.yaml POST /generate/configuration"
       },
       {
        "kind": "secondaryButton",
-       "label": "Request",
+       "label": "Request suggestion",
        "operation": "requestSuggestion",
        "provenance": "contract ai.yaml POST /ai/suggestions"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save sale board",
        "operation": "updateSaleBoard",
        "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search product import, governance",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -825,9 +1019,9 @@
   "states": {
    "loading": "The product import governance list.",
    "error": "Could not load. Names which read failed and leaves the product import governance untouched.",
-   "emptyFirstRun": "No product import governance yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the product import governance are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No product import governance yet. Offers Import product catalogue (`importProductCatalogue`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on venueId, kind and the product import governance are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listSaleBoards` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -871,6 +1065,13 @@
     "invalidates": [
      "listSaleBoards"
     ]
+   },
+   {
+    "operationId": "commitCatalogueImport",
+    "contract": "catalogue",
+    "purpose": "Apply a parsed catalogue import",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
    }
   ],
   "entryState": {
@@ -882,6 +1083,10 @@
     {
      "name": "saleBoardId",
      "from": "deepLink"
+    },
+    {
+     "name": "jobId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders.",
@@ -897,10 +1102,95 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-117",
+   "derivedFrom": "wireframes/reference/POS Board 4.dc.html",
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formImportProductCatalogue",
+    "component": "modal",
+    "trigger": "Import product catalogue",
+    "body": "**Collects what `importProductCatalogue` sends before it is called.** Required: `format`, `sourceRef`. Optional: `mode`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Import product catalogue",
+     "operation": "importProductCatalogue"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "format",
+      "sourceRef",
+      "mode"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /products/import"
+   },
+   {
+    "id": "formGenerateConfiguration",
+    "component": "modal",
+    "trigger": "Generate configuration",
+    "body": "**Collects what `generateConfiguration` sends before it is called.** Required: `kind`, `description`. Optional: `conversationId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Generate configuration",
+     "operation": "generateConfiguration"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "description",
+      "conversationId"
+     ]
+    },
+    "provenance": "contract ai.yaml POST /generate/configuration"
+   },
+   {
+    "id": "formRequestSuggestion",
+    "component": "modal",
+    "trigger": "Request suggestion",
+    "body": "**Collects what `requestSuggestion` sends before it is called.** Required: `kind`. Optional: `subjectRef`, `horizon`, `context`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Request suggestion",
+     "operation": "requestSuggestion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "subjectRef",
+      "horizon",
+      "context"
+     ]
+    },
+    "provenance": "contract ai.yaml POST /ai/suggestions"
+   },
+   {
+    "id": "formUpdateSaleBoard",
+    "component": "modal",
+    "trigger": "Save sale board",
+    "body": "**Collects what `updateSaleBoard` sends before it is called.** Required: `id`, `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SaleBoard",
+    "confirm": {
+     "label": "Save sale board",
+     "operation": "updateSaleBoard"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "venueId",
+      "kind",
+      "pages",
+      "isActive"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -949,18 +1239,19 @@
    "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
     {
+     "to": "BO-102",
+     "trigger": "Sell",
+     "provenance": "derived — BO-102 declares entryState.params  and BO-118 holds none of them, so the edge carries nothing and BO-102 opens cold"
+    },
+    {
      "to": "BO-126",
      "trigger": "Deployment, Preview & Audit",
      "provenance": "flow F86 step 4→5",
-     "operation": "createCampaign"
-    },
-    {
-     "to": "BO-102",
-     "trigger": "Sell",
+     "operation": "createCampaign",
      "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+      "reportId",
+      "saleBoardId"
+     ]
     }
    ]
   },
@@ -999,16 +1290,17 @@
        "bindsTo": "SaleBoard",
        "operation": "listSaleBoards",
        "provenance": "contract tenancy.yaml GET /sale-boards"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listCampaigns",
+       "notes": "Sends `?status=` to `listCampaigns`.",
+       "provenance": "contract marketing-crm.yaml GET /campaigns"
+      },
       {
        "kind": "dataTable",
-       "label": "Every campaign audience",
+       "label": "Every campaign",
        "bindsTo": "Campaign",
        "columns": [
         "Campaign.name",
@@ -1026,6 +1318,11 @@
        ],
        "operation": "listCampaigns",
        "provenance": "contract marketing-crm.yaml GET /campaigns"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search campaign",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1035,43 +1332,32 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create campaign",
        "operation": "createCampaign",
        "provenance": "contract marketing-crm.yaml POST /campaigns"
       },
       {
        "kind": "secondaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save sale board",
        "operation": "updateSaleBoard",
        "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search campaign",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The campaign audience list.",
+   "loading": "The campaign audience figures; each tile loads on its own.",
    "error": "Could not load. Names which read failed and leaves the campaign audience untouched.",
-   "emptyFirstRun": "No campaign audience yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the campaign audience are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No campaign audience yet. Offers Create campaign (`createCampaign`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on status and the campaign audience are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listCampaigns` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1141,10 +1427,86 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-118",
+   "derivedFrom": "wireframes/reference/POS Board 4.dc.html",
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateCampaign",
+    "component": "modal",
+    "trigger": "Create campaign",
+    "body": "**Collects what `createCampaign` sends before it is called.** Required: `name`, `kind`, `channel`, `segmentId`, `content`. Optional: `venueId`, `trigger`, `scheduledFor`, `consentPurpose`, `sendWindow`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateCampaignRequest",
+    "confirm": {
+     "label": "Create campaign",
+     "operation": "createCampaign"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "kind",
+      "channel",
+      "segmentId",
+      "content",
+      "venueId",
+      "trigger",
+      "scheduledFor",
+      "consentPurpose",
+      "sendWindow"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /campaigns"
+   },
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   },
+   {
+    "id": "formUpdateSaleBoard",
+    "component": "modal",
+    "trigger": "Save sale board",
+    "body": "**Collects what `updateSaleBoard` sends before it is called.** Required: `id`, `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SaleBoard",
+    "confirm": {
+     "label": "Save sale board",
+     "operation": "updateSaleBoard"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "venueId",
+      "kind",
+      "pages",
+      "isActive"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1199,14 +1561,11 @@
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-119 holds none of them, so the edge carries nothing and BO-102 opens cold"
     }
    ]
   },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not.",
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Upsell rules are read-only here** (decided 28 September, audit R183): rules are created and deleted at region level, and this venue screen only shows what they suggest.",
   "density": "compact",
   "boardFrames": [
    "Retail Board 5.dc.html#ret-5d"
@@ -1217,8 +1576,8 @@
   "gaps": [
    {
     "operation": "getRecommendations",
-    "why": "**2 declared operations reach no component on this screen**: getRecommendations, getUpsellSuggestions. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "why": "**`getRecommendations` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
+    "source": "contract promotions.yaml POST /recommendations"
    }
   ],
   "layout": {
@@ -1234,28 +1593,46 @@
        "provenance": "carried from the previous definition"
       },
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "getRecommendations",
-       "notes": "The act the screen exists for."
-      },
-      {
        "kind": "secondaryButton",
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "getRecommendations"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Recommendations",
+       "operation": "getRecommendations",
+       "notes": "Shows `productId`, `reason`, `confidence` from `getRecommendations`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
+       "provenance": "contract promotions.yaml POST /recommendations"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The upsell suggestion",
+       "bindsTo": "UpsellSuggestion",
+       "columns": [
+        "UpsellSuggestion.variantId",
+        "UpsellSuggestion.bundleId",
+        "UpsellSuggestion.name",
+        "UpsellSuggestion.price",
+        "UpsellSuggestion.discountedPrice",
+        "UpsellSuggestion.source",
+        "UpsellSuggestion.ruleId",
+        "UpsellSuggestion.rank",
+        "UpsellSuggestion.rationale"
+       ],
+       "operation": "getUpsellSuggestions",
+       "provenance": "contract promotions.yaml POST /upsell-suggestions"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The cross-sell upsell recommendation list.",
+   "loading": "The cross-sell upsell recommendation, read by `getUpsellSuggestions`.",
    "error": "Could not load. Names which read failed and leaves the cross-sell upsell recommendation untouched.",
-   "emptyFirstRun": "No cross-sell upsell recommendation yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the cross-sell upsell recommendation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No cross-sell upsell recommendation yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getRecommendations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1269,6 +1646,20 @@
     "contract": "promotions",
     "purpose": "Suggestions for a cart",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "createUpsellRule",
+    "contract": "promotions",
+    "purpose": "Create an upsell rule",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "deleteUpsellRule",
+    "contract": "promotions",
+    "purpose": "Remove an upsell rule",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
    }
   ],
   "entryState": {
@@ -1276,6 +1667,10 @@
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "ruleId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders."
@@ -1284,6 +1679,7 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-119",
+   "derivedFrom": "wireframes/reference/Retail Board 5.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
@@ -1336,10 +1732,7 @@
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-120 holds none of them, so the edge carries nothing and BO-102 opens cold"
     }
    ]
   },
@@ -1360,7 +1753,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every omnichannel commerce journey",
+       "label": "Every journey",
        "bindsTo": "Journey",
        "columns": [
         "Journey.id",
@@ -1376,6 +1769,11 @@
        ],
        "operation": "listJourneys",
        "provenance": "contract marketing-crm.yaml GET /journeys"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search omnichannel commerce",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1385,7 +1783,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected omnichannel commerce journey",
+       "label": "The selected journey",
        "bindsTo": "Journey",
        "columns": [
         "Journey.id",
@@ -1410,20 +1808,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create journey",
        "operation": "createJourney",
        "provenance": "contract marketing-crm.yaml POST /journeys"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search omnichannel commerce",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1432,9 +1819,9 @@
   "states": {
    "loading": "The omnichannel commerce journey list.",
    "error": "Could not load. Names which read failed and leaves the omnichannel commerce journey untouched.",
-   "emptyFirstRun": "No omnichannel commerce journey yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the omnichannel commerce journey are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No omnichannel commerce journey yet. Offers Create journey (`createJourney`).",
+   "emptyNoResults": "Never shown: `listJourneys` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listJourneys` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1473,9 +1860,39 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-120",
+   "derivedFrom": "wireframes/reference/Retail Board 5.dc.html",
    "note": "**Drawn by Claude Design on `Retail Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateJourney",
+    "component": "modal",
+    "trigger": "Create journey",
+    "body": "**Collects what `createJourney` sends before it is called.** Required: `id`, `name`, `entryEvent`, `steps`, `status`. Optional: `templateKind`, `entryConditions`, `maxDurationDays`, `reentryPolicy`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "Journey",
+    "confirm": {
+     "label": "Create journey",
+     "operation": "createJourney"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "name",
+      "entryEvent",
+      "steps",
+      "status",
+      "templateKind",
+      "entryConditions",
+      "maxDurationDays",
+      "reentryPolicy",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /journeys"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1524,10 +1941,7 @@
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-121 holds none of them, so the edge carries nothing and BO-102 opens cold"
     }
    ]
   },
@@ -1547,8 +1961,15 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "listSegments",
+       "notes": "Sends `?search=` to `listSegments`.",
+       "provenance": "contract marketing-crm.yaml GET /segments"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every personalized offers guest",
+       "label": "Every segment",
        "bindsTo": "Segment",
        "columns": [
         "Segment.name",
@@ -1563,6 +1984,11 @@
        ],
        "operation": "listSegments",
        "provenance": "contract marketing-crm.yaml GET /segments"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search personalized offers",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1572,7 +1998,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected personalized offers guest",
+       "label": "The selected segment",
        "bindsTo": "Segment",
        "columns": [
         "Segment.name",
@@ -1596,20 +2022,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create campaign",
        "operation": "createCampaign",
        "provenance": "contract marketing-crm.yaml POST /campaigns"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search personalized offers",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1618,9 +2033,9 @@
   "states": {
    "loading": "The personalized offers guest list.",
    "error": "Could not load. Names which read failed and leaves the personalized offers guest untouched.",
-   "emptyFirstRun": "No personalized offers guest yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the personalized offers guest are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No personalized offers guest yet. Offers Create campaign (`createCampaign`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on search and the personalized offers guest are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listSegments` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1659,10 +2074,40 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-121",
+   "derivedFrom": "wireframes/reference/Retail Board 5.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateCampaign",
+    "component": "modal",
+    "trigger": "Create campaign",
+    "body": "**Collects what `createCampaign` sends before it is called.** Required: `name`, `kind`, `channel`, `segmentId`, `content`. Optional: `venueId`, `trigger`, `scheduledFor`, `consentPurpose`, `sendWindow`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateCampaignRequest",
+    "confirm": {
+     "label": "Create campaign",
+     "operation": "createCampaign"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "kind",
+      "channel",
+      "segmentId",
+      "content",
+      "venueId",
+      "trigger",
+      "scheduledFor",
+      "consentPurpose",
+      "sendWindow"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /campaigns"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1711,10 +2156,7 @@
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-122 holds none of them, so the edge carries nothing and BO-102 opens cold"
     }
    ]
   },
@@ -1734,8 +2176,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listSaleBoards",
+       "notes": "Sends `?venueId=` to `listSaleBoards`.",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listSaleBoards",
+       "notes": "Sends `?kind=` to `listSaleBoards`.",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every pos experience",
+       "label": "Every sale board",
        "bindsTo": "SaleBoard",
        "columns": [
         "SaleBoard.id",
@@ -1748,6 +2204,11 @@
        ],
        "operation": "listSaleBoards",
        "provenance": "contract tenancy.yaml GET /sale-boards"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search pos experience dashboard",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1757,7 +2218,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected pos experience",
+       "label": "The selected sale board",
        "bindsTo": "SaleBoard",
        "columns": [
         "SaleBoard.id",
@@ -1772,26 +2233,15 @@
        "provenance": "contract tenancy.yaml GET /sale-boards"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search pos experience dashboard",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The pos experience list.",
    "error": "Could not load. Names which read failed and leaves the pos experience untouched.",
-   "emptyFirstRun": "No pos experience yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the pos experience are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No pos experience yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on venueId, kind and the pos experience are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listSaleBoards` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1821,6 +2271,7 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-122",
+   "derivedFrom": "wireframes/reference/Retail Board 5.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
@@ -1849,15 +2300,15 @@
   }
  },
  {
-  "id": "BO-123",
-  "name": "POS Profile Management",
+  "id": "BO-1190",
+  "name": "Donation Campaigns",
   "module": "Sell",
-  "requiresModule": "core",
+  "requiresModule": "ticketing",
   "wave": 2,
   "implementation": {
    "app": "venue-management-web",
-   "route": "/sell/pos-profile-management",
-   "component": "apps/venue-management-web/src/routes/sell/PosProfileManagementList.tsx",
+   "route": "/sell/donation-campaigns",
+   "component": "apps/venue-management-web/src/routes/sell/DonationCampaigns.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1868,45 +2319,55 @@
     "BO-102"
    ],
    "inferred": false,
-   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "notes": "Reached from BO-102 Sell. New 29 September (VM close-out): donations are a configuration area with operations and no screen.",
    "transitions": [
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "decided 29 September, VM close-out (venue management and configuration)"
     }
    ]
   },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not.",
+  "notes": "**Created 29 September (VM close-out)** because `listDonationCampaigns`, `createDonationCampaign` and `updateDonationCampaign` had no screen (matrix 1.1.128-1.1.133). **The amounts are configuration, not code**: fixed choices, a free amount or round-up. **Donations post to a liability account, not revenue** (1.1.132), so the liability account is required before a campaign goes live.",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "`listSaleBoards` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "POS Profile Management — from the client design board, 20 August.",
+  "patternReason": "`listDonationCampaigns` reads the population and the panel edits one of them — list, select, act",
+  "purpose": "Create, run and close the donation campaigns guests can give to at checkout.",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "filters",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "toggle",
+       "label": "Active only",
+       "notes": "Filters the loaded list on `isActive`.",
+       "provenance": "our build plan"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every pos profile",
-       "bindsTo": "SaleBoard",
+       "label": "Every donation campaign",
+       "bindsTo": "DonationCampaign",
        "columns": [
-        "SaleBoard.id",
-        "SaleBoard.code",
-        "SaleBoard.name",
-        "SaleBoard.venueId",
-        "SaleBoard.kind",
-        "SaleBoard.pages",
-        "SaleBoard.isActive"
+        "DonationCampaign.name",
+        "DonationCampaign.beneficiary",
+        "DonationCampaign.amountMode",
+        "DonationCampaign.channels",
+        "DonationCampaign.validFrom",
+        "DonationCampaign.validTo",
+        "DonationCampaign.isActive",
+        "DonationCampaign.raisedTotal"
        ],
-       "operation": "listSaleBoards",
-       "provenance": "contract tenancy.yaml GET /sale-boards"
+       "operation": "listDonationCampaigns",
+       "provenance": "contract catalogue.yaml GET /donation-campaigns"
       }
      ]
     },
@@ -1916,19 +2377,26 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected pos profile",
-       "bindsTo": "SaleBoard",
+       "label": "The selected campaign",
+       "bindsTo": "DonationCampaign",
        "columns": [
-        "SaleBoard.id",
-        "SaleBoard.code",
-        "SaleBoard.name",
-        "SaleBoard.venueId",
-        "SaleBoard.kind",
-        "SaleBoard.pages",
-        "SaleBoard.isActive"
+        "DonationCampaign.name",
+        "DonationCampaign.description",
+        "DonationCampaign.beneficiary",
+        "DonationCampaign.venueIds",
+        "DonationCampaign.amountMode",
+        "DonationCampaign.fixedAmounts",
+        "DonationCampaign.minAmount",
+        "DonationCampaign.maxAmount",
+        "DonationCampaign.liabilityAccountId",
+        "DonationCampaign.channels",
+        "DonationCampaign.validFrom",
+        "DonationCampaign.validTo",
+        "DonationCampaign.isActive",
+        "DonationCampaign.raisedTotal"
        ],
-       "operation": "listSaleBoards",
-       "provenance": "contract tenancy.yaml GET /sale-boards"
+       "operation": "listDonationCampaigns",
+       "provenance": "contract catalogue.yaml GET /donation-campaigns"
       }
      ]
     },
@@ -1938,47 +2406,62 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
-       "operation": "setConfigurationProfile",
-       "provenance": "contract tenancy.yaml PUT /configuration-profiles"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+       "label": "New campaign",
+       "operation": "createDonationCampaign",
+       "provenance": "contract catalogue.yaml POST /donation-campaigns"
+      },
       {
-       "kind": "searchField",
-       "label": "Search pos profile management",
-       "provenance": "carried from the previous definition"
+       "kind": "secondaryButton",
+       "label": "Save campaign",
+       "operation": "updateDonationCampaign",
+       "provenance": "contract catalogue.yaml PATCH /donation-campaigns/{campaignId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Close campaign",
+       "operation": "updateDonationCampaign",
+       "notes": "Sends `isActive` false. **Closing does not reverse donations already given**; the raised total is still owed to the beneficiary.",
+       "provenance": "contract catalogue.yaml PATCH /donation-campaigns/{campaignId}"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The pos profile list.",
-   "error": "Could not load. Names which read failed and leaves the pos profile untouched.",
-   "emptyFirstRun": "No pos profile yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the pos profile are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The tenant's donation campaigns, read by `listDonationCampaigns`.",
+   "error": "Could not load. Names which read failed and leaves the campaigns untouched.",
+   "emptyFirstRun": "No donation campaigns yet. Offers New campaign; checkout shows no donation prompt until one is active.",
+   "emptyNoResults": "The Active only filter matched nothing and the closed campaigns are still there. Offers to clear it.",
+   "emptyNoAccess": "Names the missing permission (`PRODUCT_VIEW` to see, `PRODUCT_CONFIGURE` to change). **Never an empty table.**",
+   "validation": "`400` on a missing name or amount mode, fixed amounts missing when the mode is fixed choices, or a minimum above the maximum; marked on the field. A campaign without a liability account cannot be activated."
   },
   "apis": [
    {
-    "operationId": "setConfigurationProfile",
-    "contract": "tenancy",
-    "purpose": "setConfigurationProfile",
+    "operationId": "listDonationCampaigns",
+    "contract": "catalogue",
+    "purpose": "Every campaign with what it has raised",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "createDonationCampaign",
+    "contract": "catalogue",
+    "purpose": "Create a campaign with its amounts, channels and liability account",
     "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
     "invalidates": [
-     "listSaleBoards"
+     "listDonationCampaigns"
     ]
    },
    {
-    "operationId": "listSaleBoards",
-    "contract": "tenancy",
-    "purpose": "List sale boards",
-    "trigger": "onLoad"
+    "operationId": "updateDonationCampaign",
+    "contract": "catalogue",
+    "purpose": "Amend or close a campaign",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listDonationCampaigns"
+    ]
    }
   ],
   "entryState": {
@@ -1986,23 +2469,36 @@
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "campaignId",
+     "from": "navigation"
     }
    ],
-   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders.",
-   "preloaded": [
-    "SaleBoard.id",
-    "SaleBoard.code",
-    "SaleBoard.name",
-    "SaleBoard.venueId",
-    "SaleBoard.kind"
-   ]
+   "coldEntry": "Resolves the tenant and venue from the session; a cold arrival is the ordinary case."
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-123"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-1190"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateDonationCampaign",
+    "component": "modal",
+    "trigger": "New campaign",
+    "body": "**Collects what `createDonationCampaign` sends.** Required: `name`, `amountMode`, `isActive`. With fixed choices, `fixedAmounts`; with a free amount, `minAmount` and `maxAmount`; always the `liabilityAccountId` before activation. Optional: `description`, `beneficiary`, `venueIds`, `channels`, `validFrom`, `validTo`.",
+    "bindsTo": "DonationCampaign",
+    "confirm": {
+     "label": "Create campaign",
+     "operation": "createDonationCampaign"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract catalogue.yaml POST /donation-campaigns"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

@@ -1,6 +1,6 @@
 # WS59 — Ticket Media   Credential Management board 1
 
-**10 screens · 10 operations · 11 schemas · 2 permissions**
+**10 screens · 12 operations · 11 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, SCOPE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, AUDIT_VIEW, SCOPE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,15 +60,15 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-334` | Virtual Ticket Command Center | commandCentre | 1 | 0 | — |
+| `BO-334` | Virtual Ticket Command Center | commandCentre | 3 | 0 | — |
 | `BO-335` | Virtual Ticket Identity & Master Record Configuration | configEditor | 1 | 0 | — |
 | `BO-336` | Virtual Ticket Status & Lifecycle Model | listDetail | 1 | 0 | — |
-| `BO-337` | Media Type & Credential Technology Registry | configEditor | 1 | 0 | — |
+| `BO-337` | Media Type & Credential Technology Registry | configEditor | 2 | 0 | — |
 | `BO-338` | Multi-Media Binding & Association Rules | configEditor | 1 | 0 | — |
 | `BO-339` | Credential Identity, Token & Reference Mapping | listDetail | 1 | 0 | — |
 | `BO-340` | Entitlement & Cross-Media Synchronization Rules | listDetail | 1 | 0 | — |
 | `BO-341` | Media Activation, Priority & Fallback Rules | configEditor | 1 | 0 | — |
-| `BO-342` | Media Replacement, Revocation & Rebinding Rules | configEditor | 1 | 2 | — |
+| `BO-342` | Media Replacement, Revocation & Rebinding Rules | configEditor | 2 | 2 | — |
 | `BO-343` | Virtual Ticket Architecture Testing, Governance & Audit | configEditor | 1 | 0 | — |
 
 ## Thin screens in this batch
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-334 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-335",
@@ -186,10 +182,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can locate any Virtual Ticket and immediately understand its ticket status, entitlement, usage state and all associated media from one centralized workspace.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each record should show) — counts over a population, then the population",
   "purpose": "Provide administrators and operations teams with a centralized view of all Virtual Tickets and their associated media across TICVAI. This is the primary administrative entry point into the Virtual Ticket architecture.",
-  "purposeNote": "Authorized users can locate any Virtual Ticket and immediately understand its ticket status, entitlement, usage state and all associated media from one centralized workspace.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -233,61 +229,61 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "metricTile",
        "label": "Total Virtual Tickets",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.totalVirtualTickets"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.totalVirtualTickets"
       },
       {
        "kind": "metricTile",
        "label": "Active",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.active"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.active"
       },
       {
        "kind": "metricTile",
        "label": "Pending Activation",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.pendingActivation"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.pendingActivation"
       },
       {
        "kind": "metricTile",
        "label": "Suspended",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.suspended"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.suspended"
       },
       {
        "kind": "metricTile",
        "label": "Used / Consumed",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.usedConsumed"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.usedConsumed"
       },
       {
        "kind": "metricTile",
        "label": "Partially Consumed",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.partiallyConsumed"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.partiallyConsumed"
       },
       {
        "kind": "metricTile",
        "label": "Expired",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.expired"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.expired"
       },
       {
        "kind": "metricTile",
        "label": "Cancelled",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.cancelled"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.cancelled"
       },
       {
        "kind": "metricTile",
        "label": "Revoked",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.revoked"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.revoked"
       },
       {
        "kind": "metricTile",
        "label": "Virtual Tickets with Multiple Media",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.virtualTicketsWithMultipleMedia"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.virtualTicketsWithMultipleMedia"
       },
       {
        "kind": "metricTile",
@@ -298,13 +294,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "metricTile",
        "label": "Media Binding Exceptions",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.mediaBindingExceptions"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.mediaBindingExceptions"
       },
       {
        "kind": "metricTile",
        "label": "Credential Synchronization Issues",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
-       "bindsTo": "VirtualTicketCommandCenterView.credentialSynchronizationIssues"
+       "bindsTo": "VirtualTicketCommandCenterViewSummary.credentialSynchronizationIssues"
       }
      ]
     },
@@ -323,7 +319,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "VirtualTicketCommandCenterView.orderReference",
         "VirtualTicketCommandCenterView.ticketType",
         "VirtualTicketCommandCenterView.seatResourceWhereApplicable",
-        "VirtualTicketCommandCenterView.validFromTo",
         "VirtualTicketCommandCenterView.ticketStatus",
         "VirtualTicketCommandCenterView.usageStatus",
         "VirtualTicketCommandCenterView.numberOfLinkedMedia",
@@ -353,7 +348,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "VirtualTicketCommandCenterView.orderReference",
         "VirtualTicketCommandCenterView.ticketType",
         "VirtualTicketCommandCenterView.seatResourceWhereApplicable",
-        "VirtualTicketCommandCenterView.validFromTo",
         "VirtualTicketCommandCenterView.ticketStatus",
         "VirtualTicketCommandCenterView.usageStatus",
         "VirtualTicketCommandCenterView.numberOfLinkedMedia",
@@ -393,12 +387,25 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Virtual Ticket Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listVirtualTicketStatus",
+    "contract": "access",
+    "purpose": "Virtual Ticket Status & Lifecycle Model",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listVirtualTicketArchitecture",
+    "contract": "access",
+    "purpose": "Virtual Ticket Architecture Testing, Governance & Audit",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-334"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-334",
+   "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-334"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 4. 29 of 39 labels bound to a contract property; 50 of 69 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -461,10 +468,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every issued ticket has one persistent, media-independent Virtual Ticket identity that remains authoritative regardless of which credential technologies are attached to it.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Define the authoritative Virtual Ticket object used throughout TICVAI. This screen is extremely important because the Virtual Ticket—not the QR/RFID/card— is the master ticket record.",
-  "purposeNote": "Every issued ticket has one persistent, media-independent Virtual Ticket identity that remains authoritative regardless of which credential technologies are attached to it.",
   "layout": {
    "template": "form",
    "regions": [
@@ -543,16 +550,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setVirtualTicketIdentity",
     "contract": "access",
     "purpose": "Virtual Ticket Identity & Master Record Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setVirtualTicketIdentity"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-335"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-335",
+   "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-335"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 6. 0 of 0 labels bound to a contract property; 9 of 59 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -615,10 +620,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "state changes across every credential associated with that ticket.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure the standardized lifecycle of a Virtual Ticket independently from the lifecycle of individual media.",
-  "purposeNote": "state changes across every credential associated with that ticket.",
   "gaps": [
    {
     "operation": null,
@@ -664,17 +669,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "VirtualTicketStatusLifecycleModelView.withGovernedAlternativeStates",
-    "VirtualTicketStatusLifecycleModelView.suspended",
-    "VirtualTicketStatusLifecycleModelView.cancelled",
-    "VirtualTicketStatusLifecycleModelView.voided",
-    "VirtualTicketStatusLifecycleModelView.reissuedSuperseded"
+    "VirtualTicketStatusLifecycleModelView.toStatus"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-336"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-336",
+   "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-336"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 11 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -737,10 +739,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "technologies with their capabilities, providers and technical behavior.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§For each technology configure) and no display directory — it is settings, not a population",
   "purpose": "Maintain the centralized catalogue of credential technologies supported by TICVAI. This makes the credential architecture extensible rather than hard-coded.",
-  "purposeNote": "technologies with their capabilities, providers and technical behavior.",
   "layout": {
    "template": "form",
    "regions": [
@@ -850,6 +852,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "apis": [
    {
+    "operationId": "listMediaTypeTechnology",
+    "contract": "access",
+    "purpose": "Media Type & Technology Library",
+    "trigger": "onLoad"
+   },
+   {
     "operationId": "listMediaTypeCredential",
     "contract": "access",
     "purpose": "Media Type & Credential Technology Registry",
@@ -859,7 +867,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-337"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-337",
+   "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-337"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 18 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -922,10 +931,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Ticket without creating duplicate ticket entitlements.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure how one Virtual Ticket can be associated with multiple media simultaneously. This is one of the most important screens in Area 15.",
-  "purposeNote": "Ticket without creating duplicate ticket entitlements.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1014,7 +1023,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-338"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-338",
+   "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-338"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 12 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1077,10 +1087,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every supported credential can securely and consistently resolve to its authoritative Virtual Ticket without duplicating ticket entitlement data within individual media.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Define how individual media identifiers resolve securely back to the authoritative Virtual Ticket.",
-  "purposeNote": "Every supported credential can securely and consistently resolve to its authoritative Virtual Ticket without duplicating ticket entitlement data within individual media.",
   "gaps": [
    {
     "operation": null,
@@ -1096,6 +1106,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Key references",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 12 §Support appropriate"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "components": [
@@ -1125,20 +1146,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    }
   ],
   "entryState": {
-   "preloaded": [
-    "CredentialIdentityTokenReferenceMappingView.qrToken",
-    "CredentialIdentityTokenReferenceMappingView.rfidUid",
-    "CredentialIdentityTokenReferenceMappingView.walletObject",
-    "CredentialIdentityTokenReferenceMappingView.nfcToken",
-    "CredentialIdentityTokenReferenceMappingView.faceReference"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-339"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-339",
+   "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-339"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 12. 0 of 0 labels bound to a contract property; 0 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 12. 0 of 0 labels bound to a contract property; 1 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Key references dropped (heading).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1199,10 +1215,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "All credential media consistently consume and represent the same authoritative Virtual Ticket entitlement and usage state.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Detect) and no metric row",
   "purpose": "Ensure all media attached to a Virtual Ticket share the same authoritative ticket and entitlement state.",
-  "purposeNote": "All credential media consistently consume and represent the same authoritative Virtual Ticket entitlement and usage state.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1214,11 +1230,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every entitlement cross-media synchronization",
        "columns": [
-        "EntitlementCrossMediaSynchronizationRulesView.delayedUpdates",
-        "EntitlementCrossMediaSynchronizationRulesView.conflictingStates",
-        "EntitlementCrossMediaSynchronizationRulesView.offlineTransactionsPendingSynchronization",
-        "EntitlementCrossMediaSynchronizationRulesView.providerUpdateFailures",
-        "EntitlementCrossMediaSynchronizationRulesView.staleWalletCredentials"
+        "EntitlementCrossMediaSynchronizationRulesView.monitoredConditions"
        ],
        "bindsTo": "EntitlementCrossMediaSynchronizationRulesView",
        "operation": "listEntitlementCrossMedia",
@@ -1235,11 +1247,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected entitlement cross-media synchronization",
        "bindsTo": "EntitlementCrossMediaSynchronizationRulesView",
        "columns": [
-        "EntitlementCrossMediaSynchronizationRulesView.delayedUpdates",
-        "EntitlementCrossMediaSynchronizationRulesView.conflictingStates",
-        "EntitlementCrossMediaSynchronizationRulesView.offlineTransactionsPendingSynchronization",
-        "EntitlementCrossMediaSynchronizationRulesView.providerUpdateFailures",
-        "EntitlementCrossMediaSynchronizationRulesView.staleWalletCredentials"
+        "EntitlementCrossMediaSynchronizationRulesView.monitoredConditions"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Critical Principle”, “For example, TICVAI must prevent”, “Instead”, “Face Credential”, “Virtual Ticket resolved”, “Access transaction recorded”.",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 14 §Detect"
@@ -1265,17 +1273,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "EntitlementCrossMediaSynchronizationRulesView.delayedUpdates",
-    "EntitlementCrossMediaSynchronizationRulesView.conflictingStates",
-    "EntitlementCrossMediaSynchronizationRulesView.offlineTransactionsPendingSynchronization",
-    "EntitlementCrossMediaSynchronizationRulesView.providerUpdateFailures",
-    "EntitlementCrossMediaSynchronizationRulesView.staleWalletCredentials"
+    "EntitlementCrossMediaSynchronizationRulesView.monitoredConditions"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-340"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-340",
+   "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-340"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 14. 5 of 5 labels bound to a contract property; 17 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1338,10 +1343,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "options without compromising the underlying Virtual Ticket.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure when each credential becomes active and how alternative media behave if the preferred credential cannot be used.",
-  "purposeNote": "options without compromising the underlying Virtual Ticket.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1389,6 +1394,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "primaryButton",
        "label": "On ticket activation",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 15 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "On download",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 15 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "On wallet installation",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 15 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "On event date",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 15 §Support"
       }
      ]
     }
@@ -1411,9 +1431,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-341"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-341",
+   "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-341"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 7 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 10 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1474,17 +1495,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Credential media can be securely replaced, revoked and rebound while maintaining continuity of the underlying Virtual Ticket and a complete audit history.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure controlled handling of lost, stolen, damaged, compromised or replaced credential media.",
-  "purposeNote": "Credential media can be securely replaced, revoked and rebound while maintaining continuity of the underlying Virtual Ticket and a complete audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Printed ticket replacement, Suspend Media, Revoke Media. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Support"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1550,6 +1564,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Wallet credential replacement",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Printed ticket replacement",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Support"
       },
@@ -1562,6 +1581,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "destructiveButton",
        "label": "Revoke Media",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Allow immediate"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Replace Media",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Allow immediate"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save replacement rule",
+       "operation": "setMediaReplacementRevocation",
+       "provenance": "contract access.yaml PUT /media-replacement-revocation (decided 29 September, VM close-out)"
       }
      ]
     }
@@ -1595,14 +1625,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Media Replacement, Revocation & Rebinding Rules",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setMediaReplacementRevocation",
+    "contract": "access",
+    "purpose": "Save replacement rule",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-342"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-342",
+   "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-342"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 13 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 15 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `setMediaReplacementRevocation`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1655,10 +1692,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from BO-334, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "and retain complete traceability of configuration and credential-binding changes. Board 1 — Final Screen Register",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configuration Simulator; Configuration Owner; AI Configuration Review) and no display directory — it is settings, not a population",
   "purpose": "Provide the final testing and governance environment for Virtual Ticket and multi-media configurations. Board 1 established what the Virtual Ticket is and how multiple credentials can point to the same authoritative ticket. Board 2 defines how each media type is created, designed, configured, branded, populated with data, previewed, tested and published.",
-  "purposeNote": "and retain complete traceability of configuration and credential-binding changes. Board 1 — Final Screen Register",
   "layout": {
    "template": "form",
    "regions": [
@@ -1732,7 +1769,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-343"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-343",
+   "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-343"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 17. 0 of 0 labels bound to a contract property; 9 of 116 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1776,9 +1814,35 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "virtualTicketId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "mediaType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "credentialReference",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CredentialIdentityTokenReferenceMappingView"
+  "responds": "Page"
  },
  "listEntitlementCrossMedia": {
   "method": "GET",
@@ -1831,6 +1895,19 @@ Method, path, parameters, request and response for every operation these screens
   "parameters": [],
   "requestBody": null,
   "responds": "MediaTypeCredentialTechnologyRegistryView"
+ },
+ "listMediaTypeTechnology": {
+  "method": "GET",
+  "path": "/media-type-technology",
+  "contract": "access",
+  "summary": "Media Type & Technology Library",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MediaTypeTechnologyLibraryView"
  },
  "listMultiMediaBinding": {
   "method": "GET",
@@ -1894,23 +1971,74 @@ Method, path, parameters, request and response for every operation these screens
     "name": "mediaType",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ticketType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "numberOfMedia",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "validity",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "usageStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "VirtualTicketCommandCenterView"
+  "responds": "Page"
  },
  "listVirtualTicketArchitecture": {
   "method": "GET",
   "path": "/virtual-ticket-architecture",
   "contract": "access",
   "summary": "Virtual Ticket Architecture Testing, Governance & Audit",
-  "permission": "SCOPE_VIEW",
+  "permission": "AUDIT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "changeType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "VirtualTicketArchitectureTestingGovernanceAuditView"
+  "responds": "Page"
  },
  "listVirtualTicketStatus": {
   "method": "GET",
@@ -1925,6 +2053,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "VirtualTicketStatusLifecycleModelView"
  },
+ "setMediaReplacementRevocation": {
+  "method": "PUT",
+  "path": "/media-replacement-revocation",
+  "contract": "access",
+  "summary": "Save a media replacement rule",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MediaReplacementRevocationRebindingRulesInput",
+  "responds": "MediaReplacementRevocationRebindingRulesView"
+ },
  "setVirtualTicketIdentity": {
   "method": "PUT",
   "path": "/virtual-ticket-identity",
@@ -1934,7 +2081,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "VirtualTicketIdentityMasterRecordConfigurationInput",
   "responds": "VirtualTicketIdentityMasterRecordConfigurationView"
  }
@@ -1947,185 +2100,52 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
- "CredentialIdentityTokenReferenceMappingView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Credential Identity, Token & Reference Mapping displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "qrToken": {
-    "type": "string",
-    "description": "QR Token →"
-   },
-   "rfidUid": {
-    "type": "string",
-    "description": "RFID UID →"
-   },
-   "walletObject": {
-    "type": "string",
-    "description": "Wallet Object →"
-   },
-   "nfcToken": {
-    "type": "string",
-    "description": "NFC Token →"
-   },
-   "faceReference": {
-    "type": "string",
-    "description": "Face Reference →"
-   },
-   "andTheResolverReturns": {
-    "type": "string",
-    "description": "and the resolver returns"
-   },
-   "credentialBindingId": {
-    "type": "string",
-    "description": "Credential Binding ID"
-   },
-   "virtualTicketId": {
-    "type": "string",
-    "description": "Virtual Ticket ID"
-   },
-   "mediaType": {
-    "type": "string",
-    "description": "Media Type"
-   },
-   "credentialReference": {
-    "type": "string",
-    "description": "Credential Reference"
-   },
-   "tokenIdentifier": {
-    "type": "string",
-    "description": "Token / Identifier"
-   },
-   "providerReference": {
-    "type": "string",
-    "description": "Provider Reference"
-   },
-   "issuedDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Issued Date"
-   },
-   "activationDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Activation Date"
-   },
-   "expiry": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Expiry"
-   },
-   "status": {
-    "type": "string",
-    "description": "Status"
-   },
-   "version": {
-    "type": "string",
-    "description": "Version"
-   },
-   "securityProfile": {
-    "type": "string",
-    "description": "Security profile"
-   },
-   "tokenization": {
-    "type": "string",
-    "description": "Tokenization"
-   },
-   "hashing": {
-    "type": "string",
-    "description": "Hashing"
-   },
-   "encryption": {
-    "type": "string",
-    "description": "Encryption"
-   },
-   "signedPayloads": {
-    "type": "string",
-    "description": "Signed payloads"
-   },
-   "keyReferences": {
-    "type": "string",
-    "description": "Key references"
-   },
-   "masking": {
-    "type": "string",
-    "description": "Masking"
-   },
-   "dependingOnCredentialTechnology": {
-    "type": "string",
-    "description": "depending on credential technology"
-   }
-  }
- },
  "EntitlementCrossMediaSynchronizationRulesView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Entitlement & Cross-Media Synchronization Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "entry": {
+   "triggerEvent": {
     "type": "string",
-    "description": "Entry"
+    "enum": [
+     "entry",
+     "exit",
+     "redemption",
+     "partialConsumption",
+     "cancellation",
+     "refund",
+     "suspension",
+     "reactivation",
+     "transfer",
+     "upgrade",
+     "expiry",
+     "replacement"
+    ],
+    "description": "Ticket event this synchronisation rule handles"
    },
-   "exit": {
+   "monitoredConditions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "delayedUpdates",
+      "conflictingStates",
+      "offlineTransactionsPendingSynchronization",
+      "providerUpdateFailures",
+      "staleWalletCredentials"
+     ]
+    },
+    "description": "Synchronisation problems detected and alerted"
+   },
+   "propagation": {
     "type": "string",
-    "description": "Exit"
-   },
-   "redemption": {
-    "type": "string",
-    "description": "Redemption"
-   },
-   "partialConsumption": {
-    "type": "string",
-    "description": "Partial consumption"
-   },
-   "cancellation": {
-    "type": "string",
-    "description": "Cancellation"
-   },
-   "suspension": {
-    "type": "string",
-    "description": "Suspension"
-   },
-   "reactivation": {
-    "type": "string",
-    "description": "Reactivation"
-   },
-   "expiry": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Expiry"
-   },
-   "replacement": {
-    "type": "string",
-    "description": "Replacement"
-   },
-   "mainAdmission": {
-    "type": "string",
-    "description": "Main admission"
-   },
-   "delayedUpdates": {
-    "type": "string",
-    "description": "Delayed updates"
-   },
-   "conflictingStates": {
-    "type": "string",
-    "description": "Conflicting states"
-   },
-   "offlineTransactionsPendingSynchronization": {
-    "type": "integer",
-    "description": "Offline transactions pending synchronization"
-   },
-   "providerUpdateFailures": {
-    "type": "string",
-    "description": "Provider update failures"
-   },
-   "staleWalletCredentials": {
-    "type": "string",
-    "description": "Stale wallet credentials"
+    "description": "How the Virtual Ticket state change reaches every bound medium"
    }
-  }
+  },
+  "required": [
+   "triggerEvent"
+  ]
  },
  "MediaActivationPriorityFallbackRulesView": {
   "type": "object",
@@ -2133,64 +2153,40 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Media Activation, Priority & Fallback Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "immediateOnIssuance": {
+   "mediaTypeId": {
     "type": "string",
-    "description": "Immediate on issuance"
+    "description": "Media type this rule applies to"
    },
-   "onTicketActivation": {
+   "activationTrigger": {
     "type": "string",
-    "description": "On ticket activation"
-   },
-   "onDownload": {
-    "type": "string",
-    "description": "On download"
-   },
-   "onWalletInstallation": {
-    "type": "string",
-    "description": "On wallet installation"
-   },
-   "onRfidAssignment": {
-    "type": "string",
-    "description": "On RFID assignment"
-   },
-   "onFaceEnrollment": {
-    "type": "string",
-    "description": "On face enrollment"
-   },
-   "onFirstUse": {
-    "type": "string",
-    "description": "On first use"
-   },
-   "onEventDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "On event date"
-   },
-   "manualActivation": {
-    "type": "string",
-    "description": "Manual activation"
-   },
-   "scheduledActivation": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Scheduled activation"
+    "enum": [
+     "immediateOnIssuance",
+     "onTicketActivation",
+     "onDownload",
+     "onWalletInstallation",
+     "onRfidAssignment",
+     "onFaceEnrollment",
+     "onFirstUse",
+     "onEventDate",
+     "manualActivation",
+     "scheduledActivation"
+    ],
+    "description": "When this medium becomes active"
    },
    "temporaryMedia": {
-    "type": "string",
+    "type": "boolean",
     "description": "Temporary media"
    },
    "validityDuration": {
     "type": "string",
-    "format": "date-time",
-    "description": "Validity duration"
+    "description": "ISO 8601 duration, e.g. PT30M"
    },
    "oneTimeUse": {
-    "type": "string",
-    "format": "date-time",
+    "type": "boolean",
     "description": "One-time use"
    },
    "automaticExpiration": {
-    "type": "string",
+    "type": "boolean",
     "description": "Automatic expiration"
    },
    "replacementBehavior": {
@@ -2201,9 +2197,95 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Original-media impact"
    },
-   "ticket": {
+   "fallbackMediaTypes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Ordered media to use if this one cannot be used, e.g. face unavailable then RFID"
+   }
+  },
+  "required": [
+   "mediaTypeId",
+   "activationTrigger"
+  ]
+ },
+ "MediaReplacementRevocationRebindingRulesInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; the write configures the rules the matching View reads back (decided 29 September, VM close-out)",
+  "description": "**What Media Replacement, Revocation & Rebinding Rules submits** (decided 29 September, VM close-out). The writable fields of its View; the figures the screen computes are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "required": [
+   "replacementReason",
+   "outcome"
+  ],
+  "properties": {
+   "replacementReason": {
     "type": "string",
-    "description": "Ticket"
+    "enum": [
+     "lostRfidCard",
+     "damagedWristband",
+     "compromisedQr",
+     "newMobileDevice",
+     "walletCredentialReplacement",
+     "faceReEnrollment",
+     "printedTicketReplacement",
+     "incorrectCredentialAssignment"
+    ]
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "replace",
+     "rebind",
+     "suspendMedia",
+     "revokeMedia"
+    ],
+    "description": "What happens to the media"
+   },
+   "numberOfReplacements": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Maximum replacements per credential"
+   },
+   "replacementFeeReference": {
+    "type": "string",
+    "description": "Catalogue product charged for the replacement; empty is free"
+   },
+   "approvalRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "supervisorApproval": {
+    "type": "boolean",
+    "default": false
+   },
+   "identityVerification": {
+    "type": "boolean",
+    "default": true
+   },
+   "oldMediaAutomaticallyRevoked": {
+    "type": "boolean",
+    "default": true
+   },
+   "gracePeriod": {
+    "type": "string",
+    "description": "ISO 8601 duration the old media stays valid; empty is none"
+   },
+   "simultaneousMediaPolicy": {
+    "type": "string",
+    "enum": [
+     "oneActive",
+     "allowBothDuringGrace"
+    ],
+    "default": "oneActive"
+   },
+   "reasonMandatory": {
+    "type": "boolean",
+    "default": true
+   },
+   "reissueAllowed": {
+    "type": "boolean",
+    "default": true
    }
   }
  },
@@ -2213,117 +2295,74 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Media Replacement, Revocation & Rebinding Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "lostRfidCard": {
+   "outcome": {
     "type": "string",
-    "description": "Lost RFID card"
+    "enum": [
+     "replace",
+     "rebind",
+     "suspendMedia",
+     "revokeMedia"
+    ],
+    "description": "What happens to the media (decided 29 September, VM close-out)"
    },
-   "damagedWristband": {
+   "replacementReason": {
     "type": "string",
-    "description": "Damaged wristband"
-   },
-   "compromisedQr": {
-    "type": "string",
-    "description": "Compromised QR"
-   },
-   "newMobileDevice": {
-    "type": "integer",
-    "description": "New mobile device"
-   },
-   "walletCredentialReplacement": {
-    "type": "string",
-    "description": "Wallet credential replacement"
-   },
-   "faceReEnrollment": {
-    "type": "string",
-    "description": "Face re-enrollment"
-   },
-   "printedTicketReplacement": {
-    "type": "string",
-    "description": "Printed ticket replacement"
-   },
-   "incorrectCredentialAssignment": {
-    "type": "string",
-    "description": "Incorrect credential assignment"
-   },
-   "rfid88721Revoked": {
-    "type": "string",
-    "description": "RFID-88721 — REVOKED"
-   },
-   "rfid99211Active": {
-    "type": "integer",
-    "description": "RFID-99211 — ACTIVE"
-   },
-   "vt009821Active": {
-    "type": "integer",
-    "description": "VT-009821 — ACTIVE"
+    "enum": [
+     "lostRfidCard",
+     "damagedWristband",
+     "compromisedQr",
+     "newMobileDevice",
+     "walletCredentialReplacement",
+     "faceReEnrollment",
+     "printedTicketReplacement",
+     "incorrectCredentialAssignment"
+    ],
+    "description": "Replacement case this policy covers"
    },
    "numberOfReplacements": {
     "type": "integer",
     "description": "Number of replacements"
    },
    "replacementFeeReference": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Replacement fee reference"
+    "type": "string",
+    "description": "Reference to a fee in pricing configuration; no amount is held here"
    },
    "approvalRequired": {
     "type": "boolean",
     "description": "Approval required"
    },
    "identityVerification": {
-    "type": "string",
+    "type": "boolean",
     "description": "Identity verification"
    },
    "oldMediaAutomaticallyRevoked": {
-    "type": "string",
+    "type": "boolean",
     "description": "Old media automatically revoked"
    },
    "gracePeriod": {
     "type": "string",
-    "format": "date-time",
-    "description": "Grace period"
+    "description": "ISO 8601 duration, e.g. PT30M"
    },
    "simultaneousMediaPolicy": {
     "type": "string",
     "description": "Simultaneous media policy"
    },
    "reasonMandatory": {
-    "type": "string",
+    "type": "boolean",
     "description": "Reason mandatory"
    },
    "supervisorApproval": {
-    "type": "string",
+    "type": "boolean",
     "description": "Supervisor approval"
    },
-   "oldBinding": {
-    "type": "string",
-    "description": "Old binding"
-   },
-   "newBinding": {
-    "type": "integer",
-    "description": "New binding"
-   },
-   "user": {
-    "type": "string",
-    "description": "User"
-   },
-   "dateTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date/time"
-   },
-   "reason": {
-    "type": "string",
-    "description": "Reason"
-   },
-   "approval": {
-    "type": "string",
-    "description": "Approval"
-   },
-   "relatedTransaction": {
-    "type": "string",
-    "description": "Related transaction"
+   "reissueAllowed": {
+    "type": "boolean",
+    "description": "Reissue allowed"
    }
-  }
+  },
+  "required": [
+   "replacementReason"
+  ]
  },
  "MediaTypeCredentialTechnologyRegistryView": {
   "type": "object",
@@ -2331,74 +2370,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Media Type & Credential Technology Registry displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "qr": {
-    "type": "string",
-    "description": "QR"
-   },
-   "dynamicQr": {
-    "type": "string",
-    "description": "Dynamic QR"
-   },
-   "barcode": {
-    "type": "string",
-    "description": "Barcode"
-   },
-   "mobileTicket": {
-    "type": "string",
-    "description": "Mobile Ticket"
-   },
-   "pdf": {
-    "type": "string",
-    "description": "PDF"
-   },
-   "appleWallet": {
-    "type": "string",
-    "description": "Apple Wallet"
-   },
-   "googleWallet": {
-    "type": "string",
-    "description": "Google Wallet"
-   },
-   "rfidCard": {
-    "type": "string",
-    "description": "RFID Card"
-   },
-   "rfidWristband": {
-    "type": "string",
-    "description": "RFID Wristband"
-   },
-   "nfcCard": {
-    "type": "string",
-    "description": "NFC Card"
-   },
-   "nfcWristband": {
-    "type": "string",
-    "description": "NFC Wristband"
-   },
-   "printedTicket": {
-    "type": "string",
-    "description": "Printed Ticket"
-   },
-   "thermalTicket": {
-    "type": "string",
-    "description": "Thermal Ticket"
-   },
-   "membershipCard": {
-    "type": "string",
-    "description": "Membership Card"
-   },
-   "customWearable": {
-    "type": "string",
-    "description": "Custom Wearable"
-   },
-   "faceRecognitionReference": {
-    "type": "string",
-    "description": "Face Recognition Reference"
-   },
-   "tenantDefinedIntegrationBasedCredentialTechnology": {
-    "type": "string",
-    "description": "Tenant-defined / integration-based credential technology"
-   },
    "mediaTypeId": {
     "type": "string",
     "description": "Media Type ID"
@@ -2409,11 +2380,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "category": {
     "type": "string",
-    "description": "Category"
+    "enum": [
+     "digital",
+     "physical",
+     "biometric",
+     "future"
+    ],
+    "description": "Media category"
    },
    "provider": {
-    "type": "string",
-    "description": "Provider"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Provider integrations that implement this media type (media type is not the vendor)"
    },
    "technology": {
     "type": "string",
@@ -2432,52 +2412,163 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Validation mechanism"
    },
    "supportsVisualDesign": {
-    "type": "string",
+    "type": "boolean",
     "description": "Supports visual design"
    },
    "supportsDynamicUpdate": {
-    "type": "string",
+    "type": "boolean",
     "description": "Supports dynamic update"
    },
    "supportsRevocation": {
-    "type": "string",
+    "type": "boolean",
     "description": "Supports revocation"
    },
    "supportsExpiration": {
-    "type": "string",
+    "type": "boolean",
     "description": "Supports expiration"
    },
    "supportsOfflineReference": {
-    "type": "string",
+    "type": "boolean",
     "description": "Supports offline reference"
    },
    "supportsReplacement": {
-    "type": "string",
+    "type": "boolean",
     "description": "Supports replacement"
    },
    "supportsEncryption": {
-    "type": "string",
+    "type": "boolean",
     "description": "Supports encryption"
    },
    "supportsSigning": {
-    "type": "string",
+    "type": "boolean",
     "description": "Supports signing"
    },
    "supportedChannels": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Supported channels"
    },
    "supportedDevices": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Supported devices"
    },
    "integrationAdapter": {
     "type": "string",
     "description": "Integration adapter"
+   }
+  },
+  "required": [
+   "mediaTypeId",
+   "name",
+   "category"
+  ]
+ },
+ "MediaTypeTechnologyLibraryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Media Type & Technology Library displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "active": {
+    "type": "boolean",
+    "description": "False once retired through `setMediaTypeTechnology`; issued credentials stay valid (decided 29 September, VM close-out)"
    },
-   "rfidIsTheTechnologyMediaType": {
+   "mediaType": {
     "type": "string",
-    "description": "RFID is the technology/media type"
+    "enum": [
+     "linearBarcode",
+     "twoDimensionalBarcode",
+     "qr",
+     "rfidContact",
+     "rfidProximity",
+     "rfidIso15693",
+     "rfidOtherStandard",
+     "appCredential",
+     "mobileWallet",
+     "paperTicket",
+     "wristband",
+     "plasticCard",
+     "hotelCard",
+     "facePass",
+     "faceTag",
+     "partnerQr",
+     "externalBarcode",
+     "thirdPartyCredential"
+    ],
+    "description": "The kind of medium this profile defines"
+   },
+   "technology": {
+    "type": "string",
+    "enum": [
+     "barcode",
+     "rfid",
+     "nfc",
+     "magneticStripe",
+     "mobile",
+     "physical",
+     "biometric",
+     "external"
+    ],
+    "description": "Technology family"
+   },
+   "encodingFormat": {
+    "type": "string",
+    "description": "encoding format"
+   },
+   "supportedReaderTypes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "supported reader types"
+   },
+   "onlineOfflineCapability": {
+    "type": "string",
+    "enum": [
+     "onlineOnly",
+     "offlineOnly",
+     "onlineAndOffline"
+    ],
+    "description": "online/offline capability"
+   },
+   "writableReadOnly": {
+    "type": "string",
+    "enum": [
+     "writable",
+     "readOnly"
+    ],
+    "description": "writable/read-only"
+   },
+   "securityClassification": {
+    "type": "string",
+    "description": "security classification"
+   },
+   "applicableVenues": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Venue ids"
+   },
+   "applicableProducts": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Product ids"
+   },
+   "mediaTypeId": {
+    "type": "string",
+    "description": "Media type profile identifier"
+   },
+   "name": {
+    "type": "string",
+    "description": "Profile name"
    }
   }
  },
@@ -2487,24 +2578,37 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Multi-Media Binding & Association Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "allowedMedia": {
+   "ruleId": {
     "type": "string",
-    "description": "Allowed media"
+    "description": "Binding rule ID"
+   },
+   "allowedMedia": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Media type IDs allowed"
    },
    "mandatoryMedia": {
-    "type": "string",
-    "description": "Mandatory media"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Media type IDs required"
    },
    "optionalMedia": {
-    "type": "string",
-    "description": "Optional media"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Media type IDs optional"
    },
    "maximumActiveMedia": {
-    "type": "string",
+    "type": "integer",
     "description": "Maximum active media"
    },
    "minimumMediaRequired": {
-    "type": "boolean",
+    "type": "integer",
     "description": "Minimum media required"
    },
    "primaryMedia": {
@@ -2512,60 +2616,46 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Primary media"
    },
    "secondaryMedia": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Secondary media"
    },
    "backupMedia": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Backup media"
    },
    "temporaryMedia": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Temporary media"
    },
    "mediaCombination": {
-    "type": "string",
-    "description": "Media combination"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Permitted media combinations"
    },
    "simultaneousActivation": {
-    "type": "string",
-    "description": "Simultaneous activation"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Media that may be active at the same time, e.g. face with RFID"
    },
    "exclusiveActivation": {
-    "type": "string",
-    "description": "Exclusive activation"
-   },
-   "face": {
-    "type": "string",
-    "description": "Face"
-   },
-   "rfidWristband": {
-    "type": "string",
-    "description": "RFID Wristband"
-   },
-   "mobileQr": {
-    "type": "string",
-    "description": "Mobile QR"
-   },
-   "rfidCard": {
-    "type": "string",
-    "description": "RFID Card"
-   },
-   "mobileQrBeforeWristbandCollection": {
-    "type": "string",
-    "description": "Mobile QR before wristband collection"
-   },
-   "appleWallet": {
-    "type": "string",
-    "description": "Apple Wallet"
-   },
-   "googleWallet": {
-    "type": "string",
-    "description": "Google Wallet"
-   },
-   "dynamicQr": {
-    "type": "string",
-    "description": "Dynamic QR"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Media whose activation revokes another, e.g. RFID activated revokes temporary paper"
    },
    "product": {
     "type": "string",
@@ -2607,284 +2697,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Access environment"
    }
-  }
+  },
+  "required": [
+   "ruleId"
+  ]
  },
- "VirtualTicketArchitectureTestingGovernanceAuditView": {
+ "Page": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Virtual Ticket Architecture Testing, Governance & Audit displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "required": [
+   "items",
+   "hasMore"
+  ],
   "properties": {
-   "sameAuthoritativeEntitlementEvaluated": {
-    "type": "string",
-    "description": "Same authoritative entitlement evaluated"
+   "items": {
+    "type": "array",
+    "items": {}
    },
-   "lostRfid": {
-    "type": "string",
-    "description": "Lost RFID"
+   "nextCursor": {
+    "type": "string"
    },
-   "revokedQr": {
-    "type": "string",
-    "description": "Revoked QR"
-   },
-   "expiredWalletToken": {
-    "type": "integer",
-    "description": "Expired wallet token"
-   },
-   "faceUnavailable": {
-    "type": "string",
-    "description": "Face unavailable"
-   },
-   "offlineDevice": {
-    "type": "integer",
-    "description": "Offline device"
-   },
-   "synchronizationFailure": {
-    "type": "string",
-    "description": "Synchronization failure"
-   },
-   "providerOutage": {
-    "type": "string",
-    "description": "Provider outage"
-   },
-   "credentialBindingConflict": {
-    "type": "string",
-    "description": "Credential binding conflict"
-   },
-   "invalidMediaCombinations": {
-    "type": "string",
-    "description": "Invalid media combinations"
-   },
-   "missingSecurityProfile": {
-    "type": "string",
-    "description": "Missing security profile"
-   },
-   "missingFallback": {
-    "type": "string",
-    "description": "Missing fallback"
-   },
-   "conflictingActivationRules": {
-    "type": "string",
-    "description": "Conflicting activation rules"
-   },
-   "excessiveActiveCredentials": {
-    "type": "string",
-    "description": "Excessive active credentials"
-   },
-   "brokenProviderIntegration": {
-    "type": "string",
-    "description": "Broken provider integration"
-   },
-   "invalidLifecycleDependencies": {
-    "type": "string",
-    "description": "Invalid lifecycle dependencies"
-   },
-   "configurationChanges": {
-    "type": "string",
-    "description": "Configuration changes"
-   },
-   "mediaBindings": {
-    "type": "string",
-    "description": "Media bindings"
-   },
-   "rebindings": {
-    "type": "string",
-    "description": "Rebindings"
-   },
-   "activation": {
-    "type": "string",
-    "description": "Activation"
-   },
-   "suspension": {
-    "type": "string",
-    "description": "Suspension"
-   },
-   "revocation": {
-    "type": "string",
-    "description": "Revocation"
-   },
-   "replacement": {
-    "type": "string",
-    "description": "Replacement"
-   },
-   "resolverChanges": {
-    "type": "string",
-    "description": "Resolver changes"
-   },
-   "ruleChanges": {
-    "type": "string",
-    "description": "Rule changes"
-   },
-   "approvals": {
-    "type": "string",
-    "description": "Approvals"
-   },
-   "actor": {
-    "type": "string",
-    "description": "Actor"
-   },
-   "timestamp": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Timestamp"
-   },
-   "beforeAfter": {
-    "type": "string",
-    "description": "Before/After"
-   },
-   "replacementRebindingTestGovern": {
-    "type": "string",
-    "description": "Replacement/Rebinding → Test & Govern"
-   },
-   "coreVirtualTicketArchitecture": {
-    "type": "string",
-    "description": "core Virtual Ticket architecture"
-   }
-  }
- },
- "VirtualTicketCommandCenterView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Virtual Ticket Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "totalVirtualTickets": {
-    "type": "integer",
-    "description": "Total Virtual Tickets"
-   },
-   "active": {
-    "type": "integer",
-    "description": "Active"
-   },
-   "pendingActivation": {
-    "type": "integer",
-    "description": "Pending Activation"
-   },
-   "suspended": {
-    "type": "string",
-    "description": "Suspended"
-   },
-   "usedConsumed": {
-    "type": "string",
-    "description": "Used / Consumed"
-   },
-   "partiallyConsumed": {
-    "type": "string",
-    "description": "Partially Consumed"
-   },
-   "expired": {
-    "type": "integer",
-    "description": "Expired"
-   },
-   "cancelled": {
-    "type": "integer",
-    "description": "Cancelled"
-   },
-   "revoked": {
-    "type": "string",
-    "description": "Revoked"
-   },
-   "virtualTicketsWithMultipleMedia": {
-    "type": "string",
-    "description": "Virtual Tickets with Multiple Media"
-   },
-   "mediaBindingExceptions": {
-    "type": "integer",
-    "description": "Media Binding Exceptions"
-   },
-   "credentialSynchronizationIssues": {
-    "type": "integer",
-    "description": "Credential Synchronization Issues"
-   },
-   "virtualTicketId": {
-    "type": "string",
-    "description": "Virtual Ticket ID"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "eventPerformance": {
-    "type": "string",
-    "description": "Event / Performance"
-   },
-   "ticketHolder": {
-    "type": "string",
-    "description": "Ticket Holder"
-   },
-   "orderReference": {
-    "type": "string",
-    "description": "Order Reference"
-   },
-   "ticketType": {
-    "type": "string",
-    "description": "Ticket Type"
-   },
-   "seatResourceWhereApplicable": {
-    "type": "string",
-    "description": "Seat / Resource where applicable"
-   },
-   "validFromTo": {
-    "type": "string",
-    "description": "Valid From / To"
-   },
-   "ticketStatus": {
-    "type": "integer",
-    "description": "Ticket Status"
-   },
-   "usageStatus": {
-    "type": "integer",
-    "description": "Usage Status"
-   },
-   "numberOfLinkedMedia": {
-    "type": "integer",
-    "description": "Number of Linked Media"
-   },
-   "primaryMedia": {
-    "type": "string",
-    "description": "Primary Media"
-   },
-   "lastCredentialActivity": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Last Credential Activity"
-   },
-   "lastModified": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Last Modified"
-   },
-   "productVipConcert": {
-    "type": "string",
-    "description": "Product: VIP Concert"
-   },
-   "customerAhmedHassan": {
-    "type": "string",
-    "description": "Customer: Ahmed Hassan"
-   },
-   "seatA18": {
-    "type": "string",
-    "description": "Seat: A-18"
-   },
-   "statusActive": {
-    "type": "integer",
-    "description": "Status: Active"
-   },
-   "media4": {
-    "type": "string",
-    "description": "Media: 4"
-   },
-   "bindMedia": {
-    "type": "string",
-    "description": "Bind Media"
-   },
-   "reactivate": {
-    "type": "string",
-    "description": "Reactivate"
-   },
-   "diagnoseCredential": {
-    "type": "string",
-    "description": "Diagnose Credential"
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },
@@ -2894,113 +2727,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Virtual Ticket Identity & Master Record Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "mediaReplacement": {
+   "venueId": {
     "type": "string",
-    "description": "Media replacement"
-   },
-   "qrRegeneration": {
-    "type": "string",
-    "description": "QR regeneration"
-   },
-   "rfidReplacement": {
-    "type": "string",
-    "description": "RFID replacement"
-   },
-   "walletUpdates": {
-    "type": "string",
-    "description": "Wallet updates"
-   },
-   "deviceChanges": {
-    "type": "string",
-    "description": "Device changes"
-   },
-   "faceEnrollmentChanges": {
-    "type": "string",
-    "description": "Face enrollment changes"
-   },
-   "ticketReprint": {
-    "type": "string",
-    "description": "Ticket reprint"
-   },
-   "order": {
-    "type": "string",
-    "description": "Order"
-   },
-   "orderLine": {
-    "type": "string",
-    "description": "Order Line"
-   },
-   "reservation": {
-    "type": "string",
-    "description": "Reservation"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "productVersion": {
-    "type": "string",
-    "description": "Product Version"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "performanceTimeslot": {
-    "type": "string",
-    "description": "Performance / Timeslot"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "ticketHolder": {
-    "type": "string",
-    "description": "Ticket Holder"
-   },
-   "participant": {
-    "type": "string",
-    "description": "Participant"
-   },
-   "customer": {
-    "type": "string",
-    "description": "Customer"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "seat": {
-    "type": "string",
-    "description": "Seat"
-   },
-   "resource": {
-    "type": "string",
-    "description": "Resource"
-   },
-   "priceSnapshot": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price Snapshot"
-   },
-   "entitlements": {
-    "type": "string",
-    "description": "Entitlements"
-   },
-   "validity": {
-    "type": "string",
-    "description": "Validity"
-   },
-   "accessEntitlement": {
-    "type": "string",
-    "description": "Access entitlement"
-   },
-   "fulfillmentStatus": {
-    "type": "string",
-    "description": "Fulfillment status"
+    "description": "Venue this configuration applies to"
    },
    "idGenerationPattern": {
     "type": "string",
-    "description": "ID generation pattern"
+    "description": "Virtual Ticket ID format: prefix, suffix and length"
    },
    "ticketClassification": {
     "type": "string",
@@ -3031,30 +2764,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Entitlement model"
    },
    "mediaRequirements": {
-    "type": "string",
-    "description": "Media requirements"
-   },
-   "rfid77812Vt009821": {
-    "type": "string",
-    "description": "RFID-77812 → VT-009821"
-   },
-   "rfid99142Vt009821": {
-    "type": "string",
-    "description": "RFID-99142 → VT-009821"
-   },
-   "theVirtualTicketRemainsUnchanged": {
-    "type": "string",
-    "description": "The Virtual Ticket remains unchanged"
-   },
-   "valid": {
-    "type": "string",
-    "description": "Valid"
-   },
-   "suspended": {
-    "type": "string",
-    "description": "Suspended"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Media types a ticket of this configuration must carry"
    }
-  }
+  },
+  "required": [
+   "venueId"
+  ]
  },
  "VirtualTicketIdentityMasterRecordConfigurationView": {
   "type": "object",
@@ -3062,113 +2781,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Virtual Ticket Identity & Master Record Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "mediaReplacement": {
+   "venueId": {
     "type": "string",
-    "description": "Media replacement"
-   },
-   "qrRegeneration": {
-    "type": "string",
-    "description": "QR regeneration"
-   },
-   "rfidReplacement": {
-    "type": "string",
-    "description": "RFID replacement"
-   },
-   "walletUpdates": {
-    "type": "string",
-    "description": "Wallet updates"
-   },
-   "deviceChanges": {
-    "type": "string",
-    "description": "Device changes"
-   },
-   "faceEnrollmentChanges": {
-    "type": "string",
-    "description": "Face enrollment changes"
-   },
-   "ticketReprint": {
-    "type": "string",
-    "description": "Ticket reprint"
-   },
-   "order": {
-    "type": "string",
-    "description": "Order"
-   },
-   "orderLine": {
-    "type": "string",
-    "description": "Order Line"
-   },
-   "reservation": {
-    "type": "string",
-    "description": "Reservation"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "productVersion": {
-    "type": "string",
-    "description": "Product Version"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "performanceTimeslot": {
-    "type": "string",
-    "description": "Performance / Timeslot"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "ticketHolder": {
-    "type": "string",
-    "description": "Ticket Holder"
-   },
-   "participant": {
-    "type": "string",
-    "description": "Participant"
-   },
-   "customer": {
-    "type": "string",
-    "description": "Customer"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "seat": {
-    "type": "string",
-    "description": "Seat"
-   },
-   "resource": {
-    "type": "string",
-    "description": "Resource"
-   },
-   "priceSnapshot": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price Snapshot"
-   },
-   "entitlements": {
-    "type": "string",
-    "description": "Entitlements"
-   },
-   "validity": {
-    "type": "string",
-    "description": "Validity"
-   },
-   "accessEntitlement": {
-    "type": "string",
-    "description": "Access entitlement"
-   },
-   "fulfillmentStatus": {
-    "type": "string",
-    "description": "Fulfillment status"
+    "description": "Venue this configuration applies to"
    },
    "idGenerationPattern": {
     "type": "string",
-    "description": "ID generation pattern"
+    "description": "Virtual Ticket ID format: prefix, suffix and length"
    },
    "ticketClassification": {
     "type": "string",
@@ -3199,30 +2818,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Entitlement model"
    },
    "mediaRequirements": {
-    "type": "string",
-    "description": "Media requirements"
-   },
-   "rfid77812Vt009821": {
-    "type": "string",
-    "description": "RFID-77812 → VT-009821"
-   },
-   "rfid99142Vt009821": {
-    "type": "string",
-    "description": "RFID-99142 → VT-009821"
-   },
-   "theVirtualTicketRemainsUnchanged": {
-    "type": "string",
-    "description": "The Virtual Ticket remains unchanged"
-   },
-   "valid": {
-    "type": "string",
-    "description": "Valid"
-   },
-   "suspended": {
-    "type": "string",
-    "description": "Suspended"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Media types a ticket of this configuration must carry"
    }
-  }
+  },
+  "required": [
+   "venueId"
+  ]
  },
  "VirtualTicketStatusLifecycleModelView": {
   "type": "object",
@@ -3230,101 +2835,77 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Virtual Ticket Status & Lifecycle Model displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "withGovernedAlternativeStates": {
+   "fromStatus": {
     "type": "string",
-    "description": "with governed alternative states"
+    "enum": [
+     "created",
+     "pendingFulfillment",
+     "active",
+     "partiallyUsed",
+     "used",
+     "expired",
+     "suspended",
+     "cancelled",
+     "voided",
+     "reissuedSuperseded",
+     "refunded",
+     "transferred",
+     "blocked"
+    ],
+    "description": "Status the transition starts from"
    },
-   "suspended": {
+   "toStatus": {
     "type": "string",
-    "description": "Suspended"
+    "enum": [
+     "created",
+     "pendingFulfillment",
+     "active",
+     "partiallyUsed",
+     "used",
+     "expired",
+     "suspended",
+     "cancelled",
+     "voided",
+     "reissuedSuperseded",
+     "refunded",
+     "transferred",
+     "blocked"
+    ],
+    "description": "Status the transition leads to"
    },
-   "cancelled": {
-    "type": "integer",
-    "description": "Cancelled"
+   "originatingSources": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "orderManagement",
+      "cancellation",
+      "refund",
+      "upgradeConversion",
+      "ticketTransfer",
+      "membership",
+      "expiry",
+      "accessUsage",
+      "authorizedOperator",
+      "api",
+      "scheduledProcess"
+     ]
+    },
+    "description": "Where this transition may originate"
    },
-   "voided": {
-    "type": "string",
-    "description": "Voided"
+   "allowed": {
+    "type": "boolean",
+    "description": "Whether the transition is allowed"
    },
-   "reissuedSuperseded": {
-    "type": "string",
-    "description": "Reissued / Superseded"
-   },
-   "refunded": {
-    "type": "string",
-    "description": "Refunded"
-   },
-   "transferred": {
-    "type": "string",
-    "description": "Transferred"
-   },
-   "blocked": {
-    "type": "string",
-    "description": "Blocked"
-   },
-   "from": {
-    "type": "string",
-    "description": "from"
-   },
-   "qrActive": {
-    "type": "integer",
-    "description": "QR — Active"
-   },
-   "rfidLostRevoked": {
-    "type": "string",
-    "description": "RFID — Lost / Revoked"
-   },
-   "appleWalletActive": {
-    "type": "integer",
-    "description": "Apple Wallet — Active"
-   },
-   "faceActive": {
-    "type": "integer",
-    "description": "Face — Active"
-   },
-   "theTicketItselfRemainsValid": {
-    "type": "string",
-    "description": "The ticket itself remains valid"
-   },
-   "orderManagement": {
-    "type": "string",
-    "description": "Order Management"
-   },
-   "cancellation": {
-    "type": "string",
-    "description": "Cancellation"
-   },
-   "ticketTransfer": {
-    "type": "string",
-    "description": "Ticket Transfer"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "expiry": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Expiry"
-   },
-   "accessUsage": {
-    "type": "string",
-    "description": "Access usage"
-   },
-   "authorizedOperator": {
-    "type": "string",
-    "description": "Authorized operator"
-   },
-   "api": {
-    "type": "string",
-    "description": "API"
-   },
-   "scheduledProcess": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Scheduled process"
+   "requiresAuthorizedException": {
+    "type": "boolean",
+    "description": "Allowed only with an authorised exception, e.g. Used to Active"
    }
-  }
+  },
+  "required": [
+   "fromStatus",
+   "toStatus"
+  ]
  }
 }
 ```

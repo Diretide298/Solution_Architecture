@@ -39,10 +39,11 @@
     }
    ]
   },
+  "notes": "**Moved from P09 `ADM-428` on 11 September 2026.** Board 6 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-428` is retired and never reissued.",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configuration Status; AI Configuration prepares; Initial Configuration Prepared) and no display directory — it is settings, not a population",
-  "purpose": "Confirm that provisioning is complete and move the customer into Board 7.",
+  "purpose": "Confirm that provisioning is complete and move the customer into Board 7. Enable customers to complete their TICVAI configuration independently using a combination of AI-guided setup, natural-language configuration, venue templates, guided tasks, and traditional manual configuration.",
   "gaps": [
    {
     "operation": null,
@@ -98,13 +99,21 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "Provisioning in flight",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-594"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-594",
+   "workshopBoard": "wireframes/WS158 Subscription Licensing AI Self Service Board 6.dc.html#bo-594"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 80. 0 of 0 labels bound to a contract property; 6 of 83 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**Moved from P09 `ADM-428` on 11 September 2026.** Board 6 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-428` is retired and never reissued.",
   "_platform": {
    "code": "P08",
    "audience": "staff",

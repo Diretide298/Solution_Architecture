@@ -167,19 +167,19 @@
    "operations": 6
   },
   {
-   "contract": "white-label",
-   "operations": 5
-  },
-  {
    "contract": "queue",
    "operations": 5
   },
   {
-   "contract": "ai",
-   "operations": 4
+   "contract": "white-label",
+   "operations": 5
   },
   {
    "contract": "seating",
+   "operations": 4
+  },
+  {
+   "contract": "ai",
    "operations": 4
   },
   {
@@ -187,11 +187,11 @@
    "operations": 4
   },
   {
-   "contract": "retail",
+   "contract": "venue-map",
    "operations": 3
   },
   {
-   "contract": "venue-map",
+   "contract": "retail",
    "operations": 3
   },
   {
@@ -199,11 +199,11 @@
    "operations": 2
   },
   {
-   "contract": "finance",
+   "contract": "games",
    "operations": 1
   },
   {
-   "contract": "games",
+   "contract": "finance",
    "operations": 1
   }
  ],

@@ -1,6 +1,6 @@
 # P08-orders-money-03 — P08 · Orders & Money (3 of 3)
 
-**9 screens · 55 operations · 51 schemas · 16 permissions**
+**7 screens · 41 operations · 32 schemas · 8 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 16 permissions apply here:
-  `ACCOUNT_CONFIGURE, LEDGER_APPROVE, LEDGER_POST, LEDGER_VIEW, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REPRINT, ORDER_RESCHEDULE, ORDER_VIEW, ORDER_VOID`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 8 permissions apply here:
+  `ACCOUNT_CONFIGURE, LEDGER_APPROVE, LEDGER_POST, LEDGER_VIEW, ORDER_VIEW, SETTLEMENT_VIEW, TAX_CONFIGURE, TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **13 of these operations work offline**: applyManualDiscount, createOrder, getOrder, getRefundPolicy, getVenueSettings, holdOrder, listFxRates, listOrderRefunds
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,12 +60,10 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-065` | Venue Configuration | listDetail | 5 | 0 | — |
-| `BO-070` | Work Orders | listDetail | 13 | 1 | — |
-| `BO-074` | Chart of Accounts | listDetail | 8 | 0 | — |
-| `BO-075` | Account Mapping | commandCentre | 7 | 0 | — |
-| `BO-076` | Revenue Recognition | listDetail | 4 | 0 | — |
-| `BO-077` | FX Rates & Variances | approvalInbox | 4 | 0 | — |
-| `BO-089` | Journal Entries | approvalInbox | 6 | 2 | — |
-| `BO-090` | Period Close | listDetail | 6 | 2 | — |
+| `BO-074` | Chart of Accounts | listDetail | 8 | 4 | — |
+| `BO-075` | Account Mapping | commandCentre | 8 | 4 | — |
+| `BO-076` | Revenue Recognition | listDetail | 5 | 2 | — |
+| `BO-077` | FX Rates & Variances | approvalInbox | 5 | 3 | — |
+| `BO-089` | Journal Entries | approvalInbox | 6 | 4 | — |
+| `BO-090` | Period Close | listDetail | 6 | 3 | — |
 | `BO-101` | Orders & Money | listDetail | 3 | 0 | — |

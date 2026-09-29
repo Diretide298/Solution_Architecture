@@ -1,4 +1,4 @@
--- games — 21 tables
+-- games — 23 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
@@ -184,6 +184,22 @@ CREATE TABLE IF NOT EXISTS games.pricing (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS games.pricing_exception (
+    id                                uuid PRIMARY KEY,
+    game_id                           uuid NOT NULL,
+    kind                              text NOT NULL CONSTRAINT pricing_exception_kind_chk CHECK (kind IN ('group', 'peak', 'calendarException')),
+    minimum_players                   integer,
+    days_of_week                      text[],
+    from_time                         text,
+    to_time                           text,
+    date                              date,
+    price                             numeric(18,4),
+    is_closed                         boolean DEFAULT false,
+    scope_path                        ltree NOT NULL
+);
+
 -- What credits can be redeemed for, with its own stock
 CREATE TABLE IF NOT EXISTS games.prize (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -245,7 +261,7 @@ CREATE TABLE IF NOT EXISTS games.reader_deployment (
 
 -- How a game reader behaves and what it shows (BL-153). A guest at an arcade machine cannot read a
 -- message, they can only see a light. Hangs off: reaches games.game through its keys. Reached by:
--- 1 operations read it and 1 write it; 1 tables reference it.
+-- 3 operations read it and 1 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS games.reader_profile (
     id                                uuid PRIMARY KEY NOT NULL,
     name                              text NOT NULL,
@@ -253,6 +269,19 @@ CREATE TABLE IF NOT EXISTS games.reader_profile (
     retry_pricing                     jsonb,
     re_play_window_seconds            integer,
     entitlement_product_ids           text[],
+    scope_path                        ltree NOT NULL
+);
+
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS games.reader_sync_status (
+    id                                uuid PRIMARY KEY,
+    reader_id                         uuid NOT NULL,
+    pending_transactions              integer NOT NULL,
+    pending_value                     numeric(18,4),
+    oldest_pending_at                 timestamptz,
+    last_sync_at                      timestamptz,
+    reported_at                       timestamptz NOT NULL,
     scope_path                        ltree NOT NULL
 );
 

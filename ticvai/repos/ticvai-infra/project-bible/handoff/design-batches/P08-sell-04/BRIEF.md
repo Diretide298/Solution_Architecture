@@ -1,6 +1,6 @@
 # P08-sell-04 — P08 · Sell (4 of 4)
 
-**5 screens · 19 operations · 15 schemas · 11 permissions**
+**6 screens · 22 operations · 21 schemas · 13 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 11 permissions apply here:
-  `AI_AUDIT_VIEW, DEVICE_VIEW, INCIDENT_REPORT, PLATFORM_RELEASE_PROMOTE, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE, ROLE_MANAGE, SCOPE_VIEW, TENANT_CONFIGURE, WORKSTATION_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 13 permissions apply here:
+  `AUDIT_VIEW, DEVICE_VIEW, INCIDENT_REPORT, ORDER_VIEW, PLATFORM_RELEASE_PROMOTE, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE, ROLE_MANAGE, SCOPE_VIEW, TENANT_CONFIGURE, TENANT_VIEW`…. A control nobody can use must say so,
   not sit enabled and fail.
-- **6 of these operations work offline**: getVenueSettings, listDevices, listProducts, listRoles, listSaleBoards, reportIncident
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,11 +60,12 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-124` | Layout & Journey Builder | listDetail | 6 | 0 | — |
-| `BO-125` | Product & Category Button Configuration | listDetail | 6 | 0 | — |
-| `BO-126` | Deployment, Preview & Audit | commandCentre | 7 | 0 | — |
-| `BO-142` | Store Rules, Controls & Permissions | listDetail | 4 | 0 | — |
-| `BO-143` | Retail Global Settings & Controls | statusTracker | 2 | 0 | — |
+| `BO-123` | POS Profile Management | listDetail | 2 | 1 | — |
+| `BO-124` | Layout & Journey Builder | listDetail | 6 | 4 | — |
+| `BO-125` | Product & Category Button Configuration | listDetail | 6 | 3 | — |
+| `BO-126` | Deployment, Preview & Audit | commandCentre | 7 | 4 | — |
+| `BO-142` | Store Rules, Controls & Permissions | listDetail | 4 | 1 | — |
+| `BO-143` | Retail Global Settings & Controls | statusTracker | 4 | 1 | — |
 
 ## Thin screens in this batch
 

@@ -1,0 +1,110 @@
+{
+ "createApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests",
+  "contract": "approvals",
+  "summary": "Raise a request",
+  "permission": "APPROVAL_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateApprovalRequest",
+  "responds": "ApprovalRequest"
+ },
+ "createSeatHoldPool": {
+  "method": "POST",
+  "path": "/seat-hold-pools",
+  "contract": "seating",
+  "summary": "Take a set of seats out of sale, for a reason, until a date",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SeatHoldPool",
+  "responds": "SeatHoldPool"
+ },
+ "listSeatHoldPools": {
+  "method": "GET",
+  "path": "/seat-hold-pools",
+  "contract": "seating",
+  "summary": "Held seats, by pool, with what is left and when it releases",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "performanceId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatHoldPool"
+ },
+ "listSeatHoldTypes": {
+  "method": "GET",
+  "path": "/seat-hold-types",
+  "contract": "seating",
+  "summary": "The kinds of hold a venue places, and who may release them",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SeatHoldType"
+ },
+ "releaseSeatHoldPool": {
+  "method": "POST",
+  "path": "/seat-hold-pools/{poolId}/release",
+  "contract": "seating",
+  "summary": "Put held seats back on sale, convert them, or reassign them",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatHoldPool"
+ },
+ "setSeatHoldType": {
+  "method": "PUT",
+  "path": "/seat-hold-types",
+  "contract": "seating",
+  "summary": "Define a hold kind, its owner and its release rule",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SeatHoldType",
+  "responds": "SeatHoldType"
+ }
+}

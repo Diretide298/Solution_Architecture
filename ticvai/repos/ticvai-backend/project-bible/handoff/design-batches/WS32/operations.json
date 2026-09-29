@@ -8,9 +8,34 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ApprovalExceptionServiceRecoveryManagementInput",
   "responds": "ApprovalExceptionServiceRecoveryManagementView"
+ },
+ "cleanupFailedPayment": {
+  "method": "POST",
+  "path": "/payments/{paymentId}/cleanup",
+  "contract": "orders",
+  "summary": "Clear a failed or orphaned payment",
+  "permission": "ORDER_VOID",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FailedPaymentCleanupInput",
+  "responds": "Payment"
  },
  "listAmendmentAfterSale": {
   "method": "GET",
@@ -54,6 +79,21 @@
    },
    {
     "name": "date",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "requestType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customer",
     "in": "query",
     "required": false
    }
@@ -110,19 +150,6 @@
   "requestBody": null,
   "responds": "AmendmentHistoryAuditAfterSalesAnalyticsView"
  },
- "listTicketReissueFulfillment": {
-  "method": "GET",
-  "path": "/ticket-reissue-fulfillment",
-  "contract": "orders",
-  "summary": "Ticket Reissue & Fulfillment Regeneration",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "TicketReissueFulfillmentRegenerationView"
- },
  "listVoidReversalSame": {
   "method": "GET",
   "path": "/void-reversal-same",
@@ -145,7 +172,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "AfterSalesFinancialSettlementAdjustmentWorkspaceInput",
   "responds": "AfterSalesFinancialSettlementAdjustmentWorkspaceView"
  },
@@ -158,7 +191,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "AmendmentEligibilityPolicyRuleBuilderInput",
   "responds": "AmendmentEligibilityPolicyRuleBuilderView"
  },
@@ -171,7 +210,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "CancellationPartialCancellationPolicyConfigurationInput",
   "responds": "CancellationPartialCancellationPolicyConfigurationView"
  },
@@ -184,9 +229,34 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "OrderAmendmentWorkspaceInput",
   "responds": "OrderAmendmentWorkspaceView"
+ },
+ "setRefundCalculationPolicy": {
+  "method": "PUT",
+  "path": "/refund-calculation-policy",
+  "contract": "orders",
+  "summary": "Set how a venue calculates a refund and where it goes",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RefundCalculationPolicyInput",
+  "responds": "RefundCalculationPolicyView"
  },
  "setRefundPolicy": {
   "method": "PUT",
@@ -206,5 +276,62 @@
   ],
   "requestBody": "RefundPolicy",
   "responds": "RefundPolicy"
+ },
+ "voidEntitlement": {
+  "method": "POST",
+  "path": "/entitlements/{entitlementId}/void",
+  "contract": "orders",
+  "summary": "Void a single ticket",
+  "permission": "ORDER_VOID",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VoidEntitlementInput",
+  "responds": "Entitlement"
+ },
+ "voidOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/voids",
+  "contract": "orders",
+  "summary": "Void an order",
+  "permission": "ORDER_VOID",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
+ },
+ "voidPayment": {
+  "method": "POST",
+  "path": "/payments/{paymentId}/void",
+  "contract": "orders",
+  "summary": "Release an authorisation before it is captured",
+  "permission": "PAYMENT_VOID",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Payment"
  }
 }

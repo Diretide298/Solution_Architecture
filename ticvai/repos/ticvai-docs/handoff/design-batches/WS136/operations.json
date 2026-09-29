@@ -1,0 +1,593 @@
+{
+ "decideDuplicateCandidate": {
+  "method": "POST",
+  "path": "/duplicate-candidates/{candidateId}/decide",
+  "contract": "marketing-crm",
+  "summary": "Merge, reject or split",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DuplicateCandidate"
+ },
+ "getGuestConsents": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/consents",
+  "contract": "marketing-crm",
+  "summary": "Read a guest's consent state",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ConsentState"
+ },
+ "getGuestMatchPolicy": {
+  "method": "GET",
+  "path": "/guest-match-policy",
+  "contract": "marketing-crm",
+  "summary": "How returning guests are recognised at checkout",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestMatchPolicy"
+ },
+ "getIdentityResolutionRules": {
+  "method": "GET",
+  "path": "/identity-resolution-rules",
+  "contract": "marketing-crm",
+  "summary": "How duplicates are detected and a master is chosen",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "IdentityResolutionRules"
+ },
+ "listConsentPurposes": {
+  "method": "GET",
+  "path": "/consent-purposes",
+  "contract": "marketing-crm",
+  "summary": "Configured consent purposes",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listDataSubjectCustomer": {
+  "method": "GET",
+  "path": "/data-subject-customer",
+  "contract": "marketing-crm",
+  "summary": "Data Subject / Customer Privacy Request Management",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "requestType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "jurisdiction",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "slaState",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ownerPrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listDuplicateCandidates": {
+  "method": "GET",
+  "path": "/duplicate-candidates",
+  "contract": "marketing-crm",
+  "summary": "Suspected duplicates awaiting a decision",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "band",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPrivacy": {
+  "method": "GET",
+  "path": "/privacy",
+  "contract": "marketing-crm",
+  "summary": "Privacy Operations Command Center",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "brandId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "requestType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "consentPurpose",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ownerPrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "PrivacyOperationsCommandCenterView"
+ },
+ "listPrivacyCompliance": {
+  "method": "GET",
+  "path": "/privacy-compliance",
+  "contract": "marketing-crm",
+  "summary": "Privacy Analytics & AI Compliance Intelligence",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "brandId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "consentPurpose",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "segmentId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "policyVersion",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "PrivacyAnalyticsAiComplianceIntelligenceView"
+ },
+ "listPrivacyEvidenceCompliance": {
+  "method": "GET",
+  "path": "/privacy-evidence-compliance",
+  "contract": "marketing-crm",
+  "summary": "Privacy Audit, Evidence & Compliance Reporting",
+  "permission": "AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "action",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "report",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "requestId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "actorPrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listVersioningEffectiveDate": {
+  "method": "GET",
+  "path": "/versioning-effective-date",
+  "contract": "marketing-crm",
+  "summary": "Versioning, Effective Dates & Legal Change Control",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "formId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "compareWith",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "mergeGuests": {
+  "method": "POST",
+  "path": "/guests/merge",
+  "contract": "marketing-crm",
+  "summary": "Two records, one person",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MergeResult"
+ },
+ "recordConsent": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/consents",
+  "contract": "marketing-crm",
+  "summary": "Record a consent decision",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecordConsentRequest",
+  "responds": "ConsentState"
+ },
+ "recordPrivacyIncident": {
+  "method": "POST",
+  "path": "/privacy-incidents",
+  "contract": "marketing-crm",
+  "summary": "Log a personal-data breach and start the clock",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PrivacyIncident",
+  "responds": "PrivacyIncident"
+ },
+ "runDataRetention": {
+  "method": "POST",
+  "path": "/retention-runs",
+  "contract": "marketing-crm",
+  "summary": "Preview or execute a retention pass",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RetentionRunResult"
+ },
+ "setCommunicationPreferenceMarketing": {
+  "method": "PUT",
+  "path": "/communication-preference-marketing",
+  "contract": "marketing-crm",
+  "summary": "Communication Preference & Marketing Permission Configuration",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CommunicationPreferenceMarketingPermissionConfiguratInput",
+  "responds": "CommunicationPreferenceMarketingPermissionConfiguratView"
+ },
+ "setConsentPurposes": {
+  "method": "PUT",
+  "path": "/consent-purposes",
+  "contract": "marketing-crm",
+  "summary": "Configure consent purposes",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConsentPurposeConfig"
+ },
+ "setDataDiscoveryAccess": {
+  "method": "PUT",
+  "path": "/data-discovery-access",
+  "contract": "marketing-crm",
+  "summary": "Data Discovery, Access, Export & Correction Workspace",
+  "permission": "GUEST_VIEW_PII",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DataDiscoveryAccessExportCorrectionWorkspaceInput",
+  "responds": "DataDiscoveryAccessExportCorrectionWorkspaceView"
+ },
+ "setDataRetentionPolicy": {
+  "method": "PUT",
+  "path": "/retention-policies",
+  "contract": "marketing-crm",
+  "summary": "How long guest data is kept, and what happens at expiry",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DataRetentionPolicy",
+  "responds": "DataRetentionPolicy"
+ },
+ "setGuestMatchPolicy": {
+  "method": "PUT",
+  "path": "/guest-match-policy",
+  "contract": "marketing-crm",
+  "summary": "Set how returning guests are recognised",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GuestMatchPolicy",
+  "responds": "GuestMatchPolicy"
+ },
+ "setIdentityResolutionRules": {
+  "method": "PUT",
+  "path": "/identity-resolution-rules",
+  "contract": "marketing-crm",
+  "summary": "Matching weights, thresholds and survivorship",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "IdentityResolutionRules",
+  "responds": "IdentityResolutionRules"
+ }
+}

@@ -6683,10 +6683,11 @@ screens:
   purpose: Manage the complete journey from a new partner application through internal review and activation.
   gaps:
   - operation: null
-    why: '**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Product
-      requirements, Sequential approval, Parallel approval, Rejection, Request More Information. Each
-      needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from
-      the screen side rather than the contract side.'
+    why: '**The pack names 5 actions on this screen; 1 are served since the writers pass (29 September):
+      Request More Information by `actOnPartnerApplicationReview`.** Still unserved: Product requirements,
+      Sequential approval, Parallel approval, Rejection. Each needs an operation, or needs removing from
+      the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
+      side.'
     source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 8 §Operations
   layout:
     template: form
@@ -6742,6 +6743,12 @@ screens:
       - kind: secondaryButton
         label: Request More Information
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 8 §Support
+      - kind: secondaryButton
+        label: Act on partner application review
+        operation: actOnPartnerApplicationReview
+        permission: PARTNER_MANAGE
+        notes: The review actions on PTR-024 (decided 29 September, writers pass; DM4).
+        provenance: contract subscription.yaml POST /partner-applications/{applicationId}/review-actions
   states:
     loading: The partner onboarding application configuration as saved.
     error: Could not load. Names which read failed and leaves the partner onboarding application untouched.
@@ -6754,6 +6761,12 @@ screens:
     contract: subscription
     purpose: Partner Onboarding & Application Workflow
     trigger: onLoad
+  - operationId: actOnPartnerApplicationReview
+    contract: subscription
+    purpose: Move a partner application through its departmental review
+    trigger: onAction
+    invalidates:
+    - listPartnerOnboardingApplication
   wireframe:
     status: notStarted
     provenance: generated
@@ -6763,6 +6776,31 @@ screens:
     8. 0 of 0 labels bound to a contract property; 15 of 43 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formActOnPartnerApplicationReview
+    component: modal
+    trigger: Act on partner application review
+    body: '**Collects what `actOnPartnerApplicationReview` sends before it is called.** Required: `action`.
+      Optional: `department`, `assigneePrincipalId`, `note`, `documentIds`. Dismissing sends nothing;
+      the screen behind is unchanged.'
+    bindsTo: PartnerApplicationReviewAction
+    confirm:
+      label: Act on partner application review
+      operation: actOnPartnerApplicationReview
+    dismiss:
+      label: Cancel
+      discards:
+      - action
+      - department
+      - assigneePrincipalId
+      - note
+      - documentIds
+    provenance: contract subscription.yaml POST /partner-applications/{applicationId}/review-actions
+  entryState:
+    params:
+    - name: applicationId
+      from: navigation
+      optional: true
 - id: PTR-025
   name: Partner Contacts & User Administration
   module: Partners
@@ -6800,10 +6838,11 @@ screens:
   purpose: Manage the individuals authorized to interact with TICVAI on behalf of each partner.
   gaps:
   - operation: null
-    why: '**The pack names 9 actions on this screen and the screen declares 1 operation.** Unserved: Primary
-      Contact, Commercial, Finance, Operations, Management, Emergency Contact, Password policy, SSO where
-      available …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
-      seen from the screen side rather than the contract side.'
+    why: '**The pack names 9 actions on this screen; 6 are served since the writers pass (29 September):
+      Primary Contact, Commercial, Finance, Operations, Management, Emergency Contact by `setPartnerContact`.**
+      Still unserved: Password policy, SSO where available …. Each needs an operation, or needs removing
+      from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
+      side.'
     source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support
   layout:
     template: form
@@ -6889,6 +6928,18 @@ screens:
       - kind: secondaryButton
         label: SSO where available
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support/reference
+      - kind: secondaryButton
+        label: Save partner contact
+        operation: setPartnerContact
+        permission: PARTNER_MANAGE
+        notes: The contact half of PTR-025 (decided 29 September, writers pass; DM4).
+        provenance: contract subscription.yaml PUT /partner-contacts
+      - kind: secondaryButton
+        label: Create partner user
+        operation: createPartnerUser
+        permission: PARTNER_MANAGE
+        notes: 2.7.51.
+        provenance: contract subscription.yaml POST /partners/{partnerId}/users
   states:
     loading: The partner contacts user configuration as saved.
     error: Could not load. Names which read failed and leaves the partner contacts user untouched.
@@ -6901,6 +6952,18 @@ screens:
     contract: subscription
     purpose: Partner Contacts & User Administration
     trigger: onLoad
+  - operationId: setPartnerContact
+    contract: subscription
+    purpose: Create, edit, disable, enable or revoke a partner contact
+    trigger: onAction
+    invalidates:
+    - listPartnerContactUser
+  - operationId: createPartnerUser
+    contract: subscription
+    purpose: Add a user to a partner branch
+    trigger: onAction
+    invalidates:
+    - listPartnerContactUser
   wireframe:
     status: notStarted
     provenance: generated
@@ -6910,6 +6973,63 @@ screens:
     10. 0 of 0 labels bound to a contract property; 26 of 52 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formSetPartnerContact
+    component: modal
+    trigger: Save partner contact
+    body: '**Collects what `setPartnerContact` sends before it is called.** Required: `partnerId`. Optional:
+      `contactId`, `action`, `name`, `position`, `department`, `email`, `mobile`, `telephone`, `language`,
+      `timeZone`, `contactType`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: PartnerContactInput
+    confirm:
+      label: Save partner contact
+      operation: setPartnerContact
+    dismiss:
+      label: Cancel
+      discards:
+      - partnerId
+      - contactId
+      - action
+      - name
+      - position
+      - department
+      - email
+      - mobile
+      - telephone
+      - language
+      - timeZone
+      - contactType
+    provenance: contract subscription.yaml PUT /partner-contacts
+  - id: formCreatePartnerUser
+    component: modal
+    trigger: Create partner user
+    body: '**Collects what `createPartnerUser` sends before it is called.** Required: `id`, `partnerId`,
+      `principalId`, `branchScopePath`. Optional: `role`, `salesLocation`, `currency`, `accountExpiresAt`,
+      `allocationQuota`, `creditLimitOverride`, `canManageUsers`. Dismissing sends nothing; the screen
+      behind is unchanged.'
+    bindsTo: PartnerUser
+    confirm:
+      label: Create partner user
+      operation: createPartnerUser
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - partnerId
+      - principalId
+      - branchScopePath
+      - role
+      - salesLocation
+      - currency
+      - accountExpiresAt
+      - allocationQuota
+      - creditLimitOverride
+      - canManageUsers
+    provenance: contract subscription.yaml POST /partners/{partnerId}/users
+  entryState:
+    params:
+    - name: partnerId
+      from: session
 - id: PTR-026
   name: Territory, Market & Distribution Rights
   module: Partners
@@ -6957,6 +7077,15 @@ screens:
       - kind: selectField
         label: Maximum hierarchy depth
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 12 §Configure
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Save partner distribution rights
+        operation: setPartnerDistributionRights
+        permission: PARTNER_MANAGE
+        notes: The writer for PTR-026 (decided 29 September, writers pass; DM4).
+        provenance: contract subscription.yaml PUT /partners/{partnerId}/distribution-rights
   states:
     loading: The territory market distribution configuration as saved.
     error: Could not load. Names which read failed and leaves the territory market distribution untouched.
@@ -6969,6 +7098,12 @@ screens:
     contract: subscription
     purpose: Territory, Market & Distribution Rights
     trigger: onLoad
+  - operationId: setPartnerDistributionRights
+    contract: subscription
+    purpose: Replace a partner's territory, market and distribution rights
+    trigger: onAction
+    invalidates:
+    - listTerritoryMarketDistribution
   wireframe:
     status: notStarted
     provenance: generated
@@ -6978,6 +7113,24 @@ screens:
     12. 0 of 0 labels bound to a contract property; 4 of 40 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formSetPartnerDistributionRights
+    component: modal
+    trigger: Save partner distribution rights
+    body: '**Collects what `setPartnerDistributionRights` sends before it is called.** Required: `rights`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save partner distribution rights
+      operation: setPartnerDistributionRights
+    dismiss:
+      label: Cancel
+      discards:
+      - rights
+    provenance: contract subscription.yaml PUT /partners/{partnerId}/distribution-rights
+  entryState:
+    params:
+    - name: partnerId
+      from: session
 - id: PTR-027
   name: Partner Brand, Venue & Business Scope Assignment
   module: Partners
@@ -7327,6 +7480,12 @@ screens:
           or the screen needs the control.'
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 16 §Partner Permission
           Ceiling
+      - kind: primaryButton
+        label: Save partner capability grants
+        operation: setPartnerCapabilityGrants
+        permission: PARTNER_MANAGE
+        notes: The writer for PTR-029's organisation ceiling (decided 29 September, writers pass; DM4).
+        provenance: contract subscription.yaml PUT /partners/{partnerId}/capability-grants
   states:
     loading: The partner access roles configuration as saved.
     error: Could not load. Names which read failed and leaves the partner access roles untouched.
@@ -7339,6 +7498,12 @@ screens:
     contract: subscription
     purpose: Partner Access, Roles & Permission Profile
     trigger: onLoad
+  - operationId: setPartnerCapabilityGrants
+    contract: subscription
+    purpose: Replace the capability ceiling of a partner
+    trigger: onAction
+    invalidates:
+    - listPartnerAccessRole
   wireframe:
     status: notStarted
     provenance: generated
@@ -7348,6 +7513,24 @@ screens:
     16. 0 of 0 labels bound to a contract property; 23 of 34 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formSetPartnerCapabilityGrants
+    component: modal
+    trigger: Save partner capability grants
+    body: '**Collects what `setPartnerCapabilityGrants` sends before it is called.** Required: `grants`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save partner capability grants
+      operation: setPartnerCapabilityGrants
+    dismiss:
+      label: Cancel
+      discards:
+      - grants
+    provenance: contract subscription.yaml PUT /partners/{partnerId}/capability-grants
+  entryState:
+    params:
+    - name: partnerId
+      from: session
 - id: PTR-030
   name: Partner Approval, Status & Lifecycle Management
   module: Partners
@@ -7573,14 +7756,6 @@ screens:
       trigger: Works in Partner Rate & Net Pricing Configuration
       provenance: flow F131 step 3→4
       operation: listCommercialAgreement
-    - to: PTR-035
-      trigger: Works in Commission, Margin & Incentive Management
-      provenance: flow F131 step 5→6
-      operation: listCommercialAgreement
-    - to: PTR-036
-      trigger: Works in Credit Limit & Exposure Management
-      provenance: flow F131 step 7→8
-      operation: listCommercialAgreement
     - to: PTR-037
       trigger: Works in Deposit, Guarantee & Financial Security Management
       provenance: flow F131 step 9→10
@@ -7588,10 +7763,6 @@ screens:
     - to: PTR-038
       trigger: Works in Payment Terms, Billing & Account Configuration
       provenance: flow F131 step 11→12
-      operation: listCommercialAgreement
-    - to: PTR-039
-      trigger: Works in Commercial Allocation, Quota & Commitment Management
-      provenance: flow F131 step 13→14
       operation: listCommercialAgreement
     - to: PTR-040
       trigger: Works in Booking Limits, Commercial Exceptions & Approval
@@ -7601,6 +7772,24 @@ screens:
       trigger: Works in Commercial Agreement 360°, Health & AI Review
       provenance: flow F131 step 17→18
       operation: listCommercialAgreement
+    - to: PTR-035
+      trigger: Works in Commission, Margin & Incentive Management
+      provenance: flow F131 step 5→6
+      operation: listCommercialAgreement
+      carries:
+      - agreementId
+    - to: PTR-036
+      trigger: Works in Credit Limit & Exposure Management
+      provenance: flow F131 step 7→8
+      operation: listCommercialAgreement
+      carries:
+      - agreementId
+    - to: PTR-039
+      trigger: Works in Commercial Allocation, Quota & Commitment Management
+      provenance: flow F131 step 13→14
+      operation: listCommercialAgreement
+      carries:
+      - agreementId
   density: compact
   purposeNote: Commercial management can understand the status, exposure, expiry and major commercial
     terms of every partner agreement from one central workspace.
@@ -8055,11 +8244,6 @@ screens:
   purpose: Configure how partner commissions and commercial incentives are calculated.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Campaign
-      Incentive. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
-      seen from the screen side rather than the contract side.'
-    source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 29 §Support
-  - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
@@ -8078,6 +8262,12 @@ screens:
       - kind: primaryButton
         label: Campaign Incentive
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 29 §Support
+      - kind: secondaryButton
+        label: Save partner commission rules
+        operation: setPartnerCommissionRules
+        permission: PARTNER_MANAGE
+        notes: The writer for PTR-035 (decided 29 September, writers pass; DM4).
+        provenance: contract subscription.yaml PUT /partner-agreements/{agreementId}/commission-rules
     - name: contentBody
       components:
       - kind: dataTable
@@ -8099,6 +8289,12 @@ screens:
     contract: subscription
     purpose: Commission, Margin & Incentive Management
     trigger: onLoad
+  - operationId: setPartnerCommissionRules
+    contract: subscription
+    purpose: Replace the commission and incentive rules of an agreement
+    trigger: onAction
+    invalidates:
+    - listCommissionMarginIncentive
   wireframe:
     status: notStarted
     provenance: generated
@@ -8108,6 +8304,25 @@ screens:
     29. 0 of 0 labels bound to a contract property; 1 of 9 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formSetPartnerCommissionRules
+    component: modal
+    trigger: Save partner commission rules
+    body: '**Collects what `setPartnerCommissionRules` sends before it is called.** Required: `rules`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save partner commission rules
+      operation: setPartnerCommissionRules
+    dismiss:
+      label: Cancel
+      discards:
+      - rules
+    provenance: contract subscription.yaml PUT /partner-agreements/{agreementId}/commission-rules
+  entryState:
+    params:
+    - name: agreementId
+      from: navigation
+      optional: true
 - id: PTR-036
   name: Credit Limit & Exposure Management
   module: Partners
@@ -8192,6 +8407,12 @@ screens:
           Transactions. Each needs attaching to the control it gates, or the screen needs the control.'
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Authorized users
           can
+      - kind: primaryButton
+        label: Save partner credit profile
+        operation: setPartnerCreditProfile
+        permission: CREDIT_MANAGE
+        notes: The writer for PTR-036 (decided 29 September, writers pass; DM4).
+        provenance: contract subscription.yaml PUT /partner-agreements/{agreementId}/credit-profile
   states:
     loading: The credit limit exposure configuration as saved.
     error: Could not load. Names which read failed and leaves the credit limit exposure untouched.
@@ -8204,12 +8425,22 @@ screens:
     contract: subscription
     purpose: Credit Limit & Exposure Management
     trigger: onLoad
+  - operationId: setPartnerCreditProfile
+    contract: subscription
+    purpose: Set the credit controls of an agreement
+    trigger: onAction
+    invalidates:
+    - listCreditLimitExposure
   entryState:
     preloaded:
     - 'Open Invoices: AED 210,000'
     - CreditLimitExposureManagementView.unbilledTransactions
     - CreditLimitExposureManagementView.activeHoldsReservations
     - CreditLimitExposureManagementView.availableCredit
+    params:
+    - name: agreementId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -8219,6 +8450,40 @@ screens:
     30. 0 of 0 labels bound to a contract property; 22 of 31 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formSetPartnerCreditProfile
+    component: modal
+    trigger: Save partner credit profile
+    body: '**Collects what `setPartnerCreditProfile` sends before it is called.** Required: `id`, `partnerId`,
+      `agreementId`, `creditEnabled`, `creditStatus`. Optional: `temporaryCreditLimit`, `temporaryLimitUntil`,
+      `creditOwnerPrincipalId`, `approvalAuthority`, `riskClassification`, `warningThresholdPercent`,
+      `highRiskThresholdPercent`, `blockThresholdPercent`, `effectiveFrom`, `effectiveTo`, `approvalRequestId`,
+      `scopePath`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: PartnerCreditProfile
+    confirm:
+      label: Save partner credit profile
+      operation: setPartnerCreditProfile
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - partnerId
+      - agreementId
+      - creditEnabled
+      - creditStatus
+      - temporaryCreditLimit
+      - temporaryLimitUntil
+      - creditOwnerPrincipalId
+      - approvalAuthority
+      - riskClassification
+      - warningThresholdPercent
+      - highRiskThresholdPercent
+      - blockThresholdPercent
+      - effectiveFrom
+      - effectiveTo
+      - approvalRequestId
+      - scopePath
+    provenance: contract subscription.yaml PUT /partner-agreements/{agreementId}/credit-profile
 - id: PTR-037
   name: Deposit, Guarantee & Financial Security Management
   module: Partners
@@ -8253,13 +8518,6 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Manage financial security required to support partner credit or commercial access.
-  gaps:
-  - operation: null
-    why: '**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Cash
-      Deposit, Security Deposit, Prepayment Balance, Other Approved Security. Each needs an operation,
-      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
-      rather than the contract side.'
-    source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support
   layout:
     template: split
     regions:
@@ -8302,6 +8560,12 @@ screens:
       - kind: secondaryButton
         label: Other Approved Security
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support
+      - kind: secondaryButton
+        label: Save partner security
+        operation: setPartnerSecurity
+        permission: CREDIT_MANAGE
+        notes: The writer for PTR-037 (decided 29 September, writers pass; DM4).
+        provenance: contract subscription.yaml PUT /partners/{partnerId}/securities
   states:
     loading: The deposit guarantee financial list.
     error: Could not load. Names which read failed and leaves the deposit guarantee financial untouched.
@@ -8316,11 +8580,20 @@ screens:
     contract: subscription
     purpose: Deposit, Guarantee & Financial Security Management
     trigger: onLoad
+  - operationId: setPartnerSecurity
+    contract: subscription
+    purpose: Record, amend, verify or reject a partner's deposit or guarantee
+    trigger: onAction
+    invalidates:
+    - listDepositGuaranteeFinancial
   entryState:
     preloaded:
     - DepositGuaranteeFinancialSecurityManagementView.creditExposure
     - DepositGuaranteeFinancialSecurityManagementView.securityCoverage
     - DepositGuaranteeFinancialSecurityManagementView.unsecuredExposure
+    params:
+    - name: partnerId
+      from: session
   wireframe:
     status: notStarted
     provenance: generated
@@ -8330,6 +8603,36 @@ screens:
     32. 3 of 3 labels bound to a contract property; 24 of 32 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formSetPartnerSecurity
+    component: modal
+    trigger: Save partner security
+    body: '**Collects what `setPartnerSecurity` sends before it is called.** Required: `id`, `partnerId`,
+      `securityType`, `amount`, `currency`, `effectiveDate`, `verificationStatus`. Optional: `agreementId`,
+      `issuingInstitution`, `reference`, `expiryDate`, `documentId`, `expiryAction`, `scopePath`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    bindsTo: PartnerSecurity
+    confirm:
+      label: Save partner security
+      operation: setPartnerSecurity
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - partnerId
+      - securityType
+      - amount
+      - currency
+      - effectiveDate
+      - verificationStatus
+      - agreementId
+      - issuingInstitution
+      - reference
+      - expiryDate
+      - documentId
+      - expiryAction
+      - scopePath
+    provenance: contract subscription.yaml PUT /partners/{partnerId}/securities
 - id: PTR-038
   name: Payment Terms, Billing & Account Configuration
   module: Partners
@@ -8498,14 +8801,6 @@ screens:
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Define the commercial commitment of inventory to a partner. This differs from Area 4's operational
     channel allocation.
-  gaps:
-  - operation: null
-    why: '**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Guaranteed
-      Allocation, On-Request Allocation, Shared Allocation, Fixed Quantity, Percentage Allocation, Rolling
-      Allocation, Seasonal Allocation, Take-or-pay where commercially applicable. Each needs an operation,
-      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
-      rather than the contract side.'
-    source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
   layout:
     template: split
     regions:
@@ -8569,6 +8864,12 @@ screens:
       - kind: secondaryButton
         label: Take-or-pay where commercially applicable
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
+      - kind: secondaryButton
+        label: Save partner allocations
+        operation: setPartnerAllocations
+        permission: PARTNER_MANAGE
+        notes: The writer for PTR-039 (decided 29 September, writers pass; DM4).
+        provenance: contract subscription.yaml PUT /partner-agreements/{agreementId}/allocations
   states:
     loading: The commercial allocation quota list.
     error: Could not load. Names which read failed and leaves the commercial allocation quota untouched.
@@ -8583,6 +8884,12 @@ screens:
     contract: subscription
     purpose: Commercial Allocation, Quota & Commitment Management
     trigger: onLoad
+  - operationId: setPartnerAllocations
+    contract: subscription
+    purpose: Replace the allocations of an agreement
+    trigger: onAction
+    invalidates:
+    - listCommercialAllocationQuota
   entryState:
     preloaded:
     - CommercialAllocationQuotaCommitmentManagementView.allocated
@@ -8591,6 +8898,10 @@ screens:
     - CommercialAllocationQuotaCommitmentManagementView.returned
     - CommercialAllocationQuotaCommitmentManagementView.remaining
     - CommercialAllocationQuotaCommitmentManagementView.utilization
+    params:
+    - name: agreementId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -8600,6 +8911,20 @@ screens:
     35. 7 of 7 labels bound to a contract property; 27 of 45 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formSetPartnerAllocations
+    component: modal
+    trigger: Save partner allocations
+    body: '**Collects what `setPartnerAllocations` sends before it is called.** Required: `allocations`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save partner allocations
+      operation: setPartnerAllocations
+    dismiss:
+      label: Cancel
+      discards:
+      - allocations
+    provenance: contract subscription.yaml PUT /partner-agreements/{agreementId}/allocations
 - id: PTR-040
   name: Booking Limits, Commercial Exceptions & Approval
   module: Partners
@@ -9408,6 +9733,15 @@ screens:
         impliedBy: listPartnerCancellationRefund
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Create partner change request
+        operation: createPartnerChangeRequest
+        permission: ORDER_MODIFY
+        notes: The request raised from PTR-045 (decided 29 September, writers pass; DM4).
+        provenance: contract subscription.yaml POST /partner-change-requests
   states:
     loading: The partner cancellations refunds list.
     error: Could not load. Names which read failed and leaves the partner cancellations refunds untouched.
@@ -9422,6 +9756,12 @@ screens:
     contract: subscription
     purpose: Partner Cancellations, Refunds & Amendments
     trigger: onLoad
+  - operationId: createPartnerChangeRequest
+    contract: subscription
+    purpose: A partner asks to cancel or amend a booking
+    trigger: onAction
+    invalidates:
+    - listPartnerCancellationRefund
   entryState:
     preloaded:
     - PartnerCancellationsRefundsAmendmentsView.requestType
@@ -9434,6 +9774,29 @@ screens:
     49. 0 of 0 labels bound to a contract property; 0 of 34 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formCreatePartnerChangeRequest
+    component: modal
+    trigger: Create partner change request
+    body: '**Collects what `createPartnerChangeRequest` sends before it is called.** Required: `orderId`,
+      `requestType`. Optional: `quantity`, `targetPerformanceId`, `targetProductId`, `newCustomerName`,
+      `feeWaiverRequested`, `reason`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: PartnerChangeRequestInput
+    confirm:
+      label: Create partner change request
+      operation: createPartnerChangeRequest
+    dismiss:
+      label: Cancel
+      discards:
+      - orderId
+      - requestType
+      - quantity
+      - targetPerformanceId
+      - targetProductId
+      - newCustomerName
+      - feeWaiverRequested
+      - reason
+    provenance: contract subscription.yaml POST /partner-change-requests
 - id: PTR-046
   name: Partner Statement & Account Activity
   module: Partners
@@ -9700,6 +10063,13 @@ screens:
           attaching to the control it gates, or the screen needs the control.'
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 52 §Authorized users
           can
+      - kind: primaryButton
+        label: Act on partner reconciliation exception
+        operation: actOnPartnerReconciliationException
+        permission: SETTLEMENT_RECONCILE
+        notes: The owner actions on PTR-047 (decided 29 September, writers pass; DM4); the rows themselves
+          are created and re-matched by the reconciliation job.
+        provenance: contract subscription.yaml POST /partner-reconciliation-exceptions/{exceptionId}/actions
   states:
     loading: The partner reconciliation exception list.
     error: Could not load. Names which read failed and leaves the partner reconciliation exception untouched.
@@ -9714,6 +10084,12 @@ screens:
     contract: subscription
     purpose: Partner Reconciliation & Exception Management
     trigger: onLoad
+  - operationId: actOnPartnerReconciliationException
+    contract: subscription
+    purpose: Work a partner reconciliation exception
+    trigger: onAction
+    invalidates:
+    - listPartnerReconciliationException
   entryState:
     preloaded:
     - PartnerReconciliationExceptionManagementSummary.recordsReconciled
@@ -9722,6 +10098,10 @@ screens:
     - PartnerReconciliationExceptionManagementSummary.missingTickets
     - PartnerReconciliationExceptionManagementSummary.pricingDifferences
     - PartnerReconciliationExceptionManagementSummary.commissionDifferences
+    params:
+    - name: exceptionId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -9731,6 +10111,24 @@ screens:
     52. 8 of 8 labels bound to a contract property; 15 of 39 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formActOnPartnerReconciliationException
+    component: modal
+    trigger: Act on partner reconciliation exception
+    body: '**Collects what `actOnPartnerReconciliationException` sends before it is called.** Required:
+      `action`. Optional: `assigneePrincipalId`, `adjustmentRef`, `note`. Dismissing sends nothing; the
+      screen behind is unchanged.'
+    confirm:
+      label: Act on partner reconciliation exception
+      operation: actOnPartnerReconciliationException
+    dismiss:
+      label: Cancel
+      discards:
+      - action
+      - assigneePrincipalId
+      - adjustmentRef
+      - note
+    provenance: contract subscription.yaml POST /partner-reconciliation-exceptions/{exceptionId}/actions
 - id: PTR-048
   name: Commission Calculation & Settlement Management
   module: Partners
@@ -9840,6 +10238,18 @@ screens:
       - kind: primaryButton
         label: Per Transaction
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 54 §Support
+      - kind: secondaryButton
+        label: Act on partner commission line
+        operation: actOnPartnerCommissionLine
+        permission: SETTLEMENT_RECONCILE
+        notes: The line actions on PTR-048 (decided 29 September, writers pass; DM4).
+        provenance: contract subscription.yaml POST /partner-commission-lines/{lineId}/actions
+      - kind: secondaryButton
+        label: Act on partner settlement batch
+        operation: actOnPartnerSettlementBatch
+        permission: SETTLEMENT_RECONCILE
+        notes: The batch actions on PTR-048 (decided 29 September, writers pass; DM4).
+        provenance: contract subscription.yaml POST /partner-settlement-batches/{batchId}/actions
   states:
     loading: The commission calculation settlement list.
     error: Could not load. Names which read failed and leaves the commission calculation settlement untouched.
@@ -9854,6 +10264,18 @@ screens:
     contract: subscription
     purpose: Commission Calculation & Settlement Management
     trigger: onLoad
+  - operationId: actOnPartnerCommissionLine
+    contract: subscription
+    purpose: Hold, release, dispute or reverse a single commission line
+    trigger: onAction
+    invalidates:
+    - listCommissionCalculationSettlement
+  - operationId: actOnPartnerSettlementBatch
+    contract: subscription
+    purpose: Move a commission settlement batch through Finance
+    trigger: onAction
+    invalidates:
+    - listCommissionCalculationSettlement
   entryState:
     preloaded:
     - CommissionCalculationSettlementManagementSummary.commissionEarned
@@ -9862,6 +10284,13 @@ screens:
     - CommissionCalculationSettlementManagementSummary.onHold
     - CommissionCalculationSettlementManagementSummary.paid
     - CommissionCalculationSettlementManagementSummary.reversed
+    params:
+    - name: lineId
+      from: navigation
+      optional: true
+    - name: batchId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -9871,6 +10300,38 @@ screens:
     54. 8 of 8 labels bound to a contract property; 9 of 42 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formActOnPartnerCommissionLine
+    component: modal
+    trigger: Act on partner commission line
+    body: '**Collects what `actOnPartnerCommissionLine` sends before it is called.** Required: `action`.
+      Optional: `reason`, `caseId`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Act on partner commission line
+      operation: actOnPartnerCommissionLine
+    dismiss:
+      label: Cancel
+      discards:
+      - action
+      - reason
+      - caseId
+    provenance: contract subscription.yaml POST /partner-commission-lines/{lineId}/actions
+  - id: formActOnPartnerSettlementBatch
+    component: modal
+    trigger: Act on partner settlement batch
+    body: '**Collects what `actOnPartnerSettlementBatch` sends before it is called.** Required: `action`.
+      Optional: `scheduledDate`, `reason`, `caseId`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Act on partner settlement batch
+      operation: actOnPartnerSettlementBatch
+    dismiss:
+      label: Cancel
+      discards:
+      - action
+      - scheduledDate
+      - reason
+      - caseId
+    provenance: contract subscription.yaml POST /partner-settlement-batches/{batchId}/actions
 - id: PTR-049
   name: Partner Disputes, Cases & Service Management
   module: Partners
@@ -9907,10 +10368,11 @@ screens:
   purpose: Provide a structured case-management environment for partner operational and commercial disputes.
   gaps:
   - operation: null
-    why: '**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Booking
-      Dispute, Pricing Dispute, Credit Dispute, Ticket Issue, Allocation Issue, API Issue, Finance review,
-      Technical review. Each needs an operation, or needs removing from the screen; this is the Phase
-      3 reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 8 actions on this screen; 6 are served since the writers pass (29 September):
+      Booking Dispute, Pricing Dispute, Credit Dispute, Ticket Issue, Allocation Issue, API Issue by `createPartnerCase`.**
+      Still unserved: Finance review, Technical review. Each needs an operation, or needs removing from
+      the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
+      side.'
     source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support
   layout:
     template: split
@@ -9968,6 +10430,17 @@ screens:
       - kind: secondaryButton
         label: Technical review
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Allow
+      - kind: secondaryButton
+        label: Create partner case
+        operation: createPartnerCase
+        permission: CASE_MANAGE
+        notes: Raised from PTR-049 by staff or by the partner (decided 29 September, writers pass; DM4).
+        provenance: contract subscription.yaml POST /partner-cases
+      - kind: secondaryButton
+        label: Act on partner case
+        operation: actOnPartnerCase
+        permission: CASE_MANAGE
+        provenance: contract subscription.yaml POST /partner-cases/{caseId}/actions
   states:
     loading: The partner disputes cases list.
     error: Could not load. Names which read failed and leaves the partner disputes cases untouched.
@@ -9982,12 +10455,27 @@ screens:
     contract: subscription
     purpose: Partner Disputes, Cases & Service Management
     trigger: onLoad
+  - operationId: createPartnerCase
+    contract: subscription
+    purpose: Open a partner dispute or service case
+    trigger: onAction
+    invalidates:
+    - listPartnerDisputeCase
+  - operationId: actOnPartnerCase
+    contract: subscription
+    purpose: Work a partner case
+    trigger: onAction
+    invalidates:
+    - listPartnerDisputeCase
   entryState:
     preloaded:
     - PartnerDisputesCasesServiceManagementView.firstResponse
     - PartnerDisputesCasesServiceManagementView.resolutionTarget
     - PartnerDisputesCasesServiceManagementView.timeOpen
     - PartnerDisputesCasesServiceManagementView.slaBreach
+    params:
+    - name: caseId
+      from: navigation
   wireframe:
     status: notStarted
     provenance: generated
@@ -9997,6 +10485,58 @@ screens:
     56. 4 of 4 labels bound to a contract property; 27 of 45 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formCreatePartnerCase
+    component: modal
+    trigger: Create partner case
+    body: '**Collects what `createPartnerCase` sends before it is called.** Required: `id`, `partnerId`,
+      `category`, `priority`, `description`, `status`, `resolutionTargetAt`. Optional: `contactId`, `orderId`,
+      `invoiceReference`, `settlementBatchId`, `amountInDispute`, `evidence`, `ownerPrincipalId`, `slaPolicyId`,
+      `firstResponseAt`, `resolvedAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: PartnerCase
+    confirm:
+      label: Create partner case
+      operation: createPartnerCase
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - partnerId
+      - category
+      - priority
+      - description
+      - status
+      - resolutionTargetAt
+      - contactId
+      - orderId
+      - invoiceReference
+      - settlementBatchId
+      - amountInDispute
+      - evidence
+      - ownerPrincipalId
+      - slaPolicyId
+      - firstResponseAt
+      - resolvedAt
+      - scopePath
+    provenance: contract subscription.yaml POST /partner-cases
+  - id: formActOnPartnerCase
+    component: modal
+    trigger: Act on partner case
+    body: '**Collects what `actOnPartnerCase` sends before it is called.** Required: `action`. Optional:
+      `ownerPrincipalId`, `resolution`, `reason`, `note`. Dismissing sends nothing; the screen behind
+      is unchanged.'
+    confirm:
+      label: Act on partner case
+      operation: actOnPartnerCase
+    dismiss:
+      label: Cancel
+      discards:
+      - action
+      - ownerPrincipalId
+      - resolution
+      - reason
+      - note
+    provenance: contract subscription.yaml POST /partner-cases/{caseId}/actions
 - id: PTR-050
   name: Partner Performance Scorecard & Risk Monitoring
   module: Partners

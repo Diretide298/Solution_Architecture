@@ -1,1 +1,448 @@
-{}
+{
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Prize": {
+  "x-ticvai-persistence": "games.prize",
+  "type": "object",
+  "required": [
+   "id",
+   "name",
+   "venueId",
+   "pointCost",
+   "onHand"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "merchandiseId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Links to retail. Redemption depletes stock through the inventory ledger — a prize wall running out is a stock problem and should look like one.\n"
+   },
+   "pointCost": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "onHand": {
+    "type": "integer"
+   },
+   "isAvailable": {
+    "type": "boolean"
+   },
+   "tier": {
+    "type": "string",
+    "nullable": true,
+    "description": "Small, medium, large, jackpot. Drives prize-wall layout."
+   },
+   "imageAssetRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "barcode": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true,
+    "description": "The prize's own barcode, read by `lookupPrize` before the linked retail item's barcode or SKU. Unique within the venue (VM close-out, 29 September)."
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PrizeCost": {
+  "type": "object",
+  "x-ticvai-persistence": "games.prize_cost",
+  "description": "Boards 6.7 and 6.8. **Two numbers, one of them on the shelf.**",
+  "properties": {
+   "prizeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "ticketPrice": {
+    "type": "integer"
+   },
+   "unitCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "marginPercent": {
+    "type": "number",
+    "readOnly": true
+   },
+   "inventoryItemId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Stock comes from `inventory`.** A prize catalogue with its own count is one that disagrees with the stockroom.\n"
+   },
+   "directPayPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "displayTier": {
+    "type": "string",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "PrizeRedemption": {
+  "x-ticvai-persistence": "games.redemption + games.redemption_line",
+  "type": "object",
+  "required": [
+   "id",
+   "cardCode",
+   "lines",
+   "pointsUsed",
+   "pointsRemaining",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "redemptionNumber": {
+    "type": "string"
+   },
+   "cardCode": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "prizeId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "integer"
+      },
+      "pointCost": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "pointsUsed": {
+    "type": "integer"
+   },
+   "pointsRemaining": {
+    "type": "integer"
+   },
+   "stockMovementIds": {
+    "type": "array",
+    "description": "Movements raised in the inventory ledger.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "issuedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "RedemptionAnalyticsAuditAiOptimizationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Redemption Analytics, Audit & AI Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "codesGenerated": {
+    "type": "string",
+    "description": "Codes generated"
+   },
+   "codesDistributed": {
+    "type": "string",
+    "description": "Codes distributed"
+   },
+   "codesRedeemed": {
+    "type": "string",
+    "description": "Codes redeemed"
+   },
+   "redemptionRate": {
+    "type": "number",
+    "description": "Redemption rate"
+   },
+   "conversionRate": {
+    "type": "number",
+    "description": "Conversion rate"
+   },
+   "revenueGenerated": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue generated"
+   },
+   "discountGranted": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount granted"
+   },
+   "incrementalRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Incremental revenue"
+   },
+   "aovUplift": {
+    "type": "number",
+    "description": "AOV uplift"
+   },
+   "costPerRedemption": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Cost per redemption"
+   },
+   "marginImpact": {
+    "type": "number",
+    "description": "Margin impact"
+   },
+   "expiredUnusedCodes": {
+    "type": "integer",
+    "description": "Expired unused codes"
+   },
+   "user": {
+    "type": "string",
+    "description": "User"
+   },
+   "timestamp": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Timestamp"
+   },
+   "previousValue": {
+    "type": "string",
+    "description": "Previous value"
+   },
+   "newValue": {
+    "type": "integer",
+    "description": "New value"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "approvalReference": {
+    "type": "string",
+    "description": "Approval reference"
+   },
+   "auditEvent": {
+    "type": "string",
+    "enum": [
+     "created",
+     "modified",
+     "assigned",
+     "suspended",
+     "reactivated",
+     "cancelled"
+    ],
+    "description": "Code audit event."
+   }
+  }
+ },
+ "RedemptionRules": {
+  "type": "object",
+  "x-ticvai-persistence": "games.redemption_rules",
+  "description": "Board 6. **Ticket-based and ticketless are one currency arriving two ways.**",
+  "properties": {
+   "ticketCreditTypeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "earnRules": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "gameId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "ticketsPerPlay": {
+       "type": "integer",
+       "nullable": true
+      },
+      "ticketsPerScorePoint": {
+       "type": "number",
+       "nullable": true
+      },
+      "maximumPerPlay": {
+       "type": "integer",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "ticketEaterEnabled": {
+    "type": "boolean",
+    "default": false
+   },
+   "ticketlessEnabled": {
+    "type": "boolean",
+    "default": true
+   },
+   "ticketsExpire": {
+    "type": "boolean",
+    "default": false
+   },
+   "ticketValidityDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "counterApprovalAboveTickets": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**A prize above a threshold needs a second person.** The alternative is a counter that can hand out the top shelf.\n"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "Wallet": {
+  "x-ticvai-persistence": "wallet.wallet + wallet.credit_lot",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "balance",
+   "currency",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "balance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "credits": {
+    "type": "array",
+    "description": "4.3.5 and 4.3.19. **One balance and one bonus balance with one expiry could not express what the requirement asks for** — cash, bonus and redemption credit, each with its own expiry.\n**The expiries are the reason this is a list.** Cash a guest paid for should outlive a promotional credit they were given, and a single `expiresAt` either expires the money they paid or never expires the promotion.\n**Consumed first-expiry-first-out across all three** (4.3.19), which is also the order that is fairest to the guest — spend what is about to die before what is not.\n**One entry per `active` lot in `wallet.credit_lot`** for this wallet: `amount` is the lot's `remaining_amount`, `expiresAt` its `expires_at`, `sourceRef` its `source_reference`. `kind` and `isRefundable` are not stored on the lot; they come from the lot's credit type (`listCreditLots` returns the lots themselves).\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "amount"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "cash",
+        "bonus",
+        "redemption",
+        "refund",
+        "goodwill"
+       ],
+       "description": "**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability.\n",
+       "x-ticvai-persisted": false
+      },
+      "amount": {
+       "x-ticvai-column": "remaining_amount",
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "expiresAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "sourceRef": {
+       "type": "string",
+       "nullable": true,
+       "x-ticvai-column": "source_reference"
+      },
+      "isRefundable": {
+       "type": "boolean",
+       "default": false,
+       "x-ticvai-persisted": false,
+       "description": "**True only for `cash`.** A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice.\n"
+      }
+     }
+    }
+   },
+   "bonusBalance": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Promotional value. Typically non-refundable and spent first."
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "suspended",
+     "closed"
+    ]
+   },
+   "homeCellName": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where the authoritative balance lives. Present when the guest is linked across cells.\n"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastActivityAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ }
+}

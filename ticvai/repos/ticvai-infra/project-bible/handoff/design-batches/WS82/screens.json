@@ -162,10 +162,19 @@
    "emptyNoResults": "The filter narrowed it and the game ride pricing are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getGamePricing",
+    "contract": "games",
+    "purpose": "Effective prices",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-434"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-434",
+   "workshopBoard": "wireframes/WS62 Game and Ride Board 5.dc.html#bo-434"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 43. 0 of 8 labels bound to a contract property; 13 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -303,10 +312,22 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setGamePricing",
+    "contract": "games",
+    "purpose": "Standard price",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGamePricing"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-435"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-435",
+   "workshopBoard": "wireframes/WS62 Game and Ride Board 5.dc.html#bo-435"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 44. 0 of 0 labels bound to a contract property; 11 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -449,10 +470,22 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setGamePricing",
+    "contract": "games",
+    "purpose": "Group pricing",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGamePricing"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-436"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-436",
+   "workshopBoard": "wireframes/WS62 Game and Ride Board 5.dc.html#bo-436"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 45. 0 of 0 labels bound to a contract property; 12 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -585,10 +618,22 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setGamePricing",
+    "contract": "games",
+    "purpose": "Peak and off-peak",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGamePricing"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-437"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-437",
+   "workshopBoard": "wireframes/WS62 Game and Ride Board 5.dc.html#bo-437"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 46. 0 of 0 labels bound to a contract property; 10 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -711,10 +756,22 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setGamePricing",
+    "contract": "games",
+    "purpose": "Calendar and exception dates",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGamePricing"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-438"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-438",
+   "workshopBoard": "wireframes/WS62 Game and Ride Board 5.dc.html#bo-438"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 47. 0 of 0 labels bound to a contract property; 8 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -790,6 +847,20 @@
        "kind": "selectField",
        "label": "Attraction: VR Racing",
        "provenance": "pack Game_and_Ride_Module.pdf, page 47 §Configuration"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setGamePricing",
+       "label": "Save game pricing",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setGamePricing"
       }
      ]
     }
@@ -802,10 +873,22 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setGamePricing",
+    "contract": "games",
+    "purpose": "Normal and VIP",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGamePricing"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-439"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-439",
+   "workshopBoard": "wireframes/WS62 Game and Ride Board 5.dc.html#bo-439"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 47. 0 of 0 labels bound to a contract property; 1 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -921,7 +1004,18 @@
    "emptyNoResults": "The filter narrowed it and the retry price are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setGamePricing",
+    "contract": "games",
+    "purpose": "Retry price",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGamePricing"
+    ]
+   }
+  ],
   "entryState": {
    "preloaded": [
     "↓"
@@ -929,7 +1023,8 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-440"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-440",
+   "workshopBoard": "wireframes/WS62 Game and Ride Board 5.dc.html#bo-440"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 48. 0 of 1 labels bound to a contract property; 9 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -997,11 +1092,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Reorder | Validate | Test | Save. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Game_and_Ride_Module.pdf, page 49 §Actions"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 49"
    },
@@ -1021,7 +1111,19 @@
       {
        "kind": "primaryButton",
        "label": "Reorder | Validate | Test | Save",
+       "operation": "setRulePriorityConflict",
        "provenance": "pack Game_and_Ride_Module.pdf, page 49 §Actions"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listRulePriorityConflict",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
     }
@@ -1034,12 +1136,26 @@
    "emptyNoResults": "The filter narrowed it and the price priority conflict are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listRulePriorityConflict",
+    "contract": "catalogue",
+    "purpose": "Rule Priority, Conflict Resolution & Dynamic Pricing Test Console",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setRulePriorityConflict",
+    "contract": "catalogue",
+    "purpose": "Save priority",
+    "trigger": "onAction"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-441"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-441",
+   "workshopBoard": "wireframes/WS62 Game and Ride Board 5.dc.html#bo-441"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 49. 0 of 0 labels bound to a contract property; 1 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 49. 0 of 0 labels bound to a contract property; 1 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `setRulePriorityConflict`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1105,18 +1221,126 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Game_and_Ride_Module.pdf, page 50"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 50"
    }
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "filters",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Game or attraction",
+       "operation": "getGamePricing",
+       "notes": "Sends `?gameId=` (required).",
+       "provenance": "contract games.yaml GET /game-pricing"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reader",
+       "operation": "getGamePricing",
+       "notes": "Sends `?readerId=`; the preview shows what this reader will display.",
+       "provenance": "contract games.yaml GET /game-pricing"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Date and time",
+       "operation": "getGamePricing",
+       "notes": "Sends `?at=`; covers the pack's Date and Time inputs.",
+       "provenance": "contract games.yaml GET /game-pricing"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer type / VIP status",
+       "operation": "getGamePricing",
+       "notes": "Sends `?guestTier=`.",
+       "provenance": "contract games.yaml GET /game-pricing"
+      },
+      {
+       "kind": "selectField",
+       "label": "Retry status",
+       "notes": "A pack simulation input with no query parameter.",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 50"
+      },
+      {
+       "kind": "selectField",
+       "label": "Package / entitlement",
+       "notes": "A pack simulation input with no query parameter.",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 50"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Final price",
+       "bindsTo": "GamePriceResolution",
+       "columns": [
+        "GamePriceResolution.effectivePrice"
+       ],
+       "operation": "getGamePricing",
+       "provenance": "contract games.yaml GET /game-pricing"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Applied rule",
+       "bindsTo": "GamePriceResolution",
+       "columns": [
+        "GamePriceResolution.appliedRule"
+       ],
+       "operation": "getGamePricing",
+       "provenance": "contract games.yaml GET /game-pricing"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Rule evaluation",
+       "bindsTo": "GamePriceResolution.trace",
+       "columns": [
+        "GamePriceResolution.trace[].rule",
+        "GamePriceResolution.trace[].applied",
+        "GamePriceResolution.trace[].price",
+        "GamePriceResolution.trace[].skippedBecause"
+       ],
+       "operation": "getGamePricing",
+       "notes": "Every candidate rule in evaluation order, the winner marked; matches the pack's Standard / Peak / VIP walk-through.",
+       "provenance": "contract games.yaml GET /game-pricing"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Reader preview",
+       "bindsTo": "GamePriceResolution",
+       "columns": [
+        "GamePriceResolution.gameId",
+        "GamePriceResolution.effectivePrice",
+        "Normal price on reader",
+        "Reader display text"
+       ],
+       "operation": "getGamePricing",
+       "notes": "The pack's reader mockup (\"SKY COASTER / Normal AED 45 / VIP AED 30 / TAP TO PLAY\"). The normal price can be read from the trace's untiered rule, but no field names it.",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 51"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The effective pricing reader list.",
@@ -1125,12 +1349,21 @@
    "emptyNoResults": "The filter narrowed it and the effective pricing reader are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getGamePricing",
+    "contract": "games",
+    "purpose": "What the reader will charge",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-442"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-442",
+   "workshopBoard": "wireframes/WS62 Game and Ride Board 5.dc.html#bo-442"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 50. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 50. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Game_and_Ride_Module.pdf p.50; pack Game_and_Ride_Module.pdf p.51; contract games.yaml GET /game-pricing. Pack labels with no schema field yet (shown as plain labels): Retry status (simulation input), Package / entitlement (simulation input), Venue (simulation input), Normal (untiered) price shown on reader, Reader display text.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1196,11 +1429,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Publish Now, Schedule Publication, Deactivate Rule. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Game_and_Ride_Module.pdf, page 51 §Allow"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 51"
    },
@@ -1231,8 +1459,19 @@
        "kind": "destructiveButton",
        "label": "Deactivate Rule",
        "provenance": "pack Game_and_Ride_Module.pdf, page 51 §Allow"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "operation": "publishPricingEffectiveDate",
+       "notes": "**Names the prices that change, the channels and venues they apply to, and the effective date**, before it runs. A publish with no stated consequence is one somebody presses meaning to save.",
+       "provenance": "contract catalogue.yaml PUT /pricing-effective-date (authored: required by check-screens)"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -1252,12 +1491,54 @@
    "emptyNoResults": "The filter narrowed it and the pricing audit approval are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listPricing",
+    "contract": "catalogue",
+    "purpose": "AI Pricing Intelligence Command Center",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "publishPricingEffectiveDate",
+    "contract": "catalogue",
+    "purpose": "Publish pricing now or on a scheduled effective date",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Publish Now, Schedule Publication; Deactivate Rule",
+    "invalidates": [
+     "listPricing"
+    ]
+   },
+   {
+    "operationId": "setDynamicPriceRule",
+    "contract": "catalogue",
+    "purpose": "Deactivate the price rule (isActive=false)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Publish Now, Schedule Publication; Deactivate Rule",
+    "invalidates": [
+     "listPricing"
+    ]
+   },
+   {
+    "operationId": "listDynamicPriceRules",
+    "contract": "catalogue",
+    "purpose": "The dynamic price rules reviewed and published here",
+    "trigger": "onLoad"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-443"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-443",
+   "workshopBoard": "wireframes/WS62 Game and Ride Board 5.dc.html#bo-443"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 51. 0 of 0 labels bound to a contract property; 3 of 59 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 51. 0 of 0 labels bound to a contract property; 3 of 59 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Publish Now, Schedule Publication: `publishPricingEffectiveDate`; Deactivate Rule: `setDynamicPriceRule`.",
+  "entryState": {
+   "params": [
+    {
+     "name": "ruleId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

@@ -1,0 +1,496 @@
+{
+ "Qualification": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.qualification",
+  "description": "1.2.36. **A role is not a skill**, and the check happens before assignment rather than after.\n",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "resourceId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**The resource that holds this qualification.** Set from the path of `setResourceQualifications`; without it a stored qualification belongs to nobody and the check before assignment has nothing to check against. One row per resource and `code`.\n"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "**The field that makes this worth having.** A certification with no expiry is one nobody renews, and a lifeguard certificate that lapsed last month is a safety failure rather than a data-quality one.\n"
+   },
+   "issuer": {
+    "type": "string",
+    "nullable": true
+   },
+   "documentAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "Resource": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.resource",
+  "description": "**A specific object, not a quantity of interchangeable ones.** A venue with forty identical strollers has forty resources, because guest number twelve returned stroller number twelve.\n",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "kind",
+   "venueId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ResourceKind"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "parentResourceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**A pool cabana belongs to the pool area; a seat belongs to an auditorium.** Booking a parent takes its children with it, which is the behaviour a venue expects and would otherwise have to enforce by hand.\n"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a resource of kind `instructor` or `staff`. **`workforce` still owns their rota** — this says whether they are qualified and whether they are already committed.\n"
+   },
+   "attributes": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Configurable per kind — capacity, size, shade, power, poolside."
+   },
+   "setupMinutes": {
+    "type": "integer",
+    "default": 0,
+    "description": "**Before the booking, not inside it.** An auditorium booked 14:00–16:00 is unavailable from 13:30 with a 30-minute setup, and a calendar that cannot express that double-books every time.\n"
+   },
+   "teardownMinutes": {
+    "type": "integer",
+    "default": 0
+   },
+   "requiresQualification": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Qualification codes a person must hold to be assigned to this."
+   },
+   "depositAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "available",
+     "booked",
+     "checkedOut",
+     "maintenance",
+     "retired"
+    ]
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "ResourceAllocationPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.allocation_policy",
+  "description": "Board 5.08, and the 26 August rotation decision. **Named rather than hidden in the allocator**, so somebody can answer why cabana three never gets used.\n",
+  "properties": {
+   "strategy": {
+    "type": "string",
+    "enum": [
+     "rotate",
+     "leastUtilised",
+     "priorityOrder",
+     "nearestFirst"
+    ],
+    "default": "rotate",
+    "description": "**`rotate` is the default because 26 August made it one.** *\"rotate across all available resources… rather than repeatedly reusing the same resource, to avoid overburdening any single resource while others remain unused.\"*\n"
+   },
+   "respectResourcePriority": {
+    "type": "boolean",
+    "default": true
+   },
+   "scoringWeights": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "number"
+    }
+   },
+   "allowPartialAllocation": {
+    "type": "boolean",
+    "default": false,
+    "description": "**False by default.** A stage allocated without its sound system is worse than no allocation, because it looks finished.\n"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "ResourceBooking": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.booking",
+  "required": [
+   "id",
+   "resourceId",
+   "from",
+   "to",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "resourceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "from": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "to": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "$ref": "#/components/schemas/ResourceBookingStatus"
+   },
+   "holdId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The `ResourceHold` this booking was converted from, where a guest picked the resource on a venue map (rev 3 REV3-15). Null for a staff booking or an allocation.\n"
+   },
+   "recurrenceGroupId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Ties the occurrences of a recurring booking. **Cancelling one week does not cancel the series**, and cancelling the series is a separate act with a separate confirmation.\n"
+   },
+   "depositAuthorisationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The hold, through `orders.authoriseStoredValue` (CF-126). **A deposit taken and refunded is two transactions and a fee; held and released is neither.**\n"
+   },
+   "checkedOutAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "dueBackAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "returnedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "conditionOut": {
+    "type": "string",
+    "nullable": true
+   },
+   "conditionIn": {
+    "type": "string",
+    "nullable": true
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the latest offline check-out or check-in write reached the server. **The device times are `checkedOutAt` and `returnedAt`**, taken from each write's `recordedAt`; this is the server's half of the pair naming-and-style 5.2 requires. Null while pending.\n"
+   }
+  }
+ },
+ "ResourceBookingStatus": {
+  "type": "string",
+  "enum": [
+   "reserved",
+   "checkedOut",
+   "returned",
+   "overdue",
+   "cancelled",
+   "noShow"
+  ]
+ },
+ "ResourceKind": {
+  "type": "string",
+  "description": "BL-135. **`locker` was an entitlement kind in `orders` and nothing issued, assigned or released one.** A locker is a specific object checked out to a named guest and returned — which is this context exactly, and modelling it as an entitlement would have needed a second check-out mechanism.\nA seed for `ResourceType` rather than the law (board 1.02): a customer adding a class does it with `createResourceType`, not by waiting for this list to grow.\n**`table` is a non-dining spot** (decided 29 September, rev 3 GAP-C2, confirmed by Chinmay): a beach or event table placed on a venue map, picked and sold like a cabana (`createResourceHold`, then the order). **A dining table is not this**: restaurant tables stay `fnb` tables, booked with `fnb.createTableReservation` and the waitlist (audit R073 (d)).\n",
+  "enum": [
+   "cabana",
+   "lounger",
+   "locker",
+   "wheelchair",
+   "stroller",
+   "equipment",
+   "room",
+   "auditorium",
+   "vehicle",
+   "instructor",
+   "staff",
+   "table",
+   "pitch",
+   "studio",
+   "other"
+  ],
+  "x-ticvai-refuses": {
+   "mealPlan": "**Listed by 5.5.8b and deliberately not a kind.** 5.5.8b groups meal plans with lockers and parking, but a meal plan is a balance rather than an object. It resolves to `retail.Wallet` with a `mealPlan` credit kind (CF-126), not to a resource — so it is not offered here, and a form built from this enum cannot offer it either."
+  }
+ },
+ "ResourcePackage": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.resource_package",
+  "description": "Board 1.08. **A package may hold placeholders.** \"One technician\" is a slot, and naming a person would make the package unbookable whenever they are off.\n",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "applicableVenueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "components": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ResourceRequirement"
+    }
+   },
+   "allocationPriority": {
+    "type": "integer",
+    "default": 0
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "minimumMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "maximumMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "requiresApproval": {
+    "type": "boolean",
+    "default": false
+   },
+   "internalCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "ResourceRequirement": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.resource_requirement",
+  "description": "**A type and a quantity, never a named resource.** This is what makes the 26 August rule enforceable — the product states what it needs and the platform decides which one.\nFor resources placed on a published venue map the rule is superseded (decided 29 September, rev 3 REV3-15): the guest names the resource through a `ResourceHold`, and no requirement is needed.\n",
+  "required": [
+   "quantity"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "resourceTypeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "resourceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**A fixed component, and the exception rather than the rule.** Meeting Room A really is Meeting Room A; the technician is not.\n"
+   },
+   "quantity": {
+    "type": "integer",
+    "default": 1
+   },
+   "mandatory": {
+    "type": "boolean",
+    "default": true
+   },
+   "requiredQualifications": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "requiredAttributes": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "substituteResourceIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "ResourceSelectionPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.selection_policy",
+  "description": "**Whether the guest may choose the resource, per ticket type**: the body of `setResourceSelectionPolicy` and its row, one per ticket type, replaced by each `PUT` (decided 29 September, data model DM4).\n",
+  "required": [
+   "ticketTypeId",
+   "mode"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "ticketTypeId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "One policy per ticket type; a `PUT` for a ticket type that has one replaces it."
+   },
+   "mode": {
+    "type": "string",
+    "enum": [
+     "autoAssign",
+     "guestMayChoose"
+    ]
+   },
+   "resourceTypeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "showQualifications": {
+    "type": "boolean",
+    "default": false
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005), written at `venue` scope."
+   }
+  }
+ },
+ "ResourceUtilisation": {
+  "type": "object",
+  "description": "Board 10.02. **Booked time over available time**, where available knows about schedules, blocks, setup and travel.\n",
+  "properties": {
+   "key": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "availableMinutes": {
+    "type": "integer"
+   },
+   "bookedMinutes": {
+    "type": "integer"
+   },
+   "blockedMinutes": {
+    "type": "integer"
+   },
+   "utilisationPercent": {
+    "type": "number"
+   },
+   "bookingCount": {
+    "type": "integer"
+   }
+  }
+ }
+}

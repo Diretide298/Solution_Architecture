@@ -30,13 +30,63 @@
   "path": "/credential-security",
   "contract": "access",
   "summary": "Credential Security Simulation, Audit & Publication",
-  "permission": "SCOPE_VIEW",
+  "permission": "AUDIT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CredentialSecuritySimulationAuditPublicationView"
+  "responds": "Page"
+ },
+ "listCredentialSecurityOperational": {
+  "method": "GET",
+  "path": "/credential-security-operational",
+  "contract": "access",
+  "summary": "Credential Security, Audit & Operational Evidence",
+  "permission": "AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "virtualTicket",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "action",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "actor",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listCredentialTransferRebinding": {
   "method": "GET",
@@ -60,9 +110,20 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "DeviceBindingSessionSecurityView"
+  "responds": "Page"
  },
  "listDigitalCredentialSecurity": {
   "method": "GET",
@@ -73,9 +134,20 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "DigitalCredentialSecurityCommandCenterView"
+  "responds": "Page"
  },
  "listOfflineCryptographicValidation": {
   "method": "GET",
@@ -99,9 +171,34 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "BleBeaconGeofenceConfigurationInput",
   "responds": "BleBeaconGeofenceConfigurationView"
+ },
+ "setCredentialActivationDisplay": {
+  "method": "PUT",
+  "path": "/credential-activation-display",
+  "contract": "access",
+  "summary": "Save a credential activation and display rule",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CredentialActivationDisplayRulesInput",
+  "responds": "CredentialActivationDisplayRulesView"
  },
  "setDynamicSecurityProfile": {
   "method": "PUT",
@@ -112,7 +209,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "DynamicQrSecurityProfileBuilderInput",
   "responds": "DynamicQrSecurityProfileBuilderView"
  },
@@ -125,7 +228,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "EmbeddedEntitlementPayloadDesignerInput",
   "responds": "EmbeddedEntitlementPayloadDesignerView"
  }

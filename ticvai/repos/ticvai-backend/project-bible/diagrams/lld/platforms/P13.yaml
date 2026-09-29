@@ -31,7 +31,7 @@ servicesCalled:
 - service: WhiteLabelService
   operationCalls: 66
 - service: MarketingService
-  operationCalls: 50
+  operationCalls: 52
 - service: FnbService
   operationCalls: 5
 - service: IdentityService
@@ -779,6 +779,7 @@ screens:
   density: compact
   operations:
   - listPrivacyNoticePolicy
+  - setPrivacyNoticePolicyGovernance
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -824,6 +825,7 @@ screens:
   density: compact
   operations:
   - approvePrivacyTesting
+  - setPrivacyNoticePolicyGovernance
   states:
   - emptyFirstRun
   - emptyNoAccess

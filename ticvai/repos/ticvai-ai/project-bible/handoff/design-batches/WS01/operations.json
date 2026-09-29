@@ -1,4 +1,80 @@
 {
+ "createAccessPoint": {
+  "method": "POST",
+  "path": "/access-points",
+  "contract": "access",
+  "summary": "Create an access point",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateAccessPointRequest",
+  "responds": "AccessPoint"
+ },
+ "createOrgUnit": {
+  "method": "POST",
+  "path": "/org-units",
+  "contract": "tenancy",
+  "summary": "Create a scope node",
+  "permission": "SCOPE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "brand",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateScopeNodeRequest",
+  "responds": "OrgUnit"
+ },
+ "deleteAccessPointGroup": {
+  "method": "DELETE",
+  "path": "/access-point-groups/{groupId}",
+  "contract": "access",
+  "summary": "Delete an access-point group",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "deleteOperatingCalendarEntry": {
+  "method": "DELETE",
+  "path": "/operating-calendar-entries/{entryId}",
+  "contract": "access",
+  "summary": "Delete an operating calendar entry",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "listAccess": {
   "method": "GET",
   "path": "/access",
@@ -67,6 +143,45 @@
   "requestBody": null,
   "responds": "OperatingCalendarSpecialAccessDaysView"
  },
+ "listOrgUnits": {
+  "method": "GET",
+  "path": "/org-units",
+  "contract": "tenancy",
+  "summary": "List scope nodes visible to the session",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "under",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "level",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeInactive",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listVenueParkAccess": {
   "method": "GET",
   "path": "/venue-park-access",
@@ -89,9 +204,34 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "TopologyValidationPublicationInput",
   "responds": "TopologyValidationPublicationView"
+ },
+ "rollbackConfigurationVersion": {
+  "method": "POST",
+  "path": "/configuration-versions/{versionId}/rollback",
+  "contract": "access",
+  "summary": "Roll back an active access configuration version",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessConfigurationVersion"
  },
  "setAccessAreaZone": {
   "method": "PUT",
@@ -102,7 +242,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "AccessAreaZoneBuilderInput",
   "responds": "AccessAreaZoneBuilderView"
  },
@@ -115,9 +261,34 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "AccessControlGraphicalMapDesignerInput",
   "responds": "AccessControlGraphicalMapDesignerView"
+ },
+ "setAccessPointGroup": {
+  "method": "PUT",
+  "path": "/access-point-groups",
+  "contract": "access",
+  "summary": "Create or replace an access-point group",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessAccessPointGroup",
+  "responds": "AccessAccessPointGroup"
  },
  "setAttractionAccess": {
   "method": "PUT",
@@ -128,7 +299,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "AttractionAccessConfigurationInput",
   "responds": "AttractionAccessConfigurationView"
  },
@@ -141,8 +318,52 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "GateLaneConfigurationInput",
   "responds": "GateLaneConfigurationView"
+ },
+ "setOperatingCalendarEntry": {
+  "method": "PUT",
+  "path": "/operating-calendar-entries",
+  "contract": "access",
+  "summary": "Create or replace an operating calendar entry",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessOperatingCalendarEntry",
+  "responds": "AccessOperatingCalendarEntry"
+ },
+ "updateOrgUnit": {
+  "method": "PATCH",
+  "path": "/org-units/{orgUnitId}",
+  "contract": "tenancy",
+  "summary": "Rename or deactivate a scope node",
+  "permission": "SCOPE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "brand",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OrgUnit"
  }
 }

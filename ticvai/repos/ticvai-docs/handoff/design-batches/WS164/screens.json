@@ -1,0 +1,1785 @@
+[
+ {
+  "id": "BO-943",
+  "name": "Resource Analytics Command Center",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "10",
+   "number": "01",
+   "page": 153
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/resource-analytics-command-center-bo-943",
+   "component": "apps/venue-management-web/src/routes/rentals/ResourceAnalyticsCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-944",
+    "BO-945",
+    "BO-946",
+    "BO-947",
+    "BO-948",
+    "BO-949",
+    "BO-950",
+    "BO-951",
+    "BO-952"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-944",
+     "trigger": "Resource Utilization & Capacity Analytics",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-945",
+     "trigger": "Resource Cost, Revenue & Efficiency Analytics",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-946",
+     "trigger": "Demand Forecast Accuracy & Planning Performance",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-947",
+     "trigger": "Resource KPI, SLA & Performance Framework",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-948",
+     "trigger": "Resource Governance & Policy Center",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-949",
+     "trigger": "Approval, Exception & Override Control Center",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-950",
+     "trigger": "Audit Trail & Resource Decision History",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026",
+     "carries": [
+      "resourceId"
+     ]
+    },
+    {
+     "to": "BO-951",
+     "trigger": "Resource Integration & System Health Center",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-952",
+     "trigger": "Executive Resource Intelligence & AI Improvement Center",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Provide executives and operational managers with a single enterprise dashboard showing the overall health and performance of Resource Management.",
+  "purposeNote": "Authorized management users can understand overall Resource Management performance and identify areas requiring attention from a single dashboard.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 153 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every resource analytics",
+       "columns": [
+        "Total active resources",
+        "Available resources",
+        "Currently assigned",
+        "Utilization %",
+        "Resource readiness %",
+        "Staff utilization",
+        "Physical asset utilization",
+        "Resource conflicts",
+        "Unfulfilled resource demand",
+        "Overtime",
+        "Maintenance downtime",
+        "Resource-related operational cost",
+        "Forecast vs actual demand",
+        "AI recommendations implemented",
+        "Resource Breakdown"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 153 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected resource analytics",
+       "bindsTo": null,
+       "columns": [
+        "Total active resources",
+        "Available resources",
+        "Currently assigned",
+        "Utilization %",
+        "Resource readiness %",
+        "Staff utilization",
+        "Physical asset utilization",
+        "Resource conflicts",
+        "Unfulfilled resource demand",
+        "Overtime",
+        "Maintenance downtime",
+        "Resource-related operational cost",
+        "Forecast vs actual demand",
+        "AI recommendations implemented",
+        "Resource Breakdown"
+       ],
+       "notes": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 153 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Venue",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 153 §Allow analysis by"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Attraction",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 153 §Allow analysis by"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Event",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 153 §Allow analysis by"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resource category",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 153 §Allow analysis by"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resource type",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 153 §Allow analysis by"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Equipment",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 153 §Allow analysis by"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resource analytics list.",
+   "error": "Could not load. Names which read failed and leaves the resource analytics untouched.",
+   "emptyFirstRun": "No resource analytics yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the resource analytics are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listResources",
+    "contract": "resources",
+    "purpose": "Resources at this venue",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getResourceUtilisation",
+    "contract": "resources",
+    "purpose": "Utilisation across the estate",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Total active resources",
+    "Available resources",
+    "Currently assigned",
+    "Utilization %",
+    "Resource readiness %",
+    "Staff utilization"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-943",
+   "workshopBoard": "wireframes/WS135 Resource Management Configuration Board 10.dc.html#bo-943"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 153. 0 of 15 labels bound to a contract property; 21 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Venue, Attraction, Event, Resource category, Resource type, Equipment are choices sent by `getResourceUtilisation` (groupBy venue|resourceType|category; field gap: attraction/event/equipment not in groupBy enum).",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-944",
+  "name": "Resource Utilization & Capacity Analytics",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "10",
+   "number": "02",
+   "page": 155
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/resource-utilization-capacity-analytics-bo-944",
+   "component": "apps/venue-management-web/src/routes/rentals/ResourceUtilizationCapacityAnalytics.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-943"
+   ],
+   "exitTo": [
+    "BO-943"
+   ],
+   "transitions": [
+    {
+     "to": "BO-943",
+     "trigger": "Back to Resource Analytics Command Center",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Measure how effectively resources are being utilized and identify overused or underused capacity.",
+  "purposeNote": "Managers can understand resource utilization, idle capacity, overutilization, and capacity pressure across the organization.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 155"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "filters",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "datePicker",
+       "label": "From",
+       "operation": "getResourceUtilisation",
+       "notes": "Sends `?from=` (required).",
+       "provenance": "contract resources.yaml GET /resource-utilisation"
+      },
+      {
+       "kind": "datePicker",
+       "label": "To",
+       "operation": "getResourceUtilisation",
+       "notes": "Sends `?to=` (required).",
+       "provenance": "contract resources.yaml GET /resource-utilisation"
+      },
+      {
+       "kind": "selectField",
+       "label": "Group by",
+       "operation": "getResourceUtilisation",
+       "notes": "Sends `?groupBy=`; venue gives the pack's venue comparison.",
+       "provenance": "contract resources.yaml GET /resource-utilisation"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Available capacity",
+       "bindsTo": "ResourceUtilisation",
+       "columns": [
+        "ResourceUtilisation.availableMinutes"
+       ],
+       "operation": "getResourceUtilisation",
+       "notes": "Summed and shown in hours.",
+       "provenance": "contract resources.yaml GET /resource-utilisation"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Scheduled",
+       "bindsTo": "ResourceUtilisation",
+       "columns": [
+        "ResourceUtilisation.bookedMinutes"
+       ],
+       "operation": "getResourceUtilisation",
+       "notes": "Summed and shown in hours.",
+       "provenance": "contract resources.yaml GET /resource-utilisation"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Utilization",
+       "bindsTo": "ResourceUtilisation",
+       "columns": [
+        "ResourceUtilisation.utilisationPercent"
+       ],
+       "operation": "getResourceUtilisation",
+       "provenance": "contract resources.yaml GET /resource-utilisation"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Actual usage",
+       "columns": [
+        "Actual usage"
+       ],
+       "notes": "The pack's formula is actual utilised hours over available; the contract has booked, not actual.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 155"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "chart",
+       "label": "Resource ranking by utilization",
+       "bindsTo": "ResourceUtilisation",
+       "columns": [
+        "ResourceUtilisation.label",
+        "ResourceUtilisation.utilisationPercent"
+       ],
+       "operation": "getResourceUtilisation",
+       "notes": "Under- and over-utilised resources stand out against the configured target, which has no field.",
+       "provenance": "contract resources.yaml GET /resource-utilisation"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Utilization by resource",
+       "bindsTo": "ResourceUtilisation",
+       "columns": [
+        "ResourceUtilisation.label",
+        "ResourceUtilisation.availableMinutes",
+        "ResourceUtilisation.bookedMinutes",
+        "ResourceUtilisation.blockedMinutes",
+        "ResourceUtilisation.utilisationPercent",
+        "ResourceUtilisation.bookingCount"
+       ],
+       "operation": "getResourceUtilisation",
+       "provenance": "contract resources.yaml GET /resource-utilisation"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resource utilization capacity list.",
+   "error": "Could not load. Names which read failed and leaves the resource utilization capacity untouched.",
+   "emptyFirstRun": "No resource utilization capacity yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the resource utilization capacity are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getResourceUtilisation",
+    "contract": "resources",
+    "purpose": "Utilisation and capacity",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-944",
+   "workshopBoard": "wireframes/WS135 Resource Management Configuration Board 10.dc.html#bo-944"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 155. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Resource_Management_Configuration_Reference.pdf p.155; contract resources.yaml GET /resource-utilisation. Pack labels with no schema field yet (shown as plain labels): Actual usage, Assigned time, Idle time, Maintenance time, Day/time breakdown (heatmap), Utilization target.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-945",
+  "name": "Resource Cost, Revenue & Efficiency Analytics",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "10",
+   "number": "03",
+   "page": 156
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/resource-cost-revenue-efficiency-analytics-bo-945",
+   "component": "apps/venue-management-web/src/routes/rentals/ResourceCostRevenueEfficiencyAnalytics.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-943"
+   ],
+   "exitTo": [
+    "BO-943"
+   ],
+   "transitions": [
+    {
+     "to": "BO-943",
+     "trigger": "Back to Resource Analytics Command Center",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Measure the financial and operational efficiency of resources.",
+  "purposeNote": "Authorized users can analyze resource-related costs and operational/commercial efficiency while maintaining clear ownership boundaries with Finance.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 156"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 156"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer cost",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 156 §Support analysis of"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Asset operating cost",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 156 §Support analysis of"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resource replacement cost",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 156 §Support analysis of"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resource cost revenue list.",
+   "error": "Could not load. Names which read failed and leaves the resource cost revenue untouched.",
+   "emptyFirstRun": "No resource cost revenue yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the resource cost revenue are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getResourceUtilisation",
+    "contract": "resources",
+    "purpose": "Cost and efficiency against use",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getResourceCostAnalytics",
+    "contract": "resources",
+    "purpose": "What resources cost and earn, grouped",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-945",
+   "workshopBoard": "wireframes/WS135 Resource Management Configuration Board 10.dc.html#bo-945"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 156. 0 of 0 labels bound to a contract property; 3 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `getResourceCostAnalytics`.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-946",
+  "name": "Demand Forecast Accuracy & Planning Performance",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "10",
+   "number": "04",
+   "page": 157
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/demand-forecast-accuracy-planning-performance-bo-946",
+   "component": "apps/venue-management-web/src/routes/rentals/DemandForecastAccuracyPlanningPerformance.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-943"
+   ],
+   "exitTo": [
+    "BO-943"
+   ],
+   "transitions": [
+    {
+     "to": "BO-943",
+     "trigger": "Back to Resource Analytics Command Center",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen a metric directory (§Display; Track) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "purpose": "Measure how accurately TICVAI's forecasting and planning engines predicted actual resource demand.",
+  "purposeNote": "resource planning is improving operational performance.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Forecast Demand",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 157 §Display"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Planned Resources",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 157 §Display"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Actual Demand",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 157 §Display"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Actual Resources Used",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 157 §Display"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Attendance forecast accuracy",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 157 §Track"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Resource demand forecast accuracy",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 157 §Track"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Staffing forecast accuracy",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 157 §Track"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Equipment forecast accuracy",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 157 §Track"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Forecast shortage rate",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 157 §Track"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Overstaffing rate",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 157 §Track"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Understaffing rate",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 157 §Track"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The demand forecast accuracy list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the demand forecast accuracy untouched.",
+   "emptyFirstRun": "No demand forecast accuracy yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the demand forecast accuracy are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listDemandBookingCurve",
+    "contract": "catalogue",
+    "purpose": "Forecast accuracy",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-946",
+   "workshopBoard": "wireframes/WS135 Resource Management Configuration Board 10.dc.html#bo-946"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 157. 0 of 0 labels bound to a contract property; 11 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-947",
+  "name": "Resource KPI, SLA & Performance Framework",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "10",
+   "number": "05",
+   "page": 158
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/resource-kpi-sla-performance-framework-bo-947",
+   "component": "apps/venue-management-web/src/routes/rentals/ResourceKpiSlaPerformanceFramework.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-943"
+   ],
+   "exitTo": [
+    "BO-943"
+   ],
+   "transitions": [
+    {
+     "to": "BO-943",
+     "trigger": "Back to Resource Analytics Command Center",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§KPI Library; Each KPI shall support) and no metric row",
+  "purpose": "Allow organizations to define measurable Resource Management performance standards.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 158 §KPI Library"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every resource kpi sla",
+       "columns": [
+        "Resource utilization",
+        "Assignment fulfillment",
+        "Staffing coverage",
+        "Resource readiness",
+        "Equipment availability",
+        "Maintenance downtime",
+        "Conflict resolution time",
+        "Resource replacement time",
+        "Attendance compliance",
+        "Overtime",
+        "Rental return rate",
+        "Forecast accuracy",
+        "Name",
+        "Description",
+        "Formula",
+        "Target",
+        "Warning threshold",
+        "Critical threshold",
+        "Applicable venue",
+        "Applicable resource",
+        "Effective period",
+        "Owner"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 158 §KPI Library"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected resource kpi sla",
+       "bindsTo": null,
+       "columns": [
+        "Resource utilization",
+        "Assignment fulfillment",
+        "Staffing coverage",
+        "Resource readiness",
+        "Equipment availability",
+        "Maintenance downtime",
+        "Conflict resolution time",
+        "Resource replacement time",
+        "Attendance compliance",
+        "Overtime",
+        "Rental return rate",
+        "Forecast accuracy",
+        "Name",
+        "Description",
+        "Formula",
+        "Target",
+        "Warning threshold",
+        "Critical threshold",
+        "Applicable venue",
+        "Applicable resource",
+        "Effective period",
+        "Owner"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Target”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 158 §KPI Library"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resource kpi sla list.",
+   "error": "Could not load. Names which read failed and leaves the resource kpi sla untouched.",
+   "emptyFirstRun": "No resource kpi sla yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the resource kpi sla are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getResourceUtilisation",
+    "contract": "resources",
+    "purpose": "The KPI base",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Resource utilization",
+    "Assignment fulfillment",
+    "Staffing coverage",
+    "Resource readiness",
+    "Equipment availability",
+    "Maintenance downtime"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-947",
+   "workshopBoard": "wireframes/WS135 Resource Management Configuration Board 10.dc.html#bo-947"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 158. 0 of 22 labels bound to a contract property; 22 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-948",
+  "name": "Resource Governance & Policy Center",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "10",
+   "number": "06",
+   "page": 159
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/resource-governance-policy-center-bo-948",
+   "component": "apps/venue-management-web/src/routes/rentals/ResourceGovernancePolicyCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-943"
+   ],
+   "exitTo": [
+    "BO-943"
+   ],
+   "transitions": [
+    {
+     "to": "BO-943",
+     "trigger": "Back to Resource Analytics Command Center",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Centralize the administrative policies controlling how Resource Management behaves.",
+  "purposeNote": "Administrators can centrally manage Resource Management policies with controlled inheritance, versioning, and effective dating.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 159"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 159"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setResourceAllocationPolicy",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setResourceAllocationPolicy"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resource governance policy list.",
+   "error": "Could not load. Names which read failed and leaves the resource governance policy untouched.",
+   "emptyFirstRun": "No resource governance policy yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the resource governance policy are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getResourceAllocationPolicy",
+    "contract": "resources",
+    "purpose": "Policy in force",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setResourceAllocationPolicy",
+    "contract": "resources",
+    "purpose": "Change it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getResourceAllocationPolicy"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-948",
+   "workshopBoard": "wireframes/WS135 Resource Management Configuration Board 10.dc.html#bo-948"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 159. 0 of 0 labels bound to a contract property; 0 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-949",
+  "name": "Approval, Exception & Override Control Center",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "10",
+   "number": "07",
+   "page": 160
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/approval-exception-override-control-center-bo-949",
+   "component": "apps/venue-management-web/src/routes/rentals/ApprovalExceptionOverrideControlCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-943"
+   ],
+   "exitTo": [
+    "BO-943"
+   ],
+   "transitions": [
+    {
+     "to": "BO-943",
+     "trigger": "Back to Resource Analytics Command Center",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Each request shall show) and no metric row",
+  "purpose": "Provide one centralized workspace for governed Resource Management exceptions.",
+  "purposeNote": "Resource exceptions and overrides are processed through controlled, permission-based workflows rather than informal administrative changes.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 160 §Each request shall show"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every approval exception override",
+       "columns": [
+        "Request",
+        "Resource",
+        "Requester",
+        "Venue",
+        "Reason",
+        "Operational impact",
+        "Financial impact",
+        "Risk",
+        "AI recommendation",
+        "Required approver"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 160 §Each request shall show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected approval exception override",
+       "bindsTo": null,
+       "columns": [
+        "Request",
+        "Resource",
+        "Requester",
+        "Venue",
+        "Reason",
+        "Operational impact",
+        "Financial impact",
+        "Risk",
+        "AI recommendation",
+        "Required approver"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Include”, “Request”, “Issue”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 160 §Each request shall show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The approval exception override list.",
+   "error": "Could not load. Names which read failed and leaves the approval exception override untouched.",
+   "emptyFirstRun": "No approval exception override yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the approval exception override are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listMemberExceptionOverride",
+    "contract": "subscription",
+    "purpose": "Member Exceptions, Overrides & Service Recovery",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Request",
+    "Resource",
+    "Requester",
+    "Venue",
+    "Reason",
+    "Operational impact"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-949",
+   "workshopBoard": "wireframes/WS135 Resource Management Configuration Board 10.dc.html#bo-949"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 160. 0 of 10 labels bound to a contract property; 10 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-950",
+  "name": "Audit Trail & Resource Decision History",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "10",
+   "number": "08",
+   "page": 162
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/audit-trail-resource-decision-history-bo-950",
+   "component": "apps/venue-management-web/src/routes/rentals/AuditTrailResourceDecisionHistory.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-943"
+   ],
+   "exitTo": [
+    "BO-943"
+   ],
+   "transitions": [
+    {
+     "to": "BO-943",
+     "trigger": "Back to Resource Analytics Command Center",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Capture; Each event shall capture) and no display directory — it is settings, not a population",
+  "purpose": "Provide immutable traceability of significant Resource Management changes and decisions.",
+  "purposeNote": "Authorized users can reconstruct the complete history of material Resource Management decisions and identify exactly how and why each change occurred.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Resource creation",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 162 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Resource modification",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 162 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Availability change",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 162 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Assignment",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 162 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reassignment",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 162 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Cancellation",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 162 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Staff override",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 162 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maintenance block",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 162 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Rental transaction",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 162 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Deposit adjustment",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 162 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Event allocation",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 162 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "AI recommendation",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 162 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "AI execution",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 162 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Approval",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 162 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Policy change",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 162 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Who",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 162 §Each event shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "What",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 162 §Each event shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "When",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 162 §Each event shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Where",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 162 §Each event shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Previous Value",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 162 §Each event shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "New Value",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 162 §Each event shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reason",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 162 §Each event shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Source",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 162 §Each event shall capture"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The audit trail resource configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the audit trail resource untouched.",
+   "emptyFirstRun": "No audit trail resource configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "getResourceAuditTrail",
+    "contract": "resources",
+    "purpose": "Decision history",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-950",
+   "workshopBoard": "wireframes/WS135 Resource Management Configuration Board 10.dc.html#bo-950"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 162. 0 of 0 labels bound to a contract property; 23 of 50 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "resourceId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-951",
+  "name": "Resource Integration & System Health Center",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "10",
+   "number": "09",
+   "page": 163
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/resource-integration-system-health-center-bo-951",
+   "component": "apps/venue-management-web/src/routes/rentals/ResourceIntegrationSystemHealthCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-943"
+   ],
+   "exitTo": [
+    "BO-943"
+   ],
+   "transitions": [
+    {
+     "to": "BO-943",
+     "trigger": "Back to Resource Analytics Command Center",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Monitor all technical integrations and synchronization services supporting Resource Management.",
+  "purposeNote": "Administrators can monitor integration health and understand the operational impact of synchronization failures.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 163 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every resource integration system",
+       "columns": [
+        "System",
+        "Status",
+        "Last Sync",
+        "Transactions",
+        "Errors",
+        "Latency"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 163 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected resource integration system",
+       "bindsTo": null,
+       "columns": [
+        "System",
+        "Status",
+        "Last Sync",
+        "Transactions",
+        "Errors",
+        "Latency"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Potential connections include”, “HRMS”, “Workforce Provider”, “Operational Impact”, “It should explain”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 163 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "banner",
+       "label": "Permissions this screen separates",
+       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Retry, View error, Inspect payload/reference, Reprocess, Escalate, Open affected records. Each needs attaching to the control it gates, or the screen needs the control.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 163 §Authorized users may"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resource integration system list.",
+   "error": "Could not load. Names which read failed and leaves the resource integration system untouched.",
+   "emptyFirstRun": "No resource integration system yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the resource integration system are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAnalyticsPipelines",
+    "contract": "reporting",
+    "purpose": "Integration and data health",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "System",
+    "Status",
+    "Last Sync",
+    "Transactions",
+    "Errors",
+    "Latency"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-951",
+   "workshopBoard": "wireframes/WS135 Resource Management Configuration Board 10.dc.html#bo-951"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 163. 0 of 6 labels bound to a contract property; 12 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-952",
+  "name": "Executive Resource Intelligence & AI Improvement Center",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "10",
+   "number": "10",
+   "page": 165
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/executive-resource-intelligence-ai-improvement-center-bo-952",
+   "component": "apps/venue-management-web/src/routes/rentals/ExecutiveResourceIntelligenceAiImprovementCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-943"
+   ],
+   "exitTo": [
+    "BO-943"
+   ],
+   "transitions": [
+    {
+     "to": "BO-943",
+     "trigger": "Back to Resource Analytics Command Center",
+     "provenance": "structural — pack board 10 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen both a metric directory (§Track) and a per-row directory (§Each recommendation shall show) — counts over a population, then the population",
+  "purpose": "Complete the Resource Management module with an executive AI workspace that converts operational data into management recommendations. This should be the hero screen of Board 10.",
+  "purposeNote": "Executives can use Resource Management data and AI intelligence to identify measurable opportunities for improving capacity, cost, reliability, utilization, and operational performance. Board 10 — Resource Management Control Tower Board 10 effectively becomes the Control Tower sitting above the previous nine boards. The architecture should conceptually operate as: Board 1–2 Resource Master + Availability ↓ Board 3–4 Workforce + Rostering ↓",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 165 §Each recommendation shall show"
+   }
+  ],
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Recommendations generated",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 165 §Track"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Recommendations accepted",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 165 §Track"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Recommendations rejected",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 165 §Track"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Auto-actions executed",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 165 §Track"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Forecast accuracy",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 165 §Track"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Optimization savings predicted",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 165 §Track"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Optimization savings realized",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 165 §Track"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Replacement success",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 165 §Track"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Conflict-resolution success",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 165 §Track"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "moduleTiles",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every executive resource intelligence",
+       "columns": [
+        "Evidence",
+        "Confidence",
+        "Expected benefit",
+        "Risk",
+        "Affected resources",
+        "Financial impact",
+        "Operational impact"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 165 §Each recommendation shall show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected executive resource intelligence",
+       "bindsTo": null,
+       "columns": [
+        "Evidence",
+        "Confidence",
+        "Expected benefit",
+        "Risk",
+        "Affected resources",
+        "Financial impact",
+        "Operational impact"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Executive Question”, “Overall Utilization”, “Resource Readiness”, “Assignment Fulfillment”, “Overtime”, “Resource-Related Cost”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 165 §Each recommendation shall show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The executive resource intelligence list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the executive resource intelligence untouched.",
+   "emptyFirstRun": "No executive resource intelligence yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the executive resource intelligence are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getResourceUtilisation",
+    "contract": "resources",
+    "purpose": "Executive resource view",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-952",
+   "workshopBoard": "wireframes/WS135 Resource Management Configuration Board 10.dc.html#bo-952"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 165. 0 of 7 labels bound to a contract property; 16 of 141 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

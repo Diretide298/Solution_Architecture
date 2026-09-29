@@ -30,7 +30,7 @@ hld:
   title: 35 contracts — the join between every other layer
 - file: diagrams/hld/04-lifecycles.yaml
   id: HLD-LIFECYCLES
-  title: 134 state models and 29 events
+  title: 186 state models and 30 events
 lld:
 - set: services
   files: 17
@@ -42,5 +42,5 @@ lld:
   files: 35
   folder: diagrams/lld/contracts/
 - set: lifecycles
-  files: 134
+  files: 186
   folder: diagrams/lld/lifecycles/

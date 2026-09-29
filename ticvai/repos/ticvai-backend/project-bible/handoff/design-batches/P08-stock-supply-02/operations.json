@@ -37,12 +37,31 @@
   "requestBody": null,
   "responds": "ProductionRun"
  },
+ "createInventoryItem": {
+  "method": "POST",
+  "path": "/inventory-items",
+  "contract": "inventory",
+  "summary": "Create an inventory item",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateInventoryItemRequest",
+  "responds": "InventoryItem"
+ },
  "createRequisition": {
   "method": "POST",
   "path": "/requisitions",
   "contract": "inventory",
   "summary": "Raise a requisition",
-  "permission": "ORDER_CREATE",
+  "permission": "PROCUREMENT_REQUEST",
   "offlineCapable": true,
   "conflictPolicy": "append",
   "scopeLevel": "venue",
@@ -69,6 +88,45 @@
   "requestBody": null,
   "responds": "CountVariance"
  },
+ "getKpiValues": {
+  "method": "GET",
+  "path": "/kpi-values",
+  "contract": "reporting",
+  "summary": "Current values, against target, with movement",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kpiIds",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kpiCodes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "compareTo",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KpiValue"
+ },
  "getProductionRun": {
   "method": "GET",
   "path": "/production-runs/{runId}",
@@ -82,6 +140,19 @@
   "requestBody": null,
   "responds": "ProductionRun"
  },
+ "getVenueSettings": {
+  "method": "GET",
+  "path": "/venues/{venueId}/settings",
+  "contract": "tenancy",
+  "summary": "Operational settings for this venue",
+  "permission": "TENANT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VenueSettings"
+ },
  "listAlerts": {
   "method": "GET",
   "path": "/alerts",
@@ -94,6 +165,26 @@
   "parameters": [
    {
     "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "severity",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "shiftId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "itemId",
     "in": "query",
     "required": null
    }
@@ -128,7 +219,51 @@
    }
   ],
   "requestBody": null,
-  "responds": "StockBatch"
+  "responds": "Page"
+ },
+ "listInventoryItems": {
+  "method": "GET",
+  "path": "/inventory-items",
+  "contract": "inventory",
+  "summary": "List inventory items",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "belowReorderPoint",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listProductionRuns": {
   "method": "GET",
@@ -167,7 +302,41 @@
    }
   ],
   "requestBody": null,
-  "responds": "ProductionRun"
+  "responds": "Page"
+ },
+ "listPurchaseOrders": {
+  "method": "GET",
+  "path": "/purchase-orders",
+  "contract": "inventory",
+  "summary": "List purchase orders",
+  "permission": "PROCUREMENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "supplierId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listRecipes": {
   "method": "GET",
@@ -179,6 +348,16 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "menuItemId",
+    "in": "query",
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -249,5 +428,24 @@
   ],
   "requestBody": null,
   "responds": "MenuItem"
+ },
+ "setTemperatureCheckpoint": {
+  "method": "PUT",
+  "path": "/food-safety/checkpoints",
+  "contract": "fnb",
+  "summary": "Define a checkpoint and its safe range",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TemperatureCheckpoint",
+  "responds": "TemperatureCheckpoint"
  }
 }

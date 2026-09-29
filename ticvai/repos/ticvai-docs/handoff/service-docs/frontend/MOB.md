@@ -35,14 +35,14 @@
 | [GST-009](#gst-009-review-payment) | Review & Payment | Cart & Checkout | 1 | 9 |
 | [GST-010](#gst-010-booking-confirmation) | Booking Confirmation | Cart & Checkout | 1 | 3 |
 | [GST-012](#gst-012-my-tickets) | My Tickets | Account & Self-Service | 1 | 6 |
-| [GST-013](#gst-013-ticket-details) | Ticket Details | Account & Self-Service | 1 | 4 |
+| [GST-013](#gst-013-ticket-details) | Ticket Details | Account & Self-Service | 1 | 5 |
 | [GST-039](#gst-039-profile) | Profile | Account & Self-Service | 1 | 2 |
 | [GST-041](#gst-041-checkout-entry) | Checkout Entry | Cart & Checkout | 1 | 11 |
 | [GST-042](#gst-042-simple-registration-otp) | Simple Registration & OTP | Account & Self-Service | 1 | 12 |
 | [GST-043](#gst-043-arabic-rtl-experience) | Arabic / RTL Experience | System States | 1 | 0 |
 | [GST-046](#gst-046-branded-queue-waiting-room) | Branded Queue / Waiting Room | High-Demand Access | 1 | 3 |
 | [GST-047](#gst-047-maintenance-upgrade-page) | Maintenance / Upgrade Page | System States | 1 | 1 |
-| [GST-055](#gst-055-dynamic-qr-ticket) | Dynamic QR Ticket | Account & Self-Service | 1 | 4 |
+| [GST-055](#gst-055-dynamic-qr-ticket) | Dynamic QR Ticket | Account & Self-Service | 1 | 5 |
 | [GST-063](#gst-063-search) | Search | Discovery | 1 | 1 |
 | [GST-011](#gst-011-wallet-overview) | Wallet Overview | Membership, Loyalty & Value | 2 | 2 |
 | [GST-014](#gst-014-ticket-transfer) | Ticket Transfer | Ticketing | 2 | 3 |
@@ -703,6 +703,7 @@
 |---|---|
 | entitlementId | deepLink |
 | orderId | deepLink |
+| credentialId | navigation |
 
 **Operations**
 
@@ -712,6 +713,7 @@
 | `getEntitlementCredential` | [AccessService](../backend/AccessService.md#getentitlementcredential) | onLoad | The thing that gets scanned — with the `rotation` seed the device derives the rotating code from (audit R230) | `ORDER_VIEW` |
 | `getEntitlementHistory` | [AccessService](../backend/AccessService.md#getentitlementhistory) | onLoad | Every scan, freeze, share and reissue against it | `ORDER_VIEW` |
 | `transferOrderTickets` | [OrderService](../backend/OrderService.md#transferordertickets) | onAction | Transfer tickets to another guest | `None` |
+| `bindCredentialDevice` | [AccessService](../backend/AccessService.md#bindcredentialdevice) | onAction | Bind my credential to this device | `None` |
 
 **States**
 
@@ -728,7 +730,7 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-055 | The QR rotates as they walk to the gate | entitlementId, orderId |  |
+| GST-055 | The QR rotates as they walk to the gate | credentialId, entitlementId, orderId |  |
 
 ## GST-039 Profile
 
@@ -1015,6 +1017,7 @@
 |---|---|
 | orderId | deepLink |
 | entitlementId | navigation |
+| credentialId | navigation |
 
 **Operations**
 
@@ -1024,6 +1027,7 @@
 | `getEntitlement` | [AccessService](../backend/AccessService.md#getentitlement) | onAction | The selected ticket | `ORDER_VIEW` |
 | `getEntitlementCredential` | [AccessService](../backend/AccessService.md#getentitlementcredential) | onAction | The QR code that gets scanned, refreshed — with the `rotation` seed the device derives the rotating code from (audit R230) | `ORDER_VIEW` |
 | `transferOrderTickets` | [OrderService](../backend/OrderService.md#transferordertickets) | onAction | Transfer tickets to another guest | `None` |
+| `bindCredentialDevice` | [AccessService](../backend/AccessService.md#bindcredentialdevice) | onAction | Bind my credential to this device | `None` |
 
 **States**
 

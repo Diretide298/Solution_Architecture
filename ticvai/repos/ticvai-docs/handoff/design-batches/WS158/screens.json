@@ -1,0 +1,1733 @@
+[
+ {
+  "id": "BO-883",
+  "name": "Workforce Roster Command Center",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "4",
+   "number": "01",
+   "page": 49
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/workforce-roster-command-center-bo-883",
+   "component": "apps/venue-management-web/src/routes/rentals/WorkforceRosterCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-884",
+    "BO-885",
+    "BO-886",
+    "BO-887",
+    "BO-888",
+    "BO-889",
+    "BO-890",
+    "BO-891",
+    "BO-892"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-884",
+     "trigger": "Attraction & Operational Staffing Roster",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-885",
+     "trigger": "Minimum Staffing & Coverage Rule Configuration",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-886",
+     "trigger": "Staffing Gap & Coverage Control Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-887",
+     "trigger": "Shift Marketplace & Workforce Requests",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-888",
+     "trigger": "Attendance & Live Workforce Command Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-889",
+     "trigger": "Staff Check-In, Check-Out & Attendance Exceptions",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-890",
+     "trigger": "Workforce Compliance Validation Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-891",
+     "trigger": "Labor Cost & Staffing Budget Control",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-892",
+     "trigger": "AI Workforce Planner & Roster Optimization",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide managers with the primary operational workspace for viewing and managing workforce deployment across venues, attractions, events, departments, and shifts.",
+  "purposeNote": "Managers can understand the complete workforce position for their permitted operations and manage staffing directly from one operational roster workspace.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 49"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 49"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listRotaAssignments",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The workforce roster list.",
+   "error": "Could not load. Names which read failed and leaves the workforce roster untouched.",
+   "emptyFirstRun": "No workforce roster yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the workforce roster are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listRotaAssignments",
+    "contract": "workforce",
+    "purpose": "The roster",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getStaffingCoverage",
+    "contract": "workforce",
+    "purpose": "Where it is short",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-883",
+   "workshopBoard": "wireframes/WS129 Resource Management Configuration Board 4.dc.html#bo-883"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 49. 0 of 0 labels bound to a contract property; 0 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-884",
+  "name": "Attraction & Operational Staffing Roster",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "4",
+   "number": "02",
+   "page": 50
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/attraction-operational-staffing-roster-bo-884",
+   "component": "apps/venue-management-web/src/routes/rentals/AttractionOperationalStaffingRoster.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-883"
+   ],
+   "exitTo": [
+    "BO-883"
+   ],
+   "transitions": [
+    {
+     "to": "BO-883",
+     "trigger": "Back to Workforce Roster Command Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Each candidate shall show) and no metric row",
+  "purpose": "Create detailed staffing plans for individual attractions, experiences, venues, departments, and events.",
+  "purposeNote": "Managers can construct operational staffing rosters against actual attraction, event, experience, and ticketing demand.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 50 §Each candidate shall show"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every attraction operational staffing",
+       "columns": [
+        "Name",
+        "Photograph",
+        "Role",
+        "Skill level",
+        "Certifications",
+        "Availability",
+        "Current hours",
+        "Venue",
+        "Overtime impact",
+        "AI suitability score"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 50 §Each candidate shall show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected attraction operational staffing",
+       "bindsTo": null,
+       "columns": [
+        "Name",
+        "Photograph",
+        "Role",
+        "Skill level",
+        "Certifications",
+        "Availability",
+        "Current hours",
+        "Venue",
+        "Overtime impact",
+        "AI suitability score"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Managers shall select”, “Required”, “Scheduled”, “Managers may assign employees through”, “Ticket/Experience Visibility”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 50 §Each candidate shall show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The attraction operational staffing list.",
+   "error": "Could not load. Names which read failed and leaves the attraction operational staffing untouched.",
+   "emptyFirstRun": "No attraction operational staffing yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the attraction operational staffing are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "createRotaAssignment",
+    "contract": "workforce",
+    "purpose": "Roster a position",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listRotaAssignments",
+     "getStaffingCoverage"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Name",
+    "Photograph",
+    "Role",
+    "Skill level",
+    "Certifications",
+    "Availability"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-884",
+   "workshopBoard": "wireframes/WS129 Resource Management Configuration Board 4.dc.html#bo-884"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 50. 0 of 10 labels bound to a contract property; 10 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-885",
+  "name": "Minimum Staffing & Coverage Rule Configuration",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "4",
+   "number": "03",
+   "page": 52
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/minimum-staffing-coverage-rule-configuration-bo-885",
+   "component": "apps/venue-management-web/src/routes/rentals/MinimumStaffingCoverageRuleConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-883"
+   ],
+   "exitTo": [
+    "BO-883"
+   ],
+   "transitions": [
+    {
+     "to": "BO-883",
+     "trigger": "Back to Workforce Roster Command Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Define the minimum personnel required to operate safely and effectively.",
+  "purposeNote": "Administrators can define fixed and demand-driven staffing requirements that TICVAI automatically evaluates against planned rosters.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Minimum",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Target",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Recommended",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Enforcement",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 52 §Configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The minimum staffing coverage configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the minimum staffing coverage untouched.",
+   "emptyFirstRun": "No minimum staffing coverage configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "setStaffingRules",
+    "contract": "workforce",
+    "purpose": "Minimum staffing and cover",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getStaffingCoverage",
+     "validateWorkforceCompliance"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-885",
+   "workshopBoard": "wireframes/WS129 Resource Management Configuration Board 4.dc.html#bo-885"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 52. 0 of 0 labels bound to a contract property; 5 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-886",
+  "name": "Staffing Gap & Coverage Control Center",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "4",
+   "number": "04",
+   "page": 53
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/staffing-gap-coverage-control-center-bo-886",
+   "component": "apps/venue-management-web/src/routes/rentals/StaffingGapCoverageControlCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-883"
+   ],
+   "exitTo": [
+    "BO-883"
+   ],
+   "transitions": [
+    {
+     "to": "BO-883",
+     "trigger": "Back to Workforce Roster Command Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Identify workforce shortages before they create operational problems.",
+  "purposeNote": "Managers can identify planned and live staffing gaps and receive actionable recommendations for resolving them.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 53"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "filters",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "datePicker",
+       "label": "From",
+       "operation": "getStaffingCoverage",
+       "notes": "Sends `?from=` (required).",
+       "provenance": "contract workforce.yaml GET /staffing-coverage"
+      },
+      {
+       "kind": "datePicker",
+       "label": "To",
+       "operation": "getStaffingCoverage",
+       "notes": "Sends `?to=` (required).",
+       "provenance": "contract workforce.yaml GET /staffing-coverage"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "operation": "getStaffingCoverage",
+       "notes": "Sends `?venueId=`.",
+       "provenance": "contract workforce.yaml GET /staffing-coverage"
+      },
+      {
+       "kind": "selectField",
+       "label": "Severity",
+       "operation": "getStaffingCoverage",
+       "notes": "Client-side on `severity` (covered, tight, short, blocking); the pack's Informational / Warning / High / Critical scale does not map one to one.",
+       "provenance": "contract workforce.yaml GET /staffing-coverage"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Planned gap",
+       "bindsTo": "StaffingCoverage",
+       "columns": [
+        "StaffingCoverage.gap"
+       ],
+       "operation": "getStaffingCoverage",
+       "notes": "Summed across positions.",
+       "provenance": "contract workforce.yaml GET /staffing-coverage"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Blocking gaps",
+       "bindsTo": "StaffingCoverage",
+       "columns": [
+        "StaffingCoverage.severity"
+       ],
+       "operation": "getStaffingCoverage",
+       "notes": "Count where `severity` is blocking.",
+       "provenance": "contract workforce.yaml GET /staffing-coverage"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Live operational gap",
+       "columns": [
+        "Live operational gap"
+       ],
+       "notes": "Required against checked-in staff (the pack's 12 required / 9 checked in = 3); no attendance field is returned.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 53"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Coverage by position",
+       "bindsTo": "StaffingCoverage",
+       "columns": [
+        "StaffingCoverage.date",
+        "StaffingCoverage.label",
+        "StaffingCoverage.positionCode",
+        "StaffingCoverage.from",
+        "StaffingCoverage.to",
+        "StaffingCoverage.required",
+        "StaffingCoverage.rostered",
+        "StaffingCoverage.qualified",
+        "Checked in",
+        "StaffingCoverage.gap",
+        "StaffingCoverage.severity"
+       ],
+       "operation": "getStaffingCoverage",
+       "provenance": "contract workforce.yaml GET /staffing-coverage"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected gap",
+       "bindsTo": "StaffingCoverage",
+       "columns": [
+        "StaffingCoverage.venueId",
+        "StaffingCoverage.label",
+        "StaffingCoverage.from",
+        "StaffingCoverage.to",
+        "StaffingCoverage.required",
+        "StaffingCoverage.rostered",
+        "StaffingCoverage.qualified",
+        "StaffingCoverage.gap",
+        "StaffingCoverage.severity",
+        "StaffingCoverage.openShiftIds",
+        "Gap type",
+        "Recommended employee",
+        "Match score"
+       ],
+       "operation": "getStaffingCoverage",
+       "notes": "Gap type (missing staff / role / skill / certification, absence- or demand-created) and the AI recommendation are pack labels.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 54"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The staffing gap coverage list.",
+   "error": "Could not load. Names which read failed and leaves the staffing gap coverage untouched.",
+   "emptyFirstRun": "No staffing gap coverage yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the staffing gap coverage are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getStaffingCoverage",
+    "contract": "workforce",
+    "purpose": "Gaps, by severity",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-886",
+   "workshopBoard": "wireframes/WS129 Resource Management Configuration Board 4.dc.html#bo-886"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 53. 0 of 0 labels bound to a contract property; 0 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Resource_Management_Configuration_Reference.pdf p.53; pack Resource_Management_Configuration_Reference.pdf p.54; contract workforce.yaml GET /staffing-coverage. Pack labels with no schema field yet (shown as plain labels): Live operational gap, Checked-in (actual attendance), Gap type, Recommended employee, Match score.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-887",
+  "name": "Shift Marketplace & Workforce Requests",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "4",
+   "number": "05",
+   "page": 54
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/shift-marketplace-workforce-requests-bo-887",
+   "component": "apps/venue-management-web/src/routes/rentals/ShiftMarketplaceWorkforceRequests.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-883"
+   ],
+   "exitTo": [
+    "BO-883"
+   ],
+   "transitions": [
+    {
+     "to": "BO-883",
+     "trigger": "Back to Workforce Roster Command Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow employees and managers to manage shift changes through controlled workflows rather than informal manual communication.",
+  "purposeNote": "Employees can request governed shift changes while TICVAI automatically validates qualifications, workforce rules, and operational coverage before approval.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 54"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 54"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listOpenShifts",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "claimOpenShift",
+       "label": "Claim open shift",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "claimOpenShift"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The shift marketplace workforce list.",
+   "error": "Could not load. Names which read failed and leaves the shift marketplace workforce untouched.",
+   "emptyFirstRun": "No shift marketplace workforce yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the shift marketplace workforce are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listOpenShifts",
+    "contract": "workforce",
+    "purpose": "The shift marketplace",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "claimOpenShift",
+    "contract": "workforce",
+    "purpose": "Pick one up",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listOpenShifts",
+     "getStaffingCoverage"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-887",
+   "workshopBoard": "wireframes/WS129 Resource Management Configuration Board 4.dc.html#bo-887"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 54. 0 of 0 labels bound to a contract property; 0 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-888",
+  "name": "Attendance & Live Workforce Command Center",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "4",
+   "number": "06",
+   "page": 55
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/attendance-live-workforce-command-center-bo-888",
+   "component": "apps/venue-management-web/src/routes/rentals/AttendanceLiveWorkforceCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-883"
+   ],
+   "exitTo": [
+    "BO-883"
+   ],
+   "transitions": [
+    {
+     "to": "BO-883",
+     "trigger": "Back to Workforce Roster Command Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Provide real-time visibility into whether scheduled employees actually reported and are available for operation.",
+  "purposeNote": "Managers can monitor planned versus actual workforce attendance in real time and immediately understand operational impact.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 55 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every attendance live workforce",
+       "columns": [
+        "Scheduled today",
+        "Checked in",
+        "Not yet arrived",
+        "Late",
+        "Absent",
+        "No-show",
+        "On break",
+        "Checked out",
+        "Overtime",
+        "Attendance exceptions",
+        "Planned vs Actual"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 55 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected attendance live workforce",
+       "bindsTo": null,
+       "columns": [
+        "Scheduled today",
+        "Checked in",
+        "Not yet arrived",
+        "Late",
+        "Absent",
+        "No-show",
+        "On break",
+        "Checked out",
+        "Overtime",
+        "Attendance exceptions",
+        "Planned vs Actual"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “For each employee”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 55 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The attendance live workforce list.",
+   "error": "Could not load. Names which read failed and leaves the attendance live workforce untouched.",
+   "emptyFirstRun": "No attendance live workforce yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the attendance live workforce are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAttendance",
+    "contract": "workforce",
+    "purpose": "Live attendance",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Scheduled today",
+    "Checked in",
+    "Not yet arrived",
+    "Late",
+    "Absent",
+    "No-show"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-888",
+   "workshopBoard": "wireframes/WS129 Resource Management Configuration Board 4.dc.html#bo-888"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 55. 0 of 11 labels bound to a contract property; 11 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-889",
+  "name": "Staff Check-In, Check-Out & Attendance Exceptions",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "4",
+   "number": "07",
+   "page": 56
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/staff-check-in-check-out-attendance-exceptions-bo-889",
+   "component": "apps/venue-management-web/src/routes/rentals/StaffCheckInCheckOutAttendanceExceptions.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-883"
+   ],
+   "exitTo": [
+    "BO-883"
+   ],
+   "transitions": [
+    {
+     "to": "BO-883",
+     "trigger": "Back to Workforce Roster Command Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§The system shall capture; Every correction shall capture) and no display directory — it is settings, not a population",
+  "purpose": "Record actual employee working activity and manage exceptions to scheduled attendance.",
+  "purposeNote": "handling and complete auditability.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Planned check-in",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 56 §The system shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Actual check-in",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 56 §The system shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Planned check-out",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 56 §The system shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Actual check-out",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 56 §The system shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Attendance status",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 56 §The system shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Lateness",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 56 §The system shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Early departure",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 56 §The system shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Overtime",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 56 §The system shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "No-show",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 56 §The system shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Exception",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 56 §The system shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Source/device",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 56 §The system shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Exception Types",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 56 §The system shall capture"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Amendment history",
+       "bindsTo": "AttendanceAmendment",
+       "columns": [
+        "AttendanceAmendment.amendedAt",
+        "AttendanceAmendment.amendedByPrincipalId",
+        "AttendanceAmendment.occurredAtBefore",
+        "AttendanceAmendment.occurredAtAfter",
+        "AttendanceAmendment.reason"
+       ],
+       "operation": "amendAttendance",
+       "notes": "**Every correction, not only the last** (decided 28 September, audit R129 (7)) — read from `AttendanceRecord.amendments`: who, when, before, after and why.",
+       "provenance": "contract workforce.yaml POST /attendance/{recordId}/amend"
+      },
+      {
+       "kind": "selectField",
+       "label": "Original value",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 56 §Every correction shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "New value",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 56 §Every correction shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "User",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 56 §Every correction shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Timestamp",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 56 §Every correction shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reason",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 56 §Every correction shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Approval where required",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 56 §Every correction shall capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Mobile Assignment Check-In",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 56 §Every correction shall capture"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The staff check-in check-out configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the staff check-in check-out untouched.",
+   "emptyFirstRun": "No staff check-in check-out configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "recordAttendance",
+    "contract": "workforce",
+    "purpose": "Check in or out",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listAttendance",
+     "getLabourCost"
+    ]
+   },
+   {
+    "operationId": "amendAttendance",
+    "contract": "workforce",
+    "purpose": "Correct an exception",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listAttendance",
+     "getLabourCost"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-889",
+   "workshopBoard": "wireframes/WS129 Resource Management Configuration Board 4.dc.html#bo-889"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 56. 0 of 0 labels bound to a contract property; 19 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "recordId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-890",
+  "name": "Workforce Compliance Validation Center",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "4",
+   "number": "08",
+   "page": 58
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/workforce-compliance-validation-center-bo-890",
+   "component": "apps/venue-management-web/src/routes/rentals/WorkforceComplianceValidationCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-883"
+   ],
+   "exitTo": [
+    "BO-883"
+   ],
+   "transitions": [
+    {
+     "to": "BO-883",
+     "trigger": "Back to Workforce Roster Command Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Each issue shall display) and no metric row",
+  "purpose": "Validate planned workforce schedules against legal, safety, certification, and organizational rules before roster publication or assignment.",
+  "purposeNote": "No workforce roster is published without passing configured compliance validation or following an explicitly authorized exception workflow.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 58 §Each issue shall display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every workforce compliance validation",
+       "columns": [
+        "Employee",
+        "Rule violated",
+        "Severity",
+        "Affected shift",
+        "Operational impact",
+        "Recommended action"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 58 §Each issue shall display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected workforce compliance validation",
+       "bindsTo": null,
+       "columns": [
+        "Employee",
+        "Rule violated",
+        "Severity",
+        "Affected shift",
+        "Operational impact",
+        "Recommended action"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “The engine shall support”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 58 §Each issue shall display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The workforce compliance validation list.",
+   "error": "Could not load. Names which read failed and leaves the workforce compliance validation untouched.",
+   "emptyFirstRun": "No workforce compliance validation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the workforce compliance validation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "validateWorkforceCompliance",
+    "contract": "workforce",
+    "purpose": "Where the rota breaks a rule",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Employee",
+    "Rule violated",
+    "Severity",
+    "Affected shift",
+    "Operational impact",
+    "Recommended action"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-890",
+   "workshopBoard": "wireframes/WS129 Resource Management Configuration Board 4.dc.html#bo-890"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 58. 0 of 6 labels bound to a contract property; 6 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-891",
+  "name": "Labor Cost & Staffing Budget Control",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "4",
+   "number": "09",
+   "page": 59
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/labor-cost-staffing-budget-control-bo-891",
+   "component": "apps/venue-management-web/src/routes/rentals/LaborCostStaffingBudgetControl.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-883"
+   ],
+   "exitTo": [
+    "BO-883"
+   ],
+   "transitions": [
+    {
+     "to": "BO-883",
+     "trigger": "Back to Workforce Roster Command Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Give managers visibility into the financial impact of staffing decisions before and after roster publication.",
+  "purposeNote": "Managers can understand staffing cost and budget impact before approving workforce plans and can analyze actual labor expenditure after operations.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 59 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every labor cost staffing",
+       "columns": [
+        "Budget",
+        "Scheduled",
+        "Forecast",
+        "Actual",
+        "Variance"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 59 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected labor cost staffing",
+       "bindsTo": null,
+       "columns": [
+        "Budget",
+        "Scheduled",
+        "Forecast",
+        "Actual",
+        "Variance"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Cost Calculation”, “Managers shall understand”.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 59 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The labor cost staffing list.",
+   "error": "Could not load. Names which read failed and leaves the labor cost staffing untouched.",
+   "emptyFirstRun": "No labor cost staffing yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the labor cost staffing are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getLabourCost",
+    "contract": "workforce",
+    "purpose": "Cost against budget",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Budget",
+    "Scheduled",
+    "Forecast",
+    "Actual",
+    "Variance"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-891",
+   "workshopBoard": "wireframes/WS129 Resource Management Configuration Board 4.dc.html#bo-891"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 59. 0 of 5 labels bound to a contract property; 5 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-892",
+  "name": "AI Workforce Planner & Roster Optimization",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Resource_Management_Configuration_Reference.pdf",
+   "board": "4",
+   "number": "10",
+   "page": 60
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/ai-workforce-planner-roster-optimization-bo-892",
+   "component": "apps/venue-management-web/src/routes/rentals/AiWorkforcePlannerRosterOptimization.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-883"
+   ],
+   "exitTo": [
+    "BO-883"
+   ],
+   "transitions": [
+    {
+     "to": "BO-883",
+     "trigger": "Back to Workforce Roster Command Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide TICVAI's intelligent workforce-planning experience by automatically generating or optimizing operational rosters. Administrators may configure optimization priorities such as: Best operational coverage Minimize overtime Minimize labor cost Balance employee hours Minimize cross-venue movement Maximize skill match Prioritize employee continuity Safety, compliance, and mandatory qualification rules shall remain hard constraints. AI Explanation Provide TICVAI with a centralized Resource Requirement & Assignment Engine that connects ticket products, attraction experiences, sessions, and time slots with the operational resources required to deliver them. Board 5 shall allow administrators to configure: Which resources an experience requires How many resources are required Which resource combinations are valid Which skills and qualifications are mandatory How resource requirements change with ticket quantity or capacity Whether customers may select a specific resource Whether customers may select a resource skill/type rather than a specific person Whether TICVAI should automatically allocate resources How resource priority is calculated What happens when the assigned resource becomes unavailable How assignments are exposed through POS, B2C, B2B, mobile, and APIs",
+  "purposeNote": "compliance rules, availability, and cost while retaining human governance over final publication.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Resource_Management_Configuration_Reference.pdf, page 60"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "filters",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "datePicker",
+       "label": "From",
+       "operation": "getStaffingCoverage",
+       "notes": "Sends `?from=` (required).",
+       "provenance": "contract workforce.yaml GET /staffing-coverage"
+      },
+      {
+       "kind": "datePicker",
+       "label": "To",
+       "operation": "getStaffingCoverage",
+       "notes": "Sends `?to=` (required).",
+       "provenance": "contract workforce.yaml GET /staffing-coverage"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "operation": "getStaffingCoverage",
+       "notes": "Sends `?venueId=`.",
+       "provenance": "contract workforce.yaml GET /staffing-coverage"
+      },
+      {
+       "kind": "selectField",
+       "label": "Optimization objective",
+       "notes": "Best coverage, minimise overtime, minimise labour cost, balance hours, minimise cross-venue movement, maximise skill match, continuity.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 61"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Staffing gaps (current roster)",
+       "bindsTo": "StaffingCoverage",
+       "columns": [
+        "StaffingCoverage.gap"
+       ],
+       "operation": "getStaffingCoverage",
+       "notes": "Summed; the AI-optimised side of the comparison has no read.",
+       "provenance": "contract workforce.yaml GET /staffing-coverage"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Coverage",
+       "columns": [
+        "Coverage"
+       ],
+       "notes": "The pack asks for coverage; the contract has no field for it.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 61"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Overtime hours",
+       "columns": [
+        "Overtime hours"
+       ],
+       "notes": "The pack asks for overtime hours; the contract has no field for it.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 61"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Projected labour cost",
+       "columns": [
+        "Projected labour cost"
+       ],
+       "notes": "The pack asks for projected labour cost; the contract has no field for it.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 61"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Projected saving",
+       "columns": [
+        "Projected saving"
+       ],
+       "notes": "The pack asks for projected saving; the contract has no field for it.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 61"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Current roster coverage",
+       "bindsTo": "StaffingCoverage",
+       "columns": [
+        "StaffingCoverage.date",
+        "StaffingCoverage.label",
+        "StaffingCoverage.from",
+        "StaffingCoverage.to",
+        "StaffingCoverage.required",
+        "StaffingCoverage.rostered",
+        "StaffingCoverage.qualified",
+        "StaffingCoverage.gap",
+        "StaffingCoverage.severity"
+       ],
+       "operation": "getStaffingCoverage",
+       "provenance": "contract workforce.yaml GET /staffing-coverage"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Why this assignment",
+       "columns": [
+        "Employee",
+        "Assignment",
+        "Reasons",
+        "Hard constraints satisfied"
+       ],
+       "notes": "The pack's explanation (\"Available, Level 3 Instructor, certification valid, language match, already at venue, no overtime\").",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 61"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Generate roster with AI",
+       "notes": "No roster-generation operation is bound; the pack requires human approval before publishing.",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 61"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The workforce planner roster list.",
+   "error": "Could not load. Names which read failed and leaves the workforce planner roster untouched.",
+   "emptyFirstRun": "No workforce planner roster yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the workforce planner roster are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getStaffingCoverage",
+    "contract": "workforce",
+    "purpose": "What the planner is optimising",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-892",
+   "workshopBoard": "wireframes/WS129 Resource Management Configuration Board 4.dc.html#bo-892"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 60. 0 of 0 labels bound to a contract property; 0 of 118 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Resource_Management_Configuration_Reference.pdf p.61; contract workforce.yaml GET /staffing-coverage. Pack labels with no schema field yet (shown as plain labels): Coverage, Overtime hours, Projected labour cost, Projected saving, Cross-venue transfers, AI-optimised roster (scenario side), Assignment explanation, Optimization objective.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

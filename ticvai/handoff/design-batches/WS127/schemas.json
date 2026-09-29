@@ -1,0 +1,71 @@
+{
+ "Space": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.space",
+  "description": "Event board 3.2. **Bookable, as distinct from navigable** — `venue-map` owns the geometry.\n",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueMapZoneId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "resourceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Where the space is also a bookable `resources` resource**, so its calendar and conflict detection come from there rather than a second scheduler.\n"
+   },
+   "parentSpaceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "maximumCapacity": {
+    "type": "integer",
+    "nullable": true
+   },
+   "safeCapacity": {
+    "type": "integer",
+    "nullable": true
+   },
+   "setupMinutes": {
+    "type": "integer",
+    "default": 0
+   },
+   "teardownMinutes": {
+    "type": "integer",
+    "default": 0
+   },
+   "accessRules": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": true
+   },
+   "bookable": {
+    "type": "boolean",
+    "default": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ }
+}

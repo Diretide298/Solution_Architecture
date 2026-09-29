@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 1186,
-  "operations": 1303,
+  "operations": 1361,
   "contracts": 32,
   "modules": 14,
   "undrawn": 0,
-  "operationsWithNoScreen": 189
+  "operationsWithNoScreen": 188
  },
  "waves": {
   "wave1": 60,
@@ -138,23 +138,27 @@
  "contracts": [
   {
    "contract": "access",
-   "operations": 191
+   "operations": 227
   },
   {
    "contract": "marketing-crm",
-   "operations": 135
+   "operations": 139
   },
   {
    "contract": "orders",
-   "operations": 106
+   "operations": 111
   },
   {
    "contract": "catalogue",
-   "operations": 100
+   "operations": 102
   },
   {
    "contract": "fnb",
    "operations": 62
+  },
+  {
+   "contract": "resources",
+   "operations": 54
   },
   {
    "contract": "seating",
@@ -165,10 +169,6 @@
    "operations": 52
   },
   {
-   "contract": "resources",
-   "operations": 51
-  },
-  {
    "contract": "inventory",
    "operations": 49
   },
@@ -177,11 +177,11 @@
    "operations": 48
   },
   {
-   "contract": "rental",
-   "operations": 40
+   "contract": "workforce",
+   "operations": 42
   },
   {
-   "contract": "workforce",
+   "contract": "rental",
    "operations": 40
   },
   {
@@ -189,12 +189,12 @@
    "operations": 37
   },
   {
-   "contract": "tenancy",
+   "contract": "promotions",
    "operations": 36
   },
   {
-   "contract": "promotions",
-   "operations": 35
+   "contract": "tenancy",
+   "operations": 36
   },
   {
    "contract": "maintenance",
@@ -202,15 +202,15 @@
   },
   {
    "contract": "accreditation",
-   "operations": 28
+   "operations": 29
   },
   {
    "contract": "approvals",
-   "operations": 26
+   "operations": 27
   },
   {
    "contract": "subscription",
-   "operations": 25
+   "operations": 27
   },
   {
    "contract": "transport",
@@ -218,7 +218,7 @@
   },
   {
    "contract": "reporting",
-   "operations": 22
+   "operations": 23
   },
   {
    "contract": "identity",
@@ -353,7 +353,7 @@
    "module": "Sell",
    "wave": 2,
    "route": "/venue-operations/promotions-coupons",
-   "operations": 24,
+   "operations": 26,
    "drawn": true
   },
   {
@@ -362,7 +362,7 @@
    "module": "Sell",
    "wave": 2,
    "route": "/venue-operations/packages-bundles",
-   "operations": 10,
+   "operations": 12,
    "drawn": true
   },
   {
@@ -3332,7 +3332,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/access-location-grouping-bo-151",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -3341,7 +3341,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/operating-calendar-special-access-days-bo-152",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -3350,7 +3350,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/topology-validation-publication-bo-153",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3386,7 +3386,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/anti-passback-journey-sequence-bo-157",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -3449,7 +3449,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/digital-credential-security-command-center-bo-164",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -3476,7 +3476,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/device-binding-session-security-bo-167",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -3494,7 +3494,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/credential-transfer-rebinding-bo-169",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3503,7 +3503,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/credential-revocation-lifecycle-events-bo-170",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3512,7 +3512,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/offline-cryptographic-validation-profile-bo-171",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -3566,7 +3566,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/verification-method-selection-locking-bo-177",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3683,7 +3683,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/face-change-re-enrollment-identity-protection-bo-190",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3719,7 +3719,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/device-gate-command-center-bo-194",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -3728,7 +3728,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/device-type-hardware-library-bo-195",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3737,7 +3737,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/physical-device-registration-provisioning-bo-196",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -3782,7 +3782,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/gate-modes-free-spin-emergency-controls-bo-201",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3845,7 +3845,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/offline-credential-revocation-cache-bo-208",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -3863,7 +3863,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/connectivity-failure-degraded-mode-policy-bo-210",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -3890,7 +3890,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/edge-security-audit-deployment-bo-213",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3899,7 +3899,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/guest-journey-command-center-bo-214",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -3962,7 +3962,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/fast-pass-attraction-access-journey-bo-221",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -3971,7 +3971,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/special-event-free-view-alternative-admission-bo-222",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -3998,7 +3998,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/podium-operations-console-bo-225",
-   "operations": 1,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -4016,7 +4016,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/validation-exception-reason-code-manager-bo-227",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -4043,7 +4043,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/live-gate-mode-lane-control-bo-230",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -4070,7 +4070,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/operations-audit-shift-handover-control-summary-bo-233",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -4142,7 +4142,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/policy-evaluation-architecture-offline-distribution-bo-241",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -4169,7 +4169,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/access-security-fraud-command-center-bo-244",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -4187,7 +4187,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/credential-sharing-concurrent-usage-detection-bo-246",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -4196,7 +4196,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/unified-identity-credential-lock-manager-bo-247",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -4205,7 +4205,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/biometric-identity-integrity-monitoring-bo-248",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -4214,7 +4214,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/relationship-companion-fraud-monitoring-bo-249",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -4223,7 +4223,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/access-risk-scoring-decision-engine-bo-250",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -4250,7 +4250,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/security-analytics-ai-detection-governance-bo-253",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -4493,7 +4493,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/group-arrival-check-in-admission-operations-bo-280",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -4529,7 +4529,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/membership-annual-pass-command-center-bo-284",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -4574,7 +4574,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/membership-usage-visit-consumption-rules-bo-289",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -4592,7 +4592,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/membership-commercial-pricing-channel-association-bo-291",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -4898,7 +4898,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/multi-payment-split-tender-payment-allocation-configurat-bo-326",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -4916,7 +4916,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/order-split-merge-transaction-relationship-management-bo-328",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -4934,7 +4934,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/external-payment-partner-settlement-reference-mapping-bo-330",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -4988,7 +4988,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/virtual-ticket-status-lifecycle-model-bo-336",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5006,7 +5006,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/multi-media-binding-association-rules-bo-338",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -5024,7 +5024,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/entitlement-cross-media-synchronization-rules-bo-340",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5060,7 +5060,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/media-design-studio-command-center-bo-344",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -5420,7 +5420,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/delegation-escalation-command-center-bo-384",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -5483,7 +5483,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/live-escalation-operations-center-bo-391",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6707,7 +6707,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/dynamic-pricing-ai-recommendation-bo-528",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -7634,7 +7634,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/duplicate-identity-conflict-detection-bo-631",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9146,7 +9146,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/routing-queue-management-bo-800",
-   "operations": 2,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -9191,7 +9191,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/case-queue-search-bo-805",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -9200,7 +9200,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/case-creation-bo-806",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9209,7 +9209,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/classification-workflow-bo-807",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -9218,7 +9218,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/assignment-workload-bo-808",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9965,7 +9965,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/labor-cost-staffing-budget-control-bo-891",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -10073,7 +10073,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/equipment-asset-command-center-bo-903",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -10136,7 +10136,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/maintenance-resource-blocking-bo-910",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -10154,7 +10154,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/asset-lifecycle-depreciation-retirement-bo-912",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -10451,7 +10451,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-cost-revenue-efficiency-analytics-bo-945",
-   "operations": 2,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -11836,12 +11836,6 @@
     "contract": "subscription",
     "verb": "POST",
     "summary": "Terminate a tenant subscription"
-   },
-   {
-    "operation": "createPartnerUser",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Add a user to a partner branch"
    },
    {
     "operation": "decommissionBurstEnvironment",

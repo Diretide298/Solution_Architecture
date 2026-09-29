@@ -1,0 +1,165 @@
+{
+ "importAccreditationHolders": {
+  "method": "POST",
+  "path": "/accreditation-imports",
+  "contract": "accreditation",
+  "summary": "Load a roster supplied by an organisation",
+  "permission": "ACCREDITATION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationImportResult"
+ },
+ "listAccreditationAudit": {
+  "method": "GET",
+  "path": "/accreditation-audit",
+  "contract": "accreditation",
+  "summary": "The immutable record of who granted what to whom",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "holderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationAuditRecord"
+ },
+ "listAccreditationHolders": {
+  "method": "GET",
+  "path": "/accreditation-holders",
+  "contract": "accreditation",
+  "summary": "Everybody accredited, and what state they are in",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "programmeId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "organisationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "expiringWithinDays",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationHolder"
+ },
+ "listMessageTemplates": {
+  "method": "GET",
+  "path": "/message-templates",
+  "contract": "marketing-crm",
+  "summary": "List message templates",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "sendTransactionalMessage": {
+  "method": "POST",
+  "path": "/messages",
+  "contract": "marketing-crm",
+  "summary": "Send a transactional message",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setAccreditationNotificationRules": {
+  "method": "PUT",
+  "path": "/accreditation-notifications",
+  "contract": "accreditation",
+  "summary": "Who is told what, and when",
+  "permission": "ACCREDITATION_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccreditationNotificationRules",
+  "responds": "AccreditationNotificationRules"
+ },
+ "setLocalizationBrandingCustomer": {
+  "method": "PUT",
+  "path": "/localization-branding-customer",
+  "contract": "marketing-crm",
+  "summary": "Set a waiver version's languages, branding and channels",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "LocalizationBrandingCustomerExperienceConfigurationInput",
+  "responds": "LocalizationBrandingCustomerExperienceConfigurationView"
+ }
+}

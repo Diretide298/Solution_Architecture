@@ -1,6 +1,6 @@
 # WS93 — Rental Management board 6
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 6 operations · 10 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `ASSET_VIEW, RENTAL_OPERATE, RENTAL_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-544` | Rental Checkout Command Center | commandCentre | 0 | 0 | — |
-| `BO-545` | Voucher Scan & Reservation Retrieval | listDetail | 0 | 0 | — |
-| `BO-546` | Checkout Readiness Validation | listDetail | 0 | 0 | — |
-| `BO-547` | Equipment Assignment Workspace | listDetail | 0 | 0 | — |
-| `BO-548` | Equipment Scan & Validation | listDetail | 0 | 0 | — |
-| `BO-549` | Pre-Rental Condition Inspection | listDetail | 0 | 0 | — |
-| `BO-550` | Safety & Handover Checklist | listDetail | 0 | 0 | — |
-| `BO-551` | Deposit & Financial Handover Validation | listDetail | 0 | 0 | — |
-| `BO-552` | Group & Multi-Item Checkout | listDetail | 0 | 0 | — |
-| `BO-553` | Checkout Confirmation & Rental Activation | configEditor | 0 | 0 | — |
+| `BO-544` | Rental Checkout Command Center | commandCentre | 1 | 0 | — |
+| `BO-545` | Voucher Scan & Reservation Retrieval | listDetail | 1 | 0 | — |
+| `BO-546` | Checkout Readiness Validation | listDetail | 1 | 0 | — |
+| `BO-547` | Equipment Assignment Workspace | listDetail | 1 | 0 | — |
+| `BO-548` | Equipment Scan & Validation | listDetail | 2 | 0 | — |
+| `BO-549` | Pre-Rental Condition Inspection | listDetail | 1 | 0 | — |
+| `BO-550` | Safety & Handover Checklist | listDetail | 1 | 0 | — |
+| `BO-551` | Deposit & Financial Handover Validation | listDetail | 1 | 0 | — |
+| `BO-552` | Group & Multi-Item Checkout | listDetail | 1 | 0 | — |
+| `BO-553` | Checkout Confirmation & Rental Activation | configEditor | 1 | 0 | — |
 
 ## Thin screens in this batch
 

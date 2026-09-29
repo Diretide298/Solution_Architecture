@@ -1,4 +1,36 @@
 {
+ "getDepositPolicy": {
+  "method": "GET",
+  "path": "/deposit-policy",
+  "contract": "orders",
+  "summary": "What a deposit booking takes now and when the rest is due",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "DepositPolicy"
+ },
+ "listDepositActivity": {
+  "method": "GET",
+  "path": "/deposits/{depositId}/activity",
+  "contract": "payments",
+  "summary": "Movements on a deposit",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "depositId",
+    "in": "path",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "PaymentsDepositActivity"
+ },
  "listDepositPartialPayment": {
   "method": "GET",
   "path": "/deposit-partial-payment",
@@ -34,7 +66,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "export",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "FinancialTraceabilityControlAuditExplorerView"
  },
@@ -127,7 +165,28 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "paymentProvider",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "currency",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "orderStatus",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "PaymentOrderFinancialCommandCenterView"
  },
@@ -178,10 +237,63 @@
     "name": "partnerBooking",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "payment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "refund",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
   "responds": "RelatedOrderTransactionRelationshipExplorerView"
+ },
+ "recordDepositActivity": {
+  "method": "POST",
+  "path": "/deposits/{depositId}/activity",
+  "contract": "payments",
+  "summary": "Record a movement on a deposit",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "depositId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PaymentsDepositActivity",
+  "responds": "PaymentsDepositActivity"
+ },
+ "setDepositPolicy": {
+  "method": "PUT",
+  "path": "/deposit-policy",
+  "contract": "orders",
+  "summary": "Set how deposits work",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DepositPolicy",
+  "responds": "DepositPolicy"
  },
  "setMultiPaymentSplit": {
   "method": "PUT",
@@ -192,8 +304,33 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "MultiPaymentSplitTenderPaymentAllocationConfiguratioInput",
   "responds": "MultiPaymentSplitTenderPaymentAllocationConfiguratioView"
+ },
+ "splitOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/split",
+  "contract": "orders",
+  "summary": "Break one order into independent orders",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  }
 }

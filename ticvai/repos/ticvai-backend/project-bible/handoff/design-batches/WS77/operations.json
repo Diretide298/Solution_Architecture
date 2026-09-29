@@ -1,1 +1,101 @@
-{}
+{
+ "getMediaDistribution": {
+  "method": "GET",
+  "path": "/media-distribution",
+  "contract": "assets",
+  "summary": "Where an asset is used and how it is delivered",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "assetId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaDistribution"
+ },
+ "getMediaUsageAnalytics": {
+  "method": "GET",
+  "path": "/media-usage",
+  "contract": "assets",
+  "summary": "Downloads, views, shares and library health",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaUsageRow"
+ },
+ "listMediaRenditions": {
+  "method": "GET",
+  "path": "/media-assets/{assetId}/renditions",
+  "contract": "assets",
+  "summary": "The derived sizes and formats, and whether they are ready",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MediaRendition"
+ },
+ "replaceMediaAsset": {
+  "method": "POST",
+  "path": "/media/{mediaId}/replace",
+  "contract": "assets",
+  "summary": "Replace the file behind an asset",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaReplaceResult"
+ },
+ "setMediaDistributionChannels": {
+  "method": "PUT",
+  "path": "/media-distribution/channels",
+  "contract": "assets",
+  "summary": "CDN, delivery URLs, fallbacks and expiry behaviour",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MediaDistributionChannel",
+  "responds": "MediaDistributionChannel"
+ }
+}

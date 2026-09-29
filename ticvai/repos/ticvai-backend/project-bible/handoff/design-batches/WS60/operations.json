@@ -8,9 +8,72 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "MultiMediaPreviewTestingApprovalPublicationInput",
   "responds": "MultiMediaPreviewTestingApprovalPublicationView"
+ },
+ "cloneTicketTemplate": {
+  "method": "POST",
+  "path": "/ticket-templates/{templateId}/clone",
+  "contract": "orders",
+  "summary": "Create a ticket template from an existing one",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CloneTicketTemplateInput",
+  "responds": "TicketTemplate"
+ },
+ "createTicketTemplate": {
+  "method": "POST",
+  "path": "/ticket-templates",
+  "contract": "orders",
+  "summary": "Create a ticket template",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TicketTemplateRequest",
+  "responds": "TicketTemplate"
+ },
+ "importTicketTemplate": {
+  "method": "POST",
+  "path": "/ticket-templates/imports",
+  "contract": "orders",
+  "summary": "Import a ticket template definition",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TicketTemplateImportInput",
+  "responds": "TicketTemplate"
  },
  "listBrandingLocalizationTemplate": {
   "method": "GET",
@@ -34,9 +97,93 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "mediaType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "MediaDesignStudioCommandCenterView"
+  "responds": "Page"
+ },
+ "listTicketTemplates": {
+  "method": "GET",
+  "path": "/ticket-templates",
+  "contract": "orders",
+  "summary": "The ticket templates a venue issues from",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "mediaType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "includeInactive",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "printTicketProof": {
+  "method": "POST",
+  "path": "/ticket-templates/{templateId}/proof",
+  "contract": "orders",
+  "summary": "Print a sample without selling anything",
+  "permission": "ORDER_REPRINT",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TicketProof"
  },
  "setAppleWalletPass": {
   "method": "PUT",
@@ -47,9 +194,34 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "AppleWalletPassDesignerInput",
   "responds": "AppleWalletPassDesignerView"
+ },
+ "setBrandingLocalizationTemplate": {
+  "method": "PUT",
+  "path": "/branding-localization-template",
+  "contract": "access",
+  "summary": "Save branding and languages for a level",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "BrandingLocalizationTemplateInheritanceInput",
+  "responds": "BrandingLocalizationTemplateInheritanceView"
  },
  "setDigitalBarcodeTicket": {
   "method": "PUT",
@@ -60,7 +232,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "DigitalQrBarcodeTicketDesignerInput",
   "responds": "DigitalQrBarcodeTicketDesignerView"
  },
@@ -73,7 +251,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "DigitalCardMembershipWearableDesignerInput",
   "responds": "DigitalCardMembershipWearableDesignerView"
  },
@@ -86,7 +270,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "DynamicFieldsDataMappingContentBuilderInput",
   "responds": "DynamicFieldsDataMappingContentBuilderView"
  },
@@ -99,7 +289,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "GoogleWalletPassDesignerInput",
   "responds": "GoogleWalletPassDesignerView"
  },
@@ -112,7 +308,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PdfPrintablePosTicketDesignerInput",
   "responds": "PdfPrintablePosTicketDesignerView"
  },
@@ -125,8 +327,33 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "RfidNfcCardWristbandMediaDesignerInput",
   "responds": "RfidNfcCardWristbandMediaDesignerView"
+ },
+ "updateTicketTemplate": {
+  "method": "PATCH",
+  "path": "/ticket-templates/{templateId}",
+  "contract": "orders",
+  "summary": "Change or retire a ticket template",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TicketTemplateRequest",
+  "responds": "TicketTemplate"
  }
 }

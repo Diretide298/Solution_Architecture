@@ -1,6 +1,6 @@
 # P08-orders-money-01 — P08 · Orders & Money (1 of 3)
 
-**10 screens · 57 operations · 61 schemas · 26 permissions**
+**10 screens · 69 operations · 78 schemas · 29 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 26 permissions apply here:
-  `ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW, CASH_LIFT, LEDGER_POST, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REFUND, ORDER_REPRINT, ORDER_RESCHEDULE, ORDER_VIEW`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 29 permissions apply here:
+  `ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW, CASH_LIFT, CASH_NO_SALE, GUEST_VIEW, LEDGER_POST, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REFUND, ORDER_REPRINT`…. A control nobody can use must say so,
   not sit enabled and fail.
-- **24 of these operations work offline**: addTip, applyManualDiscount, closeShift, createCashMovement, createOrder, createPayment, getCurrentShift, getMediaAsset
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-008` | Product Detail & Variants | listDetail | 4 | 0 | — |
-| `BO-022` | Order Detail | listDetail | 14 | 1 | — |
-| `BO-023` | Refunds & Exchanges | listDetail | 15 | 1 | — |
-| `BO-024` | Payment Exceptions | configEditor | 6 | 1 | — |
-| `BO-025` | Chargebacks & Disputes | listDetail | 5 | 0 | — |
-| `BO-026` | Group Bookings | listDetail | 14 | 1 | — |
-| `BO-027` | Reissue & Media Replacement | statusTracker | 4 | 0 | — |
+| `BO-008` | Product Detail & Variants | listDetail | 11 | 3 | — |
+| `BO-022` | Order Detail | listDetail | 14 | 9 | — |
+| `BO-023` | Refunds & Exchanges | listDetail | 15 | 9 | — |
+| `BO-024` | Payment Exceptions | configEditor | 6 | 4 | — |
+| `BO-025` | Chargebacks & Disputes | listDetail | 5 | 2 | — |
+| `BO-026` | Group Bookings | listDetail | 17 | 11 | — |
+| `BO-027` | Reissue & Media Replacement | statusTracker | 6 | 2 | — |
 | `BO-028` | Refund Approval Queue | configEditor | 1 | 0 | — |
-| `BO-029` | Report Builder | listDetail | 9 | 1 | — |
-| `BO-039` | Shift Directory | approvalInbox | 13 | 2 | — |
+| `BO-029` | Report Builder | listDetail | 9 | 6 | — |
+| `BO-039` | Shift Directory | approvalInbox | 13 | 9 | — |
 
 ---
 
@@ -95,48 +94,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-009",
-    "BO-010"
+    "BO-007"
    ],
    "inferred": true,
    "transitions": [
     {
      "to": "BO-007",
      "trigger": "Product Directory",
-     "provenance": "flow F85 step 3→4, F93 step 3→4"
-    },
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
+     "provenance": "flow F85 step 3→4, F93 step 3→4",
      "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-010",
-     "trigger": "Promotions & Coupons",
-     "carries": [
-      "campaignId",
-      "code",
-      "dashboardId",
-      "promotionId",
-      "reportId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-010 declares entryState.params campaignId, code, dashboardId, promotionId, reportId, venueId, so an edge into it must carry them"
+      "productId"
+     ]
     }
    ],
    "entryFrom": [
@@ -162,7 +130,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every product variants",
+       "label": "Every product variant",
        "bindsTo": "ProductVariant",
        "columns": [
         "ProductVariant.id",
@@ -182,7 +150,25 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected product variants",
+       "label": "The selected product variant",
+       "bindsTo": "ProductVariant",
+       "columns": [
+        "ProductVariant.id",
+        "ProductVariant.productId",
+        "ProductVariant.sku",
+        "ProductVariant.axisValues",
+        "ProductVariant.name",
+        "ProductVariant.barcode",
+        "ProductVariant.description",
+        "ProductVariant.isDefault",
+        "ProductVariant.isActive"
+       ],
+       "operation": "listProductVariants",
+       "provenance": "contract catalogue.yaml GET /products/{productId}/variants"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The product",
        "bindsTo": "Product",
        "columns": [
         "Product.id",
@@ -197,13 +183,46 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "Product.responsibleDepartmentId",
         "Product.onSaleFrom",
         "Product.onSaleTo",
+        "Product.categoryId",
         "Product.lifecycleState",
         "Product.isSellable",
-        "Product.hasVariants",
-        "Product.variantCount"
+        "Product.isStockTracked"
        ],
        "operation": "getProduct",
        "provenance": "contract catalogue.yaml GET /products/{productId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "What the guest sees",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.guestListing",
+        "Product.notBookableLabel",
+        "Product.displayTags",
+        "Product.media",
+        "Product.consentQuestionIds",
+        "Product.requiresTimeWindow",
+        "Product.segmentTags"
+       ],
+       "operation": "getProduct",
+       "notes": "**What the guest sees of the product** (decided 29 September, rev 3). `guestListing`: bookable (the default), info only, or hidden; an info-only product keeps its details and photo, shows `notBookableLabel` (default \"Info only / Not bookable online\") and opens details instead of Add to basket, and `addCartLine` refuses it `409` (REV3-14). `displayTags`: up to six, each a kind (clock, height, free, calendar, id) and a label; with none, the guest app derives them from duration, validity and the height rule (23SEP-3). `media`: images and videos from the asset library, one of them primary, which is the photo on the ticket card and what Read more opens on (23SEP-4). `consentQuestionIds`: the consent questions this product asks, in order, from CMS-018 (REV3-26). `requiresTimeWindow`: a space sold by the hour, such as a meeting-room type; its lengths are a `length` attribute whose values carry `durationMinutes` (REV3-13).",
+       "provenance": "contract catalogue.yaml GET /products/{productId}"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Photos and videos",
+       "bindsTo": "Product.media",
+       "operation": "searchMedia",
+       "notes": "Picks from the asset library (`searchMedia`); one item is marked primary. Saved with `updateProduct`, which registers the use of each asset (decided 29 September, rev 3 23SEP-4).",
+       "provenance": "contract assets.yaml GET /media"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Consent questions this product asks",
+       "bindsTo": "Product.consentQuestionIds",
+       "operation": "listConsentQuestions",
+       "notes": "Active questions from `listConsentQuestions`, written on CMS-018; ordered as the guest meets them. The guest is asked these together with the booking flow's own, each once (decided 29 September, rev 3 REV3-26).",
+       "provenance": "contract marketing-crm.yaml GET /consent-questions"
       }
      ]
     },
@@ -213,48 +232,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save product attributes",
        "operation": "setProductAttributes",
        "provenance": "contract catalogue.yaml PUT /products/{productId}/attributes"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save product",
        "operation": "updateProduct",
        "provenance": "contract catalogue.yaml PATCH /products/{productId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listProductVariants",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setProductAttributes",
-       "label": "Save product attributes",
-       "provenance": "carried from the previous definition"
       },
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setProductAttributes",
-       "provenance": "carried from the previous definition"
+       "label": "Save ticket type",
+       "operation": "updateProductVariant",
+       "notes": "**The words and codes on one variant**: its name, the description a guest reads behind the (i) on a ticket-type row (at most 300 characters per language, decided 29 September, rev 3 23SEP-6), its barcode, and whether it is the default. The combination of values and the SKU come from the attributes and are not edited here. A retired variant is refused `409`.",
+       "provenance": "contract catalogue.yaml PATCH /products/{productId}/variants/{variantId}"
       }
      ]
     }
@@ -263,9 +256,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The product variants list.",
    "error": "Could not load. Names which read failed and leaves the product variants untouched.",
-   "emptyFirstRun": "No product variants yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the product variants are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No product variants yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listProductVariants` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getProduct` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -297,6 +290,66 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listProductVariants"
     ]
+   },
+   {
+    "operationId": "updateProductVariant",
+    "contract": "catalogue",
+    "purpose": "Name, describe, barcode or make default one ticket type (rev 3 23SEP-6)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProductVariants"
+    ]
+   },
+   {
+    "operationId": "searchMedia",
+    "contract": "assets",
+    "purpose": "Pick the product's photos and videos from the asset library (rev 3 23SEP-4)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listConsentQuestions",
+    "contract": "marketing-crm",
+    "purpose": "The consent questions a product can ask (rev 3 REV3-26)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "restoreProductVersion",
+    "contract": "catalogue",
+    "purpose": "Put a previous version of the product back",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "getProduct",
+     "listProductVariants"
+    ]
+   },
+   {
+    "operationId": "assessProductChange",
+    "contract": "catalogue",
+    "purpose": "See what a change would touch before making it",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "getProduct",
+     "listProductVariants"
+    ]
+   },
+   {
+    "operationId": "cloneProduct",
+    "contract": "catalogue",
+    "purpose": "Copy the product as a new draft",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "getProduct",
+     "listProductVariants"
+    ]
+   },
+   {
+    "operationId": "listProductVersions",
+    "contract": "catalogue",
+    "purpose": "The product versions a restore picks from",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -308,25 +361,100 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "productId",
      "from": "deepLink"
+    },
+    {
+     "name": "variantId",
+     "from": "navigation"
+    },
+    {
+     "name": "version",
+     "from": "navigation"
     }
    ],
    "coldEntry": "A product opened from the directory or a shared link. Shows what replaced it where it retired.",
    "preloaded": [
-    "Product.id",
-    "Product.code",
-    "Product.name",
-    "Product.description",
-    "Product.kind"
+    "ProductVariant.id",
+    "ProductVariant.productId",
+    "ProductVariant.sku",
+    "ProductVariant.axisValues",
+    "ProductVariant.name"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-008",
+   "derivedFrom": "wireframes/reference/Retail Board 2.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetProductAttributes",
+    "component": "modal",
+    "trigger": "Save product attributes",
+    "body": "**Collects what `setProductAttributes` sends before it is called.** Required: `axes`. **A meeting-room type sells by length**: a `length` axis whose values each carry `durationMinutes` (e.g. 60, 120, 240, 480; minimum 15), one such axis per product, on a product with `requiresTimeWindow` on; each length is a variant priced on its own (decided 29 September, rev 3 REV3-13). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save product attributes",
+     "operation": "setProductAttributes"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "axes"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /products/{productId}/attributes"
+   },
+   {
+    "id": "formUpdateProduct",
+    "component": "modal",
+    "trigger": "Save product",
+    "body": "**Collects what `updateProduct` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `channels`, `dataMaskValues`, and what the guest sees (decided 29 September, rev 3): `guestListing` and `notBookableLabel` (REV3-14), `displayTags` (at most six, 23SEP-3), `media` (23SEP-4), `consentQuestionIds` (REV3-26) and `requiresTimeWindow` (REV3-13). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "UpdateProductRequest",
+    "confirm": {
+     "label": "Save product",
+     "operation": "updateProduct"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "description",
+      "channels",
+      "dataMaskValues",
+      "guestListing",
+      "notBookableLabel",
+      "displayTags",
+      "media",
+      "consentQuestionIds",
+      "requiresTimeWindow"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PATCH /products/{productId}"
+   },
+   {
+    "id": "formUpdateProductVariant",
+    "component": "modal",
+    "trigger": "Save ticket type",
+    "body": "**Collects what `updateProductVariant` sends before it is called.** Nothing in the body is required. Optional: `name`, `description` (who the ticket type is for and what it includes, at most 300 characters per language, shown behind the (i) when the booking flow has `cardInfo` on; decided 29 September, rev 3 23SEP-6), `barcode`, `isDefault` (setting it clears the default on the product's other variants). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save ticket type",
+     "operation": "updateProductVariant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "description",
+      "barcode",
+      "isDefault"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PATCH /products/{productId}/variants/{variantId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -365,47 +493,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+    "BO-008"
    ],
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-022 holds none of them, so the edge carries nothing and BO-008 opens cold"
     }
    ]
   },
@@ -414,13 +509,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listOrders` reads the population and `getOrder` reads one of them — list, select, act",
   "purpose": "See everything about one order in one place.",
-  "gaps": [
-   {
-    "operation": "getOrderStatement",
-    "why": "**2 declared operations reach no component on this screen**: getOrderStatement, listOrderRefunds. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -428,6 +516,48 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "name": "contentBody",
      "slot": "collection",
      "components": [
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listOrders",
+       "notes": "Sends `?venueId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Principal id",
+       "operation": "listOrders",
+       "notes": "Sends `?principalId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Shift id",
+       "operation": "listOrders",
+       "notes": "Sends `?shiftId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listOrders",
+       "notes": "Sends `?status=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created from",
+       "operation": "listOrders",
+       "notes": "Sends `?createdFrom=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created to",
+       "operation": "listOrders",
+       "notes": "Sends `?createdTo=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
       {
        "kind": "dataTable",
        "label": "Every order",
@@ -443,6 +573,34 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listOrders",
        "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every refund",
+       "bindsTo": "Refund",
+       "columns": [
+        "Refund.id",
+        "Refund.orderId",
+        "Refund.batchId",
+        "Refund.fxRate",
+        "Refund.taxReversalEntryId",
+        "Refund.settleTo",
+        "Refund.fxVariance",
+        "Refund.amount",
+        "Refund.appliedPercentage",
+        "Refund.status",
+        "Refund.reason",
+        "Refund.requestedByPrincipalId"
+       ],
+       "operation": "listOrderRefunds",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/refunds"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -453,6 +611,42 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "detailPanel",
        "label": "The selected order",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount",
+        "OrderSummary.principalId",
+        "OrderSummary.holdLabel",
+        "OrderSummary.heldUntil"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The order statement",
+       "bindsTo": "OrderStatement",
+       "columns": [
+        "OrderStatement.orderId",
+        "OrderStatement.orderNumber",
+        "OrderStatement.currency",
+        "OrderStatement.currencyScale",
+        "OrderStatement.entries",
+        "OrderStatement.totalPaid",
+        "OrderStatement.totalRefunded",
+        "OrderStatement.currentBalance"
+       ],
+       "operation": "getOrderStatement",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/statement"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The order",
        "bindsTo": "Order",
        "columns": [
         "Order.id",
@@ -483,111 +677,63 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create order",
        "operation": "createOrder",
        "provenance": "contract orders.yaml POST /orders"
       },
       {
        "kind": "secondaryButton",
-       "label": "Apply",
+       "label": "Apply manual discount",
        "operation": "applyManualDiscount",
        "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create refund",
        "operation": "createRefund",
        "provenance": "contract orders.yaml POST /orders/{orderId}/refunds"
       },
       {
        "kind": "secondaryButton",
-       "label": "Exchange",
+       "label": "Exchange order lines",
        "operation": "exchangeOrderLines",
        "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
       },
       {
        "kind": "secondaryButton",
-       "label": "Hold",
+       "label": "Hold order",
        "operation": "holdOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
       },
       {
        "kind": "secondaryButton",
-       "label": "Modify",
+       "label": "Modify order",
        "operation": "modifyOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reprint",
+       "label": "Reprint order",
        "operation": "reprintOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reschedule",
+       "label": "Reschedule order",
        "operation": "rescheduleOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
       },
       {
        "kind": "secondaryButton",
-       "label": "Resume",
+       "label": "Resume order",
        "operation": "resumeOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
       },
       {
        "kind": "destructiveButton",
-       "label": "Void",
+       "label": "Void order",
        "operation": "voidOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listOrders",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createOrder",
-       "label": "Create order",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "voidOrder",
-       "label": "Void order",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createOrder",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -597,17 +743,199 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmVoidOrder",
     "component": "confirmDialog",
-    "trigger": "Void",
-    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A order this affects should be identified in the dialog, not just counted.",
+    "trigger": "Void order",
+    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A order this affects should be identified in the dialog, not just counted. **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`. `reason` is the void reason list (`VoidReason`: guestChangedMind, enteredInError, itemUnavailable, qualityIssue, duplicate, other); **choosing Other makes `note` required** (decided 28 September, audit R125 (4), R222).",
     "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+   },
+   {
+    "id": "formCreateOrder",
+    "component": "modal",
+    "trigger": "Create order",
+    "body": "**Collects what `createOrder` sends before it is called.** Required: `id`, `venueId`, `channel`, `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `guestLinkId`, `catalogueBundleVersion`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateOrderRequest",
+    "confirm": {
+     "label": "Create order",
+     "operation": "createOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "channel",
+      "lines",
+      "recordedAt",
+      "shiftId",
+      "subjectId",
+      "guestLinkId",
+      "catalogueBundleVersion"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders"
+   },
+   {
+    "id": "formApplyManualDiscount",
+    "component": "modal",
+    "trigger": "Apply manual discount",
+    "body": "**Collects what `applyManualDiscount` sends before it is called.** Required: `id`, `reason`, `recordedAt`. Optional: `lineId`, `amount`, `percentage`, `reasonCode`, `approverPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ManualDiscountRequest",
+    "confirm": {
+     "label": "Apply manual discount",
+     "operation": "applyManualDiscount"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "reason",
+      "recordedAt",
+      "lineId",
+      "amount",
+      "percentage",
+      "reasonCode",
+      "approverPrincipalId"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
+   },
+   {
+    "id": "formCreateRefund",
+    "component": "modal",
+    "trigger": "Create refund",
+    "body": "**Collects what `createRefund` sends before it is called.** Required: `id`, `amount`, `reason`, `recordedAt`. Optional: `lineIds`, `secondaryAuthorisation`, `refundToOriginalTender`, `alternateTender`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateRefundRequest",
+    "confirm": {
+     "label": "Create refund",
+     "operation": "createRefund"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "amount",
+      "reason",
+      "recordedAt",
+      "lineIds",
+      "secondaryAuthorisation",
+      "refundToOriginalTender",
+      "alternateTender"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/refunds"
+   },
+   {
+    "id": "formExchangeOrderLines",
+    "component": "modal",
+    "trigger": "Exchange order lines",
+    "body": "**Collects what `exchangeOrderLines` sends before it is called.** Required: `id`, `outgoingLineIds`, `incomingLines`, `recordedAt`. Optional: `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ExchangeOrderRequest",
+    "confirm": {
+     "label": "Exchange order lines",
+     "operation": "exchangeOrderLines"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "outgoingLineIds",
+      "incomingLines",
+      "recordedAt",
+      "waiveFee",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
+   },
+   {
+    "id": "formHoldOrder",
+    "component": "modal",
+    "trigger": "Hold order",
+    "body": "**Collects what `holdOrder` sends before it is called.** Required: `recordedAt`. Optional: `label`, `holdUntil`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Hold order",
+     "operation": "holdOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recordedAt",
+      "label",
+      "holdUntil"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
+   },
+   {
+    "id": "formModifyOrder",
+    "component": "modal",
+    "trigger": "Modify order",
+    "body": "**Collects what `modifyOrder` sends before it is called.** Required: `id`, `recordedAt`. Optional: `addLines`, `removeLineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ModifyOrderRequest",
+    "confirm": {
+     "label": "Modify order",
+     "operation": "modifyOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "recordedAt",
+      "addLines",
+      "removeLineIds",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
+   },
+   {
+    "id": "formReprintOrder",
+    "component": "modal",
+    "trigger": "Reprint order",
+    "body": "**Collects what `reprintOrder` sends before it is called.** Required: `delivery`, `recordedAt`. Optional: `destination`, `lineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reprint order",
+     "operation": "reprintOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "delivery",
+      "recordedAt",
+      "destination",
+      "lineIds",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
+   },
+   {
+    "id": "formRescheduleOrder",
+    "component": "modal",
+    "trigger": "Reschedule order",
+    "body": "**Collects what `rescheduleOrder` sends before it is called.** Required: `targetPerformanceId`, `recordedAt`. Optional: `lineIds`, `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reschedule order",
+     "operation": "rescheduleOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "targetPerformanceId",
+      "recordedAt",
+      "lineIds",
+      "waiveFee",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
    }
   ],
   "states": {
    "loading": "The order list.",
    "error": "Could not load. Names which read failed and leaves the order untouched.",
-   "emptyFirstRun": "No order yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the order are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No order yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the order are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -620,7 +948,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getOrder",
     "contract": "orders",
     "purpose": "Read an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createOrder",
@@ -662,7 +990,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getOrderStatement",
     "contract": "orders",
     "purpose": "Full financial history of an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "holdOrder",
@@ -677,7 +1005,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "listOrderRefunds",
     "contract": "orders",
     "purpose": "List refunds against an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "modifyOrder",
@@ -734,11 +1062,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
    "preloaded": [
-    "Order.id",
-    "Order.orderNumber",
-    "Order.channel",
-    "Order.venueId",
-    "Order.scopePath"
+    "OrderSummary.id",
+    "OrderSummary.orderNumber",
+    "OrderSummary.status",
+    "OrderSummary.grossAmount",
+    "OrderSummary.refundedAmount"
    ]
   },
   "wireframe": {
@@ -785,11 +1113,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-004",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+    "BO-008"
    ],
    "inferred": true,
    "entryFrom": [
@@ -797,44 +1122,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "transitions": [
     {
-     "to": "BO-004",
-     "trigger": "Authorises the bulk refund",
-     "provenance": "flow F09 step 3→4"
-    },
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-023 holds none of them, so the edge carries nothing and BO-008 opens cold"
     },
     {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
+     "to": "BO-004",
+     "trigger": "Authorises the bulk refund",
+     "provenance": "flow F09 step 3→4",
      "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+      "refundId"
+     ]
     }
    ]
   },
@@ -843,13 +1141,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listOrderRefunds` reads the population and `getOrder` reads one of them — list, select, act",
   "purpose": "Give money back, or move the booking.",
-  "gaps": [
-   {
-    "operation": "getOrderStatement",
-    "why": "**3 declared operations reach no component on this screen**: getOrderStatement, listOrders, getRefundPolicy. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -859,7 +1150,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every refunds exchanges",
+       "label": "Every refund",
        "bindsTo": "Refund",
        "columns": [
         "Refund.id",
@@ -877,6 +1168,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listOrderRefunds",
        "provenance": "contract orders.yaml GET /orders/{orderId}/refunds"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every order",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount",
+        "OrderSummary.principalId",
+        "OrderSummary.holdLabel",
+        "OrderSummary.heldUntil"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -886,7 +1203,67 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected refunds exchanges",
+       "label": "The selected refund",
+       "bindsTo": "Refund",
+       "columns": [
+        "Refund.id",
+        "Refund.orderId",
+        "Refund.batchId",
+        "Refund.fxRate",
+        "Refund.taxReversalEntryId",
+        "Refund.settleTo",
+        "Refund.fxVariance",
+        "Refund.amount",
+        "Refund.appliedPercentage",
+        "Refund.status",
+        "Refund.reason",
+        "Refund.requestedByPrincipalId",
+        "Refund.secondaryPrincipalId",
+        "Refund.approvedByPrincipalId",
+        "Refund.ledgerEntryId",
+        "Refund.gatewayReference"
+       ],
+       "operation": "listOrderRefunds",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/refunds"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The order statement",
+       "bindsTo": "OrderStatement",
+       "columns": [
+        "OrderStatement.orderId",
+        "OrderStatement.orderNumber",
+        "OrderStatement.currency",
+        "OrderStatement.currencyScale",
+        "OrderStatement.entries",
+        "OrderStatement.totalPaid",
+        "OrderStatement.totalRefunded",
+        "OrderStatement.currentBalance"
+       ],
+       "operation": "getOrderStatement",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/statement"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The refund policy",
+       "bindsTo": "RefundPolicy",
+       "columns": [
+        "RefundPolicy.id",
+        "RefundPolicy.venueId",
+        "RefundPolicy.selfAuthoriseLimit",
+        "RefundPolicy.requiresSecondUserAbove",
+        "RefundPolicy.requiresApprovalAbove",
+        "RefundPolicy.timeBands",
+        "RefundPolicy.allowPartial",
+        "RefundPolicy.refundWindowDays",
+        "RefundPolicy.varianceThreshold"
+       ],
+       "operation": "getRefundPolicy",
+       "provenance": "contract orders.yaml GET /venues/{venueId}/refund-policy"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The order",
        "bindsTo": "Order",
        "columns": [
         "Order.id",
@@ -917,111 +1294,63 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create refund",
        "operation": "createRefund",
        "provenance": "contract orders.yaml POST /orders/{orderId}/refunds"
       },
       {
        "kind": "secondaryButton",
-       "label": "Apply",
+       "label": "Apply manual discount",
        "operation": "applyManualDiscount",
        "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create order",
        "operation": "createOrder",
        "provenance": "contract orders.yaml POST /orders"
       },
       {
        "kind": "secondaryButton",
-       "label": "Exchange",
+       "label": "Exchange order lines",
        "operation": "exchangeOrderLines",
        "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
       },
       {
        "kind": "secondaryButton",
-       "label": "Hold",
+       "label": "Hold order",
        "operation": "holdOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
       },
       {
        "kind": "secondaryButton",
-       "label": "Modify",
+       "label": "Modify order",
        "operation": "modifyOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reprint",
+       "label": "Reprint order",
        "operation": "reprintOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reschedule",
+       "label": "Reschedule order",
        "operation": "rescheduleOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
       },
       {
        "kind": "secondaryButton",
-       "label": "Resume",
+       "label": "Resume order",
        "operation": "resumeOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
       },
       {
        "kind": "destructiveButton",
-       "label": "Void",
+       "label": "Void order",
        "operation": "voidOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listOrderRefunds",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createRefund",
-       "label": "Create refund",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "voidOrder",
-       "label": "Void order",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createRefund",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1031,24 +1360,206 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmVoidOrder",
     "component": "confirmDialog",
-    "trigger": "Void",
-    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A refunds exchanges this affects should be identified in the dialog, not just counted.",
+    "trigger": "Void order",
+    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A refunds exchanges this affects should be identified in the dialog, not just counted. **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`. `reason` is the void reason list (`VoidReason`: guestChangedMind, enteredInError, itemUnavailable, qualityIssue, duplicate, other); **choosing Other makes `note` required** (decided 28 September, audit R125 (4), R222).",
     "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+   },
+   {
+    "id": "formCreateRefund",
+    "component": "modal",
+    "trigger": "Create refund",
+    "body": "**Collects what `createRefund` sends before it is called.** Required: `id`, `amount`, `reason`, `recordedAt`. Optional: `lineIds`, `secondaryAuthorisation`, `refundToOriginalTender`, `alternateTender`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateRefundRequest",
+    "confirm": {
+     "label": "Create refund",
+     "operation": "createRefund"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "amount",
+      "reason",
+      "recordedAt",
+      "lineIds",
+      "secondaryAuthorisation",
+      "refundToOriginalTender",
+      "alternateTender"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/refunds"
+   },
+   {
+    "id": "formApplyManualDiscount",
+    "component": "modal",
+    "trigger": "Apply manual discount",
+    "body": "**Collects what `applyManualDiscount` sends before it is called.** Required: `id`, `reason`, `recordedAt`. Optional: `lineId`, `amount`, `percentage`, `reasonCode`, `approverPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ManualDiscountRequest",
+    "confirm": {
+     "label": "Apply manual discount",
+     "operation": "applyManualDiscount"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "reason",
+      "recordedAt",
+      "lineId",
+      "amount",
+      "percentage",
+      "reasonCode",
+      "approverPrincipalId"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
+   },
+   {
+    "id": "formCreateOrder",
+    "component": "modal",
+    "trigger": "Create order",
+    "body": "**Collects what `createOrder` sends before it is called.** Required: `id`, `venueId`, `channel`, `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `guestLinkId`, `catalogueBundleVersion`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateOrderRequest",
+    "confirm": {
+     "label": "Create order",
+     "operation": "createOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "channel",
+      "lines",
+      "recordedAt",
+      "shiftId",
+      "subjectId",
+      "guestLinkId",
+      "catalogueBundleVersion"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders"
+   },
+   {
+    "id": "formExchangeOrderLines",
+    "component": "modal",
+    "trigger": "Exchange order lines",
+    "body": "**Collects what `exchangeOrderLines` sends before it is called.** Required: `id`, `outgoingLineIds`, `incomingLines`, `recordedAt`. Optional: `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ExchangeOrderRequest",
+    "confirm": {
+     "label": "Exchange order lines",
+     "operation": "exchangeOrderLines"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "outgoingLineIds",
+      "incomingLines",
+      "recordedAt",
+      "waiveFee",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
+   },
+   {
+    "id": "formHoldOrder",
+    "component": "modal",
+    "trigger": "Hold order",
+    "body": "**Collects what `holdOrder` sends before it is called.** Required: `recordedAt`. Optional: `label`, `holdUntil`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Hold order",
+     "operation": "holdOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recordedAt",
+      "label",
+      "holdUntil"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
+   },
+   {
+    "id": "formModifyOrder",
+    "component": "modal",
+    "trigger": "Modify order",
+    "body": "**Collects what `modifyOrder` sends before it is called.** Required: `id`, `recordedAt`. Optional: `addLines`, `removeLineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ModifyOrderRequest",
+    "confirm": {
+     "label": "Modify order",
+     "operation": "modifyOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "recordedAt",
+      "addLines",
+      "removeLineIds",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
+   },
+   {
+    "id": "formReprintOrder",
+    "component": "modal",
+    "trigger": "Reprint order",
+    "body": "**Collects what `reprintOrder` sends before it is called.** Required: `delivery`, `recordedAt`. Optional: `destination`, `lineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reprint order",
+     "operation": "reprintOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "delivery",
+      "recordedAt",
+      "destination",
+      "lineIds",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
+   },
+   {
+    "id": "formRescheduleOrder",
+    "component": "modal",
+    "trigger": "Reschedule order",
+    "body": "**Collects what `rescheduleOrder` sends before it is called.** Required: `targetPerformanceId`, `recordedAt`. Optional: `lineIds`, `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reschedule order",
+     "operation": "rescheduleOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "targetPerformanceId",
+      "recordedAt",
+      "lineIds",
+      "waiveFee",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
    }
   ],
   "states": {
    "loading": "The refunds exchanges list.",
    "error": "Could not load. Names which read failed and leaves the refunds exchanges untouched.",
-   "emptyFirstRun": "No refunds exchanges yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the refunds exchanges are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No refunds exchanges yet. Offers Create refund (`createRefund`).",
+   "emptyNoResults": "Never shown: `listOrderRefunds` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listOrderRefunds` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "listOrderRefunds",
     "contract": "orders",
     "purpose": "List refunds against an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createRefund",
@@ -1090,13 +1601,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getOrder",
     "contract": "orders",
     "purpose": "Read an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getOrderStatement",
     "contract": "orders",
     "purpose": "Full financial history of an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "holdOrder",
@@ -1178,11 +1689,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error. **The venue comes from the session** — a back-office user works one venue at a time and the refund policy is a venue setting, so the policy read needs it. Added 24 August with `getRefundPolicy`.",
    "preloaded": [
-    "Order.id",
-    "Order.orderNumber",
-    "Order.channel",
-    "Order.venueId",
-    "Order.scopePath"
+    "Refund.id",
+    "Refund.orderId",
+    "Refund.batchId",
+    "Refund.fxRate",
+    "Refund.taxReversalEntryId"
    ]
   },
   "wireframe": {
@@ -1229,47 +1740,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+    "BO-008"
    ],
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-024 holds none of them, so the edge carries nothing and BO-008 opens cold"
     },
     {
      "to": "PTR-014",
@@ -1325,7 +1803,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "textField",
        "label": "tenderedAmount",
-       "bindsTo": "CreatePaymentRequest.tenderedAmount",
+       "bindsTo": "CreatePaymentRequest.tenderAmount",
        "provenance": "contract orders.yaml POST /payments"
       },
       {
@@ -1354,65 +1832,39 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create payment",
        "operation": "createPayment",
        "provenance": "contract orders.yaml POST /payments"
       },
       {
        "kind": "secondaryButton",
-       "label": "Add",
+       "label": "Add tip",
        "operation": "addTip",
        "provenance": "contract orders.yaml POST /payments/{paymentId}/tip"
       },
       {
        "kind": "secondaryButton",
-       "label": "Capture",
+       "label": "Capture payment",
        "operation": "capturePayment",
        "provenance": "contract orders.yaml POST /payments/{paymentId}/capture"
       },
       {
        "kind": "secondaryButton",
-       "label": "Inquire",
+       "label": "Inquire payment status",
        "operation": "inquirePaymentStatus",
        "provenance": "contract orders.yaml POST /payments/{paymentId}/inquiry"
       },
       {
        "kind": "destructiveButton",
-       "label": "Close",
+       "label": "Close deposit boxes",
        "operation": "closeDepositBoxes",
        "provenance": "contract shift.yaml POST /deposit-boxes/close"
       },
       {
        "kind": "secondaryButton",
-       "label": "Settle",
+       "label": "Settle deposit",
        "operation": "settleDeposit",
        "provenance": "contract finance.yaml POST /deposits/{depositId}/settle"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createPayment",
-       "label": "Create payment",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createPayment",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1422,16 +1874,72 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmCloseDepositBoxes",
     "component": "confirmDialog",
-    "trigger": "Close",
-    "body": "**Names what `closeDepositBoxes` changes and what it leaves alone**, in the consequence rather than the verb. A payment exceptions this affects should be identified in the dialog, not just counted.",
+    "trigger": "Close deposit boxes",
+    "body": "**Names what `closeDepositBoxes` changes and what it leaves alone**, in the consequence rather than the verb. A payment exceptions this affects should be identified in the dialog, not just counted. **Collects what `closeDepositBoxes` sends before it is called.** Nothing in the body is required. Optional: `boxIds`, `allOpenAtVenue`.",
     "provenance": "contract shift.yaml POST /deposit-boxes/close"
+   },
+   {
+    "id": "formAddTip",
+    "component": "modal",
+    "trigger": "Add tip",
+    "body": "**Collects what `addTip` sends before it is called.** Required: `amount`, `source`, `recordedAt`. Optional: `allocateToPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Add tip",
+     "operation": "addTip"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "amount",
+      "source",
+      "recordedAt",
+      "allocateToPrincipalId"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /payments/{paymentId}/tip"
+   },
+   {
+    "id": "formCapturePayment",
+    "component": "modal",
+    "trigger": "Capture payment",
+    "body": "**Collects what `capturePayment` sends before it is called.** Required: `amount`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Capture payment",
+     "operation": "capturePayment"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "amount"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /payments/{paymentId}/capture"
+   },
+   {
+    "id": "formSettleDeposit",
+    "component": "modal",
+    "trigger": "Settle deposit",
+    "body": "**Collects what `settleDeposit` sends before it is called.** Required: `outcome`. Optional: `amount`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Settle deposit",
+     "operation": "settleDeposit"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "outcome",
+      "amount",
+      "reason"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /deposits/{depositId}/settle"
    }
   ],
   "states": {
    "loading": "The saved payment exceptions.",
    "error": "Could not load. Names which read failed and leaves the payment exceptions untouched.",
-   "emptyFirstRun": "No payment exceptions configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No payment exceptions configured. The form opens empty and `createPayment` saves the first one; it says what the platform does in the meantime.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_CREATE`, which `createPayment` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1488,6 +1996,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-024",
+   "derivedFrom": "wireframes/reference/Retail Board 3.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
@@ -1530,53 +2039,23 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
     "BO-008",
-    "BO-009",
     "BO-024"
    ],
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-024",
-     "trigger": "Payment Exceptions",
-     "provenance": "flow F99 step 1→2"
-    },
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-025 holds none of them, so the edge carries nothing and BO-008 opens cold"
     },
     {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
+     "to": "BO-024",
+     "trigger": "Payment Exceptions",
+     "provenance": "flow F99 step 1→2",
      "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+      "paymentId"
+     ]
     }
    ]
   },
@@ -1585,13 +2064,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listSettlementExceptions` reads the population and `getSettlement` reads one of them — list, select, act",
   "purpose": "Answer the acquirer with the evidence attached.",
-  "gaps": [
-   {
-    "operation": "listSettlements",
-    "why": "**1 declared operation reach no component on this screen**: listSettlements. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1601,7 +2073,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every chargebacks disputes",
+       "label": "Every settlement exception",
        "bindsTo": "SettlementException",
        "columns": [
         "SettlementException.id",
@@ -1617,6 +2089,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listSettlementExceptions",
        "provenance": "contract finance.yaml GET /settlements/{settlementId}/exceptions"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every settlement",
+       "bindsTo": "Settlement",
+       "columns": [
+        "Settlement.id",
+        "Settlement.currencyCode",
+        "Settlement.providerName",
+        "Settlement.periodStart",
+        "Settlement.periodEnd",
+        "Settlement.fileReference",
+        "Settlement.format",
+        "Settlement.status",
+        "Settlement.lineCount",
+        "Settlement.matchedCount",
+        "Settlement.exceptionCount",
+        "Settlement.providerGross"
+       ],
+       "operation": "listSettlements",
+       "provenance": "contract finance.yaml GET /settlements"
       }
      ]
     },
@@ -1626,13 +2119,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected chargebacks disputes",
+       "label": "The selected settlement exception",
+       "bindsTo": "SettlementException",
+       "columns": [
+        "SettlementException.id",
+        "SettlementException.settlementId",
+        "SettlementException.kind",
+        "SettlementException.providerReference",
+        "SettlementException.paymentId",
+        "SettlementException.amount",
+        "SettlementException.expectedAmount",
+        "SettlementException.resolution",
+        "SettlementException.note",
+        "SettlementException.resolvedByPrincipalId",
+        "SettlementException.resolvedAt"
+       ],
+       "operation": "listSettlementExceptions",
+       "provenance": "contract finance.yaml GET /settlements/{settlementId}/exceptions"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The settlement",
        "bindsTo": "Settlement",
        "columns": [
         "Settlement.id",
+        "Settlement.currencyCode",
         "Settlement.providerName",
         "Settlement.periodStart",
         "Settlement.periodEnd",
+        "Settlement.fileReference",
+        "Settlement.format",
         "Settlement.status",
         "Settlement.lineCount",
         "Settlement.matchedCount",
@@ -1641,10 +2157,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "Settlement.providerFees",
         "Settlement.providerNet",
         "Settlement.ledgerGross",
-        "Settlement.difference",
-        "Settlement.ingestedAt",
-        "Settlement.completedAt",
-        "Settlement.scopePath"
+        "Settlement.difference"
        ],
        "operation": "getSettlement",
        "provenance": "contract finance.yaml GET /settlements/{settlementId}"
@@ -1657,41 +2170,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Resolve",
+       "label": "Resolve settlement exception",
        "operation": "resolveSettlementException",
        "provenance": "contract finance.yaml POST /settlements/{settlementId}/exceptions"
       },
       {
        "kind": "secondaryButton",
-       "label": "Ingest",
+       "label": "Ingest settlement file",
        "operation": "ingestSettlementFile",
        "provenance": "contract finance.yaml POST /settlements"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listSettlementExceptions",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "resolveSettlementException",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1700,16 +2187,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The chargebacks disputes list.",
    "error": "Could not load. Names which read failed and leaves the chargebacks disputes untouched.",
-   "emptyFirstRun": "No chargebacks disputes yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the chargebacks disputes are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No chargebacks disputes yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listSettlementExceptions` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `SETTLEMENT_VIEW`, which `listSettlementExceptions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "listSettlementExceptions",
     "contract": "finance",
     "purpose": "Unmatched or mismatched settlement lines",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "resolveSettlementException",
@@ -1724,7 +2211,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getSettlement",
     "contract": "finance",
     "purpose": "Settlement detail with match results",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "ingestSettlementFile",
@@ -1764,6 +2251,49 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P08 Venue Management.dc.html#bo-025"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formResolveSettlementException",
+    "component": "modal",
+    "trigger": "Resolve settlement exception",
+    "body": "**Collects what `resolveSettlementException` sends before it is called.** Required: `exceptionId`, `resolution`, `note`. Optional: `matchedPaymentId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Resolve settlement exception",
+     "operation": "resolveSettlementException"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "exceptionId",
+      "resolution",
+      "note",
+      "matchedPaymentId"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /settlements/{settlementId}/exceptions"
+   },
+   {
+    "id": "formIngestSettlementFile",
+    "component": "modal",
+    "trigger": "Ingest settlement file",
+    "body": "**Collects what `ingestSettlementFile` sends before it is called.** Required: `providerName`, `periodStart`, `periodEnd`, `fileReference`. Optional: `format`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Ingest settlement file",
+     "operation": "ingestSettlementFile"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "providerName",
+      "periodStart",
+      "periodEnd",
+      "fileReference",
+      "format"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /settlements"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1802,47 +2332,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+    "BO-008"
    ],
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-026 holds none of them, so the edge carries nothing and BO-008 opens cold"
     }
    ]
   },
@@ -1854,13 +2351,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listOrders` reads the population and `getOrder` reads one of them — list, select, act",
   "purpose": "Handle a booking that arrives as a school, not a guest.",
-  "gaps": [
-   {
-    "operation": "getOrderStatement",
-    "why": "**2 declared operations reach no component on this screen**: getOrderStatement, listOrderRefunds. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1869,8 +2359,50 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listOrders",
+       "notes": "Sends `?venueId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Principal id",
+       "operation": "listOrders",
+       "notes": "Sends `?principalId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Shift id",
+       "operation": "listOrders",
+       "notes": "Sends `?shiftId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listOrders",
+       "notes": "Sends `?status=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created from",
+       "operation": "listOrders",
+       "notes": "Sends `?createdFrom=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created to",
+       "operation": "listOrders",
+       "notes": "Sends `?createdTo=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every group bookings",
+       "label": "Every order",
        "bindsTo": "OrderSummary",
        "columns": [
         "OrderSummary.id",
@@ -1883,6 +2415,34 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listOrders",
        "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every refund",
+       "bindsTo": "Refund",
+       "columns": [
+        "Refund.id",
+        "Refund.orderId",
+        "Refund.batchId",
+        "Refund.fxRate",
+        "Refund.taxReversalEntryId",
+        "Refund.settleTo",
+        "Refund.fxVariance",
+        "Refund.amount",
+        "Refund.appliedPercentage",
+        "Refund.status",
+        "Refund.reason",
+        "Refund.requestedByPrincipalId"
+       ],
+       "operation": "listOrderRefunds",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/refunds"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1892,7 +2452,68 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected group bookings",
+       "label": "The selected order",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount",
+        "OrderSummary.principalId",
+        "OrderSummary.holdLabel",
+        "OrderSummary.heldUntil"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The group booking",
+       "bindsTo": "GroupBooking",
+       "columns": [
+        "GroupBooking.id",
+        "GroupBooking.kind",
+        "GroupBooking.packageProductId",
+        "GroupBooking.yearGroup",
+        "GroupBooking.accessAndDietaryNeeds",
+        "GroupBooking.celebrantName",
+        "GroupBooking.celebrantTurningAge",
+        "GroupBooking.allergiesAndRequests",
+        "GroupBooking.finalHeadcountDueBy",
+        "GroupBooking.quoteSentAt",
+        "GroupBooking.riskAssessmentSentAt",
+        "GroupBooking.preferredDate",
+        "GroupBooking.orderId",
+        "GroupBooking.leaderSubjectId",
+        "GroupBooking.organisationName",
+        "GroupBooking.expectedSize"
+       ],
+       "operation": "getGroupBooking",
+       "provenance": "contract orders.yaml GET /group-bookings/{groupBookingId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The order statement",
+       "bindsTo": "OrderStatement",
+       "columns": [
+        "OrderStatement.orderId",
+        "OrderStatement.orderNumber",
+        "OrderStatement.currency",
+        "OrderStatement.currencyScale",
+        "OrderStatement.entries",
+        "OrderStatement.totalPaid",
+        "OrderStatement.totalRefunded",
+        "OrderStatement.currentBalance"
+       ],
+       "operation": "getOrderStatement",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/statement"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The order",
        "bindsTo": "Order",
        "columns": [
         "Order.id",
@@ -1923,111 +2544,75 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create order",
        "operation": "createOrder",
        "provenance": "contract orders.yaml POST /orders"
       },
       {
        "kind": "secondaryButton",
-       "label": "Apply",
+       "label": "Apply manual discount",
        "operation": "applyManualDiscount",
        "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create refund",
        "operation": "createRefund",
        "provenance": "contract orders.yaml POST /orders/{orderId}/refunds"
       },
       {
        "kind": "secondaryButton",
-       "label": "Exchange",
+       "label": "Exchange order lines",
        "operation": "exchangeOrderLines",
        "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
       },
       {
        "kind": "secondaryButton",
-       "label": "Hold",
+       "label": "Hold order",
        "operation": "holdOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
       },
       {
        "kind": "secondaryButton",
-       "label": "Modify",
+       "label": "Modify order",
        "operation": "modifyOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reprint",
+       "label": "Reprint order",
        "operation": "reprintOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reschedule",
+       "label": "Reschedule order",
        "operation": "rescheduleOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
       },
       {
        "kind": "secondaryButton",
-       "label": "Resume",
+       "label": "Resume order",
        "operation": "resumeOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
       },
       {
        "kind": "destructiveButton",
-       "label": "Void",
+       "label": "Void order",
        "operation": "voidOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listOrders",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createOrder",
-       "label": "Create order",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "voidOrder",
-       "label": "Void order",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
       },
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createOrder",
-       "provenance": "carried from the previous definition"
+       "label": "Create group booking",
+       "operation": "createGroupBooking",
+       "provenance": "contract orders.yaml POST /group-bookings"
       },
       {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
+       "kind": "secondaryButton",
+       "label": "Save group booking",
+       "operation": "updateGroupBooking",
+       "provenance": "contract orders.yaml PATCH /group-bookings/{groupBookingId}"
       }
      ]
     }
@@ -2037,19 +2622,286 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmVoidOrder",
     "component": "confirmDialog",
-    "trigger": "Void",
-    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A group bookings this affects should be identified in the dialog, not just counted.",
+    "trigger": "Void order",
+    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A group bookings this affects should be identified in the dialog, not just counted. **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`. `reason` is the void reason list (`VoidReason`: guestChangedMind, enteredInError, itemUnavailable, qualityIssue, duplicate, other); **choosing Other makes `note` required** (decided 28 September, audit R125 (4), R222).",
     "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+   },
+   {
+    "id": "formCreateGroupBooking",
+    "component": "modal",
+    "trigger": "Create group booking",
+    "body": "**Collects what `createGroupBooking` sends before it is called.** Required: `orderId`, `leaderSubjectId`, `expectedSize`. Optional: `kind`, `packageProductId`, `yearGroup`, `accessAndDietaryNeeds`, `celebrantName`, `celebrantTurningAge`, `allergiesAndRequests`, `finalHeadcountDueBy`, `organisationName`, `minimumSize`, `attendeeCaptureRequired`, `attendeeCaptureDueBy`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateGroupBookingRequest",
+    "confirm": {
+     "label": "Create group booking",
+     "operation": "createGroupBooking"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "orderId",
+      "leaderSubjectId",
+      "expectedSize",
+      "kind",
+      "packageProductId",
+      "yearGroup",
+      "accessAndDietaryNeeds",
+      "celebrantName",
+      "celebrantTurningAge",
+      "allergiesAndRequests",
+      "finalHeadcountDueBy",
+      "organisationName",
+      "minimumSize",
+      "attendeeCaptureRequired",
+      "attendeeCaptureDueBy"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /group-bookings"
+   },
+   {
+    "id": "formUpdateGroupBooking",
+    "component": "modal",
+    "trigger": "Save group booking",
+    "body": "**Collects what `updateGroupBooking` sends before it is called.** Nothing in the body is required. Optional: `packageProductId`, `yearGroup`, `accessAndDietaryNeeds`, `celebrantName`, `celebrantTurningAge`, `allergiesAndRequests`, `finalHeadcountDueBy`, `leaderSubjectId`, `organisationName`, `expectedSize`, `confirmedSize`, `minimumSize` and 3 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "UpdateGroupBookingRequest",
+    "confirm": {
+     "label": "Save group booking",
+     "operation": "updateGroupBooking"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "packageProductId",
+      "yearGroup",
+      "accessAndDietaryNeeds",
+      "celebrantName",
+      "celebrantTurningAge",
+      "allergiesAndRequests",
+      "finalHeadcountDueBy",
+      "leaderSubjectId",
+      "organisationName",
+      "expectedSize",
+      "confirmedSize",
+      "minimumSize",
+      "attendeeCaptureRequired",
+      "attendeeCaptureDueBy",
+      "status"
+     ]
+    },
+    "provenance": "contract orders.yaml PATCH /group-bookings/{groupBookingId}"
+   },
+   {
+    "id": "formCreateOrder",
+    "component": "modal",
+    "trigger": "Create order",
+    "body": "**Collects what `createOrder` sends before it is called.** Required: `id`, `venueId`, `channel`, `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `guestLinkId`, `catalogueBundleVersion`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateOrderRequest",
+    "confirm": {
+     "label": "Create order",
+     "operation": "createOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "channel",
+      "lines",
+      "recordedAt",
+      "shiftId",
+      "subjectId",
+      "guestLinkId",
+      "catalogueBundleVersion"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders"
+   },
+   {
+    "id": "formApplyManualDiscount",
+    "component": "modal",
+    "trigger": "Apply manual discount",
+    "body": "**Collects what `applyManualDiscount` sends before it is called.** Required: `id`, `reason`, `recordedAt`. Optional: `lineId`, `amount`, `percentage`, `reasonCode`, `approverPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ManualDiscountRequest",
+    "confirm": {
+     "label": "Apply manual discount",
+     "operation": "applyManualDiscount"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "reason",
+      "recordedAt",
+      "lineId",
+      "amount",
+      "percentage",
+      "reasonCode",
+      "approverPrincipalId"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
+   },
+   {
+    "id": "formCreateRefund",
+    "component": "modal",
+    "trigger": "Create refund",
+    "body": "**Collects what `createRefund` sends before it is called.** Required: `id`, `amount`, `reason`, `recordedAt`. Optional: `lineIds`, `secondaryAuthorisation`, `refundToOriginalTender`, `alternateTender`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateRefundRequest",
+    "confirm": {
+     "label": "Create refund",
+     "operation": "createRefund"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "amount",
+      "reason",
+      "recordedAt",
+      "lineIds",
+      "secondaryAuthorisation",
+      "refundToOriginalTender",
+      "alternateTender"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/refunds"
+   },
+   {
+    "id": "formExchangeOrderLines",
+    "component": "modal",
+    "trigger": "Exchange order lines",
+    "body": "**Collects what `exchangeOrderLines` sends before it is called.** Required: `id`, `outgoingLineIds`, `incomingLines`, `recordedAt`. Optional: `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ExchangeOrderRequest",
+    "confirm": {
+     "label": "Exchange order lines",
+     "operation": "exchangeOrderLines"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "outgoingLineIds",
+      "incomingLines",
+      "recordedAt",
+      "waiveFee",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
+   },
+   {
+    "id": "formHoldOrder",
+    "component": "modal",
+    "trigger": "Hold order",
+    "body": "**Collects what `holdOrder` sends before it is called.** Required: `recordedAt`. Optional: `label`, `holdUntil`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Hold order",
+     "operation": "holdOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recordedAt",
+      "label",
+      "holdUntil"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
+   },
+   {
+    "id": "formModifyOrder",
+    "component": "modal",
+    "trigger": "Modify order",
+    "body": "**Collects what `modifyOrder` sends before it is called.** Required: `id`, `recordedAt`. Optional: `addLines`, `removeLineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ModifyOrderRequest",
+    "confirm": {
+     "label": "Modify order",
+     "operation": "modifyOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "recordedAt",
+      "addLines",
+      "removeLineIds",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
+   },
+   {
+    "id": "formReprintOrder",
+    "component": "modal",
+    "trigger": "Reprint order",
+    "body": "**Collects what `reprintOrder` sends before it is called.** Required: `delivery`, `recordedAt`. Optional: `destination`, `lineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reprint order",
+     "operation": "reprintOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "delivery",
+      "recordedAt",
+      "destination",
+      "lineIds",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
+   },
+   {
+    "id": "formRescheduleOrder",
+    "component": "modal",
+    "trigger": "Reschedule order",
+    "body": "**Collects what `rescheduleOrder` sends before it is called.** Required: `targetPerformanceId`, `recordedAt`. Optional: `lineIds`, `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reschedule order",
+     "operation": "rescheduleOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "targetPerformanceId",
+      "recordedAt",
+      "lineIds",
+      "waiveFee",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
    }
   ],
   "states": {
    "loading": "The group bookings list.",
    "error": "Could not load. Names which read failed and leaves the group bookings untouched.",
-   "emptyFirstRun": "No group bookings yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the group bookings are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No group bookings yet. Offers Create group booking (`createGroupBooking`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the group bookings are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getGroupBooking` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "createGroupBooking",
+    "contract": "orders",
+    "purpose": "Turn an order into a group booking",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getGroupBooking",
+    "contract": "orders",
+    "purpose": "The group, its leader and its manifest",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "updateGroupBooking",
+    "contract": "orders",
+    "purpose": "Confirm numbers, change the leader or cancel",
+    "trigger": "onAction",
+    "invalidates": [
+     "getGroupBooking"
+    ]
+   },
    {
     "operationId": "listOrders",
     "contract": "orders",
@@ -2096,13 +2948,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getOrder",
     "contract": "orders",
     "purpose": "Read an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getOrderStatement",
     "contract": "orders",
     "purpose": "Full financial history of an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "holdOrder",
@@ -2117,7 +2969,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "listOrderRefunds",
     "contract": "orders",
     "purpose": "List refunds against an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "modifyOrder",
@@ -2170,21 +3022,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "orderId",
      "from": "deepLink"
+    },
+    {
+     "name": "groupBookingId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
    "preloaded": [
-    "Order.id",
-    "Order.orderNumber",
-    "Order.channel",
-    "Order.venueId",
-    "Order.scopePath"
+    "OrderSummary.id",
+    "OrderSummary.orderNumber",
+    "OrderSummary.status",
+    "OrderSummary.grossAmount",
+    "OrderSummary.refundedAmount"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-026",
+   "derivedFrom": "wireframes/reference/Seat Platform Board 7.dc.html",
    "note": "**Drawn by Claude Design on `Seat Platform Board 7.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -2226,62 +3083,43 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
     "BO-008",
-    "BO-009"
+    "BO-314",
+    "BO-644"
    ],
    "inferred": true,
+   "entryFrom": [
+    "BO-314",
+    "BO-644"
+   ],
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+     "to": "BO-314",
+     "trigger": "Back to Amendment & After-Sales Command Center",
+     "provenance": "inherited from BO-320 when it was merged here, 28 September (audit R276)",
+     "back": true
     },
     {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+     "to": "BO-644",
+     "trigger": "Back to Credential Issuance Command Center",
+     "provenance": "inherited from BO-652 when it was merged here, 28 September (audit R276)",
+     "back": true
     },
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
      "carries": [
-      "productId",
-      "venueId"
+      "version"
      ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-027 holds version, so an edge into it carries them"
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **8 assets operations removed 18 August (CF-114).** The whole media contract was attached to this screen. **A till adding an item to a ticket does not manage a media library** — it reads the asset it needs and nothing else. Same shape as CF-87, one level up: that attached sibling operations, this attached a whole contract.",
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **8 assets operations removed 18 August (CF-114).** The whole media contract was attached to this screen. **A till adding an item to a ticket does not manage a media library** — it reads the asset it needs and nothing else. Same shape as CF-87, one level up: that attached sibling operations, this attached a whole contract. **Absorbed BO-320 and BO-652 on 28 September (audit R276)**: Ticket Reissue & Fulfillment Regeneration brought `listTicketReissueFulfillment` (the reissue history of an order's tickets) and Credential Replacement & Reissue brought `listCredentialReplacementReissue` (lost, damaged and stolen credentials replaced); both are retired, and their hubs BO-314 and BO-644 open this screen.",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getMediaEntitlements` reads one record and nothing reads a population — the screen is about that one thing",
   "purpose": "Replace media a guest has lost or damaged.",
-  "gaps": [
-   {
-    "operation": "getMediaAsset",
-    "why": "**1 declared operation reach no component on this screen**: getMediaAsset. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "detail",
    "regions": [
@@ -2291,7 +3129,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected reissue media replacement",
+       "label": "The media entitlements",
        "bindsTo": "MediaEntitlements",
        "columns": [
         "MediaEntitlements.mediaCode",
@@ -2304,6 +3142,31 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getMediaEntitlements",
        "provenance": "contract orders.yaml GET /media/{mediaCode}/entitlements"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The media asset",
+       "bindsTo": "MediaAssetDetail",
+       "columns": [
+        "MediaAssetDetail.id",
+        "MediaAssetDetail.kind",
+        "MediaAssetDetail.status",
+        "MediaAssetDetail.filename",
+        "MediaAssetDetail.contentType",
+        "MediaAssetDetail.sizeBytes",
+        "MediaAssetDetail.title",
+        "MediaAssetDetail.description",
+        "MediaAssetDetail.altText",
+        "MediaAssetDetail.width",
+        "MediaAssetDetail.height",
+        "MediaAssetDetail.durationSeconds",
+        "MediaAssetDetail.customMetadata",
+        "MediaAssetDetail.sharedWithTenantIds",
+        "MediaAssetDetail.tags",
+        "MediaAssetDetail.venueId"
+       ],
+       "operation": "getMediaAsset",
+       "provenance": "contract assets.yaml GET /media/{mediaId}"
       }
      ]
     },
@@ -2313,45 +3176,46 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Append",
+       "label": "Append entitlement to media",
        "operation": "appendEntitlementToMedia",
        "provenance": "contract orders.yaml POST /media/{mediaCode}/entitlements"
       },
       {
        "kind": "secondaryButton",
-       "label": "Replace",
+       "label": "Replace media asset",
        "operation": "replaceMediaAsset",
        "provenance": "contract assets.yaml POST /media/{mediaId}/replace"
       }
      ]
     },
     {
-     "name": "contentBody",
+     "name": "history",
      "slot": "carried",
      "components": [
       {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
+       "kind": "dataTable",
+       "label": "Ticket reissues",
+       "derived": true,
+       "impliedBy": "listTicketReissueFulfillment",
+       "notes": "Carried from BO-320 (merged 28 September, audit R276) — tickets and media regenerated after an amendment, correction, loss or delivery failure. **Cursor pagination, never offset.**"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "kind": "dataTable",
+       "label": "Credential replacements",
        "derived": true,
-       "impliedBy": "appendEntitlementToMedia",
-       "provenance": "carried from the previous definition"
+       "impliedBy": "listCredentialReplacementReissue",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows. Carried from BO-652 (merged 28 September, audit R276)."
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The reissue media replacement list.",
+   "loading": "The reissue media replacement, read by `getMediaEntitlements`.",
    "error": "Could not load. Names which read failed and leaves the reissue media replacement untouched.",
-   "emptyFirstRun": "No reissue media replacement yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the reissue media replacement are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No reissue media replacement yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "The ticket reissue or credential replacement history for this media has nothing matching; the media itself is still shown. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2377,6 +3241,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "assets",
     "purpose": "Replace the file behind an asset",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listTicketReissueFulfillment",
+    "contract": "orders",
+    "purpose": "Ticket reissue and fulfilment regeneration history (absorbed from BO-320, audit R276)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCredentialReplacementReissue",
+    "contract": "access",
+    "purpose": "Credential replacement, reissue, revocation and recovery (absorbed from BO-652, audit R276)",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -2398,6 +3274,48 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P08 Venue Management.dc.html#bo-027"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAppendEntitlementToMedia",
+    "component": "modal",
+    "trigger": "Append entitlement to media",
+    "body": "**Collects what `appendEntitlementToMedia` sends before it is called.** Required: `id`, `lines`, `recordedAt`. Optional: `paymentMethod`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AppendEntitlementRequest",
+    "confirm": {
+     "label": "Append entitlement to media",
+     "operation": "appendEntitlementToMedia"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "lines",
+      "recordedAt",
+      "paymentMethod",
+      "note"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /media/{mediaCode}/entitlements"
+   },
+   {
+    "id": "formReplaceMediaAsset",
+    "component": "modal",
+    "trigger": "Replace media asset",
+    "body": "**Collects what `replaceMediaAsset` sends before it is called.** Required: `uploadId`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Replace media asset",
+     "operation": "replaceMediaAsset"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "uploadId",
+      "note"
+     ]
+    },
+    "provenance": "contract assets.yaml POST /media/{mediaId}/replace"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2436,47 +3354,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+    "BO-008"
    ],
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-028 holds none of them, so the edge carries nothing and BO-008 opens cold"
     }
    ]
   },
@@ -2485,13 +3370,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`createRefundRequest`) and no read of a population — it is settings, not a list",
   "purpose": "Approve the refunds a cashier is not allowed to make alone.",
-  "gaps": [
-   {
-    "operation": "createRefundRequest",
-    "why": "**`createRefundRequest` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
-    "source": "contract orders.yaml POST /refund-requests"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -2501,7 +3379,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create refund request",
        "operation": "createRefundRequest",
        "provenance": "contract orders.yaml POST /refund-requests"
       }
@@ -2512,24 +3390,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "carried",
      "components": [
       {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
+       "kind": "textField",
+       "label": "Order id",
+       "operation": "createRefundRequest",
+       "notes": "Required.",
+       "provenance": "contract orders.yaml POST /refund-requests"
       },
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createRefundRequest",
-       "label": "Create refund request",
-       "provenance": "carried from the previous definition"
+       "kind": "textField",
+       "label": "Reason",
+       "operation": "createRefundRequest",
+       "notes": "Required.",
+       "provenance": "contract orders.yaml POST /refund-requests"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createRefundRequest",
-       "provenance": "carried from the previous definition"
+       "kind": "multiSelect",
+       "label": "Line ids",
+       "operation": "createRefundRequest",
+       "provenance": "contract orders.yaml POST /refund-requests"
       }
      ]
     }
@@ -2538,8 +3416,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "Figures load; the expected total renders last",
    "error": "**Could not load. Every action that moves money is blocked** — a figure nobody read must not be reconciled against",
-   "emptyFirstRun": "Nothing in the period — reported as a result, not an empty screen",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "Nothing in the period — reported as a result, not an empty screen"
   },
   "apis": [
    {
@@ -2593,47 +3470,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+    "BO-008"
    ],
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-029 holds none of them, so the edge carries nothing and BO-008 opens cold"
     }
    ]
   },
@@ -2642,13 +3486,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listReports` reads the population and `getFinancialReport` reads one of them — list, select, act",
   "purpose": "Build the report nobody wrote down, without asking for a release.",
-  "gaps": [
-   {
-    "operation": "getReport",
-    "why": "**1 declared operation reach no component on this screen**: getReport. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -2657,8 +3494,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Category",
+       "operation": "listReports",
+       "notes": "Sends `?category=` to `listReports`.",
+       "provenance": "contract reporting.yaml GET /reports"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "listReports",
+       "notes": "Sends `?search=` to `listReports`.",
+       "provenance": "contract reporting.yaml GET /reports"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every report",
+       "label": "Every report definition",
        "bindsTo": "ReportDefinition",
        "columns": [
         "ReportDefinition.name",
@@ -2676,6 +3527,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listReports",
        "provenance": "contract reporting.yaml GET /reports"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -2685,7 +3543,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected report",
+       "label": "The selected report definition",
+       "bindsTo": "ReportDefinition",
+       "columns": [
+        "ReportDefinition.name",
+        "ReportDefinition.description",
+        "ReportDefinition.category",
+        "ReportDefinition.dataSource",
+        "ReportDefinition.columns",
+        "ReportDefinition.filters",
+        "ReportDefinition.groupBy",
+        "ReportDefinition.parameters",
+        "ReportDefinition.requiredPermission",
+        "ReportDefinition.maxDateRangeDays",
+        "ReportDefinition.id",
+        "ReportDefinition.isSystem",
+        "ReportDefinition.isRetired",
+        "ReportDefinition.estimatedCost",
+        "ReportDefinition.createdByPrincipalId",
+        "ReportDefinition.lastRunAt"
+       ],
+       "operation": "getReport",
+       "provenance": "contract reporting.yaml GET /reports/{reportId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The financial report",
        "bindsTo": "FinancialReport",
        "columns": [
         "FinancialReport.report",
@@ -2707,87 +3590,39 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create report",
        "operation": "createReport",
        "provenance": "contract reporting.yaml POST /reports"
       },
       {
        "kind": "secondaryButton",
-       "label": "Ask",
+       "label": "Ask reporting question",
        "operation": "askReportingQuestion",
        "provenance": "contract reporting.yaml POST /reports/ask"
       },
       {
        "kind": "destructiveButton",
-       "label": "Delete",
+       "label": "Delete report",
        "operation": "deleteReport",
        "provenance": "contract reporting.yaml DELETE /reports/{reportId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save",
+       "label": "Save natural language query",
        "operation": "saveNaturalLanguageQuery",
        "provenance": "contract reporting.yaml POST /reports/ask/{conversationId}/save"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save report",
        "operation": "updateReport",
        "provenance": "contract reporting.yaml PUT /reports/{reportId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listReports",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createReport",
-       "label": "Create report",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "deleteReport",
-       "label": "Delete report",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createReport",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -2797,17 +3632,130 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmDeleteReport",
     "component": "confirmDialog",
-    "trigger": "Delete",
+    "trigger": "Delete report",
     "body": "**Names what `deleteReport` changes and what it leaves alone**, in the consequence rather than the verb. A report this affects should be identified in the dialog, not just counted.",
     "provenance": "contract reporting.yaml DELETE /reports/{reportId}"
+   },
+   {
+    "id": "formCreateReport",
+    "component": "modal",
+    "trigger": "Create report",
+    "body": "**Collects what `createReport` sends before it is called.** Required: `name`, `category`, `dataSource`, `columns`, `requiredPermission`. Optional: `description`, `filters`, `groupBy`, `parameters`, `maxDateRangeDays`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateReportRequest",
+    "confirm": {
+     "label": "Create report",
+     "operation": "createReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "category",
+      "dataSource",
+      "columns",
+      "requiredPermission",
+      "description",
+      "filters",
+      "groupBy",
+      "parameters",
+      "maxDateRangeDays"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports"
+   },
+   {
+    "id": "formAskReportingQuestion",
+    "component": "modal",
+    "trigger": "Ask reporting question",
+    "body": "**Collects what `askReportingQuestion` sends before it is called.** Required: `question`. Optional: `conversationId`, `venueId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Ask reporting question",
+     "operation": "askReportingQuestion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "question",
+      "conversationId",
+      "venueId"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/ask"
+   },
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   },
+   {
+    "id": "formSaveNaturalLanguageQuery",
+    "component": "modal",
+    "trigger": "Save natural language query",
+    "body": "**Collects what `saveNaturalLanguageQuery` sends before it is called.** Required: `name`. Optional: `category`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save natural language query",
+     "operation": "saveNaturalLanguageQuery"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "category"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/ask/{conversationId}/save"
+   },
+   {
+    "id": "formUpdateReport",
+    "component": "modal",
+    "trigger": "Save report",
+    "body": "**Collects what `updateReport` sends before it is called.** Required: `name`, `category`, `dataSource`, `columns`, `requiredPermission`. Optional: `description`, `filters`, `groupBy`, `parameters`, `maxDateRangeDays`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateReportRequest",
+    "confirm": {
+     "label": "Save report",
+     "operation": "updateReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "category",
+      "dataSource",
+      "columns",
+      "requiredPermission",
+      "description",
+      "filters",
+      "groupBy",
+      "parameters",
+      "maxDateRangeDays"
+     ]
+    },
+    "provenance": "contract reporting.yaml PUT /reports/{reportId}"
    }
   ],
   "states": {
    "loading": "The report list.",
    "error": "Could not load. Names which read failed and leaves the report untouched.",
-   "emptyFirstRun": "No report yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the report are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No report yet. Offers Create report (`createReport`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on category, search and the report are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2853,7 +3801,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getReport",
     "contract": "reporting",
     "purpose": "Read a report definition",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "runReport",
@@ -2896,11 +3844,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom.",
    "preloaded": [
-    "FinancialReport.report",
-    "FinancialReport.fiscalPeriodId",
-    "FinancialReport.legalEntityId",
-    "FinancialReport.currency",
-    "FinancialReport.currencyScale"
+    "ReportDefinition.name",
+    "ReportDefinition.description",
+    "ReportDefinition.category",
+    "ReportDefinition.dataSource",
+    "ReportDefinition.columns"
    ]
   },
   "wireframe": {
@@ -2947,47 +3895,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+    "BO-008"
    ],
    "inferred": true,
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-039 holds none of them, so the edge carries nothing and BO-008 opens cold"
     }
    ]
   },
@@ -2996,13 +3911,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "approvalInbox",
   "patternReason": "`approveShiftOpen` decides items that `listShifts` queues — every row is waiting for a person, so the empty state is success",
   "purpose": "See every till, open or closed.",
-  "gaps": [
-   {
-    "operation": "getShift",
-    "why": "**2 declared operations reach no component on this screen**: getShift, listCashMovements. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -3010,6 +3918,34 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "name": "contentBody",
      "slot": "queue",
      "components": [
+      {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listShifts",
+       "notes": "Sends `?workstationId=` to `listShifts`.",
+       "provenance": "contract shift.yaml GET /shifts"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listShifts",
+       "notes": "Sends `?status=` to `listShifts`.",
+       "provenance": "contract shift.yaml GET /shifts"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Opened from",
+       "operation": "listShifts",
+       "notes": "Sends `?openedFrom=` to `listShifts`.",
+       "provenance": "contract shift.yaml GET /shifts"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Opened to",
+       "operation": "listShifts",
+       "notes": "Sends `?openedTo=` to `listShifts`.",
+       "provenance": "contract shift.yaml GET /shifts"
+      },
       {
        "kind": "dataTable",
        "label": "Waiting for a decision",
@@ -3030,6 +3966,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listShifts",
        "provenance": "contract shift.yaml GET /shifts"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every cash movement",
+       "bindsTo": "CashMovement",
+       "columns": [
+        "CashMovement.id",
+        "CashMovement.kind",
+        "CashMovement.amount",
+        "CashMovement.denominations",
+        "CashMovement.reference",
+        "CashMovement.reason",
+        "CashMovement.recordedAt",
+        "CashMovement.shiftId",
+        "CashMovement.depositBoxId",
+        "CashMovement.witnessPrincipalId",
+        "CashMovement.withdrawalReason",
+        "CashMovement.authorisedByPrincipalId"
+       ],
+       "operation": "listCashMovements",
+       "provenance": "contract shift.yaml GET /shifts/{shiftId}/cash-movements"
       }
      ]
     },
@@ -3061,6 +4018,31 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getCurrentShift",
        "provenance": "contract shift.yaml GET /shifts/current"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The shift",
+       "bindsTo": "Shift",
+       "columns": [
+        "Shift.id",
+        "Shift.workstationId",
+        "Shift.venueId",
+        "Shift.scopePath",
+        "Shift.principalId",
+        "Shift.principalDisplayName",
+        "Shift.incidents",
+        "Shift.status",
+        "Shift.currency",
+        "Shift.currencyScale",
+        "Shift.depositBoxCode",
+        "Shift.bagNumber",
+        "Shift.openingFloat",
+        "Shift.salesTotal",
+        "Shift.refundsTotal",
+        "Shift.liftsTotal"
+       ],
+       "operation": "getShift",
+       "provenance": "contract shift.yaml GET /shifts/{shiftId}"
       }
      ]
     },
@@ -3070,83 +4052,57 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Open",
+       "label": "Open shift",
        "operation": "openShift",
        "provenance": "contract shift.yaml POST /shifts"
       },
       {
        "kind": "secondaryButton",
-       "label": "Accept",
+       "label": "Accept shift variance",
        "operation": "acceptShiftVariance",
        "provenance": "contract shift.yaml POST /shifts/{shiftId}/accept-variance"
       },
       {
        "kind": "secondaryButton",
-       "label": "Approve",
+       "label": "Approve shift open",
        "operation": "approveShiftOpen",
        "provenance": "contract shift.yaml POST /shifts/{shiftId}/approve-open"
       },
       {
        "kind": "destructiveButton",
-       "label": "Close",
+       "label": "Close shift",
        "operation": "closeShift",
        "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create cash movement",
        "operation": "createCashMovement",
        "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
       },
       {
        "kind": "secondaryButton",
-       "label": "Record",
+       "label": "Record no sale",
        "operation": "recordNoSale",
        "provenance": "contract shift.yaml POST /shifts/{shiftId}/no-sale"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reopen",
+       "label": "Reopen shift",
        "operation": "reopenShift",
        "provenance": "contract shift.yaml POST /shifts/{shiftId}/reopen"
       },
       {
        "kind": "secondaryButton",
-       "label": "Resume",
+       "label": "Resume shift",
        "operation": "resumeShift",
        "provenance": "contract shift.yaml POST /shifts/{shiftId}/resume"
       },
       {
        "kind": "destructiveButton",
-       "label": "Suspend",
+       "label": "Suspend shift",
        "operation": "suspendShift",
        "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listShifts",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "openShift",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -3156,24 +4112,160 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmCloseShift",
     "component": "confirmDialog",
-    "trigger": "Close",
-    "body": "**Names what `closeShift` changes and what it leaves alone**, in the consequence rather than the verb. A shift this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
+    "trigger": "Close shift",
+    "body": "**Names what `closeShift` changes and what it leaves alone**, in the consequence rather than the verb. A shift this affects should be identified in the dialog, not just counted. **Collects what `closeShift` sends before it is called.** Required: `countedCash`, `recordedAt`. Optional: `nonCashDeclared`, `notes`, `releaseHeldLeases`.",
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/close",
+    "bindsTo": "CloseShiftRequest"
    },
    {
     "id": "confirmSuspendShift",
     "component": "confirmDialog",
-    "trigger": "Suspend",
-    "body": "**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than the verb. A shift this affects should be identified in the dialog, not just counted.",
+    "trigger": "Suspend shift",
+    "body": "**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than the verb. A shift this affects should be identified in the dialog, not just counted. **Collects what `suspendShift` sends before it is called.** Required: `recordedAt`. Optional: `reason`.",
     "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
+   },
+   {
+    "id": "formOpenShift",
+    "component": "modal",
+    "trigger": "Open shift",
+    "body": "**Collects what `openShift` sends before it is called.** Required: `workstationId`, `openingFloat`. Optional: `depositBoxCode`, `bagNumber`, `recordedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "OpenShiftRequest",
+    "confirm": {
+     "label": "Open shift",
+     "operation": "openShift"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "workstationId",
+      "openingFloat",
+      "depositBoxCode",
+      "bagNumber",
+      "recordedAt"
+     ]
+    },
+    "provenance": "contract shift.yaml POST /shifts"
+   },
+   {
+    "id": "formAcceptShiftVariance",
+    "component": "modal",
+    "trigger": "Accept shift variance",
+    "body": "**Collects what `acceptShiftVariance` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Accept shift variance",
+     "operation": "acceptShiftVariance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/accept-variance"
+   },
+   {
+    "id": "formApproveShiftOpen",
+    "component": "modal",
+    "trigger": "Approve shift open",
+    "body": "**Collects what `approveShiftOpen` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Approve shift open",
+     "operation": "approveShiftOpen"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/approve-open"
+   },
+   {
+    "id": "formCreateCashMovement",
+    "component": "modal",
+    "trigger": "Create cash movement",
+    "body": "**Collects what `createCashMovement` sends before it is called.** Required: `id`, `kind`, `amount`, `recordedAt`. Optional: `denominations`, `reference`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateCashMovementRequest",
+    "confirm": {
+     "label": "Create cash movement",
+     "operation": "createCashMovement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "amount",
+      "recordedAt",
+      "denominations",
+      "reference",
+      "reason"
+     ]
+    },
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
+   },
+   {
+    "id": "formRecordNoSale",
+    "component": "modal",
+    "trigger": "Record no sale",
+    "body": "**Collects what `recordNoSale` sends before it is called.** Required: `id`, `reason`, `recordedAt`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Record no sale",
+     "operation": "recordNoSale"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "reason",
+      "recordedAt",
+      "note"
+     ]
+    },
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/no-sale"
+   },
+   {
+    "id": "formReopenShift",
+    "component": "modal",
+    "trigger": "Reopen shift",
+    "body": "**Collects what `reopenShift` sends before it is called.** Required: `reason` and `supervisorStepUp` — a supervisor who did not close the shift enters their staff PIN on this device (`principalId`, `credential`) (decided 28 September, audit R144). A refusal names which: the supervisor is the closer (403 approver-is-closer) or the PIN was refused (403 supervisor-step-up-refused). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reopen shift",
+     "operation": "reopenShift"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason",
+      "supervisorStepUp"
+     ]
+    },
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/reopen"
+   },
+   {
+    "id": "formResumeShift",
+    "component": "modal",
+    "trigger": "Resume shift",
+    "body": "**Collects what `resumeShift` sends before it is called.** Required: `recordedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Resume shift",
+     "operation": "resumeShift"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recordedAt"
+     ]
+    },
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/resume"
    }
   ],
   "states": {
    "loading": "The shift list.",
    "error": "Could not load. Names which read failed and leaves the shift untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
-   "emptyNoResults": "The filter narrowed it and the shift are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoResults": "Nothing matches the filter on workstationId, status, openedFrom, openedTo and the shift are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -3450,6 +4542,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "NaturalLanguageAnswer"
  },
+ "assessProductChange": {
+  "method": "POST",
+  "path": "/products/{productId}/change-impact",
+  "contract": "catalogue",
+  "summary": "What a change would touch, before making it",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductChangeImpact"
+ },
  "capturePayment": {
   "method": "POST",
   "path": "/payments/{paymentId}/capture",
@@ -3468,6 +4579,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "Payment"
+ },
+ "cloneProduct": {
+  "method": "POST",
+  "path": "/products/{productId}/clone",
+  "contract": "catalogue",
+  "summary": "Copy a product as a new draft",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Product"
  },
  "closeDepositBoxes": {
   "method": "POST",
@@ -3494,7 +4624,7 @@ Method, path, parameters, request and response for every operation these screens
   "contract": "shift",
   "summary": "Blind close-out",
   "permission": "SHIFT_CLOSE",
-  "offlineCapable": true,
+  "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
   "parameters": [
@@ -3525,6 +4655,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "CreateCashMovementRequest",
   "responds": "CashMovement"
+ },
+ "createGroupBooking": {
+  "method": "POST",
+  "path": "/group-bookings",
+  "contract": "orders",
+  "summary": "Turn an order into a group booking",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateGroupBookingRequest",
+  "responds": "GroupBooking"
  },
  "createOrder": {
   "method": "POST",
@@ -3676,7 +4825,7 @@ Method, path, parameters, request and response for every operation these screens
   "method": "GET",
   "path": "/reports/financial",
   "contract": "finance",
-  "summary": "P&L, balance sheet or cash flow",
+  "summary": "Financial statements, revenue and tax summaries",
   "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -3710,6 +4859,19 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "FinancialReport"
+ },
+ "getGroupBooking": {
+  "method": "GET",
+  "path": "/group-bookings/{groupBookingId}",
+  "contract": "orders",
+  "summary": "A group, its leader and its name-capture duty",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GroupBooking"
  },
  "getMediaAsset": {
   "method": "GET",
@@ -3907,7 +5069,54 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "CashMovement"
+  "responds": "Page"
+ },
+ "listConsentQuestions": {
+  "method": "GET",
+  "path": "/consent-questions",
+  "contract": "marketing-crm",
+  "summary": "The consent questions a venue asks at booking",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listCredentialReplacementReissue": {
+  "method": "GET",
+  "path": "/credential-replacement-reissue",
+  "contract": "access",
+  "summary": "Credential Replacement, Reissue, Revocation & Recovery",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CredentialReplacementReissueRevocationRecoveryView"
  },
  "listOrderRefunds": {
   "method": "GET",
@@ -3931,7 +5140,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Refund"
+  "responds": "Page"
  },
  "listOrders": {
   "method": "GET",
@@ -4011,6 +5220,19 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
+ "listProductVersions": {
+  "method": "GET",
+  "path": "/products/{productId}/versions",
+  "contract": "catalogue",
+  "summary": "What this product used to be",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ProductVersion"
+ },
  "listReports": {
   "method": "GET",
   "path": "/reports",
@@ -4085,6 +5307,11 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    },
    {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": "status",
     "in": "query",
     "required": null
@@ -4147,6 +5374,19 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
+ "listTicketReissueFulfillment": {
+  "method": "GET",
+  "path": "/ticket-reissue-fulfillment",
+  "contract": "orders",
+  "summary": "Ticket Reissue & Fulfillment Regeneration",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TicketReissueFulfillmentRegenerationView"
+ },
  "modifyOrder": {
   "method": "POST",
   "path": "/orders/{orderId}/modify",
@@ -4172,7 +5412,7 @@ Method, path, parameters, request and response for every operation these screens
   "contract": "shift",
   "summary": "Open a shift",
   "permission": "SHIFT_OPEN",
-  "offlineCapable": true,
+  "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
   "parameters": [
@@ -4189,8 +5429,8 @@ Method, path, parameters, request and response for every operation these screens
   "method": "POST",
   "path": "/shifts/{shiftId}/no-sale",
   "contract": "shift",
-  "summary": "Open the drawer without a sale",
-  "permission": "SHIFT_SUSPEND",
+  "summary": "Open the Deposit Box without a sale",
+  "permission": "CASH_NO_SALE",
   "offlineCapable": true,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
@@ -4299,6 +5539,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "SettlementException"
  },
+ "restoreProductVersion": {
+  "method": "POST",
+  "path": "/products/{productId}/versions/{version}/restore",
+  "contract": "catalogue",
+  "summary": "Put a previous version back",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Product"
+ },
  "resumeOrder": {
   "method": "POST",
   "path": "/orders/{orderId}/resume",
@@ -4375,6 +5634,65 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "ReportDefinition"
  },
+ "searchMedia": {
+  "method": "GET",
+  "path": "/media",
+  "contract": "assets",
+  "summary": "Search the asset library",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "tag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "collectionId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "unusedOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "rightsExpiringWithinDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "setProductAttributes": {
   "method": "PUT",
   "path": "/products/{productId}/attributes",
@@ -4432,6 +5750,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Shift"
  },
+ "updateGroupBooking": {
+  "method": "PATCH",
+  "path": "/group-bookings/{groupBookingId}",
+  "contract": "orders",
+  "summary": "Confirm numbers, change the leader or cancel a group",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "UpdateGroupBookingRequest",
+  "responds": "GroupBooking"
+ },
  "updateProduct": {
   "method": "PATCH",
   "path": "/products/{productId}",
@@ -4450,6 +5787,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "UpdateProductRequest",
   "responds": "Product"
+ },
+ "updateProductVariant": {
+  "method": "PATCH",
+  "path": "/products/{productId}/variants/{variantId}",
+  "contract": "catalogue",
+  "summary": "Describe a variant",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductVariant"
  },
  "updateReport": {
   "method": "PUT",
@@ -4509,7 +5865,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID of the new order this creates, and its idempotency key — it must equal the `Idempotency-Key` header."
    },
    "lines": {
     "type": "array",
@@ -4584,7 +5941,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "addedEntitlementIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    }
   }
@@ -4604,7 +5962,28 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "properties": {
      "shiftId": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     },
+     "depositBoxId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "The box the cash moved in or out of. Set on every lift `withdrawFromDepositBox` records (26 September, pull audit R099).\n"
+     },
+     "witnessPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "The cashier who countersigned a withdrawal. Null on other movements."
+     },
+     "withdrawalReason": {
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/WithdrawalReason"
+       }
+      ],
+      "nullable": true
      },
      "authorisedByPrincipalId": {
       "type": "string",
@@ -4630,7 +6009,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "openingFloat",
    "lift",
    "add"
-  ]
+  ],
+  "description": "`openingFloat` is written by `openShift`; `lift` by `createCashMovement` and by `withdrawFromDepositBox`, which is a lift from one cashier's box; `add` by `createCashMovement`.\n"
  },
  "Channel": {
   "type": "string",
@@ -4652,7 +6032,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "countedCash": {
-    "$ref": "#/components/schemas/DenominationCount"
+    "type": "array",
+    "minItems": 1,
+    "description": "**The cashier's blind count, one line per denomination counted** (decided 29 September, readiness close-out; our build plan). The server writes each line as one `CashCountLine` (`countKind` close) against the shift, taking the face value from `platform.denomination`. A denomination may appear once; a repeat is refused with 422 `duplicate-denomination`.\n",
+    "items": {
+     "$ref": "#/components/schemas/CountedDenominationLine"
+    }
    },
    "nonCashDeclared": {
     "type": "array",
@@ -4688,6 +6073,36 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "CountedDenominationLine": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; lands as `CashCountLine` rows",
+  "description": "**One line of a cash count as the cashier types it: which note or coin, how many, and what they come to** (decided 29 September, readiness close-out; our build plan). The shape of the blind count on close (`closeShift`) and of the count columns on the till screens (POS-007, POS-011). It is the request side of `CashCountLine`, which is the stored row and adds the shift, the count kind, who counted and when.\n**`total` is shown to the cashier and checked, not trusted**: the server recomputes `count` times the denomination's face value and refuses a line whose `total` disagrees with 422 `count-total-mismatch`. An inactive or unknown denomination is refused with 422 `unknown-denomination`.\n",
+  "required": [
+   "denominationId",
+   "count"
+  ],
+  "properties": {
+   "denominationId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "References `platform.denomination` (`Denomination.id`) — face value, kind and counting order live there."
+   },
+   "count": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100000,
+    "description": "**How many of this note or coin were counted.** Zero is a line, not an omission: a denomination counted and found empty."
+   },
+   "total": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "`count` times the face value, in the denomination's currency. Optional on the way in (the server computes it) and checked when sent.\n"
+   }
+  }
+ },
  "CreateCashMovementRequest": {
   "type": "object",
   "required": [
@@ -4709,7 +6124,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "denominations": {
-    "$ref": "#/components/schemas/DenominationCount"
+    "$ref": "#/components/schemas/DenominationCount",
+    "x-ticvai-persisted": false,
+    "description": "**Stored as `orders.cash_count_line` rows** with `countKind: movement` and this movement's `cashMovementId`, not as a column. The jsonb blob this used to land in is what `Denomination` was created to replace (26 September, pull audit R099).\n"
    },
    "reference": {
     "type": "string",
@@ -4726,6 +6143,96 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "CreateGroupBookingRequest": {
+  "type": "object",
+  "description": "Request only. Persisted as `GroupBooking`.",
+  "required": [
+   "orderId",
+   "leaderSubjectId",
+   "expectedSize"
+  ],
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "general",
+     "school",
+     "corporate",
+     "party"
+    ],
+    "default": "general"
+   },
+   "packageProductId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The school-trip format or party package."
+   },
+   "yearGroup": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "accessAndDietaryNeeds": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "celebrantName": {
+    "type": "string",
+    "maxLength": 120,
+    "nullable": true,
+    "description": "The birthday child."
+   },
+   "celebrantTurningAge": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 18,
+    "nullable": true
+   },
+   "allergiesAndRequests": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "finalHeadcountDueBy": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "leaderSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The person who pays, is called if the coach is late, and collects the names."
+   },
+   "organisationName": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "expectedSize": {
+    "type": "integer",
+    "minimum": 2
+   },
+   "minimumSize": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true
+   },
+   "attendeeCaptureRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "attendeeCaptureDueBy": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
  "CreateOrderLine": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -4738,7 +6245,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID of the line. `lineIds` everywhere in this contract are these."
    },
    "variantId": {
     "type": "string",
@@ -4748,21 +6256,73 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid"
    },
+   "bookedWindow": {
+    "$ref": "#/components/schemas/BookedWindow"
+   },
    "inventoryHoldId": {
     "type": "string",
     "nullable": true,
-    "description": "Lease the units were drawn from. Absent for uncontended products."
+    "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products."
    },
    "seatIds": {
     "type": "array",
+    "maxItems": 50,
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     },
-    "description": "Seated products only. Not available offline."
+    "description": "Seated products only, as `seating.Seat.id`. Not available offline. **At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel** (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); **at most 10 per sale on staff and POS** (audit R080 (c)), across all the lines of one order for one performance. `createOrder` refuses more with 422 `seatLimitExceeded` (problem type `seat-limit-exceeded`)."
+   },
+   "resourceHoldId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant. `createOrder` converts the hold into a `ResourceBooking` without releasing it. Not available offline."
+   },
+   "attributes": {
+    "$ref": "#/components/schemas/OrderLineAttributes"
    },
    "quantity": {
     "type": "integer",
     "minimum": 1
+   },
+   "eligibilityDeclaration": {
+    "type": "array",
+    "nullable": true,
+    "x-ticvai-note": "One row per declared guest in `orders.order_line_eligibility` (named on `OrderLine`), because an array of objects is a child table's rows, not a column.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "ageBand": {
+       "type": "string",
+       "enum": [
+        "infant",
+        "child",
+        "junior",
+        "adult",
+        "senior"
+       ],
+       "description": "Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+."
+      },
+      "ageYears": {
+       "type": "integer",
+       "nullable": true
+      },
+      "heightBandIndex": {
+       "type": "integer",
+       "nullable": true
+      },
+      "confidentSwimmer": {
+       "type": "boolean",
+       "nullable": true,
+       "description": "**Derived, kept for the gate check** (decided 29 September, rev 3 REV3-26). The swim question is a consent: the answer is a `marketing.BookingConsentRecord` of kind `swim`, and this is filled from it (true for a `yes` covering this person, whether answered for them or once for the booking). A value sent that contradicts the record is ignored and the record wins. No longer the place a swim answer is captured.\n"
+      },
+      "guardianSigned": {
+       "type": "boolean"
+      }
+     }
+    },
+    "description": "What was declared for each guest on this line, kept as the record staff check at the gate."
    },
    "quotedUnitPrice": {
     "allOf": [
@@ -4778,7 +6338,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "dataMaskValues": {
     "type": "object",
-    "additionalProperties": true
+    "additionalProperties": true,
+    "description": "**Deliberately open.** Custom fields keyed by the venue's data mask: the field definitions travel in the catalogue bundle (`catalogue.CatalogueBundle.payload`), so the keys are the venue's to define, as on `catalogue`'s own `dataMaskValues`.\n"
    }
   }
  },
@@ -4795,7 +6356,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "id": {
     "type": "string",
     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID. Also the idempotency key."
+    "description": "Client-generated ULID. Also the idempotency key: it must equal the `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in `shared/common.yaml`. Offline replay through `syncOrders` carries no header, and this id alone deduplicates there.\n"
    },
    "venueId": {
     "type": "string",
@@ -4805,7 +6366,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "$ref": "#/components/schemas/Channel"
    },
    "shiftId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "subjectId": {
     "type": "string",
@@ -4847,10 +6409,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID of the payment, and its idempotency key — it must equal the `Idempotency-Key` header."
    },
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -4858,13 +6422,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
-   "tenderedAmount": {
+   "tenderCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "description": "The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency."
+   },
+   "tenderAmount": {
     "allOf": [
      {
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "Cash only. Change is the difference."
+    "description": "**What the guest handed over**, in `tenderCurrency` — becomes `Payment.tenderAmount`, one name for one concept (renamed from `tenderedAmount` on 26 September). For cash, change is the difference.\n"
    },
    "walletAuthorisationId": {
     "type": "string",
@@ -4893,12 +6463,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID of the refund, and its idempotency key — it must equal the `Idempotency-Key` header."
    },
    "lineIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     },
     "description": "Omit to refund the whole order."
    },
@@ -4924,7 +6496,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "credential": {
       "type": "string",
-      "maxLength": 512
+      "maxLength": 512,
+      "description": "The second person's staff PIN, as they sign in at a till with it. **A PIN, never a password** (decided 28 September, audit R123 (7))."
      }
     }
    },
@@ -4992,15 +6565,76 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     }
    },
    "requiredPermission": {
-    "type": "string",
-    "description": "Permission needed to run this report. **The author cannot assign one they do not hold** — otherwise a venue user could build themselves a tenant-wide view.\n"
+    "$ref": "../shared/permissions.yaml#/components/schemas/Permission",
+    "description": "Permission needed to run this report, from the shared `Permission` vocabulary. **The author cannot assign one they do not hold** — otherwise a venue user could build themselves a tenant-wide view.\n"
    },
    "maxDateRangeDays": {
     "type": "integer",
     "nullable": true,
-    "description": "Guards against a query spanning years of scan events."
+    "minimum": 1,
+    "default": 366,
+    "description": "Guards against a query spanning years of scan events. **When a report sets none, 366 days applies (decided 28 September, audit R158)**, so `runReport`'s date-range 400 always has a limit."
    }
   }
+ },
+ "CredentialReplacementReissueRevocationRecoveryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Credential Replacement, Reissue, Revocation & Recovery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "reason": {
+    "type": "string",
+    "enum": [
+     "lost",
+     "stolen",
+     "damaged",
+     "compromised",
+     "customerChangedPhone",
+     "rfidFailure",
+     "wristbandReplacement",
+     "qrCompromise",
+     "walletReplacement",
+     "faceReEnrollment",
+     "incorrectAssignment"
+    ],
+    "description": "Replacement reason this policy covers"
+   },
+   "immediateOldMediaRevocation": {
+    "type": "boolean",
+    "description": "Immediate old-media revocation"
+   },
+   "gracePeriod": {
+    "type": "string",
+    "description": "ISO 8601 duration, e.g. PT30M"
+   },
+   "maximumReplacements": {
+    "type": "integer",
+    "description": "Maximum replacements"
+   },
+   "identityVerification": {
+    "type": "boolean",
+    "description": "Identity verification"
+   },
+   "supervisorApproval": {
+    "type": "boolean",
+    "description": "Supervisor approval"
+   },
+   "reasonCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Reason codes"
+   },
+   "recoveryAllowed": {
+    "type": "boolean",
+    "description": "A suspended credential may be restored under this policy"
+   }
+  },
+  "required": [
+   "reason"
+  ]
  },
  "DataSource": {
   "type": "string",
@@ -5095,7 +6729,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "orderId": {
     "type": "string",
-    "format": "uuid",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "bookingId": {
@@ -5122,8 +6756,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "DepositBox": {
   "type": "object",
-  "x-ticvai-persistence": "orders.deposit_box",
-  "description": "5.8. **Allocated to a cashier, not to a workstation.** A cashier moving between tills takes their float with them, which is what makes a variance attributable to a person.\n",
+  "x-ticvai-persistence": "orders.deposit_box + orders.deposit_box_opening_denomination + orders.deposit_box_foreign_holding",
+  "description": "5.8. **Allocated to a cashier, not to a workstation.** A cashier moving between tills takes their float with them, which is what makes a variance attributable to a person.\n**`openingDenominations` and `foreignHoldings` are child rows** (26 September, pull audit R099): `orders.deposit_box_opening_denomination` and `orders.deposit_box_foreign_holding`, one row per item, keyed to the box. Until then the contract carried both and the table had nowhere to put either.\n",
   "required": [
    "cashierPrincipalId",
    "venueId",
@@ -5155,8 +6789,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "shiftId": {
     "type": "string",
-    "format": "uuid",
-    "nullable": true
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The shift trading from this box. A ULID, as `Shift.id` is."
    },
    "status": {
     "$ref": "#/components/schemas/DepositBoxStatus"
@@ -5169,12 +6804,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "5.8.3. **Either this or a total** — a supervisor handing over a counted bag should not have to re-count it into fields. POS-001 offered only denominations until 14 August.\n",
     "items": {
      "type": "object",
+     "required": [
+      "denominationId",
+      "count"
+     ],
      "properties": {
-      "denomination": {
-       "type": "number"
+      "denominationId": {
+       "type": "string",
+       "format": "uuid",
+       "description": "References `platform.denomination`, as `CashCountLine.denominationId` does. Until 26 September this was `denomination: number` — a face value as a JSON float, which naming-and-style 5.1 forbids and which could disagree with the note it named (pull audit R122).\n"
       },
       "count": {
-       "type": "integer"
+       "type": "integer",
+       "minimum": 0
       }
      }
     }
@@ -5201,8 +6843,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "currency": {
        "type": "string",
        "pattern": "^[A-Z]{3}$",
-       "x-ticvai-persisted": false,
-       "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
+       "description": "**Stored, because it is the one thing that is not the region's.** A foreign holding is by definition cash in a currency the till does not trade in, so it cannot resolve from the region (ADR-0018) the way the box's own amounts do; it is the key of the row, one per currency per box. The amounts on this item are in this currency.\n"
       },
       "expectedAmount": {
        "allOf": [
@@ -5246,7 +6887,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "allocatedAt": {
     "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "description": "When the device recorded the allocation. `allocateDepositBox` is offline-capable, so for a box allocated offline this differs from the server's receipt time.\n"
    },
    "closedAt": {
     "type": "string",
@@ -5289,13 +6931,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID of this exchange, and its idempotency key — it must equal the `Idempotency-Key` header."
    },
    "outgoingLineIds": {
     "type": "array",
     "minItems": 1,
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    },
    "incomingLines": {
@@ -5318,6 +6962,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "date-time"
    }
   }
+ },
+ "ExchangeRateDecimal": {
+  "type": "string",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,6)",
+  "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n",
+  "pattern": "^\\d+(\\.\\d{1,6})?$"
  },
  "FieldType": {
   "type": "string",
@@ -5345,7 +6996,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "report": {
-    "type": "string"
+    "$ref": "#/components/schemas/FinancialReportKind"
    },
    "fiscalPeriodId": {
     "type": "string",
@@ -5396,7 +7047,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
           "$ref": "../shared/common.yaml#/components/schemas/Money"
          },
          "priorPeriodAmount": {
-          "$ref": "../shared/common.yaml#/components/schemas/Money"
+          "allOf": [
+           {
+            "$ref": "../shared/common.yaml#/components/schemas/Money"
+           }
+          ],
+          "description": "The same line for **the same period last year** (decided 28 September, audit R127 (3)). Absent where that period did not exist."
          }
         }
        }
@@ -5407,6 +7063,190 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      }
     }
    }
+  }
+ },
+ "FinancialReportKind": {
+  "type": "string",
+  "description": "The report `getFinancialReport` returns. One vocabulary for the query and the response.",
+  "enum": [
+   "profitAndLoss",
+   "balanceSheet",
+   "cashFlow",
+   "revenueByVenue",
+   "revenueByProduct",
+   "taxSummary"
+  ]
+ },
+ "GeneratedQuery": {
+  "x-ticvai-persistence": "none — embedded; stored whole in `reporting.natural_language_query`",
+  "type": "object",
+  "description": "The structured query a natural-language question produced — data source, columns, filters, grouping. Named on 26 September so the answer and the kept copy are one shape.\n",
+  "properties": {
+   "dataSource": {
+    "$ref": "#/components/schemas/DataSource"
+   },
+   "columns": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ReportColumn"
+    }
+   },
+   "filters": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ReportFilter"
+    }
+   },
+   "groupBy": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "GroupBooking": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.group_booking",
+  "description": "BL-028. **`BO-026 Group Bookings` ran on generic order operations** — no group size, no quota, no leader, no per-attendee capture.\n**The leader is the point.** A school booking forty places has one person who pays, one who is called if the coach is late, and forty who need names collecting — and a generic order has one guest.\n",
+  "required": [
+   "id",
+   "orderId",
+   "leaderSubjectId",
+   "expectedSize",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "general",
+     "school",
+     "corporate",
+     "party"
+    ],
+    "default": "general"
+   },
+   "packageProductId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The school-trip format or party package."
+   },
+   "yearGroup": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "accessAndDietaryNeeds": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "celebrantName": {
+    "type": "string",
+    "maxLength": 120,
+    "nullable": true,
+    "description": "The birthday child."
+   },
+   "celebrantTurningAge": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 18,
+    "nullable": true
+   },
+   "allergiesAndRequests": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "finalHeadcountDueBy": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "quoteSentAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "riskAssessmentSentAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "preferredDate": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "The date the guest asked for on `requestGroupBooking` — what its `409 dateUnavailable` is checked against. Null for a group a member of staff built from an order."
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "leaderSubjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "organisationName": {
+    "type": "string",
+    "nullable": true
+   },
+   "expectedSize": {
+    "type": "integer"
+   },
+   "confirmedSize": {
+    "type": "integer",
+    "nullable": true
+   },
+   "minimumSize": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**Below which the group rate does not apply.** A booking for forty that arrives as twelve is a pricing question somebody has to answer at the gate, and stating the threshold means answering it at booking instead.\n"
+   },
+   "attendeeCaptureRequired": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Whether names are needed before admission.** A school trip usually needs them and a corporate day out usually does not, and the difference is a safeguarding requirement rather than a preference.\n"
+   },
+   "attendeeCaptureDueBy": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "provisional",
+     "confirmed",
+     "namesPending",
+     "complete",
+     "cancelled"
+    ]
+   }
+  }
+ },
+ "GuestListing": {
+  "type": "string",
+  "enum": [
+   "bookable",
+   "infoOnly",
+   "hidden"
+  ],
+  "default": "bookable",
+  "description": "**How a product appears to a guest** (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to the basket. `infoOnly`: listed and searched with its details, photo and `notBookableLabel` whether or not it is on sale, and **never added to a basket** (`addCartLine` refuses it with `409`); the screen opens its details instead. `hidden`: never listed or searched for a guest, and reachable only where a staff channel sells it. Independent of `isSellable`, which says whether a channel may sell it at all.\n"
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
   }
  },
  "ManualDiscountRequest": {
@@ -5420,10 +7260,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID of this discount, and its idempotency key — it must equal the `Idempotency-Key` header."
    },
    "lineId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true,
     "description": "Omit to discount the order rather than a line."
    },
@@ -5493,6 +7335,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "title": {
     "$ref": "#/components/schemas/LocalisedText"
+   },
+   "description": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"
    },
    "altText": {
     "allOf": [
@@ -5692,7 +7542,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "type": "object",
      "properties": {
       "entitlementId": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
       },
       "name": {
        "type": "string"
@@ -5711,7 +7562,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        ]
       },
       "orderId": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
       },
       "addedAt": {
        "type": "string",
@@ -5779,11 +7631,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "MediaUsage": {
   "x-ticvai-persistence": "assets.media_usage",
   "type": "object",
+  "description": "One place an asset is used. **`surface: product` is written by catalogue** for each item of `Product.media` (decided 29 September, rev 3 23SEP-4): `referenceId` is the product id and `isLive` is true while the product is listed to guests, which is what stops an asset in use on a ticket card being archived from under it.\n",
   "required": [
    "surface",
    "referenceId"
   ],
   "properties": {
+   "extractedText": {
+    "type": "string",
+    "description": "**Text pulled out of an uploaded document**, after extraction. The generic retrieval path for anything a tenant uploads — a PDF nobody can search is a PDF nobody reads.\n"
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -5828,7 +7685,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID **of this modification, not of the order** — the order is the path's `orderId`. It is the modification's idempotency key and must equal the `Idempotency-Key` header.\n"
    },
    "addLines": {
     "type": "array",
@@ -5839,7 +7697,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "removeLineIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    },
    "reason": {
@@ -5874,31 +7733,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "What the question was understood to mean, in plain language."
    },
    "generatedQuery": {
-    "type": "object",
-    "description": "The structured query produced — data source, columns, filters, grouping. Returned so the answer can be checked. An answer nobody can verify is worse than no answer.\n",
-    "properties": {
-     "dataSource": {
-      "$ref": "#/components/schemas/DataSource"
-     },
-     "columns": {
-      "type": "array",
-      "items": {
-       "$ref": "#/components/schemas/ReportColumn"
-      }
-     },
-     "filters": {
-      "type": "array",
-      "items": {
-       "$ref": "#/components/schemas/ReportFilter"
-      }
-     },
-     "groupBy": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      }
-     }
-    }
+    "$ref": "#/components/schemas/GeneratedQuery",
+    "description": "The structured query produced — data source, columns, filters, grouping. Returned so the answer can be checked. An answer nobody can verify is worse than no answer. **Also kept, as `NaturalLanguageQuery`**, for `saveNaturalLanguageQuery`.\n"
    },
    "result": {
     "$ref": "#/components/schemas/ReportResult"
@@ -5934,10 +7770,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "shiftId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "workstationId": {
     "type": "string",
@@ -5991,7 +7829,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "recordedAt": {
     "type": "string",
     "format": "date-time",
-    "description": "When the device recorded it. Differs from server receipt time for shifts opened offline.\n"
+    "description": "When the device recorded it. `openShift` is online-only (F32), so this differs from server receipt time only by transit; it is kept because the shift's other device writes are ordered against it.\n"
    }
   }
  },
@@ -6015,10 +7853,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The client ULID from `CreateOrderRequest.id`."
    },
    "orderNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "The number a guest reads and a cashier types. **Server-assigned: the venue prefix and a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till holds a reserved range of the venue sequence, so an order taken offline gets its number on the till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap, and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this number.\n"
    },
    "channel": {
     "allOf": [
@@ -6063,6 +7905,33 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "refundedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
+   "droppedPromotions": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Promotions left off this order at checkout because their budget cap would have been exceeded** (decided 28 September, audit R101 (8)). Empty when none was dropped. Returned by `checkoutCart` and `createOrder`, not stored.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "promotionId"
+     ],
+     "properties": {
+      "promotionId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "budgetCapReached"
+       ]
+      }
+     }
+    }
+   },
    "totalPriceVariance": {
     "allOf": [
      {
@@ -6093,12 +7962,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "shiftId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "subjectId": {
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "holdLabel": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `label` a cashier gave when parking it with `holdOrder` — how they find it again. Null on an order never held."
+   },
+   "heldUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."
    },
    "createdAt": {
     "type": "string",
@@ -6140,7 +8024,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "outgoingValue": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -6162,25 +8047,28 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "newLineIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    },
    "revokedEntitlementIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    },
    "issuedEntitlementIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    }
   }
  },
  "OrderLine": {
-  "x-ticvai-persistence": "orders.order_line",
+  "x-ticvai-persistence": "orders.order_line + orders.order_line_eligibility",
   "allOf": [
    {
     "$ref": "#/components/schemas/CreateOrderLine"
@@ -6221,8 +8109,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "entitlementIds": {
       "type": "array",
+      "description": "The entitlements this line issued. **These are the ticket ids** — `transferOrderTickets.ticketIds` and `reprintOrder.reissuedTicketIds` take and return them.",
       "items": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
       }
      },
      "crossRegionRightIds": {
@@ -6231,6 +8121,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        "type": "string"
       },
       "description": "Redemption rights propagated to other cells for this line."
+     },
+     "reprintCount": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0,
+      "readOnly": true,
+      "description": "How many times this line's tickets were reprinted or resent. `reprintOrder` increments it; repeated reprints are the signal worth surfacing."
      }
     }
    }
@@ -6263,18 +8160,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "refundId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "revokedEntitlementIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    },
    "issuedEntitlementIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    }
   }
@@ -6311,7 +8211,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        ]
       },
       "lineId": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
       },
       "detail": {
        "type": "string"
@@ -6339,7 +8240,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "orderNumber": {
     "type": "string"
@@ -6469,10 +8371,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -6491,7 +8395,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "The amount in `tenderCurrency`, at that currency's own scale."
    },
    "fxRate": {
-    "type": "number",
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
     "nullable": true,
     "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
    },
@@ -6575,6 +8483,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "maxLength": 64
    },
+   "familyKey": {
+    "type": "string",
+    "maxLength": 64,
+    "pattern": "^[A-Za-z0-9_-]+$",
+    "nullable": true,
+    "x-ticvai-unique": "venue",
+    "description": "**The same product at another location** (decided 29 September, rev 3 REV3-18). Optional. A tenant that sells one attraction at several venues gives each venue's product the same key, e.g. `aquarium-entry`; the key names the family across the tenant and each venue has at most one product in it, so a second product at the same venue with the key is refused with `409 duplicate-code`. **What it is for:** when a guest changes location on the booking screen (the 'Booking at' switcher, `BookingFlowConfig.locationSwitcher`), lines whose product shares a `familyKey` with a product at the new venue are carried over to that product, with times and prices refreshed; every other line is cleared. Null means the product belongs to no family and its lines always clear on a switch. Compared case-insensitively, like `code`.\n"
+   },
    "name": {
     "type": "string",
     "maxLength": 200
@@ -6622,12 +8538,24 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true,
     "description": "Retires the product automatically. **Retirement is not deletion** — the product stops selling and every order that referenced it still resolves.\n"
    },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Taken from their `fnb.product` and `retail.product`, 20 September.** `catalogue.product_category` has existed since 20 August with two operations and nothing could be filed under it — a merchandise hierarchy with a tree and no leaves. Their per-domain product tables both carried this column and ours did not.\n"
+   },
    "lifecycleState": {
     "$ref": "#/components/schemas/ProductLifecycleState"
    },
    "isSellable": {
     "type": "boolean",
-    "description": "True only when live **and** carried by a published bundle. Approval and publication are different acts.\n"
+    "readOnly": true,
+    "description": "True only when live **and** carried by a published bundle. Approval and publication are different acts.\n**Derived, never set.** It changes when `transitionProductLifecycle` moves the product and when `publishBundle` carries it, so `updateProduct` does not take it — `withdraw` is how a product stops selling.\n"
+   },
+   "isStockTracked": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Taken from their `fnb.product`, 20 September.** Whether a sale decrements stock, which is not what `isSellable` asks. A ticket is sellable and tracks no stock; a bottle of water is both. Without it, an F&B sale cannot tell inventory whether to move.\n"
    },
    "hasVariants": {
     "type": "boolean"
@@ -6637,7 +8565,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "segmentTags": {
     "type": "array",
-    "description": "7.3.5. **A channel and a segment tag are mandatory and nothing required either.** A catalogue that cannot be filtered by segment is a catalogue nobody can report on.\n**Hierarchical, not flat** — `family/with-toddlers` narrows `family` without duplicating it, which is how the promotions engine already treats scope.\n",
+    "description": "7.3.5. **A channel and a segment tag are mandatory and nothing required either.** A catalogue that cannot be filtered by segment is a catalogue nobody can report on.\n**Hierarchical, not flat** — `family/with-toddlers` narrows `family` without duplicating it, which is how the promotions engine already treats scope.\n**A level is a tag under `level/`** (decided 29 September, rev 3 REV3-19): `level/beginner`, `level/intermediate`, `level/advanced`, `level/expert` (proposed codes, client to correct). A guest screen filters on it with `listProducts` `segmentTag`, and the words a guest reads beside each option come from `ProductCategory.description`, not from the tag.\n",
     "items": {
      "type": "string"
     }
@@ -6667,12 +8595,127 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "object",
     "additionalProperties": true,
     "description": "Custom fields. JSONB-backed, defined by the venue's data mask."
+   },
+   "guestListing": {
+    "$ref": "#/components/schemas/GuestListing"
+   },
+   "notBookableLabel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "The label a guest reads on an `infoOnly` product, e.g. *Info only* or *Not bookable online; ask at the desk* (decided 29 September, rev 3 REV3-14). Each value at most 60 characters. Null means the guest screen shows its default wording. Ignored unless `guestListing` is `infoOnly`.\n"
+   },
+   "displayTags": {
+    "type": "array",
+    "maxItems": 6,
+    "items": {
+     "$ref": "#/components/schemas/ProductDisplayTag"
+    },
+    "description": "**Short facts a guest reads on the ticket card and under *Read more***: *2 Hours*, *Min 1.10 m*, *Free adult entry*, *Valid 90 days*, *Emirates ID* (decided 29 September, 23SEP-3). Not `segmentTags`, which are for reporting and segmentation and which a guest never reads.\n**Derived on read when none are set.** When the venue has written no tags, a read returns tags derived from the product's duration (`clock`), entitlement validity (`calendar`) and the eligibility rule's `minHeightCm` (`height`), each marked `derived: true`; they are never stored. Once the venue writes any tag, only what it wrote is returned. Whether the guest screen shows them is `BookingFlowConfig.ticketTags` (white-label).\n"
+   },
+   "media": {
+    "type": "array",
+    "maxItems": 20,
+    "items": {
+     "$ref": "#/components/schemas/ProductMedia"
+    },
+    "description": "**The product's own photos and video** (decided 29 September, 23SEP-4). *Read more* opens on the `isPrimary` item, and a listing shows each product's primary image, so two tickets in one category no longer share the category's picture (`ProductCategory.imageAssetId`).\nEvery `assetId` names an asset of the asset library (`assets.yaml` `MediaAsset`) in status `ready` whose kind matches `kind`; anything else is a `422`. **Exactly one item is `isPrimary`** when the list is not empty, and an `assetId` appears once; otherwise `400`. Setting the list records each reference as asset usage (`MediaUsage` with `surface: product`, `referenceId` the product id, `isLive` true while the product is listed to guests), which is what stops a used asset being archived from under the product.\n"
+   },
+   "consentQuestionIds": {
+    "type": "array",
+    "maxItems": 10,
+    "uniqueItems": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "**The consent questions a guest answers when booking this product**, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*. Each id names a consent question defined in marketing-crm (`ConsentQuestion`), which owns the text, its version and whether it is asked per person or once per booking; the answer is stored there as a consent record (question version, answer, who answered, when). **One question or several, as the venue chooses.** A flow can carry its own list too (`white-label.BookingFlowConfig.consentQuestionIds`, per venue through `venueOverrides`); a booking asks the union of the flow's questions and those of every product in the cart, each question once (`orders.Cart.consentQuestions`). An id that names no active consent question of the tenant is a `422`.\n"
+   },
+   "requiresTimeWindow": {
+    "type": "boolean",
+    "default": false,
+    "description": "**True for a space sold by the hour**, e.g. a meeting room type (decided 29 September, rev 3 REV3-13). The product is the room type (*focus pod*, *majlis*, *boardroom*, *auditorium*), never a named room; its lengths are a `length` axis (`setProductAttributes`) whose values carry `durationMinutes`, and each length is a variant priced on its own in the price list, so price is the room rate for that length. The cart line carries the booked start and end (orders), the end being the start plus the chosen variant's `durationMinutes`; `resources.listProductStartTimes` supplies the start times for a variant and a date and `allocateResources` picks the room from the product's resource requirements (`setExperienceResourceRequirements`) at checkout. True requires every active variant to have a `durationMinutes`; otherwise `422`.\n"
+   }
+  }
+ },
+ "ProductChangeImpact": {
+  "type": "object",
+  "description": "1.4.4 and 1.4.16. What a proposed change would touch. **Modelled on `PerformanceCancellationResult`**, which does this for a cancellation.\n",
+  "required": [
+   "entitlementsIssued",
+   "ordersAffected",
+   "propagates"
+  ],
+  "properties": {
+   "entitlementsIssued": {
+    "type": "integer",
+    "description": "How many live entitlements came from this product."
+   },
+   "ordersAffected": {
+    "type": "integer"
+   },
+   "futurePerformances": {
+    "type": "integer"
+   },
+   "openCarts": {
+    "type": "integer",
+    "description": "**A guest with this product in a cart while its price changes underneath them** is the case nobody thinks about until it happens.\n"
+   },
+   "propagates": {
+    "type": "boolean",
+    "description": "Whether the change reaches what has already been sold. **A name correction should; a price change must not**, and the difference is the whole reason this operation exists.\n"
+   },
+   "blockedBy": {
+    "type": "array",
+    "description": "Reasons the change would be refused outright.",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "ProductDisplayTag": {
+  "x-ticvai-persistence": "none — jsonb column on catalogue.product",
+  "type": "object",
+  "required": [
+   "kind",
+   "label"
+  ],
+  "description": "One short fact on a ticket card (decided 29 September, 23SEP-3). `kind` picks the icon.",
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "clock",
+     "height",
+     "free",
+     "calendar",
+     "id"
+    ],
+    "description": "`clock` a duration, `height` a height rule, `free` something included free, `calendar` a validity, `id` a document the guest must bring."
+   },
+   "label": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "What the guest reads, e.g. *2 Hours*. Each language value at most 40 characters."
+   },
+   "derived": {
+    "type": "boolean",
+    "readOnly": true,
+    "default": false,
+    "description": "True on a tag the server derived on read because the venue set none. Never sent."
    }
   }
  },
  "ProductKind": {
   "type": "string",
-  "description": "**`openDated` added 24 August** from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: **valid on any date within an eligible range, rather than for a named performance or a fixed date.**\nThe mechanism already existed — `access.entitlement` carries `valid_from`, `valid_to`, `entries_allowed` and `frozen_days`, which is exactly an open-dated pass. **What was missing was the product saying it is one**, so a catalogue could not offer it and a report could not count it.\n**`datedAdmission` is a different thing and the two were being conflated**: dated is *this Tuesday*, open-dated is *any Tuesday between March and June*. A guest buying the second and being sold the first has bought the wrong ticket.\n",
+  "description": "**`openDated` added 24 August** from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: **valid on any date within an eligible range, rather than for a named performance or a fixed date.**\nThe mechanism already existed — `access.entitlement` carries `valid_from`, `valid_to`, `entries_allowed` and `frozen_days`, which is exactly an open-dated pass. **What was missing was the product saying it is one**, so a catalogue could not offer it and a report could not count it.\n**`datedAdmission` is a different thing and the two were being conflated**: dated is *this Tuesday*, open-dated is *any Tuesday between March and June*. A guest buying the second and being sold the first has bought the wrong ticket.\n**Transport uses two existing kinds, not a new one** (decided 29 September, rev 3 REV3-21). A one-way trip is `timedAdmission`: `transport.createTransportRoute` creates the route's product with one variant per passenger type, and each departure is a performance. A multi-trip or unlimited pass is `openDated`: `transport.createTransportPassType` creates it, with `EntitlementTemplate.entriesAllowed` = the pass's trips (null for unlimited), the validity = `validityDays`, and `EntitlementTemplate.transportRestriction` naming the station pair the pass was bought for, so `access` refuses it on another journey. The sale path is unchanged: both are cart lines, priced by `transport.quoteTransportFare` (orders `TransportLineAttributes`).\n",
   "enum": [
    "admission",
    "timedAdmission",
@@ -6699,113 +8742,154 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "archived"
   ]
  },
- "Refund": {
-  "x-ticvai-persistence": "orders.refund",
+ "ProductMedia": {
+  "x-ticvai-persistence": "catalogue.product_media",
   "type": "object",
   "required": [
-   "id",
-   "orderId",
-   "amount",
-   "status",
-   "createdAt"
+   "assetId",
+   "kind",
+   "isPrimary"
   ],
+  "description": "One photo or video of a product, referencing the asset library (decided 29 September, 23SEP-4). One row per product and asset, so the asset library can answer which products use an asset.\n",
   "properties": {
-   "id": {
-    "type": "string"
-   },
-   "orderId": {
-    "type": "string"
-   },
-   "fxRate": {
-    "type": "number",
-    "nullable": true,
-    "readOnly": true,
-    "description": "**The rate on the original payment, not today's** (BL-087, CF-118).\n`Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the moment of sale, so the sale rate is always retrievable. **Refunding at today's rate repays a different amount of money than was taken** — a guest who paid 100 USD at 3.67 and is refunded at 3.72 gets back more AED than they gave, and the venue carries the difference on every refund.\nThe exposure runs both ways and neither direction is defensible: a guest short-changed by a moving rate has a complaint the venue cannot answer, because **the guest did nothing but wait.**\n"
-   },
-   "taxReversalEntryId": {
+   "assetId": {
     "type": "string",
     "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "description": "**A refund reverses the tax entry it created, and this is where that is stated rather than implied.** `reverseJournalEntry` and `calculateTax` both exist, so both halves were present and the obligation was assumed — **an implied obligation is one a developer can miss without failing anything.**\nNull only where the original sale carried no tax.\n"
+    "description": "A `MediaAsset` of `assets.yaml`, in status `ready`."
    },
-   "settleTo": {
+   "kind": {
     "type": "string",
     "enum": [
-     "originalTender",
-     "advanceBalance",
-     "wireTransfer",
-     "storeCredit"
-    ],
-    "default": "originalTender",
-    "description": "BL-086. **A refund could only go back the way it came.** A guest whose card has expired, a partner settling by wire, a guest who would rather have the credit — three real cases with one answer.\n**`originalTender` stays the default** because refunding elsewhere is how money laundering works, and anything else needs a reason.\n"
-   },
-   "fxVariance": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Where the sale rate and the current rate differ, **the difference is booked as an FX variance rather than hidden in the refund**. `runFxRevaluation` already handles this class of movement and this is the same act at a smaller scale.\n"
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "appliedPercentage": {
-    "type": "number",
-    "description": "From the venue's time bands, or an approver override."
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "pendingApproval",
-     "pendingGateway",
-     "completed",
-     "declined",
-     "failed"
+     "image",
+     "video"
     ]
    },
-   "reason": {
-    "type": "string"
+   "isPrimary": {
+    "type": "boolean",
+    "default": false,
+    "description": "The item *Read more* opens on and a listing shows. Exactly one per product."
    },
-   "requestedByPrincipalId": {
-    "type": "string",
-    "format": "uuid"
+   "displayOrder": {
+    "type": "integer",
+    "default": 100
    },
-   "secondaryPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "approvedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "ledgerEntryId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Written before the gateway is called."
-   },
-   "gatewayReference": {
-    "type": "string",
-    "nullable": true
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "completedAt": {
-    "type": "string",
-    "format": "date-time",
+   "altText": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
     "nullable": true
    }
   }
  },
- "RefundPolicy": {
-  "x-ticvai-persistence": "orders.refund_policy",
+ "ProductVariant": {
+  "x-ticvai-persistence": "catalogue.variant",
   "type": "object",
-  "description": "Venue-configured. Thresholds are policy, not permission scope — venues run different policies and the permission model should not encode commercial rules.\n",
+  "required": [
+   "id",
+   "productId",
+   "sku",
+   "axisValues",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sku": {
+    "type": "string"
+   },
+   "axisValues": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 150,
+    "nullable": true,
+    "description": "**Taken from their variant tables, 20 September.** `axisValues` gives `{size: L}` and no string a guest can read. A menu showing *Large* needs somewhere for the word to live.\n"
+   },
+   "barcode": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true,
+    "description": "**Taken from their variant tables, 20 September.** `catalogue.alternative_code` is a partner's own code for a variant and **requires `partnerId`**, so a manufacturer's EAN had nowhere to go. One per variant against many per variant is a different cardinality and belongs in a different place — and a POS scan should be an indexed column lookup, not a join.\n"
+   },
+   "isDefault": {
+    "type": "boolean",
+    "default": false,
+    "description": "Taken from their variant tables. Which variant a product page opens on. Ours had no way to say, so a three-size drink opened on whichever row sorted first.\n"
+   },
+   "isActive": {
+    "type": "boolean",
+    "description": "False when retired. Retired variants are never deleted — orders reference them."
+   },
+   "description": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "**Who this ticket type is for and what it includes**, shown behind the (i) on each Adult, Child, Senior or Infant row (decided 29 September, 23SEP-6). Each language value at most 300 characters; longer is a `400`. Set with `updateProductVariant`. Whether the guest screen shows it is `BookingFlowConfig.cardInfo` (white-label).\n"
+   }
+  }
+ },
+ "ProductVersion": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.product_version",
+  "description": "1.1.47, 1.4.9 to 1.4.11. **Follows `white-label.ConfigVersion`** — the same pattern for the same reason, and the fourth place this mechanism was asked for.\n",
+  "required": [
+   "version",
+   "publishedAt",
+   "publishedByPrincipalId"
+  ],
+  "properties": {
+   "version": {
+    "type": "integer"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "publishedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   },
+   "isCurrent": {
+    "type": "boolean"
+   },
+   "contentHash": {
+    "type": "string",
+    "description": "**Lets a diff be cheap and a no-op change be recognised.** Republishing an unchanged product should not create a version.\n"
+   },
+   "restoredFromVersion": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Set where this version was created by a restore. **A restore is a new version, not a rewind** — a price that was wrong for three days stays visible, because a finance query run next quarter has to reproduce what was charged.\n"
+   }
+  }
+ },
+ "RefundPolicy": {
+  "x-ticvai-persistence": "orders.refund_policy + orders.refund_policy_time_band",
+  "type": "object",
+  "description": "Venue-configured. Thresholds are policy, not permission scope — venues run different policies and the permission model should not encode commercial rules.\n**The three thresholds must ascend** (decided 28 September, audit R123 (6)): `selfAuthoriseLimit` <= `requiresSecondUserAbove` <= `requiresApprovalAbove`, where the second is set. `setRefundPolicy` refuses a policy that does not with 422 `refund-thresholds-not-ascending`.\n",
   "required": [
    "venueId",
    "selfAuthoriseLimit",
@@ -6820,7 +8904,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "venueId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The venue in the path. Not taken from a `setRefundPolicy` body."
    },
    "selfAuthoriseLimit": {
     "allOf": [
@@ -6874,7 +8960,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "refundWindowDays": {
     "type": "integer",
-    "nullable": true
+    "nullable": true,
+    "minimum": 0,
+    "description": "Days after purchase within which a refund may be made. 0 is allowed and means the day of purchase only; null means no window (decided 28 September, audit R123 (6))."
    },
    "varianceThreshold": {
     "allOf": [
@@ -6882,7 +8970,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "Price variance above this is an exception requiring review rather than a routine posting (CF-38). Venue-configured.\n"
+    "description": "Price variance above this is an exception requiring review rather than a routine posting (CF-38). Venue-configured.\n**A venue setting with a tenant default** (decided 28 September, audit R094). **Proposed default, client to correct (audit R094): AED 5.00 per order line.**\n"
    }
   }
  },
@@ -6965,11 +9053,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "format": "uuid"
      },
      "version": {
-      "type": "string"
+      "type": "string",
+      "description": "The current version. Assigned by the server on each publish; earlier ones are kept as `ReportDefinitionVersion`."
      },
      "isSystem": {
       "type": "boolean",
-      "description": "Shipped with the platform. Cannot be amended, only cloned."
+      "description": "Shipped with the platform — seeded at provisioning (BL-053, `SeededReport`). **Clone-only (decided 28 September, audit R096)**: `updateReport` and `deleteReport` refuse it with 409 `system-report`; a venue changes a copy made with `createReport`.\n"
      },
      "isRetired": {
       "type": "boolean"
@@ -7037,9 +9126,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "isNotNull"
     ]
    },
-   "value": {},
+   "value": {
+    "description": "**Open on purpose; its type is the field's.** One value, of the `FieldType` that `listReportFields` gives for `field` — a string, number, boolean, or a date, date-time or uuid as a string. Absent for `in`, `notIn`, `between`, `isNull` and `isNotNull`.\n"
+   },
    "values": {
     "type": "array",
+    "description": "The values for `in` and `notIn`, or exactly two (from, to) for `between`. Each of the field's `FieldType`, as `value`.",
     "items": {}
    },
    "isParameter": {
@@ -7071,7 +9163,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "isRequired": {
     "type": "boolean"
    },
-   "defaultValue": {}
+   "defaultValue": {
+    "description": "Open on purpose. A value of this parameter's `type`, used when a run supplies none."
+   }
   }
  },
  "ReportResult": {
@@ -7105,6 +9199,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "rows": {
     "type": "array",
+    "description": "**Open on purpose; the shape is `columns`.** Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a `Money`, dates, date-times and uuids as strings. A report's columns are chosen at run time, so no fixed schema can name them.\n",
     "items": {
      "type": "object",
      "additionalProperties": true
@@ -7112,7 +9207,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "totals": {
     "type": "object",
-    "additionalProperties": true
+    "additionalProperties": true,
+    "description": "Aggregated columns only, keyed and typed as a row is."
    },
    "rowCount": {
     "type": "integer"
@@ -7138,7 +9234,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "parameters": {
     "type": "object",
-    "additionalProperties": true
+    "additionalProperties": true,
+    "description": "**Open on purpose; its shape is the report's.** Keyed by `ReportParameter.key` of the definition being run, each value of that parameter's `type`. An `isRequired` parameter with no value here and no `defaultValue` is the `400` `runReport` lists.\n"
    },
    "venueId": {
     "type": "string",
@@ -7147,11 +9244,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "dateFrom": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158)."
    },
    "dateTo": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "Defaults to today in the venue's time zone when not sent (audit R158)."
    },
    "forceAsync": {
     "type": "boolean",
@@ -7176,16 +9275,44 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid"
    },
+   "currencyCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "description": "**A settlement has no account, so nothing else denominates it.** A posting takes its currency from `ledger.account.currency` and a payment from `tenderCurrency`, but a settlement is a provider file for a period: `providerGross`, `ledgerGross` and `difference` are bare amounts, and a provider file in one currency against a ledger in another computes a difference that means nothing. Added 20 September, when a venue became able to trade outside its region's currency.\n"
+   },
    "providerName": {
     "type": "string"
    },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The venue this settlement is for. **Reconciled daily per venue** (decided 28 September, audit R110 (b)), so `periodStart` and `periodEnd` are the same day."
+   },
    "periodStart": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "A day in the region's time zone, local midnight to local midnight."
    },
    "periodEnd": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "A day in the region's time zone, local midnight to local midnight."
+   },
+   "fileReference": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The `MediaAsset` holding the provider file, as given to `ingestSettlementFile`. **Kept on the row because parsing is asynchronous**: the job that parses the file reads it from here.\n"
+   },
+   "format": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "csv",
+     "fixedWidth",
+     "xml",
+     "json"
+    ],
+    "description": "The file format given at ingest. Null when none was given."
    },
    "status": {
     "$ref": "#/components/schemas/SettlementStatus"
@@ -7225,6 +9352,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "scopePath": {
     "type": "string",
+    "readOnly": true,
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `region` scope.**"
    }
   }
@@ -7241,7 +9369,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid",
+    "description": "Server-created when parsing finds the exception, so a UUID (naming-and-style 4)."
    },
    "settlementId": {
     "type": "string",
@@ -7263,6 +9393,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "paymentId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "amount": {
@@ -7272,8 +9403,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "resolution": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/SettlementResolution"
+     }
+    ],
+    "nullable": true,
+    "description": "Null while the exception is open."
+   },
+   "note": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "The `note` given to `resolveSettlementException`, stored with the resolution."
    },
    "resolvedByPrincipalId": {
     "type": "string",
@@ -7286,6 +9427,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true
    }
   }
+ },
+ "SettlementResolution": {
+  "type": "string",
+  "description": "How a settlement exception was explained. One vocabulary for the request and the stored exception.",
+  "enum": [
+   "matchedManually",
+   "writeOff",
+   "disputeRaised",
+   "providerError",
+   "timingDifference"
+  ]
  },
  "SettlementStatus": {
   "type": "string",
@@ -7300,7 +9452,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ]
  },
  "Shift": {
-  "x-ticvai-persistence": "orders.shift",
+  "x-ticvai-persistence": "orders.pos_shift + orders.pos_shift_approval + orders.pos_shift_incident",
+  "description": "**`approvals` and `incidents` are child rows** (26 September, pull audit R099): `orders.pos_shift_approval` and `orders.pos_shift_incident`, one row per item, keyed to the shift. Until then the contract carried both and `orders.pos_shift` had nowhere to put either.\n",
   "type": "object",
   "required": [
    "id",
@@ -7400,13 +9553,52 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "salesTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "x-ticvai-column": "gross_sales_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "What the till took in sales, as the guest paid it — tax included."
    },
    "refundsTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "x-ticvai-column": "gross_refunded_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "What the till paid back, as the guest was refunded it — tax included."
    },
    "liftsTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "x-ticvai-column": "lifted_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Cash taken out mid-shift by lifts and withdrawals. Cash, so neither gross nor net."
+   },
+   "expectedCash": {
+    "x-ticvai-column": "expected_cash_amount",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "nullable": true,
+    "description": "26 September, pull audit R207. **The figure the blind count was measured against**, revealed once the count is in — null until then. Until this date only `ShiftCloseResult` carried it, returned once by `closeShift`, so BO-040 could not show the over/short it exists to accept.\n"
+   },
+   "countedCash": {
+    "x-ticvai-column": "counted_cash_amount",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "nullable": true,
+    "description": "What the close count found. Null until the shift is counted."
+   },
+   "variance": {
+    "x-ticvai-column": "variance_amount",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "nullable": true,
+    "description": "Counted minus expected, as `ShiftCloseResult.variance`. Negative is short."
    },
    "heldLeaseCount": {
     "type": "integer",
@@ -7419,17 +9611,29 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "recordedAt": {
     "type": "string",
     "format": "date-time",
-    "description": "When the device recorded the open. Differs from `openedAt` when offline."
+    "description": "When the device recorded the open. `openedAt` is the server's time."
    },
    "suspendedAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true
    },
+   "suspendReason": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "The `reason` given to `suspendShift`. Cleared on resume."
+   },
    "closedAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "closedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Who submitted the close count. `reopenShift` refuses an approver who is this principal, and until 26 September there was nothing to compare against (pull audit R099).\n"
    },
    "syncedAt": {
     "type": "string",
@@ -7453,7 +9657,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
         "open",
         "close",
         "variance"
-       ]
+       ],
+       "description": "`open` from `approveShiftOpen`, `close` from `approveShiftClose`, `variance` from `acceptShiftVariance`.\n"
       },
       "principalId": {
        "type": "string",
@@ -7501,7 +9706,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "requiresAcceptance": {
     "type": "boolean",
-    "description": "True when the variance exceeds the configured threshold."
+    "description": "True when the variance exceeds the venue's `shiftVarianceThreshold` (audit R094). The shift is then `pendingVariance` and only `acceptShiftVariance` finalises it (audit R080 (e)).\n"
    },
    "nonCashVariances": {
     "type": "array",
@@ -7545,6 +9750,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "TenderKind": {
   "type": "string",
+  "description": "`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n",
   "enum": [
    "cash",
    "card",
@@ -7557,19 +9763,177 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "complimentary"
   ]
  },
+ "TicketReissueFulfillmentRegenerationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Ticket Reissue & Fulfillment Regeneration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "maximumReissues": {
+    "type": "string",
+    "description": "Maximum Reissues"
+   },
+   "freeReissueCount": {
+    "type": "integer",
+    "description": "Free Reissue Count"
+   },
+   "supervisorThreshold": {
+    "type": "integer",
+    "description": "Supervisor Threshold"
+   },
+   "reissueReason": {
+    "type": "string",
+    "enum": [
+     "dateChanged",
+     "timeslotChanged",
+     "seatChanged",
+     "attendeeChanged",
+     "lostTicket",
+     "damagedCredential",
+     "emailNotReceived",
+     "walletPassIssue",
+     "printingError",
+     "credentialCompromised",
+     "administrativeCorrection"
+    ],
+    "description": "Why the ticket is reissued."
+   },
+   "credentialMedia": {
+    "type": "string",
+    "enum": [
+     "qr",
+     "dynamicQr",
+     "barcode",
+     "rfid",
+     "nfc",
+     "printedTicket",
+     "wearable"
+    ],
+    "description": "Credential media regenerated."
+   },
+   "deliveryMethod": {
+    "type": "string",
+    "enum": [
+     "email",
+     "smsWhatsappLink",
+     "mobileApp",
+     "walletPass",
+     "walletUpdate",
+     "posPrint",
+     "boxOfficeCollection"
+    ],
+    "description": "How the reissue is delivered."
+   },
+   "reissueOption": {
+    "type": "string",
+    "enum": [
+     "regenerateNew",
+     "resendExisting"
+    ],
+    "description": "Regenerate a new credential (old one invalidated) or resend the existing one"
+   }
+  }
+ },
+ "UpdateGroupBookingRequest": {
+  "type": "object",
+  "description": "Request only. Every field optional; absent means unchanged.",
+  "properties": {
+   "packageProductId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The school-trip format or party package."
+   },
+   "yearGroup": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "accessAndDietaryNeeds": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "celebrantName": {
+    "type": "string",
+    "maxLength": 120,
+    "nullable": true,
+    "description": "The birthday child."
+   },
+   "celebrantTurningAge": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 18,
+    "nullable": true
+   },
+   "allergiesAndRequests": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "finalHeadcountDueBy": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "leaderSubjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "organisationName": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "expectedSize": {
+    "type": "integer",
+    "minimum": 2
+   },
+   "confirmedSize": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "minimumSize": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true
+   },
+   "attendeeCaptureRequired": {
+    "type": "boolean"
+   },
+   "attendeeCaptureDueBy": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "confirmed",
+     "namesPending",
+     "complete",
+     "cancelled"
+    ]
+   }
+  }
+ },
  "UpdateProductRequest": {
   "type": "object",
   "minProperties": 1,
   "properties": {
+   "familyKey": {
+    "type": "string",
+    "maxLength": 64,
+    "pattern": "^[A-Za-z0-9_-]+$",
+    "nullable": true,
+    "x-ticvai-unique": "venue",
+    "description": "The product family across the tenant's venues (decided 29 September, rev 3 REV3-18); see `Product.familyKey`. At most one product per venue in a family, else `409 duplicate-code`."
+   },
    "name": {
     "type": "string",
     "maxLength": 200
    },
    "description": {
     "type": "string"
-   },
-   "isSellable": {
-    "type": "boolean"
    },
    "channels": {
     "type": "array",
@@ -7580,8 +9944,55 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "dataMaskValues": {
     "type": "object",
     "additionalProperties": true
+   },
+   "guestListing": {
+    "$ref": "#/components/schemas/GuestListing"
+   },
+   "notBookableLabel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true
+   },
+   "displayTags": {
+    "type": "array",
+    "maxItems": 6,
+    "items": {
+     "$ref": "#/components/schemas/ProductDisplayTag"
+    }
+   },
+   "media": {
+    "type": "array",
+    "maxItems": 20,
+    "items": {
+     "$ref": "#/components/schemas/ProductMedia"
+    }
+   },
+   "consentQuestionIds": {
+    "type": "array",
+    "maxItems": 10,
+    "uniqueItems": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "requiresTimeWindow": {
+    "type": "boolean"
    }
   }
+ },
+ "WithdrawalReason": {
+  "type": "string",
+  "description": "Why a supervisor took cash out of a box. Set only on lifts `withdrawFromDepositBox` records.",
+  "enum": [
+   "banking",
+   "safeDrop",
+   "changeOrder",
+   "other"
+  ]
  }
 }
 ```

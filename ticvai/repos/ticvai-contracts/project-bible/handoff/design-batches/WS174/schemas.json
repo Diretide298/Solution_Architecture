@@ -1,0 +1,336 @@
+{
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PriceBreakdownCalculationSimulationExplainabilityInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Price Breakdown, Calculation Simulation & Explainability submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "customerId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Customer"
+   },
+   "productId": {
+    "type": "string",
+    "description": "Product"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity",
+    "minimum": 1
+   },
+   "venueId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Venue"
+   },
+   "eventId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Event"
+   },
+   "channel": {
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel",
+    "description": "Channel"
+   },
+   "date": {
+    "type": "string",
+    "format": "date",
+    "description": "Date of visit"
+   },
+   "timeslotId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Timeslot"
+   },
+   "membershipId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Membership"
+   },
+   "promotionCode": {
+    "type": "string",
+    "nullable": true,
+    "description": "Promotion"
+   },
+   "paymentMethod": {
+    "type": "string",
+    "nullable": true,
+    "description": "Payment Method"
+   },
+   "deliveryMethod": {
+    "type": "string",
+    "nullable": true,
+    "description": "Delivery Method"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency: ISO 4217 code",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "compareChannels": {
+    "type": "array",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+    },
+    "description": "Channel Comparison (p.51): run the same transaction through these channels too; empty for none"
+   }
+  }
+ },
+ "PriceBreakdownCalculationSimulationExplainabilityView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Price Breakdown, Calculation Simulation & Explainability displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "finalPayable": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Final Payable"
+   },
+   "components": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "sequence": {
+       "type": "integer"
+      },
+      "componentType": {
+       "type": "string",
+       "enum": [
+        "selectedRate",
+        "memberAdjustment",
+        "dynamicAdjustment",
+        "promotion",
+        "packageAdjustment",
+        "fee",
+        "surcharge",
+        "waiver",
+        "tax",
+        "rounding"
+       ]
+      },
+      "label": {
+       "type": "string",
+       "description": "e.g. Booking Fee, VAT"
+      },
+      "source": {
+       "type": "string",
+       "description": "Source: the price list, rule, fee or tax profile"
+      },
+      "rule": {
+       "type": "string",
+       "description": "Rule: id of the rule applied, e.g. FE-021, TAX-UAE-01"
+      },
+      "formula": {
+       "type": "string"
+      },
+      "input": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "description": "Input amount"
+      },
+      "output": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "description": "Output amount (negative for a reduction)"
+      },
+      "reason": {
+       "type": "string"
+      },
+      "taxTreatment": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    },
+    "description": "Explainability Panel and Rule Trace (p.51), in sequence"
+   },
+   "selectedRate": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Selected Rate x quantity"
+   },
+   "discountTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discounts and adjustments total"
+   },
+   "feeTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fees total"
+   },
+   "subtotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Subtotal before tax"
+   },
+   "taxTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Tax total"
+   },
+   "calculationVersion": {
+    "type": "string",
+    "description": "Calculation version used"
+   },
+   "channelComparison": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "channel": {
+       "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+      },
+      "finalPayable": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "difference": {
+       "type": "string",
+       "description": "Why it differs, e.g. Call Center Booking Fee"
+      }
+     }
+    },
+    "description": "Channel Comparison results"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI observations for this screen; advisory only, never applied automatically"
+   }
+  }
+ },
+ "SeatCategory": {
+  "x-ticvai-persistence": "seating.seat_category",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "venueId",
+   "rank"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayColour": {
+    "type": "string",
+    "nullable": true
+   },
+   "rank": {
+    "type": "integer",
+    "description": "Ordering for best-seat assignment. Lower is better."
+   },
+   "seatCount": {
+    "type": "integer"
+   },
+   "priceBands": {
+    "type": "array",
+    "description": "What a seat in this category costs, by band (decided 28 September, audit R275 (d), from the BO-1045 pack). Written by `createSeatCategory` and `updateSeatCategory`. A band may be narrowed to a sales channel or a customer segment and to a window; where several match a sale, the narrowest wins.\n",
+    "items": {
+     "$ref": "#/components/schemas/SeatPriceBand"
+    }
+   }
+  }
+ },
+ "SeatPriceBand": {
+  "x-ticvai-persistence": "seating.seat_price_band",
+  "type": "object",
+  "description": "One price band on a seat category (decided 28 September, audit R275 (d)). The currency is `amount.currency`, resolved from the region like every `Money` (ADR-0018), so the band carries no currency of its own.\n",
+  "required": [
+   "code",
+   "displayLabel",
+   "amount",
+   "effectiveFrom"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "seatCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64,
+    "description": "Unique within the category."
+   },
+   "displayLabel": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "displayColour": {
+    "type": "string",
+    "nullable": true,
+    "pattern": "^#[0-9A-Fa-f]{6}$"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "channel": {
+    "nullable": true,
+    "description": "Null means every channel.",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+     }
+    ]
+   },
+   "customerSegmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A `marketing-crm` customer segment; null means everyone."
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Null means open-ended."
+   }
+  }
+ }
+}

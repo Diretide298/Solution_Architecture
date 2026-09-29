@@ -1,0 +1,232 @@
+{
+ "createBadgePrintJob": {
+  "method": "POST",
+  "path": "/badge-print-jobs",
+  "contract": "accreditation",
+  "summary": "Queue badges for printing",
+  "permission": "ACCREDITATION_ISSUE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "BadgePrintJob",
+  "responds": "BadgePrintJob"
+ },
+ "issueAccreditationCredential": {
+  "method": "POST",
+  "path": "/accreditation-credentials",
+  "contract": "accreditation",
+  "summary": "Produce a badge, a mobile credential, or both",
+  "permission": "ACCREDITATION_ISSUE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccreditationCredential",
+  "responds": "AccreditationCredential"
+ },
+ "listAccreditationCredentials": {
+  "method": "GET",
+  "path": "/accreditation-credentials",
+  "contract": "accreditation",
+  "summary": "Badges and digital credentials issued",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "holderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationCredential"
+ },
+ "listBadgePrintJobs": {
+  "method": "GET",
+  "path": "/badge-print-jobs",
+  "contract": "accreditation",
+  "summary": "The print queue, and what failed",
+  "permission": "ACCREDITATION_ISSUE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BadgePrintJob"
+ },
+ "listBadgeTemplates": {
+  "method": "GET",
+  "path": "/badge-templates",
+  "contract": "accreditation",
+  "summary": "Badge designs, and what prints on each",
+  "permission": "ACCREDITATION_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BadgeTemplate"
+ },
+ "listCredential": {
+  "method": "GET",
+  "path": "/credential",
+  "contract": "access",
+  "summary": "Credential Operations Command Center",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "brand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "media",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customer",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "provider",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "exception",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listCredentialGenerationIssuance": {
+  "method": "GET",
+  "path": "/credential-generation-issuance",
+  "contract": "access",
+  "summary": "Credential Generation & Issuance Monitor",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "trigger",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "setBadgeTemplate": {
+  "method": "PUT",
+  "path": "/badge-templates",
+  "contract": "accreditation",
+  "summary": "Design a badge",
+  "permission": "ACCREDITATION_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "BadgeTemplate",
+  "responds": "BadgeTemplate"
+ }
+}

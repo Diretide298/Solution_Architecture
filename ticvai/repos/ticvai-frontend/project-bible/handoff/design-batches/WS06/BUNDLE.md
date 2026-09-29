@@ -1,6 +1,6 @@
 # WS06 — Access Control board 6
 
-**10 screens · 10 operations · 15 schemas · 2 permissions**
+**10 screens · 14 operations · 25 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, SCOPE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, DEVICE_CONFIGURE, DEVICE_VIEW, SCOPE_VIEW, TURNSTILE_MODE_SET`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,7 +60,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-194` | Device & Gate Command Center | listDetail | 1 | 0 | — |
+| `BO-194` | Device & Gate Command Center | listDetail | 4 | 0 | — |
 | `BO-195` | Device Type & Hardware Library | listDetail | 1 | 0 | — |
 | `BO-196` | Physical Device Registration & Provisioning | configEditor | 1 | 0 | — |
 | `BO-197` | Turnstile & Lane Behavior Configuration | configEditor | 1 | 0 | — |
@@ -70,11 +69,11 @@ convincingly. It is never a caption.
 | `BO-200` | Handheld & Mobile Access Device Configuration | configEditor | 1 | 1 | — |
 | `BO-201` | Gate Modes, Free Spin & Emergency Controls | configEditor | 1 | 0 | — |
 | `BO-202` | Device Software, Content & Remote Configuration | configEditor | 1 | 0 | — |
-| `BO-203` | Hardware Compatibility, Health, Testing & Deployment | listDetail | 1 | 0 | — |
+| `BO-203` | Hardware Compatibility, Health, Testing & Deployment | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-194, BO-195, BO-199, BO-203 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-195, BO-199 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-194 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-195",
@@ -186,13 +182,117 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations can identify every access-control device and its current operational/configuration state from one screen.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Show) and no metric row",
   "purpose": "Provide the central operational/configuration view of the complete access-control hardware estate.",
-  "purposeNote": "Operations can identify every access-control device and its current operational/configuration state from one screen.",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Total Devices",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.totalDevices",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Online",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.online",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Offline",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.offline",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Degraded",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.degraded",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Turnstiles",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.turnstiles",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Handhelds",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.handhelds",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Biometric Readers",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.biometricReaders",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "RFID/NFC Readers",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.rfidNfcReaders",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Gates Open",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.gatesOpen",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Gates Closed",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.gatesClosed",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Devices Requiring Sync",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.devicesRequiringSync",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Firmware/Software Exceptions",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.firmwareSoftwareExceptions",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Hardware Alerts",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.hardwareAlerts",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Ai",
+       "bindsTo": "DeviceGateCommandCenterViewSummary.ai",
+       "operation": "listDeviceGate",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -201,27 +301,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every device gate",
        "columns": [
-        "DeviceGateCommandCenterView.totalDevices",
-        "DeviceGateCommandCenterView.online",
-        "DeviceGateCommandCenterView.offline",
-        "DeviceGateCommandCenterView.degraded",
-        "DeviceGateCommandCenterView.turnstiles",
-        "DeviceGateCommandCenterView.handhelds",
-        "DeviceGateCommandCenterView.biometricReaders",
-        "DeviceGateCommandCenterView.rfidNfcReaders",
-        "DeviceGateCommandCenterView.gatesOpen",
-        "DeviceGateCommandCenterView.gatesClosed",
-        "DeviceGateCommandCenterView.devicesRequiringSync",
-        "DeviceGateCommandCenterView.firmwareSoftwareExceptions",
-        "DeviceGateCommandCenterView.hardwareAlerts",
         "DeviceGateCommandCenterView.connectivity",
         "DeviceGateCommandCenterView.lastHeartbeat",
         "DeviceGateCommandCenterView.configurationVersion",
         "DeviceGateCommandCenterView.localRuleVersion",
         "DeviceGateCommandCenterView.credentialSecurityPackageVersion",
         "DeviceGateCommandCenterView.scannerHealth",
-        "DeviceGateCommandCenterView.controllerHealth",
-        "DeviceGateCommandCenterView.ai"
+        "DeviceGateCommandCenterView.controllerHealth"
        ],
        "bindsTo": "DeviceGateCommandCenterView",
        "operation": "listDeviceGate",
@@ -238,27 +324,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected device gate",
        "bindsTo": "DeviceGateCommandCenterView",
        "columns": [
-        "DeviceGateCommandCenterView.totalDevices",
-        "DeviceGateCommandCenterView.online",
-        "DeviceGateCommandCenterView.offline",
-        "DeviceGateCommandCenterView.degraded",
-        "DeviceGateCommandCenterView.turnstiles",
-        "DeviceGateCommandCenterView.handhelds",
-        "DeviceGateCommandCenterView.biometricReaders",
-        "DeviceGateCommandCenterView.rfidNfcReaders",
-        "DeviceGateCommandCenterView.gatesOpen",
-        "DeviceGateCommandCenterView.gatesClosed",
-        "DeviceGateCommandCenterView.devicesRequiringSync",
-        "DeviceGateCommandCenterView.firmwareSoftwareExceptions",
-        "DeviceGateCommandCenterView.hardwareAlerts",
         "DeviceGateCommandCenterView.connectivity",
         "DeviceGateCommandCenterView.lastHeartbeat",
         "DeviceGateCommandCenterView.configurationVersion",
         "DeviceGateCommandCenterView.localRuleVersion",
         "DeviceGateCommandCenterView.credentialSecurityPackageVersion",
         "DeviceGateCommandCenterView.scannerHealth",
-        "DeviceGateCommandCenterView.controllerHealth",
-        "DeviceGateCommandCenterView.ai"
+        "DeviceGateCommandCenterView.controllerHealth"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Device Directory”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 70 §Display"
@@ -280,22 +352,52 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Device & Gate Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "registerDevice",
+    "contract": "tenancy",
+    "purpose": "Register a gate device from the command centre",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "setTurnstileMode",
+    "contract": "access",
+    "purpose": "Open, close or change the mode of a gate",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listDeviceGate"
+    ]
+   },
+   {
+    "operationId": "listAccessPoints",
+    "contract": "access",
+    "purpose": "The gates and turnstiles whose mode is set",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
    "preloaded": [
-    "DeviceGateCommandCenterView.totalDevices",
-    "DeviceGateCommandCenterView.online",
-    "DeviceGateCommandCenterView.offline",
-    "DeviceGateCommandCenterView.degraded",
-    "DeviceGateCommandCenterView.turnstiles",
-    "DeviceGateCommandCenterView.handhelds"
+    "DeviceGateCommandCenterViewSummary.totalDevices",
+    "DeviceGateCommandCenterViewSummary.online",
+    "DeviceGateCommandCenterViewSummary.offline",
+    "DeviceGateCommandCenterViewSummary.degraded",
+    "DeviceGateCommandCenterViewSummary.turnstiles",
+    "DeviceGateCommandCenterViewSummary.handhelds"
+   ],
+   "params": [
+    {
+     "name": "accessPointId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-194"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-194",
+   "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-194"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 70. 21 of 21 labels bound to a contract property; 21 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -358,10 +460,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "manufacturer-specific logic into admission policies.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Create reusable hardware definitions independently from physical deployed devices.",
-  "purposeNote": "manufacturer-specific logic into admission policies.",
   "gaps": [
    {
     "operation": null,
@@ -407,17 +509,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "DeviceTypeHardwareLibraryView.standard",
-    "DeviceTypeHardwareLibraryView.fullHeight",
-    "DeviceTypeHardwareLibraryView.tripod",
-    "DeviceTypeHardwareLibraryView.speedGate",
-    "DeviceTypeHardwareLibraryView.wideLane"
+    "DeviceTypeHardwareLibraryView.hardwareType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-195"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-195",
+   "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-195"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 72. 0 of 0 labels bound to a contract property; 0 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -475,15 +574,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-194",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F116 step 4→5",
-     "operation": "listPhysicalDeviceRegistration"
+     "operation": "listPhysicalDeviceRegistration",
+     "carries": [
+      "accessPointId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Every physical access-control device is uniquely registered, authenticated and assigned to its correct topology location.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Register actual deployed hardware and connect it to the Board 1 topology.",
-  "purposeNote": "Every physical access-control device is uniquely registered, authenticated and assigned to its correct topology location.",
   "layout": {
    "template": "form",
    "regions": [
@@ -572,7 +674,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-196"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-196",
+   "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-196"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 73. 0 of 0 labels bound to a contract property; 12 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -630,15 +733,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-194",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F116 step 6→7",
-     "operation": "setTurnstileLaneBehavior"
+     "operation": "setTurnstileLaneBehavior",
+     "carries": [
+      "accessPointId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Each gate can execute different configured behaviors according to its mode and the validated credential.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure how each turnstile or lane behaves. The matrix specifically requires software on turnstiles to behave differently according to card/ticket type and supports different operating modes.",
-  "purposeNote": "Each gate can execute different configured behaviors according to its mode and the validated credential.",
   "layout": {
    "template": "form",
    "regions": [
@@ -742,16 +848,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setTurnstileLaneBehavior",
     "contract": "access",
     "purpose": "Turnstile & Lane Behavior Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setTurnstileLaneBehavior"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-197"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-197",
+   "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-197"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 74. 0 of 0 labels bound to a contract property; 14 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -814,10 +918,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every access decision produces a configurable and understandable physical response for the guest and operator.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure what the physical access device does and displays after validation. The matrix explicitly requires valid/non-valid messages, lights, pictograms and sounds, including green/yellow/red behavior.",
-  "purposeNote": "Every access decision produces a configurable and understandable physical response for the guest and operator.",
   "layout": {
    "template": "form",
    "regions": [
@@ -906,16 +1010,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setValidationOutcomeGuest",
     "contract": "access",
     "purpose": "Validation Outcome & Guest Feedback Designer",
-    "trigger": "onAction",
-    "invalidates": [
-     "setValidationOutcomeGuest"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-198"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-198",
+   "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-198"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 76. 0 of 0 labels bound to a contract property; 11 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -973,15 +1075,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-194",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F116 step 10→11",
-     "operation": "setReaderScannerPeripheral"
+     "operation": "setReaderScannerPeripheral",
+     "carries": [
+      "accessPointId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Readers and peripherals can be independently associated with gates and checked against required admission capabilities.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure the technologies attached to a gate/device.",
-  "purposeNote": "Readers and peripherals can be independently associated with gates and checked against required admission capabilities.",
   "gaps": [
    {
     "operation": null,
@@ -1040,16 +1145,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setReaderScannerPeripheral",
     "contract": "access",
     "purpose": "Reader, Scanner & Peripheral Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setReaderScannerPeripheral"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-199"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-199",
+   "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-199"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 77. 0 of 0 labels bound to a contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1112,17 +1215,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Mobile access devices can be centrally configured, restricted and revoked according to their operational role.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure mobile access-control devices used by staff. The matrix explicitly requires handheld devices and Android/iOS dedicated mobile applications.",
-  "purposeNote": "Mobile access devices can be centrally configured, restricted and revoked according to their operational role.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Scan Ticket, Search Ticket, Override, View History. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Access Control Module_Reference.pdf, page 78 §Enable/disable"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1187,6 +1283,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 78 §Enable/disable"
       },
       {
+       "kind": "secondaryButton",
+       "label": "Entry",
+       "provenance": "pack Access Control Module_Reference.pdf, page 78 §Enable/disable"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Manual Attendance",
+       "provenance": "pack Access Control Module_Reference.pdf, page 78 §Enable/disable"
+      },
+      {
        "kind": "destructiveButton",
        "label": "Override",
        "provenance": "pack Access Control Module_Reference.pdf, page 78 §Enable/disable"
@@ -1220,18 +1326,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setHandheldMobileAccess",
     "contract": "access",
     "purpose": "Handheld & Mobile Access Device Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setHandheldMobileAccess"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-200"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-200",
+   "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-200"
   },
-  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 78. 0 of 0 labels bound to a contract property; 12 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 78. 0 of 0 labels bound to a contract property; 14 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Scan Ticket, Search Ticket, Entry, Manual Attendance, Override, View History are choices sent by `setHandheldMobileAccess`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1292,10 +1396,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized operations personnel can rapidly change gate modes across individual devices or device groups while maintaining full auditability.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Manage non-standard operational modes. The source specifically requires Free Spin and Drop Arm/Emergency behavior.",
-  "purposeNote": "Authorized operations personnel can rapidly change gate modes across individual devices or device groups while maintaining full auditability.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1354,7 +1458,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-201"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-201",
+   "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-201"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 79. 0 of 0 labels bound to a contract property; 6 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1417,10 +1522,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Device configuration and supported content can be centrally deployed without manually configuring each turnstile.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Centrally control access-control device software and guest-facing configuration. The source requires the ability to configure/manage software on turnstiles, add external webpages on supported screens, and enable payment technologies where available.",
-  "purposeNote": "Device configuration and supported content can be centrally deployed without manually configuring each turnstile.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1484,16 +1589,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setDeviceSoftwareContent",
     "contract": "access",
     "purpose": "Device Software, Content & Remote Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setDeviceSoftwareContent"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-202"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-202",
+   "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-202"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 81. 0 of 0 labels bound to a contract property; 6 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1545,13 +1648,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "BO-194"
    ],
    "inferred": false,
-   "notes": "**Reached from BO-194, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+   "notes": "**Reached from BO-194, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-194",
+     "trigger": "Device & Gate Command Center",
+     "provenance": "derived — BO-194 declares entryState.params accessPointId and BO-203 holds none of them, so the edge carries nothing and BO-194 opens cold"
+    }
+   ]
   },
   "density": "compact",
+  "purposeNote": "No access device enters production until its required capabilities, connectivity, security configuration and physical responses have been successfully validated. Board 6 — Final 10-Screen Structure # Backend Screen Main Responsibility 6.1 Device & Gate Command Center Hardware estate and live health 6.2 Device Type & Hardware Library Reusable hardware/model definitions 6.3 Physical Device Registration & Provisioning Register and authenticate deployed devices 6.4 Turnstile & Lane Behavior Configuration Gate modes, direction and physical behavior # Backend Screen Main Responsibility",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide the final testing and governance layer before hardware is used in production. The matrix says venues may select their hardware, while the provider must expose hardware limitations and recommendations.",
-  "purposeNote": "No access device enters production until its required capabilities, connectivity, security configuration and physical responses have been successfully validated. Board 6 — Final 10-Screen Structure # Backend Screen Main Responsibility 6.1 Device & Gate Command Center Hardware estate and live health 6.2 Device Type & Hardware Library Reusable hardware/model definitions 6.3 Physical Device Registration & Provisioning Register and authenticate deployed devices 6.4 Turnstile & Lane Behavior Configuration Gate modes, direction and physical behavior # Backend Screen Main Responsibility",
   "gaps": [
    {
     "operation": null,
@@ -1568,15 +1678,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "actionBar",
+     "slot": "rowActions",
      "components": [
       {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listHardwareCompatibilityHealth",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "kind": "primaryButton",
+       "label": "Selected gates",
+       "provenance": "pack Access Control Module_Reference.pdf, page 82 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "device group",
+       "provenance": "pack Access Control Module_Reference.pdf, page 82 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "venue",
+       "provenance": "pack Access Control Module_Reference.pdf, page 82 §Support"
+      },
+      {
+       "kind": "publishGate",
+       "label": "Deploy configuration version",
+       "operation": "publishHardwareDeployment",
+       "notes": "**Names the version, the target (pilot, selected gates, device group or venue) and the devices that failed the compatibility test and will be skipped**, before it runs. Devices pick the version up at their next package refresh.",
+       "provenance": "contract access.yaml POST /hardware-deployments (decided 29 September, VM close-out)"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -1593,23 +1724,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Hardware Compatibility, Health, Testing & Deployment",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "publishHardwareDeployment",
+    "contract": "access",
+    "purpose": "Deploy configuration version",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "preloaded": [
-    "HardwareCompatibilityHealthTestingDeploymentView.rfid",
-    "HardwareCompatibilityHealthTestingDeploymentView.nfc",
-    "HardwareCompatibilityHealthTestingDeploymentView.offline",
-    "HardwareCompatibilityHealthTestingDeploymentView.pilotDeployment",
-    "HardwareCompatibilityHealthTestingDeploymentView.selectedGates"
+    "HardwareCompatibilityHealthTestingDeploymentView.capabilities",
+    "HardwareCompatibilityHealthTestingDeploymentView.rolloutScope"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-203"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-203",
+   "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-203"
   },
-  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 82. 0 of 0 labels bound to a contract property; 0 of 76 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 82. 0 of 0 labels bound to a contract property; 3 of 76 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `publishHardwareDeployment`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1642,25 +1777,65 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "listAccessPoints": {
+  "method": "GET",
+  "path": "/access-points",
+  "contract": "access",
+  "summary": "List access points",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listDeviceGate": {
   "method": "GET",
   "path": "/device-gate",
   "contract": "access",
   "summary": "Device & Gate Command Center",
-  "permission": "SCOPE_VIEW",
+  "permission": "DEVICE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "DeviceGateCommandCenterView"
+  "responds": "Page"
  },
  "listDeviceTypeHardware": {
   "method": "GET",
   "path": "/device-type-hardware",
   "contract": "access",
   "summary": "Device Type & Hardware Library",
-  "permission": "SCOPE_VIEW",
+  "permission": "DEVICE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -1686,37 +1861,103 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/hardware-compatibility-health",
   "contract": "access",
   "summary": "Hardware Compatibility, Health, Testing & Deployment",
-  "permission": "SCOPE_VIEW",
+  "permission": "DEVICE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "HardwareCompatibilityHealthTestingDeploymentView"
+  "responds": "Page"
  },
  "listPhysicalDeviceRegistration": {
   "method": "GET",
   "path": "/physical-device-registration",
   "contract": "access",
   "summary": "Physical Device Registration & Provisioning",
-  "permission": "SCOPE_VIEW",
+  "permission": "DEVICE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PhysicalDeviceRegistrationProvisioningView"
+  "responds": "Page"
+ },
+ "publishHardwareDeployment": {
+  "method": "POST",
+  "path": "/hardware-deployments",
+  "contract": "access",
+  "summary": "Deploy a gate configuration version",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "HardwareDeploymentInput",
+  "responds": "HardwareDeploymentView"
+ },
+ "registerDevice": {
+  "method": "POST",
+  "path": "/devices",
+  "contract": "tenancy",
+  "summary": "Register a device",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RegisteredDevice",
+  "responds": "RegisteredDevice"
  },
  "setDeviceSoftwareContent": {
   "method": "PUT",
   "path": "/device-software-content",
   "contract": "access",
   "summary": "Device Software, Content & Remote Configuration",
-  "permission": "ACCESS_POINT_CONFIGURE",
+  "permission": "DEVICE_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "DeviceSoftwareContentRemoteConfigurationInput",
   "responds": "DeviceSoftwareContentRemoteConfigurationView"
  },
@@ -1725,11 +1966,17 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/handheld-mobile-access",
   "contract": "access",
   "summary": "Handheld & Mobile Access Device Configuration",
-  "permission": "ACCESS_POINT_CONFIGURE",
+  "permission": "DEVICE_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "HandheldMobileAccessDeviceConfigurationInput",
   "responds": "HandheldMobileAccessDeviceConfigurationView"
  },
@@ -1738,11 +1985,17 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/reader-scanner-peripheral",
   "contract": "access",
   "summary": "Reader, Scanner & Peripheral Configuration",
-  "permission": "ACCESS_POINT_CONFIGURE",
+  "permission": "DEVICE_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ReaderScannerPeripheralConfigurationInput",
   "responds": "ReaderScannerPeripheralConfigurationView"
  },
@@ -1755,9 +2008,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "TurnstileLaneBehaviorConfigurationInput",
   "responds": "TurnstileLaneBehaviorConfigurationView"
+ },
+ "setTurnstileMode": {
+  "method": "PUT",
+  "path": "/access-points/{accessPointId}/mode",
+  "contract": "access",
+  "summary": "Set the operating mode of an access point",
+  "permission": "TURNSTILE_MODE_SET",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessPoint"
  },
  "setValidationOutcomeGuest": {
   "method": "PUT",
@@ -1768,7 +2046,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ValidationOutcomeGuestFeedbackDesignerInput",
   "responds": "ValidationOutcomeGuestFeedbackDesignerView"
  }
@@ -1781,102 +2065,192 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
- "DeviceGateCommandCenterView": {
+ "AccessPoint": {
+  "x-ticvai-persistence": "access.access_point",
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Device & Gate Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "venueId",
+   "operatingMode",
+   "isActive"
+  ],
   "properties": {
-   "totalDevices": {
-    "type": "integer",
-    "description": "Total Devices"
-   },
-   "online": {
-    "type": "integer",
-    "description": "Online"
-   },
-   "offline": {
-    "type": "integer",
-    "description": "Offline"
-   },
-   "degraded": {
+   "id": {
     "type": "string",
-    "description": "Degraded"
+    "format": "uuid"
    },
-   "turnstiles": {
-    "type": "integer",
-    "description": "Turnstiles"
+   "code": {
+    "type": "string"
    },
-   "handhelds": {
-    "type": "integer",
-    "description": "Handhelds"
+   "name": {
+    "type": "string"
    },
-   "biometricReaders": {
-    "type": "integer",
-    "description": "Biometric Readers"
-   },
-   "rfidNfcReaders": {
-    "type": "integer",
-    "description": "RFID/NFC Readers"
-   },
-   "gatesOpen": {
-    "type": "integer",
-    "description": "Gates Open"
-   },
-   "gatesClosed": {
-    "type": "integer",
-    "description": "Gates Closed"
-   },
-   "devicesRequiringSync": {
+   "venueId": {
     "type": "string",
-    "description": "Devices Requiring Sync"
+    "format": "uuid"
    },
-   "firmwareSoftwareExceptions": {
-    "type": "integer",
-    "description": "Firmware/Software Exceptions"
+   "scopePath": {
+    "type": "string"
    },
-   "hardwareAlerts": {
-    "type": "integer",
-    "description": "Hardware Alerts"
+   "externalCredentialSources": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExternalCredentialSourceList"
+     }
+    ],
+    "description": "BL-108. **A hotel room card admitting a guest to a water park** — externally issued, and the platform validates it without having sold it.\n**The entitlement is created on first use, not on check-in.** A hotel with 400 rooms does not want 400 entitlements a night for guests who never visit.\n"
    },
-   "connectivity": {
+   "scanAnomalyRules": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ScanAnomalyRuleList"
+     }
+    ],
+    "description": "BL-104. **Rule-based scan anomalies, separated from the parked model-based engine** — device sharing, simultaneous entries at two gates, an impossible walking time between them.\n**These are deterministic and need no model**, which is why they are here and not in `ai`: two entries eight seconds apart at gates four hundred metres apart is arithmetic.\n"
+   },
+   "operatingMode": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AccessPointOperatingMode"
+     }
+    ],
+    "default": "normal",
+    "description": "**Set by the podium with `setTurnstileMode`, and it wins** (audit R221). BL-107 and BL-109. **A closed turnstile and one in emergency drop-arm mode look the same in the model and are opposite in meaning.** Closed refuses everybody; drop-arm lets everybody through, and it is the state that exists for an evacuation.\n**`podium` is a supervised validation position** — a member of staff directing a group through a lane, validating by eye against a list. It scans nothing and it is how school parties actually enter.\n**`freeFlow` counts without validating.** Useful at a free event, and a mode that must be visibly distinct from a broken reader.\n"
+   },
+   "vehicleLocationCapture": {
+    "type": "boolean",
+    "default": false,
+    "description": "BL-023. **Nothing helped a guest find their vehicle.** Where the access point is a car park entry, the level and zone are captured against the visit so the app can answer it — **the guest who cannot find their car at 11pm is the last impression of the day.**\n"
+   },
+   "mode": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/TurnstileMode"
+     }
+    ],
+    "nullable": true,
+    "description": "Narrows `operatingMode` only: `freeRotation` or `closed` within `normal` or `podium`, null otherwise and whenever the turnstile validates in its fixed `direction` (audit R221).\n"
+   },
+   "direction": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Direction"
+     }
+    ],
+    "description": "**Fixed per access point** (audit R221): set in the back office by `createAccessPoint` and `updateAccessPoint`, never by the podium.\n"
+   },
+   "antiPassbackEnabled": {
+    "type": "boolean"
+   },
+   "requiresExitBeforeReentry": {
+    "type": "boolean",
+    "default": false,
+    "description": "Written by `createAccessPoint` and `updateAccessPoint`, and returned so the edit form reads back what it wrote."
+   },
+   "driver": {
     "type": "string",
-    "description": "connectivity"
+    "nullable": true,
+    "description": "Driver identifier for the controller behind this access point, as written by `createAccessPoint` and `updateAccessPoint`. Where the reader speaks OSDP the driver is standards-based; the controller layer above it is vendor-specific.\n"
    },
-   "lastHeartbeat": {
+   "geofence": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AccessPointGeofence"
+     }
+    ],
+    "nullable": true,
+    "description": "Written by `setAccessPointGeofence`; null until one is set. **One `jsonb` column on the access point row** (`access.access_point.geofence`), read with the point when a handheld validates against it.\n"
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "lastHeartbeatAt": {
     "type": "string",
     "format": "date-time",
-    "description": "last heartbeat"
-   },
-   "configurationVersion": {
-    "type": "string",
-    "description": "configuration version"
-   },
-   "localRuleVersion": {
-    "type": "string",
-    "description": "local rule version"
-   },
-   "credentialSecurityPackageVersion": {
-    "type": "string",
-    "description": "credential/security package version"
-   },
-   "scannerHealth": {
-    "type": "string",
-    "description": "scanner health"
-   },
-   "controllerHealth": {
-    "type": "string",
-    "description": "controller health"
-   },
-   "cameraHealthWhereApplicable": {
-    "type": "string",
-    "description": "camera health where applicable"
-   },
-   "ai": {
-    "type": "string",
-    "description": "AI"
+    "nullable": true
    }
   }
+ },
+ "AccessPointGeofence": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "Where a handheld may validate for one access point, and what happens outside it. The body of `setAccessPointGeofence` and the value of `AccessPoint.geofence`.\n",
+  "required": [
+   "enforcement"
+  ],
+  "properties": {
+   "latitude": {
+    "type": "number"
+   },
+   "longitude": {
+    "type": "number"
+   },
+   "radiusMetres": {
+    "type": "integer",
+    "minimum": 5,
+    "maximum": 5000
+   },
+   "enforcement": {
+    "type": "string",
+    "enum": [
+     "off",
+     "warn",
+     "deny"
+    ],
+    "description": "`off` keeps the fence on record and checks nothing; `warn` lets a validation from outside the fence through with a warning; `deny` refuses it.\n"
+   },
+   "allowProximityBeacon": {
+    "type": "boolean",
+    "description": "Accept a BLE proximity assertion in place of GPS. Better indoors."
+   }
+  }
+ },
+ "AccessPointOperatingMode": {
+  "type": "string",
+  "description": "BL-107 and BL-109. **What the gate does, and what the podium sets** (`setTurnstileMode`, decided 28 September, audit R221). `closed` refuses everybody; `dropArm` lets everybody through and exists for an evacuation; `podium` is supervised validation by eye; `freeFlow` counts without validating; `maintenance` takes the lane out of use.\n",
+  "enum": [
+   "normal",
+   "freeFlow",
+   "dropArm",
+   "closed",
+   "podium",
+   "maintenance"
+  ]
+ },
+ "DeviceCapability": {
+  "type": "string",
+  "description": "BL-179. **Something a driver reports, not something the platform provides.** The list grows as vendors are added, which is ADR-0015's whole position: adding a vendor is a driver plus configuration rather than a core change.\n**`genderClassification` is here because `VenueSettings.segregatedAccess. genderVerification` already offers `deviceAssisted` and nothing answered it** — a switch with no driver behind it. Where a venue's access hardware performs the check and the venue chooses to use it, the result is **advisory to the steward and never decisive at the turnstile** (`ValidationResult.advisory`). 3.2.45 asks for rejection; the package deviates deliberately and CF-130 records why.\n",
+  "enum": [
+   "genderClassification"
+  ]
+ },
+ "DeviceKind": {
+  "type": "string",
+  "enum": [
+   "receiptPrinter",
+   "ticketPrinter",
+   "labelPrinter",
+   "cashDrawer",
+   "barcodeScanner",
+   "rfidReader",
+   "nfcReader",
+   "cardReader",
+   "idReader",
+   "biometricReader",
+   "accessReader",
+   "paymentTerminal",
+   "customerDisplay",
+   "signageDisplay",
+   "kitchenDisplay",
+   "turnstileController",
+   "wristbandEncoder",
+   "signaturePad",
+   "scale",
+   "camera"
+  ]
  },
  "DeviceSoftwareContentRemoteConfigurationInput": {
   "type": "object",
@@ -1884,6 +2258,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Device Software, Content & Remote Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
+   "deviceGroupId": {
+    "type": "string",
+    "description": "Target device group"
+   },
+   "venueId": {
+    "type": "string"
+   },
+   "configurationId": {
+    "type": "string"
+   },
    "deviceSettings": {
     "type": "string",
     "description": "Device settings"
@@ -1897,11 +2281,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Reader settings"
    },
    "mediaProfiles": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Media profiles"
    },
    "outcomeProfiles": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Outcome profiles"
    },
    "language": {
@@ -1917,8 +2307,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Local rules"
    },
    "offlineSecurityConfiguration": {
-    "type": "integer",
-    "description": "Offline security configuration"
+    "type": "string",
+    "description": "Offline security package reference"
    },
    "welcomePage": {
     "type": "string",
@@ -1947,8 +2337,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "emergencyInformation": {
     "type": "string",
     "description": "Emergency information"
+   },
+   "version": {
+    "type": "string",
+    "description": "Configuration version, for rollback"
+   },
+   "deploymentStage": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "testDevice",
+     "deviceGroup",
+     "venueRollout"
+    ]
    }
-  }
+  },
+  "required": [
+   "configurationId",
+   "venueId",
+   "deviceGroupId"
+  ]
  },
  "DeviceSoftwareContentRemoteConfigurationView": {
   "type": "object",
@@ -1956,6 +2364,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Device Software, Content & Remote Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
+   "deviceGroupId": {
+    "type": "string",
+    "description": "Target device group"
+   },
+   "venueId": {
+    "type": "string"
+   },
+   "configurationId": {
+    "type": "string"
+   },
    "deviceSettings": {
     "type": "string",
     "description": "Device settings"
@@ -1969,11 +2387,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Reader settings"
    },
    "mediaProfiles": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Media profiles"
    },
    "outcomeProfiles": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Outcome profiles"
    },
    "language": {
@@ -1989,8 +2413,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Local rules"
    },
    "offlineSecurityConfiguration": {
-    "type": "integer",
-    "description": "Offline security configuration"
+    "type": "string",
+    "description": "Offline security package reference"
    },
    "welcomePage": {
     "type": "string",
@@ -2019,8 +2443,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "emergencyInformation": {
     "type": "string",
     "description": "Emergency information"
+   },
+   "version": {
+    "type": "string",
+    "description": "Configuration version, for rollback"
+   },
+   "deploymentStage": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "testDevice",
+     "deviceGroup",
+     "venueRollout"
+    ]
    }
-  }
+  },
+  "required": [
+   "configurationId",
+   "venueId",
+   "deviceGroupId"
+  ]
  },
  "DeviceTypeHardwareLibraryView": {
   "type": "object",
@@ -2028,97 +2470,33 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Device Type & Hardware Library displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "standard": {
+   "hardwareType": {
     "type": "string",
-    "description": "Standard"
-   },
-   "fullHeight": {
-    "type": "string",
-    "description": "Full Height"
-   },
-   "tripod": {
-    "type": "string",
-    "description": "Tripod"
-   },
-   "speedGate": {
-    "type": "string",
-    "description": "Speed Gate"
-   },
-   "wideLane": {
-    "type": "string",
-    "description": "Wide Lane"
-   },
-   "accessiblePodGate": {
-    "type": "string",
-    "description": "Accessible/POD Gate"
-   },
-   "buggyGate": {
-    "type": "string",
-    "description": "Buggy Gate"
-   },
-   "vipGate": {
-    "type": "string",
-    "description": "VIP Gate"
-   },
-   "staffGate": {
-    "type": "string",
-    "description": "Staff Gate"
-   },
-   "androidHandheld": {
-    "type": "string",
-    "description": "Android Handheld"
-   },
-   "iosDevice": {
-    "type": "string",
-    "description": "iOS Device"
-   },
-   "tablet": {
-    "type": "string",
-    "description": "Tablet"
-   },
-   "qrBarcode": {
-    "type": "string",
-    "description": "QR/Barcode"
-   },
-   "rfid": {
-    "type": "string",
-    "description": "RFID"
-   },
-   "nfc": {
-    "type": "string",
-    "description": "NFC"
-   },
-   "multiTechnology": {
-    "type": "string",
-    "description": "Multi-technology"
-   },
-   "biometric": {
-    "type": "string",
-    "description": "Biometric"
-   },
-   "podium": {
-    "type": "string",
-    "description": "Podium"
-   },
-   "counter": {
-    "type": "string",
-    "description": "Counter"
-   },
-   "beacon": {
-    "type": "string",
-    "description": "Beacon"
-   },
-   "cameraController": {
-    "type": "string",
-    "description": "camera/controller"
-   },
-   "supportedExternalAccessDevice": {
-    "type": "string",
-    "description": "supported external access device"
-   },
-   "standardTurnstiles": {
-    "type": "string",
-    "description": "standard turnstiles"
+    "enum": [
+     "standardTurnstile",
+     "fullHeightTurnstile",
+     "tripodTurnstile",
+     "speedGate",
+     "wideLane",
+     "accessiblePodGate",
+     "buggyGate",
+     "vipGate",
+     "staffGate",
+     "androidHandheld",
+     "iosDevice",
+     "tablet",
+     "qrBarcodeReader",
+     "rfidReader",
+     "nfcReader",
+     "multiTechnologyReader",
+     "biometricReader",
+     "podium",
+     "counter",
+     "beacon",
+     "cameraController",
+     "externalAccessDevice"
+    ],
+    "description": "Specific hardware type within the device category"
    },
    "manufacturer": {
     "type": "string",
@@ -2130,30 +2508,43 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "deviceCategory": {
     "type": "string",
+    "enum": [
+     "turnstile",
+     "specialGate",
+     "mobile",
+     "reader",
+     "other"
+    ],
     "description": "Device Category"
    },
    "supportedTechnologies": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Supported technologies"
    },
    "connectivity": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Connectivity"
    },
    "offlineCapability": {
-    "type": "integer",
+    "type": "boolean",
     "description": "Offline capability"
    },
    "screenCapability": {
-    "type": "string",
+    "type": "boolean",
     "description": "Screen capability"
    },
    "soundCapability": {
-    "type": "string",
+    "type": "boolean",
     "description": "Sound capability"
    },
    "lightCapability": {
-    "type": "string",
+    "type": "boolean",
     "description": "Light capability"
    },
    "relayControllerSupport": {
@@ -2161,12 +2552,58 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Relay/controller support"
    },
    "paymentCapabilityWhereAvailable": {
-    "type": "string",
+    "type": "boolean",
     "description": "payment capability where available"
    },
    "firmwareSoftwareInformation": {
     "type": "string",
     "description": "firmware/software information"
+   },
+   "hardwareModelId": {
+    "type": "string"
+   }
+  }
+ },
+ "Direction": {
+  "type": "string",
+  "enum": [
+   "entry",
+   "exit",
+   "reentry",
+   "crossover"
+  ]
+ },
+ "ExternalCredentialSourceList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "**One `jsonb` column on the access point row** (`access.access_point.external_credential_sources`). Read with the access point when a credential is presented; a source is never queried on its own.\n",
+  "items": {
+   "type": "object",
+   "properties": {
+    "kind": {
+     "type": "string",
+     "enum": [
+      "hotelRoomCard",
+      "corporateBadge",
+      "cityPass",
+      "transitCard",
+      "partnerToken"
+     ]
+    },
+    "providerName": {
+     "type": "string"
+    },
+    "endpoint": {
+     "type": "string"
+    },
+    "credentialRef": {
+     "type": "string"
+    },
+    "grantsProductId": {
+     "type": "string",
+     "format": "uuid"
+    }
    }
   }
  },
@@ -2176,37 +2613,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Gate Modes, Free Spin & Emergency Controls displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "entry": {
-    "type": "string",
-    "description": "Entry"
-   },
-   "exit": {
-    "type": "string",
-    "description": "Exit"
-   },
-   "reEntry": {
-    "type": "string",
-    "description": "Re-entry"
-   },
-   "crossover": {
-    "type": "string",
-    "description": "Crossover"
-   },
-   "closed": {
-    "type": "integer",
-    "description": "Closed"
-   },
-   "credentialReadingOff": {
-    "type": "string",
-    "description": "Credential Reading: OFF"
-   },
-   "turnstileRotationCountOn": {
-    "type": "integer",
-    "description": "Turnstile Rotation Count: ON"
-   },
    "whoCanActivate": {
-    "type": "string",
-    "description": "Who can activate"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Roles allowed to activate this mode"
    },
    "venueScope": {
     "type": "string",
@@ -2216,7 +2628,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Gate group"
    },
-   "reason": {
+   "reasonRequired": {
     "type": "string",
     "description": "reason"
    },
@@ -2225,12 +2637,23 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "emergency code"
    },
    "automaticNotification": {
-    "type": "string",
+    "type": "boolean",
     "description": "automatic notification"
    },
    "incidentRecord": {
+    "type": "boolean",
+    "description": "Activation creates an incident record"
+   },
+   "policyId": {
+    "type": "string"
+   },
+   "mode": {
     "type": "string",
-    "description": "incident record"
+    "enum": [
+     "freeFlow",
+     "dropArm"
+    ],
+    "description": "Non-standard operating mode this policy governs (R221 vocabulary): freeFlow covers free spin and count only, dropArm is the emergency mode"
    }
   }
  },
@@ -2240,12 +2663,24 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Handheld & Mobile Access Device Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
+   "name": {
+    "type": "string",
+    "description": "e.g. Standard Attendant, Supervisor"
+   },
+   "profileId": {
+    "type": "string",
+    "description": "Handheld configuration profile identifier"
+   },
    "deviceType": {
     "type": "string",
     "description": "Device type"
    },
-   "androidIos": {
+   "platform": {
     "type": "string",
+    "enum": [
+     "android",
+     "ios"
+    ],
     "description": "Android/iOS"
    },
    "assignedVenue": {
@@ -2261,11 +2696,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "assigned operator group"
    },
    "permittedOperatingModes": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "permitted operating modes"
    },
    "offlineCapability": {
-    "type": "integer",
+    "type": "boolean",
     "description": "offline capability"
    },
    "scannerSource": {
@@ -2273,50 +2711,34 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "scanner source"
    },
    "biometricCapabilityWhereSupported": {
-    "type": "string",
+    "type": "boolean",
     "description": "biometric capability where supported"
    },
-   "scanTicket": {
-    "type": "string",
-    "description": "Scan Ticket"
-   },
-   "entry": {
-    "type": "string",
-    "description": "Entry"
-   },
-   "exit": {
-    "type": "string",
-    "description": "Exit"
-   },
-   "reEntry": {
-    "type": "string",
-    "description": "Re-entry"
-   },
-   "crossover": {
-    "type": "string",
-    "description": "Crossover"
-   },
-   "groupAdmission": {
-    "type": "string",
-    "description": "Group Admission"
-   },
-   "manualAttendance": {
-    "type": "integer",
-    "description": "Manual Attendance"
-   },
-   "changeDeviceMode": {
-    "type": "string",
-    "description": "Change Device Mode"
-   },
-   "scanGroupAdmission": {
-    "type": "string",
-    "description": "Scan + Group Admission"
-   },
-   "preventsFurtherTrustedAccessTransactions": {
-    "type": "string",
-    "description": "prevents further trusted access transactions"
+   "enabledFunctions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "scanTicket",
+      "searchTicket",
+      "entry",
+      "exit",
+      "reEntry",
+      "crossover",
+      "groupAdmission",
+      "manualAttendance",
+      "override",
+      "viewHistory",
+      "changeDeviceMode"
+     ]
+    },
+    "description": "Functions enabled for this device role"
    }
-  }
+  },
+  "required": [
+   "profileId",
+   "name"
+  ]
  },
  "HandheldMobileAccessDeviceConfigurationView": {
   "type": "object",
@@ -2324,12 +2746,24 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Handheld & Mobile Access Device Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
+   "name": {
+    "type": "string",
+    "description": "e.g. Standard Attendant, Supervisor"
+   },
+   "profileId": {
+    "type": "string",
+    "description": "Handheld configuration profile identifier"
+   },
    "deviceType": {
     "type": "string",
     "description": "Device type"
    },
-   "androidIos": {
+   "platform": {
     "type": "string",
+    "enum": [
+     "android",
+     "ios"
+    ],
     "description": "Android/iOS"
    },
    "assignedVenue": {
@@ -2345,11 +2779,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "assigned operator group"
    },
    "permittedOperatingModes": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "permitted operating modes"
    },
    "offlineCapability": {
-    "type": "integer",
+    "type": "boolean",
     "description": "offline capability"
    },
    "scannerSource": {
@@ -2357,218 +2794,186 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "scanner source"
    },
    "biometricCapabilityWhereSupported": {
-    "type": "string",
+    "type": "boolean",
     "description": "biometric capability where supported"
    },
-   "scanTicket": {
+   "enabledFunctions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "scanTicket",
+      "searchTicket",
+      "entry",
+      "exit",
+      "reEntry",
+      "crossover",
+      "groupAdmission",
+      "manualAttendance",
+      "override",
+      "viewHistory",
+      "changeDeviceMode"
+     ]
+    },
+    "description": "Functions enabled for this device role"
+   }
+  },
+  "required": [
+   "profileId",
+   "name"
+  ]
+ },
+ "HardwareDeploymentInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only (decided 29 September, VM close-out)",
+  "description": "Deploy one gate configuration version to a target set (decided 29 September, VM close-out).",
+  "required": [
+   "id",
+   "configurationVersion",
+   "targetScope",
+   "venueId"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Scan Ticket"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated deployment id"
    },
-   "entry": {
+   "configurationVersion": {
     "type": "string",
-    "description": "Entry"
+    "description": "The access configuration version being deployed"
    },
-   "exit": {
+   "targetScope": {
     "type": "string",
-    "description": "Exit"
+    "enum": [
+     "pilot",
+     "selectedGates",
+     "deviceGroup",
+     "venue"
+    ]
    },
-   "reEntry": {
+   "venueId": {
+    "type": "string"
+   },
+   "gateIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Required for pilot and selectedGates"
+   },
+   "deviceGroupId": {
     "type": "string",
-    "description": "Re-entry"
+    "description": "Required for deviceGroup"
    },
-   "crossover": {
+   "runCompatibilityTestFirst": {
+    "type": "boolean",
+    "default": true,
+    "description": "Devices that fail the compatibility test are skipped and named in the result"
+   },
+   "scheduledAt": {
     "type": "string",
-    "description": "Crossover"
-   },
-   "groupAdmission": {
-    "type": "string",
-    "description": "Group Admission"
-   },
-   "manualAttendance": {
-    "type": "integer",
-    "description": "Manual Attendance"
-   },
-   "changeDeviceMode": {
-    "type": "string",
-    "description": "Change Device Mode"
-   },
-   "scanGroupAdmission": {
-    "type": "string",
-    "description": "Scan + Group Admission"
-   },
-   "preventsFurtherTrustedAccessTransactions": {
-    "type": "string",
-    "description": "prevents further trusted access transactions"
+    "format": "date-time",
+    "description": "Empty deploys now"
    }
   }
  },
- "HardwareCompatibilityHealthTestingDeploymentView": {
+ "HardwareDeploymentView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Hardware Compatibility, Health, Testing & Deployment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "access.hardware_deployment",
+  "description": "**One rollout of one gate configuration version to one target set** (decided 29 September, VM close-out). The lifecycle is the one `tenancy.ProfileDeployment` uses for configuration profiles, so a partial failure is visible and retried or rolled back, never an end state.",
+  "required": [
+   "id",
+   "configurationVersion",
+   "targetScope",
+   "status"
+  ],
   "properties": {
-   "rfid": {
+   "id": {
     "type": "string",
-    "description": "RFID ✓ ✓ ✓ ✓"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
-   "nfc": {
+   "configurationVersion": {
+    "type": "string"
+   },
+   "targetScope": {
     "type": "string",
-    "description": "NFC ✓ — ✓ ✓"
+    "enum": [
+     "pilot",
+     "selectedGates",
+     "deviceGroup",
+     "venue"
+    ]
    },
-   "offline": {
-    "type": "integer",
-    "description": "Offline ✓ ✓ ✓ ✓"
+   "venueId": {
+    "type": "string"
    },
-   "pilotDeployment": {
+   "gateIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "deviceGroupId": {
+    "type": "string"
+   },
+   "status": {
     "type": "string",
-    "description": "Pilot deployment"
+    "enum": [
+     "queued",
+     "inProgress",
+     "completed",
+     "partiallyFailed",
+     "rolledBack"
+    ]
    },
-   "selectedGates": {
+   "devicesTargeted": {
+    "type": "integer"
+   },
+   "devicesAcknowledged": {
+    "type": "integer"
+   },
+   "failedDeviceIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Devices that failed the compatibility test or did not acknowledge"
+   },
+   "requestedByPrincipalId": {
+    "type": "string"
+   },
+   "requestedAt": {
     "type": "string",
-    "description": "Selected gates"
+    "format": "date-time"
    },
-   "deviceGroup": {
-    "type": "string",
-    "description": "device group"
-   },
-   "venue": {
-    "type": "string",
-    "description": "venue"
-   },
-   "scheduledRollout": {
+   "scheduledAt": {
     "type": "string",
     "format": "date-time",
-    "description": "scheduled rollout"
+    "nullable": true
    },
-   "rollback": {
+   "scopePath": {
     "type": "string",
-    "description": "rollback"
-   },
-   "sounds": {
-    "type": "string",
-    "description": "sounds"
-   },
-   "board2AccessRules": {
-    "type": "string",
-    "description": "Board 2 — Access Rules"
-   },
-   "board6PhysicalExecution": {
-    "type": "string",
-    "description": "BOARD 6 — PHYSICAL EXECUTION"
-   },
-   "issues": {
-    "type": "string",
-    "description": "issues"
-   },
-   "disappears": {
-    "type": "string",
-    "description": "disappears?"
-   },
-   "distribute": {
-    "type": "string",
-    "description": "↓ Distribute"
-   },
-   "localValidation": {
-    "type": "string",
-    "description": "↓ Local validation"
-   },
-   "synchronize": {
-    "type": "string",
-    "description": "↑ Synchronize"
+    "description": "The partition key (ADR-0005). Written at venue scope"
    }
   }
  },
- "PhysicalDeviceRegistrationProvisioningView": {
+ "Page": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Physical Device Registration & Provisioning displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "required": [
+   "items",
+   "hasMore"
+  ],
   "properties": {
-   "deviceId": {
-    "type": "string",
-    "description": "Device ID"
+   "items": {
+    "type": "array",
+    "items": {}
    },
-   "serialNumber": {
-    "type": "string",
-    "description": "Serial Number"
+   "nextCursor": {
+    "type": "string"
    },
-   "hardwareModel": {
-    "type": "string",
-    "description": "Hardware Model"
-   },
-   "manufacturer": {
-    "type": "string",
-    "description": "Manufacturer"
-   },
-   "tenant": {
-    "type": "string",
-    "description": "Tenant"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "park": {
-    "type": "string",
-    "description": "Park"
-   },
-   "zone": {
-    "type": "string",
-    "description": "Zone"
-   },
-   "accessPoint": {
-    "type": "string",
-    "description": "Access Point"
-   },
-   "gateLane": {
-    "type": "string",
-    "description": "Gate/Lane"
-   },
-   "ipNetworkReference": {
-    "type": "string",
-    "description": "IP/network reference"
-   },
-   "controllerReference": {
-    "type": "string",
-    "description": "controller reference"
-   },
-   "installationDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "installation date"
-   },
-   "useControlledDeviceCredentials": {
-    "type": "string",
-    "description": "Use controlled device credentials"
-   },
-   "useControlledDeviceCertificates": {
-    "type": "string",
-    "description": "Use controlled device certificates"
-   },
-   "whilePreserving": {
-    "type": "string",
-    "description": "while preserving"
-   },
-   "gateAssignment": {
-    "type": "string",
-    "description": "Gate assignment"
-   },
-   "configuration": {
-    "type": "string",
-    "description": "Configuration"
-   },
-   "accessRules": {
-    "type": "string",
-    "description": "Access rules"
-   },
-   "mediaProfiles": {
-    "type": "string",
-    "description": "Media profiles"
-   },
-   "operatingMode": {
-    "type": "string",
-    "description": "operating mode"
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },
@@ -2578,15 +2983,47 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Reader, Scanner & Peripheral Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "whereSupported": {
+   "accessPointId": {
     "type": "string",
-    "description": "where supported"
+    "description": "Gate or device the peripherals attach to"
    },
-   "yellowOperatorVerification": {
+   "readers": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Attached readers, e.g. qrBarcode, rfid, nfc, biometricCamera, paymentReader, heightSensor"
+   },
+   "verificationPriority": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Order methods are tried, e.g. facePass, dynamicQr, rfid, nfc"
+   },
+   "rfidRange": {
     "type": "string",
-    "description": "Yellow → Operator Verification"
+    "enum": [
+     "near",
+     "medium",
+     "far"
+    ]
+   },
+   "heightVerificationEnabled": {
+    "type": "boolean",
+    "description": "Height check for junior tickets; without a supported sensor the result is yellow for operator verification"
+   },
+   "capabilityWarnings": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Configured checks the attached hardware cannot perform"
    }
-  }
+  },
+  "required": [
+   "accessPointId"
+  ]
  },
  "ReaderScannerPeripheralConfigurationView": {
   "type": "object",
@@ -2594,13 +3031,242 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Reader, Scanner & Peripheral Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "whereSupported": {
+   "accessPointId": {
     "type": "string",
-    "description": "where supported"
+    "description": "Gate or device the peripherals attach to"
    },
-   "yellowOperatorVerification": {
+   "readers": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Attached readers, e.g. qrBarcode, rfid, nfc, biometricCamera, paymentReader, heightSensor"
+   },
+   "verificationPriority": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Order methods are tried, e.g. facePass, dynamicQr, rfid, nfc"
+   },
+   "rfidRange": {
     "type": "string",
-    "description": "Yellow → Operator Verification"
+    "enum": [
+     "near",
+     "medium",
+     "far"
+    ]
+   },
+   "heightVerificationEnabled": {
+    "type": "boolean",
+    "description": "Height check for junior tickets; without a supported sensor the result is yellow for operator verification"
+   },
+   "capabilityWarnings": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Configured checks the attached hardware cannot perform"
+   }
+  },
+  "required": [
+   "accessPointId"
+  ]
+ },
+ "RegisteredDevice": {
+  "x-ticvai-persistence": "platform.device",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "driver",
+   "workstationId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "kind": {
+    "$ref": "#/components/schemas/DeviceKind"
+   },
+   "driver": {
+    "type": "string",
+    "description": "Built to an open standard where one exists — ESC/POS, UnifiedPOS, OSDP. Adding a vendor is a driver plus configuration, not a core change (ADR-0015).\n"
+   },
+   "identifier": {
+    "type": "string",
+    "nullable": true
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "model": {
+    "type": "string",
+    "nullable": true
+   },
+   "pushToken": {
+    "type": "string",
+    "format": "password",
+    "nullable": true,
+    "writeOnly": true,
+    "description": "BL-163. **Guest devices register for push and staff devices did not** — `registerGuestDevice` exists with a token, platform and failure count, and a scanner that cannot be told anything is a scanner somebody has to walk to.\nWrite-only, and marked `writeOnly`: accepted by `registerDevice` and never returned by `listDevices` or `getDevice`. **A push token is a credential**, and the rule that no surface holds a provider key applies here too.\n"
+   },
+   "pushPlatform": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "ios",
+     "android",
+     "web",
+     "windows"
+    ]
+   },
+   "pushFailureCount": {
+    "type": "integer",
+    "default": 0,
+    "readOnly": true,
+    "description": "**Consecutive failures.** A token that has failed repeatedly is a device that was wiped or reassigned, and continuing to push to it is how a notification queue fills with nothing.\n"
+   },
+   "offlineScope": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "none",
+     "readOnly",
+     "sellAndScan",
+     "fullVenue"
+    ],
+    "description": "BL-163. **What this device may do with no connection**, which was unstated for the staff app while `venue-pos` and `venue-scanner` had it settled.\n**`fullVenue` on a personal handset is a decision, not a default** — a device that can do everything offline is a device that carries the whole venue's data in somebody's pocket.\n"
+   },
+   "firmwareVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "As the device last reported it on its heartbeat."
+   },
+   "isRequired": {
+    "type": "boolean",
+    "description": "True blocks shift open when the device is unreachable."
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "online",
+     "offline",
+     "error",
+     "consumableLow",
+     "needsAttention",
+     "unknown"
+    ],
+    "description": "What the device last said on its heartbeat; `unknown` until it has."
+   },
+   "batteryPercent": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "minimum": 0,
+    "maximum": 100,
+    "description": "Board 1 of the client's POS design set, 20 August. **A wristband encoder at 8% is a gate that stops working in an hour**, and nothing in the package carried it.\n**Null where the device has no battery**, which is most of them — a receipt printer reporting 100% forever is worse than one reporting nothing.\n"
+   },
+   "lastCheckedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Distinct from `lastHeartbeatAt`.** A heartbeat is the workstation saying the device is attached; a check is the device answering. **A printer with no paper heartbeats perfectly**, which is why the client's board shows both columns.\n"
+   },
+   "health": {
+    "type": "string",
+    "enum": [
+     "healthy",
+     "warning",
+     "degraded",
+     "offline",
+     "unknown"
+    ],
+    "default": "unknown",
+    "readOnly": true,
+    "description": "**Derived, not reported.** Computed from heartbeat age, battery, firmware currency and error rate — a device does not know whether it is healthy, and asking it produces a fleet that is 100% healthy and 12% broken.\n"
+   },
+   "lastHeartbeatAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "capabilities": {
+    "type": "array",
+    "readOnly": true,
+    "items": {
+     "$ref": "#/components/schemas/DeviceCapability"
+    },
+    "description": "BL-179. **What this driver reports it can do, beyond reading media.** ADR-0015 is standards-first — the device does what the device does — and until now a venue could switch on a feature that depended on hardware without anything being able to say whether the hardware was there.\n**A capability absent is a capability unavailable**, not a capability assumed. A venue setting that requires one is refused where no device in scope reports it, rather than silently doing nothing at the gate.\n"
+   },
+   "enrolmentState": {
+    "type": "string",
+    "enum": [
+     "registered",
+     "enrolled",
+     "provisioned",
+     "active",
+     "deactivated",
+     "retired"
+    ],
+    "default": "registered",
+    "readOnly": true,
+    "description": "BL-160. **Where the device is in its life, which is not the same question as whether it is answering.** `enrolDevice` has taken the whole matrix — registered, enrolled, provisioned, active, deactivated, retired — since 16.1.2, and until now there was no column for it to land in, so the operation read this table and wrote nothing.\n**Distinct from `status` and from `health`.** `status` is what the device last said and `health` is what we computed from it; a decommissioned turnstile still sitting on the network is `online` and `retired` at once, and neither column contradicts the other. **A device that is `retired` is refused at the gate whatever its status says.**\nThe transition itself — who moved it, from what, and why — is a `tenancy.device_audit` record. It is not repeated here, because the latest transition stored in two places is one place to go stale.\n"
+   },
+   "retiredAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Set when `enrolmentState` reaches `retired`, and null otherwise.** Derivable from `tenancy.device_audit`, and kept as a column for the same reason `maintenance.asset.retired_on` is one: a retirement date you reconstruct from an audit log is a date nobody filters a fleet by.\n"
+   },
+   "configurationProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The profile this device was provisioned with.** `enrolDevice` has accepted one since 16.1.3 and there was nowhere to keep it, so the answer to *\"what is this reader configured as\"* lived only in the request that set it.\n"
+   }
+  }
+ },
+ "ScanAnomalyRuleList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "**One `jsonb` column on the access point row** (`access.access_point.scan_anomaly_rules`). Read with the access point at validation, and a rule is never queried on its own.\n",
+  "items": {
+   "type": "object",
+   "properties": {
+    "rule": {
+     "type": "string",
+     "enum": [
+      "simultaneousEntry",
+      "impossibleTravelTime",
+      "rapidReentry",
+      "sharedDevice",
+      "velocityBreach"
+     ]
+    },
+    "action": {
+     "type": "string",
+     "enum": [
+      "log",
+      "flag",
+      "requireSupervisor",
+      "deny"
+     ]
+    },
+    "thresholdSeconds": {
+     "type": "integer",
+     "nullable": true
+    }
    }
   }
  },
@@ -2610,57 +3276,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Turnstile & Lane Behavior Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "entry": {
+   "accessPointId": {
     "type": "string",
-    "description": "Entry"
+    "description": "Turnstile or lane being configured"
    },
-   "exit": {
+   "mode": {
     "type": "string",
-    "description": "Exit"
-   },
-   "entryExit": {
-    "type": "string",
-    "description": "Entry/Exit"
-   },
-   "reEntry": {
-    "type": "string",
-    "description": "Re-entry"
-   },
-   "crossover": {
-    "type": "string",
-    "description": "Crossover"
-   },
-   "fastPass": {
-    "type": "string",
-    "description": "Fast Pass"
-   },
-   "attraction": {
-    "type": "string",
-    "description": "Attraction"
-   },
-   "group": {
-    "type": "string",
-    "description": "Group"
-   },
-   "countOnly": {
-    "type": "integer",
-    "description": "Count Only"
-   },
-   "freeSpin": {
-    "type": "string",
-    "description": "Free Spin"
-   },
-   "closed": {
-    "type": "integer",
-    "description": "Closed"
-   },
-   "emergency": {
-    "type": "string",
-    "description": "Emergency"
+    "enum": [
+     "normal",
+     "freeFlow",
+     "dropArm",
+     "closed",
+     "podium",
+     "maintenance"
+    ],
+    "description": "Default operating mode of the lane (AccessPointOperatingMode, R221). Direction is fixed per access point; re-entry, crossover, fast pass and group are admission rules, not lane modes"
    },
    "passThroughTimeout": {
-    "type": "string",
-    "description": "pass-through timeout"
+    "type": "integer",
+    "description": "Seconds"
    },
    "relockBehavior": {
     "type": "string",
@@ -2669,8 +3303,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "incompletePassageBehavior": {
     "type": "string",
     "description": "incomplete passage behavior"
+   },
+   "unlockDuration": {
+    "type": "integer",
+    "description": "Seconds"
    }
-  }
+  },
+  "required": [
+   "accessPointId",
+   "mode"
+  ]
  },
  "TurnstileLaneBehaviorConfigurationView": {
   "type": "object",
@@ -2678,57 +3320,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Turnstile & Lane Behavior Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "entry": {
+   "accessPointId": {
     "type": "string",
-    "description": "Entry"
+    "description": "Turnstile or lane being configured"
    },
-   "exit": {
+   "mode": {
     "type": "string",
-    "description": "Exit"
-   },
-   "entryExit": {
-    "type": "string",
-    "description": "Entry/Exit"
-   },
-   "reEntry": {
-    "type": "string",
-    "description": "Re-entry"
-   },
-   "crossover": {
-    "type": "string",
-    "description": "Crossover"
-   },
-   "fastPass": {
-    "type": "string",
-    "description": "Fast Pass"
-   },
-   "attraction": {
-    "type": "string",
-    "description": "Attraction"
-   },
-   "group": {
-    "type": "string",
-    "description": "Group"
-   },
-   "countOnly": {
-    "type": "integer",
-    "description": "Count Only"
-   },
-   "freeSpin": {
-    "type": "string",
-    "description": "Free Spin"
-   },
-   "closed": {
-    "type": "integer",
-    "description": "Closed"
-   },
-   "emergency": {
-    "type": "string",
-    "description": "Emergency"
+    "enum": [
+     "normal",
+     "freeFlow",
+     "dropArm",
+     "closed",
+     "podium",
+     "maintenance"
+    ],
+    "description": "Default operating mode of the lane (AccessPointOperatingMode, R221). Direction is fixed per access point; re-entry, crossover, fast pass and group are admission rules, not lane modes"
    },
    "passThroughTimeout": {
-    "type": "string",
-    "description": "pass-through timeout"
+    "type": "integer",
+    "description": "Seconds"
    },
    "relockBehavior": {
     "type": "string",
@@ -2737,8 +3347,24 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "incompletePassageBehavior": {
     "type": "string",
     "description": "incomplete passage behavior"
+   },
+   "unlockDuration": {
+    "type": "integer",
+    "description": "Seconds"
    }
-  }
+  },
+  "required": [
+   "accessPointId",
+   "mode"
+  ]
+ },
+ "TurnstileMode": {
+  "type": "string",
+  "description": "**Reduced to two values — decided 28 September, audit R221.** Entry, exit, re-entry and crossover were the access point's `Direction` under another name, and two fields that could disagree left the gate to guess. Direction is fixed per access point; within `normal` or `podium` operation the turnstile may only be let spin free or held closed.\n",
+  "enum": [
+   "freeRotation",
+   "closed"
+  ]
  },
  "ValidationOutcomeGuestFeedbackDesignerInput": {
   "type": "object",
@@ -2746,17 +3372,61 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Validation Outcome & Guest Feedback Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "greenLight": {
+   "appliesTo": {
     "type": "string",
-    "description": "Green light"
+    "enum": [
+     "adult",
+     "child",
+     "vip",
+     "pod",
+     "membership",
+     "invalidCredential",
+     "wrongVerificationMethod",
+     "biometricReview",
+     "reEntryException"
+    ],
+    "description": "Guest type or case this response is for"
    },
-   "gateOpen": {
-    "type": "integer",
-    "description": "Gate open"
-   },
-   "successTone": {
+   "outcome": {
     "type": "string",
-    "description": "Success tone"
+    "enum": [
+     "granted",
+     "operatorAction",
+     "denied"
+    ]
+   },
+   "venueId": {
+    "type": "string"
+   },
+   "outcomeProfileId": {
+    "type": "string"
+   },
+   "lightColour": {
+    "type": "string",
+    "enum": [
+     "green",
+     "yellow",
+     "red"
+    ],
+    "description": "Light shown"
+   },
+   "gateAction": {
+    "type": "string",
+    "enum": [
+     "open",
+     "remainsControlled",
+     "remainsLocked"
+    ],
+    "description": "What the gate does"
+   },
+   "sound": {
+    "type": "string",
+    "enum": [
+     "successTone",
+     "alertSound",
+     "denialSound"
+    ],
+    "description": "Sound played"
    },
    "pictogram": {
     "type": "string",
@@ -2766,43 +3436,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Custom message"
    },
-   "yellowLight": {
-    "type": "string",
-    "description": "Yellow light"
-   },
-   "alertSound": {
-    "type": "string",
-    "description": "Alert sound"
-   },
-   "gateRemainsControlled": {
-    "type": "string",
-    "description": "Gate remains controlled"
-   },
    "operatorPrompt": {
     "type": "string",
     "description": "operator prompt"
-   },
-   "redLight": {
-    "type": "string",
-    "description": "Red light"
-   },
-   "denialSound": {
-    "type": "string",
-    "description": "Denial sound"
-   },
-   "gateRemainsLocked": {
-    "type": "string",
-    "description": "Gate remains locked"
    },
    "reasonCode": {
     "type": "string",
     "description": "reason code"
    },
-   "redAccessDenied": {
+   "language": {
     "type": "string",
-    "description": "RED — ACCESS DENIED"
+    "description": "Message language, e.g. ar, en"
    }
-  }
+  },
+  "required": [
+   "outcomeProfileId",
+   "venueId",
+   "outcome",
+   "appliesTo"
+  ]
  },
  "ValidationOutcomeGuestFeedbackDesignerView": {
   "type": "object",
@@ -2810,17 +3462,61 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Validation Outcome & Guest Feedback Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "greenLight": {
+   "appliesTo": {
     "type": "string",
-    "description": "Green light"
+    "enum": [
+     "adult",
+     "child",
+     "vip",
+     "pod",
+     "membership",
+     "invalidCredential",
+     "wrongVerificationMethod",
+     "biometricReview",
+     "reEntryException"
+    ],
+    "description": "Guest type or case this response is for"
    },
-   "gateOpen": {
-    "type": "integer",
-    "description": "Gate open"
-   },
-   "successTone": {
+   "outcome": {
     "type": "string",
-    "description": "Success tone"
+    "enum": [
+     "granted",
+     "operatorAction",
+     "denied"
+    ]
+   },
+   "venueId": {
+    "type": "string"
+   },
+   "outcomeProfileId": {
+    "type": "string"
+   },
+   "lightColour": {
+    "type": "string",
+    "enum": [
+     "green",
+     "yellow",
+     "red"
+    ],
+    "description": "Light shown"
+   },
+   "gateAction": {
+    "type": "string",
+    "enum": [
+     "open",
+     "remainsControlled",
+     "remainsLocked"
+    ],
+    "description": "What the gate does"
+   },
+   "sound": {
+    "type": "string",
+    "enum": [
+     "successTone",
+     "alertSound",
+     "denialSound"
+    ],
+    "description": "Sound played"
    },
    "pictogram": {
     "type": "string",
@@ -2830,43 +3526,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Custom message"
    },
-   "yellowLight": {
-    "type": "string",
-    "description": "Yellow light"
-   },
-   "alertSound": {
-    "type": "string",
-    "description": "Alert sound"
-   },
-   "gateRemainsControlled": {
-    "type": "string",
-    "description": "Gate remains controlled"
-   },
    "operatorPrompt": {
     "type": "string",
     "description": "operator prompt"
-   },
-   "redLight": {
-    "type": "string",
-    "description": "Red light"
-   },
-   "denialSound": {
-    "type": "string",
-    "description": "Denial sound"
-   },
-   "gateRemainsLocked": {
-    "type": "string",
-    "description": "Gate remains locked"
    },
    "reasonCode": {
     "type": "string",
     "description": "reason code"
    },
-   "redAccessDenied": {
+   "language": {
     "type": "string",
-    "description": "RED — ACCESS DENIED"
+    "description": "Message language, e.g. ar, en"
    }
-  }
+  },
+  "required": [
+   "outcomeProfileId",
+   "venueId",
+   "outcome",
+   "appliesTo"
+  ]
  }
 }
 ```

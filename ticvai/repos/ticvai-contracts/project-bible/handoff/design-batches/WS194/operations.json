@@ -1,0 +1,203 @@
+{
+ "adjustWallet": {
+  "method": "POST",
+  "path": "/wallets/{subjectId}/adjust",
+  "contract": "wallet",
+  "summary": "Manually adjust a wallet balance",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Wallet"
+ },
+ "beginPeriodClose": {
+  "method": "POST",
+  "path": "/fiscal-periods/{periodId}/begin-close",
+  "contract": "finance",
+  "summary": "Begin closing a period",
+  "permission": "LEDGER_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FiscalPeriod"
+ },
+ "closeFiscalPeriod": {
+  "method": "POST",
+  "path": "/fiscal-periods/{periodId}/close",
+  "contract": "finance",
+  "summary": "Close a period and lock postings",
+  "permission": "LEDGER_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PeriodCloseResult"
+ },
+ "getUnifiedReconciliation": {
+  "method": "GET",
+  "path": "/reconciliation/unified",
+  "contract": "finance",
+  "summary": "Every money source against the ledger, in one view",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "UnifiedReconciliation"
+ },
+ "getWalletLiability": {
+  "method": "GET",
+  "path": "/wallet-liability",
+  "contract": "wallet",
+  "summary": "What is outstanding, and what is breakage",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "asOf",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletLiabilityRow"
+ },
+ "getWalletReconciliation": {
+  "method": "GET",
+  "path": "/wallet-reconciliation",
+  "contract": "wallet",
+  "summary": "The wallet sub-ledger against the general ledger and the acquirer",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletReconciliation"
+ },
+ "listFiscalPeriods": {
+  "method": "GET",
+  "path": "/fiscal-periods",
+  "contract": "finance",
+  "summary": "List fiscal periods",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "setWalletAccountingMapping": {
+  "method": "PUT",
+  "path": "/wallet-accounting",
+  "contract": "wallet",
+  "summary": "Which ledger account each credit type sits in",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletAccountingMapping",
+  "responds": "WalletAccountingMapping"
+ },
+ "setWalletReconciliationSources": {
+  "method": "PUT",
+  "path": "/wallet-reconciliation-sources",
+  "contract": "wallet",
+  "summary": "Which sources the wallet reconciles against, matched how, and when",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletReconciliationSources",
+  "responds": "WalletReconciliationSources"
+ }
+}

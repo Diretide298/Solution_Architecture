@@ -1,6 +1,6 @@
 # WS42 — Privacy  Consent   Preference Management board 2
 
-**10 screens · 10 operations · 12 schemas · 2 permissions**
+**10 screens · 10 operations · 13 schemas · 4 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `MARKETING_MANAGE, MARKETING_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `AUDIT_VIEW, GUEST_MANAGE, GUEST_VIEW, GUEST_VIEW_PII`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -70,11 +69,11 @@ convincingly. It is never a caption.
 | `CMS-037` | Data Retention, Expiry & Legal Hold Operations | listDetail | 1 | 2 | — |
 | `CMS-038` | Privacy Compliance, Exception & Investigation Workspace | listDetail | 1 | 0 | — |
 | `CMS-039` | Privacy Audit, Evidence & Compliance Reporting | configEditor | 1 | 0 | — |
-| `CMS-040` | Privacy Analytics & AI Compliance Intelligence | listDetail | 1 | 0 | — |
+| `CMS-040` | Privacy Analytics & AI Compliance Intelligence | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
 
-**CMS-032, CMS-033, CMS-035, CMS-036 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**CMS-032, CMS-033, CMS-035 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-031 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-032",
@@ -186,10 +182,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can understand the current operational privacy position and identify actions requiring attention from one command center.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide Privacy, Compliance and authorized operational teams with a centralized real-time overview of privacy operations across TICVAI.",
-  "purposeNote": "Authorized users can understand the current operational privacy position and identify actions requiring attention from one command center.",
   "layout": {
    "template": "split",
    "regions": [
@@ -321,7 +317,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-031"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-031",
+   "workshopBoard": "wireframes/WS103 Privacy  Consent   Preference Management Board 2.dc.html#cms-031"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 21. 13 of 24 labels bound to a contract property; 31 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -384,10 +381,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "An authorized user can reconstruct the customer's complete privacy relationship with TICVAI from one governed workspace.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide one authoritative privacy view for an individual customer or participant. This becomes the privacy equivalent of the customer 360° workspace. n ed el",
-  "purposeNote": "An authorized user can reconstruct the customer's complete privacy relationship with TICVAI from one governed workspace.",
   "layout": {
    "template": "split",
    "regions": [
@@ -399,11 +396,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every customer privacy consent",
        "columns": [
-        "CustomerPrivacyConsentPreference360View.privacyPolicyVersion",
-        "CustomerPrivacyConsentPreference360View.cookieNoticeVersion",
-        "CustomerPrivacyConsentPreference360View.biometricNotice",
-        "CustomerPrivacyConsentPreference360View.childrenSPrivacyNotice",
-        "CustomerPrivacyConsentPreference360View.otherApplicablePrivacyDocuments"
+        "CustomerPrivacyConsentPreference360View.policyAcceptance[].documentType",
+        "CustomerPrivacyConsentPreference360View.policyAcceptance[].acceptedVersion",
+        "CustomerPrivacyConsentPreference360View.policyAcceptance[].currentVersion",
+        "CustomerPrivacyConsentPreference360View.policyAcceptance[].requiresReacceptance"
        ],
        "bindsTo": "CustomerPrivacyConsentPreference360View",
        "operation": "listCustomerPrivacyConsent",
@@ -420,11 +416,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected customer privacy consent",
        "bindsTo": "CustomerPrivacyConsentPreference360View",
        "columns": [
-        "CustomerPrivacyConsentPreference360View.privacyPolicyVersion",
-        "CustomerPrivacyConsentPreference360View.cookieNoticeVersion",
-        "CustomerPrivacyConsentPreference360View.biometricNotice",
-        "CustomerPrivacyConsentPreference360View.childrenSPrivacyNotice",
-        "CustomerPrivacyConsentPreference360View.otherApplicablePrivacyDocuments"
+        "CustomerPrivacyConsentPreference360View.policyAcceptance[].documentType",
+        "CustomerPrivacyConsentPreference360View.policyAcceptance[].acceptedVersion",
+        "CustomerPrivacyConsentPreference360View.policyAcceptance[].currentVersion",
+        "CustomerPrivacyConsentPreference360View.policyAcceptance[].requiresReacceptance"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Display appropriate information such as”, “Email Consente”, “SMS Withdraw”, “Consente”, “Personalizatio”, “Show current”.",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 22 §Display"
@@ -449,18 +444,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    }
   ],
   "entryState": {
-   "preloaded": [
-    "CustomerPrivacyConsentPreference360View.privacyPolicyVersion",
-    "CustomerPrivacyConsentPreference360View.cookieNoticeVersion",
-    "CustomerPrivacyConsentPreference360View.biometricNotice",
-    "CustomerPrivacyConsentPreference360View.childrenSPrivacyNotice",
-    "CustomerPrivacyConsentPreference360View.otherApplicablePrivacyDocuments"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-032"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-032",
+   "workshopBoard": "wireframes/WS103 Privacy  Consent   Preference Management Board 2.dc.html#cms-032"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 22. 5 of 5 labels bound to a contract property; 5 of 50 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -523,10 +513,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "current privacy state and propagate to dependent systems.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Maintain legally and operationally useful evidence of every consent event and manage subsequent withdrawals.",
-  "purposeNote": "current privacy state and propagate to dependent systems.",
   "layout": {
    "template": "split",
    "regions": [
@@ -538,12 +528,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every consent evidence history",
        "columns": [
-        "ConsentEvidenceHistoryWithdrawalManagementView.requested",
-        "ConsentEvidenceHistoryWithdrawalManagementView.processed",
-        "ConsentEvidenceHistoryWithdrawalManagementView.propagated",
-        "ConsentEvidenceHistoryWithdrawalManagementView.acknowledged",
-        "ConsentEvidenceHistoryWithdrawalManagementView.failed",
-        "Retry Required"
+        "ConsentEvidenceHistoryWithdrawalManagementView.propagation[].target",
+        "ConsentEvidenceHistoryWithdrawalManagementView.propagation[].status"
        ],
        "bindsTo": "ConsentEvidenceHistoryWithdrawalManagementView",
        "operation": "listConsentEvidenceWithdrawal",
@@ -560,12 +546,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected consent evidence history",
        "bindsTo": "ConsentEvidenceHistoryWithdrawalManagementView",
        "columns": [
-        "ConsentEvidenceHistoryWithdrawalManagementView.requested",
-        "ConsentEvidenceHistoryWithdrawalManagementView.processed",
-        "ConsentEvidenceHistoryWithdrawalManagementView.propagated",
-        "ConsentEvidenceHistoryWithdrawalManagementView.acknowledged",
-        "ConsentEvidenceHistoryWithdrawalManagementView.failed",
-        "Retry Required"
+        "ConsentEvidenceHistoryWithdrawalManagementView.propagation[].target",
+        "ConsentEvidenceHistoryWithdrawalManagementView.propagation[].status"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Consent Evidence Record”, “Evidence Principle”, “Withdrawal”, “Central Consent Engine”.",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 24 §Display"
@@ -591,18 +573,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "ConsentEvidenceHistoryWithdrawalManagementView.requested",
-    "ConsentEvidenceHistoryWithdrawalManagementView.processed",
-    "ConsentEvidenceHistoryWithdrawalManagementView.propagated",
-    "ConsentEvidenceHistoryWithdrawalManagementView.acknowledged",
-    "ConsentEvidenceHistoryWithdrawalManagementView.failed",
     "Retry Required"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-033"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-033",
+   "workshopBoard": "wireframes/WS103 Privacy  Consent   Preference Management Board 2.dc.html#cms-033"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 24. 5 of 6 labels bound to a contract property; 6 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -665,14 +643,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every customer privacy request can be received, verified, assigned, tracked and completed through a governed case workflow.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Provide a governed case-management workflow for customer privacy requests.",
-  "purposeNote": "Every customer privacy request can be received, verified, assigned, tracked and completed through a governed case workflow.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: ID Review where permitted. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Email/manual entry, POS, API, Authorized Representative, ID Review where permitted. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 26 §Support"
    }
   ],
@@ -728,7 +706,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       },
       {
        "kind": "secondaryButton",
+       "label": "Email/manual entry",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 26 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Customer Service",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 26 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "POS",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 26 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "API",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 26 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Authorized Representative",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 26 §Support"
       },
       {
@@ -766,9 +764,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-034"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-034",
+   "workshopBoard": "wireframes/WS103 Privacy  Consent   Preference Management Board 2.dc.html#cms-034"
   },
-  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 26. 2 of 4 labels bound to a contract property; 20 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 26. 2 of 4 labels bound to a contract property; 24 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -829,10 +828,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized teams can discover applicable customer data, prepare a controlled access/export response and route correction to the authoritative data owner.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Allow authorized privacy teams to locate customer data across TICVAI and connected systems when fulfilling access, export or correction requests.",
-  "purposeNote": "Authorized teams can discover applicable customer data, prepare a controlled access/export response and route correction to the authoritative data owner.",
   "layout": {
    "template": "split",
    "regions": [
@@ -844,11 +843,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every data discovery access",
        "columns": [
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.ticketing82Records",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.orders26Records",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.membership1Record",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.crm14Records",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.consent17Records"
+        "DataDiscoveryAccessExportCorrectionWorkspaceView.results[].source",
+        "DataDiscoveryAccessExportCorrectionWorkspaceView.results[].recordCount"
        ],
        "bindsTo": "DataDiscoveryAccessExportCorrectionWorkspaceView",
        "operation": "setDataDiscoveryAccess",
@@ -865,11 +861,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected data discovery access",
        "bindsTo": "DataDiscoveryAccessExportCorrectionWorkspaceView",
        "columns": [
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.ticketing82Records",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.orders26Records",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.membership1Record",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.crm14Records",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.consent17Records"
+        "DataDiscoveryAccessExportCorrectionWorkspaceView.results[].source",
+        "DataDiscoveryAccessExportCorrectionWorkspaceView.results[].recordCount"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Search using”, “Potential sources”, “Export Package”, “Correction”, “Before release”.",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 28 §Show"
@@ -901,25 +894,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setDataDiscoveryAccess",
     "contract": "marketing-crm",
     "purpose": "Data Discovery, Access, Export & Correction Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setDataDiscoveryAccess"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
-   "preloaded": [
-    "DataDiscoveryAccessExportCorrectionWorkspaceView.ticketing82Records",
-    "DataDiscoveryAccessExportCorrectionWorkspaceView.orders26Records",
-    "DataDiscoveryAccessExportCorrectionWorkspaceView.membership1Record",
-    "DataDiscoveryAccessExportCorrectionWorkspaceView.crm14Records",
-    "DataDiscoveryAccessExportCorrectionWorkspaceView.consent17Records"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-035"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-035",
+   "workshopBoard": "wireframes/WS103 Privacy  Consent   Preference Management Board 2.dc.html#cms-035"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 28. 5 of 5 labels bound to a contract property; 13 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -982,14 +967,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "are legitimately configured for retention and provides evidence of the result.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Govern privacy requests or policies requiring personal data to be deleted, anonymized or restricted. This screen requires strong controls because deletion may affect financial, ticketing, fraud, legal and operational records.",
-  "purposeNote": "are legitimately configured for retention and provides evidence of the result.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Delete, Remove Biometric Reference. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Delete, Pseudonymize where configured, Remove Biometric Reference. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 29 §Support"
    },
    {
@@ -1013,6 +998,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "destructiveButton",
        "label": "Delete",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 29 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Pseudonymize where configured",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 29 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Restrict Processing",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 29 §Support"
       },
       {
@@ -1061,19 +1056,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "DeletionAnonymizationRestrictionOperationsView.anonymize",
-    "DeletionAnonymizationRestrictionOperationsView.pseudonymizeWhereConfigured",
-    "DeletionAnonymizationRestrictionOperationsView.restrictProcessing",
-    "DeletionAnonymizationRestrictionOperationsView.suppressMarketing",
-    "DeletionAnonymizationRestrictionOperationsView.disconnectThirdPartyProfile"
+    "DeletionAnonymizationRestrictionOperationsView.actionType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-036"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-036",
+   "workshopBoard": "wireframes/WS103 Privacy  Consent   Preference Management Board 2.dc.html#cms-036"
   },
-  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 2 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 4 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1134,14 +1126,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "preserving controlled holds, approvals and complete processing evidence.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Operationalize retention policies associated with Board 1 processing purposes and data categories.",
-  "purposeNote": "preserving controlled holds, approvals and complete processing evidence.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Review, Delete, Archive, Place Hold, Release Hold. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Review, Extend where authorized, Delete, Archive, Place Hold, Release Hold. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 30 §Support"
    }
   ],
@@ -1197,6 +1189,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "primaryButton",
        "label": "Review",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Extend where authorized",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 30 §Support"
       },
       {
@@ -1267,9 +1264,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-037"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-037",
+   "workshopBoard": "wireframes/WS103 Privacy  Consent   Preference Management Board 2.dc.html#cms-037"
   },
-  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 30. 6 of 6 labels bound to a contract property; 14 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 30. 6 of 6 labels bound to a contract property; 15 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1330,14 +1328,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Privacy-related exceptions can be centrally investigated, assigned, resolved and audited.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide a centralized workspace for privacy configuration and operational exceptions requiring investigation.",
-  "purposeNote": "Privacy-related exceptions can be centrally investigated, assigned, resolved and audited.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Security, Data Owner. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Security, Operations, Data Owner. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 32 §Allow escalation to appropriate"
    }
   ],
@@ -1353,14 +1351,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Every privacy compliance exception",
        "columns": [
         "PrivacyComplianceExceptionInvestigationWorkspaceView.severity",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.exception",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.customer",
+        "PrivacyComplianceExceptionInvestigationWorkspaceView.category",
+        "PrivacyComplianceExceptionInvestigationWorkspaceView.subjectId",
         "PrivacyComplianceExceptionInvestigationWorkspaceView.system",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.brand",
+        "PrivacyComplianceExceptionInvestigationWorkspaceView.brandId",
         "PrivacyComplianceExceptionInvestigationWorkspaceView.country",
         "PrivacyComplianceExceptionInvestigationWorkspaceView.detectedAt",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.owner",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.sla",
+        "PrivacyComplianceExceptionInvestigationWorkspaceView.ownerPrincipalId",
+        "PrivacyComplianceExceptionInvestigationWorkspaceView.slaDueAt",
         "PrivacyComplianceExceptionInvestigationWorkspaceView.status"
        ],
        "bindsTo": "PrivacyComplianceExceptionInvestigationWorkspaceView",
@@ -1379,14 +1377,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "PrivacyComplianceExceptionInvestigationWorkspaceView",
        "columns": [
         "PrivacyComplianceExceptionInvestigationWorkspaceView.severity",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.exception",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.customer",
+        "PrivacyComplianceExceptionInvestigationWorkspaceView.category",
+        "PrivacyComplianceExceptionInvestigationWorkspaceView.subjectId",
         "PrivacyComplianceExceptionInvestigationWorkspaceView.system",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.brand",
+        "PrivacyComplianceExceptionInvestigationWorkspaceView.brandId",
         "PrivacyComplianceExceptionInvestigationWorkspaceView.country",
         "PrivacyComplianceExceptionInvestigationWorkspaceView.detectedAt",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.owner",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.sla",
+        "PrivacyComplianceExceptionInvestigationWorkspaceView.ownerPrincipalId",
+        "PrivacyComplianceExceptionInvestigationWorkspaceView.slaDueAt",
         "PrivacyComplianceExceptionInvestigationWorkspaceView.status"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Provide”, “Workflow”, “Important Boundary”.",
@@ -1401,6 +1399,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "primaryButton",
        "label": "Security",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 32 §Allow escalation to appropriate"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Operations",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 32 §Allow escalation to appropriate"
       },
       {
@@ -1424,28 +1427,23 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setPrivacyComplianceException",
     "contract": "marketing-crm",
     "purpose": "Privacy Compliance, Exception & Investigation Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setPrivacyComplianceException"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "preloaded": [
     "PrivacyComplianceExceptionInvestigationWorkspaceView.severity",
-    "PrivacyComplianceExceptionInvestigationWorkspaceView.exception",
-    "PrivacyComplianceExceptionInvestigationWorkspaceView.customer",
     "PrivacyComplianceExceptionInvestigationWorkspaceView.system",
-    "PrivacyComplianceExceptionInvestigationWorkspaceView.brand",
     "PrivacyComplianceExceptionInvestigationWorkspaceView.country"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-038"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-038",
+   "workshopBoard": "wireframes/WS103 Privacy  Consent   Preference Management Board 2.dc.html#cms-038"
   },
-  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 32. 10 of 10 labels bound to a contract property; 12 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 32. 10 of 10 labels bound to a contract property; 13 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1506,10 +1504,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "performed it, what rule/version applied and what evidence supports it.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture significant activities such as) and no display directory — it is settings, not a population",
   "purpose": "Provide immutable auditability and management/compliance reporting across privacy operations.",
-  "purposeNote": "performed it, what rule/version applied and what evidence supports it.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1608,7 +1606,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-039"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-039",
+   "workshopBoard": "wireframes/WS103 Privacy  Consent   Preference Management Board 2.dc.html#cms-039"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 33. 0 of 0 labels bound to a contract property; 14 of 57 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1663,10 +1662,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from CMS-031, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "resolve compliance risks while keeping legally significant decisions under governed human control. Board 2 — Final Screen Register # Backend Screen Core Responsibility 17.2. Privacy Operations Command Center Overall privacy operations 1 17.2. Customer Privacy, Consent & Preference Complete customer privacy 2 360° view 17.2. Consent Evidence, History & Withdrawal Consent evidence and 3 Management withdrawal 17.2. Data Subject / Customer Privacy Request",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
   "purpose": "Provide executives, Privacy Officers and Compliance teams with actionable privacy analytics and AI-assisted risk detection. This should be the intelligence layer across both Privacy Boards.",
-  "purposeNote": "resolve compliance risks while keeping legally significant decisions under governed human control. Board 2 — Final Screen Register # Backend Screen Core Responsibility 17.2. Privacy Operations Command Center Overall privacy operations 1 17.2. Customer Privacy, Consent & Preference Complete customer privacy 2 360° view 17.2. Consent Evidence, History & Withdrawal Consent evidence and 3 Management withdrawal 17.2. Data Subject / Customer Privacy Request",
   "layout": {
    "template": "split",
    "regions": [
@@ -1713,12 +1712,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "PrivacyAnalyticsAiComplianceIntelligenceView.marketingOptInRate",
         "PrivacyAnalyticsAiComplianceIntelligenceView.cookieAcceptanceByCategory",
         "PrivacyAnalyticsAiComplianceIntelligenceView.privacyRequests",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.averageResolutionTime",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.slaCompliance",
+        "PrivacyAnalyticsAiComplianceIntelligenceView.averageResolutionSeconds",
+        "PrivacyAnalyticsAiComplianceIntelligenceView.slaComplianceRate",
         "PrivacyAnalyticsAiComplianceIntelligenceView.deletionCompletionRate",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.retentionCompliance",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.policyAcceptance",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.guardianConsentCompletion",
+        "PrivacyAnalyticsAiComplianceIntelligenceView.retentionComplianceRate",
+        "PrivacyAnalyticsAiComplianceIntelligenceView.policyAcceptanceRate",
+        "PrivacyAnalyticsAiComplianceIntelligenceView.guardianConsentCompletionRate",
         "PrivacyAnalyticsAiComplianceIntelligenceView.privacyExceptions",
         "PrivacyAnalyticsAiComplianceIntelligenceView.consentPropagationFailures"
        ],
@@ -1742,12 +1741,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "PrivacyAnalyticsAiComplianceIntelligenceView.marketingOptInRate",
         "PrivacyAnalyticsAiComplianceIntelligenceView.cookieAcceptanceByCategory",
         "PrivacyAnalyticsAiComplianceIntelligenceView.privacyRequests",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.averageResolutionTime",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.slaCompliance",
+        "PrivacyAnalyticsAiComplianceIntelligenceView.averageResolutionSeconds",
+        "PrivacyAnalyticsAiComplianceIntelligenceView.slaComplianceRate",
         "PrivacyAnalyticsAiComplianceIntelligenceView.deletionCompletionRate",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.retentionCompliance",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.policyAcceptance",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.guardianConsentCompletion",
+        "PrivacyAnalyticsAiComplianceIntelligenceView.retentionComplianceRate",
+        "PrivacyAnalyticsAiComplianceIntelligenceView.policyAcceptanceRate",
+        "PrivacyAnalyticsAiComplianceIntelligenceView.guardianConsentCompletionRate",
         "PrivacyAnalyticsAiComplianceIntelligenceView.privacyExceptions",
         "PrivacyAnalyticsAiComplianceIntelligenceView.consentPropagationFailures"
        ],
@@ -1783,6 +1782,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "marketing-crm",
     "purpose": "Privacy Analytics & AI Compliance Intelligence",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPrivacyEvidenceCompliance",
+    "contract": "marketing-crm",
+    "purpose": "Privacy Audit, Evidence & Compliance Reporting",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -1791,14 +1796,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "PrivacyAnalyticsAiComplianceIntelligenceView.withdrawalRate",
     "PrivacyAnalyticsAiComplianceIntelligenceView.marketingOptInRate",
     "PrivacyAnalyticsAiComplianceIntelligenceView.cookieAcceptanceByCategory",
-    "PrivacyAnalyticsAiComplianceIntelligenceView.privacyRequests",
-    "PrivacyAnalyticsAiComplianceIntelligenceView.averageResolutionTime"
+    "PrivacyAnalyticsAiComplianceIntelligenceView.privacyRequests"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-040"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-040",
+   "workshopBoard": "wireframes/WS103 Privacy  Consent   Preference Management Board 2.dc.html#cms-040"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 35. 13 of 24 labels bound to a contract property; 31 of 107 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1838,83 +1843,33 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/consent-evidence-withdrawal",
   "contract": "marketing-crm",
   "summary": "Consent Evidence, History & Withdrawal Management",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "ConsentEvidenceHistoryWithdrawalManagementView"
- },
- "listCustomerPrivacyConsent": {
-  "method": "GET",
-  "path": "/customer-privacy-consent",
-  "contract": "marketing-crm",
-  "summary": "Customer Privacy, Consent & Preference 360°",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "CustomerPrivacyConsentPreference360View"
- },
- "listDataRetentionExpiry": {
-  "method": "GET",
-  "path": "/data-retention-expiry",
-  "contract": "marketing-crm",
-  "summary": "Data Retention, Expiry & Legal Hold Operations",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "DataRetentionExpiryLegalHoldOperationsView"
- },
- "listDataSubjectCustomer": {
-  "method": "GET",
-  "path": "/data-subject-customer",
-  "contract": "marketing-crm",
-  "summary": "Data Subject / Customer Privacy Request Management",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "DataSubjectCustomerPrivacyRequestManagementView"
- },
- "listDeletionAnonymizationRestriction": {
-  "method": "GET",
-  "path": "/deletion-anonymization-restriction",
-  "contract": "marketing-crm",
-  "summary": "Deletion, Anonymization & Restriction Operations",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "DeletionAnonymizationRestrictionOperationsView"
- },
- "listPrivacy": {
-  "method": "GET",
-  "path": "/privacy",
-  "contract": "marketing-crm",
-  "summary": "Privacy Operations Command Center",
-  "permission": "MARKETING_VIEW",
+  "permission": "GUEST_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "tenant",
+    "name": "subjectId",
     "in": "query",
     "required": false
    },
    {
-    "name": "brand",
+    "name": "consentPurpose",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "source",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brandId",
     "in": "query",
     "required": false
    },
@@ -1924,7 +1879,217 @@ Method, path, parameters, request and response for every operation these screens
     "required": false
    },
    {
-    "name": "customer",
+    "name": "propagationStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listCustomerPrivacyConsent": {
+  "method": "GET",
+  "path": "/customer-privacy-consent",
+  "contract": "marketing-crm",
+  "summary": "Customer Privacy, Consent & Preference 360°",
+  "permission": "GUEST_VIEW_PII",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "CustomerPrivacyConsentPreference360View"
+ },
+ "listDataRetentionExpiry": {
+  "method": "GET",
+  "path": "/data-retention-expiry",
+  "contract": "marketing-crm",
+  "summary": "Data Retention, Expiry & Legal Hold Operations",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "dataCategory",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "jurisdiction",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "holdStatus",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "DataRetentionExpiryLegalHoldOperationsView"
+ },
+ "listDataSubjectCustomer": {
+  "method": "GET",
+  "path": "/data-subject-customer",
+  "contract": "marketing-crm",
+  "summary": "Data Subject / Customer Privacy Request Management",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "requestType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "jurisdiction",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "slaState",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ownerPrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listDeletionAnonymizationRestriction": {
+  "method": "GET",
+  "path": "/deletion-anonymization-restriction",
+  "contract": "marketing-crm",
+  "summary": "Deletion, Anonymization & Restriction Operations",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "actionType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "requestId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPrivacy": {
+  "method": "GET",
+  "path": "/privacy",
+  "contract": "marketing-crm",
+  "summary": "Privacy Operations Command Center",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "brandId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
     "in": "query",
     "required": false
    },
@@ -1944,7 +2109,17 @@ Method, path, parameters, request and response for every operation these screens
     "required": false
    },
    {
-    "name": "status",
+    "name": "ownerPrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
     "in": "query",
     "required": false
    }
@@ -1957,18 +2132,23 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/privacy-compliance",
   "contract": "marketing-crm",
   "summary": "Privacy Analytics & AI Compliance Intelligence",
-  "permission": "MARKETING_VIEW",
+  "permission": "GUEST_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "tenant",
+    "name": "from",
     "in": "query",
-    "required": false
+    "required": true
    },
    {
-    "name": "brand",
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "brandId",
     "in": "query",
     "required": false
    },
@@ -1978,7 +2158,7 @@ Method, path, parameters, request and response for every operation these screens
     "required": false
    },
    {
-    "name": "venue",
+    "name": "venueId",
     "in": "query",
     "required": false
    },
@@ -1993,12 +2173,22 @@ Method, path, parameters, request and response for every operation these screens
     "required": false
    },
    {
-    "name": "customerSegment",
+    "name": "segmentId",
     "in": "query",
     "required": false
    },
    {
-    "name": "product",
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "policyVersion",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "language",
     "in": "query",
     "required": false
    }
@@ -2011,24 +2201,76 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/privacy-evidence-compliance",
   "contract": "marketing-crm",
   "summary": "Privacy Audit, Evidence & Compliance Reporting",
-  "permission": "MARKETING_VIEW",
+  "permission": "AUDIT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "action",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "report",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "requestId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "actorPrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PrivacyAuditEvidenceComplianceReportingView"
+  "responds": "Page"
  },
  "setDataDiscoveryAccess": {
   "method": "PUT",
   "path": "/data-discovery-access",
   "contract": "marketing-crm",
   "summary": "Data Discovery, Access, Export & Correction Workspace",
-  "permission": "MARKETING_MANAGE",
+  "permission": "GUEST_VIEW_PII",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "DataDiscoveryAccessExportCorrectionWorkspaceInput",
   "responds": "DataDiscoveryAccessExportCorrectionWorkspaceView"
  },
@@ -2036,12 +2278,18 @@ Method, path, parameters, request and response for every operation these screens
   "method": "PUT",
   "path": "/privacy-compliance-exception",
   "contract": "marketing-crm",
-  "summary": "Privacy Compliance, Exception & Investigation Workspace",
-  "permission": "MARKETING_MANAGE",
+  "summary": "Raise, investigate or close a privacy exception",
+  "permission": "GUEST_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PrivacyComplianceExceptionInvestigationWorkspaceInput",
   "responds": "PrivacyComplianceExceptionInvestigationWorkspaceView"
  }
@@ -2054,1391 +2302,1640 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
- "ConsentEvidenceHistoryWithdrawalManagementView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Consent Evidence, History & Withdrawal Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "evidenceId": {
-    "type": "string",
-    "description": "Evidence ID"
-   },
-   "customerParticipant": {
-    "type": "string",
-    "description": "Customer / Participant"
-   },
-   "consentPurpose": {
-    "type": "string",
-    "description": "Consent Purpose"
-   },
-   "consentVersion": {
-    "type": "string",
-    "description": "Consent Version"
-   },
-   "exactApplicableWordingVersionReference": {
-    "type": "string",
-    "description": "Exact applicable wording/version reference"
-   },
-   "status": {
-    "type": "string",
-    "description": "Status"
-   },
-   "action": {
-    "type": "string",
-    "description": "Action"
-   },
-   "dateTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date/time"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "brand": {
-    "type": "string",
-    "description": "Brand"
-   },
-   "country": {
-    "type": "string",
-    "description": "Country"
-   },
-   "journeyCapturePoint": {
-    "type": "string",
-    "description": "Journey/Capture Point"
-   },
-   "userCustomerActor": {
-    "type": "string",
-    "description": "User/Customer Actor"
-   },
-   "sourceSystem": {
-    "type": "string",
-    "description": "Source System"
-   },
-   "deviceSessionReferenceWherePermitted": {
-    "type": "string",
-    "description": "Device/session reference where permitted"
-   },
-   "guardianReferenceWhereApplicable": {
-    "type": "string",
-    "description": "Guardian reference where applicable"
-   },
-   "yesterdaySHistoricalConsentEvidenceRemains": {
-    "type": "string",
-    "description": "Yesterday's historical consent evidence remains"
-   },
-   "customerPortal": {
-    "type": "string",
-    "description": "Customer Portal"
-   },
-   "mobileApp": {
-    "type": "string",
-    "description": "Mobile App"
-   },
-   "preferenceCenter": {
-    "type": "string",
-    "description": "Preference Center"
-   },
-   "customerService": {
-    "type": "string",
-    "description": "Customer Service"
-   },
-   "authorizedStaff": {
-    "type": "string",
-    "description": "Authorized Staff"
-   },
-   "api": {
-    "type": "string",
-    "description": "API"
-   },
-   "requested": {
-    "type": "string",
-    "description": "Requested"
-   },
-   "processed": {
-    "type": "string",
-    "description": "Processed"
-   },
-   "propagated": {
-    "type": "string",
-    "description": "Propagated"
-   },
-   "acknowledged": {
-    "type": "string",
-    "description": "Acknowledged"
-   },
-   "failed": {
-    "type": "integer",
-    "description": "Failed"
-   }
-  }
+ "ConsentPurpose": {
+  "type": "string",
+  "enum": [
+   "marketing",
+   "personalisation",
+   "profiling",
+   "thirdPartySharing",
+   "aiProcessing",
+   "transactional"
+  ]
+ },
+ "ConsentSource": {
+  "type": "string",
+  "enum": [
+   "guestApp",
+   "website",
+   "kiosk",
+   "pos",
+   "callCentre",
+   "import",
+   "agentRecorded"
+  ]
  },
  "CustomerPrivacyConsentPreference360View": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Customer Privacy, Consent & Preference 360° displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.guest_profile, marketing.consent_record, marketing.consent_record_channel, marketing.consent_purpose, marketing.privacy_request (new), marketing.tracking_technology, pii.subject",
+  "description": "One customer's privacy position (pack 17.2.2). Consent entries are current state; history is `listConsentEvidenceWithdrawal`.",
+  "required": [
+   "subjectId",
+   "consents",
+   "policyAcceptance"
+  ],
   "properties": {
-   "customerId": {
+   "subjectId": {
     "type": "string",
-    "description": "Customer ID"
+    "format": "uuid"
    },
-   "name": {
+   "displayName": {
     "type": "string",
-    "description": "Name"
+    "nullable": true
    },
-   "account": {
+   "accountStatus": {
     "type": "string",
-    "description": "Account"
+    "enum": [
+     "active",
+     "guest",
+     "suspended",
+     "archived",
+     "erased"
+    ],
+    "description": "`archived` and `erased` are the ADR-0047 lifecycle stages."
    },
    "country": {
     "type": "string",
-    "description": "Country"
+    "pattern": "^[A-Z]{2}$",
+    "nullable": true
    },
    "preferredLanguage": {
     "type": "string",
-    "description": "Preferred Language"
+    "nullable": true,
+    "description": "BCP 47 tag."
    },
    "ageCategory": {
     "type": "string",
-    "description": "Age Category"
+    "enum": [
+     "adult",
+     "minor",
+     "unknown"
+    ]
    },
-   "guardianRelationshipWhereApplicable": {
+   "guardianSubjectId": {
     "type": "string",
-    "description": "Guardian Relationship where applicable"
+    "format": "uuid",
+    "nullable": true
    },
-   "accountStatus": {
+   "guardianRelationship": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "parent",
+     "legalGuardian",
+     "other"
+    ]
+   },
+   "openExceptionCount": {
     "type": "integer",
-    "description": "Account Status"
+    "minimum": 0,
+    "description": "The privacy risk/exception indicator; open exceptions naming this customer."
    },
-   "privacyRiskExceptionIndicator": {
-    "type": "string",
-    "description": "Privacy Risk/Exception indicator"
+   "consents": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "purpose",
+      "decision"
+     ],
+     "properties": {
+      "purpose": {
+       "$ref": "#/components/schemas/ConsentPurpose"
+      },
+      "channel": {
+       "allOf": [
+        {
+         "$ref": "#/components/schemas/MessageChannel"
+        }
+       ],
+       "nullable": true
+      },
+      "decision": {
+       "type": "string",
+       "enum": [
+        "granted",
+        "declined",
+        "withdrawn",
+        "expired",
+        "notAsked"
+       ]
+      },
+      "noticeVersion": {
+       "type": "string",
+       "nullable": true
+      },
+      "capturedAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "source": {
+       "allOf": [
+        {
+         "$ref": "#/components/schemas/ConsentSource"
+        }
+       ],
+       "nullable": true
+      },
+      "requiresRenewal": {
+       "type": "boolean"
+      }
+     }
+    }
    },
-   "v3212AugB2c": {
-    "type": "string",
-    "description": "v3.2 12 Aug B2C"
+   "preferences": {
+    "type": "object",
+    "properties": {
+     "channels": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "required": [
+        "channel",
+        "optedIn"
+       ],
+       "properties": {
+        "channel": {
+         "$ref": "#/components/schemas/MessageChannel"
+        },
+        "optedIn": {
+         "type": "boolean"
+        }
+       }
+      }
+     },
+     "brandIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "marketingCategories": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "maxLength": 80
+      }
+     },
+     "personalisationEnabled": {
+      "type": "boolean"
+     }
+    }
    },
-   "v2820AugPortal": {
-    "type": "string",
-    "description": "v2.8 20 Aug Portal"
+   "policyAcceptance": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "documentType",
+      "currentVersion"
+     ],
+     "properties": {
+      "documentType": {
+       "type": "string",
+       "enum": [
+        "privacyPolicy",
+        "cookieNotice",
+        "biometricNotice",
+        "childrensPrivacyNotice",
+        "other"
+       ]
+      },
+      "documentName": {
+       "type": "string",
+       "nullable": true
+      },
+      "acceptedVersion": {
+       "type": "string",
+       "nullable": true
+      },
+      "acceptedAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "currentVersion": {
+       "type": "string"
+      },
+      "requiresReacceptance": {
+       "type": "boolean"
+      }
+     }
+    }
    },
-   "whatsappV2112AugApp": {
-    "type": "string",
-    "description": "WhatsApp v2.1 12 Aug App"
+   "trackingChoices": {
+    "type": "array",
+    "description": "Only where the preference is tied to this customer (a signed-in consent).",
+    "items": {
+     "type": "object",
+     "required": [
+      "category",
+      "decision"
+     ],
+     "properties": {
+      "category": {
+       "type": "string",
+       "enum": [
+        "strictlyNecessary",
+        "functional",
+        "analytics",
+        "personalisation",
+        "marketing",
+        "other"
+       ]
+      },
+      "decision": {
+       "type": "string",
+       "enum": [
+        "granted",
+        "declined"
+       ]
+      },
+      "decidedAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
    },
-   "biometricsV4015AugApp": {
-    "type": "string",
-    "description": "Biometrics v4.0 15 Aug App"
+   "privacyRequests": {
+    "type": "array",
+    "description": "Open requests and the 20 most recent completed ones.",
+    "items": {
+     "type": "object",
+     "required": [
+      "requestId",
+      "requestType",
+      "status"
+     ],
+     "properties": {
+      "requestId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "requestType": {
+       "type": "string"
+      },
+      "status": {
+       "type": "string",
+       "enum": [
+        "submitted",
+        "inProgress",
+        "completed"
+       ]
+      },
+      "submittedAt": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "dueAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    }
    },
-   "declinedV1412AugB2c": {
-    "type": "string",
-    "description": "Declined v1.4 12 Aug B2C"
+   "dataFootprint": {
+    "type": "array",
+    "description": "Where this customer's data exists, as counts; the records are reached through `setDataDiscoveryAccess`.",
+    "items": {
+     "type": "object",
+     "required": [
+      "system",
+      "recordCount"
+     ],
+     "properties": {
+      "system": {
+       "type": "string",
+       "enum": [
+        "crm",
+        "ticketing",
+        "membership",
+        "orders",
+        "loyalty",
+        "wallet",
+        "marketing",
+        "waiver",
+        "biometricProviderReference",
+        "connectedSystem"
+       ]
+      },
+      "systemName": {
+       "type": "string",
+       "nullable": true,
+       "description": "The connected system's name, when `system` is `connectedSystem`."
+      },
+      "recordCount": {
+       "type": "integer",
+       "minimum": 0
+      }
+     }
+    }
    },
-   "emailPreference": {
-    "type": "string",
-    "description": "Email preference"
-   },
-   "smsPreference": {
-    "type": "string",
-    "description": "SMS preference"
-   },
-   "whatsappPreference": {
-    "type": "string",
-    "description": "WhatsApp preference"
-   },
-   "pushPreference": {
-    "type": "string",
-    "description": "Push preference"
-   },
-   "brandPreferences": {
-    "type": "integer",
-    "description": "Brand preferences"
-   },
-   "marketingCategories": {
-    "type": "integer",
-    "description": "Marketing categories"
-   },
-   "personalizationPreferences": {
-    "type": "integer",
-    "description": "Personalization preferences"
-   },
-   "privacyPolicyVersion": {
-    "type": "string",
-    "description": "Privacy Policy Version"
-   },
-   "cookieNoticeVersion": {
-    "type": "string",
-    "description": "Cookie Notice Version"
-   },
-   "biometricNotice": {
-    "type": "string",
-    "description": "Biometric Notice"
-   },
-   "childrenSPrivacyNotice": {
-    "type": "string",
-    "description": "Children's Privacy Notice"
-   },
-   "otherApplicablePrivacyDocuments": {
-    "type": "string",
-    "description": "Other applicable privacy documents"
-   },
-   "choices": {
-    "type": "string",
-    "description": "choices"
-   },
-   "access": {
-    "type": "string",
-    "description": "Access"
-   },
-   "correction": {
-    "type": "string",
-    "description": "Correction"
-   },
-   "deletion": {
-    "type": "string",
-    "description": "Deletion"
-   },
-   "restriction": {
-    "type": "string",
-    "description": "Restriction"
-   },
-   "objection": {
-    "type": "string",
-    "description": "Objection"
-   },
-   "otherConfiguredRequests": {
-    "type": "integer",
-    "description": "Other configured requests"
-   },
-   "informationExists": {
-    "type": "string",
-    "description": "information exists"
+   "timeline": {
+    "type": "array",
+    "description": "The 50 most recent privacy events, newest first.",
+    "items": {
+     "type": "object",
+     "required": [
+      "occurredAt",
+      "event"
+     ],
+     "properties": {
+      "occurredAt": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "event": {
+       "type": "string",
+       "enum": [
+        "accountCreated",
+        "policyAccepted",
+        "consentGranted",
+        "consentDeclined",
+        "consentWithdrawn",
+        "preferenceChanged",
+        "privacyRequestCreated",
+        "privacyRequestCompleted",
+        "dataExportGenerated",
+        "anonymised",
+        "archived"
+       ]
+      },
+      "summary": {
+       "type": "string",
+       "maxLength": 300
+      }
+     }
+    }
    }
   }
  },
  "DataDiscoveryAccessExportCorrectionWorkspaceInput": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is marketing.guest_profile at 4%, so this is not an update to anything the package stores today and no new table has been decided",
-  "description": "**What Data Discovery, Access, Export & Correction Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "x-ticvai-persistence": "marketing.privacy_export_package",
+  "description": "What a privacy user sends for one request (pack 17.2.5 Data Discovery, Export Package, Correction, Review).",
+  "required": [
+   "requestId"
+  ],
   "properties": {
-   "customerProfile": {
+   "requestId": {
     "type": "string",
-    "description": "Customer Profile"
+    "format": "uuid",
+    "description": "The privacy request (`setPrivacyRequest`); the natural key."
    },
-   "orders": {
-    "type": "string",
-    "description": "Orders"
+   "identifiers": {
+    "type": "array",
+    "description": "Extra identifiers to search by; the request's subject is always included.",
+    "items": {
+     "type": "object",
+     "required": [
+      "type",
+      "value"
+     ],
+     "properties": {
+      "type": {
+       "type": "string",
+       "enum": [
+        "customerId",
+        "email",
+        "mobile",
+        "membershipId",
+        "orderId",
+        "participantId",
+        "other"
+       ]
+      },
+      "value": {
+       "type": "string",
+       "maxLength": 200
+      }
+     }
+    }
    },
-   "tickets": {
-    "type": "string",
-    "description": "Tickets"
+   "sources": {
+    "type": "array",
+    "description": "Sources to search; empty means all.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "customerProfile",
+      "orders",
+      "tickets",
+      "membership",
+      "loyalty",
+      "wallet",
+      "crm",
+      "marketing",
+      "paymentReferences",
+      "waiverRecords",
+      "resourceBookings",
+      "eventRegistrations",
+      "consentRecords",
+      "credentialReferences",
+      "connectedApplications"
+     ]
+    }
    },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
+   "exportPackage": {
+    "type": "object",
+    "nullable": true,
+    "description": "Present to generate or progress the export package.",
+    "properties": {
+     "includedSources": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "description": "A value of `sources`."
+      }
+     },
+     "includedCategories": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "maxLength": 80
+      }
+     },
+     "exclusions": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "maxLength": 200
+      },
+      "description": "Records withheld, each with a reason (e.g. another person's data, a legal hold)."
+     },
+     "sensitiveFieldHandling": {
+      "type": "string",
+      "enum": [
+       "include",
+       "mask",
+       "exclude"
+      ],
+      "default": "mask"
+     },
+     "format": {
+      "type": "string",
+      "enum": [
+       "json",
+       "csv",
+       "pdf"
+      ],
+      "default": "json"
+     },
+     "language": {
+      "type": "string",
+      "description": "BCP 47 tag for the cover letter and field labels."
+     },
+     "passwordProtected": {
+      "type": "boolean",
+      "default": true
+     },
+     "expiresAt": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "reviewAction": {
+      "type": "string",
+      "nullable": true,
+      "enum": [
+       "submitForReview",
+       "approve",
+       "reject",
+       "deliver"
+      ],
+      "description": "Moves the package through generated -> privacyReview -> approved -> delivered."
+     }
+    }
    },
-   "loyalty": {
-    "type": "string",
-    "description": "Loyalty"
-   },
-   "wallet": {
-    "type": "string",
-    "description": "Wallet"
-   },
-   "crm": {
-    "type": "string",
-    "description": "CRM"
-   },
-   "marketing": {
-    "type": "string",
-    "description": "Marketing"
-   },
-   "paymentsReferences": {
-    "type": "string",
-    "description": "Payments references"
-   },
-   "waiverRecords": {
-    "type": "string",
-    "description": "Waiver records"
-   },
-   "resourceBookings": {
-    "type": "string",
-    "description": "Resource bookings"
-   },
-   "eventRegistrations": {
-    "type": "string",
-    "description": "Event registrations"
-   },
-   "consentRecords": {
-    "type": "string",
-    "description": "Consent records"
-   },
-   "credentialReferences": {
-    "type": "string",
-    "description": "Credential references"
-   },
-   "connectedApplications": {
-    "type": "string",
-    "description": "Connected applications"
-   },
-   "includedSystems": {
-    "type": "string",
-    "description": "Included systems"
-   },
-   "includedCategories": {
-    "type": "string",
-    "description": "Included categories"
-   },
-   "exclusions": {
-    "type": "string",
-    "description": "Exclusions"
-   },
-   "sensitiveFieldHandling": {
-    "type": "string",
-    "description": "Sensitive-field handling"
-   },
-   "format": {
-    "type": "string",
-    "description": "Format"
-   },
-   "language": {
-    "type": "string",
-    "description": "Language"
-   },
-   "encryptionSecurity": {
-    "type": "string",
-    "description": "Encryption/security"
-   },
-   "expiry": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Expiry"
+   "corrections": {
+    "type": "array",
+    "description": "Correction requests to route to the system of record.",
+    "items": {
+     "type": "object",
+     "required": [
+      "field",
+      "proposedValue"
+     ],
+     "properties": {
+      "field": {
+       "type": "string",
+       "maxLength": 100,
+       "description": "e.g. `email`, `dateOfBirth`."
+      },
+      "proposedValue": {
+       "type": "string",
+       "maxLength": 500
+      },
+      "note": {
+       "type": "string",
+       "maxLength": 500,
+       "nullable": true
+      }
+     }
+    }
    }
   }
  },
  "DataDiscoveryAccessExportCorrectionWorkspaceView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Data Discovery, Access, Export & Correction Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "marketing.privacy_export_package",
+  "description": "One request's discovery results, export package and routed corrections.",
+  "required": [
+   "requestId",
+   "results"
+  ],
   "properties": {
-   "customerProfile": {
+   "requestId": {
     "type": "string",
-    "description": "Customer Profile"
+    "format": "uuid"
    },
-   "orders": {
-    "type": "string",
-    "description": "Orders"
-   },
-   "tickets": {
-    "type": "string",
-    "description": "Tickets"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "loyalty": {
-    "type": "string",
-    "description": "Loyalty"
-   },
-   "wallet": {
-    "type": "string",
-    "description": "Wallet"
-   },
-   "crm": {
-    "type": "string",
-    "description": "CRM"
-   },
-   "marketing": {
-    "type": "string",
-    "description": "Marketing"
-   },
-   "paymentsReferences": {
-    "type": "string",
-    "description": "Payments references"
-   },
-   "waiverRecords": {
-    "type": "string",
-    "description": "Waiver records"
-   },
-   "resourceBookings": {
-    "type": "string",
-    "description": "Resource bookings"
-   },
-   "eventRegistrations": {
-    "type": "string",
-    "description": "Event registrations"
-   },
-   "consentRecords": {
-    "type": "string",
-    "description": "Consent records"
-   },
-   "credentialReferences": {
-    "type": "string",
-    "description": "Credential references"
-   },
-   "connectedApplications": {
-    "type": "string",
-    "description": "Connected applications"
-   },
-   "ticketing82Records": {
-    "type": "string",
-    "description": "Ticketing — 82 records"
-   },
-   "orders26Records": {
-    "type": "string",
-    "description": "Orders — 26 records"
-   },
-   "membership1Record": {
-    "type": "string",
-    "description": "Membership — 1 record"
-   },
-   "crm14Records": {
-    "type": "string",
-    "description": "CRM — 14 records"
-   },
-   "consent17Records": {
-    "type": "string",
-    "description": "Consent — 17 records"
-   },
-   "includedSystems": {
-    "type": "string",
-    "description": "Included systems"
-   },
-   "includedCategories": {
-    "type": "string",
-    "description": "Included categories"
-   },
-   "exclusions": {
-    "type": "string",
-    "description": "Exclusions"
-   },
-   "sensitiveFieldHandling": {
-    "type": "string",
-    "description": "Sensitive-field handling"
-   },
-   "format": {
-    "type": "string",
-    "description": "Format"
-   },
-   "language": {
-    "type": "string",
-    "description": "Language"
-   },
-   "encryptionSecurity": {
-    "type": "string",
-    "description": "Encryption/security"
-   },
-   "expiry": {
+   "discoveredAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Expiry"
+    "readOnly": true
+   },
+   "results": {
+    "type": "array",
+    "description": "Record counts per source; the records themselves go only into the export package.",
+    "items": {
+     "type": "object",
+     "required": [
+      "source",
+      "recordCount"
+     ],
+     "properties": {
+      "source": {
+       "type": "string",
+       "description": "A value of the input's `sources`."
+      },
+      "systemName": {
+       "type": "string",
+       "nullable": true
+      },
+      "recordCount": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "searchFailed": {
+       "type": "boolean",
+       "default": false
+      }
+     }
+    }
+   },
+   "exportPackage": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "properties": {
+     "status": {
+      "type": "string",
+      "enum": [
+       "generating",
+       "generated",
+       "privacyReview",
+       "approved",
+       "rejected",
+       "delivered",
+       "expired"
+      ]
+     },
+     "format": {
+      "type": "string",
+      "enum": [
+       "json",
+       "csv",
+       "pdf"
+      ]
+     },
+     "generatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "approvedByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "deliveredAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "expiresAt": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "assetId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "The encrypted package in the asset store."
+     },
+     "dsarRequestId": {
+      "type": "string",
+      "nullable": true,
+      "description": "The cross-region fan-out that assembled it."
+     }
+    }
+   },
+   "corrections": {
+    "type": "array",
+    "readOnly": true,
+    "items": {
+     "type": "object",
+     "required": [
+      "field",
+      "systemOfRecord",
+      "status"
+     ],
+     "properties": {
+      "field": {
+       "type": "string"
+      },
+      "systemOfRecord": {
+       "type": "string",
+       "description": "The owning contract/table, e.g. `pii.subject_contact`."
+      },
+      "operation": {
+       "type": "string",
+       "nullable": true,
+       "description": "The operation that performs it, e.g. `updateGuestProfile`."
+      },
+      "status": {
+       "type": "string",
+       "enum": [
+        "routed",
+        "applied",
+        "rejected",
+        "manualActionRequired"
+       ]
+      },
+      "updatedAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
  "DataRetentionExpiryLegalHoldOperationsView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Data Retention, Expiry & Legal Hold Operations displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.retention_policy, marketing.legal_hold (new), marketing.privacy_action (new), marketing.guest_profile, pii.subject",
+  "description": "The retention dashboard (pack 17.2.7) against ADR-0047's lifecycle.",
+  "required": [
+   "recordsApproachingExpiry",
+   "policies",
+   "holds"
+  ],
   "properties": {
    "recordsApproachingExpiry": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Records Approaching Expiry"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Inside the 90-day notice window before their retention action."
    },
    "eligibleForDeletion": {
-    "type": "string",
-    "description": "Eligible for Deletion"
+    "type": "integer",
+    "minimum": 0
    },
    "eligibleForAnonymization": {
-    "type": "string",
-    "description": "Eligible for Anonymization"
+    "type": "integer",
+    "minimum": 0
+   },
+   "eligibleForArchive": {
+    "type": "integer",
+    "minimum": 0
    },
    "underLegalHold": {
-    "type": "string",
-    "description": "Under Legal Hold"
+    "type": "integer",
+    "minimum": 0
    },
    "processingFailures": {
     "type": "integer",
-    "description": "Processing Failures"
+    "minimum": 0
    },
    "retentionExceptions": {
     "type": "integer",
-    "description": "Retention Exceptions"
+    "minimum": 0,
+    "description": "Open `retentionFailure` / `deletionFailure` privacy exceptions."
    },
-   "anonymize": {
-    "type": "string",
-    "description": "Anonymize"
+   "lifecycle": {
+    "type": "object",
+    "description": "Guest subjects by ADR-0047 stage.",
+    "properties": {
+     "active": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "archived": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "erased": {
+      "type": "integer",
+      "minimum": 0
+     }
+    }
    },
-   "placeHold": {
-    "type": "string",
-    "description": "Place Hold"
+   "policies": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "policyId",
+      "code",
+      "action"
+     ],
+     "properties": {
+      "policyId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "code": {
+       "type": "string"
+      },
+      "dataCategory": {
+       "type": "string"
+      },
+      "action": {
+       "type": "string",
+       "enum": [
+        "archive",
+        "anonymise",
+        "pseudonymise",
+        "delete"
+       ]
+      },
+      "retainMonths": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "isSystemDefault": {
+       "type": "boolean",
+       "description": "True when inherited from the system default; false when the tenant or venue overrode it."
+      },
+      "floorMonths": {
+       "type": "integer",
+       "minimum": 0,
+       "nullable": true
+      },
+      "ceilingMonths": {
+       "type": "integer",
+       "minimum": 0,
+       "nullable": true
+      },
+      "anchor": {
+       "type": "string",
+       "enum": [
+        "lastActivity",
+        "creation",
+        "eventEnd",
+        "transactionDate"
+       ]
+      },
+      "approachingExpiry": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "eligibleNow": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "heldBack": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "schedule": {
+       "type": "string",
+       "enum": [
+        "daily",
+        "weekly",
+        "monthly",
+        "custom",
+        "manual"
+       ]
+      },
+      "nextRunAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "lastRun": {
+       "type": "object",
+       "nullable": true,
+       "properties": {
+        "runId": {
+         "type": "string",
+         "format": "uuid"
+        },
+        "completedAt": {
+         "type": "string",
+         "format": "date-time",
+         "nullable": true
+        },
+        "recordsAffected": {
+         "type": "integer",
+         "minimum": 0
+        },
+        "failed": {
+         "type": "integer",
+         "minimum": 0
+        }
+       }
+      }
+     }
+    }
    },
-   "holdId": {
-    "type": "string",
-    "description": "Hold ID"
+   "holds": {
+    "type": "array",
+    "description": "Holds in the requested states, by `reviewDate` ascending.",
+    "items": {
+     "$ref": "#/components/schemas/PrivacyLegalHold"
+    }
    },
-   "reason": {
+   "asOf": {
     "type": "string",
-    "description": "Reason"
-   },
-   "scope": {
-    "type": "string",
-    "description": "Scope"
-   },
-   "owner": {
-    "type": "string",
-    "description": "Owner"
-   },
-   "start": {
-    "type": "string",
-    "description": "Start"
-   },
-   "approval": {
-    "type": "string",
-    "description": "Approval"
-   },
-   "status": {
-    "type": "string",
-    "description": "Status"
-   },
-   "daily": {
-    "type": "string",
-    "description": "Daily"
-   },
-   "weekly": {
-    "type": "string",
-    "description": "Weekly"
-   },
-   "monthly": {
-    "type": "string",
-    "description": "Monthly"
-   },
-   "onConfiguredSchedules": {
-    "type": "string",
-    "description": "On configured schedules"
+    "format": "date-time"
    }
   }
  },
- "DataSubjectCustomerPrivacyRequestManagementView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Data Subject / Customer Privacy Request Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "access": {
-    "type": "string",
-    "description": "Access"
-   },
-   "dataCopyExport": {
-    "type": "string",
-    "description": "Data Copy / Export"
-   },
-   "correction": {
-    "type": "string",
-    "description": "Correction"
-   },
-   "deletion": {
-    "type": "string",
-    "description": "Deletion"
-   },
-   "anonymization": {
-    "type": "string",
-    "description": "Anonymization"
-   },
-   "restriction": {
-    "type": "string",
-    "description": "Restriction"
-   },
-   "objection": {
-    "type": "string",
-    "description": "Objection"
-   },
-   "consentWithdrawal": {
-    "type": "string",
-    "description": "Consent Withdrawal"
-   },
-   "marketingOptOut": {
-    "type": "string",
-    "description": "Marketing Opt-out"
-   },
-   "otherOrganizationDefinedPrivacyRequests": {
-    "type": "string",
-    "description": "Other organization-defined privacy requests"
-   },
-   "customerPortal": {
-    "type": "string",
-    "description": "Customer Portal"
-   },
-   "b2c": {
-    "type": "string",
-    "description": "B2C"
-   },
-   "mobileApp": {
-    "type": "string",
-    "description": "Mobile App"
-   },
-   "emailManualEntry": {
-    "type": "string",
-    "description": "Email/manual entry"
-   },
-   "customerService": {
-    "type": "string",
-    "description": "Customer Service"
-   },
-   "pos": {
-    "type": "string",
-    "description": "POS"
-   },
-   "api": {
-    "type": "string",
-    "description": "API"
-   },
-   "guardian": {
-    "type": "string",
-    "description": "Guardian"
-   },
-   "authorizedRepresentative": {
-    "type": "string",
-    "description": "Authorized Representative"
-   },
-   "requestId": {
-    "type": "string",
-    "description": "Request ID"
-   },
-   "customer": {
-    "type": "string",
-    "description": "Customer"
-   },
-   "requestType": {
-    "type": "string",
-    "description": "Request Type"
-   },
-   "submittedAt": {
-    "type": "string",
-    "description": "Submitted At"
-   },
-   "source": {
-    "type": "string",
-    "description": "Source"
-   },
-   "jurisdiction": {
-    "type": "string",
-    "description": "Jurisdiction"
-   },
-   "dueDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Due Date"
-   },
-   "sla": {
-    "type": "string",
-    "description": "SLA"
-   },
-   "priority": {
-    "type": "string",
-    "description": "Priority"
-   },
-   "owner": {
-    "type": "string",
-    "description": "Owner"
-   },
-   "verificationStatus": {
-    "type": "string",
-    "description": "Verification Status"
-   },
-   "status": {
-    "type": "string",
-    "description": "Status"
-   },
-   "notes": {
-    "type": "string",
-    "description": "Notes"
-   },
-   "accountLogin": {
-    "type": "string",
-    "description": "Account Login"
-   },
-   "otp": {
-    "type": "string",
-    "description": "OTP"
-   },
-   "emailVerification": {
-    "type": "string",
-    "description": "Email Verification"
-   },
-   "mobileVerification": {
-    "type": "string",
-    "description": "Mobile Verification"
-   },
-   "idReviewWherePermitted": {
-    "type": "string",
-    "description": "ID Review where permitted"
-   },
-   "manualVerification": {
-    "type": "string",
-    "description": "Manual Verification"
-   },
-   "daysRemaining": {
-    "type": "string",
-    "description": "Days remaining"
-   },
-   "atRisk": {
-    "type": "string",
-    "description": "At risk"
-   }
-  }
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
  },
- "DeletionAnonymizationRestrictionOperationsView": {
+ "Page": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Deletion, Anonymization & Restriction Operations displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "required": [
+   "items",
+   "hasMore"
+  ],
   "properties": {
-   "anonymize": {
-    "type": "string",
-    "description": "Anonymize"
+   "items": {
+    "type": "array",
+    "items": {}
    },
-   "pseudonymizeWhereConfigured": {
-    "type": "string",
-    "description": "Pseudonymize where configured"
+   "nextCursor": {
+    "type": "string"
    },
-   "restrictProcessing": {
-    "type": "string",
-    "description": "Restrict Processing"
-   },
-   "suppressMarketing": {
-    "type": "string",
-    "description": "Suppress Marketing"
-   },
-   "disconnectThirdPartyProfile": {
-    "type": "string",
-    "description": "Disconnect Third-party Profile"
-   },
-   "otherConfiguredAction": {
-    "type": "string",
-    "description": "Other configured action"
-   },
-   "marketingProfileDelete": {
-    "type": "string",
-    "description": "Marketing Profile — Delete"
-   },
-   "biometricReferenceDelete": {
-    "type": "string",
-    "description": "Biometric Reference — Delete"
-   },
-   "fraudInvestigationHold": {
-    "type": "string",
-    "description": "Fraud Investigation — Hold"
-   },
-   "retentionRequirements": {
-    "type": "string",
-    "description": "Retention requirements"
-   },
-   "legalHolds": {
-    "type": "string",
-    "description": "Legal holds"
-   },
-   "financialRecords": {
-    "type": "string",
-    "description": "Financial records"
-   },
-   "activeTransactions": {
-    "type": "integer",
-    "description": "Active transactions"
-   },
-   "securityFraudRequirements": {
-    "type": "string",
-    "description": "Security/fraud requirements"
-   },
-   "contractualObligations": {
-    "type": "string",
-    "description": "Contractual obligations"
-   },
-   "configuredJurisdictionRules": {
-    "type": "string",
-    "description": "Configured jurisdiction rules"
-   },
-   "pending": {
-    "type": "integer",
-    "description": "Pending"
-   },
-   "processing": {
-    "type": "string",
-    "description": "Processing"
-   },
-   "completed": {
-    "type": "string",
-    "description": "Completed"
-   },
-   "retainedWithReason": {
-    "type": "string",
-    "description": "Retained with Reason"
-   },
-   "failed": {
-    "type": "integer",
-    "description": "Failed"
-   },
-   "manualActionRequired": {
-    "type": "boolean",
-    "description": "Manual Action Required"
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },
  "PrivacyAnalyticsAiComplianceIntelligenceView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Privacy Analytics & AI Compliance Intelligence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.consent_record, marketing.privacy_request (new), marketing.privacy_action (new), marketing.retention_policy, marketing.privacy_exception (new), marketing.consent_propagation (new), marketing.tracking_technology",
+  "description": "Privacy KPIs for a period (pack 17.2.10). Rates are 0-1 over the period's denominators.",
+  "required": [
+   "consentRate",
+   "withdrawalRate",
+   "marketingOptInRate"
+  ],
   "properties": {
    "consentRate": {
     "type": "number",
-    "description": "Consent Rate"
+    "minimum": 0,
+    "maximum": 1,
+    "description": "Granted over presented."
    },
    "withdrawalRate": {
     "type": "number",
-    "description": "Withdrawal Rate"
+    "minimum": 0,
+    "maximum": 1
    },
    "marketingOptInRate": {
     "type": "number",
-    "description": "Marketing Opt-in Rate"
+    "minimum": 0,
+    "maximum": 1
    },
    "cookieAcceptanceByCategory": {
-    "type": "string",
-    "description": "Cookie Acceptance by Category"
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "category",
+      "acceptanceRate"
+     ],
+     "properties": {
+      "category": {
+       "type": "string",
+       "enum": [
+        "functional",
+        "analytics",
+        "personalisation",
+        "marketing",
+        "other"
+       ]
+      },
+      "acceptanceRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      }
+     }
+    }
    },
    "privacyRequests": {
-    "type": "string",
-    "description": "Privacy Requests"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Requests submitted in the period."
    },
-   "averageResolutionTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Average Resolution Time"
+   "privacyRequestsByType": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "requestType": {
+       "type": "string"
+      },
+      "count": {
+       "type": "integer",
+       "minimum": 0
+      }
+     }
+    }
    },
-   "slaCompliance": {
-    "type": "string",
-    "description": "SLA Compliance"
+   "averageResolutionSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "slaComplianceRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "description": "Completed within `dueAt`, over completed requests that had one."
    },
    "deletionCompletionRate": {
     "type": "number",
-    "description": "Deletion Completion Rate"
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true
    },
-   "retentionCompliance": {
-    "type": "string",
-    "description": "Retention Compliance"
+   "retentionComplianceRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "description": "Records actioned by their due date, over records due."
    },
-   "policyAcceptance": {
-    "type": "string",
-    "description": "Policy Acceptance"
+   "policyAcceptanceRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true
    },
-   "guardianConsentCompletion": {
-    "type": "string",
-    "description": "Guardian Consent Completion"
+   "guardianConsentCompletionRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true
    },
    "privacyExceptions": {
-    "type": "string",
-    "description": "Privacy Exceptions"
+    "type": "integer",
+    "minimum": 0
    },
    "consentPropagationFailures": {
-    "type": "string",
-    "description": "Consent Propagation Failures"
+    "type": "integer",
+    "minimum": 0
    },
-   "showOverdueDeletionRequests": {
-    "type": "string",
-    "description": "“Show overdue deletion requests.”"
+   "consentFunnel": {
+    "type": "array",
+    "description": "In order, each step's count and rate over the first step.",
+    "items": {
+     "type": "object",
+     "required": [
+      "step",
+      "count"
+     ],
+     "properties": {
+      "step": {
+       "type": "string",
+       "maxLength": 80,
+       "description": "e.g. privacyNoticeDisplayed, marketingConsentPresented, emailOptIn."
+      },
+      "count": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "rate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      }
+     }
+    }
    },
-   "backendScreenCoreResponsibility": {
-    "type": "string",
-    "description": "# Backend Screen Core Responsibility"
+   "riskFindings": {
+    "type": "array",
+    "description": "AI findings for human investigation; none is acted on automatically.",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "summary"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "trendAnomaly",
+        "abandonmentByLanguage",
+        "supersededPolicyInUse",
+        "configurationMismatch",
+        "other"
+       ]
+      },
+      "summary": {
+       "type": "string",
+       "maxLength": 500
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "low",
+        "medium",
+        "high"
+       ]
+      },
+      "detectedAt": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "exceptionId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "description": "Set once someone raised an exception from it."
+      }
+     }
+    }
    },
-   "board1Configure": {
+   "asOf": {
     "type": "string",
-    "description": "Board 1 — CONFIGURE"
-   },
-   "board2Operate": {
-    "type": "string",
-    "description": "Board 2 — OPERATE"
-   },
-   "consentStates": {
-    "type": "string",
-    "description": "consent states"
-   }
-  }
- },
- "PrivacyAuditEvidenceComplianceReportingView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Privacy Audit, Evidence & Compliance Reporting displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "consentGranted": {
-    "type": "string",
-    "description": "Consent Granted"
-   },
-   "consentWithdrawn": {
-    "type": "string",
-    "description": "Consent Withdrawn"
-   },
-   "preferenceChanged": {
-    "type": "string",
-    "description": "Preference Changed"
-   },
-   "policyAccepted": {
-    "type": "string",
-    "description": "Policy Accepted"
-   },
-   "privacyRequestCreated": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Privacy Request Created"
-   },
-   "identityVerified": {
-    "type": "string",
-    "description": "Identity Verified"
-   },
-   "dataExportGenerated": {
-    "type": "string",
-    "description": "Data Export Generated"
-   },
-   "correctionRequested": {
-    "type": "string",
-    "description": "Correction Requested"
-   },
-   "deletionApproved": {
-    "type": "string",
-    "description": "Deletion Approved"
-   },
-   "anonymizationExecuted": {
-    "type": "string",
-    "description": "Anonymization Executed"
-   },
-   "retentionAction": {
-    "type": "string",
-    "description": "Retention Action"
-   },
-   "legalHold": {
-    "type": "string",
-    "description": "Legal Hold"
-   },
-   "administrativeOverride": {
-    "type": "string",
-    "description": "Administrative Override"
-   },
-   "configurationChange": {
-    "type": "string",
-    "description": "Configuration Change"
-   },
-   "eventId": {
-    "type": "string",
-    "description": "Event ID"
-   },
-   "customer": {
-    "type": "string",
-    "description": "Customer"
-   },
-   "action": {
-    "type": "string",
-    "description": "Action"
-   },
-   "actor": {
-    "type": "string",
-    "description": "Actor"
-   },
-   "role": {
-    "type": "string",
-    "description": "Role"
-   },
-   "source": {
-    "type": "string",
-    "description": "Source"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "dateTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date/time"
-   },
-   "before": {
-    "type": "string",
-    "description": "Before"
-   },
-   "after": {
-    "type": "string",
-    "description": "After"
-   },
-   "reason": {
-    "type": "string",
-    "description": "Reason"
-   },
-   "approval": {
-    "type": "string",
-    "description": "Approval"
-   },
-   "relatedCase": {
-    "type": "string",
-    "description": "Related Case"
-   },
-   "evidenceReference": {
-    "type": "string",
-    "description": "Evidence reference"
-   },
-   "consentStatusReport": {
-    "type": "string",
-    "description": "Consent Status Report"
-   },
-   "consentWithdrawalReport": {
-    "type": "string",
-    "description": "Consent Withdrawal Report"
-   },
-   "marketingPermissionReport": {
-    "type": "string",
-    "description": "Marketing Permission Report"
-   },
-   "privacyRequestSlaReport": {
-    "type": "string",
-    "description": "Privacy Request SLA Report"
-   },
-   "deletionAnonymizationReport": {
-    "type": "string",
-    "description": "Deletion/Anonymization Report"
-   },
-   "retentionReport": {
-    "type": "string",
-    "description": "Retention Report"
-   },
-   "policyAcceptanceReport": {
-    "type": "string",
-    "description": "Policy Acceptance Report"
-   },
-   "minorGuardianPrivacyReport": {
-    "type": "string",
-    "description": "Minor/Guardian Privacy Report"
-   },
-   "cookieTrackingComplianceReport": {
-    "type": "string",
-    "description": "Cookie/Tracking Compliance Report"
-   },
-   "biometricPrivacyReport": {
-    "type": "string",
-    "description": "Biometric Privacy Report"
-   },
-   "exceptionReport": {
-    "type": "string",
-    "description": "Exception Report"
-   },
-   "selected": {
-    "type": "string",
-    "description": "selected"
+    "format": "date-time"
    }
   }
  },
  "PrivacyComplianceExceptionInvestigationWorkspaceInput": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
-  "description": "**What Privacy Compliance, Exception & Investigation Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "x-ticvai-persistence": "marketing.privacy_exception",
+  "description": "What a user may send to raise or progress a privacy exception (pack 17.2.8).",
+  "required": [
+   "category",
+   "severity",
+   "summary"
+  ],
   "properties": {
-   "exceptionSummary": {
+   "id": {
     "type": "string",
-    "description": "Exception summary"
+    "format": "uuid",
+    "description": "Absent to raise; present to update."
    },
-   "customerPrivacyProfile": {
+   "category": {
     "type": "string",
-    "description": "Customer privacy profile"
+    "enum": [
+     "missingConsentEvidence",
+     "consentPropagationFailure",
+     "marketingAfterWithdrawal",
+     "policyVersionMismatch",
+     "missingGuardianConsent",
+     "retentionFailure",
+     "deletionFailure",
+     "unknownTrackingTechnology",
+     "unauthorisedDataAccess",
+     "unmappedProcessingPurpose",
+     "biometricPrivacyException",
+     "dataExportFailure",
+     "other"
+    ]
    },
-   "relatedEvidence": {
+   "severity": {
     "type": "string",
-    "description": "Related evidence"
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
    },
-   "policyConfiguration": {
+   "summary": {
     "type": "string",
-    "description": "Policy/configuration"
+    "maxLength": 1000
    },
-   "systemEvents": {
+   "subjectId": {
     "type": "string",
-    "description": "System events"
+    "format": "uuid",
+    "nullable": true
    },
-   "timeline": {
+   "system": {
+    "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+   },
+   "brandId": {
     "type": "string",
-    "description": "Timeline"
+    "format": "uuid",
+    "nullable": true
+   },
+   "country": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$",
+    "nullable": true
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "detected",
+     "triaged",
+     "assigned",
+     "investigated",
+     "correctiveAction",
+     "reviewed",
+     "closed"
+    ],
+    "default": "detected"
+   },
+   "relatedEvidenceIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Consent evidence ids and audit event ids."
+   },
+   "policyReference": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "The configuration or policy version involved."
    },
    "rootCause": {
     "type": "string",
-    "description": "Root cause"
+    "maxLength": 2000,
+    "nullable": true
    },
    "correctiveAction": {
     "type": "string",
-    "description": "Corrective action"
+    "maxLength": 2000,
+    "nullable": true
    },
    "notes": {
     "type": "string",
-    "description": "Notes"
+    "maxLength": 4000,
+    "nullable": true
    },
-   "attachmentsReferenceEvidence": {
-    "type": "string",
-    "description": "Attachments/reference evidence"
+   "attachmentAssetIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
    },
-   "privacy": {
+   "escalatedTo": {
     "type": "string",
-    "description": "Privacy"
+    "nullable": true,
+    "enum": [
+     "privacy",
+     "legal",
+     "security",
+     "it",
+     "marketing",
+     "operations",
+     "dataOwner"
+    ]
    },
-   "legal": {
+   "privacyIncidentId": {
     "type": "string",
-    "description": "Legal"
-   },
-   "security": {
-    "type": "string",
-    "description": "Security"
-   },
-   "it": {
-    "type": "string",
-    "description": "IT"
-   },
-   "marketing": {
-    "type": "string",
-    "description": "Marketing"
-   },
-   "operations": {
-    "type": "string",
-    "description": "Operations"
-   },
-   "dataOwner": {
-    "type": "string",
-    "description": "Data Owner"
-   },
-   "fullEnterpriseCybersecurityIncidentManagementPlatform": {
-    "type": "string",
-    "description": "full enterprise cybersecurity incident-management platform"
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `recordPrivacyIncident` record, when the exception is also a breach."
    }
   }
  },
  "PrivacyComplianceExceptionInvestigationWorkspaceView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Privacy Compliance, Exception & Investigation Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "marketing.privacy_exception",
+  "description": "One privacy exception as stored, with its investigation fields and timeline.",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/PrivacyComplianceExceptionInvestigationWorkspaceInput"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "detectedAt"
+    ],
+    "properties": {
+     "detectedAt": {
+      "type": "string",
+      "format": "date-time",
+      "readOnly": true
+     },
+     "detectedBy": {
+      "type": "string",
+      "readOnly": true,
+      "enum": [
+       "platformCheck",
+       "aiDetection",
+       "user"
+      ]
+     },
+     "slaDueAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "description": "From the SLA policy for the severity (`setSlaPolicy`)."
+     },
+     "timeline": {
+      "type": "array",
+      "readOnly": true,
+      "items": {
+       "type": "object",
+       "properties": {
+        "at": {
+         "type": "string",
+         "format": "date-time"
+        },
+        "status": {
+         "type": "string"
+        },
+        "principalId": {
+         "type": "string",
+         "format": "uuid",
+         "nullable": true
+        },
+        "note": {
+         "type": "string",
+         "nullable": true
+        }
+       }
+      }
+     },
+     "closedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true
+     },
+     "scopePath": {
+      "type": "string",
+      "readOnly": true,
+      "description": "**The partition key** (ADR-0005)."
+     },
+     "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "readOnly": true
+     }
+    }
+   }
+  ]
+ },
+ "PrivacyLegalHold": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.legal_hold",
+  "description": "A legal or operational hold (pack 17.2.7 Hold information). Overrides scheduled deletion in its scope once approved.",
+  "required": [
+   "reason",
+   "scope"
+  ],
   "properties": {
-   "severity": {
+   "holdId": {
     "type": "string",
-    "description": "Severity"
+    "format": "uuid",
+    "readOnly": true
    },
-   "exception": {
+   "kind": {
     "type": "string",
-    "description": "Exception"
+    "enum": [
+     "legal",
+     "operational",
+     "fraudInvestigation",
+     "regulatorRequest"
+    ],
+    "default": "legal"
    },
-   "customer": {
+   "reason": {
     "type": "string",
-    "description": "Customer"
+    "maxLength": 1000
    },
-   "system": {
-    "type": "string",
-    "description": "System"
+   "scope": {
+    "type": "object",
+    "description": "At least one selector.",
+    "properties": {
+     "subjectIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "dataCategories": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "retentionPolicyCodes": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "caseId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     }
+    }
    },
-   "brand": {
+   "ownerPrincipalId": {
     "type": "string",
-    "description": "Brand"
+    "format": "uuid",
+    "nullable": true
    },
-   "country": {
+   "startsAt": {
     "type": "string",
-    "description": "Country"
+    "format": "date-time",
+    "nullable": true,
+    "description": "Defaults to approval time."
    },
-   "detectedAt": {
+   "reviewDate": {
     "type": "string",
-    "description": "Detected At"
-   },
-   "owner": {
-    "type": "string",
-    "description": "Owner"
-   },
-   "sla": {
-    "type": "string",
-    "description": "SLA"
+    "format": "date",
+    "nullable": true
    },
    "status": {
-    "type": "integer",
-    "description": "Status"
-   },
-   "exceptionSummary": {
     "type": "string",
-    "description": "Exception summary"
+    "enum": [
+     "pendingApproval",
+     "active",
+     "released"
+    ],
+    "default": "pendingApproval",
+    "description": "Set `active` to approve, `released` to release."
    },
-   "customerPrivacyProfile": {
+   "placedByPrincipalId": {
     "type": "string",
-    "description": "Customer privacy profile"
+    "format": "uuid",
+    "readOnly": true
    },
-   "relatedEvidence": {
+   "approvedByPrincipalId": {
     "type": "string",
-    "description": "Related evidence"
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
    },
-   "policyConfiguration": {
+   "approvedAt": {
     "type": "string",
-    "description": "Policy/configuration"
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    },
-   "systemEvents": {
+   "releaseReason": {
     "type": "string",
-    "description": "System events"
+    "maxLength": 1000,
+    "nullable": true
    },
-   "timeline": {
+   "releasedAt": {
     "type": "string",
-    "description": "Timeline"
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    },
-   "rootCause": {
+   "scopePath": {
     "type": "string",
-    "description": "Root cause"
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
    },
-   "correctiveAction": {
+   "updatedAt": {
     "type": "string",
-    "description": "Corrective action"
-   },
-   "notes": {
-    "type": "string",
-    "description": "Notes"
-   },
-   "attachmentsReferenceEvidence": {
-    "type": "string",
-    "description": "Attachments/reference evidence"
-   },
-   "privacy": {
-    "type": "string",
-    "description": "Privacy"
-   },
-   "legal": {
-    "type": "string",
-    "description": "Legal"
-   },
-   "security": {
-    "type": "string",
-    "description": "Security"
-   },
-   "it": {
-    "type": "string",
-    "description": "IT"
-   },
-   "marketing": {
-    "type": "string",
-    "description": "Marketing"
-   },
-   "operations": {
-    "type": "string",
-    "description": "Operations"
-   },
-   "dataOwner": {
-    "type": "string",
-    "description": "Data Owner"
-   },
-   "fullEnterpriseCybersecurityIncidentManagementPlatform": {
-    "type": "string",
-    "description": "full enterprise cybersecurity incident-management platform"
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
  "PrivacyOperationsCommandCenterView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Privacy Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.guest_profile, marketing.consent_record, marketing.privacy_request (new), marketing.privacy_action (new), marketing.retention_policy, marketing.privacy_exception (new), marketing.privacy_incident",
+  "description": "The privacy operations position for the caller's scope and filters (pack 17.2.1).",
+  "required": [
+   "totalCustomerPrivacyProfiles",
+   "consentHealth",
+   "requestQueue"
+  ],
   "properties": {
    "totalCustomerPrivacyProfiles": {
     "type": "integer",
-    "description": "Total Customer Privacy Profiles"
+    "minimum": 0
    },
    "activeConsentRecords": {
     "type": "integer",
-    "description": "Active Consent Records"
+    "minimum": 0
    },
    "withdrawnConsents": {
     "type": "integer",
-    "description": "Withdrawn Consents"
+    "minimum": 0
    },
    "marketingOptIns": {
     "type": "integer",
-    "description": "Marketing Opt-ins"
+    "minimum": 0
    },
    "marketingOptOuts": {
     "type": "integer",
-    "description": "Marketing Opt-outs"
+    "minimum": 0
    },
    "pendingDataRightsRequests": {
     "type": "integer",
-    "description": "Pending Data Rights Requests"
+    "minimum": 0,
+    "description": "Requests not yet `completed`."
    },
    "overdueRequests": {
     "type": "integer",
-    "description": "Overdue Requests"
+    "minimum": 0
+   },
+   "requestsWithoutDeadline": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Open requests whose jurisdiction has no configured response period."
    },
    "pendingDeletionActions": {
     "type": "integer",
-    "description": "Pending Deletion Actions"
+    "minimum": 0
    },
    "pendingAnonymization": {
     "type": "integer",
-    "description": "Pending Anonymization"
+    "minimum": 0
    },
    "retentionActionsDue": {
-    "type": "string",
-    "description": "Retention Actions Due"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Records inside the 90-day notice window before their retention action (ADR-0047 §6)."
    },
    "consentEvidenceExceptions": {
     "type": "integer",
-    "description": "Consent Evidence Exceptions"
+    "minimum": 0
    },
    "privacyIncidentsExceptions": {
-    "type": "string",
-    "description": "Privacy Incidents / Exceptions"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Open privacy exceptions plus open privacy incidents."
    },
    "policyReAcceptancePending": {
     "type": "integer",
-    "description": "Policy Re-Acceptance Pending"
+    "minimum": 0,
+    "description": "Customers whose accepted notice version has been superseded."
    },
-   "emailMarketing": {
+   "consentHealth": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "category",
+      "granted",
+      "withdrawn",
+      "declined"
+     ],
+     "properties": {
+      "category": {
+       "type": "string",
+       "enum": [
+        "emailMarketing",
+        "smsMarketing",
+        "whatsappMarketing",
+        "pushMarketing",
+        "personalisation",
+        "analytics",
+        "location",
+        "biometrics",
+        "other"
+       ]
+      },
+      "otherLabel": {
+       "type": "string",
+       "nullable": true,
+       "description": "The configured purpose name, when `category` is `other`."
+      },
+      "granted": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "withdrawn": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "declined": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "requiresRenewal": {
+       "type": "integer",
+       "minimum": 0
+      }
+     }
+    }
+   },
+   "requestQueue": {
+    "type": "array",
+    "description": "Open and recently completed requests by status and configured stage.",
+    "items": {
+     "type": "object",
+     "required": [
+      "status",
+      "count"
+     ],
+     "properties": {
+      "status": {
+       "type": "string",
+       "enum": [
+        "submitted",
+        "inProgress",
+        "completed"
+       ]
+      },
+      "stage": {
+       "type": "string",
+       "nullable": true
+      },
+      "count": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "atRisk": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "overdue": {
+       "type": "integer",
+       "minimum": 0
+      }
+     }
+    }
+   },
+   "alerts": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "count"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "requestsApproachingDeadline",
+        "requestsOverdue",
+        "requestsWithoutDeadline",
+        "supersededNoticeAccepted",
+        "withdrawnConsentInMarketingExport",
+        "consentPropagationFailed",
+        "retentionActionFailed"
+       ]
+      },
+      "count": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "detail": {
+       "type": "string",
+       "maxLength": 300,
+       "nullable": true
+      }
+     }
+    }
+   },
+   "asOf": {
     "type": "string",
-    "description": "Email Marketing"
-   },
-   "smsMarketing": {
-    "type": "string",
-    "description": "SMS Marketing"
-   },
-   "whatsappMarketing": {
-    "type": "string",
-    "description": "WhatsApp Marketing"
-   },
-   "push": {
-    "type": "string",
-    "description": "Push"
-   },
-   "personalization": {
-    "type": "string",
-    "description": "Personalization"
-   },
-   "analytics": {
-    "type": "integer",
-    "description": "Analytics"
-   },
-   "location": {
-    "type": "string",
-    "description": "Location"
-   },
-   "biometrics": {
-    "type": "integer",
-    "description": "Biometrics"
-   },
-   "otherConfiguredPurposes": {
-    "type": "integer",
-    "description": "Other configured purposes"
-   },
-   "investigateEvidence": {
-    "type": "string",
-    "description": "Investigate Evidence"
+    "format": "date-time"
    }
   }
  }

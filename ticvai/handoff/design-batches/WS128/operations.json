@@ -1,0 +1,21 @@
+{
+ "setEventCapacityProfile": {
+  "method": "PUT",
+  "path": "/events/{eventId}/capacity-profile",
+  "contract": "catalogue",
+  "summary": "How many, in what mode, and held back for whom",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EventCapacityProfile",
+  "responds": "EventCapacityProfile"
+ }
+}

@@ -43,7 +43,7 @@ servicesCalled:
 - service: FnbService
   operationCalls: 37
 - service: ReportingService
-  operationCalls: 2
+  operationCalls: 3
 - service: TenancyService
   operationCalls: 1
 coverage:
@@ -352,6 +352,7 @@ screens:
   operations:
   - askReportingQuestion
   - getDashboard
+  - recordDashboardView
   states:
   - emptyFirstRun
   - emptyNoAccess

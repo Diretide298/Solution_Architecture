@@ -21,9 +21,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "park",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "zone",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "gate",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AccessSecurityFraudCommandCenterView"
+  "responds": "Page"
  },
  "listBiometricIdentityIntegrity": {
   "method": "GET",
@@ -34,9 +65,20 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "BiometricIdentityIntegrityMonitoringView"
+  "responds": "Page"
  },
  "listCredentialSharingConcurrent": {
   "method": "GET",
@@ -47,9 +89,20 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CredentialSharingConcurrentUsageDetectionView"
+  "responds": "Page"
  },
  "listFraudDetectionRule": {
   "method": "GET",
@@ -82,7 +135,7 @@
   "path": "/security-detection-governance",
   "contract": "access",
   "summary": "Security Analytics, AI Detection & Governance",
-  "permission": "SCOPE_VIEW",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -126,6 +179,21 @@
     "name": "media",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "device",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "gate",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "timeDay",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -140,9 +208,39 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "UnifiedIdentityCredentialLockManagerView"
+  "responds": "Page"
+ },
+ "setFraudDetectionRule": {
+  "method": "PUT",
+  "path": "/fraud-detection-rule",
+  "contract": "access",
+  "summary": "Save an access fraud detection rule",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FraudDetectionRuleSignalLibraryInput",
+  "responds": "FraudDetectionRuleSignalLibraryView"
  },
  "setRealTimeSecurity": {
   "method": "PUT",
@@ -153,7 +251,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "RealTimeSecurityResponsePlaybookBuilderInput",
   "responds": "RealTimeSecurityResponsePlaybookBuilderView"
  },
@@ -166,7 +270,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "SecurityInvestigationEvidenceWorkspaceInput",
   "responds": "SecurityInvestigationEvidenceWorkspaceView"
  }

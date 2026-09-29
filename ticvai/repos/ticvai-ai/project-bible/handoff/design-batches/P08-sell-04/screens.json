@@ -1,5 +1,215 @@
 [
  {
+  "id": "BO-123",
+  "name": "POS Profile Management",
+  "module": "Sell",
+  "requiresModule": "core",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/pos-profile-management",
+   "component": "apps/venue-management-web/src/routes/sell/PosProfileManagementList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-102"
+   ],
+   "exitTo": [
+    "BO-102"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-102",
+     "trigger": "Sell",
+     "provenance": "derived — BO-102 declares entryState.params  and BO-123 holds none of them, so the edge carries nothing and BO-102 opens cold"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listSaleBoards` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "POS Profile Management — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listSaleBoards",
+       "notes": "Sends `?venueId=` to `listSaleBoards`.",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listSaleBoards",
+       "notes": "Sends `?kind=` to `listSaleBoards`.",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every sale board",
+       "bindsTo": "SaleBoard",
+       "columns": [
+        "SaleBoard.id",
+        "SaleBoard.code",
+        "SaleBoard.name",
+        "SaleBoard.venueId",
+        "SaleBoard.kind",
+        "SaleBoard.pages",
+        "SaleBoard.isActive"
+       ],
+       "operation": "listSaleBoards",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search pos profile management",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected sale board",
+       "bindsTo": "SaleBoard",
+       "columns": [
+        "SaleBoard.id",
+        "SaleBoard.code",
+        "SaleBoard.name",
+        "SaleBoard.venueId",
+        "SaleBoard.kind",
+        "SaleBoard.pages",
+        "SaleBoard.isActive"
+       ],
+       "operation": "listSaleBoards",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save configuration profile",
+       "operation": "setConfigurationProfile",
+       "provenance": "contract tenancy.yaml PUT /configuration-profiles"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The pos profile list.",
+   "error": "Could not load. Names which read failed and leaves the pos profile untouched.",
+   "emptyFirstRun": "No pos profile yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on venueId, kind and the pos profile are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listSaleBoards` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setConfigurationProfile",
+    "contract": "tenancy",
+    "purpose": "setConfigurationProfile",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSaleBoards"
+    ]
+   },
+   {
+    "operationId": "listSaleBoards",
+    "contract": "tenancy",
+    "purpose": "List sale boards",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders.",
+   "preloaded": [
+    "SaleBoard.id",
+    "SaleBoard.code",
+    "SaleBoard.name",
+    "SaleBoard.venueId",
+    "SaleBoard.kind"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-123"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetConfigurationProfile",
+    "component": "modal",
+    "trigger": "Save configuration profile",
+    "body": "**Collects what `setConfigurationProfile` sends before it is called.** Required: `id`, `name`, `venueKindScope`, `status`. Optional: `scopePath`, `settings`, `deployedCount`, `publishedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ConfigurationProfile",
+    "confirm": {
+     "label": "Save configuration profile",
+     "operation": "setConfigurationProfile"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "name",
+      "venueKindScope",
+      "status",
+      "scopePath",
+      "settings",
+      "deployedCount",
+      "publishedAt"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /configuration-profiles"
+   }
+  ],
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
   "id": "BO-124",
   "name": "Layout & Journey Builder",
   "module": "Sell",
@@ -14,27 +224,40 @@
   "navigation": {
    "entryFrom": [
     "BO-036",
-    "BO-102"
+    "BO-102",
+    "BO-129"
    ],
    "exitTo": [
     "BO-102",
-    "BO-125"
+    "BO-125",
+    "BO-126"
    ],
    "inferred": false,
    "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
     {
-     "to": "BO-125",
-     "trigger": "Product & Category Button Configuration",
-     "provenance": "flow F95 step 2→3"
-    },
-    {
      "to": "BO-102",
      "trigger": "Sell",
+     "provenance": "derived — BO-102 declares entryState.params  and BO-124 holds none of them, so the edge carries nothing and BO-102 opens cold"
+    },
+    {
+     "to": "BO-125",
+     "trigger": "Product & Category Button Configuration",
+     "provenance": "flow F95 step 2→3",
      "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+      "deviceId",
+      "saleBoardId",
+      "workstationId"
+     ]
+    },
+    {
+     "to": "BO-126",
+     "trigger": "The configuration is deployed and rolled out",
+     "provenance": "flow F79 step 3→4",
+     "carries": [
+      "profileId",
+      "saleBoardId"
+     ]
     }
    ]
   },
@@ -46,13 +269,6 @@
   "pattern": "listDetail",
   "patternReason": "`listAuditRecords` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "Layout & Journey Builder — from the client design board, 20 August.",
-  "gaps": [
-   {
-    "operation": "listAuditRecords",
-    "why": "**2 declared operations reach no component on this screen**: listAuditRecords, listDevices. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -62,25 +278,25 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save sale board",
        "operation": "updateSaleBoard",
        "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create sale board",
        "operation": "createSaleBoard",
        "provenance": "contract tenancy.yaml POST /sale-boards"
       },
       {
        "kind": "secondaryButton",
-       "label": "Deploy",
+       "label": "Deploy configuration profile",
        "operation": "deployConfigurationProfile",
        "provenance": "contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy"
       },
       {
        "kind": "secondaryButton",
-       "label": "Record",
+       "label": "Record device heartbeat",
        "operation": "recordDeviceHeartbeat",
        "provenance": "contract tenancy.yaml POST /devices/{deviceId}/heartbeat"
       },
@@ -106,6 +322,92 @@
        "impliedBy": "deployConfigurationProfile",
        "notes": "Declares `deployConfigurationProfile`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "textField",
+       "label": "Org unit id",
+       "operation": "listAuditRecords",
+       "notes": "Sends `?orgUnitId=` to `listAuditRecords`.",
+       "provenance": "contract tenancy.yaml GET /audit-records"
+      },
+      {
+       "kind": "textField",
+       "label": "Principal id",
+       "operation": "listAuditRecords",
+       "notes": "Sends `?principalId=` to `listAuditRecords`.",
+       "provenance": "contract tenancy.yaml GET /audit-records"
+      },
+      {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listAuditRecords",
+       "notes": "Sends `?workstationId=` to `listAuditRecords`.",
+       "provenance": "contract tenancy.yaml GET /audit-records"
+      },
+      {
+       "kind": "textField",
+       "label": "Action",
+       "operation": "listAuditRecords",
+       "notes": "Sends `?action=` to `listAuditRecords`.",
+       "provenance": "contract tenancy.yaml GET /audit-records"
+      },
+      {
+       "kind": "textField",
+       "label": "Subject ref",
+       "operation": "listAuditRecords",
+       "notes": "Sends `?subjectRef=` to `listAuditRecords`.",
+       "provenance": "contract tenancy.yaml GET /audit-records"
+      },
+      {
+       "kind": "datePicker",
+       "label": "From",
+       "operation": "listAuditRecords",
+       "notes": "Sends `?from=` to `listAuditRecords`.",
+       "provenance": "contract tenancy.yaml GET /audit-records"
+      },
+      {
+       "kind": "datePicker",
+       "label": "To",
+       "operation": "listAuditRecords",
+       "notes": "Sends `?to=` to `listAuditRecords`.",
+       "provenance": "contract tenancy.yaml GET /audit-records"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every audit",
+       "bindsTo": "AuditRecord",
+       "columns": [
+        "AuditRecord.id",
+        "AuditRecord.principalId",
+        "AuditRecord.orgUnitId",
+        "AuditRecord.workstationId",
+        "AuditRecord.action",
+        "AuditRecord.subjectRef",
+        "AuditRecord.occurredAt"
+       ],
+       "operation": "listAuditRecords",
+       "provenance": "contract tenancy.yaml GET /audit-records"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every registered device",
+       "bindsTo": "RegisteredDevice",
+       "columns": [
+        "RegisteredDevice.id",
+        "RegisteredDevice.kind",
+        "RegisteredDevice.driver",
+        "RegisteredDevice.identifier",
+        "RegisteredDevice.workstationId",
+        "RegisteredDevice.model",
+        "RegisteredDevice.pushToken",
+        "RegisteredDevice.pushPlatform",
+        "RegisteredDevice.pushFailureCount",
+        "RegisteredDevice.offlineScope",
+        "RegisteredDevice.firmwareVersion",
+        "RegisteredDevice.isRequired"
+       ],
+       "operation": "listDevices",
+       "provenance": "contract tenancy.yaml GET /devices"
       }
      ]
     }
@@ -114,9 +416,9 @@
   "states": {
    "loading": "The layout journey list.",
    "error": "Could not load. Names which read failed and leaves the layout journey untouched.",
-   "emptyFirstRun": "No layout journey yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the layout journey are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No layout journey yet. Offers Create sale board (`createSaleBoard`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on orgUnitId, principalId, workstationId, action, subjectRef, from and the layout journey are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `AUDIT_VIEW`, which `listAuditRecords` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -193,10 +495,109 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-124",
+   "derivedFrom": "wireframes/reference/POS Board 1.dc.html",
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formUpdateSaleBoard",
+    "component": "modal",
+    "trigger": "Save sale board",
+    "body": "**Collects what `updateSaleBoard` sends before it is called.** Required: `id`, `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SaleBoard",
+    "confirm": {
+     "label": "Save sale board",
+     "operation": "updateSaleBoard"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "venueId",
+      "kind",
+      "pages",
+      "isActive"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
+   },
+   {
+    "id": "formCreateSaleBoard",
+    "component": "modal",
+    "trigger": "Create sale board",
+    "body": "**Collects what `createSaleBoard` sends before it is called.** Required: `id`, `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SaleBoard",
+    "confirm": {
+     "label": "Create sale board",
+     "operation": "createSaleBoard"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "venueId",
+      "kind",
+      "pages",
+      "isActive"
+     ]
+    },
+    "provenance": "contract tenancy.yaml POST /sale-boards"
+   },
+   {
+    "id": "formDeployConfigurationProfile",
+    "component": "modal",
+    "trigger": "Deploy configuration profile",
+    "body": "**Collects what `deployConfigurationProfile` sends before it is called.** Required: `id`, `profileId`, `status`. Optional: `targetWorkstationIds`, `targetFilter`, `strategy`, `succeededCount`, `failedCount`, `failureReasons`, `startedAt`, `completedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ProfileDeployment",
+    "confirm": {
+     "label": "Deploy configuration profile",
+     "operation": "deployConfigurationProfile"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "profileId",
+      "status",
+      "targetWorkstationIds",
+      "targetFilter",
+      "strategy",
+      "succeededCount",
+      "failedCount",
+      "failureReasons",
+      "startedAt",
+      "completedAt"
+     ]
+    },
+    "provenance": "contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy"
+   },
+   {
+    "id": "formRecordDeviceHeartbeat",
+    "component": "modal",
+    "trigger": "Record device heartbeat",
+    "body": "**Collects what `recordDeviceHeartbeat` sends before it is called.** Required: `status`, `recordedAt`. Optional: `detail`, `firmwareVersion`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Record device heartbeat",
+     "operation": "recordDeviceHeartbeat"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "recordedAt",
+      "detail",
+      "firmwareVersion"
+     ]
+    },
+    "provenance": "contract tenancy.yaml POST /devices/{deviceId}/heartbeat"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -246,10 +647,7 @@
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-125 holds none of them, so the edge carries nothing and BO-102 opens cold"
     }
    ]
   },
@@ -264,8 +662,8 @@
   "gaps": [
    {
     "operation": "getWorkstationHealth",
-    "why": "**2 declared operations reach no component on this screen**: getWorkstationHealth, listAlerts. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "why": "**`getWorkstationHealth` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
+    "source": "contract tenancy.yaml GET /workstations/{workstationId}/health"
    }
   ],
   "layout": {
@@ -276,8 +674,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listProducts",
+       "notes": "Sends `?venueId=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listProducts",
+       "notes": "Sends `?kind=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is sellable",
+       "operation": "listProducts",
+       "notes": "Sends `?isSellable=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every product category button",
+       "label": "Every product",
        "bindsTo": "Product",
        "columns": [
         "Product.id",
@@ -295,6 +714,32 @@
        ],
        "operation": "listProducts",
        "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every alert",
+       "bindsTo": "Alert",
+       "columns": [
+        "Alert.id",
+        "Alert.ruleId",
+        "Alert.ruleName",
+        "Alert.metric",
+        "Alert.raisedAt",
+        "Alert.severity",
+        "Alert.status",
+        "Alert.observedValue",
+        "Alert.threshold",
+        "Alert.scopePath",
+        "Alert.workstationId",
+        "Alert.shiftId"
+       ],
+       "operation": "listAlerts",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search product",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -304,32 +749,34 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save sale board",
        "operation": "updateSaleBoard",
        "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Record",
+       "label": "Record device heartbeat",
        "operation": "recordDeviceHeartbeat",
        "provenance": "contract tenancy.yaml POST /devices/{deviceId}/heartbeat"
       },
       {
        "kind": "secondaryButton",
-       "label": "Report",
+       "label": "Report incident",
        "operation": "reportIncident",
        "provenance": "contract maintenance.yaml POST /incidents"
       }
      ]
     },
     {
-     "name": "contentBody",
-     "slot": "carried",
+     "name": "contextPanel",
+     "slot": "reads",
      "components": [
       {
-       "kind": "searchField",
-       "label": "Search product",
-       "provenance": "carried from the previous definition"
+       "kind": "detailPanel",
+       "label": "Workstation health",
+       "operation": "getWorkstationHealth",
+       "notes": "Shows `score`, `status`, `contributors` from `getWorkstationHealth`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
+       "provenance": "contract tenancy.yaml GET /workstations/{workstationId}/health"
       }
      ]
     }
@@ -338,9 +785,9 @@
   "states": {
    "loading": "The product category button list.",
    "error": "Could not load. Names which read failed and leaves the product category button untouched.",
-   "emptyFirstRun": "No product category button yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the product category button are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No product category button yet. Offers Record device heartbeat (`recordDeviceHeartbeat`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the product category button are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -414,10 +861,89 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-125",
+   "derivedFrom": "wireframes/reference/POS Board 1.dc.html",
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formUpdateSaleBoard",
+    "component": "modal",
+    "trigger": "Save sale board",
+    "body": "**Collects what `updateSaleBoard` sends before it is called.** Required: `id`, `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SaleBoard",
+    "confirm": {
+     "label": "Save sale board",
+     "operation": "updateSaleBoard"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "venueId",
+      "kind",
+      "pages",
+      "isActive"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
+   },
+   {
+    "id": "formRecordDeviceHeartbeat",
+    "component": "modal",
+    "trigger": "Record device heartbeat",
+    "body": "**Collects what `recordDeviceHeartbeat` sends before it is called.** Required: `status`, `recordedAt`. Optional: `detail`, `firmwareVersion`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Record device heartbeat",
+     "operation": "recordDeviceHeartbeat"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "recordedAt",
+      "detail",
+      "firmwareVersion"
+     ]
+    },
+    "provenance": "contract tenancy.yaml POST /devices/{deviceId}/heartbeat"
+   },
+   {
+    "id": "formReportIncident",
+    "component": "modal",
+    "trigger": "Report incident",
+    "body": "**Collects what `reportIncident` sends before it is called.** Required: `id`, `kind`, `severity`, `venueId`, `description`, `occurredAt`, `recordedAt`. Optional: `assetId`, `locationDescription`, `involvedSubjectIds`, `involvedStaffPrincipalIds`, `witnessCount`, `firstAidGiven`, `emergencyServicesCalled`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ReportIncidentRequest",
+    "confirm": {
+     "label": "Report incident",
+     "operation": "reportIncident"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "severity",
+      "venueId",
+      "description",
+      "occurredAt",
+      "recordedAt",
+      "assetId",
+      "locationDescription",
+      "involvedSubjectIds",
+      "involvedStaffPrincipalIds",
+      "witnessCount",
+      "firstAidGiven",
+      "emergencyServicesCalled",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract maintenance.yaml POST /incidents"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -456,7 +982,8 @@
   "navigation": {
    "entryFrom": [
     "BO-102",
-    "BO-118"
+    "BO-118",
+    "BO-124"
    ],
    "exitTo": [
     "BO-036",
@@ -466,17 +993,18 @@
    "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
     {
-     "to": "BO-036",
-     "trigger": "Device Registry",
-     "provenance": "flow F79 step 1→2"
-    },
-    {
      "to": "BO-102",
      "trigger": "Sell",
+     "provenance": "derived — BO-102 declares entryState.params  and BO-126 holds none of them, so the edge carries nothing and BO-102 opens cold"
+    },
+    {
+     "to": "BO-036",
+     "trigger": "Device Registry",
+     "provenance": "flow F79 step 1→2",
      "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+      "profileId",
+      "workstationId"
+     ]
     }
    ]
   },
@@ -516,49 +1044,7 @@
        "bindsTo": "Workstation",
        "operation": "listWorkstations",
        "provenance": "contract tenancy.yaml GET /workstations"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Deploy",
-       "operation": "deployConfigurationProfile",
-       "provenance": "contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy"
       },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updateSaleBoard",
-       "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Run",
-       "operation": "runReport",
-       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Start",
-       "operation": "startRollout",
-       "provenance": "contract platform-ops.yaml POST /rollouts/{rolloutId}/start"
-      },
-      {
-       "kind": "publishGate",
-       "label": "What publishing changes",
-       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
-       "provenance": "authored — required by check-screens"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
       {
        "kind": "searchField",
        "label": "Search deployment, preview",
@@ -571,15 +1057,50 @@
        "provenance": "carried from the previous definition"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Deploy configuration profile",
+       "operation": "deployConfigurationProfile",
+       "provenance": "contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save sale board",
+       "operation": "updateSaleBoard",
+       "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Run report",
+       "operation": "runReport",
+       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Start rollout",
+       "operation": "startRollout",
+       "provenance": "contract platform-ops.yaml POST /rollouts/{rolloutId}/start"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
+       "provenance": "authored — required by check-screens"
+      }
+     ]
     }
    ]
   },
   "states": {
-   "loading": "The deployment preview audit list.",
+   "loading": "The deployment preview audit figures; each tile loads on its own.",
    "error": "Could not load. Names which read failed and leaves the deployment preview audit untouched.",
-   "emptyFirstRun": "No deployment preview audit yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the deployment preview audit are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No deployment preview audit yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `AUDIT_VIEW`, which `listAuditRecords` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -666,10 +1187,104 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-126",
+   "derivedFrom": "wireframes/reference/POS Board 1.dc.html",
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formDeployConfigurationProfile",
+    "component": "modal",
+    "trigger": "Deploy configuration profile",
+    "body": "**Collects what `deployConfigurationProfile` sends before it is called.** Required: `id`, `profileId`, `status`. Optional: `targetWorkstationIds`, `targetFilter`, `strategy`, `succeededCount`, `failedCount`, `failureReasons`, `startedAt`, `completedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ProfileDeployment",
+    "confirm": {
+     "label": "Deploy configuration profile",
+     "operation": "deployConfigurationProfile"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "profileId",
+      "status",
+      "targetWorkstationIds",
+      "targetFilter",
+      "strategy",
+      "succeededCount",
+      "failedCount",
+      "failureReasons",
+      "startedAt",
+      "completedAt"
+     ]
+    },
+    "provenance": "contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy"
+   },
+   {
+    "id": "formUpdateSaleBoard",
+    "component": "modal",
+    "trigger": "Save sale board",
+    "body": "**Collects what `updateSaleBoard` sends before it is called.** Required: `id`, `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SaleBoard",
+    "confirm": {
+     "label": "Save sale board",
+     "operation": "updateSaleBoard"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "venueId",
+      "kind",
+      "pages",
+      "isActive"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
+   },
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   },
+   {
+    "id": "formStartRollout",
+    "component": "modal",
+    "trigger": "Start rollout",
+    "body": "**Collects what `startRollout` sends before it is called.** Required: `stage`. **The request answers 202 pending the platform release manager** (`releasePromotion`, decided 28 September, audit R144): the rollout shows *start pending approval* until someone other than the requester approves it — a requester cannot approve their own. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Start rollout",
+     "operation": "startRollout"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "stage"
+     ]
+    },
+    "provenance": "contract platform-ops.yaml POST /rollouts/{rolloutId}/start"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -718,10 +1333,7 @@
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-142 holds none of them, so the edge carries nothing and BO-102 opens cold"
     }
    ]
   },
@@ -733,13 +1345,6 @@
   "pattern": "listDetail",
   "patternReason": "`listRoles` reads the population and `getVenueSettings` reads one of them — list, select, act",
   "purpose": "Store Rules, Controls & Permissions — from the client design board, 20 August.",
-  "gaps": [
-   {
-    "operation": "listStoreRules",
-    "why": "**1 declared operation reach no component on this screen**: listStoreRules. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -749,7 +1354,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every store rules controls",
+       "label": "Every role",
        "bindsTo": "Role",
        "columns": [
         "Role.id",
@@ -764,6 +1369,29 @@
        ],
        "operation": "listRoles",
        "provenance": "contract identity.yaml GET /roles"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every store rule",
+       "bindsTo": "StoreRule",
+       "columns": [
+        "StoreRule.id",
+        "StoreRule.venueId",
+        "StoreRule.outletId",
+        "StoreRule.kind",
+        "StoreRule.thresholdAmount",
+        "StoreRule.minimumAgeYears",
+        "StoreRule.requiresPermission",
+        "StoreRule.enabled",
+        "StoreRule.updatedByPrincipalId"
+       ],
+       "operation": "listStoreRules",
+       "provenance": "contract retail.yaml GET /store-rules"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search store rules, controls",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -773,13 +1401,34 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected store rules controls",
+       "label": "The selected role",
+       "bindsTo": "Role",
+       "columns": [
+        "Role.id",
+        "Role.code",
+        "Role.name",
+        "Role.description",
+        "Role.permissions",
+        "Role.inheritsFromRoleId",
+        "Role.isSystem",
+        "Role.principalCount",
+        "Role.grantCount"
+       ],
+       "operation": "listRoles",
+       "provenance": "contract identity.yaml GET /roles"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The venue settings",
        "bindsTo": "VenueSettings",
        "columns": [
         "VenueSettings.id",
         "VenueSettings.venueId",
+        "VenueSettings.currencyCode",
+        "VenueSettings.currencyScale",
         "VenueSettings.supportHours",
         "VenueSettings.quietHours",
+        "VenueSettings.biometrics",
         "VenueSettings.segregatedAccess",
         "VenueSettings.alerting"
        ],
@@ -794,20 +1443,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save store rules",
        "operation": "setStoreRules",
        "provenance": "contract retail.yaml PUT /store-rules"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search store rules, controls",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -816,9 +1454,9 @@
   "states": {
    "loading": "The store rules controls list.",
    "error": "Could not load. Names which read failed and leaves the store rules controls untouched.",
-   "emptyFirstRun": "No store rules controls yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the store rules controls are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No store rules controls yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listRoles` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getVenueSettings` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -869,9 +1507,38 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-142",
+   "derivedFrom": "wireframes/reference/Retail Board 1.dc.html",
    "note": "**Drawn by Claude Design on `Retail Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetStoreRules",
+    "component": "modal",
+    "trigger": "Save store rules",
+    "body": "**Collects what `setStoreRules` sends before it is called.** Required: `id`. Optional: `venueId`, `outletId`, `kind`, `thresholdAmount`, `minimumAgeYears`, `requiresPermission`, `enabled`, `updatedByPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "StoreRule",
+    "confirm": {
+     "label": "Save store rules",
+     "operation": "setStoreRules"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "outletId",
+      "kind",
+      "thresholdAmount",
+      "minimumAgeYears",
+      "requiresPermission",
+      "enabled",
+      "updatedByPrincipalId"
+     ]
+    },
+    "provenance": "contract retail.yaml PUT /store-rules"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -920,10 +1587,7 @@
     {
      "to": "BO-102",
      "trigger": "Sell",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-102 declares entryState.params  and BO-143 holds none of them, so the edge carries nothing and BO-102 opens cold"
     }
    ]
   },
@@ -944,7 +1608,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected retail global settings",
+       "label": "The venue settings",
        "bindsTo": "VenueSettings",
        "columns": [
         "VenueSettings.id",
@@ -956,6 +1620,11 @@
        ],
        "operation": "getVenueSettings",
        "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search retail global settings",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -965,31 +1634,19 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save venue settings",
        "operation": "setVenueSettings",
        "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search retail global settings",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The retail global settings list.",
+   "loading": "The retail global settings, read by `getVenueSettings`.",
    "error": "Could not load. Names which read failed and leaves the retail global settings untouched.",
-   "emptyFirstRun": "No retail global settings yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the retail global settings are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No retail global settings yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getVenueSettings` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1003,6 +1660,23 @@
     "contract": "tenancy",
     "purpose": "Set support hours, quiet hours, segregated access and alerti",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "lookupShopAndDrop",
+    "contract": "retail",
+    "purpose": "Find an uncollected shop-and-drop item",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "disposeShopAndDrop",
+    "contract": "retail",
+    "purpose": "Dispose of an item left past the hold period",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "lookupShopAndDrop"
+    ]
    }
   ],
   "entryState": {
@@ -1010,6 +1684,10 @@
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "dropId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first."
@@ -1018,9 +1696,38 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-143",
+   "derivedFrom": "wireframes/reference/Retail Board 1.dc.html",
    "note": "**Drawn by Claude Design on `Retail Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetVenueSettings",
+    "component": "modal",
+    "trigger": "Save venue settings",
+    "body": "**Collects what `setVenueSettings` sends before it is called.** Nothing in the body is required. Optional: `id`, `venueId`, `currencyCode`, `currencyScale`, `supportHours`, `quietHours`, `biometrics`, `segregatedAccess`, `alerting`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "VenueSettings",
+    "confirm": {
+     "label": "Save venue settings",
+     "operation": "setVenueSettings"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "currencyCode",
+      "currencyScale",
+      "supportHours",
+      "quietHours",
+      "biometrics",
+      "segregatedAccess",
+      "alerting"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

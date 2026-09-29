@@ -39,10 +39,7 @@
     {
      "to": "CMS-001",
      "trigger": "Tenant Workspace",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — CMS-001 declares entryState.params  and CMS-031 holds none of them, so the edge carries nothing and CMS-001 opens cold"
     },
     {
      "to": "CMS-032",
@@ -101,10 +98,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can understand the current operational privacy position and identify actions requiring attention from one command center.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide Privacy, Compliance and authorized operational teams with a centralized real-time overview of privacy operations across TICVAI.",
-  "purposeNote": "Authorized users can understand the current operational privacy position and identify actions requiring attention from one command center.",
   "layout": {
    "template": "split",
    "regions": [
@@ -236,7 +233,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-031"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-031",
+   "workshopBoard": "wireframes/WS103 Privacy  Consent   Preference Management Board 2.dc.html#cms-031"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 21. 13 of 24 labels bound to a contract property; 31 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -299,10 +297,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "An authorized user can reconstruct the customer's complete privacy relationship with TICVAI from one governed workspace.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide one authoritative privacy view for an individual customer or participant. This becomes the privacy equivalent of the customer 360° workspace. n ed el",
-  "purposeNote": "An authorized user can reconstruct the customer's complete privacy relationship with TICVAI from one governed workspace.",
   "layout": {
    "template": "split",
    "regions": [
@@ -314,11 +312,10 @@
        "kind": "dataTable",
        "label": "Every customer privacy consent",
        "columns": [
-        "CustomerPrivacyConsentPreference360View.privacyPolicyVersion",
-        "CustomerPrivacyConsentPreference360View.cookieNoticeVersion",
-        "CustomerPrivacyConsentPreference360View.biometricNotice",
-        "CustomerPrivacyConsentPreference360View.childrenSPrivacyNotice",
-        "CustomerPrivacyConsentPreference360View.otherApplicablePrivacyDocuments"
+        "CustomerPrivacyConsentPreference360View.policyAcceptance[].documentType",
+        "CustomerPrivacyConsentPreference360View.policyAcceptance[].acceptedVersion",
+        "CustomerPrivacyConsentPreference360View.policyAcceptance[].currentVersion",
+        "CustomerPrivacyConsentPreference360View.policyAcceptance[].requiresReacceptance"
        ],
        "bindsTo": "CustomerPrivacyConsentPreference360View",
        "operation": "listCustomerPrivacyConsent",
@@ -335,11 +332,10 @@
        "label": "The selected customer privacy consent",
        "bindsTo": "CustomerPrivacyConsentPreference360View",
        "columns": [
-        "CustomerPrivacyConsentPreference360View.privacyPolicyVersion",
-        "CustomerPrivacyConsentPreference360View.cookieNoticeVersion",
-        "CustomerPrivacyConsentPreference360View.biometricNotice",
-        "CustomerPrivacyConsentPreference360View.childrenSPrivacyNotice",
-        "CustomerPrivacyConsentPreference360View.otherApplicablePrivacyDocuments"
+        "CustomerPrivacyConsentPreference360View.policyAcceptance[].documentType",
+        "CustomerPrivacyConsentPreference360View.policyAcceptance[].acceptedVersion",
+        "CustomerPrivacyConsentPreference360View.policyAcceptance[].currentVersion",
+        "CustomerPrivacyConsentPreference360View.policyAcceptance[].requiresReacceptance"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Display appropriate information such as”, “Email Consente”, “SMS Withdraw”, “Consente”, “Personalizatio”, “Show current”.",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 22 §Display"
@@ -364,18 +360,13 @@
    }
   ],
   "entryState": {
-   "preloaded": [
-    "CustomerPrivacyConsentPreference360View.privacyPolicyVersion",
-    "CustomerPrivacyConsentPreference360View.cookieNoticeVersion",
-    "CustomerPrivacyConsentPreference360View.biometricNotice",
-    "CustomerPrivacyConsentPreference360View.childrenSPrivacyNotice",
-    "CustomerPrivacyConsentPreference360View.otherApplicablePrivacyDocuments"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-032"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-032",
+   "workshopBoard": "wireframes/WS103 Privacy  Consent   Preference Management Board 2.dc.html#cms-032"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 22. 5 of 5 labels bound to a contract property; 5 of 50 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -438,10 +429,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "current privacy state and propagate to dependent systems.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Maintain legally and operationally useful evidence of every consent event and manage subsequent withdrawals.",
-  "purposeNote": "current privacy state and propagate to dependent systems.",
   "layout": {
    "template": "split",
    "regions": [
@@ -453,12 +444,8 @@
        "kind": "dataTable",
        "label": "Every consent evidence history",
        "columns": [
-        "ConsentEvidenceHistoryWithdrawalManagementView.requested",
-        "ConsentEvidenceHistoryWithdrawalManagementView.processed",
-        "ConsentEvidenceHistoryWithdrawalManagementView.propagated",
-        "ConsentEvidenceHistoryWithdrawalManagementView.acknowledged",
-        "ConsentEvidenceHistoryWithdrawalManagementView.failed",
-        "Retry Required"
+        "ConsentEvidenceHistoryWithdrawalManagementView.propagation[].target",
+        "ConsentEvidenceHistoryWithdrawalManagementView.propagation[].status"
        ],
        "bindsTo": "ConsentEvidenceHistoryWithdrawalManagementView",
        "operation": "listConsentEvidenceWithdrawal",
@@ -475,12 +462,8 @@
        "label": "The selected consent evidence history",
        "bindsTo": "ConsentEvidenceHistoryWithdrawalManagementView",
        "columns": [
-        "ConsentEvidenceHistoryWithdrawalManagementView.requested",
-        "ConsentEvidenceHistoryWithdrawalManagementView.processed",
-        "ConsentEvidenceHistoryWithdrawalManagementView.propagated",
-        "ConsentEvidenceHistoryWithdrawalManagementView.acknowledged",
-        "ConsentEvidenceHistoryWithdrawalManagementView.failed",
-        "Retry Required"
+        "ConsentEvidenceHistoryWithdrawalManagementView.propagation[].target",
+        "ConsentEvidenceHistoryWithdrawalManagementView.propagation[].status"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Consent Evidence Record”, “Evidence Principle”, “Withdrawal”, “Central Consent Engine”.",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 24 §Display"
@@ -506,18 +489,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "ConsentEvidenceHistoryWithdrawalManagementView.requested",
-    "ConsentEvidenceHistoryWithdrawalManagementView.processed",
-    "ConsentEvidenceHistoryWithdrawalManagementView.propagated",
-    "ConsentEvidenceHistoryWithdrawalManagementView.acknowledged",
-    "ConsentEvidenceHistoryWithdrawalManagementView.failed",
     "Retry Required"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-033"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-033",
+   "workshopBoard": "wireframes/WS103 Privacy  Consent   Preference Management Board 2.dc.html#cms-033"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 24. 5 of 6 labels bound to a contract property; 6 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -580,14 +559,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every customer privacy request can be received, verified, assigned, tracked and completed through a governed case workflow.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Provide a governed case-management workflow for customer privacy requests.",
-  "purposeNote": "Every customer privacy request can be received, verified, assigned, tracked and completed through a governed case workflow.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: ID Review where permitted. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Email/manual entry, POS, API, Authorized Representative, ID Review where permitted. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 26 §Support"
    }
   ],
@@ -643,7 +622,27 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Email/manual entry",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 26 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Customer Service",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 26 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "POS",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 26 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "API",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 26 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Authorized Representative",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 26 §Support"
       },
       {
@@ -681,9 +680,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-034"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-034",
+   "workshopBoard": "wireframes/WS103 Privacy  Consent   Preference Management Board 2.dc.html#cms-034"
   },
-  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 26. 2 of 4 labels bound to a contract property; 20 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 26. 2 of 4 labels bound to a contract property; 24 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -744,10 +744,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized teams can discover applicable customer data, prepare a controlled access/export response and route correction to the authoritative data owner.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Allow authorized privacy teams to locate customer data across TICVAI and connected systems when fulfilling access, export or correction requests.",
-  "purposeNote": "Authorized teams can discover applicable customer data, prepare a controlled access/export response and route correction to the authoritative data owner.",
   "layout": {
    "template": "split",
    "regions": [
@@ -759,11 +759,8 @@
        "kind": "dataTable",
        "label": "Every data discovery access",
        "columns": [
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.ticketing82Records",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.orders26Records",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.membership1Record",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.crm14Records",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.consent17Records"
+        "DataDiscoveryAccessExportCorrectionWorkspaceView.results[].source",
+        "DataDiscoveryAccessExportCorrectionWorkspaceView.results[].recordCount"
        ],
        "bindsTo": "DataDiscoveryAccessExportCorrectionWorkspaceView",
        "operation": "setDataDiscoveryAccess",
@@ -780,11 +777,8 @@
        "label": "The selected data discovery access",
        "bindsTo": "DataDiscoveryAccessExportCorrectionWorkspaceView",
        "columns": [
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.ticketing82Records",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.orders26Records",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.membership1Record",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.crm14Records",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.consent17Records"
+        "DataDiscoveryAccessExportCorrectionWorkspaceView.results[].source",
+        "DataDiscoveryAccessExportCorrectionWorkspaceView.results[].recordCount"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Search using”, “Potential sources”, “Export Package”, “Correction”, “Before release”.",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 28 §Show"
@@ -816,25 +810,17 @@
     "operationId": "setDataDiscoveryAccess",
     "contract": "marketing-crm",
     "purpose": "Data Discovery, Access, Export & Correction Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setDataDiscoveryAccess"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
-   "preloaded": [
-    "DataDiscoveryAccessExportCorrectionWorkspaceView.ticketing82Records",
-    "DataDiscoveryAccessExportCorrectionWorkspaceView.orders26Records",
-    "DataDiscoveryAccessExportCorrectionWorkspaceView.membership1Record",
-    "DataDiscoveryAccessExportCorrectionWorkspaceView.crm14Records",
-    "DataDiscoveryAccessExportCorrectionWorkspaceView.consent17Records"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-035"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-035",
+   "workshopBoard": "wireframes/WS103 Privacy  Consent   Preference Management Board 2.dc.html#cms-035"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 28. 5 of 5 labels bound to a contract property; 13 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -897,14 +883,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "are legitimately configured for retention and provides evidence of the result.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Govern privacy requests or policies requiring personal data to be deleted, anonymized or restricted. This screen requires strong controls because deletion may affect financial, ticketing, fraud, legal and operational records.",
-  "purposeNote": "are legitimately configured for retention and provides evidence of the result.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Delete, Remove Biometric Reference. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Delete, Pseudonymize where configured, Remove Biometric Reference. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 29 §Support"
    },
    {
@@ -928,6 +914,16 @@
       {
        "kind": "destructiveButton",
        "label": "Delete",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 29 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Pseudonymize where configured",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 29 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Restrict Processing",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 29 §Support"
       },
       {
@@ -976,19 +972,16 @@
   ],
   "entryState": {
    "preloaded": [
-    "DeletionAnonymizationRestrictionOperationsView.anonymize",
-    "DeletionAnonymizationRestrictionOperationsView.pseudonymizeWhereConfigured",
-    "DeletionAnonymizationRestrictionOperationsView.restrictProcessing",
-    "DeletionAnonymizationRestrictionOperationsView.suppressMarketing",
-    "DeletionAnonymizationRestrictionOperationsView.disconnectThirdPartyProfile"
+    "DeletionAnonymizationRestrictionOperationsView.actionType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-036"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-036",
+   "workshopBoard": "wireframes/WS103 Privacy  Consent   Preference Management Board 2.dc.html#cms-036"
   },
-  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 2 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 4 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1049,14 +1042,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "preserving controlled holds, approvals and complete processing evidence.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Operationalize retention policies associated with Board 1 processing purposes and data categories.",
-  "purposeNote": "preserving controlled holds, approvals and complete processing evidence.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Review, Delete, Archive, Place Hold, Release Hold. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Review, Extend where authorized, Delete, Archive, Place Hold, Release Hold. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 30 §Support"
    }
   ],
@@ -1112,6 +1105,11 @@
       {
        "kind": "primaryButton",
        "label": "Review",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Extend where authorized",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 30 §Support"
       },
       {
@@ -1182,9 +1180,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-037"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-037",
+   "workshopBoard": "wireframes/WS103 Privacy  Consent   Preference Management Board 2.dc.html#cms-037"
   },
-  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 30. 6 of 6 labels bound to a contract property; 14 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 30. 6 of 6 labels bound to a contract property; 15 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1245,14 +1244,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Privacy-related exceptions can be centrally investigated, assigned, resolved and audited.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide a centralized workspace for privacy configuration and operational exceptions requiring investigation.",
-  "purposeNote": "Privacy-related exceptions can be centrally investigated, assigned, resolved and audited.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Security, Data Owner. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Security, Operations, Data Owner. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 32 §Allow escalation to appropriate"
    }
   ],
@@ -1268,14 +1267,14 @@
        "label": "Every privacy compliance exception",
        "columns": [
         "PrivacyComplianceExceptionInvestigationWorkspaceView.severity",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.exception",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.customer",
+        "PrivacyComplianceExceptionInvestigationWorkspaceView.category",
+        "PrivacyComplianceExceptionInvestigationWorkspaceView.subjectId",
         "PrivacyComplianceExceptionInvestigationWorkspaceView.system",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.brand",
+        "PrivacyComplianceExceptionInvestigationWorkspaceView.brandId",
         "PrivacyComplianceExceptionInvestigationWorkspaceView.country",
         "PrivacyComplianceExceptionInvestigationWorkspaceView.detectedAt",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.owner",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.sla",
+        "PrivacyComplianceExceptionInvestigationWorkspaceView.ownerPrincipalId",
+        "PrivacyComplianceExceptionInvestigationWorkspaceView.slaDueAt",
         "PrivacyComplianceExceptionInvestigationWorkspaceView.status"
        ],
        "bindsTo": "PrivacyComplianceExceptionInvestigationWorkspaceView",
@@ -1294,14 +1293,14 @@
        "bindsTo": "PrivacyComplianceExceptionInvestigationWorkspaceView",
        "columns": [
         "PrivacyComplianceExceptionInvestigationWorkspaceView.severity",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.exception",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.customer",
+        "PrivacyComplianceExceptionInvestigationWorkspaceView.category",
+        "PrivacyComplianceExceptionInvestigationWorkspaceView.subjectId",
         "PrivacyComplianceExceptionInvestigationWorkspaceView.system",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.brand",
+        "PrivacyComplianceExceptionInvestigationWorkspaceView.brandId",
         "PrivacyComplianceExceptionInvestigationWorkspaceView.country",
         "PrivacyComplianceExceptionInvestigationWorkspaceView.detectedAt",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.owner",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.sla",
+        "PrivacyComplianceExceptionInvestigationWorkspaceView.ownerPrincipalId",
+        "PrivacyComplianceExceptionInvestigationWorkspaceView.slaDueAt",
         "PrivacyComplianceExceptionInvestigationWorkspaceView.status"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Provide”, “Workflow”, “Important Boundary”.",
@@ -1316,6 +1315,11 @@
       {
        "kind": "primaryButton",
        "label": "Security",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 32 §Allow escalation to appropriate"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Operations",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 32 §Allow escalation to appropriate"
       },
       {
@@ -1339,28 +1343,23 @@
     "operationId": "setPrivacyComplianceException",
     "contract": "marketing-crm",
     "purpose": "Privacy Compliance, Exception & Investigation Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setPrivacyComplianceException"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "preloaded": [
     "PrivacyComplianceExceptionInvestigationWorkspaceView.severity",
-    "PrivacyComplianceExceptionInvestigationWorkspaceView.exception",
-    "PrivacyComplianceExceptionInvestigationWorkspaceView.customer",
     "PrivacyComplianceExceptionInvestigationWorkspaceView.system",
-    "PrivacyComplianceExceptionInvestigationWorkspaceView.brand",
     "PrivacyComplianceExceptionInvestigationWorkspaceView.country"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-038"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-038",
+   "workshopBoard": "wireframes/WS103 Privacy  Consent   Preference Management Board 2.dc.html#cms-038"
   },
-  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 32. 10 of 10 labels bound to a contract property; 12 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 32. 10 of 10 labels bound to a contract property; 13 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1421,10 +1420,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "performed it, what rule/version applied and what evidence supports it.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture significant activities such as) and no display directory — it is settings, not a population",
   "purpose": "Provide immutable auditability and management/compliance reporting across privacy operations.",
-  "purposeNote": "performed it, what rule/version applied and what evidence supports it.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1523,7 +1522,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-039"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-039",
+   "workshopBoard": "wireframes/WS103 Privacy  Consent   Preference Management Board 2.dc.html#cms-039"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 33. 0 of 0 labels bound to a contract property; 14 of 57 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1578,10 +1578,10 @@
    "notes": "**Reached from CMS-031, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "resolve compliance risks while keeping legally significant decisions under governed human control. Board 2 — Final Screen Register # Backend Screen Core Responsibility 17.2. Privacy Operations Command Center Overall privacy operations 1 17.2. Customer Privacy, Consent & Preference Complete customer privacy 2 360° view 17.2. Consent Evidence, History & Withdrawal Consent evidence and 3 Management withdrawal 17.2. Data Subject / Customer Privacy Request",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
   "purpose": "Provide executives, Privacy Officers and Compliance teams with actionable privacy analytics and AI-assisted risk detection. This should be the intelligence layer across both Privacy Boards.",
-  "purposeNote": "resolve compliance risks while keeping legally significant decisions under governed human control. Board 2 — Final Screen Register # Backend Screen Core Responsibility 17.2. Privacy Operations Command Center Overall privacy operations 1 17.2. Customer Privacy, Consent & Preference Complete customer privacy 2 360° view 17.2. Consent Evidence, History & Withdrawal Consent evidence and 3 Management withdrawal 17.2. Data Subject / Customer Privacy Request",
   "layout": {
    "template": "split",
    "regions": [
@@ -1628,12 +1628,12 @@
         "PrivacyAnalyticsAiComplianceIntelligenceView.marketingOptInRate",
         "PrivacyAnalyticsAiComplianceIntelligenceView.cookieAcceptanceByCategory",
         "PrivacyAnalyticsAiComplianceIntelligenceView.privacyRequests",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.averageResolutionTime",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.slaCompliance",
+        "PrivacyAnalyticsAiComplianceIntelligenceView.averageResolutionSeconds",
+        "PrivacyAnalyticsAiComplianceIntelligenceView.slaComplianceRate",
         "PrivacyAnalyticsAiComplianceIntelligenceView.deletionCompletionRate",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.retentionCompliance",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.policyAcceptance",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.guardianConsentCompletion",
+        "PrivacyAnalyticsAiComplianceIntelligenceView.retentionComplianceRate",
+        "PrivacyAnalyticsAiComplianceIntelligenceView.policyAcceptanceRate",
+        "PrivacyAnalyticsAiComplianceIntelligenceView.guardianConsentCompletionRate",
         "PrivacyAnalyticsAiComplianceIntelligenceView.privacyExceptions",
         "PrivacyAnalyticsAiComplianceIntelligenceView.consentPropagationFailures"
        ],
@@ -1657,12 +1657,12 @@
         "PrivacyAnalyticsAiComplianceIntelligenceView.marketingOptInRate",
         "PrivacyAnalyticsAiComplianceIntelligenceView.cookieAcceptanceByCategory",
         "PrivacyAnalyticsAiComplianceIntelligenceView.privacyRequests",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.averageResolutionTime",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.slaCompliance",
+        "PrivacyAnalyticsAiComplianceIntelligenceView.averageResolutionSeconds",
+        "PrivacyAnalyticsAiComplianceIntelligenceView.slaComplianceRate",
         "PrivacyAnalyticsAiComplianceIntelligenceView.deletionCompletionRate",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.retentionCompliance",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.policyAcceptance",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.guardianConsentCompletion",
+        "PrivacyAnalyticsAiComplianceIntelligenceView.retentionComplianceRate",
+        "PrivacyAnalyticsAiComplianceIntelligenceView.policyAcceptanceRate",
+        "PrivacyAnalyticsAiComplianceIntelligenceView.guardianConsentCompletionRate",
         "PrivacyAnalyticsAiComplianceIntelligenceView.privacyExceptions",
         "PrivacyAnalyticsAiComplianceIntelligenceView.consentPropagationFailures"
        ],
@@ -1698,6 +1698,12 @@
     "contract": "marketing-crm",
     "purpose": "Privacy Analytics & AI Compliance Intelligence",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPrivacyEvidenceCompliance",
+    "contract": "marketing-crm",
+    "purpose": "Privacy Audit, Evidence & Compliance Reporting",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -1706,14 +1712,14 @@
     "PrivacyAnalyticsAiComplianceIntelligenceView.withdrawalRate",
     "PrivacyAnalyticsAiComplianceIntelligenceView.marketingOptInRate",
     "PrivacyAnalyticsAiComplianceIntelligenceView.cookieAcceptanceByCategory",
-    "PrivacyAnalyticsAiComplianceIntelligenceView.privacyRequests",
-    "PrivacyAnalyticsAiComplianceIntelligenceView.averageResolutionTime"
+    "PrivacyAnalyticsAiComplianceIntelligenceView.privacyRequests"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-040"
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-040",
+   "workshopBoard": "wireframes/WS103 Privacy  Consent   Preference Management Board 2.dc.html#cms-040"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 35. 13 of 24 labels bound to a contract property; 31 of 107 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

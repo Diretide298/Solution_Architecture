@@ -1,0 +1,95 @@
+{
+ "PerformanceTemplate": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.performance_template",
+  "description": "Event board 8. **An activity venue sells time, not seats.** Each slot the template produces is a Performance. Formerly `SessionTemplate` on `catalogue.session_template`: a session is a Performance (decided 28 September, audit R165).",
+  "required": [
+   "code"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "spaceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "slotMinutes": {
+    "type": "integer"
+   },
+   "turnaroundMinutes": {
+    "type": "integer",
+    "default": 0
+   },
+   "concurrentCapacity": {
+    "type": "integer"
+   },
+   "bands": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "offPeak",
+        "standard",
+        "peak",
+        "superPrime"
+       ]
+      },
+      "daysOfWeek": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "from": {
+       "type": "string"
+      },
+      "to": {
+       "type": "string"
+      },
+      "priceMultiplier": {
+       "type": "number",
+       "nullable": true
+      },
+      "minuteMultiplier": {
+       "type": "number",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "walkIn": {
+    "type": "object",
+    "description": "**Configured, not assumed.** It decides whether a family turning up on a Sunday is turned away.\n",
+    "properties": {
+     "allowed": {
+      "type": "boolean",
+      "default": true
+     },
+     "heldBackPercent": {
+      "type": "integer",
+      "default": 0
+     },
+     "cutoffMinutesBefore": {
+      "type": "integer",
+      "nullable": true
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ }
+}

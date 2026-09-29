@@ -1,4 +1,4 @@
--- rental — 23 tables
+-- rental — 24 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
@@ -382,6 +382,28 @@ CREATE TABLE IF NOT EXISTS rental.product (
     effective_from                    timestamptz,
     version                           integer DEFAULT 1,
     is_active                         boolean DEFAULT true
+);
+
+-- Holds 17 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS rental.quote (
+    quote_id                          uuid PRIMARY KEY NOT NULL,
+    product_id                        uuid NOT NULL,
+    location_id                       uuid,
+    valid_from                        timestamptz NOT NULL,
+    valid_to                          timestamptz NOT NULL,
+    quantity                          integer DEFAULT 1,
+    customer_id                       uuid,
+    rental_amount                     numeric(18,4) NOT NULL,
+    tax_amount                        numeric(18,4),
+    add_on_amount                     numeric(18,4),
+    discount_amount                   numeric(18,4),
+    total_payable                     numeric(18,4),
+    deposit_amount                    numeric(18,4) NOT NULL,
+    deposit_instrument                text,
+    expires_at                        timestamptz,
+    created_at                        timestamptz,
+    scope_path                        ltree NOT NULL
 );
 
 -- Holds 15 columns. No description has been written for this table — the name is the only thing

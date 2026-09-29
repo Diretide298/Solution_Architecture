@@ -1,4 +1,4 @@
--- resources — 18 tables
+-- resources — 20 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
@@ -153,6 +153,21 @@ CREATE TABLE IF NOT EXISTS resources.resource_category (
     is_active                         boolean DEFAULT true
 );
 
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS resources.resource_cost (
+    id                                uuid PRIMARY KEY NOT NULL,
+    resource_id                       uuid NOT NULL,
+    kind                              text NOT NULL CONSTRAINT resource_cost_kind_chk CHECK (kind IN ('transfer', 'operating', 'replacement')),
+    amount                            numeric(18,4) NOT NULL,
+    incurred_on                       date NOT NULL,
+    from_venue_id                     uuid,
+    to_venue_id                       uuid,
+    note                              text,
+    created_at                        timestamptz,
+    scope_path                        ltree NOT NULL
+);
+
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS resources.resource_dependency (
@@ -171,7 +186,7 @@ CREATE TABLE IF NOT EXISTS resources.resource_dependency (
 );
 
 -- Holds 15 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 3 operations read it and 0 write it; 3 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS resources.resource_hold (
     id                                text PRIMARY KEY NOT NULL,
     map_id                            uuid NOT NULL,
@@ -220,7 +235,7 @@ CREATE TABLE IF NOT EXISTS resources.resource_relation (
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 0 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS resources.resource_request (
     id                                text PRIMARY KEY NOT NULL,
     kind                              text NOT NULL CONSTRAINT resource_request_kind_chk CHECK (kind IN ('replacementResource', 'additionalEquipment', 'resourceIssue', 'maintenanceRequest', 'assignmentChange', 'venueChange', 'scheduleClarification', 'other')),
@@ -285,6 +300,18 @@ CREATE TABLE IF NOT EXISTS resources.resource_type (
     is_customer_selectable            boolean DEFAULT false,
     scope_path                        ltree NOT NULL,
     is_active                         boolean DEFAULT true
+);
+
+-- Holds 7 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS resources.selection_policy (
+    id                                uuid PRIMARY KEY,
+    ticket_type_id                    uuid NOT NULL,
+    mode                              text NOT NULL CONSTRAINT selection_policy_mode_chk CHECK (mode IN ('autoAssign', 'guestMayChoose')),
+    resource_type_id                  uuid,
+    show_qualifications               boolean DEFAULT false,
+    updated_at                        timestamptz,
+    scope_path                        ltree NOT NULL
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing

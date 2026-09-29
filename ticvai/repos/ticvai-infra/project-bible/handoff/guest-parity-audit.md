@@ -8,8 +8,8 @@
 |---|---|
 | Screens | P01 49 · P02 77 |
 | Capability groups | 56 — appOnly 7 · folded 3 · paired 45 · webOnly 1 |
-| Operations | web 186 · app 188 · shared 183 |
-| Findings | high 32 · medium 183 · low 212 · info 3 |
+| Operations | web 186 · app 189 · shared 183 |
+| Findings | high 33 · medium 184 · low 211 · info 3 |
 
 ## By dimension
 
@@ -17,11 +17,11 @@
 |---|---|---|---|---|
 | licence | 12 |  |  |  |
 | wave | 11 |  |  | 1 |
-| operations | 6 | 42 |  |  |
+| operations | 7 | 42 |  |  |
 | frontend manifest | 2 | 1 |  |  |
 | coverage | 1 | 5 | 3 | 2 |
 | design bundles |  | 33 |  |  |
-| entry parameters |  | 23 |  |  |
+| entry parameters |  | 24 |  |  |
 | bindings |  | 22 |  |  |
 | states |  | 17 |  |  |
 | flows |  | 12 |  |  |
@@ -34,7 +34,7 @@
 | events |  | 1 |  |  |
 | platform |  | 1 |  |  |
 | capability code |  |  | 41 |  |
-| components |  |  | 32 |  |
+| components |  |  | 31 |  |
 | layout split |  |  | 15 |  |
 | naming |  |  | 15 |  |
 | navigation |  |  | 43 |  |
@@ -57,7 +57,7 @@
 - **density** — compact on the web, comfortable on the app: the input, not the product
 - **routes and component paths** — each shell's own codebase
 
-## High — 32
+## High — 33
 
 | Dimension | Where | Difference | Resolve by |
 |---|---|---|---|
@@ -76,11 +76,12 @@
 | licence | venue-info (WEB-028 ↔ GST-029) | web requires ['core'], app requires ['fnb'] — a tenant licensed for one and not the other sees it on one shell only | one requiresModule for the capability |
 | licence | venue-map-and-wait-times (WEB-039 ↔ GST-021/GST-022) | web requires ['queue'], app requires ['queue', 'seating'] — a tenant licensed for one and not the other sees it on one shell only | one requiresModule for the capability |
 | licence | wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071) | web requires ['retail'], app requires ['core', 'retail'] — a tenant licensed for one and not the other sees it on one shell only | one requiresModule for the capability |
-| operations | app only | enrolFacePass, getOrderCalendarEvent, getVisitReminder, reserveMerchandise, setVisitReminder |  |
+| operations | app only | bindCredentialDevice, enrolFacePass, getOrderCalendarEvent, getVisitReminder, reserveMerchandise, setVisitReminder |  |
 | operations | cart (WEB-010 ↔ GST-041) | the web calls createCart, evaluatePromotions and the app cannot call it anywhere |  |
 | operations | reservations (WEB-031 ↔ GST-016/GST-017) | the web calls getResourceAvailability and the app cannot call it anywhere |  |
 | operations | shop (WEB-033 ↔ GST-026) | the app calls reserveMerchandise and the web cannot call it anywhere |  |
 | operations | ticket-selection (WEB-005 ↔ GST-008) | the web calls evaluatePromotions and the app cannot call it anywhere |  |
+| operations | tickets (WEB-018 ↔ GST-012/GST-013) | the app calls bindCredentialDevice and the web cannot call it anywhere |  |
 | operations | web only | createCart, evaluatePromotions, getResourceAvailability |  |
 | wave | help-and-cases (WEB-025 ↔ GST-068) | ships in wave 1 on the web and wave 2 on the app | one wave for both, or record why one shell waits |
 | wave | lost-and-found (WEB-034 ↔ GST-034) | ships in wave 3 on the web and wave 2 on the app | one wave for both, or record why one shell waits |
@@ -94,7 +95,7 @@
 | wave | virtual-queue (WEB-040 ↔ GST-023) | ships in wave 2 on the web and wave 3 on the app | one wave for both, or record why one shell waits |
 | wave | waiting-room (WEB-015 ↔ GST-046) | ships in wave 2 on the web and wave 1 on the app | one wave for both, or record why one shell waits |
 
-## Medium — 183
+## Medium — 184
 
 | Dimension | Where | Difference | Resolve by |
 |---|---|---|---|
@@ -195,6 +196,7 @@
 | entry parameters | shop (WEB-033 ↔ GST-026) | web opens with ['cartId', 'outletId'], app with ['cardCode', 'cartId', 'outletId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | shop-and-drop (WEB-042 ↔ GST-062) | web opens with ['cartId', 'outletId'], app with — — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | ticket-selection (WEB-005 ↔ GST-008) | web opens with ['productId', 'venueId'], app with ['cartId', 'performanceId', 'productId', 'venueId'] — one shared link cannot open both | one deep-link shape per capability |
+| entry parameters | tickets (WEB-018 ↔ GST-012/GST-013) | web opens with ['entitlementId', 'orderId'], app with ['credentialId', 'entitlementId', 'orderId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | transport (WEB-049 ↔ GST-076/GST-077/GST-078/GST-079) | web opens with ['cartId', 'favouriteId', 'routeId'], app with ['cartId', 'departureId', 'favouriteId', 'routeId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | venue-info (WEB-028 ↔ GST-029) | web opens with —, app with ['venueId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | venue-map-and-wait-times (WEB-039 ↔ GST-021/GST-022) | web opens with ['mapId', 'venueId'], app with ['mapId'] — one shared link cannot open both | one deep-link shape per capability |
@@ -282,7 +284,7 @@
 | unbound operations | privacy-security-devices (WEB-024 ↔ GST-066/GST-073) | WEB-024 declares enrolMfaMethod, removeMfaMethod, verifyMfaEnrolment and no component in its layout calls them; the twin binds or lacks enrolMfaMethod | bind each to a component, or move it to the screen that calls it |
 | unbound operations | privacy-security-devices (WEB-024 ↔ GST-066/GST-073) | GST-073 declares createMfaChallenge, removeMfaMethod, verifyMfaChallenge, verifyMfaEnrolment and no component in its layout calls them; the twin binds or lacks createMfaChallenge, verifyMfaChallenge | bind each to a component, or move it to the screen that calls it |
 
-## Low — 212
+## Low — 211
 
 | Dimension | Where | Difference | Resolve by |
 |---|---|---|---|
@@ -354,7 +356,6 @@
 | components | shop-and-drop (WEB-042 ↔ GST-062) | web only ['cardList', 'dataTable', 'detailPanel', 'searchField', 'secondaryButton', 'textField', 'toggle'], app only ['banner'] (13 vs 2 components) |  |
 | components | ticket-selection (WEB-005 ↔ GST-008) | web only ['dataTable', 'detailPanel', 'iconButton', 'selectField'], app only — (12 vs 6 components) |  |
 | components | ticket-transfer (WEB-030 ↔ GST-014/GST-045) | web only —, app only ['multiSelect'] (11 vs 14 components) |  |
-| components | tickets (WEB-018 ↔ GST-012/GST-013) | web only ['secondaryButton'], app only — (10 vs 12 components) |  |
 | components | venue-info (WEB-028 ↔ GST-029) | web only —, app only ['dataTable', 'textField', 'toggle'] (2 vs 6 components) |  |
 | components | venue-map-and-wait-times (WEB-039 ↔ GST-021/GST-022) | web only ['cardList'], app only — (9 vs 9 components) |  |
 | components | virtual-queue (WEB-040 ↔ GST-023) | web only ['cardList'], app only ['dataTable'] (8 vs 5 components) |  |
@@ -362,7 +363,7 @@
 | coverage | refunds-and-resale | GST-067 Refunds & Resale has no web screen; its operations are on WEB-019, WEB-030; getWaiverStatus on WEB-024 | draw the screen on the other shell, or record the fold as the decision |
 | coverage | reserve-table-or-cabana | GST-070 Reserve a Table has no web screen; its operations are on WEB-031, WEB-036, WEB-040 | draw the screen on the other shell, or record the fold as the decision |
 | coverage | share-and-group-booking | GST-072 Share & Group Booking has no web screen; its operations are on WEB-017, WEB-018, WEB-031, WEB-043 | draw the screen on the other shell, or record the fold as the decision |
-| documents | contracts/spine/catalogue.yaml:954 | "browses by category and cannot search" — GST-063 Search exists since 17 August | rewrite to the 12 September rule |
+| documents | contracts/spine/catalogue.yaml:964 | "browses by category and cannot search" — GST-063 Search exists since 17 August | rewrite to the 12 September rule |
 | documents | docs/active/design-plan.md:267 | "guest-app surfaces are not" — P02 is offlineCapable: true | rewrite to the 12 September rule |
 | documents | docs/registers/conflicts.md:146 | "stay app-only by design" — CF-93 predates WEB-036–046 and the 10 September decision | rewrite to the 12 September rule |
 | layout split | add-ons (WEB-008 ↔ GST-048/GST-056) | 1 screen(s) on the web, 2 on the app: Add-ons & Upsell ↔ Upsell / Cross-Sell; Bundle Package | fine if deliberate; a builder should know it is one capability |
@@ -503,7 +504,7 @@
 
 | Dimension | Where | Difference | Resolve by |
 |---|---|---|---|
-| coverage | dynamic-qr-ticket | GST-055 Dynamic QR Ticket — app only (deliberate). The 2 September session decided a dynamic-QR ticket bought on the web is redirected into the app, because a credential that needs a network round trip at a gate fails at the gate (_components.yaml, credentialPresenter). Since 28 September the code is derived on the device from the `rotation` seed (audit R230), and the web's My Tickets shows the same rotating code. |  |
+| coverage | dynamic-qr-ticket | GST-055 Dynamic QR Ticket — app only (deliberate). The 2 September session decided a dynamic-QR ticket bought on the web is redirected into the app, because a credential that needs a network round trip at a gate fails at the gate (_components.yaml, credentialPresenter). Since 28 September the code is derived on the device from the `rotation` seed (audit R230), and the web's My Tickets shows the same rotating code. Not callable on the web: bindCredentialDevice. |  |
 | coverage | face-pass | GST-069 Face Pass — app only (deliberate). enrolFacePass needs a camera and a liveness check (apply-web-parity.py). Viewing and revoking an enrolment are on the web's Devices, Wishlist & Consent. Not callable on the web: enrolFacePass. |  |
 | wave | multi-currency (WEB-035 ↔ GST-044) | ships in wave 1 on the web and wave 2 on the app — sanctioned: CF-111 — web is Wave 1 because that is where an overseas guest compares before booking, and the app is Wave 2 because that is where they check after. |  |
 

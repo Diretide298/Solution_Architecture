@@ -1,6 +1,6 @@
 # WS01 — Access Control board 1
 
-**10 screens · 10 operations · 15 schemas · 2 permissions**
+**10 screens · 19 operations · 29 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, SCOPE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, SCOPE_MANAGE, SCOPE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **1 of these operations work offline**: listAccessPoints
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-144` | Access Control Command Center | listDetail | 1 | 0 | — |
-| `BO-145` | Venue & Park Access Structure | listDetail | 1 | 0 | — |
+| `BO-144` | Access Control Command Center | listDetail | 2 | 0 | — |
+| `BO-145` | Venue & Park Access Structure | listDetail | 4 | 0 | — |
 | `BO-146` | Access Area & Zone Builder | listDetail | 1 | 0 | — |
 | `BO-147` | Attraction Access Configuration | listDetail | 1 | 0 | — |
 | `BO-148` | Access Point Directory | configEditor | 1 | 0 | — |
 | `BO-149` | Gate & Lane Configuration | listDetail | 1 | 0 | — |
 | `BO-150` | Access Control Graphical Map Designer | listDetail | 1 | 0 | — |
-| `BO-151` | Access Location Grouping | listDetail | 1 | 0 | — |
-| `BO-152` | Operating Calendar & Special Access Days | configEditor | 1 | 0 | — |
-| `BO-153` | Topology Validation & Publication | listDetail | 1 | 0 | — |
+| `BO-151` | Access Location Grouping | listDetail | 3 | 2 | — |
+| `BO-152` | Operating Calendar & Special Access Days | configEditor | 3 | 2 | — |
+| `BO-153` | Topology Validation & Publication | listDetail | 2 | 1 | — |
 
 ## Thin screens in this batch
 

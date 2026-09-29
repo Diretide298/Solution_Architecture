@@ -34,9 +34,55 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "tenantId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "media",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "credentialType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "integration",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "MediaCredentialCommandCenterView"
+  "responds": "Page"
  },
  "listMediaIssuanceEncoding": {
   "method": "GET",
@@ -60,9 +106,33 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMediaTypeCredential": {
+  "method": "GET",
+  "path": "/media-type-credential",
+  "contract": "access",
+  "summary": "Media Type & Credential Technology Registry",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "MediaSwapReplacementView"
+  "responds": "MediaTypeCredentialTechnologyRegistryView"
  },
  "listMediaTypeTechnology": {
   "method": "GET",
@@ -99,9 +169,20 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "VirtualCredentialMediaAssociationView"
+  "responds": "Page"
  },
  "publishMediaCompatibilityTesting": {
   "method": "PUT",
@@ -112,9 +193,72 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "MediaCompatibilityTestingPublicationInput",
   "responds": "MediaCompatibilityTestingPublicationView"
+ },
+ "setHotelWalletExternal": {
+  "method": "PUT",
+  "path": "/hotel-wallet-external",
+  "contract": "access",
+  "summary": "Save a hotel, wallet or external media integration",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "HotelWalletExternalMediaIntegrationInput",
+  "responds": "HotelWalletExternalMediaIntegrationView"
+ },
+ "setMediaIssuanceEncoding": {
+  "method": "PUT",
+  "path": "/media-issuance-encoding",
+  "contract": "access",
+  "summary": "Save a media issuance and encoding profile",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MediaIssuanceEncodingProfileInput",
+  "responds": "MediaIssuanceEncodingProfileView"
+ },
+ "setMediaTypeTechnology": {
+  "method": "PUT",
+  "path": "/media-type-technology",
+  "contract": "access",
+  "summary": "Add, amend or retire a media type",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MediaTypeTechnologyLibraryInput",
+  "responds": "MediaTypeTechnologyLibraryView"
  },
  "setRfidNfc": {
   "method": "PUT",
@@ -125,8 +269,33 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "RfidNfcConfigurationInput",
   "responds": "RfidNfcConfigurationView"
+ },
+ "setRfidNfcCard": {
+  "method": "PUT",
+  "path": "/rfid-nfc-card",
+  "contract": "access",
+  "summary": "RFID, NFC, Card & Wristband Media Designer",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RfidNfcCardWristbandMediaDesignerInput",
+  "responds": "RfidNfcCardWristbandMediaDesignerView"
  }
 }

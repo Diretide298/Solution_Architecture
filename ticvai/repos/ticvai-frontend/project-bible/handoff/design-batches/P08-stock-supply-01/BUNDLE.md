@@ -1,6 +1,6 @@
 # P08-stock-supply-01 — P08 · Stock & Supply (1 of 2)
 
-**10 screens · 51 operations · 31 schemas · 11 permissions**
+**10 screens · 51 operations · 32 schemas · 12 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 11 permissions apply here:
-  `APPROVAL_ACT, LEDGER_APPROVE, LEDGER_POST, LEDGER_VIEW, ORDER_CANCEL, ORDER_CREATE, ORDER_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE, TENANT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 12 permissions apply here:
+  `APPROVAL_ACT, LEDGER_APPROVE, LEDGER_POST, LEDGER_VIEW, ORDER_VIEW, PROCUREMENT_MANAGE, PROCUREMENT_RECEIVE, PROCUREMENT_REQUEST, PROCUREMENT_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **16 of these operations work offline**: createGoodsReceipt, createRequisition, enterCountLine, getCountVariance, getInventoryItem, getStockPositions, getStockTransfer, getVenueSettings
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-049` | Stock Levels | listDetail | 6 | 0 | — |
+| `BO-049` | Stock Levels | listDetail | 6 | 3 | — |
 | `BO-050` | Stock Position & Valuation | statusTracker | 2 | 0 | — |
-| `BO-052` | Goods Receipt | listDetail | 12 | 4 | — |
-| `BO-078` | Requisitions | approvalInbox | 10 | 2 | — |
-| `BO-079` | Stock Count | listDetail | 8 | 1 | — |
-| `BO-080` | Stock Transfers | listDetail | 6 | 1 | — |
-| `BO-081` | Inventory Items | listDetail | 7 | 0 | — |
-| `BO-082` | Stock Movements | listDetail | 4 | 0 | — |
-| `BO-083` | Suppliers | listDetail | 5 | 0 | — |
-| `BO-105` | Stock & Supply | listDetail | 4 | 0 | — |
+| `BO-051` | Purchase Orders | listDetail | 7 | 4 | — |
+| `BO-052` | Goods Receipt | listDetail | 12 | 7 | — |
+| `BO-078` | Requisitions | approvalInbox | 10 | 6 | — |
+| `BO-079` | Stock Count | listDetail | 9 | 7 | — |
+| `BO-080` | Stock Transfers | listDetail | 6 | 4 | — |
+| `BO-081` | Inventory Items | listDetail | 7 | 3 | — |
+| `BO-082` | Stock Movements | listDetail | 4 | 2 | — |
+| `BO-083` | Suppliers | listDetail | 5 | 3 | — |
 
 ## Thin screens in this batch
 
@@ -99,10 +98,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009",
     "BO-079",
     "BO-080",
     "BO-081",
@@ -120,60 +115,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "operation": "createStockMovement"
     },
     {
-     "to": "BO-081",
-     "trigger": "Inventory Items",
-     "provenance": "flow F92 step 1→2"
-    },
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-079",
      "trigger": "Stock Count",
-     "carries": [
-      "countId"
-     ],
-     "provenance": "derived — BO-079 declares entryState.params countId, so an edge into it must carry them"
+     "provenance": "derived — BO-079 declares entryState.params countId and BO-049 holds none of them, so the edge carries nothing and BO-079 opens cold"
     },
     {
      "to": "BO-080",
      "trigger": "Stock Transfers",
-     "carries": [
-      "transferId"
-     ],
-     "provenance": "derived — BO-080 declares entryState.params transferId, so an edge into it must carry them"
+     "provenance": "derived — BO-080 declares entryState.params transferId and BO-049 holds none of them, so the edge carries nothing and BO-080 opens cold"
     },
     {
      "to": "EMP-065",
@@ -181,6 +130,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "provenance": "flow F35 step 1→2",
      "crossesDevice": true,
      "back": false
+    },
+    {
+     "to": "BO-081",
+     "trigger": "Inventory Items",
+     "provenance": "flow F92 step 1→2",
+     "carries": [
+      "itemId"
+     ]
     }
    ]
   },
@@ -190,18 +147,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "FnB Board 5.dc.html#fnb-5a",
    "FnB Board 5.dc.html#fnb-5b",
    "Retail Board 4.dc.html#ret-4a",
-   "Retail Board 4.dc.html#ret-4h"
+   "Retail Board 4.dc.html#ret-4h",
+   "Inventory Board 1.dc.html#inv-7",
+   "Inventory Board 1.dc.html#inv-9"
   ],
   "pattern": "listDetail",
   "patternReason": "`listStockLocations` reads the population and `getStockPositions` reads one of them — list, select, act",
   "purpose": "Know what is on the shelf and what is on order.",
-  "gaps": [
-   {
-    "operation": "getStockValuation",
-    "why": "**1 declared operation reach no component on this screen**: getStockValuation. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -211,7 +163,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every stock levels",
+       "label": "Every stock location",
        "bindsTo": "StockLocation",
        "columns": [
         "StockLocation.id",
@@ -233,7 +185,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected stock levels",
+       "label": "The selected stock location",
+       "bindsTo": "StockLocation",
+       "columns": [
+        "StockLocation.id",
+        "StockLocation.code",
+        "StockLocation.name",
+        "StockLocation.venueId",
+        "StockLocation.kind",
+        "StockLocation.parentLocationId",
+        "StockLocation.isActive"
+       ],
+       "operation": "listStockLocations",
+       "provenance": "contract inventory.yaml GET /stock-locations"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The stock valuation",
+       "bindsTo": "StockValuation",
+       "columns": [
+        "StockValuation.asAt",
+        "StockValuation.total",
+        "StockValuation.byLocation",
+        "StockValuation.byCategory"
+       ],
+       "operation": "getStockValuation",
+       "provenance": "contract inventory.yaml GET /stock/valuation"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The stock position",
        "bindsTo": "StockPosition",
        "columns": [
         "StockPosition.itemId",
@@ -260,54 +241,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save item availability",
        "operation": "setItemAvailability",
        "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/availability"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create stock transfer",
        "operation": "createStockTransfer",
        "provenance": "contract inventory.yaml POST /stock-transfers"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create stock movement",
        "operation": "createStockMovement",
        "provenance": "contract inventory.yaml POST /stock-movements"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setItemAvailability",
-       "label": "Save item availability",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listStockLocations",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setItemAvailability",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -316,9 +264,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The stock levels list.",
    "error": "Could not load. Names which read failed and leaves the stock levels untouched.",
-   "emptyFirstRun": "No stock levels yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the stock levels are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No stock levels yet. Offers Create stock transfer (`createStockTransfer`).",
+   "emptyNoResults": "Never shown: `listStockLocations` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getStockPositions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -380,21 +328,93 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "An item opened from the catalogue.",
    "preloaded": [
-    "StockPosition.itemId",
-    "StockPosition.itemName",
-    "StockPosition.sku",
-    "StockPosition.locationId",
-    "StockPosition.locationName"
+    "StockLocation.id",
+    "StockLocation.code",
+    "StockLocation.name",
+    "StockLocation.venueId",
+    "StockLocation.kind"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-049",
+   "derivedFrom": "wireframes/reference/Retail Board 4.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetItemAvailability",
+    "component": "modal",
+    "trigger": "Save item availability",
+    "body": "**Collects what `setItemAvailability` sends before it is called.** Required: `isAvailable`, `recordedAt`. Optional: `reason`, `restoreAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save item availability",
+     "operation": "setItemAvailability"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "isAvailable",
+      "recordedAt",
+      "reason",
+      "restoreAt"
+     ]
+    },
+    "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/availability"
+   },
+   {
+    "id": "formCreateStockTransfer",
+    "component": "modal",
+    "trigger": "Create stock transfer",
+    "body": "**Collects what `createStockTransfer` sends before it is called.** Required: `id`, `fromLocationId`, `toLocationId`, `lines`, `recordedAt`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateStockTransferRequest",
+    "confirm": {
+     "label": "Create stock transfer",
+     "operation": "createStockTransfer"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "fromLocationId",
+      "toLocationId",
+      "lines",
+      "recordedAt",
+      "note"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /stock-transfers"
+   },
+   {
+    "id": "formCreateStockMovement",
+    "component": "modal",
+    "trigger": "Create stock movement",
+    "body": "**Collects what `createStockMovement` sends before it is called.** Required: `id`, `itemId`, `locationId`, `kind`, `quantity`, `recordedAt`. Optional: `unit`, `reason`, `costCenterId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateStockMovementRequest",
+    "confirm": {
+     "label": "Create stock movement",
+     "operation": "createStockMovement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "itemId",
+      "locationId",
+      "kind",
+      "quantity",
+      "recordedAt",
+      "unit",
+      "reason",
+      "costCenterId"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /stock-movements"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -432,66 +452,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted"
   },
   "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
-   ],
    "inferred": true,
    "entryFrom": [
     "BO-105"
-   ],
-   "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
-    }
    ]
   },
   "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Named `Stock Count` and carrying `getStockPositions` and `getStockValuation`** — two screens with one name, while `BO-079 Stock Count` holds the actual counting operations. Renamed 20 August; the operations were right.",
   "density": "compact",
+  "boardFrames": [
+   "Inventory Board 3.dc.html#inv-3h",
+   "Inventory Board 7.dc.html#inv-7d"
+  ],
   "pattern": "statusTracker",
   "patternReason": "`getStockPositions` reads one record and nothing reads a population — the screen is about that one thing",
   "purpose": "Count the shelf and account for the difference.",
-  "gaps": [
-   {
-    "operation": "getStockValuation",
-    "why": "**1 declared operation reach no component on this screen**: getStockValuation. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "detail",
    "regions": [
@@ -501,7 +475,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected stock position valuation",
+       "label": "The stock position",
        "bindsTo": "StockPosition",
        "columns": [
         "StockPosition.itemId",
@@ -519,28 +493,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getStockPositions",
        "provenance": "contract inventory.yaml GET /stock"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+      },
       {
        "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
+       "label": "The stock valuation",
+       "bindsTo": "StockValuation",
+       "columns": [
+        "StockValuation.asAt",
+        "StockValuation.total",
+        "StockValuation.byLocation",
+        "StockValuation.byCategory"
+       ],
+       "operation": "getStockValuation",
+       "provenance": "contract inventory.yaml GET /stock/valuation"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The stock position valuation list.",
+   "loading": "The stock position valuation, read by `getStockPositions`.",
    "error": "Could not load. Names which read failed and leaves the stock position valuation untouched.",
-   "emptyFirstRun": "No stock position valuation yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the stock position valuation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No stock position valuation yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getStockPositions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -586,97 +561,48 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   }
  },
  {
-  "id": "BO-052",
-  "name": "Goods Receipt",
+  "id": "BO-051",
+  "name": "Purchase Orders",
   "module": "Stock & Supply",
   "requiresModule": "inventory",
   "wave": 2,
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
-   "route": "/venue-operations/goods-receipt",
-   "component": "apps/venue-management-web/src/routes/venue-operations/GoodsReceiptDetail.tsx",
+   "route": "/venue-operations/purchase-orders",
+   "component": "apps/venue-management-web/src/routes/venue-operations/PurchaseOrdersDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009",
-    "BO-049"
-   ],
-   "inferred": true,
-   "fromFlows": true,
-   "entryFrom": [
-    "BO-080",
-    "BO-105"
+    "BO-052"
    ],
    "transitions": [
     {
-     "to": "BO-049",
-     "trigger": "The website has already sold four of the damaged units",
-     "provenance": "flow F35 step 4→5"
-    },
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
+     "to": "BO-052",
+     "trigger": "Receive against this order",
+     "provenance": "purpose — a purchase order that has been sent is received on Goods Receipt (decided 28 September, audit R254)",
      "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
-    },
-    {
-     "to": "EMP-005",
-     "trigger": "The technician resumes",
-     "provenance": "flow F15 step 4→5",
-     "crossesDevice": true,
-     "back": false
+      "purchaseOrderId"
+     ]
     }
-   ]
+   ],
+   "entryFrom": [
+    "BO-105"
+   ],
+   "inferred": false,
+   "notes": "**Moved 29 September (VM close-out) from Orders & Money to Stock & Supply**, beside BO-052 Goods Receipt: a purchase order is stock supply, not guest money, and `requiresModule` is inventory like its receipt. Reached from BO-105; the old cold link from BO-101 Orders & Money is removed."
   },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Pulled to Wave 2 (CF-101). Requisitions are Wave 1 and receipt was Wave 3 — **the end of the chain arriving two waves after the start.** **Cross-platform navigation removed 24 August**: EMP-005. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. **Rebound 28 September to the inventory purchase-order operations** (decided 28 September, audit R254): it carried 13 sales-order operations (`listOrders`, `voidOrder`, `holdOrder` and the rest), attached by name resemblance as BO-070 was, and none of them orders stock. It now lists, raises, sends, acknowledges, cancels and short-closes purchase orders; receiving is BO-052. Guards are the procurement permissions (audit R091 (4)), and cancel and close-short may answer 202 pending a finance approver (audit R144).",
   "density": "compact",
   "boardFrames": [
-   "Retail Board 4.dc.html#ret-4e"
+   "Inventory Board 5.dc.html#inv-5a",
+   "Inventory Board 5.dc.html#inv-5h",
+   "Inventory Board 5.dc.html#inv-5j"
   ],
   "pattern": "listDetail",
   "patternReason": "`listPurchaseOrders` reads the population and `getPurchaseOrder` reads one of them — list, select, act",
-  "purpose": "Book in what actually arrived.",
-  "gaps": [
-   {
-    "operation": "listGoodsReceipts",
-    "why": "**2 declared operations reach no component on this screen**: listGoodsReceipts, getStockTransfer. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
+  "purpose": "Order more of what is running out.",
   "layout": {
    "template": "split",
    "regions": [
@@ -685,24 +611,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listPurchaseOrders",
+       "notes": "Sends `?status=` to `listPurchaseOrders`.",
+       "provenance": "contract inventory.yaml GET /purchase-orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Supplier id",
+       "operation": "listPurchaseOrders",
+       "notes": "Sends `?supplierId=` to `listPurchaseOrders`.",
+       "provenance": "contract inventory.yaml GET /purchase-orders"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every goods receipt",
+       "label": "Every purchase order",
        "bindsTo": "PurchaseOrder",
        "columns": [
-        "PurchaseOrder.id",
         "PurchaseOrder.purchaseOrderNumber",
-        "PurchaseOrder.requisitionId",
-        "PurchaseOrder.supplierId",
         "PurchaseOrder.supplierName",
         "PurchaseOrder.kind",
-        "PurchaseOrder.blanketParentId",
-        "PurchaseOrder.contractPriceValidUntil",
-        "PurchaseOrder.rfqId",
-        "PurchaseOrder.supplierInvoiceRef",
+        "PurchaseOrder.status",
         "PurchaseOrder.matchStatus",
-        "PurchaseOrder.status"
+        "PurchaseOrder.approvalRequestId"
        ],
        "operation": "listPurchaseOrders",
+       "notes": "A row with `approvalRequestId` set shows *pending approval* (audit R144).",
        "provenance": "contract inventory.yaml GET /purchase-orders"
       }
      ]
@@ -713,13 +648,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected goods receipt",
+       "label": "The selected purchase order",
        "bindsTo": "PurchaseOrder",
        "columns": [
-        "PurchaseOrder.id",
         "PurchaseOrder.purchaseOrderNumber",
         "PurchaseOrder.requisitionId",
-        "PurchaseOrder.supplierId",
         "PurchaseOrder.supplierName",
         "PurchaseOrder.kind",
         "PurchaseOrder.blanketParentId",
@@ -728,6 +661,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "PurchaseOrder.supplierInvoiceRef",
         "PurchaseOrder.matchStatus",
         "PurchaseOrder.status",
+        "PurchaseOrder.approvalRequestId",
         "PurchaseOrder.deliverToLocationId",
         "PurchaseOrder.lines",
         "PurchaseOrder.subtotal",
@@ -744,92 +678,332 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createGoodsReceipt",
-       "provenance": "contract inventory.yaml POST /goods-receipts"
+       "label": "Create purchase order",
+       "operation": "createPurchaseOrder",
+       "permission": "PROCUREMENT_MANAGE",
+       "notes": "PO lines prefill the unit price from the selected quotation; changing it asks for an override reason (decided 28 September, audit R171).",
+       "provenance": "contract inventory.yaml POST /purchase-orders"
       },
       {
        "kind": "secondaryButton",
-       "label": "Acknowledge",
+       "label": "Send purchase order",
+       "operation": "sendPurchaseOrder",
+       "permission": "PROCUREMENT_MANAGE",
+       "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/send"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Acknowledge purchase order",
        "operation": "acknowledgePurchaseOrder",
+       "permission": "PROCUREMENT_MANAGE",
        "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/acknowledge"
       },
       {
        "kind": "destructiveButton",
-       "label": "Cancel",
+       "label": "Cancel purchase order",
        "operation": "cancelPurchaseOrder",
+       "permission": "PROCUREMENT_MANAGE",
        "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/cancel"
       },
       {
        "kind": "destructiveButton",
-       "label": "Close",
+       "label": "Close purchase order short",
        "operation": "closePurchaseOrderShort",
+       "permission": "PROCUREMENT_MANAGE",
        "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/close-short"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createPurchaseOrder",
-       "provenance": "contract inventory.yaml POST /purchase-orders"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Reject",
-       "operation": "rejectReceivedGoods",
-       "provenance": "contract inventory.yaml POST /goods-receipts/{receiptId}/reject"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Send",
-       "operation": "sendPurchaseOrder",
-       "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/send"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Close",
-       "operation": "closeTransferShort",
-       "provenance": "contract inventory.yaml POST /stock-transfers/{transferId}/close-short"
       }
      ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "formCreatePurchaseOrder",
+    "component": "modal",
+    "trigger": "Create purchase order",
+    "body": "**Collects what `createPurchaseOrder` sends before it is called.** Required: `id`, `requisitionId`, `supplierId`, `quotationId`, `lines`, `expectedDelivery`. Optional: `deliverToLocationId`, `note`. **Each line's `unitPrice` is prefilled from the selected quotation**; if the user changes it, the line asks for `priceOverrideReason`, which the server requires (400) whenever the price differs from the quotation (decided 28 September, audit R171). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreatePurchaseOrderRequest",
+    "confirm": {
+     "label": "Create purchase order",
+     "operation": "createPurchaseOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "requisitionId",
+      "supplierId",
+      "quotationId",
+      "lines",
+      "expectedDelivery",
+      "deliverToLocationId",
+      "note"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /purchase-orders"
+   },
+   {
+    "id": "formAcknowledgePurchaseOrder",
+    "component": "modal",
+    "trigger": "Acknowledge purchase order",
+    "body": "**Collects what `acknowledgePurchaseOrder` sends before it is called.** Required: `supplierReference`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Acknowledge purchase order",
+     "operation": "acknowledgePurchaseOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "supplierReference"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/acknowledge"
+   },
+   {
+    "id": "confirmCancelPurchaseOrder",
+    "component": "confirmDialog",
+    "trigger": "Cancel purchase order",
+    "body": "**Names what `cancelPurchaseOrder` changes and what it leaves alone**, in the consequence rather than the verb: the order number, the supplier and the value not yet received. **Collects what `cancelPurchaseOrder` sends before it is called.** Required: `reason`. **It may answer 202 pending a finance approver** (decided 28 September, audit R144): the order is unchanged, shows *cancellation pending approval* and carries `approvalRequestId` until the approver acts.",
+    "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/cancel"
+   },
+   {
+    "id": "confirmClosePurchaseOrderShort",
+    "component": "confirmDialog",
+    "trigger": "Close purchase order short",
+    "body": "**Names what `closePurchaseOrderShort` changes and what it leaves alone**, in the consequence rather than the verb: the balance that will no longer be expected. **Collects what `closePurchaseOrderShort` sends before it is called.** Required: `reason`. **It may answer 202 pending a finance approver** (decided 28 September, audit R144): the order is unchanged, shows *close-short pending approval* and carries `approvalRequestId` until the approver acts.",
+    "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/close-short"
+   }
+  ],
+  "states": {
+   "loading": "The purchase orders list.",
+   "error": "Could not load. Names which read failed and leaves the purchase orders untouched.",
+   "emptyFirstRun": "No purchase orders yet. Offers Create purchase order (`createPurchaseOrder`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on status and supplierId, and the purchase orders are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PROCUREMENT_VIEW`, which `listPurchaseOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPurchaseOrders",
+    "contract": "inventory",
+    "purpose": "List purchase orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getPurchaseOrder",
+    "contract": "inventory",
+    "purpose": "Read a purchase order with receipt progress",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "createPurchaseOrder",
+    "contract": "inventory",
+    "purpose": "Raise a purchase order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPurchaseOrders"
+    ]
+   },
+   {
+    "operationId": "sendPurchaseOrder",
+    "contract": "inventory",
+    "purpose": "Issue the order to the supplier",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPurchaseOrders"
+    ]
+   },
+   {
+    "operationId": "acknowledgePurchaseOrder",
+    "contract": "inventory",
+    "purpose": "Record the supplier acknowledgement",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPurchaseOrders"
+    ]
+   },
+   {
+    "operationId": "cancelPurchaseOrder",
+    "contract": "inventory",
+    "purpose": "Cancel a purchase order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPurchaseOrders"
+    ]
+   },
+   {
+    "operationId": "closePurchaseOrderShort",
+    "contract": "inventory",
+    "purpose": "Close an order accepting the balance will not arrive",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPurchaseOrders"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "purchaseOrderId",
+     "from": "deepLink",
+     "optional": true
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the purchase order or says plainly that it is gone.** Without `purchaseOrderId` the list opens. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold.",
+   "preloaded": [
+    "PurchaseOrder.id",
+    "PurchaseOrder.purchaseOrderNumber",
+    "PurchaseOrder.supplierName",
+    "PurchaseOrder.status"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-051"
+  },
+  "apisNote": "Rebound 28 September 2026 to the seven inventory purchase-order operations (audit R254); the 13 sales-order operations it declared before were attached by name resemblance.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-052",
+  "name": "Goods Receipt",
+  "module": "Stock & Supply",
+  "requiresModule": "inventory",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/goods-receipt",
+   "component": "apps/venue-management-web/src/routes/venue-operations/GoodsReceiptDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-049"
+   ],
+   "inferred": true,
+   "fromFlows": true,
+   "entryFrom": [
+    "BO-080",
+    "BO-105",
+    "BO-051"
+   ],
+   "transitions": [
+    {
+     "to": "EMP-005",
+     "trigger": "The technician resumes",
+     "provenance": "flow F15 step 4→5",
+     "crossesDevice": true,
+     "back": false
     },
     {
+     "to": "BO-049",
+     "trigger": "The website has already sold four of the damaged units",
+     "provenance": "flow F35 step 4→5",
+     "carries": [
+      "itemId"
+     ]
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Pulled to Wave 2 (CF-101). Requisitions are Wave 1 and receipt was Wave 3 — **the end of the chain arriving two waves after the start.** **Cross-platform navigation removed 24 August**: EMP-005. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
+  "density": "compact",
+  "boardFrames": [
+   "Retail Board 4.dc.html#ret-4e",
+   "Inventory Board 6.dc.html#inv-6a",
+   "Inventory Board 6.dc.html#inv-6b",
+   "Inventory Board 6.dc.html#inv-6c",
+   "Inventory Board 6.dc.html#inv-6d",
+   "Inventory Board 6.dc.html#inv-6e",
+   "Inventory Board 2.dc.html#inv-2d",
+   "Inventory Board 2.dc.html#inv-2e"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listPurchaseOrders` reads the population and `getPurchaseOrder` reads one of them — list, select, act",
+  "purpose": "Book in what actually arrived.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
      "name": "contentBody",
-     "slot": "carried",
+     "slot": "collection",
      "components": [
       {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listPurchaseOrders",
+       "notes": "Sends `?status=` to `listPurchaseOrders`.",
+       "provenance": "contract inventory.yaml GET /purchase-orders"
       },
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createGoodsReceipt",
-       "label": "Create goods receipt",
-       "provenance": "carried from the previous definition"
+       "kind": "textField",
+       "label": "Supplier id",
+       "operation": "listPurchaseOrders",
+       "notes": "Sends `?supplierId=` to `listPurchaseOrders`.",
+       "provenance": "contract inventory.yaml GET /purchase-orders"
       },
       {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listPurchaseOrders",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
+       "label": "Every purchase order",
+       "bindsTo": "PurchaseOrder",
+       "columns": [
+        "PurchaseOrder.id",
+        "PurchaseOrder.purchaseOrderNumber",
+        "PurchaseOrder.requisitionId",
+        "PurchaseOrder.supplierId",
+        "PurchaseOrder.supplierName",
+        "PurchaseOrder.kind",
+        "PurchaseOrder.blanketParentId",
+        "PurchaseOrder.contractPriceValidUntil",
+        "PurchaseOrder.rfqId",
+        "PurchaseOrder.supplierInvoiceRef",
+        "PurchaseOrder.matchStatus",
+        "PurchaseOrder.status",
+        "PurchaseOrder.approvalRequestId"
+       ],
+       "operation": "listPurchaseOrders",
+       "provenance": "contract inventory.yaml GET /purchase-orders"
       },
       {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "cancelPurchaseOrder",
-       "label": "Cancel purchase order",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createGoodsReceipt",
-       "provenance": "carried from the previous definition"
+       "kind": "dataTable",
+       "label": "Every goods receipt",
+       "bindsTo": "GoodsReceipt",
+       "columns": [
+        "GoodsReceipt.id",
+        "GoodsReceipt.receiptNumber",
+        "GoodsReceipt.purchaseOrderId",
+        "GoodsReceipt.locationId",
+        "GoodsReceipt.deliveryNoteReference",
+        "GoodsReceipt.lines",
+        "GoodsReceipt.totalValue",
+        "GoodsReceipt.receivedByPrincipalId",
+        "GoodsReceipt.journalEntryId",
+        "GoodsReceipt.recordedAt",
+        "GoodsReceipt.syncedAt"
+       ],
+       "operation": "listGoodsReceipts",
+       "provenance": "contract inventory.yaml GET /goods-receipts"
       },
       {
        "kind": "confirmDialog",
@@ -839,6 +1013,122 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "carried from the previous definition"
       }
      ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected purchase order",
+       "bindsTo": "PurchaseOrder",
+       "columns": [
+        "PurchaseOrder.id",
+        "PurchaseOrder.purchaseOrderNumber",
+        "PurchaseOrder.requisitionId",
+        "PurchaseOrder.supplierId",
+        "PurchaseOrder.supplierName",
+        "PurchaseOrder.kind",
+        "PurchaseOrder.blanketParentId",
+        "PurchaseOrder.contractPriceValidUntil",
+        "PurchaseOrder.rfqId",
+        "PurchaseOrder.supplierInvoiceRef",
+        "PurchaseOrder.matchStatus",
+        "PurchaseOrder.status",
+        "PurchaseOrder.approvalRequestId",
+        "PurchaseOrder.deliverToLocationId",
+        "PurchaseOrder.lines",
+        "PurchaseOrder.subtotal",
+        "PurchaseOrder.taxAmount"
+       ],
+       "operation": "getPurchaseOrder",
+       "provenance": "contract inventory.yaml GET /purchase-orders/{purchaseOrderId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The stock transfer",
+       "bindsTo": "StockTransfer",
+       "columns": [
+        "StockTransfer.id",
+        "StockTransfer.transferNumber",
+        "StockTransfer.fromLocationId",
+        "StockTransfer.toLocationId",
+        "StockTransfer.status",
+        "StockTransfer.lines",
+        "StockTransfer.dispatchedByPrincipalId",
+        "StockTransfer.receivedByPrincipalId",
+        "StockTransfer.dispatchedAt",
+        "StockTransfer.receivedAt",
+        "StockTransfer.closeShortReason",
+        "StockTransfer.scopePath"
+       ],
+       "operation": "getStockTransfer",
+       "provenance": "contract inventory.yaml GET /stock-transfers/{transferId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create goods receipt",
+       "operation": "createGoodsReceipt",
+       "permission": "PROCUREMENT_RECEIVE",
+       "provenance": "contract inventory.yaml POST /goods-receipts"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Acknowledge purchase order",
+       "operation": "acknowledgePurchaseOrder",
+       "permission": "PROCUREMENT_MANAGE",
+       "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/acknowledge"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel purchase order",
+       "operation": "cancelPurchaseOrder",
+       "permission": "PROCUREMENT_MANAGE",
+       "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/cancel"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Close purchase order short",
+       "operation": "closePurchaseOrderShort",
+       "permission": "PROCUREMENT_MANAGE",
+       "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/close-short"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create purchase order",
+       "operation": "createPurchaseOrder",
+       "permission": "PROCUREMENT_MANAGE",
+       "notes": "PO lines prefill the unit price from the selected quotation; changing it asks for an override reason (decided 28 September, audit R171).",
+       "provenance": "contract inventory.yaml POST /purchase-orders"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Reject received goods",
+       "operation": "rejectReceivedGoods",
+       "permission": "PROCUREMENT_RECEIVE",
+       "notes": "**Rejects receipt lines, not items** — the picker lists the receipt's batch/expiry lines by `lineId` (decided 28 September, audit R171). Choosing reason Other makes the note required (audit R222).",
+       "provenance": "contract inventory.yaml POST /goods-receipts/{receiptId}/reject"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Send purchase order",
+       "operation": "sendPurchaseOrder",
+       "permission": "PROCUREMENT_MANAGE",
+       "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/send"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Close transfer short",
+       "operation": "closeTransferShort",
+       "provenance": "contract inventory.yaml POST /stock-transfers/{transferId}/close-short"
+      }
+     ]
     }
    ]
   },
@@ -846,38 +1136,103 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmCancelPurchaseOrder",
     "component": "confirmDialog",
-    "trigger": "Cancel",
-    "body": "**Names what `cancelPurchaseOrder` changes and what it leaves alone**, in the consequence rather than the verb. A goods receipt this affects should be identified in the dialog, not just counted.",
+    "trigger": "Cancel purchase order",
+    "body": "**Names what `cancelPurchaseOrder` changes and what it leaves alone**, in the consequence rather than the verb. A goods receipt this affects should be identified in the dialog, not just counted. **Collects what `cancelPurchaseOrder` sends before it is called.** Required: `reason`. **It may answer 202 pending a finance approver** (decided 28 September, audit R144): the order is unchanged, shows *cancellation pending approval* and carries `approvalRequestId` until the approver acts.",
     "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/cancel"
    },
    {
     "id": "confirmClosePurchaseOrderShort",
     "component": "confirmDialog",
-    "trigger": "Close",
-    "body": "**Names what `closePurchaseOrderShort` changes and what it leaves alone**, in the consequence rather than the verb. A goods receipt this affects should be identified in the dialog, not just counted.",
+    "trigger": "Close purchase order short",
+    "body": "**Names what `closePurchaseOrderShort` changes and what it leaves alone**, in the consequence rather than the verb. A goods receipt this affects should be identified in the dialog, not just counted. **Collects what `closePurchaseOrderShort` sends before it is called.** Required: `reason`. **It may answer 202 pending a finance approver** (decided 28 September, audit R144): the order is unchanged, shows *close-short pending approval* and carries `approvalRequestId` until the approver acts.",
     "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/close-short"
    },
    {
     "id": "confirmRejectReceivedGoods",
     "component": "confirmDialog",
-    "trigger": "Reject",
-    "body": "**Names what `rejectReceivedGoods` changes and what it leaves alone**, in the consequence rather than the verb. A goods receipt this affects should be identified in the dialog, not just counted.",
+    "trigger": "Reject received goods",
+    "body": "**Names what `rejectReceivedGoods` changes and what it leaves alone**, in the consequence rather than the verb. A goods receipt this affects should be identified in the dialog, not just counted. **Collects what `rejectReceivedGoods` sends before it is called.** Required: `lines` — each a receipt line picked by `lineId` (the batch or expiry line, so one item received on two batches can be rejected on one of them) with the `quantity` rejected (decided 28 September, audit R171) — and `reason` (damaged, wrongItem, qualityFailure, shortDated, overDelivery, other). `note` is optional, **and required (at least 3 characters) when the reason is Other**; the dialog will not confirm without it and the server refuses 400 (decided 28 September, audit R222).",
     "provenance": "contract inventory.yaml POST /goods-receipts/{receiptId}/reject"
    },
    {
     "id": "confirmCloseTransferShort",
     "component": "confirmDialog",
-    "trigger": "Close",
-    "body": "**Names what `closeTransferShort` changes and what it leaves alone**, in the consequence rather than the verb. A goods receipt this affects should be identified in the dialog, not just counted.",
+    "trigger": "Close transfer short",
+    "body": "**Names what `closeTransferShort` changes and what it leaves alone**, in the consequence rather than the verb. A goods receipt this affects should be identified in the dialog, not just counted. **Collects what `closeTransferShort` sends before it is called.** Required: `reason` and `supervisorStepUp` — a supervisor enters their staff PIN on this device (`principalId`, `credential`); a refused PIN is 403 supervisor-step-up-refused (decided 28 September, audit R144).",
     "provenance": "contract inventory.yaml POST /stock-transfers/{transferId}/close-short"
+   },
+   {
+    "id": "formCreateGoodsReceipt",
+    "component": "modal",
+    "trigger": "Create goods receipt",
+    "body": "**Collects what `createGoodsReceipt` sends before it is called.** Required: `id`, `purchaseOrderId`, `locationId`, `lines`, `recordedAt`. Optional: `deliveryNoteReference`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateGoodsReceiptRequest",
+    "confirm": {
+     "label": "Create goods receipt",
+     "operation": "createGoodsReceipt"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "purchaseOrderId",
+      "locationId",
+      "lines",
+      "recordedAt",
+      "deliveryNoteReference"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /goods-receipts"
+   },
+   {
+    "id": "formAcknowledgePurchaseOrder",
+    "component": "modal",
+    "trigger": "Acknowledge purchase order",
+    "body": "**Collects what `acknowledgePurchaseOrder` sends before it is called.** Required: `supplierReference`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Acknowledge purchase order",
+     "operation": "acknowledgePurchaseOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "supplierReference"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/acknowledge"
+   },
+   {
+    "id": "formCreatePurchaseOrder",
+    "component": "modal",
+    "trigger": "Create purchase order",
+    "body": "**Collects what `createPurchaseOrder` sends before it is called.** Required: `id`, `requisitionId`, `supplierId`, `quotationId`, `lines`, `expectedDelivery`. Optional: `deliverToLocationId`, `note`. **Each line's `unitPrice` is prefilled from the selected quotation**; if the user changes it, the line asks for `priceOverrideReason`, which the server requires (400) whenever the price differs from the quotation (decided 28 September, audit R171). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreatePurchaseOrderRequest",
+    "confirm": {
+     "label": "Create purchase order",
+     "operation": "createPurchaseOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "requisitionId",
+      "supplierId",
+      "quotationId",
+      "lines",
+      "expectedDelivery",
+      "deliverToLocationId",
+      "note"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /purchase-orders"
    }
   ],
   "states": {
    "loading": "The goods receipt list.",
    "error": "Could not load. Names which read failed and leaves the goods receipt untouched.",
-   "emptyFirstRun": "No goods receipt yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the goods receipt are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No goods receipt yet. Offers Create goods receipt (`createGoodsReceipt`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on status, supplierId and the goods receipt are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PROCUREMENT_VIEW`, which `listPurchaseOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -935,7 +1290,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getPurchaseOrder",
     "contract": "inventory",
     "purpose": "Read a purchase order with receipt progress",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listGoodsReceipts",
@@ -1006,6 +1361,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-052",
+   "derivedFrom": "wireframes/reference/Retail Board 4.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
@@ -1048,7 +1404,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-079",
     "BO-080",
     "BO-081",
@@ -1072,22 +1427,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "operation": "createRequisition"
     },
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-079",
      "trigger": "Stock Count",
-     "carries": [
-      "countId"
-     ],
-     "provenance": "derived — BO-079 declares entryState.params countId, so an edge into it must carry them"
+     "provenance": "derived — BO-079 declares entryState.params countId and BO-078 holds none of them, so the edge carries nothing and BO-079 opens cold"
     },
     {
      "to": "BO-081",
@@ -1095,7 +1437,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "itemId"
      ],
-     "provenance": "derived — BO-081 declares entryState.params itemId, so an edge into it must carry them"
+     "provenance": "derived — BO-081 declares entryState.params itemId and BO-078 holds itemId, so an edge into it carries them"
     }
    ]
   },
@@ -1104,18 +1446,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "boardFrames": [
    "FnB Board 5.dc.html#fnb-5f",
    "Retail Board 4.dc.html#ret-4c",
-   "Retail Board 4.dc.html#ret-4k"
+   "Retail Board 4.dc.html#ret-4k",
+   "Inventory Board 4.dc.html#inv-4a",
+   "Inventory Board 4.dc.html#inv-4e",
+   "Inventory Board 4.dc.html#inv-4f",
+   "Inventory Board 4.dc.html#inv-4h",
+   "Inventory Board 4.dc.html#inv-4j",
+   "Inventory Board 5.dc.html#inv-5b",
+   "Inventory Board 5.dc.html#inv-5c",
+   "Inventory Board 5.dc.html#inv-5d",
+   "Inventory Board 5.dc.html#inv-5e",
+   "Inventory Board 5.dc.html#inv-5f",
+   "Inventory Board 5.dc.html#inv-5g"
   ],
   "pattern": "approvalInbox",
   "patternReason": "`approveRequisition` decides items that `listRequisitions` queues — every row is waiting for a person, so the empty state is success",
   "purpose": "Raise, track and approve a request to buy something.",
-  "gaps": [
-   {
-    "operation": "listStockLocations",
-    "why": "**1 declared operation reach no component on this screen**: listStockLocations. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1123,6 +1469,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "name": "contentBody",
      "slot": "queue",
      "components": [
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listRequisitions",
+       "notes": "Sends `?status=` to `listRequisitions`.",
+       "provenance": "contract inventory.yaml GET /requisitions"
+      },
+      {
+       "kind": "textField",
+       "label": "Raised by principal id",
+       "operation": "listRequisitions",
+       "notes": "Sends `?raisedByPrincipalId=` to `listRequisitions`.",
+       "provenance": "contract inventory.yaml GET /requisitions"
+      },
       {
        "kind": "dataTable",
        "label": "Waiting for a decision",
@@ -1143,6 +1503,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listRequisitions",
        "provenance": "contract inventory.yaml GET /requisitions"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every stock location",
+       "bindsTo": "StockLocation",
+       "columns": [
+        "StockLocation.id",
+        "StockLocation.code",
+        "StockLocation.name",
+        "StockLocation.venueId",
+        "StockLocation.kind",
+        "StockLocation.parentLocationId",
+        "StockLocation.isActive"
+       ],
+       "operation": "listStockLocations",
+       "provenance": "contract inventory.yaml GET /stock-locations"
       }
      ]
     },
@@ -1152,7 +1528,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected requisitions",
+       "label": "The selected requisition",
+       "bindsTo": "Requisition",
+       "columns": [
+        "Requisition.id",
+        "Requisition.requisitionNumber",
+        "Requisition.venueId",
+        "Requisition.departmentId",
+        "Requisition.costCenterId",
+        "Requisition.justification",
+        "Requisition.status",
+        "Requisition.lines",
+        "Requisition.estimatedTotal",
+        "Requisition.raisedByPrincipalId",
+        "Requisition.approvedByPrincipalId",
+        "Requisition.approvalNote",
+        "Requisition.requiredBy",
+        "Requisition.approvedAt",
+        "Requisition.rejectionReason",
+        "Requisition.rejectedAt"
+       ],
+       "operation": "listRequisitions",
+       "provenance": "contract inventory.yaml GET /requisitions"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The requisition suggestion",
        "bindsTo": "RequisitionSuggestion",
        "columns": [
         "RequisitionSuggestion.itemId",
@@ -1178,44 +1579,51 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create requisition",
        "operation": "createRequisition",
+       "permission": "PROCUREMENT_REQUEST",
        "provenance": "contract inventory.yaml POST /requisitions"
       },
       {
        "kind": "secondaryButton",
-       "label": "Approve",
+       "label": "Approve requisition",
        "operation": "approveRequisition",
+       "permission": "APPROVAL_ACT",
        "provenance": "contract inventory.yaml POST /requisitions/{requisitionId}/approve"
       },
       {
        "kind": "destructiveButton",
-       "label": "Reject",
+       "label": "Reject requisition",
        "operation": "rejectRequisition",
+       "permission": "APPROVAL_ACT",
        "provenance": "contract inventory.yaml POST /requisitions/{requisitionId}/reject"
       },
       {
        "kind": "secondaryButton",
-       "label": "Return",
+       "label": "Return requisition",
        "operation": "returnRequisition",
+       "permission": "APPROVAL_ACT",
        "provenance": "contract inventory.yaml POST /requisitions/{requisitionId}/return"
       },
       {
        "kind": "destructiveButton",
-       "label": "Cancel",
+       "label": "Cancel requisition",
        "operation": "cancelRequisition",
+       "permission": "PROCUREMENT_REQUEST",
        "provenance": "contract inventory.yaml POST /requisitions/{requisitionId}/cancel"
       },
       {
        "kind": "secondaryButton",
-       "label": "Compare",
+       "label": "Compare quotations",
        "operation": "compareQuotations",
+       "permission": "PROCUREMENT_VIEW",
        "provenance": "contract inventory.yaml GET /requisitions/{requisitionId}/quotations"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save requisition lines",
        "operation": "updateRequisitionLines",
+       "permission": "PROCUREMENT_REQUEST",
        "provenance": "contract inventory.yaml PUT /requisitions/{requisitionId}/lines"
       }
      ]
@@ -1226,24 +1634,101 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmRejectRequisition",
     "component": "confirmDialog",
-    "trigger": "Reject",
-    "body": "**Names what `rejectRequisition` changes and what it leaves alone**, in the consequence rather than the verb. A requisitions this affects should be identified in the dialog, not just counted.",
+    "trigger": "Reject requisition",
+    "body": "**Names what `rejectRequisition` changes and what it leaves alone**, in the consequence rather than the verb. A requisitions this affects should be identified in the dialog, not just counted. **Collects what `rejectRequisition` sends before it is called.** Required: `reason`.",
     "provenance": "contract inventory.yaml POST /requisitions/{requisitionId}/reject"
    },
    {
     "id": "confirmCancelRequisition",
     "component": "confirmDialog",
-    "trigger": "Cancel",
-    "body": "**Names what `cancelRequisition` changes and what it leaves alone**, in the consequence rather than the verb. A requisitions this affects should be identified in the dialog, not just counted.",
+    "trigger": "Cancel requisition",
+    "body": "**Names what `cancelRequisition` changes and what it leaves alone**, in the consequence rather than the verb. A requisitions this affects should be identified in the dialog, not just counted. **Collects what `cancelRequisition` sends before it is called.** Required: `reason`.",
     "provenance": "contract inventory.yaml POST /requisitions/{requisitionId}/cancel"
+   },
+   {
+    "id": "formCreateRequisition",
+    "component": "modal",
+    "trigger": "Create requisition",
+    "body": "**Collects what `createRequisition` sends before it is called.** Required: `id`, `venueId`, `lines`, `requiredBy`. Optional: `departmentId`, `costCenterId`, `justification`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateRequisitionRequest",
+    "confirm": {
+     "label": "Create requisition",
+     "operation": "createRequisition"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "lines",
+      "requiredBy",
+      "departmentId",
+      "costCenterId",
+      "justification"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /requisitions"
+   },
+   {
+    "id": "formApproveRequisition",
+    "component": "modal",
+    "trigger": "Approve requisition",
+    "body": "**Collects what `approveRequisition` sends before it is called.** Required: `decision`. Optional: `note`, `amendedLines`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Approve requisition",
+     "operation": "approveRequisition"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "decision",
+      "note",
+      "amendedLines"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /requisitions/{requisitionId}/approve"
+   },
+   {
+    "id": "formReturnRequisition",
+    "component": "modal",
+    "trigger": "Return requisition",
+    "body": "**Collects what `returnRequisition` sends before it is called.** Required: `question`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Return requisition",
+     "operation": "returnRequisition"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "question"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /requisitions/{requisitionId}/return"
+   },
+   {
+    "id": "formUpdateRequisitionLines",
+    "component": "modal",
+    "trigger": "Save requisition lines",
+    "body": "**Collects what `updateRequisitionLines` sends before it is called.** Required: `lines`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save requisition lines",
+     "operation": "updateRequisitionLines"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "lines"
+     ]
+    },
+    "provenance": "contract inventory.yaml PUT /requisitions/{requisitionId}/lines"
    }
   ],
   "states": {
    "loading": "The requisitions list.",
    "error": "Could not load. Names which read failed and leaves the requisitions untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
-   "emptyNoResults": "The filter narrowed it and the requisitions are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoResults": "Nothing matches the filter on status, raisedByPrincipalId and the requisitions are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PROCUREMENT_VIEW`, which `listRequisitions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1307,7 +1792,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "compareQuotations",
     "contract": "inventory",
     "purpose": "Compare quotations for a requisition",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listStockLocations",
@@ -1334,17 +1819,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `requisitionId`.",
    "preloaded": [
-    "RequisitionSuggestion.itemId",
-    "RequisitionSuggestion.itemName",
-    "RequisitionSuggestion.sku",
-    "RequisitionSuggestion.onHand",
-    "RequisitionSuggestion.reorderPoint"
+    "Requisition.id",
+    "Requisition.requisitionNumber",
+    "Requisition.venueId",
+    "Requisition.departmentId",
+    "Requisition.costCenterId"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-078",
+   "derivedFrom": "wireframes/reference/Retail Board 4.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
@@ -1387,7 +1873,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-049",
     "BO-078",
     "BO-080",
@@ -1400,50 +1885,39 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "transitions": [
     {
+     "to": "BO-049",
+     "trigger": "Stock Levels",
+     "carries": [
+      "itemId"
+     ],
+     "provenance": "derived — BO-049 declares entryState.params itemId and BO-079 holds itemId, so an edge into it carries them"
+    },
+    {
+     "to": "BO-078",
+     "trigger": "Requisitions",
+     "provenance": "derived — BO-078 declares entryState.params requisitionId and BO-079 holds none of them, so the edge carries nothing and BO-078 opens cold"
+    },
+    {
+     "to": "BO-080",
+     "trigger": "Stock Transfers",
+     "provenance": "derived — BO-080 declares entryState.params transferId and BO-079 holds none of them, so the edge carries nothing and BO-080 opens cold"
+    },
+    {
      "to": "BO-081",
      "trigger": "Inventory Items",
-     "provenance": "flow F76 step 1→2"
+     "provenance": "flow F76 step 1→2",
+     "carries": [
+      "itemId"
+     ]
     },
     {
      "to": "BO-137",
      "trigger": "The variance feeds theoretical-against-actual",
      "provenance": "flow F30 step 7→8",
-     "operation": "postStockCount"
-    },
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
+     "operation": "postStockCount",
      "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-049",
-     "trigger": "Stock Levels",
-     "carries": [
-      "itemId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-049 declares entryState.params itemId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-078",
-     "trigger": "Requisitions",
-     "carries": [
-      "requisitionId"
-     ],
-     "provenance": "derived — BO-078 declares entryState.params requisitionId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-080",
-     "trigger": "Stock Transfers",
-     "carries": [
-      "transferId"
-     ],
-     "provenance": "derived — BO-080 declares entryState.params transferId, so an edge into it must carry them"
+      "countId"
+     ]
     },
     {
      "to": "EMP-066",
@@ -1451,15 +1925,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "provenance": "flow F30 step 5→6",
      "operation": "requestRecount",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "countId"
+     ]
     }
    ]
   },
-  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **Improved 20 August against the client design board**, answering 1 board screen(s): Stock Count, Reconciliation & Variance. **The id, flows and navigation are unchanged** — a board specifies a screen further; it does not replace it. **Operations from the 24 August F&B build wired here** — the contract grew and the screens had not caught up, which is how 92 operations reached 49% of screens.",
+  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **Improved 20 August against the client design board**, answering 1 board screen(s): Stock Count, Reconciliation & Variance. **The id, flows and navigation are unchanged** — a board specifies a screen further; it does not replace it. **Operations from the 24 August F&B build wired here** — the contract grew and the screens had not caught up, which is how 92 operations reached 49% of screens. **Blind counting (decided 28 September, audit R110)**: while a count is open or counting the screen shows the pre-filled item list with a blank count and no expected quantity or variance; variance appears only after submission.",
   "density": "compact",
   "boardFrames": [
    "FnB Board 5.dc.html#fnb-5h",
-   "Retail Board 4.dc.html#ret-4f"
+   "Retail Board 4.dc.html#ret-4f",
+   "Inventory Board 3.dc.html#inv-3a",
+   "Inventory Board 3.dc.html#inv-3d",
+   "Inventory Board 3.dc.html#inv-3e",
+   "Inventory Board 3.dc.html#inv-3f"
   ],
   "pattern": "listDetail",
   "patternReason": "`listStockCounts` reads the population and `getCountVariance` reads one of them — list, select, act",
@@ -1471,6 +1952,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "name": "contentBody",
      "slot": "collection",
      "components": [
+      {
+       "kind": "textField",
+       "label": "Location id",
+       "operation": "listStockCounts",
+       "notes": "Sends `?locationId=` to `listStockCounts`.",
+       "provenance": "contract inventory.yaml GET /stock-counts"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listStockCounts",
+       "notes": "Sends `?status=` to `listStockCounts`.",
+       "provenance": "contract inventory.yaml GET /stock-counts"
+      },
       {
        "kind": "dataTable",
        "label": "Every stock count",
@@ -1490,6 +1985,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "StockCount.postedByPrincipalId"
        ],
        "operation": "listStockCounts",
+       "notes": "**Variance columns stay blank while a count is `open` or `counting`** (decided 28 September, audit R110) — they fill only once the count is submitted.",
        "provenance": "contract inventory.yaml GET /stock-counts"
       }
      ]
@@ -1501,6 +1997,31 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "detailPanel",
        "label": "The selected stock count",
+       "bindsTo": "StockCount",
+       "columns": [
+        "StockCount.id",
+        "StockCount.locationId",
+        "StockCount.locationName",
+        "StockCount.kind",
+        "StockCount.status",
+        "StockCount.isBlind",
+        "StockCount.lineCount",
+        "StockCount.countedCount",
+        "StockCount.varianceLineCount",
+        "StockCount.varianceValue",
+        "StockCount.startedByPrincipalId",
+        "StockCount.postedByPrincipalId",
+        "StockCount.journalEntryId",
+        "StockCount.startedAt",
+        "StockCount.closedAt",
+        "StockCount.postedAt"
+       ],
+       "operation": "listStockCounts",
+       "provenance": "contract inventory.yaml GET /stock-counts"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The count variance",
        "bindsTo": "CountVariance",
        "columns": [
         "CountVariance.countId",
@@ -1509,6 +2030,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "CountVariance.lines"
        ],
        "operation": "getCountVariance",
+       "notes": "**Called only after the count is submitted** (decided 28 September, audit R110). While the count is `open` or `counting` the server answers 409 and the panel reads *Variance appears once the count is submitted* — never a zero.",
        "provenance": "contract inventory.yaml GET /stock-counts/{countId}/variance"
       }
      ]
@@ -1519,39 +2041,47 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Start",
+       "label": "Start stock count",
        "operation": "startStockCount",
        "provenance": "contract inventory.yaml POST /stock-counts"
       },
       {
        "kind": "secondaryButton",
-       "label": "Post",
+       "label": "Post stock count",
        "operation": "postStockCount",
        "provenance": "contract inventory.yaml POST /stock-counts/{countId}/post"
       },
       {
        "kind": "secondaryButton",
-       "label": "Recount",
+       "label": "Recount stock count",
        "operation": "recountStockCount",
        "provenance": "contract inventory.yaml POST /stock-counts/{countId}/recount"
       },
       {
        "kind": "destructiveButton",
-       "label": "Cancel",
+       "label": "Cancel stock count",
        "operation": "cancelStockCount",
        "provenance": "contract inventory.yaml POST /stock-counts/{countId}/cancel"
       },
       {
        "kind": "secondaryButton",
-       "label": "Enter",
-       "operation": "enterCountLine",
-       "provenance": "contract fnb.yaml POST /stock-counts/{countId}/lines"
+       "label": "Submit counted quantities",
+       "operation": "submitCountLines",
+       "notes": "**Lines arrive pre-filled from on-hand stock** — one per item at the location (per category for a cycle count) with the count blank; the counter enters only what is on the shelf. No expected quantity and no variance is shown while the count is open or counting (decided 28 September, audit R110, R171).",
+       "provenance": "contract inventory.yaml POST /stock-counts/{countId}/lines"
       },
       {
        "kind": "secondaryButton",
-       "label": "Request",
+       "label": "Enter count line",
+       "operation": "enterCountLine",
+       "notes": "**Shows the counted quantity only.** The F&B response still carries `theoreticalQuantity` and `variance`; the screen does not display them until the count is submitted (decided 28 September, audit R110).",
+       "provenance": "contract fnb.yaml POST /fnb-stock-counts/{countId}/lines"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request recount",
        "operation": "requestRecount",
-       "provenance": "contract fnb.yaml POST /stock-counts/{countId}/recount"
+       "provenance": "contract fnb.yaml POST /fnb-stock-counts/{countId}/recount"
       }
      ]
     }
@@ -1561,17 +2091,132 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmCancelStockCount",
     "component": "confirmDialog",
-    "trigger": "Cancel",
-    "body": "**Names what `cancelStockCount` changes and what it leaves alone**, in the consequence rather than the verb. A stock count this affects should be identified in the dialog, not just counted.",
+    "trigger": "Cancel stock count",
+    "body": "**Names what `cancelStockCount` changes and what it leaves alone**, in the consequence rather than the verb. A stock count this affects should be identified in the dialog, not just counted. **Collects what `cancelStockCount` sends before it is called.** Required: `reason`.",
     "provenance": "contract inventory.yaml POST /stock-counts/{countId}/cancel"
+   },
+   {
+    "id": "formStartStockCount",
+    "component": "modal",
+    "trigger": "Start stock count",
+    "body": "**Collects what `startStockCount` sends before it is called.** Required: `id`, `locationId`, `kind`. Optional: `categoryIds`, `isBlind`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "StartStockCountRequest",
+    "confirm": {
+     "label": "Start stock count",
+     "operation": "startStockCount"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "locationId",
+      "kind",
+      "categoryIds",
+      "isBlind"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /stock-counts"
+   },
+   {
+    "id": "formPostStockCount",
+    "component": "modal",
+    "trigger": "Post stock count",
+    "body": "**Collects what `postStockCount` sends before it is called.** Nothing in the body is required. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Post stock count",
+     "operation": "postStockCount"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "note"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /stock-counts/{countId}/post"
+   },
+   {
+    "id": "formRecountStockCount",
+    "component": "modal",
+    "trigger": "Recount stock count",
+    "body": "**Collects what `recountStockCount` sends before it is called.** Required: `reason` and `supervisorStepUp` — a supervisor enters their staff PIN on this device (`principalId`, `credential`); a refused PIN is 403 supervisor-step-up-refused (decided 28 September, audit R144). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Recount stock count",
+     "operation": "recountStockCount"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason",
+      "supervisorStepUp"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /stock-counts/{countId}/recount"
+   },
+   {
+    "id": "formSubmitCountLines",
+    "component": "modal",
+    "trigger": "Submit counted quantities",
+    "body": "**Collects what `submitCountLines` sends before it is called.** Required: `lines` (each `itemId`, `countedQuantity`, `recordedAt`; optional `unit`, `note`). The item list is pre-filled from on-hand stock with the count blank, and **no expected quantity or variance is shown** (decided 28 September, audit R110). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Submit counted quantities",
+     "operation": "submitCountLines"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "lines"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /stock-counts/{countId}/lines"
+   },
+   {
+    "id": "formEnterCountLine",
+    "component": "modal",
+    "trigger": "Enter count line",
+    "body": "**Collects what `enterCountLine` sends before it is called.** Required: `recordedAt`, `itemId`, `countedQuantity`. Optional: `locationId`, `uom`, `batchId`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Enter count line",
+     "operation": "enterCountLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recordedAt",
+      "itemId",
+      "countedQuantity",
+      "locationId",
+      "uom",
+      "batchId",
+      "note"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /fnb-stock-counts/{countId}/lines"
+   },
+   {
+    "id": "formRequestRecount",
+    "component": "modal",
+    "trigger": "Request recount",
+    "body": "**Collects what `requestRecount` sends before it is called.** Required: `lineIds`. Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Request recount",
+     "operation": "requestRecount"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "lineIds",
+      "reason"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /fnb-stock-counts/{countId}/recount"
    }
   ],
   "states": {
    "loading": "The stock count list.",
    "error": "Could not load. Names which read failed and leaves the stock count untouched.",
-   "emptyFirstRun": "No stock count yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the stock count are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No stock count yet. Offers Request recount (`requestRecount`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on locationId, status and the stock count are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listStockCounts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1617,10 +2262,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     ]
    },
    {
+    "operationId": "submitCountLines",
+    "contract": "inventory",
+    "purpose": "Submit counted quantities against the pre-filled lines; returns no expected quantity and no variance (decided 28 September, audit R110)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listStockCounts"
+    ]
+   },
+   {
     "operationId": "getCountVariance",
     "contract": "inventory",
-    "purpose": "Variance between counted and expected",
-    "trigger": "onLoad"
+    "purpose": "Variance between counted and expected, once the count is submitted (409 before, audit R110)",
+    "trigger": "onAction"
    },
    {
     "operationId": "enterCountLine",
@@ -1650,16 +2304,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `countId`.",
    "preloaded": [
-    "CountVariance.countId",
-    "CountVariance.totalVarianceValue",
-    "CountVariance.exceptionCount",
-    "CountVariance.lines"
+    "StockCount.id",
+    "StockCount.locationId",
+    "StockCount.locationName",
+    "StockCount.kind",
+    "StockCount.status"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-079",
+   "derivedFrom": "wireframes/reference/Retail Board 4.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
@@ -1702,7 +2358,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-052",
     "BO-078",
     "BO-079",
@@ -1714,35 +2369,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "transitions": [
     {
-     "to": "BO-052",
-     "trigger": "Goods Receipt",
-     "provenance": "flow F76 step 4→5, F92 step 4→5"
-    },
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-078",
      "trigger": "Requisitions",
-     "carries": [
-      "requisitionId"
-     ],
-     "provenance": "derived — BO-078 declares entryState.params requisitionId, so an edge into it must carry them"
+     "provenance": "derived — BO-078 declares entryState.params requisitionId and BO-080 holds none of them, so the edge carries nothing and BO-078 opens cold"
     },
     {
      "to": "BO-079",
      "trigger": "Stock Count",
-     "carries": [
-      "countId"
-     ],
-     "provenance": "derived — BO-079 declares entryState.params countId, so an edge into it must carry them"
+     "provenance": "derived — BO-079 declares entryState.params countId and BO-080 holds none of them, so the edge carries nothing and BO-079 opens cold"
     },
     {
      "to": "BO-081",
@@ -1750,25 +2384,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "itemId"
      ],
-     "provenance": "derived — BO-081 declares entryState.params itemId, so an edge into it must carry them"
+     "provenance": "derived — BO-081 declares entryState.params itemId and BO-080 holds itemId, so an edge into it carries them"
+    },
+    {
+     "to": "BO-052",
+     "trigger": "Goods Receipt",
+     "provenance": "flow F76 step 4→5, F92 step 4→5",
+     "carries": [
+      "purchaseOrderId",
+      "transferId"
+     ]
     }
    ]
   },
   "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **Improved 20 August against the client design board**, answering 1 board screen(s): Transfers, Distribution & Outlet Receiving. **The id, flows and navigation are unchanged** — a board specifies a screen further; it does not replace it. **Retail board operations wired 24 August.**",
   "density": "compact",
   "boardFrames": [
-   "Retail Board 4.dc.html#ret-4d"
+   "Retail Board 4.dc.html#ret-4d",
+   "Inventory Board 3.dc.html#inv-3b",
+   "Inventory Board 3.dc.html#inv-3c"
   ],
   "pattern": "listDetail",
   "patternReason": "`listStockTransfers` reads the population and `getStockTransfer` reads one of them — list, select, act",
-  "purpose": "Move stock between venues, and receive what arrives.",
-  "gaps": [
-   {
-    "operation": "getStockTransfer",
-    "why": "**1 declared operation reach no component on this screen**: getStockTransfer. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
+  "purpose": "Move stock between venues, and receive what arrives. Shows inbound and outbound transfers for the venue (decided 28 September, audit R183).",
   "layout": {
    "template": "split",
    "regions": [
@@ -1777,8 +2415,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listStockTransfers",
+       "notes": "Sends `?status=` to `listStockTransfers`.",
+       "provenance": "contract inventory.yaml GET /stock-transfers"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every stock transfers",
+       "label": "Every stock transfer",
        "bindsTo": "StockTransfer",
        "columns": [
         "StockTransfer.id",
@@ -1791,9 +2436,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "StockTransfer.receivedByPrincipalId",
         "StockTransfer.dispatchedAt",
         "StockTransfer.receivedAt",
+        "StockTransfer.fromVenueId",
+        "StockTransfer.toVenueId",
         "StockTransfer.scopePath"
        ],
        "operation": "listStockTransfers",
+       "notes": "**Inbound and outbound** (decided 28 September, audit R183) — the list holds every transfer whose source or destination is this venue; each row is marked outbound (`fromVenueId` is this venue) or inbound (`toVenueId` is this venue), and the direction is a filter.",
        "provenance": "contract inventory.yaml GET /stock-transfers"
       }
      ]
@@ -1804,27 +2452,57 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create stock transfer",
        "operation": "createStockTransfer",
        "provenance": "contract inventory.yaml POST /stock-transfers"
       },
       {
        "kind": "secondaryButton",
-       "label": "Receive",
+       "label": "Receive stock transfer",
        "operation": "receiveStockTransfer",
+       "notes": "Offered on inbound transfers only — the destination venue receives (audit R183).",
        "provenance": "contract inventory.yaml POST /stock-transfers/{transferId}/receive"
       },
       {
        "kind": "destructiveButton",
-       "label": "Close",
+       "label": "Close transfer short",
        "operation": "closeTransferShort",
        "provenance": "contract inventory.yaml POST /stock-transfers/{transferId}/close-short"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create goods receipt",
        "operation": "createGoodsReceipt",
        "provenance": "contract inventory.yaml POST /goods-receipts"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "reads",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The stock transfer",
+       "bindsTo": "StockTransfer",
+       "columns": [
+        "StockTransfer.id",
+        "StockTransfer.transferNumber",
+        "StockTransfer.fromLocationId",
+        "StockTransfer.toLocationId",
+        "StockTransfer.status",
+        "StockTransfer.lines",
+        "StockTransfer.dispatchedByPrincipalId",
+        "StockTransfer.receivedByPrincipalId",
+        "StockTransfer.dispatchedAt",
+        "StockTransfer.receivedAt",
+        "StockTransfer.closeShortReason",
+        "StockTransfer.fromVenueId",
+        "StockTransfer.toVenueId",
+        "StockTransfer.scopePath"
+       ],
+       "operation": "getStockTransfer",
+       "provenance": "contract inventory.yaml GET /stock-transfers/{transferId}"
       }
      ]
     }
@@ -1834,23 +2512,86 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmCloseTransferShort",
     "component": "confirmDialog",
-    "trigger": "Close",
-    "body": "**Names what `closeTransferShort` changes and what it leaves alone**, in the consequence rather than the verb. A stock transfers this affects should be identified in the dialog, not just counted.",
+    "trigger": "Close transfer short",
+    "body": "**Names what `closeTransferShort` changes and what it leaves alone**, in the consequence rather than the verb. A stock transfers this affects should be identified in the dialog, not just counted. **Collects what `closeTransferShort` sends before it is called.** Required: `reason` and `supervisorStepUp` — a supervisor enters their staff PIN on this device (`principalId`, `credential`); a refused PIN is 403 supervisor-step-up-refused (decided 28 September, audit R144).",
     "provenance": "contract inventory.yaml POST /stock-transfers/{transferId}/close-short"
+   },
+   {
+    "id": "formCreateStockTransfer",
+    "component": "modal",
+    "trigger": "Create stock transfer",
+    "body": "**Collects what `createStockTransfer` sends before it is called.** Required: `id`, `fromLocationId`, `toLocationId`, `lines`, `recordedAt`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateStockTransferRequest",
+    "confirm": {
+     "label": "Create stock transfer",
+     "operation": "createStockTransfer"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "fromLocationId",
+      "toLocationId",
+      "lines",
+      "recordedAt",
+      "note"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /stock-transfers"
+   },
+   {
+    "id": "formReceiveStockTransfer",
+    "component": "modal",
+    "trigger": "Receive stock transfer",
+    "body": "**Collects what `receiveStockTransfer` sends before it is called.** Required: `lines`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Receive stock transfer",
+     "operation": "receiveStockTransfer"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "lines"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /stock-transfers/{transferId}/receive"
+   },
+   {
+    "id": "formCreateGoodsReceipt",
+    "component": "modal",
+    "trigger": "Create goods receipt",
+    "body": "**Collects what `createGoodsReceipt` sends before it is called.** Required: `id`, `purchaseOrderId`, `locationId`, `lines`, `recordedAt`. Optional: `deliveryNoteReference`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateGoodsReceiptRequest",
+    "confirm": {
+     "label": "Create goods receipt",
+     "operation": "createGoodsReceipt"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "purchaseOrderId",
+      "locationId",
+      "lines",
+      "recordedAt",
+      "deliveryNoteReference"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /goods-receipts"
    }
   ],
   "states": {
    "loading": "The stock transfers list.",
    "error": "Could not load. Names which read failed and leaves the stock transfers untouched.",
-   "emptyFirstRun": "No stock transfers yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the stock transfers are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No stock transfers yet. Offers Create stock transfer (`createStockTransfer`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on status and the stock transfers are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listStockTransfers` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "listStockTransfers",
     "contract": "inventory",
-    "purpose": "List transfers",
+    "purpose": "Inbound and outbound transfers for this venue (decided 28 September, audit R183)",
     "trigger": "onLoad"
    },
    {
@@ -1893,7 +2634,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getStockTransfer",
     "contract": "inventory",
     "purpose": "One transfer, its manifest and where it is",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1909,6 +2650,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-080",
+   "derivedFrom": "wireframes/reference/Retail Board 4.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
@@ -1951,7 +2693,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-078",
     "BO-079",
     "BO-080"
@@ -1968,48 +2709,31 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "provenance": "flow F76 step 2→3, F92 step 2→3"
     },
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-079",
      "trigger": "Stock Count",
-     "carries": [
-      "countId"
-     ],
-     "provenance": "derived — BO-079 declares entryState.params countId, so an edge into it must carry them"
+     "provenance": "derived — BO-079 declares entryState.params countId and BO-081 holds none of them, so the edge carries nothing and BO-079 opens cold"
     },
     {
      "to": "BO-080",
      "trigger": "Stock Transfers",
-     "carries": [
-      "transferId"
-     ],
-     "provenance": "derived — BO-080 declares entryState.params transferId, so an edge into it must carry them"
+     "provenance": "derived — BO-080 declares entryState.params transferId and BO-081 holds none of them, so the edge carries nothing and BO-080 opens cold"
     }
    ]
   },
   "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing.",
   "density": "compact",
   "boardFrames": [
-   "Retail Board 4.dc.html#ret-4b"
+   "Retail Board 4.dc.html#ret-4b",
+   "Inventory Board 1.dc.html#inv-2",
+   "Inventory Board 1.dc.html#inv-3",
+   "Inventory Board 1.dc.html#inv-4",
+   "Inventory Board 1.dc.html#inv-5",
+   "Inventory Board 2.dc.html#inv-2b",
+   "Inventory Board 2.dc.html#inv-2c"
   ],
   "pattern": "listDetail",
   "patternReason": "`listInventoryItems` reads the population and `getInventoryItem` reads one of them — list, select, act",
   "purpose": "What the venue stocks, and where.",
-  "gaps": [
-   {
-    "operation": "listStockLocations",
-    "why": "**1 declared operation reach no component on this screen**: listStockLocations. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -2018,8 +2742,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listInventoryItems",
+       "notes": "Sends `?venueId=` to `listInventoryItems`.",
+       "provenance": "contract inventory.yaml GET /inventory-items"
+      },
+      {
+       "kind": "textField",
+       "label": "Category id",
+       "operation": "listInventoryItems",
+       "notes": "Sends `?categoryId=` to `listInventoryItems`.",
+       "provenance": "contract inventory.yaml GET /inventory-items"
+      },
+      {
+       "kind": "toggle",
+       "label": "Below reorder point",
+       "operation": "listInventoryItems",
+       "notes": "Sends `?belowReorderPoint=` to `listInventoryItems`.",
+       "provenance": "contract inventory.yaml GET /inventory-items"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "listInventoryItems",
+       "notes": "Sends `?search=` to `listInventoryItems`.",
+       "provenance": "contract inventory.yaml GET /inventory-items"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every inventory items",
+       "label": "Every inventory",
        "bindsTo": "InventoryItem",
        "columns": [
         "InventoryItem.sku",
@@ -2037,6 +2789,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listInventoryItems",
        "provenance": "contract inventory.yaml GET /inventory-items"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every stock location",
+       "bindsTo": "StockLocation",
+       "columns": [
+        "StockLocation.id",
+        "StockLocation.code",
+        "StockLocation.name",
+        "StockLocation.venueId",
+        "StockLocation.kind",
+        "StockLocation.parentLocationId",
+        "StockLocation.isActive"
+       ],
+       "operation": "listStockLocations",
+       "provenance": "contract inventory.yaml GET /stock-locations"
       }
      ]
     },
@@ -2046,7 +2814,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected inventory items",
+       "label": "The selected inventory",
        "bindsTo": "InventoryItem",
        "columns": [
         "InventoryItem.sku",
@@ -2077,25 +2845,25 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create inventory item",
        "operation": "createInventoryItem",
        "provenance": "contract inventory.yaml POST /inventory-items"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save inventory item",
        "operation": "updateInventoryItem",
        "provenance": "contract inventory.yaml PATCH /inventory-items/{itemId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Lookup",
+       "label": "Lookup inventory item",
        "operation": "lookupInventoryItem",
        "provenance": "contract inventory.yaml GET /inventory-items/lookup"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create stock location",
        "operation": "createStockLocation",
        "provenance": "contract inventory.yaml POST /stock-locations"
       }
@@ -2106,9 +2874,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The inventory items list.",
    "error": "Could not load. Names which read failed and leaves the inventory items untouched.",
-   "emptyFirstRun": "No inventory items yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the inventory items are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No inventory items yet. Offers Create inventory item (`createInventoryItem`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on venueId, categoryId, belowReorderPoint, search and the inventory items are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listInventoryItems` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2121,7 +2889,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getInventoryItem",
     "contract": "inventory",
     "purpose": "Read an item with stock position",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createInventoryItem",
@@ -2145,7 +2913,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "lookupInventoryItem",
     "contract": "inventory",
     "purpose": "Look up by barcode or SKU",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listStockLocations",
@@ -2183,10 +2951,92 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-081",
+   "derivedFrom": "wireframes/reference/Retail Board 4.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateInventoryItem",
+    "component": "modal",
+    "trigger": "Create inventory item",
+    "body": "**Collects what `createInventoryItem` sends before it is called.** Required: `sku`, `name`, `venueId`, `baseUnit`, `costingMethod`. Optional: `barcode`, `categoryId`, `purchaseUnit`, `purchaseUnitFactor`, `reorderPoint`, `reorderQuantity`, `parLevel`, `preferredSupplierId`, `allowNegativeStock`, `isPerishable`, `shelfLifeDays`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateInventoryItemRequest",
+    "confirm": {
+     "label": "Create inventory item",
+     "operation": "createInventoryItem"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "sku",
+      "name",
+      "venueId",
+      "baseUnit",
+      "costingMethod",
+      "barcode",
+      "categoryId",
+      "purchaseUnit",
+      "purchaseUnitFactor",
+      "reorderPoint",
+      "reorderQuantity",
+      "parLevel",
+      "preferredSupplierId",
+      "allowNegativeStock",
+      "isPerishable",
+      "shelfLifeDays"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /inventory-items"
+   },
+   {
+    "id": "formUpdateInventoryItem",
+    "component": "modal",
+    "trigger": "Save inventory item",
+    "body": "**Collects what `updateInventoryItem` sends before it is called.** Nothing in the body is required. Optional: `name`, `categoryId`, `reorderPoint`, `reorderQuantity`, `parLevel`, `preferredSupplierId`, `isActive`, `costingMethod`, `baseUnit`. **Category and preferred supplier can be cleared** — each picker has a *None* choice that sends `null` (decided 28 September, audit R171). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save inventory item",
+     "operation": "updateInventoryItem"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "categoryId",
+      "reorderPoint",
+      "reorderQuantity",
+      "parLevel",
+      "preferredSupplierId",
+      "isActive",
+      "costingMethod",
+      "baseUnit"
+     ]
+    },
+    "provenance": "contract inventory.yaml PATCH /inventory-items/{itemId}"
+   },
+   {
+    "id": "formCreateStockLocation",
+    "component": "modal",
+    "trigger": "Create stock location",
+    "body": "**Collects what `createStockLocation` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`. Optional: `parentLocationId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create stock location",
+     "operation": "createStockLocation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "venueId",
+      "kind",
+      "parentLocationId"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /stock-locations"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2225,7 +3075,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-078",
     "BO-079",
     "BO-080"
@@ -2241,48 +3090,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "provenance": "flow F35 step 7→8"
     },
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-078",
      "trigger": "Requisitions",
-     "carries": [
-      "requisitionId"
-     ],
-     "provenance": "derived — BO-078 declares entryState.params requisitionId, so an edge into it must carry them"
+     "provenance": "derived — BO-078 declares entryState.params requisitionId and BO-082 holds none of them, so the edge carries nothing and BO-078 opens cold"
     },
     {
      "to": "BO-080",
      "trigger": "Stock Transfers",
-     "carries": [
-      "transferId"
-     ],
-     "provenance": "derived — BO-080 declares entryState.params transferId, so an edge into it must carry them"
+     "provenance": "derived — BO-080 declares entryState.params transferId and BO-082 holds none of them, so the edge carries nothing and BO-080 opens cold"
     }
    ]
   },
   "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **Moved to wave 1 on 24 August.** F34 walks a retail sale and its return, which is a wave-1 journey — **a venue that can take a return and cannot disposition the item puts damaged stock back on the shelf**, and the count finds it three weeks later.",
   "density": "compact",
   "boardFrames": [
-   "Retail Board 4.dc.html#ret-4g"
+   "Retail Board 4.dc.html#ret-4g",
+   "Inventory Board 1.dc.html#inv-8",
+   "Inventory Board 2.dc.html#inv-2j"
   ],
   "pattern": "listDetail",
   "patternReason": "`listStockMovements` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "Every movement, and why it happened.",
-  "gaps": [
-   {
-    "operation": "listOrders",
-    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -2291,8 +3119,43 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Item id",
+       "operation": "listStockMovements",
+       "notes": "Sends `?itemId=` to `listStockMovements`.",
+       "provenance": "contract inventory.yaml GET /stock-movements"
+      },
+      {
+       "kind": "textField",
+       "label": "Location id",
+       "operation": "listStockMovements",
+       "notes": "Sends `?locationId=` to `listStockMovements`.",
+       "provenance": "contract inventory.yaml GET /stock-movements"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listStockMovements",
+       "notes": "Sends `?kind=` to `listStockMovements`. Offers every `MovementKind`, including `adjustmentIn`/`adjustmentOut` and `countGain`/`countLoss`, which replaced `adjustment` and `countAdjustment` (audit R171).",
+       "provenance": "contract inventory.yaml GET /stock-movements"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Recorded from",
+       "operation": "listStockMovements",
+       "notes": "Sends `?recordedFrom=` to `listStockMovements`.",
+       "provenance": "contract inventory.yaml GET /stock-movements"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Recorded to",
+       "operation": "listStockMovements",
+       "notes": "Sends `?recordedTo=` to `listStockMovements`.",
+       "provenance": "contract inventory.yaml GET /stock-movements"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every stock movements",
+       "label": "Every stock movement",
        "bindsTo": "StockMovement",
        "columns": [
         "StockMovement.id",
@@ -2309,7 +3172,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "StockMovement.totalCost"
        ],
        "operation": "listStockMovements",
+       "notes": "`countGain` and `countLoss` rows are shown (posted by a stock count), never entered here; quantity is always positive and the kind shows the direction (decided 28 September, audit R171).",
        "provenance": "contract inventory.yaml GET /stock-movements"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every order",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount",
+        "OrderSummary.principalId",
+        "OrderSummary.holdLabel",
+        "OrderSummary.heldUntil"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
       }
      ]
     },
@@ -2319,7 +3202,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected stock movements",
+       "label": "The selected stock movement",
        "bindsTo": "StockMovement",
        "columns": [
         "StockMovement.id",
@@ -2350,13 +3233,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create stock movement",
        "operation": "createStockMovement",
        "provenance": "contract inventory.yaml POST /stock-movements"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create stock transfer",
        "operation": "createStockTransfer",
        "provenance": "contract inventory.yaml POST /stock-transfers"
       }
@@ -2367,9 +3250,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The stock movements list.",
    "error": "Could not load. Names which read failed and leaves the stock movements untouched.",
-   "emptyFirstRun": "No stock movements yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the stock movements are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No stock movements yet. Offers Create stock movement (`createStockMovement`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on itemId, locationId, kind, recordedFrom, recordedTo and the stock movements are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listStockMovements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2416,10 +3299,62 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-082",
+   "derivedFrom": "wireframes/reference/Retail Board 4.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateStockMovement",
+    "component": "modal",
+    "trigger": "Create stock movement",
+    "body": "**Collects what `createStockMovement` sends before it is called.** Required: `id`, `itemId`, `locationId`, `kind`, `quantity`, `recordedAt`. Optional: `unit`, `reason`, `costCenterId`. **The kind picker offers `adjustmentIn` and `adjustmentOut`** (and issue, waste, supplierReturn); the kind decides the direction, so **quantity is entered positive** and the field refuses a sign. **Reason is required for adjustmentIn, adjustmentOut and waste** — the dialog will not confirm without it and the server refuses 400 (decided 28 September, audit R171). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateStockMovementRequest",
+    "confirm": {
+     "label": "Create stock movement",
+     "operation": "createStockMovement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "itemId",
+      "locationId",
+      "kind",
+      "quantity",
+      "recordedAt",
+      "unit",
+      "reason",
+      "costCenterId"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /stock-movements"
+   },
+   {
+    "id": "formCreateStockTransfer",
+    "component": "modal",
+    "trigger": "Create stock transfer",
+    "body": "**Collects what `createStockTransfer` sends before it is called.** Required: `id`, `fromLocationId`, `toLocationId`, `lines`, `recordedAt`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateStockTransferRequest",
+    "confirm": {
+     "label": "Create stock transfer",
+     "operation": "createStockTransfer"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "fromLocationId",
+      "toLocationId",
+      "lines",
+      "recordedAt",
+      "note"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /stock-transfers"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2458,7 +3393,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-007",
     "BO-078",
     "BO-079",
@@ -2470,59 +3404,47 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "transitions": [
     {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "provenance": "flow F78 step 1→2"
-    },
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
      "to": "BO-078",
      "trigger": "Requisitions",
      "carries": [
       "requisitionId"
      ],
-     "provenance": "derived — BO-078 declares entryState.params requisitionId, so an edge into it must carry them"
+     "provenance": "derived — BO-078 declares entryState.params requisitionId and BO-083 holds requisitionId, so an edge into it carries them"
     },
     {
      "to": "BO-079",
      "trigger": "Stock Count",
-     "carries": [
-      "countId"
-     ],
-     "provenance": "derived — BO-079 declares entryState.params countId, so an edge into it must carry them"
+     "provenance": "derived — BO-079 declares entryState.params countId and BO-083 holds none of them, so the edge carries nothing and BO-079 opens cold"
     },
     {
      "to": "BO-080",
      "trigger": "Stock Transfers",
-     "carries": [
-      "transferId"
-     ],
-     "provenance": "derived — BO-080 declares entryState.params transferId, so an edge into it must carry them"
+     "provenance": "derived — BO-080 declares entryState.params transferId and BO-083 holds none of them, so the edge carries nothing and BO-080 opens cold"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "The new range becomes products in the directory",
+     "provenance": "flow F78 step 1→2"
     }
    ]
   },
   "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **Retail board operations wired 24 August.**",
   "density": "compact",
   "boardFrames": [
-   "Retail Board 2.dc.html#ret-2g"
+   "Retail Board 2.dc.html#ret-2g",
+   "Inventory Board 4.dc.html#inv-4b",
+   "Inventory Board 4.dc.html#inv-4c",
+   "Inventory Board 4.dc.html#inv-4d",
+   "Inventory Board 7.dc.html#inv-7f"
   ],
   "pattern": "listDetail",
   "patternReason": "`listSuppliers` reads the population and `getSupplierPerformance` reads one of them — list, select, act",
-  "purpose": "Who we buy from, and what they quoted.",
+  "purpose": "Who we buy from, and what they quoted. Suppliers are the tenant's; a venue sees them read-only and records quotations (decided 28 September, audit R183).",
   "gaps": [
    {
     "operation": "getSupplierPerformance",
-    "why": "**1 declared operation reach no component on this screen**: getSupplierPerformance. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "why": "**`getSupplierPerformance` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
+    "source": "contract reporting.yaml GET /suppliers/{supplierId}/performance"
    }
   ],
   "layout": {
@@ -2534,7 +3456,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every suppliers",
+       "label": "Every supplier",
        "bindsTo": "Supplier",
        "columns": [
         "Supplier.id",
@@ -2561,21 +3483,40 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create supplier",
        "operation": "createSupplier",
+       "permission": "PROCUREMENT_MANAGE",
+       "notes": "**Tenant scope only** (decided 28 September, audit R183) — suppliers are created and edited at tenant level; a session scoped to a venue does not see this button.",
        "provenance": "contract inventory.yaml POST /suppliers"
       },
       {
        "kind": "secondaryButton",
-       "label": "Record",
+       "label": "Record quotation",
        "operation": "recordQuotation",
+       "permission": "PROCUREMENT_MANAGE",
+       "notes": "A venue user records quotations against the tenant's suppliers; the quotation carries the venue's scope (decided 28 September, audit R183).",
        "provenance": "contract inventory.yaml POST /suppliers/{supplierId}/quotations"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save supplier",
        "operation": "updateSupplier",
+       "permission": "PROCUREMENT_MANAGE",
+       "notes": "**Tenant scope only** (decided 28 September, audit R183); at venue scope the supplier is read-only.",
        "provenance": "contract inventory.yaml PUT /suppliers/{supplierId}"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "reads",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Supplier performance",
+       "operation": "getSupplierPerformance",
+       "notes": "Shows `ordersPlaced`, `onTimeInFullPercent`, `averageDaysLate`, `shortDeliveryPercent`, `rejectionPercent`, `rejectionReasons`, `priceVariancePercent` from `getSupplierPerformance`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
+       "provenance": "contract reporting.yaml GET /suppliers/{supplierId}/performance"
       }
      ]
     }
@@ -2584,9 +3525,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The suppliers list.",
    "error": "Could not load. Names which read failed and leaves the suppliers untouched.",
-   "emptyFirstRun": "No suppliers yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the suppliers are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No suppliers yet. At tenant scope offers Create supplier (`createSupplier`); at venue scope says suppliers are set up by the tenant (audit R183).",
+   "emptyNoResults": "Never shown: `listSuppliers` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PROCUREMENT_VIEW`, which `listSuppliers` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2598,7 +3539,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "operationId": "createSupplier",
     "contract": "inventory",
-    "purpose": "Create a supplier",
+    "purpose": "Create a supplier — tenant scope only; venues read suppliers (decided 28 September, audit R183)",
     "trigger": "onAction",
     "invalidates": [
      "listSuppliers"
@@ -2616,7 +3557,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "operationId": "updateSupplier",
     "contract": "inventory",
-    "purpose": "Change terms, or stop buying from them",
+    "purpose": "Change terms, or stop buying from them — tenant scope only (audit R183)",
     "trigger": "onAction",
     "invalidates": [
      "listSuppliers"
@@ -2626,7 +3567,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getSupplierPerformance",
     "contract": "reporting",
     "purpose": "getSupplierPerformance",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -2642,325 +3583,92 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-083",
+   "derivedFrom": "wireframes/reference/Retail Board 2.dc.html",
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-105",
-  "name": "Stock & Supply",
-  "module": "Stock & Supply",
-  "requiresModule": "core",
-  "wave": 1,
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/stock-supply",
-   "component": "apps/venue-management-web/src/routes/home/StockSupplyList.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-100"
-   ],
-   "exitTo": [
-    "BO-049",
-    "BO-050",
-    "BO-052",
-    "BO-078",
-    "BO-079",
-    "BO-080",
-    "BO-081",
-    "BO-082",
-    "BO-083",
-    "BO-137",
-    "BO-138",
-    "BO-139",
-    "BO-140",
-    "BO-141"
-   ],
-   "transitions": [
-    {
-     "to": "BO-049",
-     "trigger": "Stock Levels",
-     "carries": [
-      "itemId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-049 declares entryState.params itemId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-052",
-     "trigger": "Goods Receipt",
-     "carries": [
-      "purchaseOrderId",
-      "receiptId",
-      "transferId"
-     ],
-     "provenance": "derived — BO-052 declares entryState.params purchaseOrderId, receiptId, transferId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-078",
-     "trigger": "Requisitions",
-     "carries": [
-      "requisitionId"
-     ],
-     "provenance": "derived — BO-078 declares entryState.params requisitionId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-079",
-     "trigger": "Stock Count",
-     "carries": [
-      "countId"
-     ],
-     "provenance": "derived — BO-079 declares entryState.params countId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-080",
-     "trigger": "Stock Transfers",
-     "carries": [
-      "transferId"
-     ],
-     "provenance": "derived — BO-080 declares entryState.params transferId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-081",
-     "trigger": "Inventory Items",
-     "carries": [
-      "itemId"
-     ],
-     "provenance": "derived — BO-081 declares entryState.params itemId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-083",
-     "trigger": "Suppliers",
-     "carries": [
-      "supplierId"
-     ],
-     "provenance": "derived — BO-083 declares entryState.params supplierId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-137",
-     "trigger": "Recipe Consumption & Theoretical Inventory",
-     "carries": [
-      "countId",
-      "runId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-137 declares entryState.params countId, runId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-138",
-     "trigger": "Production Execution & Batch Management",
-     "carries": [
-      "runId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-138 declares entryState.params runId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-139",
-     "trigger": "Wastage, Spoilage, Returns & Write-Off",
-     "carries": [
-      "outletId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-139 declares entryState.params outletId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-140",
-     "trigger": "Product Availability, 86 & Operational Food Safety",
-     "carries": [
-      "itemId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-140 declares entryState.params itemId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-141",
-     "trigger": "Operational Alerts, AI Replenishment & Action Center",
-     "carries": [
-      "alertId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-141 declares entryState.params alertId, venueId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Section landing. **9 screens reach the entry point through here** — before 20 August they reached it through nothing.",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listInventoryItems` reads the population and `getVenueSettings` reads one of them — list, select, act",
-  "purpose": "Everything in stock & supply, and what in it needs attention.",
-  "gaps": [
+  "overlays": [
    {
-    "operation": "listPurchaseOrders",
-    "why": "**1 declared operation reach no component on this screen**: listPurchaseOrders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "id": "formCreateSupplier",
+    "component": "modal",
+    "trigger": "Create supplier",
+    "body": "**Collects what `createSupplier` sends before it is called.** Required: `id`, `code`, `name`. Optional: `contactName`, `contactEmail`, `contactPhone`, `taxRegistrationNumber`, `paymentTermsDays`, `leadTimeDays`, `currency`, `accountId`, `isActive`, `status`, `statusReason`, `minimumOrderValue` and 1 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "Supplier",
+    "confirm": {
+     "label": "Create supplier",
+     "operation": "createSupplier"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "contactName",
+      "contactEmail",
+      "contactPhone",
+      "taxRegistrationNumber",
+      "paymentTermsDays",
+      "leadTimeDays",
+      "currency",
+      "accountId",
+      "isActive",
+      "status",
+      "statusReason",
+      "minimumOrderValue",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /suppliers"
+   },
+   {
+    "id": "formRecordQuotation",
+    "component": "modal",
+    "trigger": "Record quotation",
+    "body": "**Collects what `recordQuotation` sends before it is called.** Required: `requisitionId`, `lines`, `validUntil`. Optional: `reference`, `leadTimeDays`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateQuotationRequest",
+    "confirm": {
+     "label": "Record quotation",
+     "operation": "recordQuotation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "requisitionId",
+      "lines",
+      "validUntil",
+      "reference",
+      "leadTimeDays",
+      "note"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /suppliers/{supplierId}/quotations"
+   },
+   {
+    "id": "formUpdateSupplier",
+    "component": "modal",
+    "trigger": "Save supplier",
+    "body": "**Collects what `updateSupplier` sends before it is called.** Nothing in the body is required. Optional: `name`, `status`, `statusReason`, `paymentTermDays`, `leadTimeDays`, `minimumOrderValue`, `contacts`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save supplier",
+     "operation": "updateSupplier"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "status",
+      "statusReason",
+      "paymentTermDays",
+      "leadTimeDays",
+      "minimumOrderValue",
+      "contacts"
+     ]
+    },
+    "provenance": "contract inventory.yaml PUT /suppliers/{supplierId}"
    }
   ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every stock supply",
-       "bindsTo": "InventoryItem",
-       "columns": [
-        "InventoryItem.sku",
-        "InventoryItem.barcode",
-        "InventoryItem.name",
-        "InventoryItem.venueId",
-        "InventoryItem.categoryId",
-        "InventoryItem.baseUnit",
-        "InventoryItem.purchaseUnit",
-        "InventoryItem.purchaseUnitFactor",
-        "InventoryItem.costingMethod",
-        "InventoryItem.reorderPoint",
-        "InventoryItem.reorderQuantity",
-        "InventoryItem.parLevel"
-       ],
-       "operation": "listInventoryItems",
-       "provenance": "contract inventory.yaml GET /inventory-items"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected stock supply",
-       "bindsTo": "VenueSettings",
-       "columns": [
-        "VenueSettings.id",
-        "VenueSettings.venueId",
-        "VenueSettings.supportHours",
-        "VenueSettings.quietHours",
-        "VenueSettings.segregatedAccess",
-        "VenueSettings.alerting"
-       ],
-       "operation": "getVenueSettings",
-       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createInventoryItem",
-       "provenance": "contract inventory.yaml POST /inventory-items"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "cardList",
-       "bindsTo": "screens",
-       "notes": "9 screens, each with what needs attention.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "searchField",
-       "label": "Search stock & supply",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The list, with counts.",
-   "error": "Could not load. Venue Home is still reachable.",
-   "emptyFirstRun": "**Nothing configured in stock & supply yet.** The action is the first thing to set up, not a blank list.",
-   "emptyNoResults": "Nothing matches the filter.",
-   "emptyNoAccess": "You do not have permission for stock & supply. **Said plainly** — an empty section reads as broken."
-  },
-  "apis": [
-   {
-    "operationId": "getVenueSettings",
-    "contract": "tenancy",
-    "purpose": "What is enabled here",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listInventoryItems",
-    "contract": "inventory",
-    "purpose": "Stock on hand",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listPurchaseOrders",
-    "contract": "inventory",
-    "purpose": "Orders placed with suppliers",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createInventoryItem",
-    "contract": "inventory",
-    "purpose": "Add an item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listInventoryItems"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "venueId",
-     "from": "session"
-    }
-   ],
-   "coldEntry": "**Resolves from the session, so a cold arrival is the ordinary case** — a manager bookmarks the back office and opens it every morning. A principal with more than one venue is asked which before the page renders, rather than shown the first one.",
-   "preloaded": [
-    "VenueSettings.id",
-    "VenueSettings.venueId",
-    "VenueSettings.supportHours",
-    "VenueSettings.quietHours",
-    "VenueSettings.segregatedAccess"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-105"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2998,7 +3706,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/purchase-orders/{purchaseOrderId}/acknowledge",
   "contract": "inventory",
   "summary": "Record the supplier acknowledgement",
-  "permission": "PRODUCT_CONFIGURE",
+  "permission": "PROCUREMENT_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -3010,7 +3718,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "PurchaseOrder"
  },
  "approveRequisition": {
   "method": "POST",
@@ -3036,7 +3744,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/purchase-orders/{purchaseOrderId}/cancel",
   "contract": "inventory",
   "summary": "Cancel a purchase order",
-  "permission": "ORDER_CANCEL",
+  "permission": "PROCUREMENT_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -3055,7 +3763,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/requisitions/{requisitionId}/cancel",
   "contract": "inventory",
   "summary": "Cancel a requisition",
-  "permission": "PRODUCT_CONFIGURE",
+  "permission": "PROCUREMENT_REQUEST",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -3067,7 +3775,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Requisition"
  },
  "cancelStockCount": {
   "method": "POST",
@@ -3086,14 +3794,14 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "StockCount"
  },
  "closePurchaseOrderShort": {
   "method": "POST",
   "path": "/purchase-orders/{purchaseOrderId}/close-short",
   "contract": "inventory",
   "summary": "Close an order accepting the balance will not arrive",
-  "permission": "LEDGER_APPROVE",
+  "permission": "PROCUREMENT_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -3105,7 +3813,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "PurchaseOrder"
  },
  "closeTransferShort": {
   "method": "POST",
@@ -3124,14 +3832,14 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "StockTransfer"
  },
  "compareQuotations": {
   "method": "GET",
   "path": "/requisitions/{requisitionId}/quotations",
   "contract": "inventory",
   "summary": "Compare quotations for a requisition",
-  "permission": "PRODUCT_VIEW",
+  "permission": "PROCUREMENT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -3144,7 +3852,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/goods-receipts",
   "contract": "inventory",
   "summary": "Receive goods against a purchase order",
-  "permission": "PRODUCT_CONFIGURE",
+  "permission": "PROCUREMENT_RECEIVE",
   "offlineCapable": true,
   "conflictPolicy": "append",
   "scopeLevel": "venue",
@@ -3182,7 +3890,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/purchase-orders",
   "contract": "inventory",
   "summary": "Raise a purchase order",
-  "permission": "ORDER_CREATE",
+  "permission": "PROCUREMENT_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -3201,7 +3909,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/requisitions",
   "contract": "inventory",
   "summary": "Raise a requisition",
-  "permission": "ORDER_CREATE",
+  "permission": "PROCUREMENT_REQUEST",
   "offlineCapable": true,
   "conflictPolicy": "append",
   "scopeLevel": "venue",
@@ -3277,10 +3985,10 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/suppliers",
   "contract": "inventory",
   "summary": "Create a supplier",
-  "permission": "PRODUCT_CONFIGURE",
+  "permission": "PROCUREMENT_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -3293,7 +4001,7 @@ Method, path, parameters, request and response for every operation these screens
  },
  "enterCountLine": {
   "method": "POST",
-  "path": "/stock-counts/{countId}/lines",
+  "path": "/fnb-stock-counts/{countId}/lines",
   "contract": "fnb",
   "summary": "What was actually on the shelf",
   "permission": "PRODUCT_CONFIGURE",
@@ -3341,7 +4049,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/purchase-orders/{purchaseOrderId}",
   "contract": "inventory",
   "summary": "Read a purchase order with receipt progress",
-  "permission": "PRODUCT_VIEW",
+  "permission": "PROCUREMENT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -3399,7 +4107,7 @@ Method, path, parameters, request and response for every operation these screens
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": null
+  "responds": "StockTransfer"
  },
  "getStockValuation": {
   "method": "GET",
@@ -3430,7 +4138,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/requisitions/suggested",
   "contract": "inventory",
   "summary": "Draft requisitions from reorder points",
-  "permission": "PRODUCT_VIEW",
+  "permission": "PROCUREMENT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -3468,25 +4176,12 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": null
  },
- "getVenueSettings": {
-  "method": "GET",
-  "path": "/venues/{venueId}/settings",
-  "contract": "tenancy",
-  "summary": "Operational settings for this venue",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "VenueSettings"
- },
  "listGoodsReceipts": {
   "method": "GET",
   "path": "/goods-receipts",
   "contract": "inventory",
   "summary": "List goods receipts",
-  "permission": "PRODUCT_VIEW",
+  "permission": "PROCUREMENT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -3613,7 +4308,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/purchase-orders",
   "contract": "inventory",
   "summary": "List purchase orders",
-  "permission": "PRODUCT_VIEW",
+  "permission": "PROCUREMENT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -3647,7 +4342,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/requisitions",
   "contract": "inventory",
   "summary": "List requisitions",
-  "permission": "PRODUCT_VIEW",
+  "permission": "PROCUREMENT_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -3732,7 +4427,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "StockLocation"
+  "responds": "Page"
  },
  "listStockMovements": {
   "method": "GET",
@@ -3817,10 +4512,10 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/suppliers",
   "contract": "inventory",
   "summary": "List suppliers",
-  "permission": "PRODUCT_VIEW",
+  "permission": "PROCUREMENT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
+  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
@@ -3903,7 +4598,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/suppliers/{supplierId}/quotations",
   "contract": "inventory",
   "summary": "Record a supplier quotation",
-  "permission": "PRODUCT_CONFIGURE",
+  "permission": "PROCUREMENT_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -3934,14 +4629,14 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "StockCount"
  },
  "rejectReceivedGoods": {
   "method": "POST",
   "path": "/goods-receipts/{receiptId}/reject",
   "contract": "inventory",
   "summary": "Reject received goods",
-  "permission": "PRODUCT_CONFIGURE",
+  "permission": "PROCUREMENT_RECEIVE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -3960,7 +4655,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/requisitions/{requisitionId}/reject",
   "contract": "inventory",
   "summary": "Reject a requisition",
-  "permission": "LEDGER_APPROVE",
+  "permission": "APPROVAL_ACT",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -3972,11 +4667,11 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Requisition"
  },
  "requestRecount": {
   "method": "POST",
-  "path": "/stock-counts/{countId}/recount",
+  "path": "/fnb-stock-counts/{countId}/recount",
   "contract": "fnb",
   "summary": "Send a line back to be counted again",
   "permission": "PRODUCT_CONFIGURE",
@@ -3991,14 +4686,14 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "RecountResult"
  },
  "returnRequisition": {
   "method": "POST",
   "path": "/requisitions/{requisitionId}/return",
   "contract": "inventory",
   "summary": "Return a requisition for more information",
-  "permission": "LEDGER_APPROVE",
+  "permission": "APPROVAL_ACT",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -4010,14 +4705,14 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Requisition"
  },
  "sendPurchaseOrder": {
   "method": "POST",
   "path": "/purchase-orders/{purchaseOrderId}/send",
   "contract": "inventory",
   "summary": "Issue the order to the supplier",
-  "permission": "PRODUCT_CONFIGURE",
+  "permission": "PROCUREMENT_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -4029,7 +4724,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "PurchaseOrder"
  },
  "setItemAvailability": {
   "method": "PUT",
@@ -4069,6 +4764,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "StartStockCountRequest",
   "responds": "StockCount"
  },
+ "submitCountLines": {
+  "method": "POST",
+  "path": "/stock-counts/{countId}/lines",
+  "contract": "inventory",
+  "summary": "Submit counted quantities",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "updateInventoryItem": {
   "method": "PATCH",
   "path": "/inventory-items/{itemId}",
@@ -4093,7 +4807,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/requisitions/{requisitionId}/lines",
   "contract": "inventory",
   "summary": "Change what an outlet is asking for, before it is approved",
-  "permission": "PRODUCT_CONFIGURE",
+  "permission": "PROCUREMENT_REQUEST",
   "offlineCapable": true,
   "conflictPolicy": "lastWriterWins",
   "scopeLevel": "venue",
@@ -4105,14 +4819,14 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Requisition"
  },
  "updateSupplier": {
   "method": "PUT",
   "path": "/suppliers/{supplierId}",
   "contract": "inventory",
   "summary": "Change terms, or stop buying from them",
-  "permission": "PRODUCT_CONFIGURE",
+  "permission": "PROCUREMENT_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
@@ -4124,7 +4838,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Supplier"
  }
 }
 ```
@@ -4135,6 +4849,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AllergenCode": {
+  "type": "string",
+  "description": "**The fourteen declarable allergens, as one closed list.** Every allergen field in this contract uses it — the menu claim, the ticket line, a substitution's delta, a modifier option, the label on a bag — so a declared set and an actual set compare without anybody normalising case or synonyms. It was the `Allergen.contains` enum; the other fields were free text.\n",
+  "enum": [
+   "gluten",
+   "crustaceans",
+   "eggs",
+   "fish",
+   "peanuts",
+   "soybeans",
+   "milk",
+   "nuts",
+   "celery",
+   "mustard",
+   "sesame",
+   "sulphites",
+   "lupin",
+   "molluscs"
+  ]
+ },
  "CostingMethod": {
   "type": "string",
   "description": "Fixed at item creation. Immutable once movements exist.",
@@ -4166,14 +4900,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "countId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "totalVarianceValue": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "exceptionCount": {
     "type": "integer",
-    "description": "Lines beyond tolerance, requiring review before posting."
+    "description": "Lines beyond `VenueSettings.inventory.countVarianceTolerancePercent` (proposed default 2 per cent, audit R094), requiring review before posting."
    },
    "lines": {
     "type": "array",
@@ -4244,7 +4979,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "purchaseOrderId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "locationId": {
     "type": "string",
@@ -4392,7 +5128,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "requisitionId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "supplierId": {
     "type": "string",
@@ -4413,8 +5150,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "type": "object",
      "required": [
       "itemId",
-      "quantity",
-      "unitPrice"
+      "quantity"
      ],
      "properties": {
       "itemId": {
@@ -4429,7 +5165,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        "type": "string"
       },
       "unitPrice": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "description": "Omitted, the selected quotation line's price. **Editable with a reason** (decided 28 September, audit R171).\n"
+      },
+      "priceOverrideReason": {
+       "type": "string",
+       "maxLength": 500,
+       "nullable": true,
+       "description": "Required when `unitPrice` differs from the quotation line (audit R171)."
       }
      }
     }
@@ -4454,7 +5201,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "requisitionId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "reference": {
     "type": "string",
@@ -4594,7 +5342,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "quantity": {
     "type": "number",
-    "description": "Positive increases stock, negative decreases it."
+    "exclusiveMinimum": 0,
+    "description": "Always positive. **The `kind` decides whether it adds or removes stock**, not the sign (decided 28 September, audit R171).\n"
    },
    "unit": {
     "type": "string"
@@ -4602,7 +5351,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "reason": {
     "type": "string",
     "maxLength": 500,
-    "description": "Required for adjustments, which are reported separately."
+    "description": "**Required for `adjustmentIn`, `adjustmentOut` and `waste`** (decided 28 September, audit R171); adjustments are reported separately.\n"
    },
    "costCenterId": {
     "type": "string",
@@ -4685,13 +5434,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "receiptNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152), e.g. `MAR-GR-000431`. Not gapless; only tax invoices are gapless, per legal entity. A receipt recorded offline takes the next number from the range its device holds in reserve.\n"
    },
    "purchaseOrderId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "locationId": {
     "type": "string",
@@ -4706,6 +5459,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "items": {
      "type": "object",
      "properties": {
+      "lineId": {
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "readOnly": true,
+       "description": "One batch or expiry line of the receipt. What `rejectReceivedGoods` addresses (decided 28 September, audit R171).\n"
+      },
       "itemId": {
        "type": "string",
        "format": "uuid"
@@ -4738,6 +5497,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     }
    },
    "totalValue": {
+    "x-ticvai-column": "net_value_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "receivedByPrincipalId": {
@@ -4793,7 +5553,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "type": "number"
      },
      "available": {
-      "type": "number"
+      "type": "number",
+      "description": "On-hand minus allocated, where allocated is stock reserved for orders (decided 28 September, audit R171)."
      },
      "averageCost": {
       "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -4855,6 +5616,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true
    },
    "price": {
+    "x-ticvai-column": "list_price",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "sortOrder": {
@@ -4872,6 +5634,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid",
     "nullable": true
    },
+   "menuSectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The section the item sits in, set by `setMenuSections` and `applyMenuActions` (`moveSection`)."
+   },
    "isStockTracked": {
     "type": "boolean",
     "description": "True where a recipe exists. Stock-tracked items cannot be sold offline."
@@ -4883,6 +5652,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "nullable": true
    },
+   "restoreAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When an unavailable item comes back on its own (`setItemAvailability`). Null means by hand."
+   },
    "preparationMinutes": {
     "type": "integer",
     "nullable": true
@@ -4890,22 +5665,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "allergens": {
     "type": "array",
     "items": {
-     "type": "string"
+     "$ref": "#/components/schemas/AllergenCode"
     }
    }
   }
  },
  "MovementKind": {
   "type": "string",
+  "description": "**The kind decides the direction** (decided 28 September, audit R171). In: `receipt`, `transferIn`, `adjustmentIn`, `countGain`, `production` (the finished item entering stock; the ingredients leave as `issue`). Out: `issue`, `saleDepletion`, `waste`, `adjustmentOut`, `transferOut`, `countLoss`, `supplierReturn`. `adjustment` and `countAdjustment` were split into an in and an out kind so that no kind has two directions.\n",
   "enum": [
    "receipt",
    "issue",
    "saleDepletion",
    "waste",
-   "adjustment",
+   "adjustmentIn",
+   "adjustmentOut",
    "transferOut",
    "transferIn",
-   "countAdjustment",
+   "countGain",
+   "countLoss",
    "supplierReturn",
    "production"
   ]
@@ -4943,13 +5721,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "purchaseOrderNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "**Per venue, in sequence** (decided 28 September, audit R171). Assigned by the server from the venue's gap-free sequence, or the tenant's for an order with no venue. Proposed format `PO-<venue code>-<sequence, six digits>`, client to correct.\n"
    },
    "requisitionId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "Null on a blanket order or an RFQ award, which are raised without one."
+   },
+   "quotationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The quotation selected when the order was raised (`createPurchaseOrder` requires it). **The link that shows the comparison was made**, which `rfqId` alone does not."
    },
    "supplierId": {
     "type": "string",
@@ -4971,8 +5761,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "blanketParentId": {
     "type": "string",
-    "format": "uuid",
-    "nullable": true
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The blanket order this release draws against — another purchase order, so the same id type."
    },
    "contractPriceValidUntil": {
     "type": "string",
@@ -5038,6 +5829,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "unitPrice": {
        "$ref": "../shared/common.yaml#/components/schemas/Money"
       },
+      "quotedUnitPrice": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "nullable": true,
+       "description": "The selected quotation line's price, kept beside `unitPrice` (audit R171)."
+      },
+      "priceOverrideReason": {
+       "type": "string",
+       "nullable": true,
+       "description": "Why `unitPrice` differs from `quotedUnitPrice` (audit R171)."
+      },
       "lineTotal": {
        "$ref": "../shared/common.yaml#/components/schemas/Money"
       }
@@ -5045,12 +5850,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     }
    },
    "subtotal": {
+    "x-ticvai-column": "net_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "taxAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "total": {
+    "x-ticvai-column": "gross_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "expectedDelivery": {
@@ -5066,6 +5873,39 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "date-time"
    },
    "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "supplierReference": {
+    "type": "string",
+    "nullable": true,
+    "description": "The supplier's own order reference, from `acknowledgePurchaseOrder`."
+   },
+   "acknowledgedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**Null is the supplier performance figure** — goods arriving against an order never acknowledged."
+   },
+   "closeShortReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Why the balance was written off, from `closePurchaseOrderShort`."
+   },
+   "cancelReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "From `cancelPurchaseOrder`."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The pending approval request raised by `cancelPurchaseOrder` or `closePurchaseOrderShort` (kinds `purchaseOrderCancel`, `purchaseOrderShortClose`; audit R144). Null when none is open."
+   },
+   "cancelledAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true
@@ -5121,6 +5961,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "type": "string"
      },
      "total": {
+      "x-ticvai-column": "gross_amount",
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      },
      "isSelected": {
@@ -5132,7 +5973,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "scopePath": {
       "type": "string",
-      "description": "The partition key. A quotation is sought by somebody and the scope says who."
+      "description": "The partition key. A quotation is sought by somebody and the scope says who, the venue that recorded it, against a tenant supplier (audit R183)."
      }
     }
    }
@@ -5148,7 +5989,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "requisitionId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "quotations": {
     "type": "array",
@@ -5202,6 +6044,32 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "RecountResult": {
+  "type": "object",
+  "x-ticvai-persistence": "none — response shape",
+  "description": "The lines `requestRecount` reopened.",
+  "required": [
+   "countId",
+   "reopenedLineIds"
+  ],
+  "properties": {
+   "countId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "reopenedLineIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
  "Requisition": {
   "x-ticvai-persistence": "inventory.requisition + inventory.requisition_line",
   "type": "object",
@@ -5216,7 +6084,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "requisitionNumber": {
     "type": "string"
@@ -5228,6 +6097,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "departmentId": {
     "type": "string",
     "format": "uuid",
+    "nullable": true
+   },
+   "costCenterId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "justification": {
+    "type": "string",
     "nullable": true
    },
    "status": {
@@ -5251,6 +6129,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "requestedQuantity": {
        "type": "number"
       },
+      "suggestedQuantity": {
+       "type": "number",
+       "nullable": true,
+       "description": "**Kept, never overwritten** (`updateRequisitionLines`). Null on a line nobody suggested.\n"
+      },
       "approvedQuantity": {
        "type": "number",
        "nullable": true
@@ -5261,6 +6144,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       },
       "unit": {
        "type": "string"
+      },
+      "reason": {
+       "type": "string",
+       "nullable": true,
+       "description": "Why the requested quantity differs from the suggestion."
+      },
+      "note": {
+       "type": "string",
+       "nullable": true
       },
       "estimatedCost": {
        "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -5293,6 +6185,36 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "date-time"
    },
    "approvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "rejectionReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "From `rejectRequisition`. What the requester reads before copying it into a new draft."
+   },
+   "rejectedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "returnQuestion": {
+    "type": "string",
+    "nullable": true,
+    "description": "From `returnRequisition`. What the requester must answer before resubmitting."
+   },
+   "returnedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "cancelReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "From `cancelRequisition`."
+   },
+   "cancelledAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true
@@ -5348,7 +6270,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "isBlind": {
     "type": "boolean",
     "default": true,
-    "description": "Expected quantities withheld from the counting device. Defaults true because a counter who can see the figure reconciles to it rather than to the shelf.\n"
+    "description": "Expected quantities withheld from the counting device. Defaults true because a counter who can see the figure reconciles to it rather than to the shelf. **The expected quantity and the variance stay hidden until the count is submitted** (decided 28 September, audit R110).\n"
    }
   }
  },
@@ -5367,7 +6289,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "locationId": {
     "type": "string",
@@ -5423,6 +6346,23 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "recountReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Why the count was last sent back by `recountStockCount`."
+   },
+   "recountSignedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The supervisor whose step-up sent the count back last (audit R144)."
+   },
+   "cancelReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Why it was abandoned, from `cancelStockCount`."
    }
   }
  },
@@ -5485,6 +6425,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      },
      "totalCost": {
+      "x-ticvai-column": "net_cost_amount",
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      },
      "principalId": {
@@ -5525,7 +6466,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "transferNumber": {
     "type": "string"
@@ -5589,9 +6531,38 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "date-time",
     "nullable": true
    },
+   "closeShortReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Why the balance was written off, from `closeTransferShort`."
+   },
+   "closeShortSignedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The supervisor whose step-up closed the transfer short (audit R144)."
+   },
+   "fromVenueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The venue of `fromLocationId`. Set by the server (audit R183)."
+   },
+   "toVenueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The venue of `toLocationId`. Set by the server (audit R183)."
+   },
    "scopePath": {
     "type": "string",
-    "description": "**The partition key** (ADR-0005). `fromLocationId` and `toLocationId` give the endpoints; **this gives the owner.** A transfer between two venues belongs to the tenant above both, and without it the row is addressable from neither end."
+    "description": "**The partition key** (ADR-0005). `fromLocationId` and `toLocationId` give the endpoints; **this gives the owner**, the source venue's scope.\n\n**Both venues see a transfer between them** (decided 28 September, audit R183). It used to sit at the tenant above both, where neither venue could see it. The row is owned at the source venue and `toScopePath` admits the destination venue too."
+   },
+   "toScopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The destination venue's scope. Row-level security admits a caller whose scope matches `scopePath` or `toScopePath`, so both venues read the transfer (decided 28 September, audit R183).\n"
    }
   }
  },
@@ -5667,7 +6638,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "code": {
     "type": "string",
-    "maxLength": 64
+    "maxLength": 64,
+    "x-ticvai-unique": "tenant",
+    "description": "**Unique per tenant** (decided 28 September, audit R108).\n"
    },
    "name": {
     "type": "string",
@@ -5709,9 +6682,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "isActive": {
     "type": "boolean"
    },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "onHold",
+     "suspended",
+     "terminated"
+    ],
+    "description": "Set by `updateSupplier`. **A supplier on hold stops appearing in requisitions and purchase orders while its history stays intact.**"
+   },
+   "statusReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "minimumOrderValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
    "scopePath": {
     "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `region`, `tenant` scope.**"
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.** Suppliers are owned at tenant and venues quote against them (decided 28 September, audit R183)."
    }
   }
  },
@@ -5724,173 +6714,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "partiallyReceived",
    "cancelled"
   ]
- },
- "VenueSettings": {
-  "type": "object",
-  "x-ticvai-persistence": "platform.venue_settings",
-  "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n",
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "supportHours": {
-    "type": "object",
-    "description": "CF-100. **A venue decides whether its support desk is 24/7 or bounded, and the platform does not.** This was recorded as an open question for eleven days and was never one — the code is identical either way, and what was missing was somewhere to put the answer.\n",
-    "properties": {
-     "mode": {
-      "type": "string",
-      "enum": [
-       "alwaysOn",
-       "businessHours",
-       "custom",
-       "none"
-      ]
-     },
-     "timezone": {
-      "type": "string"
-     },
-     "windows": {
-      "type": "array",
-      "items": {
-       "type": "object",
-       "properties": {
-        "day": {
-         "type": "string",
-         "enum": [
-          "mon",
-          "tue",
-          "wed",
-          "thu",
-          "fri",
-          "sat",
-          "sun"
-         ]
-        },
-        "from": {
-         "type": "string"
-        },
-        "to": {
-         "type": "string"
-        }
-       }
-      }
-     },
-     "outOfHoursMessage": {
-      "type": "string",
-      "nullable": true
-     }
-    }
-   },
-   "quietHours": {
-    "type": "object",
-    "nullable": true,
-    "description": "**When the platform does not send.** A wallet low-balance alert at 3am is a complaint, and journeys and message triggers both respect this.\n**Operational messages ignore it** — a queue-turn alert is why a guest is holding the phone.\n",
-    "properties": {
-     "from": {
-      "type": "string"
-     },
-     "to": {
-      "type": "string"
-     }
-    }
-   },
-   "segregatedAccess": {
-    "type": "object",
-    "nullable": true,
-    "description": "CF-130. **Configured at venue level because it changes by region and the venue is where it is known** — a Ladies Night, a family session, a prayer-time closure.\n**The platform does not infer gender.** 3.2.45 asks for automatic gender recognition and 3.2.46 for rule-based facial recognition validation, and neither is built. Two reasons, and the second is the one that decided it:\n**A Ladies Night ticket is already gendered at the point of sale**, so the gate checks the entitlement the platform issued rather than the face in front of it — deterministic, auditable, and already contracted through `admissionRules`.\n**And these events are staffed.** A steward at the entrance is making the judgment anyway, and a classifier that overrules a person who can see more than it can is a machine and a human disagreeing while a guest waits.\n**`genderVerification` is a switch, not an implementation.** Where a venue's access hardware offers the capability and the venue chooses to use it, this turns it on — following ADR-0015's standards-first driver model, where the device does what the device does. **Not everything needs to be built.**\n",
-    "properties": {
-     "isEnabled": {
-      "type": "boolean",
-      "default": false
-     },
-     "appliesToAccessPointIds": {
-      "type": "array",
-      "items": {
-       "type": "string",
-       "format": "uuid"
-      }
-     },
-     "schedule": {
-      "type": "array",
-      "items": {
-       "type": "object",
-       "properties": {
-        "day": {
-         "type": "string"
-        },
-        "from": {
-         "type": "string"
-        },
-        "to": {
-         "type": "string"
-        },
-        "admits": {
-         "type": "string",
-         "enum": [
-          "all",
-          "women",
-          "womenAndChildren",
-          "families",
-          "members"
-         ]
-        }
-       }
-      }
-     },
-     "entitlementGated": {
-      "type": "boolean",
-      "default": true,
-      "readOnly": true,
-      "description": "**Always true, and stated rather than assumed.** The gate admits on the entitlement. Everything below is advisory on top of that, and nothing replaces it.\n"
-     },
-     "genderVerification": {
-      "type": "string",
-      "enum": [
-       false,
-       "staffAssisted",
-       "deviceAssisted"
-      ],
-      "default": false,
-      "description": "`off` — the entitlement decides and a steward handles exceptions. **The default, and what is contracted.**\n`staffAssisted` — the steward's screen shows the ticket type so they can ask. No inference anywhere.\n`deviceAssisted` — **the venue's access hardware performs the check, not the platform.** Available only where the driver reports the capability, and the result is **advisory to the steward rather than decisive at the turnstile** (3.2.45 asks for rejection; this deviates deliberately).\n"
-     },
-     "overrideRateAlertThreshold": {
-      "type": "number",
-      "nullable": true,
-      "description": "Where `deviceAssisted` is on. **An override rate near zero means the steward has stopped deciding**, and that is the number that says whether the human safeguard is working or decorative.\n"
-     }
-    }
-   },
-   "alerting": {
-    "type": "object",
-    "description": "CF-134. **On-platform notification, marked as read.** Six contracts detect their own trouble and none told a person.\n**The panel is the default and email or WhatsApp only where the matrix names them** — an operational alert that arrives by email is an alert nobody sees in time.\n",
-    "properties": {
-     "channel": {
-      "type": "string",
-      "enum": [
-       "dashboardPanel",
-       "dashboardAndEmail",
-       "dashboardAndWhatsapp"
-      ],
-      "default": "dashboardPanel"
-     },
-     "acknowledgementRequired": {
-      "type": "boolean",
-      "default": true
-     },
-     "escalateAfterMinutes": {
-      "type": "integer",
-      "nullable": true
-     }
-    }
-   }
-  }
  }
 }
 ```

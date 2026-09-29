@@ -1,6 +1,6 @@
 # WS91 — Rental Management board 4
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 10 operations · 8 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `PRODUCT_VIEW, RENTAL_OVERRIDE, RENTAL_PRICE, RENTAL_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-524` | Rental Pricing Command Center | commandCentre | 0 | 0 | — |
-| `BO-525` | Pricing Profile Builder | configEditor | 0 | 0 | — |
-| `BO-526` | Duration & Tiered Pricing Configuration | configEditor | 0 | 0 | — |
-| `BO-527` | Calendar, Peak & Seasonal Pricing | listDetail | 0 | 0 | — |
-| `BO-528` | Dynamic Pricing & AI Recommendation | listDetail | 0 | 0 | — |
-| `BO-529` | Deposit & Security Hold Policy | listDetail | 0 | 0 | — |
-| `BO-530` | Deposit Lifecycle & Settlement Rules | configEditor | 0 | 0 | — |
-| `BO-531` | Late Fee, Grace Period & Extension Pricing | configEditor | 0 | 0 | — |
-| `BO-532` | Commercial Exceptions, Waivers & Overrides | listDetail | 0 | 0 | — |
-| `BO-533` | Pricing Simulation, Validation & AI Commercial Intelligence | listDetail | 0 | 0 | — |
+| `BO-524` | Rental Pricing Command Center | commandCentre | 2 | 0 | — |
+| `BO-525` | Pricing Profile Builder | configEditor | 2 | 0 | — |
+| `BO-526` | Duration & Tiered Pricing Configuration | configEditor | 1 | 0 | — |
+| `BO-527` | Calendar, Peak & Seasonal Pricing | listDetail | 1 | 0 | — |
+| `BO-528` | Dynamic Pricing & AI Recommendation | listDetail | 1 | 0 | — |
+| `BO-529` | Deposit & Security Hold Policy | listDetail | 1 | 0 | — |
+| `BO-530` | Deposit Lifecycle & Settlement Rules | configEditor | 1 | 0 | — |
+| `BO-531` | Late Fee, Grace Period & Extension Pricing | configEditor | 1 | 0 | — |
+| `BO-532` | Commercial Exceptions, Waivers & Overrides | listDetail | 1 | 0 | — |
+| `BO-533` | Pricing Simulation, Validation & AI Commercial Intelligence | listDetail | 3 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -176,13 +175,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Central management screen for all rental pricing and commercial policies.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: + Create Pricing Profile. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Rental_Management.pdf, page 38 §Actions"
-   }
-  ],
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -279,7 +271,25 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the rental pricing are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listRentalPricingProfiles",
+    "contract": "rental",
+    "purpose": "Profiles, and products without one",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createRentalPricingProfile",
+    "contract": "rental",
+    "purpose": "Create a new rental pricing profile",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) + Create Pricing Profile",
+    "invalidates": [
+     "listRentalPricingProfiles"
+    ]
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Active Pricing Profiles",
@@ -292,9 +302,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-524"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-524",
+   "workshopBoard": "wireframes/WS119 Rental Management Board 4.dc.html#bo-524"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 38. 0 of 8 labels bound to a contract property; 17 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 38. 0 of 8 labels bound to a contract property; 17 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** + Create Pricing Profile: `createRentalPricingProfile`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -421,12 +432,42 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createRentalPricingProfile",
+    "contract": "rental",
+    "purpose": "Build a profile",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listRentalPricingProfiles"
+    ]
+   },
+   {
+    "operationId": "updateRentalPricingProfile",
+    "contract": "rental",
+    "purpose": "Change it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listRentalPricingProfiles"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-525"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-525",
+   "workshopBoard": "wireframes/WS119 Rental Management Board 4.dc.html#bo-525"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 39. 0 of 0 labels bound to a contract property; 8 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "profileId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -541,12 +582,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "updateRentalPricingProfile",
+    "contract": "rental",
+    "purpose": "Duration and tiered rates",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listRentalPricingProfiles"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-526"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-526",
+   "workshopBoard": "wireframes/WS119 Rental Management Board 4.dc.html#bo-526"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 40. 0 of 0 labels bound to a contract property; 7 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "profileId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -622,7 +683,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateRentalPricingProfile",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateRentalPricingProfile"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The calendar peak seasonal list.",
@@ -631,12 +712,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the calendar peak seasonal are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "updateRentalPricingProfile",
+    "contract": "rental",
+    "purpose": "Peak, weekend and seasonal rules",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listRentalPricingProfiles"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-527"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-527",
+   "workshopBoard": "wireframes/WS119 Rental Management Board 4.dc.html#bo-527"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 41. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "profileId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -701,11 +802,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Accept | Modify | Reject | Schedule. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Rental_Management.pdf, page 42 §Actions"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack Rental_Management.pdf, page 42"
    },
@@ -728,6 +824,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Rental_Management.pdf, page 42 §Actions"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listDynamicPricingStrategy",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
     }
    ]
   },
@@ -738,12 +845,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the dynamic pricing recommendation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listDynamicPricingStrategy",
+    "contract": "catalogue",
+    "purpose": "Dynamic pricing",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-528"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-528",
+   "workshopBoard": "wireframes/WS119 Rental Management Board 4.dc.html#bo-528"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 42. 0 of 0 labels bound to a contract property; 1 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 42. 0 of 0 labels bound to a contract property; 1 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Accept | Modify | Reject | Schedule dropped (AI design pending review (accept/modify/reject/schedule acts on AI pricing recommendations; would bind ai decideProposedAction)).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -808,11 +924,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Credit Card Pre-Authorization, Card Charge, Wallet. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Rental_Management.pdf, page 43 §Enable"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack Rental_Management.pdf, page 43"
    },
@@ -845,6 +956,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Rental_Management.pdf, page 43 §Enable"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -855,12 +970,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the deposit security hold are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setRentalDepositPolicy",
+    "contract": "rental",
+    "purpose": "Deposit basis, limits and instruments",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listRentalPricingProfiles"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-529"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-529",
+   "workshopBoard": "wireframes/WS119 Rental Management Board 4.dc.html#bo-529"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 43. 0 of 0 labels bound to a contract property; 3 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 43. 0 of 0 labels bound to a contract property; 3 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Credit Card Pre-Authorization, Card Charge, Wallet are choices sent by `setRentalDepositPolicy` (instruments cardPreAuthorisation|cardCharge|wallet).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -975,10 +1102,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setRentalDepositPolicy",
+    "contract": "rental",
+    "purpose": "Release, capture and approval thresholds",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listRentalPricingProfiles"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-530"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-530",
+   "workshopBoard": "wireframes/WS119 Rental Management Board 4.dc.html#bo-530"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 44. 0 of 0 labels bound to a contract property; 7 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1095,10 +1234,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setRentalFeePolicy",
+    "contract": "rental",
+    "purpose": "Grace, late fee and extension pricing",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listRentalPricingProfiles"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-531"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-531",
+   "workshopBoard": "wireframes/WS119 Rental Management Board 4.dc.html#bo-531"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 44. 0 of 0 labels bound to a contract property; 7 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1176,7 +1327,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "requestRentalCommercialOverride",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "requestRentalCommercialOverride"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The commercial exceptions waivers list.",
@@ -1185,10 +1355,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the commercial exceptions waivers are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "requestRentalCommercialOverride",
+    "contract": "rental",
+    "purpose": "Waive or adjust, with approval",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-532"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-532",
+   "workshopBoard": "wireframes/WS119 Rental Management Board 4.dc.html#bo-532"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 45. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1266,7 +1445,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listCommercialPricing",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "simulateRentalPricing",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "simulateRentalPricing"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The pricing simulation validation list.",
@@ -1275,10 +1479,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the pricing simulation validation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listCommercialPricing",
+    "contract": "catalogue",
+    "purpose": "Commercial Pricing Command Center",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "simulateRentalPricing",
+    "contract": "rental",
+    "purpose": "Test the configuration",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "explainRentalPrice",
+    "contract": "rental",
+    "purpose": "Why the price is what it is",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-533"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-533",
+   "workshopBoard": "wireframes/WS119 Rental Management Board 4.dc.html#bo-533"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 46. 0 of 0 labels bound to a contract property; 0 of 51 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1312,7 +1538,288 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
-{}
+{
+ "createRentalPricingProfile": {
+  "method": "POST",
+  "path": "/rental-pricing-profiles",
+  "contract": "rental",
+  "summary": "Define how a rental is priced",
+  "permission": "RENTAL_PRICE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalPricingProfile",
+  "responds": "RentalPricingProfile"
+ },
+ "explainRentalPrice": {
+  "method": "POST",
+  "path": "/rental-price/explain",
+  "contract": "rental",
+  "summary": "Why the price is what it is, rule by rule",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalQuoteRequest",
+  "responds": "RentalPriceExplanation"
+ },
+ "listCommercialPricing": {
+  "method": "GET",
+  "path": "/commercial-pricing",
+  "contract": "catalogue",
+  "summary": "Commercial Pricing Command Center",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priceListType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "market",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "currency",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "owner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listDynamicPricingStrategy": {
+  "method": "GET",
+  "path": "/dynamic-pricing-strategy",
+  "contract": "catalogue",
+  "summary": "Dynamic Pricing Strategy Command Center",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "strategyType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "automationMode",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listRentalPricingProfiles": {
+  "method": "GET",
+  "path": "/rental-pricing-profiles",
+  "contract": "rental",
+  "summary": "Pricing profiles, and the products with none",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "unpricedOnly",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RentalPricingProfile"
+ },
+ "requestRentalCommercialOverride": {
+  "method": "POST",
+  "path": "/rental-overrides",
+  "contract": "rental",
+  "summary": "Deviate from policy, with a reason and an approver",
+  "permission": "RENTAL_OVERRIDE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalOverride",
+  "responds": "RentalOverride"
+ },
+ "setRentalDepositPolicy": {
+  "method": "PUT",
+  "path": "/rental-deposit-policies",
+  "contract": "rental",
+  "summary": "How much is held, how, and what happens to it",
+  "permission": "RENTAL_PRICE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalDepositPolicy",
+  "responds": "RentalDepositPolicy"
+ },
+ "setRentalFeePolicy": {
+  "method": "PUT",
+  "path": "/rental-fee-policies",
+  "contract": "rental",
+  "summary": "Grace period, late fees and extension pricing",
+  "permission": "RENTAL_PRICE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalFeePolicy",
+  "responds": "RentalFeePolicy"
+ },
+ "simulateRentalPricing": {
+  "method": "POST",
+  "path": "/rental-price/simulate",
+  "contract": "rental",
+  "summary": "Test a commercial configuration before publishing it",
+  "permission": "RENTAL_PRICE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalQuoteRequest",
+  "responds": null
+ },
+ "updateRentalPricingProfile": {
+  "method": "PUT",
+  "path": "/rental-pricing-profiles/{profileId}",
+  "contract": "rental",
+  "summary": "Change a pricing profile",
+  "permission": "RENTAL_PRICE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalPricingProfile",
+  "responds": "RentalPricingProfile"
+ }
+}
 ```
 
 ## `schemas.json`
@@ -1320,5 +1827,628 @@ Method, path, parameters, request and response for every operation these screens
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
-{}
+{
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "RentalDepositPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "rental.deposit_policy",
+  "description": "Boards 4.6 and 4.7. **Held, not taken**, and settled against an inspection.",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "required": {
+    "type": "boolean",
+    "default": true
+   },
+   "basis": {
+    "type": "string",
+    "enum": [
+     "fixed",
+     "percentage",
+     "riskBased"
+    ]
+   },
+   "fixedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "percentage": {
+    "type": "number",
+    "nullable": true
+   },
+   "minimumAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "maximumAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "instruments": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "cardPreAuthorisation",
+      "cardCharge",
+      "cash",
+      "wallet"
+     ]
+    }
+   },
+   "autoRelease": {
+    "type": "boolean",
+    "default": true
+   },
+   "inspectionRequiredBeforeRelease": {
+    "type": "boolean",
+    "default": false
+   },
+   "autoReleaseDelayHours": {
+    "type": "integer",
+    "default": 0
+   },
+   "partialCapturePermitted": {
+    "type": "boolean",
+    "default": true
+   },
+   "supervisorApprovalThreshold": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "waiverEligible": {
+    "type": "boolean",
+    "default": false
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "RentalFeePolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "rental.fee_policy",
+  "description": "Board 4.8. **Extension is priced below late return on purpose** — *\"this encourages customers to extend properly rather than returning late.\"*\n",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "gracePeriodMinutes": {
+    "type": "integer",
+    "default": 0
+   },
+   "lateFeeBasis": {
+    "type": "string",
+    "enum": [
+     "fixed",
+     "perMinute",
+     "per15Minutes",
+     "per30Minutes",
+     "perHour",
+     "tiered"
+    ]
+   },
+   "lateFeeAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "lateFeeTiers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "afterMinutes": {
+       "type": "integer"
+      },
+      "amount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "maximumDailyCharge": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "extensionPricePerIncrement": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "extensionIncrementMinutes": {
+    "type": "integer",
+    "default": 30
+   },
+   "notReturnedAfterHours": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**When a late rental becomes a lost one.** The deposit is captured in full and the asset retired; without a threshold the fee accrues forever and nobody decides.\n"
+   },
+   "damageFeeMaximum": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "**A ceiling, not a rate.** Added 22 September: `rental.settlement.damage_fee` was stored with nothing bounding it. **A dent is assessed, not tabulated** — the amount is entered per incident against the actual damage, so the control is how high an operator may go, the same shape `maximumDailyCharge` already gives the late fee.\n"
+   },
+   "damageFeeApprovalAbove": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "**Above this, a second person signs it off.** A damage fee is the one charge on a settlement that a single operator decides alone, and the one a guest is most likely to dispute. The shape is `orders.RefundPolicy.requiresApprovalAbove`, applied to the other direction of money.\n"
+   },
+   "missingItemFeeBasis": {
+    "type": "string",
+    "enum": [
+     "replacementCost",
+     "fixedAmount"
+    ],
+    "description": "**What an unreturned item costs.** `replacementCost` reads the item's own replacement value, which is what the fee usually is; `fixedAmount` uses `missingItemFeeAmount`. Added 22 September — `rental.settlement.missing_item_fee` was stored with no source.\n"
+   },
+   "missingItemFeeAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Used when `missingItemFeeBasis` is `fixedAmount`."
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "RentalOverride": {
+  "type": "object",
+  "x-ticvai-persistence": "rental.override",
+  "description": "Board 4.9. **The original amount is recorded as well as the adjusted one.**",
+  "required": [
+   "kind",
+   "reason"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "bookingId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "priceOverride",
+     "complimentary",
+     "depositWaiver",
+     "depositReduction",
+     "lateFeeWaiver",
+     "damageFeeWaiver",
+     "extensionFeeWaiver",
+     "manualRefund",
+     "goodwill"
+    ]
+   },
+   "originalAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "adjustedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "reason": {
+    "type": "string"
+   },
+   "requestedBy": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "approvedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "RentalPriceExplanation": {
+  "type": "object",
+  "description": "Board 4.10 — *\"show why the price was calculated.\"* **The ordered trace, including the rules that did not apply**, because *\"why is it not the peak price\"* is asked as often as *\"why is it\"*.\n",
+  "properties": {
+   "quote": {
+    "$ref": "#/components/schemas/RentalQuote"
+   },
+   "steps": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "order": {
+       "type": "integer"
+      },
+      "stage": {
+       "type": "string",
+       "enum": [
+        "basePrice",
+        "locationRule",
+        "calendarRule",
+        "dynamicPricing",
+        "channelEligibility",
+        "promotion",
+        "manualOverride",
+        "tax"
+       ]
+      },
+      "ruleId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "ruleName": {
+       "type": "string",
+       "nullable": true
+      },
+      "applied": {
+       "type": "boolean"
+      },
+      "skippedBecause": {
+       "type": "string",
+       "nullable": true
+      },
+      "amountBefore": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "amountAfter": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   }
+  }
+ },
+ "RentalPricingProfile": {
+  "type": "object",
+  "x-ticvai-persistence": "rental.pricing_profile",
+  "description": "Board 4.2. **Several will apply at once**, and the precedence is configurable and auditable (board 4.10).\n",
+  "required": [
+   "code",
+   "name",
+   "model"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "locationIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018). Region-scoped and not overridable below it, so a row in a UAE region is AED and cannot be anything else. Kept on the wire, removed from the table.\n"
+   },
+   "salesChannel": {
+    "type": "string",
+    "nullable": true
+   },
+   "customerSegmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "model": {
+    "type": "string",
+    "enum": [
+     "flat",
+     "durationBased",
+     "tiered",
+     "peakOffPeak",
+     "weekend",
+     "seasonal",
+     "dynamic",
+     "hybrid"
+    ]
+   },
+   "basePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "durationTiers": {
+    "type": "array",
+    "description": "Board 4.3. *30 min AED 40, 60 min AED 60, 90 min AED 80, 120 min AED 95.*",
+    "items": {
+     "type": "object",
+     "properties": {
+      "minutes": {
+       "type": "integer"
+      },
+      "price": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "minimumCharge": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "billingIncrementMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "additionalIncrementPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "rounding": {
+    "type": "string",
+    "enum": [
+     "exactUsage",
+     "roundUp15",
+     "roundUp30",
+     "roundUpHour"
+    ],
+    "default": "exactUsage"
+   },
+   "calendarRules": {
+    "type": "array",
+    "description": "Board 4.4. *Peak 16:00–20:00 AED 90/hr; off-peak 09:00–12:00 AED 50/hr; peak season 1 Nov – 31 Mar.*\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "peak",
+        "offPeak",
+        "weekend",
+        "seasonal",
+        "special"
+       ]
+      },
+      "from": {
+       "type": "string",
+       "nullable": true
+      },
+      "to": {
+       "type": "string",
+       "nullable": true
+      },
+      "dateFrom": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      },
+      "dateTo": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      },
+      "adjustmentPercent": {
+       "type": "number",
+       "nullable": true
+      },
+      "price": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "dynamicEnabled": {
+    "type": "boolean",
+    "default": false
+   },
+   "dynamicMaxIncreasePercent": {
+    "type": "number",
+    "default": 25
+   },
+   "dynamicMaxDecreasePercent": {
+    "type": "number",
+    "default": 15
+   },
+   "priority": {
+    "type": "integer",
+    "default": 0
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "pendingApproval",
+     "active",
+     "scheduled",
+     "expired"
+    ]
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "RentalQuote": {
+  "type": "object",
+  "x-ticvai-persistence": "rental.quote",
+  "description": "Board 4.10. **Rental amount and deposit are returned apart, because the deposit is not revenue.**\n**A quote `quoteRentalPrice` issues is stored until `expiresAt`**, with what was asked, so the figures it gave can be held to and checked later. `explainRentalPrice` and `simulateRentalPricing` return the same shape and store nothing (decided 29 September, data model DM4).\n",
+  "required": [
+   "quoteId",
+   "productId",
+   "from",
+   "to",
+   "rentalAmount",
+   "depositAmount"
+  ],
+  "properties": {
+   "quoteId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The request's product; with `locationId`, `from`, `to` and `quantity`, what was quoted."
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "from": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "to": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "quantity": {
+    "type": "integer",
+    "default": 1
+   },
+   "customerId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "rentalAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "addOnAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "discountAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "totalPayable": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "depositAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "depositInstrument": {
+    "type": "string",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005), written at `venue` scope."
+   }
+  }
+ },
+ "RentalQuoteRequest": {
+  "type": "object",
+  "required": [
+   "productId",
+   "from",
+   "to"
+  ],
+  "properties": {
+   "productId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "from": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "to": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "quantity": {
+    "type": "integer",
+    "default": 1
+   },
+   "salesChannel": {
+    "type": "string",
+    "nullable": true
+   },
+   "customerId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "promotionCode": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ }
+}
 ```

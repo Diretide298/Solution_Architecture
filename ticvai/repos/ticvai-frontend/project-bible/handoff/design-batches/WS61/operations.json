@@ -1,4 +1,36 @@
 {
+ "deliverCredential": {
+  "method": "POST",
+  "path": "/credentials/{credentialId}/deliveries",
+  "contract": "access",
+  "summary": "Send a credential over a channel",
+  "permission": "ORDER_REPRINT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CredentialDeliveryInput",
+  "responds": "CredentialDeliveryDistributionOperationsView"
+ },
+ "getCredentialIssuanceRetryPolicy": {
+  "method": "GET",
+  "path": "/credential-issuance-retry-policy",
+  "contract": "access",
+  "summary": "Read the credential issuance retry policy",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CredentialIssuanceRetryPolicyView"
+ },
  "listCredential": {
   "method": "GET",
   "path": "/credential",
@@ -43,10 +75,40 @@
     "name": "customer",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "provider",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "exception",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "CredentialOperationsCommandCenterView"
+  "responds": "Page"
  },
  "listCredentialDeliveryDistribution": {
   "method": "GET",
@@ -57,9 +119,30 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CredentialDeliveryDistributionOperationsView"
+  "responds": "Page"
  },
  "listCredentialGenerationIssuance": {
   "method": "GET",
@@ -70,9 +153,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "trigger",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CredentialGenerationIssuanceMonitorView"
+  "responds": "Page"
  },
  "listCredentialReplacementReissue": {
   "method": "GET",
@@ -92,26 +206,73 @@
   "path": "/credential-security-operational",
   "contract": "access",
   "summary": "Credential Security, Audit & Operational Evidence",
-  "permission": "SCOPE_VIEW",
+  "permission": "AUDIT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "virtualTicket",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "action",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "actor",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CredentialSecurityAuditOperationalEvidenceView"
+  "responds": "Page"
  },
  "listCredentialUsageCross": {
   "method": "GET",
   "path": "/credential-usage-cross",
   "contract": "access",
   "summary": "Credential Usage & Cross-Media Traceability",
-  "permission": "SCOPE_VIEW",
+  "permission": "TICKET_LOOKUP",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "virtualTicket",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "media",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CredentialUsageCrossMediaTraceabilityView"
+  "responds": "Page"
  },
  "listFailedGenerationDelivery": {
   "method": "GET",
@@ -122,16 +283,37 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "severity",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "failureType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "FailedGenerationDeliveryCredentialExceptionManagemenView"
+  "responds": "Page"
  },
  "listTicketMedia": {
   "method": "GET",
   "path": "/ticket-media",
   "contract": "access",
   "summary": "Ticket Media Analytics & AI Operations Intelligence",
-  "permission": "SCOPE_VIEW",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -175,10 +357,96 @@
     "name": "device",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "customerSegment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "timePeriod",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
   "responds": "TicketMediaAnalyticsAiOperationsIntelligenceView"
+ },
+ "replaceCredential": {
+  "method": "POST",
+  "path": "/credentials/{credentialId}/replace",
+  "contract": "access",
+  "summary": "Replace a credential's media",
+  "permission": "ORDER_EXCHANGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CredentialReplacementInput",
+  "responds": "CredentialOperationsCommandCenterView"
+ },
+ "resolveCredentialException": {
+  "method": "POST",
+  "path": "/credential-exceptions/{exceptionId}/resolve",
+  "contract": "access",
+  "summary": "Act on a credential exception",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CredentialExceptionActionInput",
+  "responds": "FailedGenerationDeliveryCredentialExceptionManagemenView"
+ },
+ "retryCredentialGeneration": {
+  "method": "POST",
+  "path": "/credential-generation-issuance/retry",
+  "contract": "access",
+  "summary": "Retry failed credential generation",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CredentialGenerationRetryInput",
+  "responds": "CredentialGenerationRetryResult"
+ },
+ "setCredentialIssuanceRetryPolicy": {
+  "method": "PUT",
+  "path": "/credential-issuance-retry-policy",
+  "contract": "access",
+  "summary": "Set the credential issuance retry policy",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CredentialIssuanceRetryPolicyInput",
+  "responds": "CredentialIssuanceRetryPolicyView"
  },
  "setMediaBindingActivation": {
   "method": "PUT",
@@ -189,7 +457,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "MediaBindingActivationAssignmentOperationsInput",
   "responds": "MediaBindingActivationAssignmentOperationsView"
  },
@@ -202,7 +476,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "VirtualTicketCredential360WorkspaceInput",
   "responds": "VirtualTicketCredential360WorkspaceView"
  }

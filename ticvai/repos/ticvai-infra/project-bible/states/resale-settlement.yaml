@@ -1,0 +1,70 @@
+# Resale settlement — state model
+# Contract: orders.ResaleSettlement.status
+# Checked by tools/check-states.py. Added 29 September (DM5: data model for the agreed operations).
+
+entity: Resale settlement
+contract: orders
+enum: ResaleSettlement.status
+enumKind: inline
+enumSchema: ResaleSettlement
+enumProperty: status
+owner: orders
+initial:
+- pending
+terminal:
+- paid
+- reversed
+transitions:
+- from: pending
+  to: scheduled
+  trigger: job
+  guard: '**The venue''s `settlementTiming` is met** — by default the buyer has been admitted
+    (`afterAccessValidation`), not merely paid; `expectedPayoutDate` is set'
+- from: pending
+  to: onHold
+  trigger: job
+  guard: A compliance check, a refund or a dispute on the resale order (`holdReason`)
+- from: scheduled
+  to: onHold
+  trigger: job
+  guard: A refund or dispute arrived before the payout ran
+- from: onHold
+  to: scheduled
+  trigger: job
+  guard: The refund or dispute behind a `refundDisputeHold` ended in the seller's favour
+- from: pending
+  to: onHold
+  operation: holdResaleSettlement
+  trigger: operation
+  guard: A person holds the payout with a reason; `holdReason` becomes `manualHold`
+- from: scheduled
+  to: onHold
+  operation: holdResaleSettlement
+  trigger: operation
+  guard: A person holds the payout with a reason before the payout run; `holdReason` becomes `manualHold`
+- from: onHold
+  to: scheduled
+  operation: releaseResaleSettlementHold
+  trigger: operation
+  guard: '**Only a `manualHold` or `complianceHold`**; a `refundDisputeHold` is released by the refund
+    or dispute outcome, never by a person. `expectedPayoutDate` is recomputed'
+- from: onHold
+  to: reversed
+  trigger: job
+  guard: The resale was refunded or the dispute lost; the seller is owed nothing and was never paid
+- from: scheduled
+  to: paid
+  trigger: job
+  guard: The payout run paid the seller
+- from: scheduled
+  to: failed
+  trigger: externalEvent
+  guard: The payout was refused (account details, provider error)
+- from: failed
+  to: scheduled
+  trigger: job
+  guard: Retried after the seller corrected their payout details
+notes: '**The seller is paid after the buyer is admitted, not after they pay** (`ResaleListing.payoutStatus`),
+  so a refund or dispute always lands on a settlement that has not been paid; nothing leaves `paid`.
+  A person holds a payout with `holdResaleSettlement` and releases a manual or compliance hold with
+  `releaseResaleSettlementHold` (decided 29 September, writers pass; closes the DM5 open item).'

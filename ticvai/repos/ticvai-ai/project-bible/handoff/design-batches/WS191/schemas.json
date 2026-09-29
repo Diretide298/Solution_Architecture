@@ -1,0 +1,350 @@
+{
+ "CreditAllocation": {
+  "type": "object",
+  "description": "Board 3.10. **Which lots this purchase would draw on**, in order.",
+  "properties": {
+   "requested": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "covered": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "shortfall": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "lotId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "creditTypeId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "creditTypeName": {
+       "type": "string"
+      },
+      "amount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "expiresAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "reason": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "rejected": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "creditTypeId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "notEligibleHere",
+        "notEligibleForProduct",
+        "expired",
+        "basketCapReached",
+        "restricted"
+       ]
+      }
+     }
+    }
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PaymentTerminal": {
+  "type": "object",
+  "x-ticvai-persistence": "payments.terminal",
+  "description": "Board 3. **The payment layer on a `tenancy` device**, not a second device register.",
+  "required": [
+   "deviceId"
+  ],
+  "properties": {
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The `tenancy.RegisteredDevice`. **Enrolment, credentials, firmware and tamper state live there.**"
+   },
+   "merchantAccountId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "acquirerConnectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "terminalIdentifier": {
+    "type": "string",
+    "nullable": true
+   },
+   "emvConfigurationVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "contactlessLimit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "pinBypassAllowed": {
+    "type": "boolean",
+    "default": false
+   },
+   "storeAndForward": {
+    "type": "object",
+    "description": "**A risk decision, not a technical one.**",
+    "properties": {
+     "enabled": {
+      "type": "boolean",
+      "default": false
+     },
+     "floorLimit": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "maximumHeldTotal": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "maximumAgeMinutes": {
+      "type": "integer",
+      "nullable": true
+     }
+    }
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "unconfigured",
+     "active",
+     "offline",
+     "suspended"
+    ]
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletAuthenticationPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.authentication_policy",
+  "description": "Board 6, p.68. **Risk-tiered proof of identity for a wallet spend.** The highest matching tier wins; with no policy, `WalletChannelRules.requiresPin` applies.",
+  "required": [
+   "tiers"
+  ],
+  "properties": {
+   "tiers": {
+    "type": "array",
+    "maxItems": 20,
+    "items": {
+     "type": "object",
+     "required": [
+      "aboveAmount",
+      "methods"
+     ],
+     "properties": {
+      "aboveAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "channels": {
+       "type": "array",
+       "description": "Empty means every channel in `WalletChannelRules.allowedChannels`.",
+       "items": {
+        "type": "string"
+       }
+      },
+      "transactionKinds": {
+       "type": "array",
+       "description": "Empty means every kind.",
+       "items": {
+        "$ref": "#/components/schemas/WalletTransactionKind"
+       }
+      },
+      "methods": {
+       "type": "array",
+       "minItems": 1,
+       "uniqueItems": true,
+       "description": "Any one of these satisfies the tier.",
+       "items": {
+        "type": "string",
+        "enum": [
+         "walletPin",
+         "deviceAuthentication",
+         "digitalKey",
+         "customerLogin",
+         "membershipCredential"
+        ]
+       }
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletChannelRules": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.channel_rules",
+  "description": "Board 6. **The offline rule is stated once, not per device.**",
+  "properties": {
+   "allowedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "allowedCredentialKinds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "card",
+      "wristband",
+      "nfc",
+      "rfid",
+      "qr",
+      "mobileApp",
+      "digitalKey"
+     ]
+    }
+   },
+   "requiresPin": {
+    "type": "boolean",
+    "default": false
+   },
+   "pinAboveAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "offlineAllowed": {
+    "type": "boolean",
+    "default": false
+   },
+   "offlineFloorLimit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "offlineMaximumAgeMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**How stale a cached balance may be before the device refuses.** Without a ceiling an offline terminal spends a balance that ran out yesterday.\n"
+   },
+   "acceptancePointIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletCredential": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.credential",
+  "description": "Boards 6.4 and 6.5. **A credential is not the wallet** — a lost wristband is relinked, not refunded.\n",
+  "required": [
+   "walletId",
+   "kind",
+   "identifier"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "walletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "card",
+     "wristband",
+     "nfc",
+     "rfid",
+     "qr",
+     "mobileApp",
+     "digitalKey"
+    ]
+   },
+   "identifier": {
+    "type": "string"
+   },
+   "linkedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "unlinkedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "lost",
+     "replaced",
+     "blocked",
+     "expired"
+    ]
+   },
+   "replacedByCredentialId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletTransactionKind": {
+  "type": "string",
+  "enum": [
+   "topUp",
+   "spend",
+   "refund",
+   "adjustment",
+   "bonus",
+   "expiry",
+   "transfer"
+  ]
+ }
+}

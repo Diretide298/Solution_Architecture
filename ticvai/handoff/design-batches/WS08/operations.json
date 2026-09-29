@@ -1,4 +1,47 @@
 {
+ "createAdmissionRules": {
+  "method": "POST",
+  "path": "/admission-rules",
+  "contract": "access",
+  "summary": "Create an admission profile",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AdmissionRules",
+  "responds": "AdmissionRules"
+ },
+ "listAdmissionRules": {
+  "method": "GET",
+  "path": "/admission-rules",
+  "contract": "access",
+  "summary": "List admission profiles",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listEntryTemporaryExit": {
   "method": "GET",
   "path": "/entry-temporary-exit",
@@ -47,9 +90,20 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "GroupAttendancePartialEntryManagerView"
+  "responds": "Page"
  },
  "listGroupLeaderFast": {
   "method": "GET",
@@ -60,9 +114,20 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "GroupLeaderFastB2bValidationView"
+  "responds": "Page"
  },
  "listGuestJourney": {
   "method": "GET",
@@ -73,9 +138,20 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "GuestJourneyCommandCenterView"
+  "responds": "Page"
  },
  "listJourneys": {
   "method": "GET",
@@ -99,7 +175,20 @@
    }
   ],
   "requestBody": null,
-  "responds": "Journey"
+  "responds": "Page"
+ },
+ "listMultiParkCrossover": {
+  "method": "GET",
+  "path": "/multi-park-crossover",
+  "contract": "access",
+  "summary": "Multi-Park & Crossover Rules",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MultiParkCrossoverRulesView"
  },
  "listMultiParkCrossover2": {
   "method": "GET",
@@ -110,9 +199,54 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "MultiParkCrossoverJourneyOrchestratorView"
+  "responds": "Page"
+ },
+ "listQueues": {
+  "method": "GET",
+  "path": "/queues",
+  "contract": "queue",
+  "summary": "List queues",
+  "permission": "QUEUE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "openOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listSpecialEventFree": {
   "method": "GET",
@@ -127,6 +261,25 @@
   "requestBody": null,
   "responds": "SpecialEventFreeViewAlternativeAdmissionView"
  },
+ "setContextTimeEvent": {
+  "method": "PUT",
+  "path": "/context-time-event",
+  "contract": "access",
+  "summary": "Context, Time, Event & Capacity Policy Builder",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ContextTimeEventCapacityPolicyBuilderInput",
+  "responds": "ContextTimeEventCapacityPolicyBuilderView"
+ },
  "setGroupAdmissionProfile": {
   "method": "PUT",
   "path": "/group-admission-profile",
@@ -136,8 +289,90 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "GroupB2bAdmissionProfileBuilderInput",
   "responds": "GroupB2bAdmissionProfileBuilderView"
+ },
+ "setGuestCompanionEligibility": {
+  "method": "PUT",
+  "path": "/guest-companion-eligibility",
+  "contract": "access",
+  "summary": "Save a companion eligibility rule",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GuestCompanionEligibilityRulesInput",
+  "responds": "GuestCompanionEligibilityRulesView"
+ },
+ "simulateGuestJourney": {
+  "method": "POST",
+  "path": "/guest-journey/simulate",
+  "contract": "access",
+  "summary": "Simulate an access journey",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GuestJourneySimulationInput",
+  "responds": "GuestJourneySimulationView"
+ },
+ "updateAdmissionRules": {
+  "method": "PUT",
+  "path": "/admission-rules/{profileId}",
+  "contract": "access",
+  "summary": "Update an admission profile",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AdmissionRules",
+  "responds": "AdmissionRules"
+ },
+ "updateQueue": {
+  "method": "PATCH",
+  "path": "/queues/{queueId}",
+  "contract": "queue",
+  "summary": "Amend queue configuration",
+  "permission": "QUEUE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Queue"
  }
 }

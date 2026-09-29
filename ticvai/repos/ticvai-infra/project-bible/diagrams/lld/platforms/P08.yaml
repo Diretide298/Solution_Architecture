@@ -55,17 +55,17 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: VenueOpsService
-  operationCalls: 517
+  operationCalls: 525
 - service: CatalogueService
-  operationCalls: 392
+  operationCalls: 396
 - service: TenancyService
-  operationCalls: 323
+  operationCalls: 330
 - service: AccessService
-  operationCalls: 257
+  operationCalls: 307
 - service: OrderService
-  operationCalls: 217
+  operationCalls: 222
 - service: MarketingService
-  operationCalls: 202
+  operationCalls: 211
 - service: WalletService
   operationCalls: 168
 - service: FnbService
@@ -73,9 +73,9 @@ servicesCalled:
 - service: InventoryService
   operationCalls: 89
 - service: ReportingService
-  operationCalls: 82
+  operationCalls: 83
 - service: PlatformService
-  operationCalls: 69
+  operationCalls: 72
 - service: LedgerService
   operationCalls: 63
 - service: IdentityService
@@ -458,12 +458,14 @@ screens:
   - getDashboard
   - getPromotion
   - getPromotionUsage
+  - listCommercialCampaigns
   - listCouponCampaigns
   - listCouponCodes
   - listPromotions
   - listVoucherBatches
   - pausePromotion
   - publishPromotion
+  - recordDashboardView
   - runReport
   - setPromotionVariants
   - simulatePromotion
@@ -511,10 +513,12 @@ screens:
   - getGroupPackageDefinition
   - getLatestBundle
   - listCatalogueBundles
+  - listCommercialCampaigns
   - publishBundle
   - reportBundleApplied
   - setComboSlots
   - setGroupPackageDefinition
+  - setPackagePricingDefinition
   - updateBundle
   states:
   - emptyFirstRun
@@ -4861,7 +4865,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - deleteAccessPointGroup
   - listAccessLocationGrouping
+  - setAccessPointGroup
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -4869,7 +4875,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - groupId<-navigation
   goesTo:
   - BO-144
   boardFrames: null
@@ -4883,14 +4890,17 @@ screens:
   wave: 3
   density: compact
   operations:
+  - deleteOperatingCalendarEntry
   - listOperatingCalendarSpecial
+  - setOperatingCalendarEntry
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - entryId<-navigation
   goesTo:
   - BO-144
   boardFrames: null
@@ -4905,6 +4915,7 @@ screens:
   density: compact
   operations:
   - publishTopologyValidation
+  - rollbackConfigurationVersion
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -4912,7 +4923,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - versionId<-navigation
   goesTo:
   - BO-144
   boardFrames: null
@@ -5006,14 +5018,17 @@ screens:
   wave: 3
   density: compact
   operations:
+  - deleteJourneySequenceRule
   - listAntiPassbackJourney
+  - setJourneySequenceRule
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - ruleId<-navigation
   goesTo:
   - BO-154
   boardFrames: null
@@ -5169,6 +5184,7 @@ screens:
   operations:
   - listCredentialSecurity
   - listDigitalCredentialSecurity
+  - setDeviceBindingPolicy
   - setDynamicSecurityProfile
   states:
   - emptyFirstRun
@@ -5245,6 +5261,8 @@ screens:
   density: compact
   operations:
   - listDeviceBindingSession
+  - releaseCredentialDevice
+  - setDeviceBindingPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -5252,7 +5270,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - bindingId<-navigation
   goesTo:
   - BO-164
   boardFrames: null
@@ -5288,13 +5307,15 @@ screens:
   density: compact
   operations:
   - listCredentialTransferRebinding
+  - releaseCredentialDevice
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - bindingId<-navigation
   goesTo:
   - BO-164
   boardFrames: null
@@ -5309,6 +5330,7 @@ screens:
   density: compact
   operations:
   - listCredentialRevocationLifecycle
+  - setCredentialEventPropagationRule
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -5331,6 +5353,8 @@ screens:
   density: compact
   operations:
   - listOfflineCryptographicValidation
+  - setGateOfflinePolicy
+  - setOfflinePolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -5475,6 +5499,7 @@ screens:
   density: compact
   operations:
   - listVerificationMethodSelection
+  - setVerificationMethodPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -5770,6 +5795,7 @@ screens:
   density: compact
   operations:
   - listFaceChangeEnrollment
+  - reviewFaceReenrolment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -5777,7 +5803,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - attemptId<-navigation
   goesTo:
   - BO-184
   boardFrames: null
@@ -5863,6 +5890,7 @@ screens:
   - listDeviceGate
   - registerDevice
   - setTurnstileMode
+  - updateAccessDevice
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -5872,6 +5900,7 @@ screens:
   offlineState: false
   entryParams:
   - accessPointId<-navigation
+  - deviceId<-navigation
   goesTo:
   - BO-100
   - BO-195
@@ -5895,6 +5924,7 @@ screens:
   density: compact
   operations:
   - listDeviceTypeHardware
+  - setHardwareModel
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -5917,13 +5947,16 @@ screens:
   density: compact
   operations:
   - listPhysicalDeviceRegistration
+  - registerAccessDevice
+  - updateAccessDevice
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - deviceId<-session
   goesTo:
   - BO-194
   boardFrames: null
@@ -6023,6 +6056,7 @@ screens:
   density: compact
   operations:
   - listGateModeFree
+  - setGateModePolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -6185,6 +6219,8 @@ screens:
   density: compact
   operations:
   - listOfflineCredentialRevocation
+  - setGateOfflinePolicy
+  - setOfflinePolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -6230,6 +6266,7 @@ screens:
   operations:
   - listConnectivityFailureDegraded
   - setConnectivityThresholds
+  - setGateOfflinePolicy
   - setOfflinePolicy
   states:
   - emptyFirstRun
@@ -6297,6 +6334,7 @@ screens:
   density: compact
   operations:
   - listEdgeSecurityDeployment
+  - updateSecurityAlert
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -6304,7 +6342,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - alertId<-navigation
   goesTo:
   - BO-204
   boardFrames: null
@@ -6320,6 +6359,7 @@ screens:
   operations:
   - createAdmissionRules
   - listGuestJourney
+  - setJourneyProfile
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -6489,6 +6529,7 @@ screens:
   operations:
   - listFastPassAttraction
   - listQueues
+  - setFastPassProfile
   - updateQueue
   states:
   - emptyFirstRun
@@ -6514,6 +6555,7 @@ screens:
   - createAdmissionRules
   - listSpecialEventFree
   - setContextTimeEvent
+  - setOperatingCalendarEntry
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -6588,7 +6630,11 @@ screens:
   wave: 3
   density: compact
   operations:
+  - deletePodium
+  - endPodiumShift
   - listPodiumConsole
+  - setPodium
+  - startPodiumShift
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -6596,7 +6642,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - shiftId<-navigation
+  - podiumId<-navigation
   goesTo:
   - BO-224
   boardFrames: null
@@ -6632,7 +6680,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - deleteReasonCode
   - listValidationExceptionReason
+  - setReasonCode
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -6640,7 +6690,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - reasonCodeId<-navigation
   goesTo:
   - BO-224
   boardFrames: null
@@ -6697,6 +6748,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - cancelGateModeChange
   - listAccessPoints
   - listLiveGateMode
   - setTurnstileMode
@@ -6709,6 +6761,7 @@ screens:
   offlineState: false
   entryParams:
   - accessPointId<-navigation
+  - changeId<-navigation
   goesTo:
   - BO-224
   boardFrames: null
@@ -6766,6 +6819,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - endPodiumShift
   - listShiftHandoverSummary
   states:
   - emptyFirstRun
@@ -6774,7 +6828,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - shiftId<-navigation
   goesTo:
   - BO-224
   boardFrames: null
@@ -6958,6 +7013,7 @@ screens:
   - listPolicyEvaluationArchitecture
   - setEdgeNodeLocal
   - setOfflinePolicy
+  - setPolicyEvaluationSetting
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7030,6 +7086,8 @@ screens:
   density: compact
   operations:
   - listAccessSecurityFraud
+  - lockIdentity
+  - updateSecurityAlert
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7037,7 +7095,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - alertId<-navigation
   goesTo:
   - BO-100
   - BO-245
@@ -7084,6 +7143,7 @@ screens:
   density: compact
   operations:
   - listCredentialSharingConcurrent
+  - updateSecurityAlert
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7091,7 +7151,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - alertId<-navigation
   goesTo:
   - BO-244
   boardFrames: null
@@ -7106,6 +7167,8 @@ screens:
   density: compact
   operations:
   - listUnifiedIdentityCredential
+  - lockIdentity
+  - releaseIdentityLock
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7113,7 +7176,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - lockId<-navigation
   goesTo:
   - BO-244
   boardFrames: null
@@ -7128,7 +7192,9 @@ screens:
   density: compact
   operations:
   - listBiometricIdentityIntegrity
+  - reviewFaceReenrolment
   - setSecurityInvestigationEvidence
+  - updateSecurityAlert
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7136,7 +7202,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - alertId<-navigation
+  - attemptId<-navigation
   goesTo:
   - BO-244
   boardFrames: null
@@ -7151,6 +7219,7 @@ screens:
   density: compact
   operations:
   - listRelationshipCompanionFraud
+  - setRelationshipFraudRule
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7172,6 +7241,7 @@ screens:
   density: compact
   operations:
   - listAccessRiskScoring
+  - setRiskScoringConfig
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7238,6 +7308,7 @@ screens:
   density: compact
   operations:
   - listSecurityDetectionGovernance
+  - updateSecurityAlert
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7245,7 +7316,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - alertId<-navigation
   goesTo:
   - BO-244
   boardFrames: null
@@ -7878,6 +7950,7 @@ screens:
   density: compact
   operations:
   - listGroupArrivalCheck
+  - recordGroupCheckIn
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7885,7 +7958,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - groupBookingId<-navigation
   goesTo:
   - BO-274
   boardFrames: null
@@ -7971,6 +8045,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - approveMembershipProductValidation
   - listMembershipAnnualPass
   states:
   - emptyFirstRun
@@ -8094,6 +8169,7 @@ screens:
   operations:
   - listEntitlementTemplates
   - listMembershipUsageVisit
+  - setMembershipUsagePolicy
   - setPlanBenefits
   states:
   - emptyFirstRun
@@ -8141,6 +8217,7 @@ screens:
   - listMembershipCommercialPricing
   - listPriceLists
   - publishChannelAvailability
+  - setMembershipCommercialConfig
   - setPrices
   states:
   - emptyFirstRun
@@ -8941,6 +9018,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listPaymentAllocationRules
   - setMultiPaymentSplit
   states:
   - emptyFirstRun
@@ -8990,6 +9068,7 @@ screens:
   density: compact
   operations:
   - listOrderSplitMerge
+  - mergeOrders
   - splitOrder
   states:
   - emptyFirstRun
@@ -9036,13 +9115,16 @@ screens:
   density: compact
   operations:
   - listExternalPaymentPartner
+  - listExternalReferenceMappings
+  - recordExternalReference
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - orderId<-navigation
   goesTo:
   - BO-324
   boardFrames: null
@@ -9176,6 +9258,7 @@ screens:
   density: compact
   operations:
   - listVirtualTicketStatus
+  - setTicketStatusTransition
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9219,14 +9302,17 @@ screens:
   wave: 3
   density: compact
   operations:
+  - deleteMediaBindingRule
   - listMultiMediaBinding
+  - setMediaBindingRule
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - ruleId<-navigation
   goesTo:
   - BO-334
   boardFrames: null
@@ -9263,6 +9349,7 @@ screens:
   density: compact
   operations:
   - listEntitlementCrossMedia
+  - setCredentialEventPropagationRule
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9348,6 +9435,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - archiveMediaTemplate
   - cloneTicketTemplate
   - importTicketTemplate
   - listMediaDesign
@@ -10293,6 +10381,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - actOnWorkflowInstance
   - listApprovalDelegations
   - listSlaEscalationBottleneck
   states:
@@ -10302,7 +10391,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - instanceId<-navigation
   goesTo:
   - BO-100
   - BO-385
@@ -10460,6 +10550,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - actOnWorkflowInstance
   - listSlaEscalationBottleneck
   states:
   - emptyFirstRun
@@ -10468,7 +10559,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - instanceId<-navigation
   goesTo:
   - BO-384
   boardFrames: null
@@ -13707,6 +13799,7 @@ screens:
   density: compact
   operations:
   - listDynamicPricingStrategy
+  - transitionDynamicPricingStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13714,7 +13807,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - BO-524
   boardFrames: null
@@ -16134,6 +16228,7 @@ screens:
   density: compact
   operations:
   - listAccreditationIdentityConflicts
+  - resolveIdentityConflict
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -16141,7 +16236,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - conflictId<-navigation
   goesTo:
   - BO-625
   boardFrames: null
@@ -20121,7 +20217,10 @@ screens:
   density: compact
   operations:
   - listAgentWorkloadAvailability
+  - listCaseCategories
+  - listServiceQueues
   - setIntelligentRoutingSkill
+  - setServiceQueueDefinition
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -20243,7 +20342,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listCaseCategories
   - listCases
+  - listServiceQueues
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -20266,6 +20367,7 @@ screens:
   density: compact
   operations:
   - createCase
+  - listCaseCategories
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -20287,6 +20389,8 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listCaseCategories
+  - setCaseCategoryDefinition
   - setCaseInvestigationResolution
   states:
   - emptyFirstRun
@@ -20310,6 +20414,7 @@ screens:
   density: compact
   operations:
   - listAgentWorkloadAvailability
+  - listServiceQueues
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -22313,6 +22418,8 @@ screens:
   density: compact
   operations:
   - getLabourCost
+  - listLabourBudgets
+  - setLabourBudget
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -22594,7 +22701,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - createResourceCost
   - listAssets
+  - listResourceCosts
   - listResources
   states:
   - emptyFirstRun
@@ -22770,6 +22879,7 @@ screens:
   density: compact
   operations:
   - createResourceBlock
+  - createResourceCost
   - createWorkOrder
   - getDueMaintenance
   states:
@@ -22818,7 +22928,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - createResourceCost
   - getAssetHistory
+  - listResourceCosts
   - setResourceLifecycleState
   states:
   - emptyFirstRun
@@ -23598,8 +23710,11 @@ screens:
   wave: 3
   density: compact
   operations:
+  - createResourceCost
+  - deleteResourceCost
   - getResourceCostAnalytics
   - getResourceUtilisation
+  - listResourceCosts
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -23607,7 +23722,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - costId<-navigation
   goesTo:
   - BO-943
   boardFrames: null

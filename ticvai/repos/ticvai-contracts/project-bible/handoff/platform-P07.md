@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 11 |
-| Operations | 24 |
+| Operations | 27 |
 | Contracts | 5 |
 | Modules | 1 |
 | Undrawn | 0 |
@@ -73,7 +73,7 @@
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
 | `SCN-001` | Sign in | Access | 1 | 9 | yes |
-| `SCN-002` | Access point & direction | Access | 1 | 3 | yes |
+| `SCN-002` | Access point & direction | Access | 1 | 5 | yes |
 | `SCN-003` | Ready to scan | Access | 1 | 9 | yes |
 | `SCN-007` | Group admission | Access | 1 | 7 | yes |
 | `SCN-008` | Manual entry | Access | 1 | 7 | yes |
@@ -82,5 +82,5 @@
 | `SCN-013` | Offline journal | Access | 1 | 7 | yes |
 | `SCN-014` | Sync & reconciliation | Access | 1 | 9 | yes |
 | `SCN-015` | Offline package | Access | 1 | 7 | yes |
-| `SCN-016` | Gate mode | Access | 1 | 3 | yes |
+| `SCN-016` | Gate mode | Access | 1 | 4 | yes |
 

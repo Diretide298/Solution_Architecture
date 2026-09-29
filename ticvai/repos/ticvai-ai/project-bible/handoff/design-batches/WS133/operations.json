@@ -1,0 +1,34 @@
+{
+ "assignPerformanceMedia": {
+  "method": "POST",
+  "path": "/performances/{performanceId}/media",
+  "contract": "catalogue",
+  "summary": "Attach photos and video to the participants in a performance",
+  "permission": "EVENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listPerformanceTemplates": {
+  "method": "GET",
+  "path": "/performance-templates",
+  "contract": "catalogue",
+  "summary": "Slot templates, peak bands and walk-in rules",
+  "permission": "PERFORMANCE_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PerformanceTemplate"
+ }
+}

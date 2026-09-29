@@ -28,7 +28,7 @@
     "BO-317",
     "BO-318",
     "BO-319",
-    "BO-320",
+    "BO-027",
     "BO-321",
     "BO-322",
     "BO-323"
@@ -39,18 +39,12 @@
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-314 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-318",
      "trigger": "Refund Policy & Refund Calculation Configuration",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-318 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-318 declares entryState.params venueId and BO-314 holds none of them, so the edge carries nothing and BO-318 opens cold"
     },
     {
      "to": "BO-315",
@@ -71,18 +65,6 @@
      "operation": "listAmendmentAfterSale"
     },
     {
-     "to": "BO-319",
-     "trigger": "Works in Void, Reversal & Same-Day Correction Management",
-     "provenance": "flow F141 step 9→10",
-     "operation": "listAmendmentAfterSale"
-    },
-    {
-     "to": "BO-320",
-     "trigger": "Works in Ticket Reissue & Fulfillment Regeneration",
-     "provenance": "flow F141 step 11→12",
-     "operation": "listAmendmentAfterSale"
-    },
-    {
      "to": "BO-321",
      "trigger": "Works in After-Sales Financial Settlement & Adjustment Workspace",
      "provenance": "flow F141 step 13→14",
@@ -99,21 +81,29 @@
      "trigger": "Works in Amendment History, Audit & After-Sales Analytics",
      "provenance": "flow F141 step 17→18",
      "operation": "listAmendmentAfterSale"
+    },
+    {
+     "to": "BO-027",
+     "trigger": "Works in Reissue & Media Replacement (Ticket Reissue & Fulfillment Regeneration, merged into it on 28…",
+     "provenance": "flow F141 step 11→12",
+     "operation": "listAmendmentAfterSale"
+    },
+    {
+     "to": "BO-319",
+     "trigger": "Works in Void, Reversal & Same-Day Correction Management",
+     "provenance": "flow F141 step 9→10",
+     "operation": "listAmendmentAfterSale",
+     "carries": [
+      "orderId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can monitor and manage all after-sales order activities from one centralized operational workspace.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide one operational workspace for all post-sale activities affecting confirmed orders and reservations.",
-  "purposeNote": "Authorized users can monitor and manage all after-sales order activities from one centralized operational workspace.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Order Amendment, Reservation Amendment, Date Change, Timeslot Change, Performance Change, Quantity Change, Attendee Change, Void. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Order___Reservation_Management_Reference.pdf, page 20 §Support"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -264,23 +254,14 @@
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 20 §Support"
       },
       {
-       "kind": "destructiveButton",
-       "label": "Void",
+       "kind": "secondaryButton",
+       "label": "Refund",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 20 §Support"
       }
      ]
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "confirmVoid",
-    "component": "confirmDialog",
-    "trigger": "Void",
-    "body": "**Void on a amendment after-sales is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
-    "provenance": "pack Order___Reservation_Management_Reference.pdf, page 20 §Support"
-   }
-  ],
   "states": {
    "loading": "The amendment after-sales list.",
    "error": "Could not load. Names which read failed and leaves the amendment after-sales untouched.",
@@ -289,6 +270,12 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "listAmendmentAfterSale2",
+    "contract": "orders",
+    "purpose": "Amendment History, Audit & After-Sales Analytics",
+    "trigger": "onLoad"
+   },
    {
     "operationId": "listAmendmentAfterSale",
     "contract": "orders",
@@ -309,9 +296,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-314"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-314",
+   "workshopBoard": "wireframes/WS85 Order   Reservation Management Board 2.dc.html#bo-314"
   },
-  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 20. 25 of 34 labels bound to a contract property; 42 of 56 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 20. 25 of 34 labels bound to a contract property; 43 of 56 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Order Amendment, Reservation Amendment, Date Change, Timeslot Change, Performance Change, Quantity Change, Attendee Change, Refund … are choices sent by `listAmendmentAfterSale`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -372,17 +360,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can amend eligible order attributes through a controlled transaction while preserving the original order and validating all affected services.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide agents with a controlled workspace for modifying an existing order without directly editing historical transaction records. The original order must always remain reconstructable.",
-  "purposeNote": "Authorized users can amend eligible order attributes through a controlled transaction while preserving the original order and validating all affected services.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 9 actions on this screen and the screen declares 1 operation.** Unserved: Ticket Holder, Customer Details, Delivery Method, Save Draft, Validate, Calculate, Submit for Approval, Execute Amendment …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Order___Reservation_Management_Reference.pdf, page 22 §Allow authorized changes to"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -442,6 +423,16 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Timeslot",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 22 §Allow authorized changes to"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Quantity",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 22 §Allow authorized changes to"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Ticket Holder",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 22 §Allow authorized changes to"
       },
@@ -457,27 +448,17 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Eligible Product Attributes",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 22 §Allow authorized changes to"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Seat where applicable",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 22 §Allow authorized changes to"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Save Draft",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 22 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Validate",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 22 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Calculate",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 22 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Submit for Approval",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 22 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Execute Amendment",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 22 §Actions"
       }
      ]
@@ -496,10 +477,7 @@
     "operationId": "setOrderAmendment",
     "contract": "orders",
     "purpose": "Order Amendment Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setOrderAmendment"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -515,9 +493,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-315"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-315",
+   "workshopBoard": "wireframes/WS85 Order   Reservation Management Board 2.dc.html#bo-315"
   },
-  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 22. 10 of 10 labels bound to a contract property; 19 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 22. 10 of 10 labels bound to a contract property; 23 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Timeslot, Quantity, Ticket Holder, Customer Details, Delivery Method, Eligible Product Attributes, Seat where applicable, Save Draft … are choices sent by `setOrderAmendment`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -578,17 +557,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "centrally configured after-sales policies.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure by; Configure) and no display directory — it is settings, not a population",
   "purpose": "Define when an order or reservation may be amended and which changes are permitted.",
-  "purposeNote": "centrally configured after-sales policies.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Date Change, Timeslot Change, Performance Change, Quantity Increase, Seat Change, Attendee Change, Delivery Change. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Order___Reservation_Management_Reference.pdf, page 24 §Enable/disable"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -699,6 +671,11 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Quantity Reduction",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 24 §Enable/disable"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Seat Change",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 24 §Enable/disable"
       },
@@ -727,18 +704,16 @@
     "operationId": "setAmendmentEligibilityPolicy",
     "contract": "orders",
     "purpose": "Amendment Eligibility & Policy Rule Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setAmendmentEligibilityPolicy"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-316"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-316",
+   "workshopBoard": "wireframes/WS85 Order   Reservation Management Board 2.dc.html#bo-316"
   },
-  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 24. 0 of 0 labels bound to a contract property; 22 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 24. 0 of 0 labels bound to a contract property; 23 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Date Change, Timeslot Change, Performance Change, Quantity Increase, Quantity Reduction, Seat Change, Attendee Change, Delivery Change are choices sent by `setAmendmentEligibilityPolicy`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -805,11 +780,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Entire Order, Individual Ticket, Selected Order Lines, Add-On Only. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Order___Reservation_Management_Reference.pdf, page 26 §Support"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack Order___Reservation_Management_Reference.pdf, page 26"
    },
@@ -833,6 +803,11 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Entire Reservation",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 26 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Individual Ticket",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 26 §Support"
       },
@@ -843,7 +818,17 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Selected Quantity",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 26 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Add-On Only",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 26 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Package Component where permitted",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 26 §Support"
       }
      ]
@@ -866,18 +851,16 @@
     "operationId": "setCancellationPartialPolicy",
     "contract": "orders",
     "purpose": "Cancellation & Partial Cancellation Policy Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setCancellationPartialPolicy"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-317"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-317",
+   "workshopBoard": "wireframes/WS85 Order   Reservation Management Board 2.dc.html#bo-317"
   },
-  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 26. 0 of 0 labels bound to a contract property; 4 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 26. 0 of 0 labels bound to a contract property; 7 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Entire Order, Entire Reservation, Individual Ticket, Selected Order Lines, Selected Quantity, Add-On Only, Package Component where permitted are choices sent by `setCancellationPartialPolicy`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -938,10 +921,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "duplicating payment execution or central pricing logic.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure separately) and no display directory — it is settings, not a population",
   "purpose": "Define when a cancellation/amendment creates a refundable amount and how refund entitlement is determined.",
-  "purposeNote": "duplicating payment execution or central pricing logic.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1002,8 +985,44 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
-       "provenance": "contract operation setRefundPolicy"
+       "label": "Full Refund",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 27 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Partial Refund",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 27 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Percentage Refund",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 27 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Pro-Rata Refund",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 27 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Original Value Less Fees",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 27 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Wallet Credit",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 27 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Voucher/Credit Note",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 27 §Support"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save refund policy",
+       "operation": "setRefundCalculationPolicy",
+       "provenance": "contract orders.yaml PUT /refund-calculation-policy (decided 29 September, VM close-out)"
       }
      ]
     }
@@ -1020,10 +1039,13 @@
     "operationId": "setRefundPolicy",
     "contract": "orders",
     "purpose": "Set a venue's refund policy",
-    "trigger": "onAction",
-    "invalidates": [
-     "setRefundPolicy"
-    ]
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "setRefundCalculationPolicy",
+    "contract": "orders",
+    "purpose": "Save refund policy",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1038,9 +1060,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-318"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-318",
+   "workshopBoard": "wireframes/WS85 Order   Reservation Management Board 2.dc.html#bo-318"
   },
-  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 27. 0 of 0 labels bound to a contract property; 9 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 27. 0 of 0 labels bound to a contract property; 16 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `setRefundCalculationPolicy`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1101,17 +1124,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "normal cancellation/refund transactions.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Separate genuine void/correction operations from normal customer cancellations and refunds. This is important financially and operationally.",
-  "purposeNote": "normal cancellation/refund transactions.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Order Void, Payment Void Request, Ticket Void, Accidental Sale Reversal, Duplicate Transaction Correction, Failed Transaction Cleanup. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Order___Reservation_Management_Reference.pdf, page 29 §Support"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1168,6 +1184,7 @@
       {
        "kind": "secondaryButton",
        "label": "Ticket Void",
+       "operation": "voidEntitlement",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 29 §Support"
       },
       {
@@ -1183,6 +1200,7 @@
       {
        "kind": "secondaryButton",
        "label": "Failed Transaction Cleanup",
+       "operation": "cleanupFailedPayment",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 29 §Support"
       }
      ]
@@ -1201,182 +1219,64 @@
     "contract": "orders",
     "purpose": "Void, Reversal & Same-Day Correction Management",
     "trigger": "onLoad"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-319"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 12 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-320",
-  "name": "Ticket Reissue & Fulfillment Regeneration",
-  "module": "Orders & Money",
-  "requiresModule": "ticketing",
-  "wave": 3,
-  "source": {
-   "pack": "Order___Reservation_Management_Reference.pdf",
-   "board": "2",
-   "number": "12.2.7",
-   "page": 30
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/orders-money/ticket-reissue-fulfillment-regeneration-bo-320",
-   "component": "apps/venue-management-web/src/routes/orders-money/TicketReissueFulfillmentRegeneration.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-314"
-   ],
-   "exitTo": [
-    "BO-314"
-   ],
-   "inferred": false,
-   "notes": "**Reached from BO-314, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "BO-314",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F141 step 12→13",
-     "operation": "listTicketReissueFulfillment"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Configure; Options) and no display directory — it is settings, not a population",
-  "purpose": "Manage ticket/media regeneration following an amendment, correction, loss, delivery failure, or other authorized event.",
-  "purposeNote": "Authorized reissues regenerate the appropriate ticket/credential while preventing duplicate valid credentials and preserving full history.",
-  "gaps": [
+   },
    {
-    "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Lost Ticket, Printing Error, SMS/WhatsApp link, Wallet Update. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Order___Reservation_Management_Reference.pdf, page 30 §Support"
+    "operationId": "voidOrder",
+    "contract": "orders",
+    "purpose": "Void the order same-day (reason enteredInError or duplicate)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Order Void, Accidental Sale Reversal, Duplicate Transaction Correction; Payment Void Request",
+    "invalidates": [
+     "listVoidReversalSame"
+    ]
+   },
+   {
+    "operationId": "voidPayment",
+    "contract": "orders",
+    "purpose": "Void the payment",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Order Void, Accidental Sale Reversal, Duplicate Transaction Correction; Payment Void Request",
+    "invalidates": [
+     "listVoidReversalSame"
+    ]
+   },
+   {
+    "operationId": "voidEntitlement",
+    "contract": "orders",
+    "purpose": "Void ticket",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "cleanupFailedPayment",
+    "contract": "orders",
+    "purpose": "Clear failed payment",
+    "trigger": "onAction"
    }
   ],
-  "layout": {
-   "template": "form",
-   "regions": [
+  "entryState": {
+   "params": [
     {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Maximum Reissues",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 30 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Reissue Fee",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 30 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Free Reissue Count",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 30 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Supervisor Threshold",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 30 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Immediately Invalidate",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 30 §Options"
-      },
-      {
-       "kind": "selectField",
-       "label": "Supersede",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 30 §Options"
-      },
-      {
-       "kind": "textField",
-       "label": "Retain Until New Credential Activated",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 30 §Options"
-      },
-      {
-       "kind": "textField",
-       "label": "Preserve where credential remains unchanged",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 30 §Options"
-      }
-     ]
+     "name": "orderId",
+     "from": "navigation"
     },
     {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Lost Ticket",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 30 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Printing Error",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 30 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "SMS/WhatsApp link",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 30 §Allow"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Wallet Update",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 30 §Allow"
-      }
-     ]
+     "name": "paymentId",
+     "from": "navigation"
+    },
+    {
+     "name": "entitlementId",
+     "from": "navigation"
     }
-   ]
+   ],
+   "coldEntry": "Opened from BO-314 with the order picked there. Opened cold (a bookmark or a refresh), it shows the list to pick from rather than an empty record, and says plainly if the order no longer exists."
   },
-  "states": {
-   "loading": "The ticket reissue fulfillment configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the ticket reissue fulfillment untouched.",
-   "emptyFirstRun": "No ticket reissue fulfillment configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listTicketReissueFulfillment",
-    "contract": "orders",
-    "purpose": "Ticket Reissue & Fulfillment Regeneration",
-    "trigger": "onLoad"
-   }
-  ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-320"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-319",
+   "workshopBoard": "wireframes/WS85 Order   Reservation Management Board 2.dc.html#bo-319"
   },
-  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 30. 0 of 0 labels bound to a contract property; 12 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 12 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Order Void, Accidental Sale Reversal, Duplicate Transaction Correction: `voidOrder`; Payment Void Request: `voidPayment`; still owed by a contract change: `voidEntitlement`, `cleanupFailedPayment`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1437,10 +1337,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every after-sales operation has a reconciled financial outcome linked to the corresponding order change.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Track) and no metric row",
   "purpose": "Provide a consolidated view of the financial consequences of amendments, cancellations, refunds, exchanges and corrections. This is not the payment engine; it is the after-sales financial orchestration layer.",
-  "purposeNote": "Every after-sales operation has a reconciled financial outcome linked to the corresponding order change.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1462,13 +1362,9 @@
         "AfterSalesFinancialSettlementAdjustmentWorkspaceView.alreadyRefunded",
         "AfterSalesFinancialSettlementAdjustmentWorkspaceView.outstandingBalance",
         "AfterSalesFinancialSettlementAdjustmentWorkspaceView.netTransactionImpact",
-        "AfterSalesFinancialSettlementAdjustmentWorkspaceView.collectionRequired",
-        "AfterSalesFinancialSettlementAdjustmentWorkspaceView.paymentPending",
-        "AfterSalesFinancialSettlementAdjustmentWorkspaceView.paymentComplete",
+        "AfterSalesFinancialSettlementAdjustmentWorkspaceView.paymentStatus",
         "Refund Pending",
-        "Refund Complete",
-        "AfterSalesFinancialSettlementAdjustmentWorkspaceView.failed",
-        "AfterSalesFinancialSettlementAdjustmentWorkspaceView.reconciliationRequired"
+        "Refund Complete"
        ],
        "bindsTo": "AfterSalesFinancialSettlementAdjustmentWorkspaceView",
        "operation": "setAfterSaleFinancial",
@@ -1495,13 +1391,9 @@
         "AfterSalesFinancialSettlementAdjustmentWorkspaceView.alreadyRefunded",
         "AfterSalesFinancialSettlementAdjustmentWorkspaceView.outstandingBalance",
         "AfterSalesFinancialSettlementAdjustmentWorkspaceView.netTransactionImpact",
-        "AfterSalesFinancialSettlementAdjustmentWorkspaceView.collectionRequired",
-        "AfterSalesFinancialSettlementAdjustmentWorkspaceView.paymentPending",
-        "AfterSalesFinancialSettlementAdjustmentWorkspaceView.paymentComplete",
+        "AfterSalesFinancialSettlementAdjustmentWorkspaceView.paymentStatus",
         "Refund Pending",
-        "Refund Complete",
-        "AfterSalesFinancialSettlementAdjustmentWorkspaceView.failed",
-        "AfterSalesFinancialSettlementAdjustmentWorkspaceView.reconciliationRequired"
+        "Refund Complete"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Customer Receives Refund”, “No Financial Difference”, “Commit Control”, “Before payment”, “Only after successful payment”, “Trigger relevant”.",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 32 §Display"
@@ -1533,10 +1425,7 @@
     "operationId": "setAfterSaleFinancial",
     "contract": "orders",
     "purpose": "After-Sales Financial Settlement & Adjustment Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setAfterSaleFinancial"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1552,7 +1441,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-321"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-321",
+   "workshopBoard": "wireframes/WS85 Order   Reservation Management Board 2.dc.html#bo-321"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 32. 14 of 17 labels bound to a contract property; 17 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1615,17 +1505,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Out-of-policy and high-risk after-sales actions are routed through configurable approval and service-recovery workflows with appropriate segregation of duties.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Govern after-sales actions that fall outside normal policies or exceed financial/operational authority.",
-  "purposeNote": "Out-of-policy and high-risk after-sales actions are routed through configurable approval and service-recovery workflows with appropriate segregation of duties.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Fee Waiver. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Order___Reservation_Management_Reference.pdf, page 33 §Allow governed remedies"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1688,6 +1571,26 @@
        "kind": "primaryButton",
        "label": "Fee Waiver",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 33 §Allow governed remedies"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Partial Refund",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 33 §Allow governed remedies"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Voucher",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 33 §Allow governed remedies"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Wallet Credit",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 33 §Allow governed remedies"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Alternative Event",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 33 §Allow governed remedies"
       }
      ]
     }
@@ -1704,18 +1607,16 @@
     "operationId": "approveExceptionServiceRecovery",
     "contract": "orders",
     "purpose": "Approval, Exception & Service Recovery Management",
-    "trigger": "onAction",
-    "invalidates": [
-     "approveExceptionServiceRecovery"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-322"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-322",
+   "workshopBoard": "wireframes/WS85 Order   Reservation Management Board 2.dc.html#bo-322"
   },
-  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 33. 0 of 0 labels bound to a contract property; 10 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 33. 0 of 0 labels bound to a contract property; 14 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Fee Waiver, Partial Refund, Voucher, Wallet Credit, Alternative Event are choices sent by `approveExceptionServiceRecovery`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1768,10 +1669,10 @@
    "notes": "**Reached from BO-314, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "through the final commercial, financial and credential state. Board 2 — Final Screen Register # Backend Screen Core Responsibility 12.2. Central after-sales",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Provide complete traceability and analytical visibility across all changes made after original order creation.",
-  "purposeNote": "through the final commercial, financial and credential state. Board 2 — Final Screen Register # Backend Screen Core Responsibility 12.2. Central after-sales",
   "layout": {
    "template": "form",
    "regions": [
@@ -1898,12 +1799,19 @@
     "contract": "orders",
     "purpose": "Amendment History, Audit & After-Sales Analytics",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listAmendmentAfterSale",
+    "contract": "orders",
+    "purpose": "Amendment & After-Sales Command Center",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-323"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-323",
+   "workshopBoard": "wireframes/WS85 Order   Reservation Management Board 2.dc.html#bo-323"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 35. 1 of 8 labels bound to a contract property; 23 of 109 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

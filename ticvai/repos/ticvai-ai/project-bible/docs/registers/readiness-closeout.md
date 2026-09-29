@@ -672,6 +672,245 @@ Operations resting on the pack and our build plan are in areas the client never 
 | `setRenewalAutoMembership` | pack 'Membership___Annual_Pass_Management_Reference.pdf' pp.15-16 (13.1.9 Renewal Modes, Renewal Window, Early Renewal, Renewal Pricing, Auto-Renewal, Failed Renewal, Renewal Eligibility, Tier Movement) and p.31 (Retry Management); MoM 25 Aug (renewal/auto-renewal with tokenised card-on-file billing ahead of expiry, subject to consent; refund/cancellation policy managed centrally); MoM 5 Aug (renew/upgrade/cancel/extend) | renewal-mode, pricing, revalidation and tier-movement options became enums/arrays; price amounts moved out to pricing; auto-renew typed as eligible/terms/card-on-file/reminder/retry/failure with safe defaults; window, early renewal, grace and a central cancellation policy reference added |
 | `setValidityActivationExpiry` | pack 'Membership___Annual_Pass_Management_Reference.pdf' pp.8-9 (13.1.4 Validity Methods, Activation Methods, Activation Deadline, Expiry, Future-Dated Membership, Backdating, Expiry Behavior); MoM 25 Aug (validity types fixed, rolling and first-use activation; first-use activation tickets need a fallback expiry); MoM 12 Aug (annual memberships recognised straight-line monthly) | the five activation options became activationMethod; validity method, duration, season, activation deadline (doubling as the MoM 25 Aug fallback expiry), expiry rule, grace period and backdating added; start/end typed as dates |
 
+## The data model under them (29 September)
+
+**Mapping the agreed operations' lineage showed the tables they need did not exist: the packs gave screens, not tables.** So the same day 211 tables were designed and declared in their contracts (groups DM1 to DM6), each from the agreed operation shapes and the packs, near-duplicates merged. Then a writers pass (WA to WE) gave every new table a writer or a documented job: 107 operations, bound to their screens. The lineage of the agreed operations was then merged: agreed operations touching no real table went from 647 to 4.
+
+| Schema | New tables |
+| --- | ---: |
+| access | 64 |
+| catalogue | 45 |
+| control | 24 |
+| orders | 19 |
+| marketing | 14 |
+| approvals | 11 |
+| promotions | 11 |
+| subscription | 8 |
+| workforce | 2 |
+| resources | 2 |
+| payments | 2 |
+| games | 2 |
+| reporting | 2 |
+| accreditation | 1 |
+| seating | 1 |
+| rental | 1 |
+| assets | 1 |
+| wallet | 1 |
+
+| Table | Group | Merged from |
+| --- | --- | --- |
+| `access.access_area` | DM1 |  |
+| `access.access_attribute` | DM1 |  |
+| `access.access_device` | DM1 |  |
+| `access.access_incident` | DM1 |  |
+| `access.access_map` | DM1 |  |
+| `access.access_point_configuration` | DM1 |  |
+| `access.access_point_group` | DM1 |  |
+| `access.attraction_access` | DM1 |  |
+| `access.biometric_audit_event` | DM1 |  |
+| `access.biometric_profile` | DM1 |  |
+| `access.branding_profile` | DM1 |  |
+| `access.companion_rule` | DM1 |  |
+| `access.configuration_change` | DM1 |  |
+| `access.configuration_version` | DM1 |  |
+| `access.consumption_rule` | DM1 |  |
+| `access.credential_binding` | DM1 |  |
+| `access.credential_delivery` | DM1 |  |
+| `access.credential_event` | DM1 |  |
+| `access.credential_event_propagation_rule` | DM1 |  |
+| `access.credential_exception` | DM1 |  |
+| `access.credential_issuance` | DM1 |  |
+| `access.credential_policy` | DM1 |  |
+| `access.credential_security_profile` | DM1 |  |
+| `access.credential_sharing_case` | DM1 |  |
+| `access.device_binding` | DM1 |  |
+| `access.device_configuration` | DM1 |  |
+| `access.dynamic_field` | DM1 |  |
+| `access.dynamic_policy` | DM1 |  |
+| `access.dynamic_policy_version` | DM1 |  |
+| `access.edge_node` | DM1 |  |
+| `access.edge_package` | DM1 |  |
+| `access.external_credential_integration` | DM1 |  |
+| `access.face_reenrolment_attempt` | DM1 |  |
+| `access.fast_pass_profile` | DM1 |  |
+| `access.fraud_rule` | DM1 |  |
+| `access.gate_lane` | DM1 |  |
+| `access.gate_mode_change` | DM1 |  |
+| `access.gate_mode_policy` | DM1 |  |
+| `access.gate_outcome_profile` | DM1 |  |
+| `access.group_admission_rule` | DM1 |  |
+| `access.hardware_model` | DM1 |  |
+| `access.identity_lock` | DM1 |  |
+| `access.journey_profile` | DM1 |  |
+| `access.journey_sequence_rule` | DM1 |  |
+| `access.media_binding_rule` | DM1 |  |
+| `access.media_compatibility_test` | DM1 |  |
+| `access.media_encoding_profile` | DM1 |  |
+| `access.media_replacement_policy` | DM1 |  |
+| `access.media_template` | DM1 |  |
+| `access.media_template_version` | DM1 |  |
+| `access.media_type` | DM1 |  |
+| `access.offline_policy` | DM1 |  |
+| `access.operating_calendar_entry` | DM1 |  |
+| `access.podium` | DM1 |  |
+| `access.podium_shift` | DM1 |  |
+| `access.policy_evaluation_setting` | DM1 |  |
+| `access.policy_scope_assignment` | DM1 |  |
+| `access.reason_code` | DM1 |  |
+| `access.risk_scoring_config` | DM1 |  |
+| `access.security_alert` | DM1 |  |
+| `access.security_investigation` | DM1 |  |
+| `access.security_playbook` | DM1 |  |
+| `access.ticket_status_transition` | DM1 |  |
+| `access.verification_method_policy` | DM1 |  |
+| `accreditation.identity_conflict` | DM2 |  |
+| `approvals.automation` | DM2 |  |
+| `approvals.automation_execution` | DM2 |  |
+| `approvals.business_rule` | DM2 |  |
+| `approvals.decision_table` | DM2 |  |
+| `approvals.decision_table_row` | DM2 |  |
+| `approvals.workflow_definition` | DM2 |  |
+| `approvals.workflow_exception` | DM2 |  |
+| `approvals.workflow_instance` | DM2 |  |
+| `approvals.workflow_step_execution` | DM2 |  |
+| `approvals.workflow_trigger` | DM2 |  |
+| `approvals.workflow_version` | DM2 |  |
+| `assets.media_fingerprint` | DM4 |  |
+| `catalogue.ai_catalogue_session` | DM3 |  |
+| `catalogue.ai_finding` | DM3 |  |
+| `catalogue.approval_policy` | DM3 |  |
+| `catalogue.audit_entry` | DM3 |  |
+| `catalogue.calculation_profile` | DM3 |  |
+| `catalogue.calculation_step` | DM3 |  |
+| `catalogue.change_request` | DM3 |  |
+| `catalogue.change_request_line` | DM3 |  |
+| `catalogue.channel_connection` | DM3 |  |
+| `catalogue.channel_incident` | DM3 |  |
+| `catalogue.channel_sales_rule` | DM3 |  |
+| `catalogue.channel_sync` | DM3 |  |
+| `catalogue.configuration_template` | DM3 |  |
+| `catalogue.demand_forecast` | DM3 |  |
+| `catalogue.demand_signal` | DM3 |  |
+| `catalogue.dynamic_pricing_control` | DM3 |  |
+| `catalogue.dynamic_pricing_strategy` | DM3 |  |
+| `catalogue.fee` | DM3 |  |
+| `catalogue.fee_rule` | DM3 |  |
+| `catalogue.lifecycle_action` | DM3 |  |
+| `catalogue.lifecycle_workflow` | DM3 |  |
+| `catalogue.package_pricing` | DM3 |  |
+| `catalogue.performance_media` | DM3 |  |
+| `catalogue.price_assignment` | DM3 |  |
+| `catalogue.price_category` | DM3 |  |
+| `catalogue.price_execution` | DM3 |  |
+| `catalogue.price_ladder` | DM3 |  |
+| `catalogue.price_list_version` | DM3 |  |
+| `catalogue.price_resolution_policy` | DM3 |  |
+| `catalogue.pricing_experiment` | DM3 |  |
+| `catalogue.pricing_market` | DM3 |  |
+| `catalogue.pricing_publication` | DM3 |  |
+| `catalogue.pricing_publication_target` | DM3 |  |
+| `catalogue.pricing_recommendation` | DM3 |  |
+| `catalogue.pricing_simulation` | DM3 |  |
+| `catalogue.pricing_test_case` | DM3 |  |
+| `catalogue.product_channel_assignment` | DM3 |  |
+| `catalogue.product_link` | DM3 |  |
+| `catalogue.rate` | DM3 |  |
+| `catalogue.rollback_action` | DM3 |  |
+| `catalogue.rounding_profile` | DM3 |  |
+| `catalogue.sales_channel` | DM3 |  |
+| `catalogue.signal_registry` | DM3 |  |
+| `catalogue.tax_profile` | DM3 |  |
+| `catalogue.tax_rule` | DM3 |  |
+| `control.partner` | DM4 |  |
+| `control.partner_allocation` | DM4 |  |
+| `control.partner_application` | DM4 |  |
+| `control.partner_application_review_task` | DM4 |  |
+| `control.partner_billing_profile` | DM4 |  |
+| `control.partner_booking_limit` | DM4 |  |
+| `control.partner_capability_grant` | DM4 |  |
+| `control.partner_case` | DM4 |  |
+| `control.partner_change_request` | DM4 |  |
+| `control.partner_commercial_exception` | DM4 |  |
+| `control.partner_commission_line` | DM4 |  |
+| `control.partner_commission_rule` | DM4 |  |
+| `control.partner_commission_rule_tier` | DM4 |  |
+| `control.partner_contact` | DM4 |  |
+| `control.partner_credit_profile` | DM4 |  |
+| `control.partner_distribution_right` | DM4 |  |
+| `control.partner_document` | DM4 |  |
+| `control.partner_rate` | DM4 |  |
+| `control.partner_rate_volume_band` | DM4 |  |
+| `control.partner_reconciliation_exception` | DM4 |  |
+| `control.partner_scope_assignment` | DM4 |  |
+| `control.partner_security` | DM4 |  |
+| `control.partner_settlement_batch` | DM4 |  |
+| `control.partner_status_history` | DM4 |  |
+| `games.pricing_exception` | DM6 |  |
+| `games.reader_sync_status` | DM6 |  |
+| `marketing.business_event` | DM6 |  |
+| `marketing.case_category` | DM6 |  |
+| `marketing.case_escalation` | DM6 |  |
+| `marketing.communication_policy_decision` | DM6 |  |
+| `marketing.consent_propagation` | DM6 |  |
+| `marketing.feedback_classification` | DM6 |  |
+| `marketing.message_dispatch_attempt` | DM6 |  |
+| `marketing.message_template_version` | DM6 |  |
+| `marketing.message_trigger_condition` | DM6 |  |
+| `marketing.privacy_notice_governance` | DM6 |  |
+| `marketing.retention_run` | DM6 |  |
+| `marketing.service_queue` | DM6 |  |
+| `marketing.waiver_requirement` | DM6 |  |
+| `marketing.waiver_requirement_event` | DM6 |  |
+| `orders.after_sale_policy` | DM5 |  |
+| `orders.after_sale_policy_window` | DM5 |  |
+| `orders.after_sale_request` | DM5 |  |
+| `orders.external_reference_mapping` | DM5 |  |
+| `orders.group_quote` | DM5 |  |
+| `orders.group_quote_line` | DM5 |  |
+| `orders.group_task` | DM5 |  |
+| `orders.group_visit_plan` | DM5 |  |
+| `orders.order_event` | DM5 |  |
+| `orders.order_relationship` | DM5 |  |
+| `orders.order_source_channel` | DM5 |  |
+| `orders.payment_allocation_rule` | DM5 |  |
+| `orders.resale_eligibility_rule` | DM5 |  |
+| `orders.resale_marketplace_config` | DM5 |  |
+| `orders.resale_recommendation` | DM5 |  |
+| `orders.resale_settlement` | DM5 |  |
+| `orders.reservation_hold_policy` | DM5 |  |
+| `orders.status_transition_rule` | DM5 |  |
+| `orders.upgrade_rule` | DM5 |  |
+| `payments.payment_attempt` | DM6 |  |
+| `payments.provider_cost` | DM6 |  |
+| `promotions.bundle_capacity_policy` | DM5 |  |
+| `promotions.campaign` | DM5 |  |
+| `promotions.campaign_budget` | DM5 |  |
+| `promotions.partner_bundle_product` | DM5 |  |
+| `promotions.promotion_alert` | DM5 |  |
+| `promotions.promotion_audit` | DM5 |  |
+| `promotions.promotion_channel_publication` | DM5 |  |
+| `promotions.promotion_conflict` | DM5 |  |
+| `promotions.promotion_evaluation_trace` | DM5 |  |
+| `promotions.promotion_rule` | DM5 |  |
+| `promotions.stacking_rule` | DM5 |  |
+| `rental.quote` | DM4 |  |
+| `reporting.dashboard_view` | DM6 |  |
+| `reporting.site_normalisation_basis` | DM6 |  |
+| `resources.resource_cost` | DM4 |  |
+| `resources.selection_policy` | DM4 |  |
+| `seating.group_request_participant` | DM4 |  |
+| `subscription.membership_eligibility_rule` | DM4 |  |
+| `subscription.membership_entitlement` | DM4 |  |
+| `subscription.membership_household_policy` | DM4 |  |
+| `subscription.membership_household_policy_role_limit` | DM4 |  |
+| `subscription.membership_product` | DM4 |  |
+| `subscription.membership_product_history` | DM4 |  |
+| `subscription.membership_renewal_policy` | DM4 |  |
+| `subscription.membership_usage_policy` | DM4 |  |
+| `wallet.configuration_version_snapshot` | DM6 |  |
+| `workforce.labour_budget` | DM2 |  |
+| `workforce.position_requirement` | DM2 |  |
+
 ## Operations added
 
 | Operation | Contract | Added by | Screens |
@@ -775,3 +1014,110 @@ Operations resting on the pack and our build plan are in areas the client never 
 | `setWalletReconciliationSources` | wallet | K3 | BO-1166 |
 | `setWalletRiskRuleStatus` | wallet | K3 | BO-1162 |
 | `withdrawWalletDispute` | wallet | K3 | BO-1151, BO-1179 |
+| `archiveMediaTemplate` | | WA (writers pass) | P08 BO-344 Media Design Studio Command Center |
+| `bindCredentialDevice` | | WA (writers pass) | P02 GST-055 Dynamic QR Ticket, P02 GST-013 Ticket Details |
+| `cancelGateModeChange` | | WA (writers pass) | P08 BO-230 Live Gate Mode & Lane Control, P07 SCN-016 Gate mode |
+| `deleteAccessPointGroup` | | WA (writers pass) | P08 BO-151 Access Location Grouping |
+| `deleteJourneySequenceRule` | | WA (writers pass) | P08 BO-157 Anti-Passback & Journey Sequence |
+| `deleteMediaBindingRule` | | WA (writers pass) | P08 BO-338 Multi-Media Binding & Association Rules |
+| `deleteOperatingCalendarEntry` | | WA (writers pass) | P08 BO-152 Operating Calendar & Special Access Days |
+| `deletePodium` | | WA (writers pass) | P08 BO-225 Podium Operations Console |
+| `deleteReasonCode` | | WA (writers pass) | P08 BO-227 Validation Exception & Reason Code Manager |
+| `endPodiumShift` | | WA (writers pass) | P08 BO-225 Podium Operations Console, P08 BO-233 Operations Audit, Shift Handover & Control Summary, P07 SCN-002 Access point & direction |
+| `lockIdentity` | | WA (writers pass) | P08 BO-247 Unified Identity & Credential Lock Manager, P08 BO-244 Access Security & Fraud Command Center |
+| `registerAccessDevice` | | WA (writers pass) | P08 BO-196 Physical Device Registration & Provisioning |
+| `releaseCredentialDevice` | | WA (writers pass) | P08 BO-167 Device Binding & Session Security, P08 BO-169 Credential Transfer & Rebinding |
+| `releaseIdentityLock` | | WA (writers pass) | P08 BO-247 Unified Identity & Credential Lock Manager |
+| `reviewFaceReenrolment` | | WA (writers pass) | P08 BO-190 Face Change, Re-enrollment & Identity Protection, P08 BO-248 Biometric & Identity Integrity Monitoring |
+| `rollbackConfigurationVersion` | | WA (writers pass) | P08 BO-153 Topology Validation & Publication |
+| `setAccessPointGroup` | | WA (writers pass) | P08 BO-151 Access Location Grouping |
+| `setCredentialEventPropagationRule` | | WA (writers pass) | P08 BO-340 Entitlement & Cross-Media Synchronization Rules, P08 BO-170 Credential Revocation & Lifecycle Events |
+| `setDeviceBindingPolicy` | | WA (writers pass) | P08 BO-167 Device Binding & Session Security, P08 BO-164 Digital Credential Security Command Center |
+| `setFastPassProfile` | | WA (writers pass) | P08 BO-221 Fast Pass & Attraction Access Journey |
+| `setGateModePolicy` | | WA (writers pass) | P08 BO-201 Gate Modes, Free Spin & Emergency Controls |
+| `setHardwareModel` | | WA (writers pass) | P08 BO-195 Device Type & Hardware Library |
+| `setJourneyProfile` | | WA (writers pass) | P08 BO-214 Guest Journey Command Center |
+| `setJourneySequenceRule` | | WA (writers pass) | P08 BO-157 Anti-Passback & Journey Sequence |
+| `setMediaBindingRule` | | WA (writers pass) | P08 BO-338 Multi-Media Binding & Association Rules |
+| `setOfflinePolicy` | | WA (writers pass) | P08 BO-171 Offline Cryptographic Validation Profile, P08 BO-208 Offline Credential & Revocation Cache, P08 BO-210 Connectivity Failure & Degraded Mode Policy |
+| `setOperatingCalendarEntry` | | WA (writers pass) | P08 BO-152 Operating Calendar & Special Access Days, P08 BO-222 Special Event, Free View & Alternative Admission |
+| `setPodium` | | WA (writers pass) | P08 BO-225 Podium Operations Console |
+| `setPolicyEvaluationSetting` | | WA (writers pass) | P08 BO-241 Policy Evaluation Architecture & Offline Distribution |
+| `setReasonCode` | | WA (writers pass) | P08 BO-227 Validation Exception & Reason Code Manager |
+| `setRelationshipFraudRule` | | WA (writers pass) | P08 BO-249 Relationship & Companion Fraud Monitoring |
+| `setRiskScoringConfig` | | WA (writers pass) | P08 BO-250 Access Risk Scoring & Decision Engine |
+| `setTicketStatusTransition` | | WA (writers pass) | P08 BO-336 Virtual Ticket Status & Lifecycle Model |
+| `setVerificationMethodPolicy` | | WA (writers pass) | P08 BO-177 Verification Method Selection & Locking |
+| `startPodiumShift` | | WA (writers pass) | P08 BO-225 Podium Operations Console, P07 SCN-002 Access point & direction |
+| `updateAccessDevice` | | WA (writers pass) | P08 BO-196 Physical Device Registration & Provisioning, P08 BO-194 Device & Gate Command Center |
+| `updateSecurityAlert` | | WA (writers pass) | P08 BO-244 Access Security & Fraud Command Center, P08 BO-246 Credential Sharing & Concurrent Usage Detection, P08 BO-248 Biometric & Identity Integrity Monitoring, P08 BO-213 Edge Security, Audit & Deployment, P08 BO-253 Security Analytics, AI Detection & Governance |
+| `actOnWorkflowInstance` | | WB (writers pass) | P09 ADM-250 Workflow Instance Monitor & Process Timeline, P09 ADM-251 Workflow Exception, Failure & Recovery Center, P09 ADM-252 SLA, Escalation & Bottleneck Monitor, P08 BO-384 Delegation & Escalation Command Center, P08 BO-391 Live Escalation Operations Center |
+| `listLabourBudgets` | | WB (writers pass) | P08 BO-891 Labor Cost & Staffing Budget Control |
+| `resolveIdentityConflict` | | WB (writers pass) | P08 BO-631 Duplicate & Identity Conflict Detection |
+| `setLabourBudget` | | WB (writers pass) | P08 BO-891 Labor Cost & Staffing Budget Control |
+| `createCommercialCampaign` | | WC (writers pass) | ADM-139, ADM-219 |
+| `getResaleMarketplaceConfig` | | WC (writers pass) | ADM-280, ADM-282, ADM-278 |
+| `holdResaleSettlement` | | WC (writers pass) | ADM-294, ADM-295 |
+| `listBundleCapacityPolicies` | | WC (writers pass) | ADM-191, ADM-195 |
+| `listBundlePartnerProductMappings` | | WC (writers pass) | ADM-185 |
+| `listCommercialCampaigns` | | WC (writers pass) | ADM-139, ADM-142, ADM-219, ADM-229, ADM-179, BO-010, BO-011 |
+| `listExternalReferenceMappings` | | WC (writers pass) | BO-330 |
+| `listPaymentAllocationRules` | | WC (writers pass) | BO-326, ADM-601 |
+| `mergeOrders` | | WC (writers pass) | BO-328 |
+| `recordExternalReference` | | WC (writers pass) | BO-330 |
+| `recordGroupCheckIn` | | WC (writers pass) | BO-280 |
+| `releaseResaleSettlementHold` | | WC (writers pass) | ADM-294, ADM-295 |
+| `setBundleCapacityPolicy` | | WC (writers pass) | ADM-191, ADM-195 |
+| `setBundlePartnerProductMappings` | | WC (writers pass) | ADM-185 |
+| `setResaleMarketplaceConfig` | | WC (writers pass) | ADM-280, ADM-282 |
+| `updateCommercialCampaign` | | WC (writers pass) | ADM-139, ADM-219 |
+| `actOnPartnerApplicationReview` | | WD (writers pass) | P10 PTR-024 Partner Onboarding & Application Workflow |
+| `actOnPartnerCase` | | WD (writers pass) | P10 PTR-049 Partner Disputes, Cases & Service Management |
+| `actOnPartnerCommissionLine` | | WD (writers pass) | P10 PTR-048 Commission Calculation & Settlement Management |
+| `actOnPartnerReconciliationException` | | WD (writers pass) | P10 PTR-047 Partner Reconciliation & Exception Management |
+| `actOnPartnerSettlementBatch` | | WD (writers pass) | P10 PTR-048 Commission Calculation & Settlement Management |
+| `createPartnerCase` | | WD (writers pass) | P10 PTR-049 Partner Disputes, Cases & Service Management |
+| `createPartnerChangeRequest` | | WD (writers pass) | P10 PTR-045 Partner Cancellations, Refunds & Amendments |
+| `createResourceCost` | | WD (writers pass) | P08 BO-945, P08 BO-903, P08 BO-912, P08 BO-910 |
+| `deleteResourceCost` | | WD (writers pass) | P08 BO-945 |
+| `listCaseCategories` | | WD (writers pass) | BO-807, BO-806, BO-805, BO-800, SUP-012, SUP-021 |
+| `listResourceCosts` | | WD (writers pass) | P08 BO-945, P08 BO-903, P08 BO-912 |
+| `listServiceQueues` | | WD (writers pass) | BO-800, SUP-020, SUP-021, BO-808, BO-805 |
+| `listSiteNormalisationBases` | | WD (writers pass) | P16 ANL-064, P16 ANL-020 |
+| `recordDashboardView` | | WD (writers pass) | P16 ANL-001, P16 ANL-002, P16 ANL-003, P16 ANL-004, P16 ANL-005, P16 ANL-006, P16 ANL-007, P16 ANL-008, P16 ANL-021, P16 ANL-023, P16 ANL-030, P08 BO-010, P09 ADM-031, P15 KIT-010 |
+| `reportReaderQueue` | | WD (writers pass) |  |
+| `setCaseCategoryDefinition` | | WD (writers pass) | BO-807 |
+| `setMembershipCommercialConfig` | | WD (writers pass) | P08 BO-291 Membership Commercial, Pricing & Channel Association |
+| `setMembershipUsagePolicy` | | WD (writers pass) | P08 BO-289 Membership Usage, Visit & Consumption Rules |
+| `setPartnerAllocations` | | WD (writers pass) | P10 PTR-039 Commercial Allocation, Quota & Commitment Management |
+| `setPartnerCapabilityGrants` | | WD (writers pass) | P10 PTR-029 Partner Access, Roles & Permission Profile |
+| `setPartnerCommissionRules` | | WD (writers pass) | P10 PTR-035 Commission, Margin & Incentive Management |
+| `setPartnerContact` | | WD (writers pass) | P10 PTR-025 Partner Contacts & User Administration |
+| `setPartnerCreditProfile` | | WD (writers pass) | P10 PTR-036 Credit Limit & Exposure Management |
+| `setPartnerDistributionRights` | | WD (writers pass) | P10 PTR-026 Territory, Market & Distribution Rights |
+| `setPartnerSecurity` | | WD (writers pass) | P10 PTR-037 Deposit, Guarantee & Financial Security Management |
+| `setPrivacyNoticePolicyGovernance` | | WD (writers pass) | CMS-028, CMS-030 |
+| `setServiceQueueDefinition` | | WD (writers pass) | BO-800, SUP-020 |
+| `setSiteNormalisationBasis` | | WD (writers pass) | P16 ANL-064 |
+| `cancelPricingRollback` | | WE (writers pass) | P09 ADM-086 Pricing Rollback & Emergency Control Center |
+| `decideCatalogueAiFinding` | | WE (writers pass) | P09 ADM-137 Governance Risk, AI Monitoring & Control Center, P09 ADM-277 AI Channel Optimization & Intelligence Center, P09 ADM-128 Product Governance Command Center |
+| `requestPricingRollback` | | WE (writers pass) | P09 ADM-086 Pricing Rollback & Emergency Control Center |
+| `retryChannelIncident` | | WE (writers pass) | P09 ADM-273 Channel Exceptions, Incidents & Recovery |
+| `setChannelConnectionConfiguration` | | WE (writers pass) | P09 ADM-269 Channel Connection & Integration Manager |
+| `setChannelSalesRule` | | WE (writers pass) | P09 ADM-263 Channel Sales Schedule & Availability Windows, P09 ADM-264 Customer & Eligibility Rules by Channel, P09 ADM-265 Channel Sales Rules, Limits & Restrictions |
+| `setChannelSyncSetting` | | WE (writers pass) | P09 ADM-270 Product, Price & Availability Synchronization |
+| `setConfigurationTemplate` | | WE (writers pass) | P09 ADM-126 Product Duplication & Template Library, P09 ADM-056 Price List Templates, Clone & Reuse |
+| `setCurrencyRoundingRule` | | WE (writers pass) | P09 ADM-075 Currency Precision, Rounding & Monetary Rules |
+| `setDemandSignalConfiguration` | | WE (writers pass) | P09 ADM-092 Seasonal, Calendar, Day & Timeslot Dynamic Rules, P09 ADM-100 Weather Intelligence & Demand Impact Configuration, P09 ADM-101 Nearby Event, Exhibition & Local Demand Intelligence, P09 ADM-102 Competitor Pricing & Market Position Intelligence, P09 ADM-103 Market, Tourism, Holiday & Contextual Signal Hub |
+| `setDynamicPricingGuardrailPolicy` | | WE (writers pass) | P09 ADM-095 Dynamic Pricing Guardrails & Commercial Protection, P09 ADM-096 Dynamic Pricing Automation Policy & Control, P09 ADM-114 Automation Policy & Autonomous Pricing Orchestrator |
+| `setFeeDefinition` | | WE (writers pass) | P09 ADM-071 Fee & Surcharge Library |
+| `setMarketPricingConfiguration` | | WE (writers pass) | P09 ADM-054 Market, Venue & Currency Pricing Structure |
+| `setPackagePricingDefinition` | | WE (writers pass) | P09 ADM-053 Package, Bundle & Add-On Pricing, P08 BO-011 Packages & Bundles |
+| `setPriceCalculationPolicy` | | WE (writers pass) | P09 ADM-074 Price Calculation Sequence & Formula Engine |
+| `setPriceCategoryRateType` | | WE (writers pass) | P09 ADM-050 Price Category & Rate Type Library |
+| `setPriceLadderMatrix` | | WE (writers pass) | P09 ADM-094 Dynamic Price Bands, Ladders & Adjustment Matrix |
+| `setProductLinks` | | WE (writers pass) | P09 ADM-134 Change Propagation & Dependency Control, P09 ADM-133 Change Impact Analysis |
+| `setSignalRegistryPolicy` | | WE (writers pass) | P09 ADM-107 AI Signal Registry, Data Quality & Model Governance, P09 ADM-117 AI Learning, Model Performance & Optimization Feedback |
+| `testChannelConnection` | | WE (writers pass) | P09 ADM-269 Channel Connection & Integration Manager |
+| `transitionDynamicPricingStrategy` | | WE (writers pass) | P09 ADM-088 Dynamic Pricing Strategy Command Center, P09 ADM-089 Dynamic Pricing Strategy Builder, P08 BO-528 Dynamic Pricing & AI Recommendation |
+| `updateChannelIncident` | | WE (writers pass) | P09 ADM-273 Channel Exceptions, Incidents & Recovery |

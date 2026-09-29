@@ -39,10 +39,7 @@
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-144 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-145",
@@ -101,10 +98,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrator can understand the complete access-control estate and identify operational/configuration problems from one screen.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Dashboard should show) and no metric row",
   "purpose": "Central operational/configuration landing page for the complete Access Control module.",
-  "purposeNote": "Administrator can understand the complete access-control estate and identify operational/configuration problems from one screen.",
   "layout": {
    "template": "split",
    "regions": [
@@ -130,7 +127,6 @@
         "AccessControlCommandCenterView.failedScans",
         "AccessControlCommandCenterView.overrides",
         "AccessControlCommandCenterView.securityAlerts",
-        "AccessControlCommandCenterView.offlineDevices",
         "AccessControlCommandCenterView.synchronizationStatus"
        ],
        "bindsTo": "AccessControlCommandCenterView",
@@ -162,7 +158,6 @@
         "AccessControlCommandCenterView.failedScans",
         "AccessControlCommandCenterView.overrides",
         "AccessControlCommandCenterView.securityAlerts",
-        "AccessControlCommandCenterView.offlineDevices",
         "AccessControlCommandCenterView.synchronizationStatus"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Display hierarchy such as”.",
@@ -185,6 +180,16 @@
     "contract": "access",
     "purpose": "Access Control Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "createAccessPoint",
+    "contract": "access",
+    "purpose": "Add an access point to the estate from the command centre",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listAccess"
+    ]
    }
   ],
   "entryState": {
@@ -200,7 +205,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-144"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-144",
+   "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-144"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 6. 14 of 16 labels bound to a contract property; 16 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -263,10 +269,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Any tenant can model single-site or multi-park operations without development.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Define the highest-level physical access hierarchy.",
-  "purposeNote": "Any tenant can model single-site or multi-park operations without development.",
   "gaps": [
    {
     "operation": null,
@@ -290,6 +296,20 @@
        "derived": true,
        "impliedBy": "listVenueParkAccess",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createOrgUnit",
+       "label": "Create org unit",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createOrgUnit"
       }
      ]
     }
@@ -308,21 +328,51 @@
     "contract": "access",
     "purpose": "Venue & Park Access Structure",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOrgUnits",
+    "contract": "tenancy",
+    "purpose": "The venue, park and zone tree the access structure hangs from",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "createOrgUnit",
+    "contract": "tenancy",
+    "purpose": "Add a venue, park or zone node",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listOrgUnits"
+    ]
+   },
+   {
+    "operationId": "updateOrgUnit",
+    "contract": "tenancy",
+    "purpose": "Rename, move or deactivate a node",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listOrgUnits"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "VenueParkAccessStructureView.venue",
-    "VenueParkAccessStructureView.park",
-    "VenueParkAccessStructureView.building",
-    "VenueParkAccessStructureView.eventSpace",
-    "VenueParkAccessStructureView.waterpark"
+    "VenueParkAccessStructureView.entityType"
+   ],
+   "params": [
+    {
+     "name": "orgUnitId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-145"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-145",
+   "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-145"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 0 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -385,10 +435,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Access-controlled zones can be configured and reorganized without software changes.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Divide a venue into controlled access areas.",
-  "purposeNote": "Access-controlled zones can be configured and reorganized without software changes.",
   "gaps": [
    {
     "operation": null,
@@ -441,16 +491,14 @@
     "operationId": "setAccessAreaZone",
     "contract": "access",
     "purpose": "Access Area & Zone Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setAccessAreaZone"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-146"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-146",
+   "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-146"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -513,10 +561,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "An attraction can independently enforce admission requirements without changing the base ticket product.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure attractions as access-controlled destinations.",
-  "purposeNote": "An attraction can independently enforce admission requirements without changing the base ticket product.",
   "gaps": [
    {
     "operation": null,
@@ -569,16 +617,14 @@
     "operationId": "setAttractionAccess",
     "contract": "access",
     "purpose": "Attraction Access Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setAttractionAccess"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-147"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-147",
+   "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-147"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -641,10 +687,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations can logically group multiple physical devices under one controlled access point.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Additional settings) and no display directory — it is settings, not a population",
   "purpose": "Create the logical access points where validation occurs. An Access Point is different from a physical reader/device.",
-  "purposeNote": "Operations can logically group multiple physical devices under one controlled access point.",
   "layout": {
    "template": "form",
    "regions": [
@@ -703,7 +749,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-148"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-148",
+   "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-148"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 6 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -766,10 +813,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every physical lane can have independent configuration while inheriting settings from its parent access point.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure individual physical gates/lanes.",
-  "purposeNote": "Every physical lane can have independent configuration while inheriting settings from its parent access point.",
   "gaps": [
    {
     "operation": null,
@@ -822,16 +869,14 @@
     "operationId": "setGateLane",
     "contract": "access",
     "purpose": "Gate & Lane Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setGateLane"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-149"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-149",
+   "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-149"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 0 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -894,10 +939,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Access infrastructure can be configured and monitored geographically from a venue map.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Create a graphical digital twin of the access-control environment.",
-  "purposeNote": "Access infrastructure can be configured and monitored geographically from a venue map.",
   "gaps": [
    {
     "operation": null,
@@ -950,16 +995,14 @@
     "operationId": "setAccessGraphicalMap",
     "contract": "access",
     "purpose": "Access Control Graphical Map Designer",
-    "trigger": "onAction",
-    "invalidates": [
-     "setAccessGraphicalMap"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-150"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-150",
+   "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-150"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 12. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1022,10 +1065,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Multiple access-control devices can contribute to common occupancy and operational statistics.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Group multiple access points for operational and capacity purposes.",
-  "purposeNote": "Multiple access-control devices can contribute to common occupancy and operational statistics.",
   "gaps": [
    {
     "operation": null,
@@ -1051,6 +1094,28 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save access point group",
+       "operation": "setAccessPointGroup",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Access Location Grouping** (BO-151): a named group of access points in one venue (e.g.",
+       "provenance": "contract access.yaml PUT /access-point-groups"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Delete access point group",
+       "operation": "deleteAccessPointGroup",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "Deletes a group.",
+       "provenance": "contract access.yaml DELETE /access-point-groups/{groupId}"
+      }
+     ]
     }
    ]
   },
@@ -1067,14 +1132,65 @@
     "contract": "access",
     "purpose": "Access Location Grouping",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setAccessPointGroup",
+    "contract": "access",
+    "purpose": "Create or replace an access-point group",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAccessLocationGrouping"
+    ]
+   },
+   {
+    "operationId": "deleteAccessPointGroup",
+    "contract": "access",
+    "purpose": "Delete an access-point group",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAccessLocationGrouping"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-151"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-151",
+   "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-151"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 13. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetAccessPointGroup",
+    "component": "modal",
+    "trigger": "Save access point group",
+    "body": "**Collects what `setAccessPointGroup` sends before it is called.** Required: `id`, `venueId`, `name`, `scopePath`. Optional: `parentGroupId`, `accessPointIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessAccessPointGroup",
+    "confirm": {
+     "label": "Save access point group",
+     "operation": "setAccessPointGroup"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "name",
+      "scopePath",
+      "parentGroupId",
+      "accessPointIds"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /access-point-groups"
+   },
+   {
+    "id": "confirmDeleteAccessPointGroup",
+    "component": "confirmDialog",
+    "trigger": "Delete access point group",
+    "body": "**Names what `deleteAccessPointGroup` changes and what it leaves alone**, in the consequence rather than the verb. A record this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract access.yaml DELETE /access-point-groups/{groupId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1135,10 +1251,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Special-date access configurations can automatically replace standard operation without manual gate-by- gate changes.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Allow access topology and operating behavior to change by date/time.",
-  "purposeNote": "Special-date access configurations can automatically replace standard operation without manual gate-by- gate changes.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1197,6 +1313,28 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 13 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save operating calendar entry",
+       "operation": "setOperatingCalendarEntry",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Operating Calendar & Special Access Days** (BO-152) and Special Event, Free View & Alternative Admission (BO-222): one dated entry (a holiday, private event, free-entry day, special event and so on), whether tickets must be validated, and for a free-view or special-event window its admission type.",
+       "provenance": "contract access.yaml PUT /operating-calendar-entries"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Delete operating calendar entry",
+       "operation": "deleteOperatingCalendarEntry",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "Deletes one calendar entry.",
+       "provenance": "contract access.yaml DELETE /operating-calendar-entries/{entryId}"
+      }
+     ]
     }
    ]
   },
@@ -1212,14 +1350,70 @@
     "contract": "access",
     "purpose": "Operating Calendar & Special Access Days",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setOperatingCalendarEntry",
+    "contract": "access",
+    "purpose": "Create or replace an operating calendar entry",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOperatingCalendarSpecial"
+    ]
+   },
+   {
+    "operationId": "deleteOperatingCalendarEntry",
+    "contract": "access",
+    "purpose": "Delete an operating calendar entry",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOperatingCalendarSpecial"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-152"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-152",
+   "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-152"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 13. 0 of 0 labels bound to a contract property; 10 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetOperatingCalendarEntry",
+    "component": "modal",
+    "trigger": "Save operating calendar entry",
+    "body": "**Collects what `setOperatingCalendarEntry` sends before it is called.** Required: `id`, `venueId`, `dayType`, `startsAt`, `endsAt`, `scopePath`. Optional: `name`, `ticketValidationRequired`, `admissionType`, `attractionValidation`, `manualAttendanceRequired`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessOperatingCalendarEntry",
+    "confirm": {
+     "label": "Save operating calendar entry",
+     "operation": "setOperatingCalendarEntry"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "dayType",
+      "startsAt",
+      "endsAt",
+      "scopePath",
+      "name",
+      "ticketValidationRequired",
+      "admissionType",
+      "attractionValidation",
+      "manualAttendanceRequired"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /operating-calendar-entries"
+   },
+   {
+    "id": "confirmDeleteOperatingCalendarEntry",
+    "component": "confirmDialog",
+    "trigger": "Delete operating calendar entry",
+    "body": "**Names what `deleteOperatingCalendarEntry` changes and what it leaves alone**, in the consequence rather than the verb. A record this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract access.yaml DELETE /operating-calendar-entries/{entryId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1272,10 +1466,10 @@
    "notes": "**Reached from BO-144, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "No access topology enters production without validation, authorization, version tracking and rollback capability. Board 1 — Final Backend Navigation The left-side navigation for this board should therefore be:",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Final validation and controlled deployment of access configuration. Before publication, TICVAI automatically validates: orphan gates devices without access points access points without zones incorrect entry/exit direction missing offline configuration conflicting operating calendars inaccessible zones missing emergency configuration capacity inconsistencies missing reader/device association policy dependencies.",
-  "purposeNote": "No access topology enters production without validation, authorization, version tracking and rollback capability. Board 1 — Final Backend Navigation The left-side navigation for this board should therefore be:",
   "gaps": [
    {
     "operation": null,
@@ -1305,6 +1499,14 @@
        "label": "What publishing changes",
        "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
        "provenance": "authored — required by check-screens for publishTopologyValidation"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Rollback configuration version",
+       "operation": "rollbackConfigurationVersion",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**Rolls back the version in force** (Topology Validation & Publication, BO-153; rule sets roll back through `publishRuleConflictCheck` with step `rollBack`): the active version becomes `rolledBack` and the version it replaced (`previousVersionId`) becomes `active` again and is redistributed to the targets.",
+       "provenance": "contract access.yaml POST /configuration-versions/{versionId}/rollback"
       }
      ]
     },
@@ -1326,18 +1528,50 @@
     "operationId": "publishTopologyValidation",
     "contract": "access",
     "purpose": "Topology Validation & Publication",
-    "trigger": "onAction",
-    "invalidates": [
-     "publishTopologyValidation"
-    ]
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "rollbackConfigurationVersion",
+    "contract": "access",
+    "purpose": "Roll back an active access configuration version",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-153"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-153",
+   "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-153"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 0 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formRollbackConfigurationVersion",
+    "component": "modal",
+    "trigger": "Rollback configuration version",
+    "body": "**Collects what `rollbackConfigurationVersion` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Rollback configuration version",
+     "operation": "rollbackConfigurationVersion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract access.yaml POST /configuration-versions/{versionId}/rollback"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "versionId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

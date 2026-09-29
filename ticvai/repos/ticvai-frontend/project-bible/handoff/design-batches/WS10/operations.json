@@ -1,4 +1,42 @@
 {
+ "createApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests",
+  "contract": "approvals",
+  "summary": "Raise a request",
+  "permission": "APPROVAL_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateApprovalRequest",
+  "responds": "ApprovalRequest"
+ },
+ "decideApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests/{requestId}/decide",
+  "contract": "approvals",
+  "summary": "Approve, reject, return or ask for information",
+  "permission": "APPROVAL_DECIDE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalRequest"
+ },
  "listAccessAttributeCatalog": {
   "method": "GET",
   "path": "/access-attribute-catalog",
@@ -21,9 +59,20 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AuthorizationGovernanceTemporaryAccessView"
+  "responds": "Page"
  },
  "listDynamicAccessPolicy": {
   "method": "GET",
@@ -34,9 +83,20 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "DynamicAccessPolicyCommandCenterView"
+  "responds": "Page"
  },
  "listIdentityMembershipAccreditation": {
   "method": "GET",
@@ -60,7 +120,18 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "includeHistory",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Policy"
  },
@@ -90,6 +161,63 @@
   "requestBody": null,
   "responds": "PolicyScopeHierarchyInheritanceView"
  },
+ "rollbackAccessPolicy": {
+  "method": "POST",
+  "path": "/dynamic-access-policy/{policyId}/rollback",
+  "contract": "access",
+  "summary": "Put a previous policy version back",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DynamicAccessPolicyCommandCenterView"
+ },
+ "setAccessAttributeCatalog": {
+  "method": "PUT",
+  "path": "/access-attribute-catalog",
+  "contract": "access",
+  "summary": "Add or amend an access attribute",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessAttributeCatalogInput",
+  "responds": "AccessAttributeCatalogView"
+ },
+ "setAccessProfile": {
+  "method": "PUT",
+  "path": "/accreditation-access-profiles",
+  "contract": "accreditation",
+  "summary": "Define which zones, on which dates, at which times",
+  "permission": "ACCREDITATION_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessProfile",
+  "responds": "AccessProfile"
+ },
  "setContextTimeEvent": {
   "method": "PUT",
   "path": "/context-time-event",
@@ -99,9 +227,72 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ContextTimeEventCapacityPolicyBuilderInput",
   "responds": "ContextTimeEventCapacityPolicyBuilderView"
+ },
+ "setEdgeNodeLocal": {
+  "method": "PUT",
+  "path": "/edge-node-local",
+  "contract": "access",
+  "summary": "Edge Node & Local Processing Configuration",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EdgeNodeLocalProcessingConfigurationInput",
+  "responds": "EdgeNodeLocalProcessingConfigurationView"
+ },
+ "setOfflinePolicy": {
+  "method": "PUT",
+  "path": "/offline-policy",
+  "contract": "tenancy",
+  "summary": "What a workstation may do with no network, and for how long",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "OfflinePolicy",
+  "responds": "OfflinePolicy"
+ },
+ "setPolicyScopeHierarchy": {
+  "method": "PUT",
+  "path": "/policy-scope-hierarchy",
+  "contract": "access",
+  "summary": "Place a policy in the scope hierarchy",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PolicyScopeHierarchyInheritanceInput",
+  "responds": "PolicyScopeHierarchyInheritanceView"
  },
  "setVisualDynamicPolicy": {
   "method": "PUT",
@@ -112,7 +303,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "VisualDynamicPolicyBuilderInput",
   "responds": "VisualDynamicPolicyBuilderView"
  },
@@ -125,7 +322,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PolicySimulationConflictImpactAnalysisInput",
   "responds": "PolicySimulationConflictImpactAnalysisView"
  }

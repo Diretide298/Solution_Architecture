@@ -1,0 +1,33 @@
+id: LLD-AccessJourneyProfile
+title: AccessJourneyProfile — 2 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/access-journey-profile.yaml
+entity: AccessJourneyProfile
+contract: access
+enum: AccessJourneyProfile.status
+enumKind: inline
+enumSchema: AccessJourneyProfile
+enumProperty: status
+owner: access
+description: One guest access journey profile, such as School Group Entry, with its type, venue, credential
+  and the ordered steps a simulation walks (declared 29 September, writers pass). `setJourneyProfile`
+  is a PUT upsert and carries `status`, so every move is that write.
+initial:
+- active
+- inactive
+terminal: []
+transitions:
+- from: active
+  to: inactive
+  operation: setJourneyProfile
+  trigger: operation
+  guard: '`status` `inactive`; the profile is no longer offered for simulation'
+- from: inactive
+  to: active
+  operation: setJourneyProfile
+  trigger: operation
+  guard: '`status` `active`'
+openQuestions: null
+notes: '**No terminal state, by design** (`terminal: []`): a journey profile is configuration, switched
+  off and on again. Created `active` (the schema default) unless the write says `inactive`.'

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Reporting & Analytics
   version: 0.1.0
-  x-ticvai-screen-count: 43
+  x-ticvai-screen-count: 46
   x-ticvai-tier: satellite
   x-ticvai-module: 8 — Unified Operations Dashboard  ·  cross-cutting
   x-ticvai-requirements: 332
@@ -1517,6 +1517,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Archived
         '409':
           description: The dashboard is shared. Un-share it first.
@@ -2238,9 +2241,207 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AnalyticsUsageRow'
+  /dashboards/{dashboardId}/views:
+    parameters:
+    - name: dashboardId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: recordDashboardView
+      x-ticvai-consumed-by:
+        - "P08 BO-010 Promotions & Coupons"
+        - "P09 ADM-031 Security & Compliance Dashboard"
+        - "P15 KIT-010 Kitchen Performance, AI & Operational Optimization"
+        - "P16 ANL-001 Executive Command Center"
+        - "P16 ANL-002 Sales, Revenue & Channel"
+        - "P16 ANL-003 Operational Performance"
+        - "P16 ANL-004 Product Performance"
+        - "P16 ANL-005 Cost, Margin & Profitability"
+        - "P16 ANL-006 Inventory & Waste Intelligence"
+        - "P16 ANL-007 Guest & Conversion Intelligence"
+        - "P16 ANL-008 Demand Forecasting"
+        - "P16 ANL-021 Dashboard Library"
+        - "P16 ANL-023 Drag-and-Drop Dashboard Canvas"
+        - "P16 ANL-030 Dashboard Preview, Validation & Health"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass; BI board 10.9 (usage: opens, distinct users, last
+        opened, per dashboard, user and venue); data model DM6 open item on reporting.dashboard_view; shape
+        follows acknowledgeAlert (a small POST beside a read)'
+      summary: Record that a dashboard was opened
+      description: '**The writer of `reporting.dashboard_view`** (decided 29 September, writers pass).
+        `getDashboard` stays a pure read on the analytical replica: a write inside a GET would break
+        replica routing, so the dashboard client posts this once when a dashboard is rendered for the
+        caller, not on every tile refresh. One row per call, stamped with the caller as
+        `viewedByPrincipalId` and the server time as `openedAt`; `getAnalyticsUsage` reads it for `opens`,
+        `distinctUsers` and `lastOpenedAt`.
+
+        **Best effort for the client.** A failure here must never stop the dashboard rendering, and a
+        retry with the same `Idempotency-Key` records nothing twice. An archived dashboard or one the
+        caller cannot read is `404`, exactly as `getDashboard` answers.
+
+        '
+      tags:
+      - dashboard
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                venueId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: The venue the dashboard was narrowed to when opened, as
+                    `Dashboard.venueId`. Must be inside the caller's scope.
+      responses:
+        '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Recorded
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+  /site-normalisation-bases:
+    get:
+      operationId: listSiteNormalisationBases
+      x-ticvai-consumed-by:
+        - "P16 ANL-020 Multi-Site & Performance Comparison"
+        - "P16 ANL-064 Benchmark & Comparative Analytics Configuration"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass; BI boards 7.9 and 10.4 (benchmark per visitor, per
+        operating hour, per square metre, per staffed position); data model DM6 open item on
+        reporting.site_normalisation_basis; shape follows listReports'
+      x-ticvai-read-routing: replica
+      summary: The denominators each site is benchmarked by
+      description: 'The stored `reporting.site_normalisation_basis` rows inside the caller''s scope,
+        newest period first (decided 29 September, writers pass). What `getAnalyticsBenchmark` divides
+        by.
+
+        '
+      tags:
+      - reporting
+      x-ticvai-permission: REPORT_VIEW_TENANT
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: scopePath
+        in: query
+        description: Only this site.
+        schema:
+          type: string
+      - name: periodFrom
+        in: query
+        description: Only bases whose period ends on or after this date.
+        schema:
+          type: string
+          format: date
+      - name: periodTo
+        in: query
+        description: Only bases whose period starts on or before this date.
+        schema:
+          type: string
+          format: date
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Bases
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/SiteNormalisationBasis'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+    put:
+      operationId: setSiteNormalisationBasis
+      x-ticvai-consumed-by:
+        - "P16 ANL-064 Benchmark & Comparative Analytics Configuration"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass; BI boards 7.9 and 10.4; data model DM6 open item on
+        reporting.site_normalisation_basis; shape follows setKpiTargets'
+      summary: Set the denominators a site is benchmarked by
+      description: '**The writer of `reporting.site_normalisation_basis`** (decided 29 September, writers
+        pass). **PUT semantics, as `setKpiTargets`.** Each basis is matched on (`scopePath`,
+        `periodStart`, `periodEnd`): one in the body replaces the stored one whole and a new triple adds
+        a basis. Bases the body leaves out are kept, because a basis is history a past benchmark was
+        computed on. Two bases for the same site whose periods overlap are `422`; `periodEnd` before
+        `periodStart` is `422`. A `scopePath` outside the caller''s scope is `403`.
+
+        **A null denominator is not zero.** When `visitors` is null, `getAnalyticsBenchmark` uses the
+        seeded `admissions` KPI for the site and period; when `operatingHours`, `staffedPositions` or
+        `areaSquareMetres` is null, that site''s `normalisedValue` is null for that basis rather than
+        a guess (our build plan).
+
+        '
+      tags:
+      - reporting
+      x-ticvai-permission: REPORT_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - bases
+              properties:
+                bases:
+                  type: array
+                  minItems: 1
+                  items:
+                    $ref: '#/components/schemas/SiteNormalisationBasis'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SiteNormalisationBasis'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '422':
+          description: A period ends before it starts, or overlaps another basis for the same site.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
 
 components:
   schemas:
+
     KpiDefinition:
       type: object
       x-ticvai-persistence: reporting.kpi_definition
@@ -2406,6 +2607,52 @@ components:
         percentile:
           type: number
           nullable: true
+    SiteNormalisationBasis:
+      type: object
+      x-ticvai-persistence: reporting.site_normalisation_basis
+      description: 'BI boards 7.9 and 10.4. **The denominators a benchmark divides by**, per site and
+        period: visitors, operating hours, staffed positions and area, one for each
+        `BenchmarkNormalisation` other than `none`. Read by `getAnalyticsBenchmark` for the period that
+        covers the benchmark (data model, 29 September).
+
+        '
+      required:
+      - scopePath
+      - periodStart
+      - periodEnd
+      properties:
+        id:
+          type: string
+          format: uuid
+        scopePath:
+          type: string
+          description: The site (venue scope) the basis applies to.
+        periodStart:
+          type: string
+          format: date
+        periodEnd:
+          type: string
+          format: date
+        visitors:
+          type: integer
+          nullable: true
+          minimum: 0
+          description: '`perVisitor`.'
+        operatingHours:
+          type: number
+          nullable: true
+          minimum: 0
+          description: '`perOperatingHour`.'
+        staffedPositions:
+          type: number
+          nullable: true
+          minimum: 0
+          description: '`perStaffedPosition`. Average positions staffed over the period.'
+        areaSquareMetres:
+          type: number
+          nullable: true
+          minimum: 0
+          description: '`perSquareMetre`. Operated area.'
     SemanticModel:
       type: object
       x-ticvai-persistence: reporting.semantic_model
@@ -2716,6 +2963,39 @@ components:
           nullable: true
         neverOpened:
           type: boolean
+    DashboardView:
+      type: object
+      x-ticvai-persistence: reporting.dashboard_view
+      description: 'BI board 10.9. **One row each time a dashboard is opened.** Report runs are already
+        recorded in `reporting.execution`; dashboard opens were not. Read by `getAnalyticsUsage` for
+        `opens`, `distinctUsers` and `lastOpenedAt` per dashboard, user and venue (data model, 29
+        September).
+
+        '
+      required:
+      - dashboardId
+      - viewedByPrincipalId
+      - openedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        dashboardId:
+          type: string
+          format: uuid
+          x-ticvai-references: reporting.dashboard
+        viewedByPrincipalId:
+          type: string
+          format: uuid
+          x-ticvai-references: identity.principal
+        venueId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The venue the dashboard was narrowed to when opened, as `Dashboard.venueId`.
+        openedAt:
+          type: string
+          format: date-time
     ReportCategory:
       type: string
       enum:

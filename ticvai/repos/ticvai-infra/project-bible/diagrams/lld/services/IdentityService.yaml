@@ -348,7 +348,7 @@ operationsByContract:
     scope: tenant
     permission: PERMISSION_VIEW
     offline: false
-    reads: 0
+    reads: 2
     writes: 0
   - operation: listModules
     verb: GET
@@ -412,7 +412,7 @@ operationsByContract:
     scope: venue
     permission: PERMISSION_VIEW
     offline: false
-    reads: 0
+    reads: 4
     writes: 0
   - operation: listSsoProviders
     verb: GET
@@ -803,7 +803,7 @@ tables:
   - identity
   foreignWriters: null
 - table: identity.membership_history
-  columns: 7
+  columns: 20
   store: postgres
   parent: null
   writtenBy: []

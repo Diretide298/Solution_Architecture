@@ -1,0 +1,47 @@
+id: LLD-Pricing publication
+title: Pricing publication — 6 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/pricing-publication.yaml
+entity: Pricing publication
+contract: catalogue
+enum: PricingPublication.status
+enumKind: inline
+enumSchema: PricingPublication
+enumProperty: status
+owner: catalogue
+initial:
+- scheduled
+- publishing
+terminal:
+- published
+- failed
+- cancelled
+transitions:
+- from: scheduled
+  to: publishing
+  trigger: timer
+  guard: The publication date is reached (per stage, for `staged`)
+- from: scheduled
+  to: cancelled
+  operation: publishPricingEffectiveDate
+  trigger: operation
+  guard: '`cancel` before the publication date; the change request returns to `approved`'
+- from: publishing
+  to: published
+  trigger: job
+  guard: Every distribution target reports `inSync`
+- from: publishing
+  to: partiallyFailed
+  trigger: job
+  guard: At least one target failed and at least one is in sync
+- from: publishing
+  to: failed
+  trigger: job
+  guard: No target could be brought in sync
+- from: partiallyFailed
+  to: publishing
+  trigger: job
+  guard: The failed targets are retried
+notes: '**Created by `publishPricingEffectiveDate`**: `scheduled` for a future publication date, `publishing`
+  for `immediate`. Refused unless every pre-publication check passes.'

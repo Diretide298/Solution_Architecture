@@ -1,0 +1,265 @@
+{
+ "amendAttendance": {
+  "method": "POST",
+  "path": "/attendance/{recordId}/amend",
+  "contract": "workforce",
+  "summary": "A supervisor corrects a record",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AttendanceRecord"
+ },
+ "claimOpenShift": {
+  "method": "POST",
+  "path": "/shift-marketplace",
+  "contract": "workforce",
+  "summary": "Pick up a released shift",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OpenShift"
+ },
+ "createRotaAssignment": {
+  "method": "POST",
+  "path": "/rota-assignments",
+  "contract": "workforce",
+  "summary": "Put someone on the rota",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RotaAssignment",
+  "responds": "RotaAssignment"
+ },
+ "getLabourCost": {
+  "method": "GET",
+  "path": "/labour-cost",
+  "contract": "workforce",
+  "summary": "Rostered and actual labour cost against budget",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LabourCostRow"
+ },
+ "getStaffingCoverage": {
+  "method": "GET",
+  "path": "/staffing-coverage",
+  "contract": "workforce",
+  "summary": "Where the rota is short, and by how much",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "StaffingCoverage"
+ },
+ "listAttendance": {
+  "method": "GET",
+  "path": "/attendance",
+  "contract": "workforce",
+  "summary": "Who was here",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "date",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "exceptionsOnly",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AttendanceRecord"
+ },
+ "listOpenShifts": {
+  "method": "GET",
+  "path": "/shift-marketplace",
+  "contract": "workforce",
+  "summary": "Shifts offered back, and who may take them",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OpenShift"
+ },
+ "listRotaAssignments": {
+  "method": "GET",
+  "path": "/rota-assignments",
+  "contract": "workforce",
+  "summary": "The rota",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "departmentId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "recordAttendance": {
+  "method": "POST",
+  "path": "/attendance/clock",
+  "contract": "workforce",
+  "summary": "Clock in, clock out, or take a break",
+  "permission": "ATTENDANCE_RECORD",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AttendanceRecord"
+ },
+ "setStaffingRules": {
+  "method": "PUT",
+  "path": "/staffing-rules",
+  "contract": "workforce",
+  "summary": "Minimum cover, working-hour limits and overtime",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "StaffingRules",
+  "responds": "StaffingRules"
+ },
+ "validateWorkforceCompliance": {
+  "method": "GET",
+  "path": "/workforce-compliance",
+  "contract": "workforce",
+  "summary": "Where the rota breaks a rule",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkforceComplianceFinding"
+ }
+}

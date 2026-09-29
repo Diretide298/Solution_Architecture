@@ -1,4 +1,42 @@
 {
+ "createAdmissionRules": {
+  "method": "POST",
+  "path": "/admission-rules",
+  "contract": "access",
+  "summary": "Create an admission profile",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AdmissionRules",
+  "responds": "AdmissionRules"
+ },
+ "getProductEligibilityRule": {
+  "method": "GET",
+  "path": "/products/{productId}/eligibility-rule",
+  "contract": "catalogue",
+  "summary": "Who may take part: age, height, supervision",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "path",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductEligibilityRule"
+ },
  "listAccessRule": {
   "method": "GET",
   "path": "/access-rule",
@@ -8,9 +46,60 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "park",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "attraction",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "credential",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ruleType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AccessRuleCommandCenterView"
+  "responds": "Page"
  },
  "listAccessValidityTime": {
   "method": "GET",
@@ -24,6 +113,30 @@
   "parameters": [],
   "requestBody": null,
   "responds": "AccessValidityTimeRulesView"
+ },
+ "listAdmissionRules": {
+  "method": "GET",
+  "path": "/admission-rules",
+  "contract": "access",
+  "summary": "List admission profiles",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listAntiPassbackJourney": {
   "method": "GET",
@@ -112,9 +225,58 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "RuleSimulationConflictCheckPublicationInput",
   "responds": "RuleSimulationConflictCheckPublicationView"
+ },
+ "setEntitlementConsumption": {
+  "method": "PUT",
+  "path": "/entitlement-consumption",
+  "contract": "access",
+  "summary": "Save an entitlement consumption rule",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EntitlementConsumptionEngineInput",
+  "responds": "EntitlementConsumptionEngineView"
+ },
+ "setProductEligibilityRule": {
+  "method": "PUT",
+  "path": "/products/{productId}/eligibility-rule",
+  "contract": "catalogue",
+  "summary": "Set age, height and supervision limits",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "productId",
+    "in": "path",
+    "required": true
+   }
+  ],
+  "requestBody": "ProductEligibilityRule",
+  "responds": "ProductEligibilityRule"
  },
  "setVisualAccessRule": {
   "method": "PUT",
@@ -125,8 +287,33 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "VisualAccessRuleBuilderInput",
   "responds": "VisualAccessRuleBuilderView"
+ },
+ "updateAdmissionRules": {
+  "method": "PUT",
+  "path": "/admission-rules/{profileId}",
+  "contract": "access",
+  "summary": "Update an admission profile",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AdmissionRules",
+  "responds": "AdmissionRules"
  }
 }

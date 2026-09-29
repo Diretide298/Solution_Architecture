@@ -39,10 +39,7 @@
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-304 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-305",
@@ -101,10 +98,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can locate and monitor any TICVAI order/reservation across all channels from one centralized operational workspace.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide the central operational workspace for searching, monitoring, opening, and managing every order and reservation across TICVAI.",
-  "purposeNote": "Authorized users can locate and monitor any TICVAI order/reservation across all channels from one centralized operational workspace.",
   "layout": {
    "template": "split",
    "regions": [
@@ -130,10 +127,8 @@
         "OrderReservationCommandCenterView.grossOrderValue",
         "OrderReservationCommandCenterView.orderId",
         "OrderReservationCommandCenterView.reservationId",
-        "OrderReservationCommandCenterView.customer",
         "OrderReservationCommandCenterView.channel",
         "OrderReservationCommandCenterView.venue",
-        "OrderReservationCommandCenterView.productEvent",
         "OrderReservationCommandCenterView.orderValue",
         "OrderReservationCommandCenterView.paymentStatus",
         "OrderReservationCommandCenterView.reservationStatus",
@@ -171,10 +166,8 @@
         "OrderReservationCommandCenterView.grossOrderValue",
         "OrderReservationCommandCenterView.orderId",
         "OrderReservationCommandCenterView.reservationId",
-        "OrderReservationCommandCenterView.customer",
         "OrderReservationCommandCenterView.channel",
         "OrderReservationCommandCenterView.venue",
-        "OrderReservationCommandCenterView.productEvent",
         "OrderReservationCommandCenterView.orderValue",
         "OrderReservationCommandCenterView.paymentStatus",
         "OrderReservationCommandCenterView.reservationStatus",
@@ -230,7 +223,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-304"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-304",
+   "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-304"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 3. 25 of 25 labels bound to a contract property; 32 of 57 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -293,10 +287,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "The complete commercial, operational, customer, payment, ticket and fulfillment context of an order can be understood from one screen.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display; Show) and a per-row directory (§Each line should display) — counts over a population, then the population",
   "purpose": "Provide the authoritative 360-degree view of a single order. This should become one of the most important operational screens in TICVAI.",
-  "purposeNote": "The complete commercial, operational, customer, payment, ticket and fulfillment context of an order can be understood from one screen.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -439,21 +433,21 @@
        "kind": "dataTable",
        "label": "Every order detail transaction",
        "columns": [
-        "OrderDetailTransactionWorkspaceView.product",
-        "OrderDetailTransactionWorkspaceView.ticketType",
-        "OrderDetailTransactionWorkspaceView.event",
-        "OrderDetailTransactionWorkspaceView.performance",
+        "OrderDetailTransactionWorkspaceView.lines[].product",
+        "OrderDetailTransactionWorkspaceView.lines[].ticketType",
+        "OrderDetailTransactionWorkspaceView.lines[].event",
+        "OrderDetailTransactionWorkspaceView.lines[].performance",
         "OrderDetailTransactionWorkspaceView.date",
-        "OrderDetailTransactionWorkspaceView.timeslot",
-        "OrderDetailTransactionWorkspaceView.quantity",
-        "OrderDetailTransactionWorkspaceView.personType",
-        "OrderDetailTransactionWorkspaceView.seat",
-        "OrderDetailTransactionWorkspaceView.unitPrice",
-        "OrderDetailTransactionWorkspaceView.discount",
-        "OrderDetailTransactionWorkspaceView.tax",
-        "OrderDetailTransactionWorkspaceView.fee",
+        "OrderDetailTransactionWorkspaceView.lines[].timeslot",
+        "OrderDetailTransactionWorkspaceView.lines[].quantity",
+        "OrderDetailTransactionWorkspaceView.lines[].personType",
+        "OrderDetailTransactionWorkspaceView.lines[].seat",
+        "OrderDetailTransactionWorkspaceView.lines[].unitPrice",
+        "OrderDetailTransactionWorkspaceView.lines[].discount",
+        "OrderDetailTransactionWorkspaceView.lines[].tax",
+        "OrderDetailTransactionWorkspaceView.lines[].fee",
         "OrderDetailTransactionWorkspaceView.total",
-        "OrderDetailTransactionWorkspaceView.ticketStatus"
+        "OrderDetailTransactionWorkspaceView.lines[].ticketStatus"
        ],
        "bindsTo": "OrderDetailTransactionWorkspaceView",
        "operation": "setOrderDetailTransaction",
@@ -470,21 +464,21 @@
        "label": "The selected order detail transaction",
        "bindsTo": "OrderDetailTransactionWorkspaceView",
        "columns": [
-        "OrderDetailTransactionWorkspaceView.product",
-        "OrderDetailTransactionWorkspaceView.ticketType",
-        "OrderDetailTransactionWorkspaceView.event",
-        "OrderDetailTransactionWorkspaceView.performance",
+        "OrderDetailTransactionWorkspaceView.lines[].product",
+        "OrderDetailTransactionWorkspaceView.lines[].ticketType",
+        "OrderDetailTransactionWorkspaceView.lines[].event",
+        "OrderDetailTransactionWorkspaceView.lines[].performance",
         "OrderDetailTransactionWorkspaceView.date",
-        "OrderDetailTransactionWorkspaceView.timeslot",
-        "OrderDetailTransactionWorkspaceView.quantity",
-        "OrderDetailTransactionWorkspaceView.personType",
-        "OrderDetailTransactionWorkspaceView.seat",
-        "OrderDetailTransactionWorkspaceView.unitPrice",
-        "OrderDetailTransactionWorkspaceView.discount",
-        "OrderDetailTransactionWorkspaceView.tax",
-        "OrderDetailTransactionWorkspaceView.fee",
+        "OrderDetailTransactionWorkspaceView.lines[].timeslot",
+        "OrderDetailTransactionWorkspaceView.lines[].quantity",
+        "OrderDetailTransactionWorkspaceView.lines[].personType",
+        "OrderDetailTransactionWorkspaceView.lines[].seat",
+        "OrderDetailTransactionWorkspaceView.lines[].unitPrice",
+        "OrderDetailTransactionWorkspaceView.lines[].discount",
+        "OrderDetailTransactionWorkspaceView.lines[].tax",
+        "OrderDetailTransactionWorkspaceView.lines[].fee",
         "OrderDetailTransactionWorkspaceView.total",
-        "OrderDetailTransactionWorkspaceView.ticketStatus"
+        "OrderDetailTransactionWorkspaceView.lines[].ticketStatus"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Order Total”, “Internal Notes”.",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Each line should display"
@@ -516,16 +510,14 @@
     "operationId": "setOrderDetailTransaction",
     "contract": "orders",
     "purpose": "Order Detail & Transaction Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setOrderDetailTransaction"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-305"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-305",
+   "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-305"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 5. 35 of 35 labels bound to a contract property; 36 of 51 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -588,17 +580,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "overselling or orphaning inventory.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure by; Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure how TICVAI temporarily reserves inventory before an order is fully confirmed.",
-  "purposeNote": "overselling or orphaning inventory.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Cart Hold, Checkout Hold, Manual Hold, Payment Hold, Seat Hold, Inventory Hold. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -684,22 +669,32 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Agent Reservation",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Group Reservation",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "B2B Reservation",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Corporate Reservation",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Manual Hold",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
       },
       {
        "kind": "secondaryButton",
        "label": "Payment Hold",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Seat Hold",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Inventory Hold",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
       }
      ]
@@ -717,18 +712,16 @@
     "operationId": "setReservationHoldPolicy",
     "contract": "orders",
     "purpose": "Reservation & Hold Policy Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setReservationHoldPolicy"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-306"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-306",
+   "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-306"
   },
-  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 18 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 22 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Cart Hold, Checkout Hold, Agent Reservation, Group Reservation, B2B Reservation, Corporate Reservation, Manual Hold, Payment Hold … are choices sent by `setReservationHoldPolicy`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -789,10 +782,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every order and reservation follows a centralized, controlled and auditable lifecycle regardless of originating sales channel.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§For each transition define) and no display directory — it is settings, not a population",
   "purpose": "Define the governed state machine for orders and reservations. SoftLab should not hard-code status transitions independently in every channel.",
-  "purposeNote": "Every order and reservation follows a centralized, controlled and auditable lifecycle regardless of originating sales channel.",
   "layout": {
    "template": "form",
    "regions": [
@@ -866,16 +859,14 @@
     "operationId": "setOrderReservationStatus",
     "contract": "orders",
     "purpose": "Order & Reservation Status Lifecycle Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setOrderReservationStatus"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-307"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-307",
+   "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-307"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 8 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -938,17 +929,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Orders from all TICVAI and external sales channels are created consistently while preserving complete source and attribution metadata.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture; Configure numbering rules; Configure whether a channel may) and no display directory — it is settings, not a population",
   "purpose": "Configure how orders can originate from different TICVAI sales channels while using one common transaction engine.",
-  "purposeNote": "Orders from all TICVAI and external sales channels are created consistently while preserving complete source and attribution metadata.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: OTA Booking Reference, Reseller Order ID. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Order___Reservation_Management_Reference.pdf, page 10 §Support partner identifiers such as"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1091,6 +1075,11 @@
        "kind": "secondaryButton",
        "label": "Reseller Order ID",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Support partner identifiers such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "External CRM Reference",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Support partner identifiers such as"
       }
      ]
     }
@@ -1107,18 +1096,16 @@
     "operationId": "createOrderSourceChannel",
     "contract": "orders",
     "purpose": "Order Creation & Source/Channel Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "createOrderSourceChannel"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-308"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-308",
+   "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-308"
   },
-  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 26 of 46 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 27 of 46 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** OTA Booking Reference, Reseller Order ID, External CRM Reference are choices sent by `createOrderSourceChannel`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1179,17 +1166,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every order can correctly identify purchaser, attendee, member, corporate or partner relationships without creating unnecessary duplicate customer records.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Depending on configuration) and no display directory — it is settings, not a population",
   "purpose": "Define how customers are identified and associated with orders/reservations.",
-  "purposeNote": "Every order can correctly identify purchaser, attendee, member, corporate or partner relationships without creating unnecessary duplicate customer records.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Registered Customer, Anonymous Sale where permitted, Link Existing, Continue Guest, Review Match. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Order___Reservation_Management_Reference.pdf, page 11 §Support"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1298,18 +1278,16 @@
     "operationId": "setCustomerGuestAccount",
     "contract": "orders",
     "purpose": "Customer, Guest & Account Assignment",
-    "trigger": "onAction",
-    "invalidates": [
-     "setCustomerGuestAccount"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-309"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-309",
+   "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-309"
   },
-  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 16 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 16 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Registered Customer, Anonymous Sale where permitted, Link Existing, Continue Guest, Review Match are choices sent by `setCustomerGuestAccount`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1370,10 +1348,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "entitlements, commercial calculations and fulfillment requirements.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Each line captures) and no display directory — it is settings, not a population",
   "purpose": "Manage the products and commercial components contained within an order.",
-  "purposeNote": "entitlements, commercial calculations and fulfillment requirements.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1477,7 +1455,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-310"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-310",
+   "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-310"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 13. 0 of 0 labels bound to a contract property; 15 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1540,10 +1519,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Order and reservation activity commits and releases capacity consistently without double- selling, lost inventory, or inconsistent transaction states.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Control when and how order activity consumes real capacity/inventory. This is the transactional bridge between the Order Engine and the Capacity/Inventory Engines.",
-  "purposeNote": "Order and reservation activity commits and releases capacity consistently without double- selling, lost inventory, or inconsistent transaction states.",
   "gaps": [
    {
     "operation": null,
@@ -1589,17 +1568,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "CapacityReservationInventoryCommitmentView.temporaryAvailabilityProtection",
-    "CapacityReservationInventoryCommitmentView.confirmedInventoryConsumption",
-    "CapacityReservationInventoryCommitmentView.generalAdmissionCapacity",
-    "CapacityReservationInventoryCommitmentView.seatInventory",
-    "CapacityReservationInventoryCommitmentView.timeslotCapacity"
+    "CapacityReservationInventoryCommitmentView.inventoryType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-311"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-311",
+   "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-311"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1662,10 +1638,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "and compliance conditions have been satisfied.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure combinations of) and no display directory — it is settings, not a population",
   "purpose": "Determine when a reservation becomes a confirmed order and when it is ready for ticket/media fulfillment.",
-  "purposeNote": "and compliance conditions have been satisfied.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1739,7 +1715,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-312"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-312",
+   "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-312"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 9 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1794,10 +1771,10 @@
    "notes": "**Reached from BO-304, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Operations teams can reconstruct the complete lifecycle of an order, identify abnormal transactions and safely recover exceptions through controlled actions. Board 1 — Final Screen Register # Backend Screen Core Responsibility 12.1. Central order/reservation",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Detect) and no metric row",
   "purpose": "Provide complete lifecycle visibility and proactively identify orders/reservations that require operational intervention.",
-  "purposeNote": "Operations teams can reconstruct the complete lifecycle of an order, identify abnormal transactions and safely recover exceptions through controlled actions. Board 1 — Final Screen Register # Backend Screen Core Responsibility 12.1. Central order/reservation",
   "layout": {
    "template": "split",
    "regions": [
@@ -1809,13 +1786,7 @@
        "kind": "dataTable",
        "label": "Every order lifecycle timeline",
        "columns": [
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.stuckOrder",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.orphanReservation",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.paymentOrderMismatch",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.capacityMismatch",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.missingCustomerData",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.fulfillmentFailure",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.externalSynchronizationFailure",
+        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.exceptionType",
         "Duplicate Transaction Risk"
        ],
        "bindsTo": "OrderLifecycleTimelineSlaExceptionsAiOperationsView",
@@ -1833,13 +1804,7 @@
        "label": "The selected order lifecycle timeline",
        "bindsTo": "OrderLifecycleTimelineSlaExceptionsAiOperationsView",
        "columns": [
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.stuckOrder",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.orphanReservation",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.paymentOrderMismatch",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.capacityMismatch",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.missingCustomerData",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.fulfillmentFailure",
-        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.externalSynchronizationFailure",
+        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.exceptionType",
         "Duplicate Transaction Risk"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Prioritize by”, “Depending on exception”, “Order & Reservation Command Center”, “Transaction state machine”, “Omnichannel order creation”, “Customer, Guest & Account Assignment”.",
@@ -1866,18 +1831,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "OrderLifecycleTimelineSlaExceptionsAiOperationsView.stuckOrder",
-    "OrderLifecycleTimelineSlaExceptionsAiOperationsView.orphanReservation",
-    "OrderLifecycleTimelineSlaExceptionsAiOperationsView.paymentOrderMismatch",
-    "OrderLifecycleTimelineSlaExceptionsAiOperationsView.capacityMismatch",
-    "OrderLifecycleTimelineSlaExceptionsAiOperationsView.missingCustomerData",
-    "OrderLifecycleTimelineSlaExceptionsAiOperationsView.fulfillmentFailure"
+    "OrderLifecycleTimelineSlaExceptionsAiOperationsView.exceptionType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-313"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-313",
+   "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-313"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 17. 7 of 8 labels bound to a contract property; 17 of 93 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

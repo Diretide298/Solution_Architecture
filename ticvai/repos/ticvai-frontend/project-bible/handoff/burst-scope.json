@@ -6,9 +6,9 @@
   "services": 17,
   "deployed": 3,
   "operations": 34,
-  "ofTotalOperations": 2298,
-  "tables": 50,
-  "ofTotalTables": 771
+  "ofTotalOperations": 2405,
+  "tables": 56,
+  "ofTotalTables": 983
  },
  "routing": {
   "note": "**Normal traffic and sale traffic are separate systems running concurrently.** The burst environment carries the on-sale and nothing else; everything a venue does that day continues in the shared cell. **They meet once, afterwards, at reconciliation.**",
@@ -17,8 +17,8 @@
     "name": "normal",
     "target": "shared cell",
     "services": 17,
-    "operations": 2264,
-    "tables": 771,
+    "operations": 2371,
+    "tables": 983,
     "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
     "description": "**Everything except the sale.** Admission, food, retail, stock, staff back-office, reporting. Runs whether or not a sale is happening."
    },
@@ -27,7 +27,7 @@
     "target": "burst environment",
     "services": 3,
     "operations": 34,
-    "tables": 50,
+    "tables": 56,
     "exampleLoad": "same stadium on-sale: 1.25M requests in 2h = 1,045 RPS at a 6x burst; compressed to 20 minutes, 6,270",
     "description": "**The on-sale only.** Provisioned before it opens, torn down after, and **its orders reconcile back into the shared cell** (ADR-0035) — which is the single point the two paths touch."
    }
@@ -261,7 +261,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "Holds 2 columns. **No description has been written for this table** — the name is the only thing saying what it is. **Reached by**: 25 operations read it and 6 write it; 3 tables reference it."
+   "note": "Holds 2 columns. **No description has been written for this table** — the name is the only thing saying what it is"
   },
   {
    "table": "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
@@ -272,7 +272,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "Holds 3 columns. **No description has been written for this table** — the name is the only thing saying what it is. **Reached by**: 25 operations read it and 6 write it; 3 tables reference it."
+   "note": "Holds 3 columns. **No description has been written for this table** — the name is the only thing saying what it is"
   },
   {
    "table": "orders.payment",
@@ -321,7 +321,7 @@
   {
    "table": "catalogue.product",
    "schema": "catalogue",
-   "columns": 29,
+   "columns": 39,
    "burstOperations": 4,
    "written": false,
    "contention": null,
@@ -368,7 +368,18 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "Holds 6 columns. **No description has been written for this table** — the name is the only thing saying what it is. **Reached by**: 8 operations read it and 3 write it."
+   "note": "Holds 6 columns. **No description has been written for this table** — the name is the only thing saying what it is"
+  },
+  {
+   "table": "orders.order_event",
+   "schema": "orders",
+   "columns": 16,
+   "burstOperations": 3,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "Holds 16 columns. **No description has been written for this table** — the name is the only thing saying what it is"
   },
   {
    "table": "orders.order_line",
@@ -395,7 +406,7 @@
   {
    "table": "promotions.promotion",
    "schema": "promotions",
-   "columns": 20,
+   "columns": 22,
    "burstOperations": 3,
    "written": false,
    "contention": null,
@@ -412,7 +423,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "Standing in for an approver. Always time-bounded — an open-ended delegation is one nobody remembers **Hangs off**: reaches `approvals.request` through its keys; references `identity.principal`. **Reached by**: 5 operatio"
+   "note": "Standing in for an approver. Always time-bounded — an open-ended delegation is one nobody remembers **Hangs off**: reaches `approvals.request` through its keys; references `identity.principal`. **Reached by**: 8 operatio"
   },
   {
    "table": "approvals.matrix",
@@ -423,7 +434,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "What requires approval where. Versioned, because a request must be decided by the rules it was raised under **Hangs off**: reaches `approvals.request` through its keys. **Reached by**: 4 operations read it and 1 write it"
+   "note": "What requires approval where. Versioned, because a request must be decided by the rules it was raised under **Hangs off**: reaches `approvals.request` through its keys. **Reached by**: 8 operations read it and 2 write it"
   },
   {
    "table": "approvals.rule",
@@ -434,7 +445,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "Ordered within a matrix. First match wins, so adding a rule cannot silently change another **Hangs off**: reaches `approvals.request` through its keys; references `approvals.matrix`. **Reached by**: 6 operations read it "
+   "note": "Ordered within a matrix. First match wins, so adding a rule cannot silently change another **Hangs off**: reaches `approvals.request` through its keys; references `approvals.matrix`. **Reached by**: 13 operations read it"
   },
   {
    "table": "catalogue.entitlement_template",
@@ -500,7 +511,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "Holds 11 columns. **No description has been written for this table** — the name is the only thing saying what it is. **Reached by**: 11 operations read it and 2 write it."
+   "note": "Holds 11 columns. **No description has been written for this table** — the name is the only thing saying what it is"
   },
   {
    "table": "marketing.consent_question_version",
@@ -511,7 +522,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": ""
+   "note": "Holds 6 columns. **No description has been written for this table** — the name is the only thing saying what it is"
   },
   {
    "table": "orders.cart",
@@ -555,7 +566,18 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "**Written in the same transaction as the state change, by the platform, not by an operation.** That is what makes it exactly-once **Hangs off**: reaches `platform.scope` through its keys. **Reached by**: 2 operations rea"
+   "note": "**Written in the same transaction as the state change, by the platform, not by an operation.** That is what makes it exactly-once **Hangs off**: reaches `platform.scope` through its keys. **Reached by**: 3 operations rea"
+  },
+  {
+   "table": "promotions.promotion_evaluation_trace",
+   "schema": "promotions",
+   "columns": 9,
+   "burstOperations": 2,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "Holds 9 columns. **No description has been written for this table** — the name is the only thing saying what it is"
   },
   {
    "table": "seating.seat",
@@ -571,7 +593,7 @@
   {
    "table": "access.blacklist",
    "schema": "access",
-   "columns": 7,
+   "columns": 10,
    "burstOperations": 1,
    "written": false,
    "contention": null,
@@ -582,7 +604,7 @@
   {
    "table": "access.scan_event",
    "schema": "access",
-   "columns": 16,
+   "columns": 19,
    "burstOperations": 1,
    "written": false,
    "contention": null,
@@ -610,12 +632,12 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "One request per action needing authorisation. The subject is a reference, never a copy **Hangs off**: **a root** — nothing above it in its schema; references `identity.principal`. **Reached by**: 8 operations read it and"
+   "note": "One request per action needing authorisation. The subject is a reference, never a copy **Hangs off**: **a root** — nothing above it in its schema; references `identity.principal`. **Reached by**: 29 operations read it an"
   },
   {
    "table": "catalogue.price_list",
    "schema": "catalogue",
-   "columns": 8,
+   "columns": 28,
    "burstOperations": 1,
    "written": false,
    "contention": null,
@@ -654,7 +676,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "configured rates with effective windows. A rate change is a new row; the old is never edited **Hangs off**: reaches `ledger.account` through its keys; references `identity.principal`, `platform.scope`. **Reached by**: 14"
+   "note": "configured rates with effective windows. A rate change is a new row; the old is never edited **Hangs off**: reaches `ledger.account` through its keys; references `identity.principal`, `platform.scope`. **Reached by**: 17"
   },
   {
    "table": "marketing.guest_profile",
@@ -701,6 +723,28 @@
    "note": "**Money going back**, always against a payment and never editing it. The ledger posts both"
   },
   {
+   "table": "payments.payment_attempt",
+   "schema": "payments",
+   "columns": 16,
+   "burstOperations": 1,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "Holds 16 columns. **No description has been written for this table** — the name is the only thing saying what it is"
+  },
+  {
+   "table": "payments.provider_connection",
+   "schema": "payments",
+   "columns": 11,
+   "burstOperations": 1,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "Holds 11 columns. **No description has been written for this table** — the name is the only thing saying what it is"
+  },
+  {
    "table": "platform.scope",
    "schema": "platform",
    "columns": 8,
@@ -721,6 +765,28 @@
    "contended": false,
    "contentionIndeterminate": false,
    "note": "**A till, a scanner, a kiosk — a place work happens.** The lowest organisational level. **Authority is the person’s, not the workstation’s** (ADR-0002), which is what makes a shared handheld safe"
+  },
+  {
+   "table": "promotions.coupon_code",
+   "schema": "promotions",
+   "columns": 15,
+   "burstOperations": 1,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**One issued code**, with its own redemption state"
+  },
+  {
+   "table": "promotions.promotion_rule",
+   "schema": "promotions",
+   "columns": 13,
+   "burstOperations": 1,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "Holds 13 columns. **No description has been written for this table** — the name is the only thing saying what it is"
   },
   {
    "table": "retail.return_policy",
@@ -922,9 +988,13 @@
    "callsPerBuyer": 2,
    "reads": [
     "catalogue.price_list",
-    "promotions.promotion"
+    "promotions.coupon_code",
+    "promotions.promotion",
+    "promotions.promotion_rule"
    ],
-   "writes": [],
+   "writes": [
+    "promotions.promotion_evaluation_trace"
+   ],
    "lock": null
   },
   {
@@ -1064,9 +1134,11 @@
    "writes": [
     "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
     "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
+    "orders.order_event",
     "orders.order_line",
     "orders.payment",
-    "orders.sales_order"
+    "orders.sales_order",
+    "promotions.promotion_evaluation_trace"
    ],
    "lock": null
   },
@@ -1080,12 +1152,15 @@
    "reads": [
     "ledger.fx_rate",
     "orders.payment",
-    "orders.sales_order"
+    "orders.sales_order",
+    "payments.provider_connection"
    ],
    "writes": [
     "ledger.journal_entry",
     "ledger.posting",
+    "orders.order_event",
     "orders.payment",
+    "payments.payment_attempt",
     "platform.outbox"
    ],
    "lock": null
@@ -1105,6 +1180,7 @@
    "writes": [
     "ledger.journal_entry",
     "ledger.posting",
+    "orders.order_event",
     "orders.refund",
     "platform.outbox"
    ],

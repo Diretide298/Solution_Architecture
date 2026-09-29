@@ -187,7 +187,22 @@
    "emptyNoResults": "The filter narrowed it and the rental inventory are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listInventoryItems",
+    "contract": "inventory",
+    "purpose": "Stock across locations",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getStockPositions",
+    "contract": "inventory",
+    "purpose": "What is where",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Total Inventory",
@@ -200,7 +215,8 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-504"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-504",
+   "workshopBoard": "wireframes/WS117 Rental Management Board 2.dc.html#bo-504"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 17. 0 of 9 labels bound to a contract property; 19 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -332,10 +348,26 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listSerialisedItems",
+    "contract": "inventory",
+    "purpose": "Individually identified assets",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listAssets",
+    "contract": "maintenance",
+    "purpose": "The asset register behind them",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-505"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-505",
+   "workshopBoard": "wireframes/WS117 Rental Management Board 2.dc.html#bo-505"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 18. 0 of 0 labels bound to a contract property; 10 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -413,7 +445,33 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getAsset",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateAsset",
+       "label": "Save asset",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateAsset"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The equipment asset profile list.",
@@ -422,12 +480,40 @@
    "emptyNoResults": "The filter narrowed it and the equipment asset profile are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getAsset",
+    "contract": "maintenance",
+    "purpose": "The asset profile",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "updateAsset",
+    "contract": "maintenance",
+    "purpose": "Change it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getAsset",
+     "listAssets"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-506"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-506",
+   "workshopBoard": "wireframes/WS117 Rental Management Board 2.dc.html#bo-506"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 19. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "assetId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -492,11 +578,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Increase Quantity, Decrease Quantity, Adjust Inventory, Transfer Quantity, Mark Out of Service. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Rental_Management.pdf, page 20 §Actions"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack Rental_Management.pdf, page 20"
    },
@@ -539,6 +620,10 @@
        "provenance": "pack Rental_Management.pdf, page 20 §Actions"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -549,12 +634,42 @@
    "emptyNoResults": "The filter narrowed it and the pooled inventory are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getStockPositions",
+    "contract": "inventory",
+    "purpose": "Pooled quantities",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createStockMovement",
+    "contract": "inventory",
+    "purpose": "Adjust the pool",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getStockPositions",
+     "listStockMovements"
+    ]
+   },
+   {
+    "operationId": "createStockTransfer",
+    "contract": "inventory",
+    "purpose": "Move pooled quantity to another location",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Transfer Quantity",
+    "invalidates": [
+     "getStockPositions"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-507"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-507",
+   "workshopBoard": "wireframes/WS117 Rental Management Board 2.dc.html#bo-507"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 20. 0 of 0 labels bound to a contract property; 5 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 20. 0 of 0 labels bound to a contract property; 5 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Increase Quantity, Decrease Quantity, Adjust Inventory are choices sent by `createStockMovement` (kind adjustmentIn|adjustmentOut with reason); Mark Out of Service are choices sent by `createStockMovement` (kind adjustmentOut with reason outOfService; return with adjustmentIn); Transfer Quantity: `createStockTransfer`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -630,7 +745,33 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setAssetStatus",
+       "label": "Save asset status",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getAsset",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setAssetStatus"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The equipment status condition list.",
@@ -639,12 +780,40 @@
    "emptyNoResults": "The filter narrowed it and the equipment status condition are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setAssetStatus",
+    "contract": "maintenance",
+    "purpose": "Available, rented or faulty",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getAsset",
+     "listAssets"
+    ]
+   },
+   {
+    "operationId": "getAsset",
+    "contract": "maintenance",
+    "purpose": "Current condition",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-508"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-508",
+   "workshopBoard": "wireframes/WS117 Rental Management Board 2.dc.html#bo-508"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 20. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "assetId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -720,7 +889,20 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "searchField",
+       "derived": true,
+       "impliedBy": "lookupAsset",
+       "label": "Search",
+       "notes": "A search that returns nothing must say so differently from a search not yet run."
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The barcode equipment identification list.",
@@ -729,10 +911,19 @@
    "emptyNoResults": "The filter narrowed it and the barcode equipment identification are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "lookupAsset",
+    "contract": "maintenance",
+    "purpose": "Scan a QR or barcode",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-509"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-509",
+   "workshopBoard": "wireframes/WS117 Rental Management Board 2.dc.html#bo-509"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 21. 0 of 0 labels bound to a contract property; 0 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -810,7 +1001,33 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listStockLocations",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createStockLocation",
+       "label": "Create stock location",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createStockLocation"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The inventory location allocation list.",
@@ -819,10 +1036,29 @@
    "emptyNoResults": "The filter narrowed it and the inventory location allocation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listStockLocations",
+    "contract": "inventory",
+    "purpose": "Where stock may sit",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createStockLocation",
+    "contract": "inventory",
+    "purpose": "Add a location",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listStockLocations"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-510"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-510",
+   "workshopBoard": "wireframes/WS117 Rental Management Board 2.dc.html#bo-510"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 22. 0 of 0 labels bound to a contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -889,11 +1125,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Serialized asset transfer, Pooled quantity transfer, Bulk transfer, Scheduled transfer, Emergency transfer. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Rental_Management.pdf, page 23 §Support"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack Rental_Management.pdf, page 23"
    },
@@ -936,6 +1167,29 @@
        "provenance": "pack Rental_Management.pdf, page 23 §Support"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Inbound and outbound transfers",
+       "bindsTo": "StockTransfer",
+       "columns": [
+        "StockTransfer.transferNumber",
+        "StockTransfer.fromLocationId",
+        "StockTransfer.toLocationId",
+        "StockTransfer.fromVenueId",
+        "StockTransfer.toVenueId",
+        "StockTransfer.status",
+        "StockTransfer.dispatchedAt",
+        "StockTransfer.receivedAt"
+       ],
+       "operation": "listStockTransfers",
+       "notes": "**Every transfer whose source or destination is this venue**, marked inbound or outbound (decided 28 September, audit R183).",
+       "provenance": "contract inventory.yaml GET /stock-transfers"
+      }
+     ]
     }
    ]
   },
@@ -946,12 +1200,51 @@
    "emptyNoResults": "The filter narrowed it and the inventory transfer are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listStockTransfers",
+    "contract": "inventory",
+    "purpose": "Transfers in flight, inbound and outbound for this venue (decided 28 September, audit R183)",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createStockTransfer",
+    "contract": "inventory",
+    "purpose": "Move stock between stations",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listStockTransfers",
+     "getStockPositions"
+    ]
+   },
+   {
+    "operationId": "receiveStockTransfer",
+    "contract": "inventory",
+    "purpose": "Receive it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listStockTransfers",
+     "getStockPositions"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-511"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-511",
+   "workshopBoard": "wireframes/WS117 Rental Management Board 2.dc.html#bo-511"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 23. 0 of 0 labels bound to a contract property; 5 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 23. 0 of 0 labels bound to a contract property; 5 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Pooled quantity transfer, Bulk transfer are choices sent by `createStockTransfer` (lines[] carry one or many items); Serialized asset transfer are choices sent by `createStockTransfer` (serialised item moved as a quantity-1 line; field gap: lines have no serial/assetId); Scheduled transfer, Emergency transfer are choices sent by `createStockTransfer` (field gap: add scheduledFor and priority (normal|emergency) to CreateStockTransferRequest).",
+  "entryState": {
+   "params": [
+    {
+     "name": "transferId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1027,7 +1320,33 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createStockMovement",
+       "label": "Create stock movement",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listStockMovements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createStockMovement"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The inventory adjustment exception list.",
@@ -1036,10 +1355,30 @@
    "emptyNoResults": "The filter narrowed it and the inventory adjustment exception are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createStockMovement",
+    "contract": "inventory",
+    "purpose": "Adjust with a reason",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getStockPositions",
+     "listStockMovements"
+    ]
+   },
+   {
+    "operationId": "listStockMovements",
+    "contract": "inventory",
+    "purpose": "Adjustments so far",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-512"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-512",
+   "workshopBoard": "wireframes/WS117 Rental Management Board 2.dc.html#bo-512"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 23. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1104,11 +1443,6 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Use operational data and AI to improve rental inventory distribution and utilization. This is one of the areas where TICVAI should go beyond the original matrix.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Review Recommendation | Create Transfer | Dismiss. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Rental_Management.pdf, page 24 §Actions"
-   },
    {
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
@@ -1184,7 +1518,33 @@
    "emptyNoResults": "The filter narrowed it and the inventory intelligence rebalancing are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getStockPositions",
+    "contract": "inventory",
+    "purpose": "Imbalance across locations",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getSuggestedRequisitions",
+    "contract": "inventory",
+    "purpose": "What to move, and where",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createStockTransfer",
+    "contract": "inventory",
+    "purpose": "Act on a rebalancing recommendation by raising the transfer (review/dismiss are client-side)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Review Recommendation | Create Transfer | Dismiss",
+    "invalidates": [
+     "getStockPositions",
+     "getSuggestedRequisitions"
+    ]
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Utilization by product",
@@ -1197,9 +1557,10 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-513"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-513",
+   "workshopBoard": "wireframes/WS117 Rental Management Board 2.dc.html#bo-513"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 24. 0 of 8 labels bound to a contract property; 9 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 24. 0 of 8 labels bound to a contract property; 9 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Review Recommendation | Create Transfer | Dismiss: `createStockTransfer`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",

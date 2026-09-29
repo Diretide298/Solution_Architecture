@@ -1,0 +1,67 @@
+# Catalogue rollback or emergency action — state model
+# Contract: catalogue.CatalogueRollbackAction.status
+# Checked by tools/check-states.py. Added 29 September (writers pass).
+
+entity: Catalogue rollback or emergency action
+contract: catalogue
+enum: CatalogueRollbackAction.status
+enumKind: inline
+enumSchema: CatalogueRollbackAction
+enumProperty: status
+owner: catalogue
+initial:
+- requested
+- scheduled
+- executing
+terminal:
+- completed
+- failed
+- cancelled
+transitions:
+- from: requested
+  to: executing
+  operation: restoreProductVersion
+  trigger: operation
+  guard: A product restore runs immediately within the call
+- from: requested
+  to: executing
+  trigger: externalEvent
+  guard: The pricing rollback's `approvals.ApprovalRequest` (kind `pricingChange`) is approved and `executionMode`
+    is `immediate`
+  requiresApproval: true
+- from: requested
+  to: scheduled
+  trigger: externalEvent
+  guard: The approval request (kind `pricingChange`) is approved and `executionMode` is `scheduled`
+  requiresApproval: true
+- from: scheduled
+  to: executing
+  trigger: timer
+  guard: '`scheduledAt` is reached'
+- from: executing
+  to: completed
+  trigger: job
+  guard: The earlier version is restored as a new version, or the freeze or stop is in force; sold orders untouched
+- from: executing
+  to: failed
+  trigger: job
+  guard: The restore or action could not complete; nothing live was changed
+- from: requested
+  to: cancelled
+  operation: cancelPricingRollback
+  trigger: operation
+  guard: Not yet running; an open approval request is withdrawn
+- from: requested
+  to: cancelled
+  trigger: externalEvent
+  guard: The approval request is rejected
+- from: scheduled
+  to: cancelled
+  operation: cancelPricingRollback
+  trigger: operation
+  guard: Before `scheduledAt`
+notes: '**Created by `requestPricingRollback` (pricing) or `restoreProductVersion` (product).** An ordinary pricing
+  rollback is created `requested` and waits for its approval. An emergency action (`isEmergency`) is created
+  `executing` without waiting and carries `retrospectiveApprovalRequired`, so its approval is raised after the
+  fact. `restoreProductVersion` completes (or fails) within the call. Nothing is edited in place and orders
+  already sold are never repriced (MoM 31 Aug 2026 §4.10).'

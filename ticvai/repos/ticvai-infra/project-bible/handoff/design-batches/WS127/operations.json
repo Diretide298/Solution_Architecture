@@ -1,0 +1,34 @@
+{
+ "listSpaces": {
+  "method": "GET",
+  "path": "/spaces",
+  "contract": "catalogue",
+  "summary": "Halls, rooms and areas an event can occupy",
+  "permission": "EVENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Space"
+ },
+ "setSpace": {
+  "method": "PUT",
+  "path": "/spaces",
+  "contract": "catalogue",
+  "summary": "Define a space, its capacity and its access rules",
+  "permission": "EVENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Space",
+  "responds": "Space"
+ }
+}

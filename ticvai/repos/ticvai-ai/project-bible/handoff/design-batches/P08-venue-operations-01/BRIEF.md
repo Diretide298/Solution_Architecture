@@ -1,6 +1,6 @@
 # P08-venue-operations-01 — P08 · Venue Operations (1 of 2)
 
-**10 screens · 74 operations · 69 schemas · 31 permissions**
+**10 screens · 80 operations · 82 schemas · 33 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 31 permissions apply here:
-  `ACCESS_OVERRIDE, ACCESS_POINT_CONFIGURE, ACCESS_VALIDATE, AI_AUDIT_VIEW, ASSET_VIEW, DEVELOPER_MANAGE, DEVELOPER_VIEW, DEVICE_CONFIGURE, DEVICE_VIEW, GUEST_MANAGE, GUEST_VIEW, INCIDENT_MANAGE`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 33 permissions apply here:
+  `ACCESS_OVERRIDE, ACCESS_POINT_CONFIGURE, ACCESS_VALIDATE, ASSET_VIEW, AUDIT_VIEW, DEVELOPER_MANAGE, DEVELOPER_VIEW, DEVICE_CONFIGURE, DEVICE_MANAGE, DEVICE_VIEW, INCIDENT_MANAGE, INCIDENT_VIEW`…. A control nobody can use must say so,
   not sit enabled and fail.
-- **18 of these operations work offline**: getAccessPoint, getHaccpStatus, getReturnPolicy, getTableMap, getVenueSettings, getWorkstation, listAccessPoints, listAssets
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,13 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-036` | Device Registry | listDetail | 20 | 1 | — |
-| `BO-044` | F&B Outlets | listDetail | 15 | 0 | — |
-| `BO-058` | Reporting Home | listDetail | 11 | 1 | — |
-| `BO-060` | Attendance & Footfall | listDetail | 16 | 2 | — |
-| `BO-064` | Zones & Areas | listDetail | 10 | 0 | — |
-| `BO-067` | Integrations | commandCentre | 5 | 0 | — |
-| `BO-100` | Venue Home | listDetail | 2 | 0 | — |
-| `BO-108` | Venue Operations | listDetail | 4 | 0 | — |
-| `BO-127` | Hardware & Peripherals Management | listDetail | 3 | 0 | — |
-| `BO-128` | Live Workstation Health Monitor | listDetail | 3 | 0 | — |
-
-## Thin screens in this batch
-
-**BO-128 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+| `BO-036` | Device Registry | listDetail | 12 | 4 | — |
+| `BO-044` | F&B Outlets | listDetail | 20 | 8 | — |
+| `BO-058` | Reporting Home | listDetail | 11 | 7 | — |
+| `BO-060` | Attendance & Footfall | listDetail | 16 | 10 | — |
+| `BO-064` | Zones & Areas | listDetail | 10 | 6 | — |
+| `BO-067` | Integrations | commandCentre | 5 | 2 | — |
+| `BO-070` | Work Orders | listDetail | 9 | 7 | — |
+| `BO-100` | Venue Home | listDetail | 3 | 0 | — |
+| `BO-108` | Venue Operations | listDetail | 5 | 0 | — |
+| `BO-128` | Live Workstation Health Monitor | listDetail | 3 | 1 | — |

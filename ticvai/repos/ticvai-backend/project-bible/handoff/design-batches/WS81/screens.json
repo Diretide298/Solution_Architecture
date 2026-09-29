@@ -175,7 +175,22 @@
    "emptyNoResults": "The filter narrowed it and the gameplay validation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getGameplayValidationRules",
+    "contract": "games",
+    "purpose": "Rules in force",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listGameplayTransactions",
+    "contract": "games",
+    "purpose": "What they produced",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Gameplay Requests Today",
@@ -188,7 +203,8 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-424"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-424",
+   "workshopBoard": "wireframes/WS61 Game and Ride Board 4.dc.html#bo-424"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 33. 0 of 6 labels bound to a contract property; 14 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -267,7 +283,27 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setGameplayValidationRules",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setGameplayValidationRules"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The gameplay validation rule list.",
@@ -276,10 +312,22 @@
    "emptyNoResults": "The filter narrowed it and the gameplay validation rule are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setGameplayValidationRules",
+    "contract": "games",
+    "purpose": "What a tap is checked against",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGameplayValidationRules"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-425"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-425",
+   "workshopBoard": "wireframes/WS61 Game and Ride Board 4.dc.html#bo-425"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 34. 0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -358,7 +406,27 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setGameplayValidationRules",
+       "label": "Save",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setGameplayValidationRules"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The deduction priority funding list.",
@@ -367,10 +435,22 @@
    "emptyNoResults": "The filter narrowed it and the deduction priority funding are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setGameplayValidationRules",
+    "contract": "games",
+    "purpose": "Deduction priority",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGameplayValidationRules"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-426"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-426",
+   "workshopBoard": "wireframes/WS61 Game and Ride Board 4.dc.html#bo-426"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 35. 0 of 0 labels bound to a contract property; 0 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -508,10 +588,22 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createGameEntitlement",
+    "contract": "games",
+    "purpose": "An all-games pass",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listGameEntitlements"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-427"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-427",
+   "workshopBoard": "wireframes/WS61 Game and Ride Board 4.dc.html#bo-427"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 36. 0 of 0 labels bound to a contract property; 11 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -639,10 +731,22 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createGameEntitlement",
+    "contract": "games",
+    "purpose": "Unlimited on one game",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listGameEntitlements"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-428"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-428",
+   "workshopBoard": "wireframes/WS61 Game and Ride Board 4.dc.html#bo-428"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 37. 0 of 0 labels bound to a contract property; 9 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -718,6 +822,20 @@
        "kind": "selectField",
        "label": "Entitlement Name",
        "provenance": "pack Game_and_Ride_Module.pdf, page 37 §Configuration"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createGameEntitlement",
+       "label": "Create game entitlement",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createGameEntitlement"
       }
      ]
     }
@@ -730,10 +848,22 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createGameEntitlement",
+    "contract": "games",
+    "purpose": "A limited number of plays",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listGameEntitlements"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-429"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-429",
+   "workshopBoard": "wireframes/WS61 Game and Ride Board 4.dc.html#bo-429"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 37. 0 of 0 labels bound to a contract property; 1 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -817,7 +947,33 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createGameEntitlement",
+       "label": "Create game entitlement",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listGameEntitlements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createGameEntitlement"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The game package list.",
@@ -826,10 +982,29 @@
    "emptyNoResults": "The filter narrowed it and the game package are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createGameEntitlement",
+    "contract": "games",
+    "purpose": "Build a package",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listGameEntitlements"
+    ]
+   },
+   {
+    "operationId": "listGameEntitlements",
+    "contract": "games",
+    "purpose": "Existing packages",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-430"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-430",
+   "workshopBoard": "wireframes/WS61 Game and Ride Board 4.dc.html#bo-430"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 38. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -908,7 +1083,27 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createGameEntitlement",
+       "label": "Create game entitlement",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createGameEntitlement"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The entitlement validity activation list.",
@@ -917,10 +1112,22 @@
    "emptyNoResults": "The filter narrowed it and the entitlement validity activation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createGameEntitlement",
+    "contract": "games",
+    "purpose": "Validity and activation",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listGameEntitlements"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-431"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-431",
+   "workshopBoard": "wireframes/WS61 Game and Ride Board 4.dc.html#bo-431"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 39. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -999,7 +1206,26 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "authoriseGameplay",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "authoriseGameplay"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The real-time gameplay authorization list.",
@@ -1008,10 +1234,23 @@
    "emptyNoResults": "The filter narrowed it and the real-time gameplay authorization are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "authoriseGameplay",
+    "contract": "games",
+    "purpose": "Authorise a tap",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listGameplayTransactions",
+     "getGameCard"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-432"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-432",
+   "workshopBoard": "wireframes/WS61 Game and Ride Board 4.dc.html#bo-432"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 40. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1090,7 +1329,26 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "simulateGameplayAuthorisation",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "simulateGameplayAuthorisation"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The validation simulator exception list.",
@@ -1099,10 +1357,19 @@
    "emptyNoResults": "The filter narrowed it and the validation simulator exception are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "simulateGameplayAuthorisation",
+    "contract": "games",
+    "purpose": "Simulate and analyse exceptions",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-433"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-433",
+   "workshopBoard": "wireframes/WS61 Game and Ride Board 4.dc.html#bo-433"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 41. 0 of 0 labels bound to a contract property; 0 of 75 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

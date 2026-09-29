@@ -1,6 +1,6 @@
 # WS33 — Order   Reservation Management board 3
 
-**10 screens · 10 operations · 11 schemas · 2 permissions**
+**10 screens · 15 operations · 14 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `ORDER_CREATE, ORDER_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 7 permissions apply here:
+  `ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, PAYMENT_CONFIGURE, PAYMENT_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -64,8 +63,8 @@ convincingly. It is never a caption.
 | `BO-324` | Payment & Order Financial Command Center | listDetail | 1 | 0 | — |
 | `BO-325` | Order Payment Detail & Transaction Ledger | listDetail | 1 | 1 | — |
 | `BO-326` | Multi-Payment, Split Tender & Payment Allocation Configuration | configEditor | 1 | 0 | — |
-| `BO-327` | Deposit, Partial Payment & Outstanding Balance Management | listDetail | 1 | 0 | — |
-| `BO-328` | Order Split, Merge & Transaction Relationship Management | listDetail | 1 | 0 | — |
+| `BO-327` | Deposit, Partial Payment & Outstanding Balance Management | listDetail | 5 | 1 | — |
+| `BO-328` | Order Split, Merge & Transaction Relationship Management | listDetail | 2 | 0 | — |
 | `BO-329` | Related Order & Transaction Relationship Explorer | listDetail | 1 | 0 | — |
 | `BO-330` | External Payment, Partner & Settlement Reference Mapping | configEditor | 1 | 0 | — |
 | `BO-331` | Payment Reconciliation & Exception Management | listDetail | 1 | 0 | — |
@@ -74,7 +73,7 @@ convincingly. It is never a caption.
 
 ## Thin screens in this batch
 
-**BO-327, BO-328, BO-331, BO-332 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-331, BO-332 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-324 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-325",
@@ -145,12 +141,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-327",
      "trigger": "Works in Deposit, Partial Payment & Outstanding Balance Management",
      "provenance": "flow F142 step 5→6",
-     "operation": "listPaymentOrderFinancial"
-    },
-    {
-     "to": "BO-328",
-     "trigger": "Works in Order Split, Merge & Transaction Relationship Management",
-     "provenance": "flow F142 step 7→8",
      "operation": "listPaymentOrderFinancial"
     },
     {
@@ -182,21 +172,23 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "trigger": "Works in Order Financial Analytics & AI Reconciliation Intelligence",
      "provenance": "flow F142 step 17→18",
      "operation": "listPaymentOrderFinancial"
+    },
+    {
+     "to": "BO-328",
+     "trigger": "Works in Order Split, Merge & Transaction Relationship Management",
+     "provenance": "flow F142 step 7→8",
+     "operation": "listPaymentOrderFinancial",
+     "carries": [
+      "orderId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can monitor the complete payment and financial condition of orders across all TICVAI channels from one workspace.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide operations and finance teams with a centralized view of the financial status of all",
-  "purposeNote": "Authorized users can monitor the complete payment and financial condition of orders across all TICVAI channels from one workspace.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Failed. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Order___Reservation_Management_Reference.pdf, page 40 §Support"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -213,12 +205,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "multiSelect",
        "label": "Filter by",
        "columns": [
-        "PaymentOrderFinancialCommandCenterView.venue",
         "PaymentOrderFinancialCommandCenterView.channel",
-        "PaymentOrderFinancialCommandCenterView.paymentMethod",
-        "PaymentOrderFinancialCommandCenterView.paymentProvider",
-        "PaymentOrderFinancialCommandCenterView.currency",
-        "PaymentOrderFinancialCommandCenterView.orderStatus",
+        "PaymentOrderFinancialCommandCenterView.paymentMethods",
         "PaymentOrderFinancialCommandCenterView.paymentStatus",
         "PaymentOrderFinancialCommandCenterView.settlementStatus",
         "Date",
@@ -311,7 +299,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Payment Initiated",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 40 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Authorized",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 40 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Failed",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 40 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reconciliation Required",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 40 §Support"
       }
      ]
@@ -346,9 +349,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-324"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-324",
+   "workshopBoard": "wireframes/WS86 Order   Reservation Management Board 3.dc.html#bo-324"
   },
-  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 40. 31 of 33 labels bound to a contract property; 34 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 40. 31 of 33 labels bound to a contract property; 37 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Authorized, Failed, Reconciliation Required are choices sent by `listPaymentOrderFinancial`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -409,17 +413,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Users can reconstruct every financial movement associated with an order from initial authorization through final refund/reversal.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide the complete payment history associated with an individual order.",
-  "purposeNote": "Users can reconstruct every financial movement associated with an order from initial authorization through final refund/reversal.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Capture, Additional Collection, Void. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Order___Reservation_Management_Reference.pdf, page 41 §Support"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -484,12 +481,37 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       },
       {
        "kind": "secondaryButton",
+       "label": "Payment",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 41 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Deposit",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 41 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Additional Collection",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 41 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Refund",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 41 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Partial Refund",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 41 §Support"
       },
       {
        "kind": "destructiveButton",
        "label": "Void",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 41 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reversal",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 41 §Support"
       }
      ]
@@ -533,9 +555,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-325"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-325",
+   "workshopBoard": "wireframes/WS86 Order   Reservation Management Board 3.dc.html#bo-325"
   },
-  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 41. 10 of 10 labels bound to a contract property; 20 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 41. 10 of 10 labels bound to a contract property; 28 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Capture, Deposit, Additional Collection, Refund, Partial Refund, Void, Reversal, Wallet Credit … are choices sent by `listOrderPaymentDetail`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -596,10 +619,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "every monetary amount to the relevant order components.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure by; Configure whether payment is allocated) and no display directory — it is settings, not a population",
   "purpose": "Support orders paid using multiple payment methods and determine how each payment is allocated.",
-  "purposeNote": "every monetary amount to the relevant order components.",
   "layout": {
    "template": "form",
    "regions": [
@@ -693,16 +716,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setMultiPaymentSplit",
     "contract": "orders",
     "purpose": "Multi-Payment, Split Tender & Payment Allocation Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setMultiPaymentSplit"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-326"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-326",
+   "workshopBoard": "wireframes/WS86 Order   Reservation Management Board 3.dc.html#bo-326"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 43. 0 of 0 labels bound to a contract property; 12 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -765,10 +786,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "controlling reservation and fulfillment states.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Support commercial scenarios where an order may be confirmed or reserved without full immediate payment.",
-  "purposeNote": "controlling reservation and fulfillment states.",
   "layout": {
    "template": "split",
    "regions": [
@@ -813,6 +834,75 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "notes": "The pack groups this record's detail under its own headings: “Important for”, “Required Deposit”, “Due”, “Notifications”.",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 44 §Display"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Table deposit (dining)",
+       "bindsTo": "DiningDepositPolicy",
+       "columns": [
+        "DiningDepositPolicy.enabled",
+        "DiningDepositPolicy.basis",
+        "DiningDepositPolicy.amount",
+        "DiningDepositPolicy.percent",
+        "DiningDepositPolicy.minimumSpendPerGuest",
+        "DiningDepositPolicy.appliesFromPartySize",
+        "DiningDepositPolicy.outletIds",
+        "DiningDepositPolicy.collection",
+        "DiningDepositPolicy.depositVariantId",
+        "DiningDepositPolicy.refundableUntilHours",
+        "DiningDepositPolicy.onLateCancelOrNoShow",
+        "DiningDepositPolicy.onArrival"
+       ],
+       "operation": "getDepositPolicy",
+       "notes": "**A venue option, off unless the venue switches it on here** (decided 29 September, rev 3 REV3-8b, superseding audit R077 (a) \"no table deposit in the first release\": the capability ships, disabled by default). The venue sets from what party size it applies, the basis (per guest, per table, or a percentage of a minimum spend) and the amount; nothing about the amount is fixed in code. While it is off a table booking takes no payment and the guest sees a \"no card needed\" confirmation (REV3-8).",
+       "provenance": "contract orders.yaml GET /deposit-policy"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Full Payment",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 44 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Fixed Deposit",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 44 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Percentage Deposit",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 44 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Staged Payment",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 44 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Balance Before Visit",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 44 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Balance by Fixed Date",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 44 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Credit Account",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 44 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save table deposit",
+       "operation": "setDepositPolicy",
+       "provenance": "contract orders.yaml PUT /deposit-policy"
       }
      ]
     }
@@ -827,10 +917,34 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "apis": [
    {
+    "operationId": "getDepositPolicy",
+    "contract": "orders",
+    "purpose": "How deposits work",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setDepositPolicy",
+    "contract": "orders",
+    "purpose": "Set deposit amount, balance due and refund cut-off",
+    "trigger": "onAction"
+   },
+   {
     "operationId": "listDepositPartialPayment",
     "contract": "orders",
     "purpose": "Deposit, Partial Payment & Outstanding Balance Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listDepositActivity",
+    "contract": "payments",
+    "purpose": "What has happened against this deposit",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "recordDepositActivity",
+    "contract": "payments",
+    "purpose": "Record a capture, release or adjustment",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -841,14 +955,41 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "DepositPartialPaymentOutstandingBalanceManagementView.remainingBalance",
     "DepositPartialPaymentOutstandingBalanceManagementView.dueDate",
     "DepositPartialPaymentOutstandingBalanceManagementView.daysRemaining"
+   ],
+   "params": [
+    {
+     "name": "depositId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-327"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-327",
+   "workshopBoard": "wireframes/WS86 Order   Reservation Management Board 3.dc.html#bo-327"
   },
-  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 44. 7 of 7 labels bound to a contract property; 14 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 44. 7 of 7 labels bound to a contract property; 21 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Full Payment, Fixed Deposit, Percentage Deposit, Staged Payment, Balance Before Visit, Balance by Fixed Date, Credit Account are choices sent by `setDepositPolicy`.",
+  "overlays": [
+   {
+    "id": "formSetDiningDeposit",
+    "component": "modal",
+    "trigger": "Save table deposit",
+    "body": "**Collects the `dining` block of what `setDepositPolicy` sends before it is called** (decided 29 September, rev 3 REV3-8b). `enabled` (off by default), `basis` (`fixedPerGuest`, `fixedPerTable` or `percentOfMinimumSpend`), `amount` for the fixed bases, `percent` and `minimumSpendPerGuest` for the percentage basis, `appliesFromPartySize`, `outletIds` (empty means every outlet that takes bookings), `collection` (authorise and capture only on a late cancel or no-show, or charge), `depositVariantId`, `refundableUntilHours`, `onLateCancelOrNoShow`, `onArrival`. **Switched on with no amount or percent for its basis, or no deposit variant, it is refused `400`** and the modal stays open with the field marked. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "DepositPolicy",
+    "confirm": {
+     "label": "Save table deposit",
+     "operation": "setDepositPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "dining"
+     ]
+    },
+    "provenance": "contract orders.yaml PUT /deposit-policy"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -909,16 +1050,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Orders can be split or merged while maintaining accurate financial, customer, product, payment and historical relationships.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Allow complex orders to be reorganized without destroying transaction history.",
-  "purposeNote": "Orders can be split or merged while maintaining accurate financial, customer, product, payment and historical relationships.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Ticket. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Order___Reservation_Management_Reference.pdf, page 46 §Support"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -944,7 +1080,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       },
       {
        "kind": "secondaryButton",
+       "label": "Product",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 46 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Order Line",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 46 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Payment Responsibility",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 46 §Support"
       }
      ]
@@ -968,23 +1114,37 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "orders",
     "purpose": "Order Split, Merge & Transaction Relationship Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "splitOrder",
+    "contract": "orders",
+    "purpose": "Split the order by ticket, product or payment responsibility",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Ticket, Product, Payment Responsibility",
+    "invalidates": [
+     "listOrderSplitMerge"
+    ]
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "navigation"
+    }
+   ],
    "preloaded": [
-    "OrderSplitMergeTransactionRelationshipManagementView.orderA4Tickets",
-    "OrderSplitMergeTransactionRelationshipManagementView.orderB2Tickets",
-    "OrderSplitMergeTransactionRelationshipManagementView.ticket",
-    "OrderSplitMergeTransactionRelationshipManagementView.attendee",
-    "OrderSplitMergeTransactionRelationshipManagementView.product"
-   ]
+    "OrderSplitMergeTransactionRelationshipManagementView.splitBasis"
+   ],
+   "coldEntry": "Opened from BO-324 with the order picked there. Opened cold (a bookmark or a refresh), it shows the list to pick from rather than an empty record, and says plainly if the order no longer exists."
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-328"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-328",
+   "workshopBoard": "wireframes/WS86 Order   Reservation Management Board 3.dc.html#bo-328"
   },
-  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 46. 0 of 0 labels bound to a contract property; 2 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 46. 0 of 0 labels bound to a contract property; 4 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Ticket, Product, Payment Responsibility: `splitOrder`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1045,10 +1205,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Users can understand complex transaction chains without manually searching multiple systems or screens.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide a visual relationship map for complex transaction histories. This becomes especially useful after amendments, upgrades, exchanges, reissues, splits and refunds.",
-  "purposeNote": "Users can understand complex transaction chains without manually searching multiple systems or screens.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1068,7 +1228,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "Order",
         "Ticket",
         "Customer",
-        "RelatedOrderTransactionRelationshipExplorerView.payment",
+        "RelatedOrderTransactionRelationshipExplorerView.relationshipType",
         "Refund",
         "External Reference",
         "Partner Booking"
@@ -1086,19 +1246,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every related order transaction",
        "columns": [
-        "RelatedOrderTransactionRelationshipExplorerView.original",
+        "RelatedOrderTransactionRelationshipExplorerView.relationshipType",
         "Amendment",
         "Upgrade",
-        "RelatedOrderTransactionRelationshipExplorerView.conversion",
-        "RelatedOrderTransactionRelationshipExplorerView.exchange",
         "Split",
         "Merge",
         "Reissue",
-        "RelatedOrderTransactionRelationshipExplorerView.cancellation",
-        "Refund",
-        "RelatedOrderTransactionRelationshipExplorerView.payment",
-        "RelatedOrderTransactionRelationshipExplorerView.chargebackWhereIntegrated",
-        "RelatedOrderTransactionRelationshipExplorerView.externalTransaction"
+        "Refund"
        ],
        "bindsTo": "RelatedOrderTransactionRelationshipExplorerView",
        "operation": "listRelatedOrderTransaction",
@@ -1115,19 +1269,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected related order transaction",
        "bindsTo": "RelatedOrderTransactionRelationshipExplorerView",
        "columns": [
-        "RelatedOrderTransactionRelationshipExplorerView.original",
+        "RelatedOrderTransactionRelationshipExplorerView.relationshipType",
         "Amendment",
         "Upgrade",
-        "RelatedOrderTransactionRelationshipExplorerView.conversion",
-        "RelatedOrderTransactionRelationshipExplorerView.exchange",
         "Split",
         "Merge",
         "Reissue",
-        "RelatedOrderTransactionRelationshipExplorerView.cancellation",
-        "Refund",
-        "RelatedOrderTransactionRelationshipExplorerView.payment",
-        "RelatedOrderTransactionRelationshipExplorerView.chargebackWhereIntegrated",
-        "RelatedOrderTransactionRelationshipExplorerView.externalTransaction"
+        "Refund"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Original Order ORD-1001”, “ORD-1001-A”, “Upgrade TXN UPG-1042”, “PAY-2014”, “CAN-3021”, “Graph Interaction”.",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 47 §Display"
@@ -1153,18 +1301,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "RelatedOrderTransactionRelationshipExplorerView.original",
+    "RelatedOrderTransactionRelationshipExplorerView.relationshipType",
     "Amendment",
     "Upgrade",
-    "RelatedOrderTransactionRelationshipExplorerView.conversion",
-    "RelatedOrderTransactionRelationshipExplorerView.exchange",
     "Split"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-329"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-329",
+   "workshopBoard": "wireframes/WS86 Order   Reservation Management Board 3.dc.html#bo-329"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 47. 8 of 20 labels bound to a contract property; 20 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1227,10 +1374,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "relevant external transaction and settlement references.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Maintain the relationship between TICVAI transactions and external financial/channel references.",
-  "purposeNote": "relevant external transaction and settlement references.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1299,6 +1446,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 49 §Capture"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Payment Gateways",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 49 §Support references from"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "POS Terminals",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 49 §Support references from"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Finance Systems",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 49 §Support references from"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Wallet Providers",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 49 §Support references from"
+      }
+     ]
     }
    ]
   },
@@ -1319,9 +1492,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-330"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-330",
+   "workshopBoard": "wireframes/WS86 Order   Reservation Management Board 3.dc.html#bo-330"
   },
-  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 49. 0 of 0 labels bound to a contract property; 12 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 49. 0 of 0 labels bound to a contract property; 16 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** POS Terminals, Finance Systems, Wallet Providers are choices sent by `listExternalPaymentPartner`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1382,10 +1556,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "records and provide controlled exception-resolution workflows.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Compare) and no metric row",
   "purpose": "Automatically compare TICVAI payment records with external payment and settlement records.",
-  "purposeNote": "records and provide controlled exception-resolution workflows.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1397,14 +1571,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every payment reconciliation exception",
        "columns": [
-        "PaymentReconciliationExceptionManagementView.paymentGateway",
-        "PaymentReconciliationExceptionManagementView.acquirer",
-        "PaymentReconciliationExceptionManagementView.bank",
-        "PaymentReconciliationExceptionManagementView.pos",
-        "PaymentReconciliationExceptionManagementView.ota",
-        "PaymentReconciliationExceptionManagementView.reseller",
-        "PaymentReconciliationExceptionManagementView.wallet",
-        "PaymentReconciliationExceptionManagementView.erp"
+        "PaymentReconciliationExceptionManagementView.sourceSystem"
        ],
        "bindsTo": "PaymentReconciliationExceptionManagementView",
        "operation": "listPaymentReconciliationException",
@@ -1421,14 +1588,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected payment reconciliation exception",
        "bindsTo": "PaymentReconciliationExceptionManagementView",
        "columns": [
-        "PaymentReconciliationExceptionManagementView.paymentGateway",
-        "PaymentReconciliationExceptionManagementView.acquirer",
-        "PaymentReconciliationExceptionManagementView.bank",
-        "PaymentReconciliationExceptionManagementView.pos",
-        "PaymentReconciliationExceptionManagementView.ota",
-        "PaymentReconciliationExceptionManagementView.reseller",
-        "PaymentReconciliationExceptionManagementView.wallet",
-        "PaymentReconciliationExceptionManagementView.erp"
+        "PaymentReconciliationExceptionManagementView.sourceSystem"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Use”, “AED 20”, “Missing AED”, “Resolution Actions”.",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 50 §Compare"
@@ -1454,18 +1614,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "PaymentReconciliationExceptionManagementView.paymentGateway",
-    "PaymentReconciliationExceptionManagementView.acquirer",
-    "PaymentReconciliationExceptionManagementView.bank",
-    "PaymentReconciliationExceptionManagementView.pos",
-    "PaymentReconciliationExceptionManagementView.ota",
-    "PaymentReconciliationExceptionManagementView.reseller"
+    "PaymentReconciliationExceptionManagementView.sourceSystem"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-331"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-331",
+   "workshopBoard": "wireframes/WS86 Order   Reservation Management Board 3.dc.html#bo-331"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 50. 8 of 8 labels bound to a contract property; 8 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1528,10 +1684,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every financial change affecting an order is attributable, reconstructable and linked to the responsible transaction, user, rule and approval.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Where configured) and no display directory — it is settings, not a population",
   "purpose": "Provide a complete financial audit trail across the order lifecycle.",
-  "purposeNote": "Every financial change affecting an order is attributable, reconstructable and linked to the responsible transaction, user, rule and approval.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1571,7 +1727,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-332"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-332",
+   "workshopBoard": "wireframes/WS86 Order   Reservation Management Board 3.dc.html#bo-332"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 51. 0 of 0 labels bound to a contract property; 1 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1626,10 +1783,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from BO-324, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Management can analyze order-related financial performance and use AI-assisted intelligence to identify collection, payment and reconciliation issues. Board 3 — Final Screen Register # Backend Screen Core Responsibility 12.3. Financial operations Payment & Order Financial Command Center 1 overview 12.3. Complete payment Order Payment Detail & Transaction Ledger 2 history 12.3. Multi-Payment, Split Tender & Payment Multiple payment 3 Allocation Configuration methods 12.3. Deposit, Partial Payment & Outstanding Balance",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Compare) and no metric row",
   "purpose": "Provide management-level analytics across order payment performance, balances, settlement and reconciliation.",
-  "purposeNote": "Management can analyze order-related financial performance and use AI-assisted intelligence to identify collection, payment and reconciliation issues. Board 3 — Final Screen Register # Backend Screen Core Responsibility 12.3. Financial operations Payment & Order Financial Command Center 1 overview 12.3. Complete payment Order Payment Detail & Transaction Ledger 2 history 12.3. Multi-Payment, Split Tender & Payment Multiple payment 3 Allocation Configuration methods 12.3. Deposit, Partial Payment & Outstanding Balance",
   "layout": {
    "template": "split",
    "regions": [
@@ -1733,7 +1890,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-333"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-333",
+   "workshopBoard": "wireframes/WS86 Order   Reservation Management Board 3.dc.html#bo-333"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 53. 4 of 17 labels bound to a contract property; 28 of 94 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1768,6 +1926,38 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "getDepositPolicy": {
+  "method": "GET",
+  "path": "/deposit-policy",
+  "contract": "orders",
+  "summary": "What a deposit booking takes now and when the rest is due",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "DepositPolicy"
+ },
+ "listDepositActivity": {
+  "method": "GET",
+  "path": "/deposits/{depositId}/activity",
+  "contract": "payments",
+  "summary": "Movements on a deposit",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "depositId",
+    "in": "path",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "PaymentsDepositActivity"
+ },
  "listDepositPartialPayment": {
   "method": "GET",
   "path": "/deposit-partial-payment",
@@ -1803,7 +1993,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "export",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "FinancialTraceabilityControlAuditExplorerView"
  },
@@ -1896,7 +2092,28 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "paymentProvider",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "currency",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "orderStatus",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "PaymentOrderFinancialCommandCenterView"
  },
@@ -1947,10 +2164,63 @@ Method, path, parameters, request and response for every operation these screens
     "name": "partnerBooking",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "payment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "refund",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
   "responds": "RelatedOrderTransactionRelationshipExplorerView"
+ },
+ "recordDepositActivity": {
+  "method": "POST",
+  "path": "/deposits/{depositId}/activity",
+  "contract": "payments",
+  "summary": "Record a movement on a deposit",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "depositId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PaymentsDepositActivity",
+  "responds": "PaymentsDepositActivity"
+ },
+ "setDepositPolicy": {
+  "method": "PUT",
+  "path": "/deposit-policy",
+  "contract": "orders",
+  "summary": "Set how deposits work",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DepositPolicy",
+  "responds": "DepositPolicy"
  },
  "setMultiPaymentSplit": {
   "method": "PUT",
@@ -1961,9 +2231,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "MultiPaymentSplitTenderPaymentAllocationConfiguratioInput",
   "responds": "MultiPaymentSplitTenderPaymentAllocationConfiguratioView"
+ },
+ "splitOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/split",
+  "contract": "orders",
+  "summary": "Break one order into independent orders",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  }
 }
 ```
@@ -1980,67 +2275,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Deposit, Partial Payment & Outstanding Balance Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "groups": {
-    "type": "string",
-    "description": "Groups"
-   },
-   "b2b": {
-    "type": "string",
-    "description": "B2B"
-   },
-   "corporateSales": {
-    "type": "string",
-    "description": "Corporate Sales"
-   },
-   "schools": {
-    "type": "string",
-    "description": "Schools"
-   },
-   "events": {
-    "type": "string",
-    "description": "Events"
-   },
-   "largeReservations": {
-    "type": "string",
-    "description": "Large Reservations"
-   },
-   "fullPayment": {
-    "type": "string",
-    "description": "Full Payment"
-   },
-   "fixedDeposit": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed Deposit"
-   },
-   "percentageDeposit": {
-    "type": "number",
-    "description": "Percentage Deposit"
-   },
-   "stagedPayment": {
-    "type": "string",
-    "description": "Staged Payment"
-   },
-   "balanceBeforeVisit": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Balance Before Visit"
-   },
-   "balanceByFixedDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Balance by Fixed Date"
-   },
-   "creditAccount": {
-    "type": "string",
-    "description": "Credit Account"
-   },
-   "payOnCollectionWherePermitted": {
-    "type": "string",
-    "description": "Pay on Collection where permitted"
-   },
-   "requiredDeposit": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Required Deposit (the pack shows 20% = AED 5,000)"
-   },
    "total": {
     "type": "integer",
     "description": "Total"
@@ -2083,21 +2317,231 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "boolean",
     "description": "Require Approval"
    },
-   "paymentReminder": {
-    "type": "string",
-    "description": "Payment Reminder"
+   "appliesTo": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "groups",
+      "b2b",
+      "corporateSales",
+      "schools",
+      "events",
+      "largeReservations"
+     ]
+    },
+    "description": "Bookings this deposit model applies to."
    },
-   "dueSoon": {
+   "paymentModel": {
     "type": "string",
-    "description": "Due Soon"
+    "enum": [
+     "fullPayment",
+     "fixedDeposit",
+     "percentageDeposit",
+     "stagedPayment",
+     "balanceBeforeVisit",
+     "balanceByFixedDate",
+     "creditAccount",
+     "payOnCollection"
+    ],
+    "description": "Payment model."
    },
-   "overdue": {
+   "reminderStage": {
     "type": "string",
-    "description": "Overdue"
+    "enum": [
+     "paymentReminder",
+     "dueSoon",
+     "overdue",
+     "finalNotice"
+    ],
+    "description": "Balance reminder stage."
+   }
+  }
+ },
+ "DepositPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.deposit_policy",
+  "required": [
+   "basis"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
    },
-   "finalNotice": {
+   "appliesTo": {
+    "type": "array",
+    "description": "Which bookings the top-level `basis` covers. **`dining` is deprecated here since 29 September** (rev 3 REV3-8b): a table deposit is the `dining` block below, with its own switch, basis and amount, and `setDepositPolicy` refuses `dining` in this list with 400.\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "party",
+      "dining",
+      "school",
+      "event"
+     ]
+    }
+   },
+   "dining": {
+    "$ref": "#/components/schemas/DiningDepositPolicy"
+   },
+   "basis": {
     "type": "string",
-    "description": "Final Notice"
+    "enum": [
+     "fixedPerBooking",
+     "fixedPerGuest",
+     "percentOfTotal",
+     "perBand"
+    ]
+   },
+   "amount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "percent": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true
+   },
+   "bandSize": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "`perBand`: one `amount` per this much of the total, e.g. AED 100 per AED 400."
+   },
+   "balanceDue": {
+    "type": "string",
+    "enum": [
+     "onTheDay",
+     "daysBefore"
+    ],
+    "default": "onTheDay"
+   },
+   "balanceDueDaysBefore": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "refundableUntilHours": {
+    "type": "integer",
+    "minimum": 0,
+    "default": 24
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   }
+  }
+ },
+ "DiningDepositPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.deposit_policy (dining_* columns)",
+  "description": "**The table deposit hold: a venue option, off unless the venue enables it** (decided 29 September, rev 3 REV3-8b, superseding audit R077 (a) \"no table deposit in the first release\"; the capability ships, disabled by default). Set in Venue Management through `setDepositPolicy` and read by `fnb.createTableReservation`. **Nothing about the amount is in code**: the AED 100 per guest in the rev 3 prototype is an example a venue may type, not a default. With `enabled` false a table booking takes no payment and never enters the cart (rev 3 REV3-8).\n",
+  "properties": {
+   "enabled": {
+    "type": "boolean",
+    "default": false,
+    "description": "Off unless the venue enables it. While false every other field is kept but not applied."
+   },
+   "basis": {
+    "type": "string",
+    "enum": [
+     "fixedPerGuest",
+     "fixedPerTable",
+     "percentOfMinimumSpend"
+    ],
+    "default": "fixedPerGuest",
+    "description": "`fixedPerGuest`, `amount` times the party size; `fixedPerTable`, `amount` once per booking; `percentOfMinimumSpend`, `percent` of `minimumSpendPerGuest` times the party size.\n"
+   },
+   "amount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Required for the two fixed bases."
+   },
+   "percent": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Required for `percentOfMinimumSpend`."
+   },
+   "minimumSpendPerGuest": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Required for `percentOfMinimumSpend`."
+   },
+   "appliesFromPartySize": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 50,
+    "default": 1,
+    "description": "A party smaller than this books with no deposit. Proposed default, client to correct."
+   },
+   "outletIds": {
+    "type": "array",
+    "description": "The outlets it applies to. Empty means every outlet of the venue that takes bookings.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "collection": {
+    "type": "string",
+    "enum": [
+     "authorisationHold",
+     "charge"
+    ],
+    "default": "authorisationHold",
+    "description": "`authorisationHold` authorises the card and captures only on a late cancel or no-show; `charge` takes the money now and holds it as a deposit. Either way it is an `orders.deposit` row, not a sale. A hold the card network would let lapse before the booking date is taken as `charge` instead, and the guest is told so.\n"
+   },
+   "depositVariantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The catalogue variant the deposit line is sold as: a non-inventory product the venue set up whose ledger mapping posts to deposit liability, not revenue. Required while `enabled` is true.\n"
+   },
+   "refundableUntilHours": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 168,
+    "default": 24,
+    "description": "Cancelling at least this long before the booking releases the deposit in full. Proposed default, client to correct."
+   },
+   "onLateCancelOrNoShow": {
+    "type": "string",
+    "enum": [
+     "forfeit",
+     "release"
+    ],
+    "default": "forfeit",
+    "description": "What happens to the deposit on a later cancel or a `noShow`. Settled through `finance.settleDeposit`."
+   },
+   "onArrival": {
+    "type": "string",
+    "enum": [
+     "releaseHold",
+     "applyToBill"
+    ],
+    "default": "releaseHold",
+    "description": "When the party is seated, release the deposit or put it towards the bill."
    }
   }
  },
@@ -2107,46 +2551,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What External Payment, Partner & Settlement Reference Mapping displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "paymentGateways": {
-    "type": "string",
-    "description": "Payment Gateways"
-   },
-   "acquirers": {
-    "type": "string",
-    "description": "Acquirers"
-   },
-   "banks": {
-    "type": "string",
-    "description": "Banks"
-   },
-   "posTerminals": {
-    "type": "string",
-    "description": "POS Terminals"
-   },
-   "b2bPartners": {
-    "type": "string",
-    "description": "B2B Partners"
-   },
-   "resellers": {
-    "type": "string",
-    "description": "Resellers"
-   },
-   "otas": {
-    "type": "string",
-    "description": "OTAs"
-   },
-   "erp": {
-    "type": "string",
-    "description": "ERP"
-   },
-   "financeSystems": {
-    "type": "string",
-    "description": "Finance Systems"
-   },
-   "walletProviders": {
-    "type": "string",
-    "description": "Wallet Providers"
-   },
    "ticvaiOrderId": {
     "type": "string",
     "description": "TICVAI Order ID"
@@ -2196,22 +2600,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Amount"
    },
-   "multiplePayments": {
-    "type": "string",
-    "description": "Multiple Payments"
-   },
-   "multipleGatewayTransactions": {
-    "type": "string",
-    "description": "Multiple Gateway Transactions"
-   },
-   "multipleRefunds": {
-    "type": "string",
-    "description": "Multiple Refunds"
-   },
-   "multiplePartnerReferences": {
-    "type": "string",
-    "description": "Multiple Partner References"
-   },
    "reason": {
     "type": "string",
     "description": "Reason"
@@ -2225,9 +2613,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "date-time",
     "description": "Timestamp"
    },
-   "approvalWhereRequired": {
+   "approvalReference": {
     "type": "boolean",
     "description": "Approval where required"
+   },
+   "sourceSystem": {
+    "type": "string",
+    "enum": [
+     "paymentGateways",
+     "acquirers",
+     "banks",
+     "posTerminals",
+     "b2bPartners",
+     "resellers",
+     "otas",
+     "erp",
+     "financeSystems",
+     "walletProviders"
+    ],
+    "description": "External system the reference comes from."
    }
   }
  },
@@ -2282,53 +2686,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "date-time",
     "description": "Timestamp"
    },
-   "manualPaymentAdjustment": {
+   "interventionType": {
     "type": "string",
-    "description": "Manual Payment Adjustment"
-   },
-   "manualAllocation": {
-    "type": "string",
-    "description": "Manual Allocation"
-   },
-   "manualReconciliation": {
-    "type": "string",
-    "description": "Manual Reconciliation"
-   },
-   "manualRefund": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Manual Refund"
-   },
-   "feeWaiver": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fee Waiver"
-   },
-   "creditOverride": {
-    "type": "string",
-    "description": "Credit Override"
-   },
-   "manualSettlementMapping": {
-    "type": "string",
-    "description": "Manual Settlement Mapping"
-   },
-   "finance": {
-    "type": "string",
-    "description": "Finance"
-   },
-   "internalAudit": {
-    "type": "string",
-    "description": "Internal Audit"
-   },
-   "externalAudit": {
-    "type": "string",
-    "description": "External Audit"
-   },
-   "compliance": {
-    "type": "string",
-    "description": "Compliance"
-   },
-   "management": {
-    "type": "string",
-    "description": "Management"
+    "enum": [
+     "manualPaymentAdjustment",
+     "manualAllocation",
+     "manualReconciliation",
+     "manualRefund",
+     "feeWaiver",
+     "creditOverride",
+     "manualSettlementMapping"
+    ],
+    "description": "Manual intervention recorded."
    }
   }
  },
@@ -2362,45 +2731,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Customer Type"
    },
-   "walletAed250": {
+   "allocationLevel": {
     "type": "string",
-    "description": "Wallet — AED 250"
-   },
-   "voucherAed150": {
-    "type": "string",
-    "description": "Voucher — AED 150"
-   },
-   "visaAed600": {
-    "type": "string",
-    "description": "Visa — AED 600"
-   },
-   "orderLevel": {
-    "type": "string",
-    "description": "Order Level"
-   },
-   "orderLineLevel": {
-    "type": "string",
-    "description": "Order-Line Level"
-   },
-   "productLevel": {
-    "type": "string",
-    "description": "Product Level"
-   },
-   "taxFeeComponent": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Tax/Fee Component"
-   },
-   "specificTicket": {
-    "type": "string",
-    "description": "Specific Ticket"
-   },
-   "deposit": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Deposit"
-   },
-   "destination": {
-    "type": "string",
-    "description": "destination"
+    "enum": [
+     "orderLevel",
+     "orderLineLevel",
+     "productLevel",
+     "taxFeeComponent",
+     "specificTicket",
+     "deposit"
+    ],
+    "description": "What a payment is allocated against."
    }
   }
  },
@@ -2434,45 +2775,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Customer Type"
    },
-   "walletAed250": {
+   "allocationLevel": {
     "type": "string",
-    "description": "Wallet — AED 250"
-   },
-   "voucherAed150": {
-    "type": "string",
-    "description": "Voucher — AED 150"
-   },
-   "visaAed600": {
-    "type": "string",
-    "description": "Visa — AED 600"
-   },
-   "orderLevel": {
-    "type": "string",
-    "description": "Order Level"
-   },
-   "orderLineLevel": {
-    "type": "string",
-    "description": "Order-Line Level"
-   },
-   "productLevel": {
-    "type": "string",
-    "description": "Product Level"
-   },
-   "taxFeeComponent": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Tax/Fee Component"
-   },
-   "specificTicket": {
-    "type": "string",
-    "description": "Specific Ticket"
-   },
-   "deposit": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Deposit"
-   },
-   "destination": {
-    "type": "string",
-    "description": "destination"
+    "enum": [
+     "orderLevel",
+     "orderLineLevel",
+     "productLevel",
+     "taxFeeComponent",
+     "specificTicket",
+     "deposit"
+    ],
+    "description": "What a payment is allocated against."
    }
   }
  },
@@ -2541,26 +2854,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "reconciliationExceptions": {
     "type": "string",
     "description": "Reconciliation Exceptions"
-   },
-   "backendScreenCoreResponsibility": {
-    "type": "string",
-    "description": "# Backend Screen Core Responsibility"
-   },
-   "area12FinalArchitecture": {
-    "type": "string",
-    "description": "Area 12 — Final Architecture"
-   },
-   "orderReservation": {
-    "type": "string",
-    "description": "order/reservation"
-   },
-   "paymentGatewayModules": {
-    "type": "string",
-    "description": "Payment Gateway modules"
-   },
-   "sow": {
-    "type": "string",
-    "description": "SOW"
    }
   }
  },
@@ -2610,93 +2903,72 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "Settlement Status"
    },
-   "onOdNt": {
-    "type": "string",
-    "description": "on od nt"
-   },
-   "nt300": {
-    "type": "string",
-    "description": "nt 300"
-   },
-   "nt100": {
-    "type": "string",
-    "description": "nt 100"
-   },
-   "aedComplete": {
-    "type": "string",
-    "description": "AED Complete"
-   },
-   "authorization": {
-    "type": "string",
-    "description": "Authorization"
-   },
-   "capture": {
-    "type": "string",
-    "description": "Capture"
-   },
-   "payment": {
-    "type": "string",
-    "description": "Payment"
-   },
-   "deposit": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Deposit"
-   },
-   "additionalCollection": {
-    "type": "string",
-    "description": "Additional Collection"
-   },
-   "partialRefund": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Partial Refund"
-   },
-   "reversal": {
-    "type": "string",
-    "description": "Reversal"
-   },
-   "walletCredit": {
-    "type": "string",
-    "description": "Wallet Credit"
-   },
-   "voucher": {
-    "type": "string",
-    "description": "Voucher"
-   },
-   "creditNote": {
-    "type": "string",
-    "description": "Credit Note"
-   },
-   "adjustment": {
-    "type": "string",
-    "description": "Adjustment"
-   },
-   "gateway": {
-    "type": "string",
-    "description": "Gateway"
-   },
-   "merchant": {
-    "type": "string",
-    "description": "Merchant"
-   },
-   "terminal": {
-    "type": "string",
-    "description": "Terminal"
-   },
-   "authorizationCode": {
-    "type": "string",
-    "description": "Authorization Code"
-   },
-   "gatewayTransactionId": {
-    "type": "string",
-    "description": "Gateway Transaction ID"
-   },
-   "settlementReference": {
-    "type": "string",
-    "description": "Settlement Reference"
-   },
-   "externalReference": {
-    "type": "string",
-    "description": "External Reference"
+   "transactions": {
+    "type": "array",
+    "description": "Every financial transaction on the order, one entry each",
+    "items": {
+     "type": "object",
+     "properties": {
+      "type": {
+       "type": "string",
+       "enum": [
+        "authorization",
+        "capture",
+        "payment",
+        "deposit",
+        "additionalCollection",
+        "partialRefund",
+        "reversal",
+        "walletCredit",
+        "voucher",
+        "creditNote",
+        "adjustment"
+       ],
+       "description": "Transaction type"
+      },
+      "amount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Amount"
+      },
+      "status": {
+       "type": "string",
+       "description": "Status"
+      },
+      "gateway": {
+       "type": "string",
+       "description": "Gateway"
+      },
+      "merchant": {
+       "type": "string",
+       "description": "Merchant"
+      },
+      "terminal": {
+       "type": "string",
+       "description": "Terminal"
+      },
+      "authorizationCode": {
+       "type": "string",
+       "description": "Authorization code"
+      },
+      "gatewayTransactionId": {
+       "type": "string",
+       "description": "Gateway transaction ID"
+      },
+      "settlementReference": {
+       "type": "string",
+       "description": "Settlement reference"
+      },
+      "externalReference": {
+       "type": "string",
+       "description": "External reference"
+      },
+      "occurredAt": {
+       "type": "string",
+       "format": "date-time",
+       "description": "When"
+      }
+     }
+    }
    }
   }
  },
@@ -2706,98 +2978,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Order Split, Merge & Transaction Relationship Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "orderA4Tickets": {
-    "type": "string",
-    "description": "Order A — 4 Tickets"
-   },
-   "orderB2Tickets": {
-    "type": "string",
-    "description": "Order B — 2 Tickets"
-   },
-   "ticket": {
-    "type": "string",
-    "description": "Ticket"
-   },
-   "attendee": {
-    "type": "string",
-    "description": "Attendee"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "orderLine": {
-    "type": "string",
-    "description": "Order Line"
-   },
-   "paymentResponsibility": {
-    "type": "string",
-    "description": "Payment Responsibility"
-   },
-   "department": {
-    "type": "string",
-    "description": "Department"
-   },
-   "corporateCostCenter": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Corporate Cost Center"
-   },
-   "customer": {
-    "type": "string",
-    "description": "Customer"
-   },
-   "currency": {
-    "type": "string",
-    "description": "Currency"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "legalEntity": {
-    "type": "string",
-    "description": "Legal Entity"
-   },
-   "taxContext": {
-    "type": "string",
-    "description": "Tax Context"
-   },
-   "paymentStatus": {
-    "type": "string",
-    "description": "Payment Status"
-   },
-   "productCompatibility": {
-    "type": "string",
-    "description": "Product Compatibility"
-   },
-   "parentOrder": {
-    "type": "string",
-    "description": "Parent Order"
-   },
-   "childOrder": {
-    "type": "string",
-    "description": "Child Order"
-   },
-   "mergedInto": {
-    "type": "string",
-    "description": "Merged Into"
-   },
-   "replacementOrder": {
-    "type": "string",
-    "description": "Replacement Order"
-   },
-   "amendedFrom": {
-    "type": "string",
-    "description": "Amended From"
-   },
-   "convertedFrom": {
-    "type": "string",
-    "description": "Converted From"
-   },
-   "reissuedFrom": {
-    "type": "string",
-    "description": "Reissued From"
-   },
    "basePrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Base Price"
@@ -2826,13 +3006,32 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Credits"
    },
-   "correctlyAcrossDerivedOrders": {
+   "splitBasis": {
     "type": "string",
-    "description": "correctly across derived orders"
+    "enum": [
+     "ticket",
+     "attendee",
+     "product",
+     "orderLine",
+     "paymentResponsibility",
+     "department",
+     "corporateCostCenter",
+     "customer"
+    ],
+    "description": "What the order is split by."
    },
-   "neverEraseTheOriginalRelationship": {
+   "relationshipType": {
     "type": "string",
-    "description": "Never erase the original relationship"
+    "enum": [
+     "parentOrder",
+     "childOrder",
+     "mergedInto",
+     "replacementOrder",
+     "amendedFrom",
+     "convertedFrom",
+     "reissuedFrom"
+    ],
+    "description": "How the orders relate."
    }
   }
  },
@@ -2922,10 +3121,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "Payment Methods"
    },
-   "paymentStatus": {
-    "type": "integer",
-    "description": "Payment Status"
-   },
    "settlementStatus": {
     "type": "integer",
     "description": "Settlement Status"
@@ -2934,73 +3129,23 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "Reconciliation Status"
    },
-   "notRequired": {
-    "type": "boolean",
-    "description": "Not Required"
-   },
-   "unpaid": {
+   "paymentStatus": {
     "type": "string",
-    "description": "Unpaid"
-   },
-   "paymentInitiated": {
-    "type": "string",
-    "description": "Payment Initiated"
-   },
-   "authorized": {
-    "type": "string",
-    "description": "Authorized"
-   },
-   "partiallyPaid": {
-    "type": "string",
-    "description": "Partially Paid"
-   },
-   "paid": {
-    "type": "string",
-    "description": "Paid"
-   },
-   "overpaid": {
-    "type": "string",
-    "description": "Overpaid"
-   },
-   "partiallyRefunded": {
-    "type": "string",
-    "description": "Partially Refunded"
-   },
-   "failed": {
-    "type": "integer",
-    "description": "Failed"
-   },
-   "reversed": {
-    "type": "string",
-    "description": "Reversed"
-   },
-   "reconciliationRequired": {
-    "type": "boolean",
-    "description": "Reconciliation Required"
-   },
-   "by": {
-    "type": "string",
-    "description": "By"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "paymentMethod": {
-    "type": "string",
-    "description": "Payment Method"
-   },
-   "paymentProvider": {
-    "type": "string",
-    "description": "Payment Provider"
-   },
-   "currency": {
-    "type": "string",
-    "description": "Currency"
-   },
-   "orderStatus": {
-    "type": "string",
-    "description": "Order Status"
+    "enum": [
+     "notRequired",
+     "unpaid",
+     "paymentInitiated",
+     "authorized",
+     "partiallyPaid",
+     "paid",
+     "overpaid",
+     "partiallyRefunded",
+     "refunded",
+     "failed",
+     "reversed",
+     "reconciliationRequired"
+    ],
+    "description": "Payment status"
    }
   }
  },
@@ -3010,38 +3155,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Payment Reconciliation & Exception Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "paymentGateway": {
-    "type": "string",
-    "description": "Payment Gateway"
-   },
-   "acquirer": {
-    "type": "string",
-    "description": "Acquirer"
-   },
-   "bank": {
-    "type": "string",
-    "description": "Bank"
-   },
-   "pos": {
-    "type": "string",
-    "description": "POS"
-   },
-   "ota": {
-    "type": "string",
-    "description": "OTA"
-   },
-   "reseller": {
-    "type": "string",
-    "description": "Reseller"
-   },
-   "wallet": {
-    "type": "string",
-    "description": "Wallet"
-   },
-   "erp": {
-    "type": "string",
-    "description": "ERP"
-   },
    "transactionId": {
     "type": "string",
     "description": "Transaction ID"
@@ -3075,33 +3188,83 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Authorization Code"
    },
-   "mismatch500480": {
+   "sourceSystem": {
     "type": "string",
-    "description": "mismatch 500 480"
+    "enum": [
+     "paymentGateway",
+     "acquirer",
+     "bank",
+     "pos",
+     "ota",
+     "reseller",
+     "wallet",
+     "erp"
+    ],
+    "description": "Source system."
    },
-   "aed250": {
+   "exceptionType": {
     "type": "string",
-    "description": "AED 250"
+    "description": "Exception, e.g. amount mismatch, unmatched settlement"
    },
-   "settlement250": {
+   "expectedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Expected amount"
+   },
+   "actualAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Actual amount"
+   }
+  }
+ },
+ "PaymentsDepositActivity": {
+  "type": "object",
+  "x-ticvai-persistence": "payments.deposit_activity",
+  "description": "**Taken from the backend workbook, 20 September.** NEW TABLE. Provides an auditable history of every deposit authorization, hold, capture, release, forfeiture, refund, or adjustment.",
+  "required": [
+   "depositId",
+   "type",
+   "amount",
+   "occurredAt",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "settlement 250"
+    "format": "uuid"
    },
-   "match": {
+   "depositId": {
     "type": "string",
-    "description": "Match"
+    "format": "uuid"
    },
-   "remap": {
+   "paymentId": {
     "type": "string",
-    "description": "Remap"
+    "format": "uuid",
+    "nullable": true
    },
-   "investigate": {
+   "type": {
     "type": "string",
-    "description": "Investigate"
+    "maxLength": 30
    },
-   "markPending": {
-    "type": "integer",
-    "description": "Mark Pending"
+   "amount": {
+    "type": "number"
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "createdByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
    }
   }
  },
@@ -3111,53 +3274,34 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Related Order & Transaction Relationship Explorer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "amendment": {
+   "relationshipType": {
     "type": "string",
-    "description": "↓ Amendment"
+    "enum": [
+     "original",
+     "amendment",
+     "ticketUpgrade",
+     "additionalPayment",
+     "partialCancellation",
+     "conversion",
+     "exchange",
+     "cancellation",
+     "payment",
+     "chargebackWhereIntegrated",
+     "externalTransaction"
+    ],
+    "description": "Relationship to the original."
    },
-   "ticketUpgrade": {
+   "orderId": {
     "type": "string",
-    "description": "↓ Ticket Upgrade"
+    "description": "Order ID"
    },
-   "additionalPayment": {
+   "relatedOrderId": {
     "type": "string",
-    "description": "↓ Additional Payment"
+    "description": "Related order or transaction ID"
    },
-   "partialCancellation": {
-    "type": "string",
-    "description": "↓ Partial Cancellation"
-   },
-   "refund": {
+   "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "↓ Refund"
-   },
-   "original": {
-    "type": "string",
-    "description": "Original"
-   },
-   "conversion": {
-    "type": "number",
-    "description": "Conversion"
-   },
-   "exchange": {
-    "type": "string",
-    "description": "Exchange"
-   },
-   "cancellation": {
-    "type": "string",
-    "description": "Cancellation"
-   },
-   "payment": {
-    "type": "string",
-    "description": "Payment"
-   },
-   "chargebackWhereIntegrated": {
-    "type": "string",
-    "description": "Chargeback where integrated"
-   },
-   "externalTransaction": {
-    "type": "string",
-    "description": "External Transaction"
+    "description": "Amount"
    }
   }
  }

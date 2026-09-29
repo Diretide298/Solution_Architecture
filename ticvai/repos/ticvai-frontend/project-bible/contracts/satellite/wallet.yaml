@@ -511,6 +511,9 @@ paths:
                   default: preview
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: What would happen, or what did
           content:
             application/json:
@@ -1417,7 +1420,9 @@ paths:
         that was retired. Validation names those before they reach a till.
 
         Published as a version, so a change can be rolled back and so `getApprovalRecord` can say what
-        was in force.
+        was in force. **`mode: publish` writes `wallet.configuration_version` and one
+        `wallet.configuration_version_snapshot` row per configuration area**, read from the area tables
+        at that moment; validation alone writes neither (decided 29 September, writers pass; DM6).
 
         '
       tags:
@@ -1447,6 +1452,9 @@ paths:
                   nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Findings, and the version if published
           content:
             application/json:
@@ -2405,6 +2413,11 @@ paths:
         audit R139). A credit type retired since that version is reported as a blocking finding rather
         than silently revived.
 
+        **It reads the version''s `wallet.configuration_version_snapshot` rows and writes their values
+        back into the area tables** (wallet types, credit types, funding, consumption, transfer, refund,
+        channel, risk, authentication, accounting, integration and reconciliation), which are the
+        working draft (decided 29 September, writers pass; DM6).
+
         '
       tags:
       - wallet
@@ -2835,7 +2848,7 @@ components:
         scopePath:
           type: string
     WalletConfigurationDiff:
-      x-ticvai-persistence: none — computed
+      x-ticvai-persistence: none — computed from wallet.configuration_version_snapshot (a published version) against the area tables (the working draft)
       type: object
       description: Board 8, p.98. Field-level comparison of two wallet configuration versions, shaped as
         white-label `ConfigDiff`.
@@ -4318,6 +4331,56 @@ components:
                 type: string
               message:
                 type: string
+        scopePath:
+          type: string
+    WalletConfigurationSnapshot:
+      type: object
+      x-ticvai-persistence: wallet.configuration_version_snapshot
+      description: 'Board 8, p.98. **What each configuration area held when a version was published**,
+        one row per area per version, so a version can be compared field by field and put back.
+        Written by `publishWalletConfiguration` (`mode: publish`); read by
+        `diffWalletConfigurationVersion` and `restoreWalletConfigurationVersion` (data model, 29
+        September).
+
+        '
+      required:
+      - configurationVersionId
+      - area
+      - values
+      - capturedAt
+      - scopePath
+      properties:
+        id:
+          type: string
+          format: uuid
+        configurationVersionId:
+          type: string
+          format: uuid
+          x-ticvai-references: wallet.configuration_version
+        area:
+          type: string
+          enum:
+          - walletTypes
+          - creditTypes
+          - consumptionPolicy
+          - fundingRules
+          - channelRules
+          - authenticationPolicy
+          - transferRules
+          - refundPolicy
+          - riskRules
+          - accountingMapping
+          - reconciliationSources
+          - integrationMappings
+          description: The areas `WalletConfigurationDiff` compares.
+        values:
+          type: object
+          additionalProperties: true
+          description: The area's rows as published, in that area's own schema. The diff `path` is a
+            path into this document.
+        capturedAt:
+          type: string
+          format: date-time
         scopePath:
           type: string
     Wallet:

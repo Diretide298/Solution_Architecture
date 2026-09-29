@@ -138,7 +138,21 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - wallet.accounting_mapping
+  - wallet.authentication_policy
+  - wallet.channel_rules
+  - wallet.configuration_version
+  - wallet.configuration_version_snapshot
+  - wallet.consumption_policy
+  - wallet.credit_type
+  - wallet.funding_rules
+  - wallet.integration_mapping
+  - wallet.reconciliation_source
+  - wallet.refund_policy
+  - wallet.risk_rules
+  - wallet.transfer_rules
+  - wallet.wallet_type
   writes: []
 - operation: expireCreditLots
   verb: POST
@@ -148,8 +162,18 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - wallet.accounting_mapping
+  - wallet.credit_lot
+  - wallet.credit_type
+  - wallet.wallet
+  writes:
+  - cache:idempotency
+  - wallet.adjustment
+  - wallet.credit_lot
+  - wallet.wallet
+  - wallet.wallet_transaction
 - operation: getCreditConsumptionPolicy
   verb: GET
   path: /credit-consumption-policy
@@ -216,7 +240,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - wallet.accounting_mapping
+  - wallet.credit_lot
+  - wallet.credit_type
   writes: []
 - operation: getWalletReconciliation
   verb: GET
@@ -226,7 +253,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - wallet.credit_lot
+  - wallet.reconciliation_source
+  - wallet.wallet_transaction
   writes: []
 - operation: issueGiftCard
   verb: POST
@@ -380,8 +410,24 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
+  - wallet.accounting_mapping
+  - wallet.authentication_policy
+  - wallet.channel_rules
   - wallet.configuration_version
-  writes: []
+  - wallet.consumption_policy
+  - wallet.credit_type
+  - wallet.funding_rules
+  - wallet.integration_mapping
+  - wallet.reconciliation_source
+  - wallet.refund_policy
+  - wallet.risk_rules
+  - wallet.transfer_rules
+  - wallet.wallet_type
+  writes:
+  - cache:idempotency
+  - wallet.configuration_version
+  - wallet.configuration_version_snapshot
 - operation: raiseWalletDispute
   verb: POST
   path: /wallet-disputes
@@ -444,8 +490,23 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.configuration_version
-  writes: []
+  - wallet.configuration_version_snapshot
+  writes:
+  - cache:idempotency
+  - wallet.accounting_mapping
+  - wallet.authentication_policy
+  - wallet.channel_rules
+  - wallet.consumption_policy
+  - wallet.credit_type
+  - wallet.funding_rules
+  - wallet.integration_mapping
+  - wallet.reconciliation_source
+  - wallet.refund_policy
+  - wallet.risk_rules
+  - wallet.transfer_rules
+  - wallet.wallet_type
 - operation: reverseWalletFunding
   verb: POST
   path: /wallet-funding/reversals
@@ -645,8 +706,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  - wallet.consumption_policy
+  - wallet.credit_eligibility
+  - wallet.credit_lot
+  - wallet.credit_type
+  - wallet.wallet
+  writes:
+  - cache:idempotency
 - operation: suspendWallet
   verb: POST
   path: /wallets/{walletId}/suspend

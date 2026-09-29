@@ -1,0 +1,1416 @@
+[
+ {
+  "id": "BO-654",
+  "name": "Accreditation Access Command Center",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "5",
+   "number": "1",
+   "page": 37
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/accreditation-access-command-center-bo-654",
+   "component": "apps/venue-management-web/src/routes/access-venue/AccreditationAccessCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-655",
+    "BO-656",
+    "BO-657",
+    "BO-658",
+    "BO-659",
+    "BO-660",
+    "BO-661",
+    "BO-662",
+    "BO-663"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-655",
+     "trigger": "Access Profile Management",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-656",
+     "trigger": "Venue & Zone Access Matrix",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-657",
+     "trigger": "Operational Area Permission Management",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-658",
+     "trigger": "Date & Time Access Rules",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-659",
+     "trigger": "Access Schedule Management",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-660",
+     "trigger": "Holder Access Assignment",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-661",
+     "trigger": "Temporary Access & Exception Management",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-662",
+     "trigger": "Access Revocation & Suspension",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "BO-663",
+     "trigger": "Access Rights Preview, Impact & Synchronization",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen a metric directory (§Dashboard KPIs shall include) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "purpose": "Central operational dashboard for accreditation access permissions.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active access profiles",
+       "provenance": "pack ACCREDITATION.pdf, page 37 §Dashboard KPIs shall include"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Accredited holders with access",
+       "provenance": "pack ACCREDITATION.pdf, page 37 §Dashboard KPIs shall include"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Credentials with assigned access",
+       "provenance": "pack ACCREDITATION.pdf, page 37 §Dashboard KPIs shall include"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Restricted-access holders",
+       "provenance": "pack ACCREDITATION.pdf, page 37 §Dashboard KPIs shall include"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Temporary access grants",
+       "provenance": "pack ACCREDITATION.pdf, page 37 §Dashboard KPIs shall include"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Expiring permissions",
+       "provenance": "pack ACCREDITATION.pdf, page 37 §Dashboard KPIs shall include"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Suspended access",
+       "provenance": "pack ACCREDITATION.pdf, page 37 §Dashboard KPIs shall include"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Revoked access",
+       "provenance": "pack ACCREDITATION.pdf, page 37 §Dashboard KPIs shall include"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Access exceptions",
+       "provenance": "pack ACCREDITATION.pdf, page 37 §Dashboard KPIs shall include"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Unassigned approved credentials",
+       "provenance": "pack ACCREDITATION.pdf, page 37 §Dashboard KPIs shall include"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Event",
+       "provenance": "pack ACCREDITATION.pdf, page 37 §Dashboard KPIs shall include"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Venue",
+       "provenance": "pack ACCREDITATION.pdf, page 37 §Dashboard KPIs shall include"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Accreditation program",
+       "provenance": "pack ACCREDITATION.pdf, page 37 §Dashboard KPIs shall include"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Category",
+       "provenance": "pack ACCREDITATION.pdf, page 37 §Dashboard KPIs shall include"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Organization",
+       "provenance": "pack ACCREDITATION.pdf, page 37 §Dashboard KPIs shall include"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Zone",
+       "provenance": "pack ACCREDITATION.pdf, page 37 §Dashboard KPIs shall include"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Access profile",
+       "provenance": "pack ACCREDITATION.pdf, page 37 §Dashboard KPIs shall include"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Credential status",
+       "provenance": "pack ACCREDITATION.pdf, page 37 §Dashboard KPIs shall include"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The accreditation access list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the accreditation access untouched.",
+   "emptyFirstRun": "No accreditation access yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the accreditation access are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAccessProfiles",
+    "contract": "accreditation",
+    "purpose": "Access at a glance",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-654",
+   "workshopBoard": "wireframes/WS05 ACCREDITATION Board 5.dc.html#bo-654"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 37. 0 of 0 labels bound to a contract property; 18 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-655",
+  "name": "Access Profile Management",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "5",
+   "number": "2",
+   "page": 38
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/access-profile-management-bo-655",
+   "component": "apps/venue-management-web/src/routes/access-venue/AccessProfileManagement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-654"
+   ],
+   "exitTo": [
+    "BO-654"
+   ],
+   "transitions": [
+    {
+     "to": "BO-654",
+     "trigger": "Back to Accreditation Access Command Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Each profile shall define) and no display directory — it is settings, not a population",
+  "purpose": "Create reusable accreditation access profiles.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack ACCREDITATION.pdf, page 38 §Each profile shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Permitted zones",
+       "provenance": "pack ACCREDITATION.pdf, page 38 §Each profile shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Permitted operational areas",
+       "provenance": "pack ACCREDITATION.pdf, page 38 §Each profile shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Date validity",
+       "provenance": "pack ACCREDITATION.pdf, page 38 §Each profile shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Time validity",
+       "provenance": "pack ACCREDITATION.pdf, page 38 §Each profile shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Access schedule",
+       "provenance": "pack ACCREDITATION.pdf, page 38 §Each profile shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Accreditation categories allowed",
+       "provenance": "pack ACCREDITATION.pdf, page 38 §Each profile shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Applicable events",
+       "provenance": "pack ACCREDITATION.pdf, page 38 §Each profile shall define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Default credential behavior",
+       "provenance": "pack ACCREDITATION.pdf, page 38 §Each profile shall define"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The access profile configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the access profile untouched.",
+   "emptyFirstRun": "No access profile configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "listAccessProfiles",
+    "contract": "accreditation",
+    "purpose": "Profiles",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setAccessProfile",
+    "contract": "accreditation",
+    "purpose": "Define one",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listAccessProfiles"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-655",
+   "workshopBoard": "wireframes/WS05 ACCREDITATION Board 5.dc.html#bo-655"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 38. 0 of 0 labels bound to a contract property; 9 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-656",
+  "name": "Venue & Zone Access Matrix",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "5",
+   "number": "3",
+   "page": 39
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/venue-zone-access-matrix-bo-656",
+   "component": "apps/venue-management-web/src/routes/access-venue/VenueZoneAccessMatrix.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-654"
+   ],
+   "exitTo": [
+    "BO-654"
+   ],
+   "transitions": [
+    {
+     "to": "BO-654",
+     "trigger": "Back to Accreditation Access Command Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Visually configure which accreditation profiles can access each venue zone.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 39"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 39"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setAccessProfile",
+       "label": "Save access profile",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setAccessProfile"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The venue zone access list.",
+   "error": "Could not load. Names which read failed and leaves the venue zone access untouched.",
+   "emptyFirstRun": "No venue zone access yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the venue zone access are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setAccessProfile",
+    "contract": "accreditation",
+    "purpose": "Venue and zone matrix",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listAccessProfiles"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-656",
+   "workshopBoard": "wireframes/WS05 ACCREDITATION Board 5.dc.html#bo-656"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 39. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-657",
+  "name": "Operational Area Permission Management",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "5",
+   "number": "4",
+   "page": 40
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/operational-area-permission-management-bo-657",
+   "component": "apps/venue-management-web/src/routes/access-venue/OperationalAreaPermissionManagement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-654"
+   ],
+   "exitTo": [
+    "BO-654"
+   ],
+   "transitions": [
+    {
+     "to": "BO-654",
+     "trigger": "Back to Accreditation Access Command Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure access to operational areas below the broader zone level.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 40"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 40"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setAccessProfile",
+       "label": "Save access profile",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setAccessProfile"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The operational area permission list.",
+   "error": "Could not load. Names which read failed and leaves the operational area permission untouched.",
+   "emptyFirstRun": "No operational area permission yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the operational area permission are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setAccessProfile",
+    "contract": "accreditation",
+    "purpose": "Operational area permissions",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listAccessProfiles"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-657",
+   "workshopBoard": "wireframes/WS05 ACCREDITATION Board 5.dc.html#bo-657"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 40. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-658",
+  "name": "Date & Time Access Rules",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "5",
+   "number": "5",
+   "page": 40
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/date-time-access-rules-bo-658",
+   "component": "apps/venue-management-web/src/routes/access-venue/DateTimeAccessRules.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-654"
+   ],
+   "exitTo": [
+    "BO-654"
+   ],
+   "transitions": [
+    {
+     "to": "BO-654",
+     "trigger": "Back to Accreditation Access Command Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Control when accreditation access is valid.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 40"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 40"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setAccessProfile",
+       "label": "Save access profile",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setAccessProfile"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The date time access list.",
+   "error": "Could not load. Names which read failed and leaves the date time access untouched.",
+   "emptyFirstRun": "No date time access yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the date time access are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setAccessProfile",
+    "contract": "accreditation",
+    "purpose": "Date and time rules",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listAccessProfiles"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-658",
+   "workshopBoard": "wireframes/WS05 ACCREDITATION Board 5.dc.html#bo-658"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 40. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-659",
+  "name": "Access Schedule Management",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "5",
+   "number": "6",
+   "page": 41
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/access-schedule-management-bo-659",
+   "component": "apps/venue-management-web/src/routes/access-venue/AccessScheduleManagement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-654"
+   ],
+   "exitTo": [
+    "BO-654"
+   ],
+   "transitions": [
+    {
+     "to": "BO-654",
+     "trigger": "Back to Accreditation Access Command Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Create reusable schedules for accreditation permissions.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 41"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 41"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setAccessProfile",
+       "label": "Save access profile",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setAccessProfile"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The access schedule list.",
+   "error": "Could not load. Names which read failed and leaves the access schedule untouched.",
+   "emptyFirstRun": "No access schedule yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the access schedule are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setAccessProfile",
+    "contract": "accreditation",
+    "purpose": "Schedule by event phase",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listAccessProfiles"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-659",
+   "workshopBoard": "wireframes/WS05 ACCREDITATION Board 5.dc.html#bo-659"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 41. 0 of 0 labels bound to a contract property; 0 of 6 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-660",
+  "name": "Holder Access Assignment",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "5",
+   "number": "7",
+   "page": 42
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/holder-access-assignment-bo-660",
+   "component": "apps/venue-management-web/src/routes/access-venue/HolderAccessAssignment.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-654"
+   ],
+   "exitTo": [
+    "BO-654"
+   ],
+   "transitions": [
+    {
+     "to": "BO-654",
+     "trigger": "Back to Accreditation Access Command Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§The screen shall display) and no metric row",
+  "purpose": "Assign access permissions to an individual accreditation holder.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack ACCREDITATION.pdf, page 42 §The screen shall display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every holder access",
+       "columns": [
+        "Holder",
+        "Photograph",
+        "Accreditation",
+        "Category",
+        "Credential",
+        "Event",
+        "Venue",
+        "Current access profile"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack ACCREDITATION.pdf, page 42 §The screen shall display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected holder access",
+       "bindsTo": null,
+       "columns": [
+        "Holder",
+        "Photograph",
+        "Accreditation",
+        "Category",
+        "Credential",
+        "Event",
+        "Venue",
+        "Current access profile"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Administrators shall be able to”, “Inherited Access”, “Individual Override”.",
+       "provenance": "pack ACCREDITATION.pdf, page 42 §The screen shall display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The holder access list.",
+   "error": "Could not load. Names which read failed and leaves the holder access untouched.",
+   "emptyFirstRun": "No holder access yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the holder access are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setHolderAccess",
+    "contract": "accreditation",
+    "purpose": "Assign profiles to a holder",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getAccreditationHolder"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Holder",
+    "Photograph",
+    "Accreditation",
+    "Category",
+    "Credential",
+    "Event"
+   ],
+   "params": [
+    {
+     "name": "holderId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-660",
+   "workshopBoard": "wireframes/WS05 ACCREDITATION Board 5.dc.html#bo-660"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 42. 0 of 8 labels bound to a contract property; 8 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-661",
+  "name": "Temporary Access & Exception Management",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "5",
+   "number": "8",
+   "page": 42
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/temporary-access-exception-management-bo-661",
+   "component": "apps/venue-management-web/src/routes/access-venue/TemporaryAccessExceptionManagement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-654"
+   ],
+   "exitTo": [
+    "BO-654"
+   ],
+   "transitions": [
+    {
+     "to": "BO-654",
+     "trigger": "Back to Accreditation Access Command Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide controlled short-term access outside normal accreditation permissions.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 42"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 42"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setHolderAccess",
+       "label": "Save holder access",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setHolderAccess"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The temporary access exception list.",
+   "error": "Could not load. Names which read failed and leaves the temporary access exception untouched.",
+   "emptyFirstRun": "No temporary access exception yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the temporary access exception are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setHolderAccess",
+    "contract": "accreditation",
+    "purpose": "Temporary access and exceptions",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getAccreditationHolder"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-661",
+   "workshopBoard": "wireframes/WS05 ACCREDITATION Board 5.dc.html#bo-661"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 42. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "holderId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-662",
+  "name": "Access Revocation & Suspension",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "5",
+   "number": "9",
+   "page": 43
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/access-revocation-suspension-bo-662",
+   "component": "apps/venue-management-web/src/routes/access-venue/AccessRevocationSuspension.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-654"
+   ],
+   "exitTo": [
+    "BO-654"
+   ],
+   "transitions": [
+    {
+     "to": "BO-654",
+     "trigger": "Back to Accreditation Access Command Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Immediately remove or temporarily disable accreditation access.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 43"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 43"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setAccreditationStatus",
+       "label": "Save accreditation status",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setAccreditationStatus"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The access revocation suspension list.",
+   "error": "Could not load. Names which read failed and leaves the access revocation suspension untouched.",
+   "emptyFirstRun": "No access revocation suspension yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the access revocation suspension are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setAccreditationStatus",
+    "contract": "accreditation",
+    "purpose": "Revoke or suspend",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listAccreditationHolders",
+     "listAccreditationAudit"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-662",
+   "workshopBoard": "wireframes/WS05 ACCREDITATION Board 5.dc.html#bo-662"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 43. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "holderId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-663",
+  "name": "Access Rights Preview, Impact & Synchronization",
+  "module": "Access & Venue",
+  "requiresModule": "accreditation",
+  "wave": 3,
+  "source": {
+   "pack": "ACCREDITATION.pdf",
+   "board": "5",
+   "number": "10",
+   "page": 44
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/access-rights-preview-impact-synchronization-bo-663",
+   "component": "apps/venue-management-web/src/routes/access-venue/AccessRightsPreviewImpactSynchronization.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-654"
+   ],
+   "exitTo": [
+    "BO-654"
+   ],
+   "transitions": [
+    {
+     "to": "BO-654",
+     "trigger": "Back to Accreditation Access Command Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Validate accreditation access before publishing it to Access Control.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 44"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack ACCREDITATION.pdf, page 44"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "previewAccessImpact",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "previewAccessImpact"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The access rights preview list.",
+   "error": "Could not load. Names which read failed and leaves the access rights preview untouched.",
+   "emptyFirstRun": "No access rights preview yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the access rights preview are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "previewAccessImpact",
+    "contract": "accreditation",
+    "purpose": "Who this change would affect",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-663",
+   "workshopBoard": "wireframes/WS05 ACCREDITATION Board 5.dc.html#bo-663"
+  },
+  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 44. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

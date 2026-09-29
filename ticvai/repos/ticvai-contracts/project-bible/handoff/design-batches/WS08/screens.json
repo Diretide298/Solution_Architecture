@@ -39,10 +39,7 @@
     {
      "to": "BO-100",
      "trigger": "Venue Home",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params  and BO-214 holds none of them, so the edge carries nothing and BO-100 opens cold"
     },
     {
      "to": "BO-215",
@@ -109,23 +106,87 @@
    "regions": [
     {
      "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active Journey Profiles",
+       "bindsTo": "GuestJourneyCommandCenterViewSummary.activeJourneyProfiles",
+       "operation": "listGuestJourney",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Group Arrivals Today",
+       "bindsTo": "GuestJourneyCommandCenterViewSummary.groupArrivalsToday",
+       "operation": "listGuestJourney",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Guests via Group Admission",
+       "bindsTo": "GuestJourneyCommandCenterViewSummary.guestsViaGroupAdmission",
+       "operation": "listGuestJourney",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Family Journeys",
+       "bindsTo": "GuestJourneyCommandCenterViewSummary.familyJourneys",
+       "operation": "listGuestJourney",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Re-entry Guests",
+       "bindsTo": "GuestJourneyCommandCenterViewSummary.reEntryGuests",
+       "operation": "listGuestJourney",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Crossovers Today",
+       "bindsTo": "GuestJourneyCommandCenterViewSummary.crossoversToday",
+       "operation": "listGuestJourney",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Fast Pass Validations",
+       "bindsTo": "GuestJourneyCommandCenterViewSummary.fastPassValidations",
+       "operation": "listGuestJourney",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Special Event Admissions",
+       "bindsTo": "GuestJourneyCommandCenterViewSummary.specialEventAdmissions",
+       "operation": "listGuestJourney",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "VIP Admissions",
+       "bindsTo": "GuestJourneyCommandCenterViewSummary.vipAdmissions",
+       "operation": "listGuestJourney",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Journey Exceptions",
+       "bindsTo": "GuestJourneyCommandCenterViewSummary.journeyExceptions",
+       "operation": "listGuestJourney",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
      "slot": "collection",
      "components": [
       {
        "kind": "dataTable",
        "label": "Every guest journey",
-       "columns": [
-        "GuestJourneyCommandCenterView.activeJourneyProfiles",
-        "GuestJourneyCommandCenterView.groupArrivalsToday",
-        "GuestJourneyCommandCenterView.guestsViaGroupAdmission",
-        "GuestJourneyCommandCenterView.familyJourneys",
-        "GuestJourneyCommandCenterView.reEntryGuests",
-        "GuestJourneyCommandCenterView.crossoversToday",
-        "GuestJourneyCommandCenterView.fastPassValidations",
-        "GuestJourneyCommandCenterView.specialEventAdmissions",
-        "GuestJourneyCommandCenterView.vipAdmissions",
-        "GuestJourneyCommandCenterView.journeyExceptions"
-       ],
        "bindsTo": "GuestJourneyCommandCenterView",
        "operation": "listGuestJourney",
        "provenance": "pack Access Control Module_Reference.pdf, page 101 §Show"
@@ -140,18 +201,6 @@
        "kind": "detailPanel",
        "label": "The selected guest journey",
        "bindsTo": "GuestJourneyCommandCenterView",
-       "columns": [
-        "GuestJourneyCommandCenterView.activeJourneyProfiles",
-        "GuestJourneyCommandCenterView.groupArrivalsToday",
-        "GuestJourneyCommandCenterView.guestsViaGroupAdmission",
-        "GuestJourneyCommandCenterView.familyJourneys",
-        "GuestJourneyCommandCenterView.reEntryGuests",
-        "GuestJourneyCommandCenterView.crossoversToday",
-        "GuestJourneyCommandCenterView.fastPassValidations",
-        "GuestJourneyCommandCenterView.specialEventAdmissions",
-        "GuestJourneyCommandCenterView.vipAdmissions",
-        "GuestJourneyCommandCenterView.journeyExceptions"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “Journey Type Venue Credential Status”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 101 §Show"
       }
@@ -172,22 +221,33 @@
     "contract": "access",
     "purpose": "Guest Journey Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "createAdmissionRules",
+    "contract": "access",
+    "purpose": "Start a new guest journey from an admission profile",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listGuestJourney"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "GuestJourneyCommandCenterView.activeJourneyProfiles",
-    "GuestJourneyCommandCenterView.groupArrivalsToday",
-    "GuestJourneyCommandCenterView.guestsViaGroupAdmission",
-    "GuestJourneyCommandCenterView.familyJourneys",
-    "GuestJourneyCommandCenterView.reEntryGuests",
-    "GuestJourneyCommandCenterView.crossoversToday"
+    "GuestJourneyCommandCenterViewSummary.activeJourneyProfiles",
+    "GuestJourneyCommandCenterViewSummary.groupArrivalsToday",
+    "GuestJourneyCommandCenterViewSummary.guestsViaGroupAdmission",
+    "GuestJourneyCommandCenterViewSummary.familyJourneys",
+    "GuestJourneyCommandCenterViewSummary.reEntryGuests",
+    "GuestJourneyCommandCenterViewSummary.crossoversToday"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-214"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-214",
+   "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-214"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 101. 10 of 10 labels bound to a contract property; 10 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -250,10 +310,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Group admission behavior can be configured independently from standard individual-ticket admission.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure admission for) and no display directory — it is settings, not a population",
   "purpose": "Group & B2B Admission Profile Builder",
-  "purposeNote": "Group admission behavior can be configured independently from standard individual-ticket admission.",
   "layout": {
    "template": "form",
    "regions": [
@@ -322,16 +382,14 @@
     "operationId": "setGroupAdmissionProfile",
     "contract": "access",
     "purpose": "Group & B2B Admission Profile Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setGroupAdmissionProfile"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-215"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-215",
+   "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-215"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 102. 0 of 0 labels bound to a contract property; 7 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -394,10 +452,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Large B2B groups can be admitted using a streamlined workflow without individually processing every credential when the configured group product allows it.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Solve the specific matrix requirement for faster entrance flow when large B2B groups have multiple tickets stored on one device.",
-  "purposeNote": "Large B2B groups can be admitted using a streamlined workflow without individually processing every credential when the configured group product allows it.",
   "layout": {
    "template": "split",
    "regions": [
@@ -411,7 +469,6 @@
        "columns": [
         "GroupLeaderFastB2bValidationView.payment",
         "GroupLeaderFastB2bValidationView.booking",
-        "GroupLeaderFastB2bValidationView.visitDate",
         "GroupLeaderFastB2bValidationView.groupProduct",
         "GroupLeaderFastB2bValidationView.accessRules",
         "GroupLeaderFastB2bValidationView.manifest"
@@ -433,7 +490,6 @@
        "columns": [
         "GroupLeaderFastB2bValidationView.payment",
         "GroupLeaderFastB2bValidationView.booking",
-        "GroupLeaderFastB2bValidationView.visitDate",
         "GroupLeaderFastB2bValidationView.groupProduct",
         "GroupLeaderFastB2bValidationView.accessRules",
         "GroupLeaderFastB2bValidationView.manifest"
@@ -464,7 +520,6 @@
    "preloaded": [
     "GroupLeaderFastB2bValidationView.payment",
     "GroupLeaderFastB2bValidationView.booking",
-    "GroupLeaderFastB2bValidationView.visitDate",
     "GroupLeaderFastB2bValidationView.groupProduct",
     "GroupLeaderFastB2bValidationView.accessRules",
     "GroupLeaderFastB2bValidationView.manifest"
@@ -473,7 +528,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-216"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-216",
+   "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-216"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 103. 6 of 6 labels bound to a contract property; 6 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -536,10 +592,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Attendance reflects the number of guests actually admitted rather than simply the quantity on the group ticket.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Manage actual attendance when fewer guests arrive than the quantity purchased. The matrix explicitly requires the scanner to show the exact group size and allow the operator to enter actual attendants so daily attendance is updated correctly.",
-  "purposeNote": "Attendance reflects the number of guests actually admitted rather than simply the quantity on the group ticket.",
   "gaps": [
    {
     "operation": null,
@@ -590,17 +646,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "GroupAttendancePartialEntryManagerView.purchased50",
-    "GroupAttendancePartialEntryManagerView.previouslyEntered0",
-    "GroupAttendancePartialEntryManagerView.entered43",
-    "GroupAttendancePartialEntryManagerView.remaining7",
     "GroupAttendancePartialEntryManagerView.remaining"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-217"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-217",
+   "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-217"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 104. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -663,10 +716,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Dependent and companion credentials cannot bypass their configured relationship requirements.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure linked-person access journeys. The matrix requires child protection through adult-ticket pairing or biometric validation of the assigned adult. It also requires POD accompanying persons and nannies to be bound to a primary guest and only enter when accompanied by that guest.",
-  "purposeNote": "Dependent and companion credentials cannot bypass their configured relationship requirements.",
   "layout": {
    "template": "form",
    "regions": [
@@ -700,6 +753,18 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 105 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save companion rule",
+       "operation": "setGuestCompanionEligibility",
+       "provenance": "contract access.yaml PUT /guest-companion-eligibility (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -715,12 +780,19 @@
     "contract": "access",
     "purpose": "Family, Child, POD & Companion Journey",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setGuestCompanionEligibility",
+    "contract": "access",
+    "purpose": "Save companion rule",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-218"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-218",
+   "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-218"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 105. 0 of 0 labels bound to a contract property; 5 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -783,10 +855,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Temporary exit and re-entry are tracked as distinct journey events rather than being counted as new normal admissions.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Manage guests temporarily leaving and returning to the venue. The source matrix requires configurable re-entry and also describes a journey using a designated re-entry gate with both ticket verification and a UV stamp.",
-  "purposeNote": "Temporary exit and re-entry are tracked as distinct journey events rather than being counted as new normal admissions.",
   "layout": {
    "template": "form",
    "regions": [
@@ -830,14 +902,41 @@
     "contract": "access",
     "purpose": "Re-entry & Temporary Exit Journey",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listAdmissionRules",
+    "contract": "access",
+    "purpose": "The admission profiles that allow a temporary exit",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "updateAdmissionRules",
+    "contract": "access",
+    "purpose": "Save re-entry quantity and the exit-before-re-entry rule",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listEntryTemporaryExit",
+     "listAdmissionRules"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-219"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-219",
+   "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-219"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 106. 0 of 0 labels bound to a contract property; 4 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "profileId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -926,6 +1025,18 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save admission rules",
+       "operation": "updateAdmissionRules",
+       "provenance": "contract access.yaml PUT /admission-rules/{profileId} (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -942,21 +1053,49 @@
     "contract": "access",
     "purpose": "Multi-Park & Crossover Journey Orchestrator",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listMultiParkCrossover",
+    "contract": "access",
+    "purpose": "Multi-Park & Crossover Rules",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listAdmissionRules",
+    "contract": "access",
+    "purpose": "The admission profiles that carry crossover rules",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "updateAdmissionRules",
+    "contract": "access",
+    "purpose": "Save the parks a crossover journey admits to",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listMultiParkCrossover2",
+     "listMultiParkCrossover",
+     "listAdmissionRules"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "MultiParkCrossoverJourneyOrchestratorView.maximum",
-    "MultiParkCrossoverJourneyOrchestratorView.adventureParkInside",
-    "MultiParkCrossoverJourneyOrchestratorView.waterParkCrossoverAvailable",
-    "MultiParkCrossoverJourneyOrchestratorView.normalEntry",
-    "MultiParkCrossoverJourneyOrchestratorView.reEntry"
+    "MultiParkCrossoverJourneyOrchestratorView.eventType"
+   ],
+   "params": [
+    {
+     "name": "profileId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-220"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-220",
+   "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-220"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 108. 0 of 0 labels bound to a contract property; 0 of 6 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1019,10 +1158,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Priority-access journeys correctly consume and display limited/unlimited entitlement usage.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Select eligible) and no display directory — it is settings, not a population",
   "purpose": "Configure the operational experience for limited and unlimited priority-access entitlements. The matrix requires Silver Fast Pass to support three accesses and Gold to support unlimited access with an optional one-access-per-ride restriction.",
-  "purposeNote": "Priority-access journeys correctly consume and display limited/unlimited entitlement usage.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1046,6 +1185,18 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 109 §Select eligible"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save Fast Pass settings",
+       "operation": "updateQueue",
+       "provenance": "contract queue.yaml PATCH /queues/{queueId} (decided 29 September, VM close-out)"
+      }
+     ]
     }
    ]
   },
@@ -1061,14 +1212,35 @@
     "contract": "access",
     "purpose": "Fast Pass & Attraction Access Journey",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listQueues",
+    "contract": "queue",
+    "purpose": "The attraction lanes a Fast Pass is configured on",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateQueue",
+    "contract": "queue",
+    "purpose": "Save Fast Pass settings",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-221"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-221",
+   "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-221"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 109. 0 of 0 labels bound to a contract property; 3 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "queueId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1129,10 +1301,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Special admission processes can temporarily replace normal access behavior without permanent gate reconfiguration.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure temporary/special admission processes that differ from normal venue access. The matrix requires special-event products capable of capturing attendance without physical admission, N- person attendance entered through a turnstile/tablet/handheld, and Free View days where main gates are open while attraction gates continue validating tickets.",
-  "purposeNote": "Special admission processes can temporarily replace normal access behavior without permanent gate reconfiguration.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1166,12 +1338,33 @@
     "contract": "access",
     "purpose": "Special Event, Free View & Alternative Admission",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "createAdmissionRules",
+    "contract": "access",
+    "purpose": "Create a special-event or free-view admission profile",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listSpecialEventFree"
+    ]
+   },
+   {
+    "operationId": "setContextTimeEvent",
+    "contract": "access",
+    "purpose": "Tie the alternative admission to a date, event or calendar day",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listSpecialEventFree"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-222"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-222",
+   "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-222"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 110. 0 of 0 labels bound to a contract property; 2 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1226,17 +1419,10 @@
    "notes": "**Reached from BO-214, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Complex guest journeys can be simulated end-to-end, approved, deployed, audited and rolled back. Board 8 — Final 10-Screen Structure # Backend Screen Main Responsibility 8.1 Guest Journey Command Center Special journey management and monitoring 8.2 Group & B2B Admission Profile Builder Configure group-access models 8.3 Group Leader & Fast B2B Validation Accelerate large-group entry 8.4 Group Attendance & Partial Entry Manager Actual attendance and multiple arrival waves 8.5 Family, Child, POD & Companion Journey Linked-person and child-protection journeys 8.6 Re-entry & Temporary Exit Journey",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Detect) and no metric row",
   "purpose": "Test an entire guest journey—not merely an individual scan—before deploying it.",
-  "purposeNote": "Complex guest journeys can be simulated end-to-end, approved, deployed, audited and rolled back. Board 8 — Final 10-Screen Structure # Backend Screen Main Responsibility 8.1 Guest Journey Command Center Special journey management and monitoring 8.2 Group & B2B Admission Profile Builder Configure group-access models 8.3 Group Leader & Fast B2B Validation Accelerate large-group entry 8.4 Group Attendance & Partial Entry Manager Actual attendance and multiple arrival waves 8.5 Family, Child, POD & Companion Journey Linked-person and child-protection journeys 8.6 Re-entry & Temporary Exit Journey",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Free View Day. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Access Control Module_Reference.pdf, page 111 §Support"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1290,6 +1476,12 @@
        "kind": "primaryButton",
        "label": "Free View Day",
        "provenance": "pack Access Control Module_Reference.pdf, page 111 §Support"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Run journey simulation",
+       "operation": "simulateGuestJourney",
+       "provenance": "contract access.yaml POST /guest-journey/simulate (decided 29 September, VM close-out)"
       }
      ]
     }
@@ -1308,6 +1500,12 @@
     "contract": "marketing-crm",
     "purpose": "Automated journeys",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "simulateGuestJourney",
+    "contract": "access",
+    "purpose": "Run journey simulation",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1323,9 +1521,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-223"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-223",
+   "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-223"
   },
-  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 111. 0 of 6 labels bound to a contract property; 7 of 94 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 111. 0 of 6 labels bound to a contract property; 7 of 94 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `simulateGuestJourney`.",
   "_platform": {
    "code": "P08",
    "audience": "staff",

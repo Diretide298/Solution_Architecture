@@ -64,6 +64,19 @@
   "requestBody": null,
   "responds": "GroupPaymentDepositBalanceManagementView"
  },
+ "listGroupSale": {
+  "method": "GET",
+  "path": "/group-sale",
+  "contract": "orders",
+  "summary": "Group Sales Command Center",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GroupSalesCommandCenterView"
+ },
  "listGroupSale2": {
   "method": "GET",
   "path": "/group-sale-2",
@@ -113,6 +126,16 @@
     "name": "date",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "campaign",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "market",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -157,6 +180,44 @@
   "requestBody": null,
   "responds": "ParticipantsGuestListsGroupStructureView"
  },
+ "modifyOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/modify",
+  "contract": "orders",
+  "summary": "Add or remove lines on an existing order",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ModifyOrderRequest",
+  "responds": "OrderModificationResult"
+ },
+ "rescheduleOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/reschedule",
+  "contract": "orders",
+  "summary": "Move an order to another performance",
+  "permission": "ORDER_RESCHEDULE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OrderExchangeResult"
+ },
  "setGroupOperationalPlanning": {
   "method": "PUT",
   "path": "/group-operational-planning",
@@ -166,8 +227,109 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "GroupOperationalPlanningTaskWorkspaceInput",
   "responds": "GroupOperationalPlanningTaskWorkspaceView"
+ },
+ "setGroupPaymentSchedule": {
+  "method": "PUT",
+  "path": "/group-bookings/{groupBookingId}/payment-schedule",
+  "contract": "orders",
+  "summary": "Set a group's payment schedule",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GroupPaymentScheduleInput",
+  "responds": "GroupPaymentScheduleView"
+ },
+ "setGroupTicketAllocation": {
+  "method": "PUT",
+  "path": "/group-bookings/{groupBookingId}/allocation",
+  "contract": "orders",
+  "summary": "Set how a group's tickets are allocated",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GroupTicketAllocationInput",
+  "responds": "GroupTicketAllocationView"
+ },
+ "setGroupTicketFulfillment": {
+  "method": "PUT",
+  "path": "/group-bookings/{groupBookingId}/fulfillment",
+  "contract": "orders",
+  "summary": "Set how a group's tickets are delivered",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GroupTicketFulfillmentInput",
+  "responds": "GroupTicketFulfillmentView"
+ },
+ "setParticipantGuestList": {
+  "method": "PUT",
+  "path": "/group-bookings/{groupBookingId}/participants",
+  "contract": "orders",
+  "summary": "Set a group's participant list",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ParticipantGuestListInput",
+  "responds": "ParticipantGuestListView"
+ },
+ "updateGroupBooking": {
+  "method": "PATCH",
+  "path": "/group-bookings/{groupBookingId}",
+  "contract": "orders",
+  "summary": "Confirm numbers, change the leader or cancel a group",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "UpdateGroupBookingRequest",
+  "responds": "GroupBooking"
  }
 }

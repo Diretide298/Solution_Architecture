@@ -3493,7 +3493,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; openPlatformStaffGrant · listTenants · listDashboards · getDashboard +2</div>
+          <div><b>OPERATIONS</b> &middot; openPlatformStaffGrant · listTenants · listDashboards · getDashboard +3</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; dashboardId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-001">ADM-001</a>  &mdash; <i>Platform Login / MFA</i><br><a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-004">ADM-004</a>  &mdash; <i>Platform Audit Log</i></div>
@@ -4305,12 +4305,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listWorkflowInstanceProcess</div>
+          <div><b>OPERATIONS</b> &middot; listWorkflowInstanceProcess · actOnWorkflowInstance</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; instanceId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-248">ADM-248</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formActOnWorkflowInstance &middot; <i>Act on workflow instance</i> &middot; <b>Act on workflow instance</b> &middot; Cancel <span class="dis">discards action · reason · workflowStepExecutionId · workflowExceptionId · assigneePrincipalId · alternativeNodeId · correctedInput · extendByMinutes · priority</span></div></div>
         </div>
       </div>
       <div id="adm-251" class="scr" data-ws="WS56">
@@ -4335,12 +4335,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listWorkflowExceptionFailure</div>
+          <div><b>OPERATIONS</b> &middot; listWorkflowExceptionFailure · actOnWorkflowInstance</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; instanceId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-248">ADM-248</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formActOnWorkflowInstance &middot; <i>Act on workflow instance</i> &middot; <b>Act on workflow instance</b> &middot; Cancel <span class="dis">discards action · reason · workflowStepExecutionId · workflowExceptionId · assigneePrincipalId · alternativeNodeId · correctedInput · extendByMinutes · priority</span></div></div>
         </div>
       </div>
       <div id="adm-252" class="scr" data-ws="WS56">
@@ -4365,12 +4365,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listSlaEscalationBottleneck</div>
+          <div><b>OPERATIONS</b> &middot; listSlaEscalationBottleneck · actOnWorkflowInstance</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; instanceId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-248">ADM-248</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formActOnWorkflowInstance &middot; <i>Act on workflow instance</i> &middot; <b>Act on workflow instance</b> &middot; Cancel <span class="dis">discards action · reason · workflowStepExecutionId · workflowExceptionId · assigneePrincipalId · alternativeNodeId · correctedInput · extendByMinutes · priority</span></div></div>
         </div>
       </div>
       <div id="adm-253" class="scr" data-ws="WS56">
@@ -8175,12 +8175,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPriceCategoryRate</div>
+          <div><b>OPERATIONS</b> &middot; listPriceCategoryRate · setPriceCategoryRateType</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-048">ADM-048</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetPriceCategoryRateType &middot; <i>Save price category rate type</i> &middot; <b>Save price category rate type</b> &middot; Cancel <span class="dis">discards id · scopePath · entryKind · code · name · isActive · description · categoryFamily · displayName · localizedDisplayNames · iconLabel · parentId · isStandard · sortOrder</span></div></div>
         </div>
       </div>
       <div id="adm-051" class="scr" data-ws="WS34">
@@ -8265,12 +8265,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPackageBundleAdd</div>
+          <div><b>OPERATIONS</b> &middot; listPackageBundleAdd · setPackagePricingDefinition</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-048">ADM-048</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetPackagePricingDefinition &middot; <i>Save package pricing definition</i> &middot; <b>Save package pricing definition</b> &middot; Cancel <span class="dis">discards id · scopePath · productId · recordKind · pricingModel · status · name · priceListId · addOnType · packagePrice · components · componentPriceVisibility</span></div></div>
         </div>
       </div>
       <div id="adm-054" class="scr" data-ws="WS34">
@@ -8295,12 +8295,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listMarketVenueCurrency</div>
+          <div><b>OPERATIONS</b> &middot; listMarketVenueCurrency · setMarketPricingConfiguration</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-048">ADM-048</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetMarketPricingConfiguration &middot; <i>Save market pricing configuration</i> &middot; <b>Save market pricing configuration</b> &middot; Cancel <span class="dis">discards id · scopePath · hierarchyLevel · parentId · countryCode · marketCode · region · venueId · brand · legalEntityId · baseCurrency · sellingCurrency · roundingProfileId · displayFormat · priceListId · inheritsFromParent · fxReferenceRate</span></div></div>
         </div>
       </div>
       <div id="adm-055" class="scr" data-ws="WS34">
@@ -8355,12 +8355,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPriceListTemplate</div>
+          <div><b>OPERATIONS</b> &middot; listPriceListTemplate · setConfigurationTemplate</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-048">ADM-048</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetConfigurationTemplate &middot; <i>Save configuration template</i> &middot; <b>Save configuration template</b> &middot; Cancel <span class="dis">discards id · scopePath · subject · name · status · description · templateKind · productKind · venueId · sourceProductId · sourcePriceListId · includedComponents · reviewFields · isAiDrafted · ownerPrincipalId</span></div></div>
         </div>
       </div>
       <div id="adm-057" class="scr" data-ws="WS34">
@@ -8805,12 +8805,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listFeeSurcharge</div>
+          <div><b>OPERATIONS</b> &middot; listFeeSurcharge · setFeeDefinition</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-068">ADM-068</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetFeeDefinition &middot; <i>Save fee definition</i> &middot; <b>Save fee definition</b> &middot; Cancel <span class="dis">discards id · scopePath · code · name · feeType · valueType · chargeBasis · status · description · amount · percentage · tiers · taxTreatment · refundability · visibility · effectiveFrom · effectiveTo</span></div></div>
         </div>
       </div>
       <div id="adm-072" class="scr" data-ws="WS36">
@@ -8895,12 +8895,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPriceCalculationSequence</div>
+          <div><b>OPERATIONS</b> &middot; listPriceCalculationSequence · setPriceCalculationPolicy</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-068">ADM-068</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetPriceCalculationPolicy &middot; <i>Save price calculation policy</i> &middot; <b>Save price calculation policy</b> &middot; Cancel <span class="dis">discards id · scopePath · code · name · status · isDefault · effectiveFrom · effectiveTo · steps</span></div></div>
         </div>
       </div>
       <div id="adm-075" class="scr" data-ws="WS36">
@@ -8925,12 +8925,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listCurrencyPrecisionRounding</div>
+          <div><b>OPERATIONS</b> &middot; listCurrencyPrecisionRounding · setCurrencyRoundingRule</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-068">ADM-068</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetCurrencyRoundingRule &middot; <i>Save currency rounding rule</i> &middot; <b>Save currency rounding rule</b> &middot; Cancel <span class="dis">discards id · scopePath · currency · decimalPlaces · roundingMethod · roundingStage · status · code · name · minimumMonetaryUnit · displayPrecision · calculationPrecision · cashRoundingIncrement</span></div></div>
         </div>
       </div>
       <div id="adm-076" class="scr" data-ws="WS36">
@@ -9255,12 +9255,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPricingRollbackEmergency</div>
+          <div><b>OPERATIONS</b> &middot; listPricingRollbackEmergency · requestPricingRollback · cancelPricingRollback</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; actionId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-078">ADM-078</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRequestPricingRollback &middot; <i>Request pricing rollback</i> &middot; <b>Request pricing rollback</b> &middot; Cancel <span class="dis">discards id · scopePath · subject · actionType · reason · status · requestedByPrincipalId · requestedAt · productId · priceListId · fromVersion · toVersion · productScope · rollbackTarget · rollbackScope · scopeIds · dependencies · executionMode</span></div><div class="ov"><b>confirmDialog</b> confirmCancelPricingRollback &middot; <i>Cancel pricing rollback</i></div></div>
         </div>
       </div>
       <div id="adm-087" class="scr" data-ws="WS37">
@@ -9315,12 +9315,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listDynamicPricingStrategy</div>
+          <div><b>OPERATIONS</b> &middot; listDynamicPricingStrategy · transitionDynamicPricingStrategy</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
+          <div><b>ARRIVES WITH</b> &middot; strategyId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-089">ADM-089</a>  &mdash; <i>Works in Dynamic Pricing Strategy Builder</i> <span class="car">strategyId</span><br><a href="#adm-090">ADM-090</a>  &mdash; <i>Works in Demand, Occupancy &amp; Availability Ru</i><br><a href="#adm-091">ADM-091</a>  &mdash; <i>Works in Booking Velocity &amp; Time-to-Event Ru</i><br><a href="#adm-092">ADM-092</a>  &mdash; <i>Works in Seasonal, Calendar, Day &amp; Timeslot </i><br><a href="#adm-093">ADM-093</a>  &mdash; <i>Works in Channel, Customer Segment &amp; Locatio</i><br><a href="#adm-094">ADM-094</a>  &mdash; <i>Works in Dynamic Price Bands, Ladders &amp; Adju</i> <span class="car">strategyId</span><br><a href="#adm-095">ADM-095</a>  &mdash; <i>Works in Dynamic Pricing Guardrails &amp; Commer</i><br><a href="#adm-096">ADM-096</a>  &mdash; <i>Works in Dynamic Pricing Automation Policy &amp;</i><br><a href="#adm-097">ADM-097</a>  &mdash; <i>Works in Rule Priority, Conflict Resolution </i></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-089">ADM-089</a>  &mdash; <i>Works in Dynamic Pricing Strategy Builder</i><br><a href="#adm-090">ADM-090</a>  &mdash; <i>Works in Demand, Occupancy &amp; Availability Ru</i><br><a href="#adm-091">ADM-091</a>  &mdash; <i>Works in Booking Velocity &amp; Time-to-Event Ru</i><br><a href="#adm-092">ADM-092</a>  &mdash; <i>Works in Seasonal, Calendar, Day &amp; Timeslot </i><br><a href="#adm-093">ADM-093</a>  &mdash; <i>Works in Channel, Customer Segment &amp; Locatio</i><br><a href="#adm-094">ADM-094</a>  &mdash; <i>Works in Dynamic Price Bands, Ladders &amp; Adju</i><br><a href="#adm-095">ADM-095</a>  &mdash; <i>Works in Dynamic Pricing Guardrails &amp; Commer</i><br><a href="#adm-096">ADM-096</a>  &mdash; <i>Works in Dynamic Pricing Automation Policy &amp;</i><br><a href="#adm-097">ADM-097</a>  &mdash; <i>Works in Rule Priority, Conflict Resolution </i></div>
-          
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formTransitionDynamicPricingStrategy &middot; <i>Transition dynamic pricing strategy</i> &middot; <b>Transition dynamic pricing strategy</b> &middot; Cancel <span class="dis">discards action · reason</span></div></div>
         </div>
       </div>
       <div id="adm-089" class="scr" data-ws="WS38">
@@ -9345,12 +9345,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setDynamicPricingStrategy</div>
+          <div><b>OPERATIONS</b> &middot; setDynamicPricingStrategy · transitionDynamicPricingStrategy</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
+          <div><b>ARRIVES WITH</b> &middot; strategyId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-088">ADM-088</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i> <span class="car">strategyId</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-088">ADM-088</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
-          
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formTransitionDynamicPricingStrategy &middot; <i>Transition dynamic pricing strategy</i> &middot; <b>Transition dynamic pricing strategy</b> &middot; Cancel <span class="dis">discards action · reason</span></div></div>
         </div>
       </div>
       <div id="adm-090" class="scr" data-ws="WS38">
@@ -9378,7 +9378,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; setDemandOccupancyAvailability</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-088">ADM-088</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-088">ADM-088</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i> <span class="car">strategyId</span></div>
           
           
         </div>
@@ -9408,7 +9408,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; setBookingVelocityTime</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-088">ADM-088</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-088">ADM-088</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i> <span class="car">strategyId</span></div>
           
           
         </div>
@@ -9435,12 +9435,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listSeasonalCalendarDay</div>
+          <div><b>OPERATIONS</b> &middot; listSeasonalCalendarDay · setDemandSignalConfiguration</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
+          <div><b>ARRIVES WITH</b> &middot; signalId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-088">ADM-088</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i> <span class="car">strategyId</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-088">ADM-088</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
-          
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetDemandSignalConfiguration &middot; <i>Save demand signal configuration</i> &middot; <b>Save demand signal configuration</b> &middot; Cancel <span class="dis">discards id · scopePath · signalKind · source · signalType · name · venueId · productId · geography · marketCode · periodStart · periodEnd · currentValue · unit · reading · configuration · weight · reliability</span></div></div>
         </div>
       </div>
       <div id="adm-093" class="scr" data-ws="WS38">
@@ -9468,7 +9468,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listChannelCustomerSegment</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-088">ADM-088</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-088">ADM-088</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i> <span class="car">strategyId</span></div>
           
           
         </div>
@@ -9495,12 +9495,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listDynamicPriceBand</div>
+          <div><b>OPERATIONS</b> &middot; listDynamicPriceBand · setPriceLadderMatrix</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
+          <div><b>ARRIVES WITH</b> &middot; strategyId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-088">ADM-088</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i> <span class="car">strategyId</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-088">ADM-088</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
-          
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetPriceLadderMatrix &middot; <i>Save price ladder matrix</i> &middot; <b>Save price ladder matrix</b> &middot; Cancel <span class="dis">discards id · scopePath · dynamicPricingStrategyId · adjustmentModel · basePriceSource · bands · baseBandCode · stepAmount · minimumPrice · basePrice · maximumPrice · allowUpward · allowDownward · maxIncreasePercentPerAdjustment · maxDecreasePercentPerAdjustment · maximumBandsPerMovement · minimumMinutesBetweenMovements · cooldownMinutes</span></div></div>
         </div>
       </div>
       <div id="adm-095" class="scr" data-ws="WS38">
@@ -9525,12 +9525,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listDynamicPricingGuardrail</div>
+          <div><b>OPERATIONS</b> &middot; listDynamicPricingGuardrail · setDynamicPricingGuardrailPolicy</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-088">ADM-088</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetDynamicPricingGuardrailPolicy &middot; <i>Save dynamic pricing guardrail policy</i> &middot; <b>Save dynamic pricing guardrail policy</b> &middot; Cancel <span class="dis">discards id · scopePath · scopeLevel · automationLevel · scopeId · absoluteMinimumPrice · absoluteMaximumPrice · minimumMarginPercent · maximumUpliftPercent · maximumReductionPercent · maximumSingleChangePercent · maximumDailyChangePercent · maximumWeeklyChangePercent · minimumChangeIntervalMinutes · maximumChangesPerDay · minimumInventory · maximumOccupancyTriggerPercent · protectedRateTypes</span></div></div>
         </div>
       </div>
       <div id="adm-096" class="scr" data-ws="WS38">
@@ -9555,12 +9555,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listDynamicPricingAutomation</div>
+          <div><b>OPERATIONS</b> &middot; listDynamicPricingAutomation · setDynamicPricingGuardrailPolicy</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-088">ADM-088</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetDynamicPricingGuardrailPolicy &middot; <i>Save dynamic pricing guardrail policy</i> &middot; <b>Save dynamic pricing guardrail policy</b> &middot; Cancel <span class="dis">discards id · scopePath · scopeLevel · automationLevel · scopeId · absoluteMinimumPrice · absoluteMaximumPrice · minimumMarginPercent · maximumUpliftPercent · maximumReductionPercent · maximumSingleChangePercent · maximumDailyChangePercent · maximumWeeklyChangePercent · minimumChangeIntervalMinutes · maximumChangesPerDay · minimumInventory · maximumOccupancyTriggerPercent · protectedRateTypes</span></div></div>
         </div>
       </div>
       <div id="adm-097" class="scr" data-ws="WS38">
@@ -9588,7 +9588,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listRulePriorityConflict · setRulePriorityConflict</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-088">ADM-088</a> </div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-088">ADM-088</a>  &mdash; <i>Dynamic Pricing Strategy Command Center</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmStopProcessing &middot; <i>Stop Processing</i></div></div>
         </div>
@@ -9675,12 +9675,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listWeatherDemandImpact</div>
+          <div><b>OPERATIONS</b> &middot; listWeatherDemandImpact · setDemandSignalConfiguration</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; signalId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-098">ADM-098</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetDemandSignalConfiguration &middot; <i>Save demand signal configuration</i> &middot; <b>Save demand signal configuration</b> &middot; Cancel <span class="dis">discards id · scopePath · signalKind · source · signalType · name · venueId · productId · geography · marketCode · periodStart · periodEnd · currentValue · unit · reading · configuration · weight · reliability</span></div></div>
         </div>
       </div>
       <div id="adm-101" class="scr" data-ws="WS39">
@@ -9705,12 +9705,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listNearbyEventExhibition</div>
+          <div><b>OPERATIONS</b> &middot; listNearbyEventExhibition · setDemandSignalConfiguration</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; signalId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-098">ADM-098</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetDemandSignalConfiguration &middot; <i>Save demand signal configuration</i> &middot; <b>Save demand signal configuration</b> &middot; Cancel <span class="dis">discards id · scopePath · signalKind · source · signalType · name · venueId · productId · geography · marketCode · periodStart · periodEnd · currentValue · unit · reading · configuration · weight · reliability</span></div></div>
         </div>
       </div>
       <div id="adm-102" class="scr" data-ws="WS39">
@@ -9735,12 +9735,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listCompetitorPricingMarket</div>
+          <div><b>OPERATIONS</b> &middot; listCompetitorPricingMarket · setDemandSignalConfiguration</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; signalId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-098">ADM-098</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetDemandSignalConfiguration &middot; <i>Save demand signal configuration</i> &middot; <b>Save demand signal configuration</b> &middot; Cancel <span class="dis">discards id · scopePath · signalKind · source · signalType · name · venueId · productId · geography · marketCode · periodStart · periodEnd · currentValue · unit · reading · configuration · weight · reliability</span></div></div>
         </div>
       </div>
       <div id="adm-103" class="scr" data-ws="WS39">
@@ -9765,12 +9765,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listMarketTourismHoliday</div>
+          <div><b>OPERATIONS</b> &middot; listMarketTourismHoliday · setDemandSignalConfiguration</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; signalId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-098">ADM-098</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetDemandSignalConfiguration &middot; <i>Save demand signal configuration</i> &middot; <b>Save demand signal configuration</b> &middot; Cancel <span class="dis">discards id · scopePath · signalKind · source · signalType · name · venueId · productId · geography · marketCode · periodStart · periodEnd · currentValue · unit · reading · configuration · weight · reliability</span></div></div>
         </div>
       </div>
       <div id="adm-104" class="scr" data-ws="WS39">
@@ -9885,12 +9885,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listSignalDataQuality</div>
+          <div><b>OPERATIONS</b> &middot; listSignalDataQuality · setSignalRegistryPolicy</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-098">ADM-098</a> </div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetSignalRegistryPolicy &middot; <i>Save signal registry policy</i> &middot; <b>Save signal registry policy</b> &middot; Cancel <span class="dis">discards id · scopePath · registryKind · name · trustLevel · category · provider · source · internalExternal · marketCode · refreshFrequency · aiUsePermissions · fallbackPolicy · status · ownerPrincipalId · purpose · deployedAt · trainingWindow</span></div></div>
         </div>
       </div>
       <div id="adm-108" class="scr" data-ws="WS40">
@@ -10095,12 +10095,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAutomationPolicyAutonomous</div>
+          <div><b>OPERATIONS</b> &middot; listAutomationPolicyAutonomous · setDynamicPricingGuardrailPolicy</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-108">ADM-108</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetDynamicPricingGuardrailPolicy &middot; <i>Save dynamic pricing guardrail policy</i> &middot; <b>Save dynamic pricing guardrail policy</b> &middot; Cancel <span class="dis">discards id · scopePath · scopeLevel · automationLevel · scopeId · absoluteMinimumPrice · absoluteMaximumPrice · minimumMarginPercent · maximumUpliftPercent · maximumReductionPercent · maximumSingleChangePercent · maximumDailyChangePercent · maximumWeeklyChangePercent · minimumChangeIntervalMinutes · maximumChangesPerDay · minimumInventory · maximumOccupancyTriggerPercent · protectedRateTypes</span></div></div>
         </div>
       </div>
       <div id="adm-115" class="scr" data-ws="WS40">
@@ -10185,12 +10185,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listLearningModelPerformance</div>
+          <div><b>OPERATIONS</b> &middot; listLearningModelPerformance · setSignalRegistryPolicy</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-108">ADM-108</a> </div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetSignalRegistryPolicy &middot; <i>Save signal registry policy</i> &middot; <b>Save signal registry policy</b> &middot; Cancel <span class="dis">discards id · scopePath · registryKind · name · trustLevel · category · provider · source · internalExternal · marketCode · refreshFrequency · aiUsePermissions · fallbackPolicy · status · ownerPrincipalId · purpose · deployedAt · trainingWindow</span></div></div>
         </div>
       </div>
       <div id="adm-138" class="scr" data-ws="WS45">
@@ -10218,7 +10218,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listPromotions · getPromotionUsage</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; promotionId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-139">ADM-139</a>  &mdash; <i>Works in Promotion &amp; Campaign Directory</i><br><a href="#adm-140">ADM-140</a>  &mdash; <i>Works in Promotion Overview</i><br><a href="#adm-141">ADM-141</a>  &mdash; <i>Works in Promotion Lifecycle &amp; Status Manage</i><br><a href="#adm-142">ADM-142</a>  &mdash; <i>Works in Campaign Calendar &amp; Timeline</i><br><a href="#adm-143">ADM-143</a>  &mdash; <i>Works in Promotion Channel &amp; Publication Mon</i><br><a href="#adm-144">ADM-144</a>  &mdash; <i>Works in Promotion Alerts &amp; Exception Center</i><br><a href="#adm-145">ADM-145</a>  &mdash; <i>Promotion Approval Inbox</i><br><a href="#adm-146">ADM-146</a>  &mdash; <i>Works in Promotion Health &amp; Performance Moni</i><br><a href="#adm-147">ADM-147</a>  &mdash; <i>Works in Promotion Audit, Activity &amp; Version</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-139">ADM-139</a>  &mdash; <i>Works in Promotion &amp; Campaign Directory</i> <span class="car">campaignId</span><br><a href="#adm-140">ADM-140</a>  &mdash; <i>Works in Promotion Overview</i><br><a href="#adm-141">ADM-141</a>  &mdash; <i>Works in Promotion Lifecycle &amp; Status Manage</i><br><a href="#adm-142">ADM-142</a>  &mdash; <i>Works in Campaign Calendar &amp; Timeline</i><br><a href="#adm-143">ADM-143</a>  &mdash; <i>Works in Promotion Channel &amp; Publication Mon</i><br><a href="#adm-144">ADM-144</a>  &mdash; <i>Works in Promotion Alerts &amp; Exception Center</i><br><a href="#adm-145">ADM-145</a>  &mdash; <i>Promotion Approval Inbox</i><br><a href="#adm-146">ADM-146</a>  &mdash; <i>Works in Promotion Health &amp; Performance Moni</i><br><a href="#adm-147">ADM-147</a>  &mdash; <i>Works in Promotion Audit, Activity &amp; Version</i></div>
           
           
         </div>
@@ -10245,12 +10245,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPromotionCampaign · listCampaignPromotionPerformance</div>
+          <div><b>OPERATIONS</b> &middot; listPromotionCampaign · listCampaignPromotionPerformance · listCommercialCampaigns · createCommercialCampaign +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; campaignId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-138">ADM-138</a>  &mdash; <i>Promotion Command Center Dashboard</i> <span class="car">promotionId</span></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateCommercialCampaign &middot; <i>Create commercial campaign</i> &middot; <b>Create commercial campaign</b> &middot; Cancel <span class="dis">discards venueId · name · code · description · ownerPrincipalId · legalEntityId · validFrom · validTo</span></div><div class="ov"><b>modal</b> formUpdateCommercialCampaign &middot; <i>Save commercial campaign</i> &middot; <b>Save commercial campaign</b> &middot; Cancel <span class="dis">discards code · name · description · ownerPrincipalId · legalEntityId · validFrom · validTo</span></div></div>
         </div>
       </div>
       <div id="adm-140" class="scr" data-ws="WS45">
@@ -10330,12 +10330,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Tenants</b><span>184</span></div><div class="kpi"><b>Cells</b><span>3</span></div><div class="kpi"><b>Incidents</b><span>2</span></div><div class="kpi"><b>Releases</b><span>11</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Every campaign calendar timeline</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Every campaign calendar timeline</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Venue id</b><div class="chip">Venue id</div><span class="why">Sends `?venueId=` to `listCommercialCampaigns`.</span></div><div class="panel"><b>Active at</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?activeAt=` to `listCommercialCampaigns`.</span></div></div><div class="side"><div class="panel"><b>Owner principal id</b><div class="chip">Owner principal id</div><span class="why">Sends `?ownerPrincipalId=` to `listCommercialCampaigns`.</span></div><div class="panel"><b>Q</b><div class="chip">Q</div><span class="why">Sends `?q=` to `listCommercialCampaigns`.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listCampaignCalendarTimeline</div>
+          <div><b>OPERATIONS</b> &middot; listCampaignCalendarTimeline · listCommercialCampaigns</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-138">ADM-138</a>  &mdash; <i>Promotion Command Center Dashboard</i> <span class="car">promotionId</span></div>
@@ -11445,7 +11445,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setBundleDefinition</div>
+          <div><b>OPERATIONS</b> &middot; setBundleDefinition · listCommercialCampaigns</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-178">ADM-178</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -11620,17 +11620,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Tenants</b><span>184</span></div><div class="kpi"><b>Cells</b><span>3</span></div><div class="kpi"><b>Incidents</b><span>2</span></div><div class="kpi"><b>Releases</b><span>11</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Every partner external product</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Every partner external product</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Every partner bundle product</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPartnerExternalProduct</div>
+          <div><b>OPERATIONS</b> &middot; listPartnerExternalProduct · listBundlePartnerProductMappings · setBundlePartnerProductMappings</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; bundleId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-178">ADM-178</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetBundlePartnerProductMappings &middot; <i>Save bundle partner product mappings</i> &middot; <b>Save bundle partner product mappings</b> &middot; Cancel <span class="dis">discards mappings</span></div></div>
         </div>
       </div>
       <div id="adm-186" class="scr" data-ws="WS49">
@@ -11805,12 +11805,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listCapacityPoolReservation</div>
+          <div><b>OPERATIONS</b> &middot; listCapacityPoolReservation · listBundleCapacityPolicies · setBundleCapacityPolicy</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; bundleId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-188">ADM-188</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetBundleCapacityPolicy &middot; <i>Save bundle capacity policy</i> &middot; <b>Save bundle capacity policy</b> &middot; Cancel <span class="dis">discards policies</span></div></div>
         </div>
       </div>
       <div id="adm-192" class="scr" data-ws="WS50">
@@ -11925,12 +11925,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listBundleAvailabilityChannel</div>
+          <div><b>OPERATIONS</b> &middot; listBundleAvailabilityChannel · listBundleCapacityPolicies · setBundleCapacityPolicy</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; bundleId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-188">ADM-188</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetBundleCapacityPolicy &middot; <i>Save bundle capacity policy</i> &middot; <b>Save bundle capacity policy</b> &middot; Cancel <span class="dis">discards policies</span></div></div>
         </div>
       </div>
       <div id="adm-196" class="scr" data-ws="WS50">
@@ -12645,12 +12645,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setCampaignBudgetFinancial</div>
+          <div><b>OPERATIONS</b> &middot; setCampaignBudgetFinancial · listCommercialCampaigns · createCommercialCampaign · updateCommercialCampaign</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; campaignId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-218">ADM-218</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateCommercialCampaign &middot; <i>Create commercial campaign</i> &middot; <b>Create commercial campaign</b> &middot; Cancel <span class="dis">discards venueId · name · code · description · ownerPrincipalId · legalEntityId · validFrom · validTo</span></div><div class="ov"><b>modal</b> formUpdateCommercialCampaign &middot; <i>Save commercial campaign</i> &middot; <b>Save commercial campaign</b> &middot; Cancel <span class="dis">discards code · name · description · ownerPrincipalId · legalEntityId · validFrom · validTo</span></div></div>
         </div>
       </div>
       <div id="adm-220" class="scr" data-ws="WS53">
@@ -12940,12 +12940,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Tenants</b><span>184</span></div><div class="kpi"><b>Cells</b><span>3</span></div><div class="kpi"><b>Incidents</b><span>2</span></div><div class="kpi"><b>Releases</b><span>11</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><b>Venue id</b><div class="chip">Venue id</div><span class="why">Sends `?venueId=` to `listCommercialCampaigns`.</span></div><div class="panel"><b>Active at</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?activeAt=` to `listCommercialCampaigns`.</span></div></div><div class="side"><div class="panel"><b>Owner principal id</b><div class="chip">Owner principal id</div><span class="why">Sends `?ownerPrincipalId=` to `listCommercialCampaigns`.</span></div><div class="panel"><b>Q</b><div class="chip">Q</div><span class="why">Sends `?q=` to `listCommercialCampaigns`.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listCampaignPromotionPerformance · listPromotionPerformance · listPromotionCampaign</div>
+          <div><b>OPERATIONS</b> &middot; listCampaignPromotionPerformance · listPromotionPerformance · listPromotionCampaign · listCommercialCampaigns</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-228">ADM-228</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -13218,7 +13218,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listSaleChannel · listChannelSaleSchedule · listChannelSaleRule</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-259">ADM-259</a>  &mdash; <i>Works in Channel Creation &amp; Profile Configur</i><br><a href="#adm-260">ADM-260</a>  &mdash; <i>Works in Product &amp; Catalogue Assignment</i><br><a href="#adm-261">ADM-261</a>  &mdash; <i>Works in Channel Pricing &amp; Commercial Profil</i><br><a href="#adm-262">ADM-262</a>  &mdash; <i>Works in Inventory, Capacity &amp; Channel Alloc</i><br><a href="#adm-263">ADM-263</a>  &mdash; <i>Works in Channel Sales Schedule &amp; Availabili</i><br><a href="#adm-264">ADM-264</a>  &mdash; <i>Works in Customer &amp; Eligibility Rules by Cha</i><br><a href="#adm-265">ADM-265</a>  &mdash; <i>Works in Channel Sales Rules, Limits &amp; Restr</i><br><a href="#adm-266">ADM-266</a>  &mdash; <i>Works in Channel Fees, Payment &amp; Fulfillment</i><br><a href="#adm-267">ADM-267</a>  &mdash; <i>Works in Channel Publication, Readiness &amp; AI</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-259">ADM-259</a>  &mdash; <i>Works in Channel Creation &amp; Profile Configur</i><br><a href="#adm-260">ADM-260</a>  &mdash; <i>Works in Product &amp; Catalogue Assignment</i><br><a href="#adm-261">ADM-261</a>  &mdash; <i>Works in Channel Pricing &amp; Commercial Profil</i><br><a href="#adm-262">ADM-262</a>  &mdash; <i>Works in Inventory, Capacity &amp; Channel Alloc</i><br><a href="#adm-263">ADM-263</a>  &mdash; <i>Works in Channel Sales Schedule &amp; Availabili</i> <span class="car">ruleId</span><br><a href="#adm-264">ADM-264</a>  &mdash; <i>Works in Customer &amp; Eligibility Rules by Cha</i> <span class="car">ruleId</span><br><a href="#adm-265">ADM-265</a>  &mdash; <i>Works in Channel Sales Rules, Limits &amp; Restr</i> <span class="car">ruleId</span><br><a href="#adm-266">ADM-266</a>  &mdash; <i>Works in Channel Fees, Payment &amp; Fulfillment</i><br><a href="#adm-267">ADM-267</a>  &mdash; <i>Works in Channel Publication, Readiness &amp; AI</i></div>
           
           
         </div>
@@ -13365,12 +13365,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listChannelSaleSchedule</div>
+          <div><b>OPERATIONS</b> &middot; listChannelSaleSchedule · setChannelSalesRule</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; ruleId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-258">ADM-258</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetChannelSalesRule &middot; <i>Save channel sales rule</i> &middot; <b>Save channel sales rule</b> &middot; Cancel <span class="dis">discards id · scopePath · salesChannelId · ruleKind · isActive · productId · name · ruleLevel · overridesProductRule · effectiveFrom · effectiveTo · salesStartDate · salesStartTime · salesEndDate · salesEndTime · timeZone · daysOfWeek · hoursOfOperation</span></div></div>
         </div>
       </div>
       <div id="adm-264" class="scr" data-ws="WS57">
@@ -13395,12 +13395,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listCustomerEligibilityRule</div>
+          <div><b>OPERATIONS</b> &middot; listCustomerEligibilityRule · setChannelSalesRule</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; ruleId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-258">ADM-258</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetChannelSalesRule &middot; <i>Save channel sales rule</i> &middot; <b>Save channel sales rule</b> &middot; Cancel <span class="dis">discards id · scopePath · salesChannelId · ruleKind · isActive · productId · name · ruleLevel · overridesProductRule · effectiveFrom · effectiveTo · salesStartDate · salesStartTime · salesEndDate · salesEndTime · timeZone · daysOfWeek · hoursOfOperation</span></div></div>
         </div>
       </div>
       <div id="adm-265" class="scr" data-ws="WS57">
@@ -13425,12 +13425,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listChannelSaleRule</div>
+          <div><b>OPERATIONS</b> &middot; listChannelSaleRule · setChannelSalesRule</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; ruleId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-258">ADM-258</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetChannelSalesRule &middot; <i>Save channel sales rule</i> &middot; <b>Save channel sales rule</b> &middot; Cancel <span class="dis">discards id · scopePath · salesChannelId · ruleKind · isActive · productId · name · ruleLevel · overridesProductRule · effectiveFrom · effectiveTo · salesStartDate · salesStartTime · salesEndDate · salesEndTime · timeZone · daysOfWeek · hoursOfOperation</span></div></div>
         </div>
       </div>
       <div id="adm-266" class="scr" data-ws="WS57">
@@ -13545,12 +13545,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listChannelConnectionIntegration</div>
+          <div><b>OPERATIONS</b> &middot; listChannelConnectionIntegration · setChannelConnectionConfiguration · testChannelConnection</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; connectionId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-268">ADM-268</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetChannelConnectionConfiguration &middot; <i>Save channel connection configuration</i> &middot; <b>Save channel connection configuration</b> &middot; Cancel <span class="dis">discards id · scopePath · salesChannelId · connectorName · environment · connectionType · partner · direction · endpoint · apiVersion · authenticationType · credentialsReference · certificateReference · certificateExpiresAt · timeoutMs · rateLimitPerMinute · ipRestrictions · retryPolicy</span></div><div class="ov"><b>modal</b> formTestChannelConnection &middot; <i>Test channel connection</i> &middot; <b>Test channel connection</b> &middot; Cancel <span class="dis">discards tests</span></div></div>
         </div>
       </div>
       <div id="adm-270" class="scr" data-ws="WS58">
@@ -13575,12 +13575,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listProductPriceAvailability</div>
+          <div><b>OPERATIONS</b> &middot; listProductPriceAvailability · setChannelSyncSetting</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-268">ADM-268</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetChannelSyncSetting &middot; <i>Save channel sync setting</i> &middot; <b>Save channel sync setting</b> &middot; Cancel <span class="dis">discards id · scopePath · salesChannelId · domain · channelConnectionId · direction · frequency · isPaused · lastSuccessfulSyncAt · nextSyncAt · recordsProcessed · successful · failed · pending · warnings · durationMs · mismatchCount</span></div></div>
         </div>
       </div>
       <div id="adm-271" class="scr" data-ws="WS58">
@@ -13665,12 +13665,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listChannelExceptionIncident</div>
+          <div><b>OPERATIONS</b> &middot; listChannelExceptionIncident · updateChannelIncident · retryChannelIncident</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; incidentId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-268">ADM-268</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formUpdateChannelIncident &middot; <i>Save channel incident</i> &middot; <b>Save channel incident</b> &middot; Cancel <span class="dis">discards status · ownerPrincipalId · slaDueAt · resolutionNote</span></div></div>
         </div>
       </div>
       <div id="adm-274" class="scr" data-ws="WS58">
@@ -13785,12 +13785,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listChannel2 · listChannel</div>
+          <div><b>OPERATIONS</b> &middot; listChannel2 · listChannel · decideCatalogueAiFinding</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; findingId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-268">ADM-268</a> </div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formDecideCatalogueAiFinding &middot; <i>Decide catalogue AI finding</i> &middot; <b>Decide catalogue AI finding</b> &middot; Cancel <span class="dis">discards decision · comment · ownerPrincipalId · dueDate</span></div></div>
         </div>
       </div>
       <div id="adm-278" class="scr" data-ws="WS62">
@@ -13815,7 +13815,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listResaleMarketplace · listTicketResaleMarketplace · listResalePolicyMarketplace · listOfficialResaleMarketplace</div>
+          <div><b>OPERATIONS</b> &middot; listResaleMarketplace · listTicketResaleMarketplace · listResalePolicyMarketplace · listOfficialResaleMarketplace +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-279">ADM-279</a>  &mdash; <i>Works in Resale Eligibility Rule Configurati</i><br><a href="#adm-280">ADM-280</a>  &mdash; <i>Works in Resale Policy &amp; Marketplace Setting</i><br><a href="#adm-281">ADM-281</a>  &mdash; <i>Works in Listing Creation &amp; Seller Configura</i><br><a href="#adm-282">ADM-282</a>  &mdash; <i>Works in Resale Pricing &amp; Price Guardrails</i><br><a href="#adm-283">ADM-283</a>  &mdash; <i>Works in Resale Fees, Commission &amp; Seller Pr</i><br><a href="#adm-284">ADM-284</a>  &mdash; <i>Works in Listing Approval &amp; Moderation</i><br><a href="#adm-285">ADM-285</a>  &mdash; <i>Works in Resale Inventory &amp; Availability Man</i><br><a href="#adm-286">ADM-286</a>  &mdash; <i>Works in Listing Lifecycle, Expiry &amp; Cancell</i><br><a href="#adm-287">ADM-287</a>  &mdash; <i>Works in AI Resale Configuration &amp; Marketpla</i></div>
@@ -13875,12 +13875,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listResalePolicyMarketplace</div>
+          <div><b>OPERATIONS</b> &middot; listResalePolicyMarketplace · getResaleMarketplaceConfig · setResaleMarketplaceConfig</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-278">ADM-278</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetResaleMarketplaceConfig &middot; <i>Save resale marketplace config</i> &middot; <b>Save resale marketplace config</b> &middot; Cancel <span class="dis">discards id · marketplaceName · pricingMode · moderationMode · isActive · maximumDiscountPercent · sellerCanEditPrice · maximumPriceChanges · minimumMinutesBetweenPriceChanges · reviewTriggers · expiryRule · expiryOffset · withdrawalPolicy · maximumWithdrawals · cancellationFee · checkoutHoldMinutes · buyerIdentityVerificationRequired · settlementTiming</span></div></div>
         </div>
       </div>
       <div id="adm-281" class="scr" data-ws="WS62">
@@ -13935,12 +13935,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listResalePricingPrice</div>
+          <div><b>OPERATIONS</b> &middot; listResalePricingPrice · getResaleMarketplaceConfig · setResaleMarketplaceConfig</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-278">ADM-278</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetResaleMarketplaceConfig &middot; <i>Save resale marketplace config</i> &middot; <b>Save resale marketplace config</b> &middot; Cancel <span class="dis">discards id · marketplaceName · pricingMode · moderationMode · isActive · maximumDiscountPercent · sellerCanEditPrice · maximumPriceChanges · minimumMinutesBetweenPriceChanges · reviewTriggers · expiryRule · expiryOffset · withdrawalPolicy · maximumWithdrawals · cancellationFee · checkoutHoldMinutes · buyerIdentityVerificationRequired · settlementTiming</span></div></div>
         </div>
       </div>
       <div id="adm-283" class="scr" data-ws="WS62">
@@ -14295,12 +14295,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listSellerSettlementPayout</div>
+          <div><b>OPERATIONS</b> &middot; listSellerSettlementPayout · holdResaleSettlement · releaseResaleSettlementHold</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; resaleSettlementId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-288">ADM-288</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formHoldResaleSettlement &middot; <i>Hold resale settlement</i> &middot; <b>Hold resale settlement</b> &middot; Cancel <span class="dis">discards reason</span></div><div class="ov"><b>modal</b> formReleaseResaleSettlementHold &middot; <i>Release resale settlement hold</i> &middot; <b>Release resale settlement hold</b> &middot; Cancel <span class="dis">discards reason</span></div></div>
         </div>
       </div>
       <div id="adm-295" class="scr" data-ws="WS63">
@@ -14325,12 +14325,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listRefundDisputeResale</div>
+          <div><b>OPERATIONS</b> &middot; listRefundDisputeResale · holdResaleSettlement · releaseResaleSettlementHold</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; resaleSettlementId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-288">ADM-288</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formHoldResaleSettlement &middot; <i>Hold resale settlement</i> &middot; <b>Hold resale settlement</b> &middot; Cancel <span class="dis">discards reason</span></div><div class="ov"><b>modal</b> formReleaseResaleSettlementHold &middot; <i>Release resale settlement hold</i> &middot; <b>Release resale settlement hold</b> &middot; Cancel <span class="dis">discards reason</span></div></div>
         </div>
       </div>
       <div id="adm-296" class="scr" data-ws="WS63">
@@ -16270,12 +16270,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Tenants</b><span>184</span></div><div class="kpi"><b>Cells</b><span>3</span></div><div class="kpi"><b>Incidents</b><span>2</span></div><div class="kpi"><b>Releases</b><span>11</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Save multi payment split</b><div class="chip cta">Save multi payment split</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Save multi payment split</b><div class="chip cta">Save multi payment split</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><b>Channel</b><div class="chip">Channel</div><span class="why">Sends `?channel=` to `listPaymentAllocationRules`.</span></div></div><div class="side"><div class="panel"><b>Terminal id</b><div class="chip">Terminal id</div><span class="why">Sends `?terminalId=` to `listPaymentAllocationRules`.</span></div><div class="panel"><b>Product id</b><div class="chip">Product id</div><span class="why">Sends `?productId=` to `listPaymentAllocationRules`.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setMultiPaymentSplit · setMixedTenderRules</div>
+          <div><b>OPERATIONS</b> &middot; setMultiPaymentSplit · setMixedTenderRules · listPaymentAllocationRules</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-599">ADM-599</a>  &mdash; <i>Back to Mixed Tender &amp; Credit Command Center</i></div>
@@ -19455,12 +19455,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listProductDuplicationTemplate</div>
+          <div><b>OPERATIONS</b> &middot; listProductDuplicationTemplate · setConfigurationTemplate</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-118">ADM-118</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetConfigurationTemplate &middot; <i>Save configuration template</i> &middot; <b>Save configuration template</b> &middot; Cancel <span class="dis">discards id · scopePath · subject · name · status · description · templateKind · productKind · venueId · sourceProductId · sourcePriceListId · includedComponents · reviewFields · isAiDrafted · ownerPrincipalId</span></div></div>
         </div>
       </div>
       <div id="adm-127" class="scr" data-ws="WS43">
@@ -19515,12 +19515,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listProductGovernance</div>
+          <div><b>OPERATIONS</b> &middot; listProductGovernance · decideCatalogueAiFinding</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
+          <div><b>ARRIVES WITH</b> &middot; findingId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-129">ADM-129</a>  &mdash; <i>Works in Approval Workflow Designer</i><br><a href="#adm-130">ADM-130</a>  &mdash; <i>Works in Approval Review &amp; Decision Workspac</i><br><a href="#adm-131">ADM-131</a>  &mdash; <i>Product Version Management</i> <span class="car">productId</span><br><a href="#adm-132">ADM-132</a>  &mdash; <i>Works in Rollback &amp; Recovery Management</i><br><a href="#adm-133">ADM-133</a>  &mdash; <i>Works in Change Impact Analysis</i> <span class="car">productId</span><br><a href="#adm-134">ADM-134</a>  &mdash; <i>Works in Change Propagation &amp; Dependency Con</i> <span class="car">productId</span><br><a href="#adm-135">ADM-135</a>  &mdash; <i>Works in Product Retirement, Suspension &amp; Ar</i><br><a href="#adm-136">ADM-136</a>  &mdash; <i>Works in Product Audit Trail &amp; Change Histor</i><br><a href="#adm-137">ADM-137</a>  &mdash; <i>Works in Governance Risk, AI Monitoring &amp; Co</i> <span class="car">findingId</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-129">ADM-129</a>  &mdash; <i>Works in Approval Workflow Designer</i><br><a href="#adm-130">ADM-130</a>  &mdash; <i>Works in Approval Review &amp; Decision Workspac</i><br><a href="#adm-131">ADM-131</a>  &mdash; <i>Product Version Management</i> <span class="car">productId</span><br><a href="#adm-132">ADM-132</a>  &mdash; <i>Works in Rollback &amp; Recovery Management</i><br><a href="#adm-133">ADM-133</a>  &mdash; <i>Works in Change Impact Analysis</i><br><a href="#adm-134">ADM-134</a>  &mdash; <i>Works in Change Propagation &amp; Dependency Con</i><br><a href="#adm-135">ADM-135</a>  &mdash; <i>Works in Product Retirement, Suspension &amp; Ar</i><br><a href="#adm-136">ADM-136</a>  &mdash; <i>Works in Product Audit Trail &amp; Change Histor</i><br><a href="#adm-137">ADM-137</a>  &mdash; <i>Works in Governance Risk, AI Monitoring &amp; Co</i></div>
-          
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formDecideCatalogueAiFinding &middot; <i>Decide catalogue AI finding</i> &middot; <b>Decide catalogue AI finding</b> &middot; Cancel <span class="dis">discards decision · comment · ownerPrincipalId · dueDate</span></div></div>
         </div>
       </div>
       <div id="adm-129" class="scr" data-ws="WS44">
@@ -19665,9 +19665,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listChangeImpactAnalysis</div>
+          <div><b>OPERATIONS</b> &middot; listChangeImpactAnalysis · setProductLinks</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; productId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-128">ADM-128</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
           
@@ -19695,9 +19695,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listChangePropagationDependency</div>
+          <div><b>OPERATIONS</b> &middot; listChangePropagationDependency · setProductLinks</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; productId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-128">ADM-128</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
           
@@ -19785,12 +19785,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listGovernanceRiskMonitoring</div>
+          <div><b>OPERATIONS</b> &middot; listGovernanceRiskMonitoring · decideCatalogueAiFinding</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
+          <div><b>ARRIVES WITH</b> &middot; findingId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-128">ADM-128</a>  &mdash; <i>Product Governance Command Center</i> <span class="car">findingId</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-128">ADM-128</a> </div>
-          
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formDecideCatalogueAiFinding &middot; <i>Decide catalogue AI finding</i> &middot; <b>Decide catalogue AI finding</b> &middot; Cancel <span class="dis">discards decision · comment · ownerPrincipalId · dueDate</span></div></div>
         </div>
       </div></div><div class="grp">13 — Platform Ops · 1 screens</div><div class="stack">
       <div id="adm-318" class="scr">

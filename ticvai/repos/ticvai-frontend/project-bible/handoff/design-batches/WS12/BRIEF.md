@@ -1,6 +1,6 @@
 # WS12 — Access Control board 12
 
-**10 screens · 10 operations · 10 schemas · 1 permissions**
+**10 screens · 16 operations · 19 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 1 permissions apply here:
-  `SCOPE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `REPORT_SCHEDULE, REPORT_VIEW_VENUE, SCOPE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -69,9 +68,9 @@ convincingly. It is never a caption.
 | `BO-259` | Throughput, Queue & Validation Performance Analytics | commandCentre | 1 | 0 | — |
 | `BO-260` | Validation Outcome & Rejection Analytics | listDetail | 1 | 0 | — |
 | `BO-261` | Guest Dwell Time, Length of Stay & Attraction Flow | commandCentre | 1 | 0 | — |
-| `BO-262` | Access Reports, Scheduled Reporting & Data Export | listDetail | 1 | 0 | — |
+| `BO-262` | Access Reports, Scheduled Reporting & Data Export | listDetail | 7 | 0 | — |
 | `BO-263` | AI Access Intelligence, Forecasting & Executive Insights | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-254, BO-255, BO-256, BO-258, BO-260, BO-262, BO-263 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-255, BO-256, BO-258, BO-260, BO-262, BO-263 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

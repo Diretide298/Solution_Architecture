@@ -1,6 +1,6 @@
 # P08-access-venue-02 — P08 · Access & Venue (2 of 3)
 
-**10 screens · 50 operations · 47 schemas · 20 permissions**
+**10 screens · 53 operations · 60 schemas · 20 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,10 +48,9 @@ convincingly. It is never a caption.
 ## Rules that are not style preferences
 
 - **Every control that can be refused must be gated.** 20 permissions apply here:
-  `ACCESS_OVERRIDE, ACCESS_VALIDATE, AI_AUDIT_VIEW, ASSET_MANAGE, ASSET_VIEW, INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, QUEUE_MANAGE, QUEUE_VIEW`…. A control nobody can use must say so,
+  `ACCESS_OVERRIDE, ACCESS_VALIDATE, ASSET_MANAGE, ASSET_VIEW, AUDIT_VIEW, INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, QUEUE_MANAGE, QUEUE_VIEW`…. A control nobody can use must say so,
   not sit enabled and fail.
-- **18 of these operations work offline**: getAsset, getQueue, getVenueMap, getVenueMapGraph, getWaitTimes, listAssets, listGames, listQueues
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,13 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-034` | Scan Activity | listDetail | 7 | 1 | — |
-| `BO-035` | Override Audit | listDetail | 8 | 1 | — |
-| `BO-038` | Reconciliation Queue | listDetail | 9 | 0 | — |
-| `BO-069` | Asset Register | listDetail | 11 | 0 | — |
-| `BO-071` | Planned Maintenance | listDetail | 4 | 0 | — |
-| `BO-072` | Incident Log | listDetail | 5 | 0 | — |
-| `BO-092` | Venue Maps | listDetail | 2 | 0 | — |
-| `BO-093` | Map Import & Labelling | configEditor | 3 | 0 | — |
-| `BO-094` | Map Editor & Publish | statusTracker | 6 | 0 | — |
-| `BO-095` | Resources | listDetail | 2 | 0 | — |
+| `BO-034` | Scan Activity | listDetail | 7 | 4 | — |
+| `BO-035` | Override Audit | listDetail | 8 | 4 | — |
+| `BO-038` | Reconciliation Queue | listDetail | 9 | 5 | — |
+| `BO-069` | Asset Register | listDetail | 11 | 6 | — |
+| `BO-071` | Planned Maintenance | listDetail | 4 | 2 | — |
+| `BO-072` | Incident Log | listDetail | 5 | 3 | — |
+| `BO-092` | Venue Maps | listDetail | 2 | 1 | — |
+| `BO-093` | Map Import & Labelling | configEditor | 5 | 1 | — |
+| `BO-094` | Map Editor & Publish | statusTracker | 7 | 4 | — |
+| `BO-095` | Resources | listDetail | 2 | 1 | — |
+
+## Thin screens in this batch
+
+**BO-092 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

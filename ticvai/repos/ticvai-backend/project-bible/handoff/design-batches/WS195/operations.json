@@ -1,0 +1,366 @@
+{
+ "createApiClient": {
+  "method": "POST",
+  "path": "/api-clients",
+  "contract": "public-api",
+  "summary": "Create a client with scopes and an environment",
+  "permission": "DEVELOPER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApiClient",
+  "responds": null
+ },
+ "createApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests",
+  "contract": "approvals",
+  "summary": "Raise a request",
+  "permission": "APPROVAL_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateApprovalRequest",
+  "responds": "ApprovalRequest"
+ },
+ "createWebhookSubscription": {
+  "method": "POST",
+  "path": "/webhook-subscriptions",
+  "contract": "public-api",
+  "summary": "Subscribe to business events",
+  "permission": "DEVELOPER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WebhookSubscription",
+  "responds": "WebhookSubscription"
+ },
+ "getWalletLiability": {
+  "method": "GET",
+  "path": "/wallet-liability",
+  "contract": "wallet",
+  "summary": "What is outstanding, and what is breakage",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "asOf",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletLiabilityRow"
+ },
+ "getWalletReconciliation": {
+  "method": "GET",
+  "path": "/wallet-reconciliation",
+  "contract": "wallet",
+  "summary": "The wallet sub-ledger against the general ledger and the acquirer",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletReconciliation"
+ },
+ "listAccessPolicies": {
+  "method": "GET",
+  "path": "/access-policies",
+  "contract": "identity",
+  "summary": "Attribute-based access policies",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessPolicy"
+ },
+ "listApiClients": {
+  "method": "GET",
+  "path": "/api-clients",
+  "contract": "public-api",
+  "summary": "Registered clients for this developer",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ApiClient"
+ },
+ "listWalletDisputes": {
+  "method": "GET",
+  "path": "/wallet-disputes",
+  "contract": "wallet",
+  "summary": "Contested transactions and operational exceptions",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletDispute"
+ },
+ "listWalletTypes": {
+  "method": "GET",
+  "path": "/wallet-types",
+  "contract": "wallet",
+  "summary": "The kinds of wallet that may exist — who owns one",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WalletType"
+ },
+ "listWebhookSubscriptions": {
+  "method": "GET",
+  "path": "/webhook-subscriptions",
+  "contract": "public-api",
+  "summary": "The tenant's webhook subscriptions, filterable by API client",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "clientId",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "WebhookSubscription"
+ },
+ "publishWalletConfiguration": {
+  "method": "POST",
+  "path": "/wallet-configuration/publish",
+  "contract": "wallet",
+  "summary": "Validate and publish the wallet configuration as a version",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletConfigurationVersion"
+ },
+ "replayEvents": {
+  "method": "POST",
+  "path": "/webhook-subscriptions/{subscriptionId}/replay",
+  "contract": "public-api",
+  "summary": "Re-deliver events from a point in time",
+  "permission": "DEVELOPER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "resolveWalletDispute": {
+  "method": "POST",
+  "path": "/wallet-disputes/{disputeId}/resolve",
+  "contract": "wallet",
+  "summary": "Work a wallet dispute or integration exception",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletDispute"
+ },
+ "setApiClientStatus": {
+  "method": "POST",
+  "path": "/api-clients/{clientId}/status",
+  "contract": "public-api",
+  "summary": "Suspend or reactivate an integration, reversibly",
+  "permission": "DEVELOPER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApiClient"
+ },
+ "setWalletChannelRules": {
+  "method": "PUT",
+  "path": "/wallet-channel-rules",
+  "contract": "wallet",
+  "summary": "Where a wallet may be used, on what, and when it may not",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletChannelRules",
+  "responds": "WalletChannelRules"
+ },
+ "setWalletIntegrationMapping": {
+  "method": "PUT",
+  "path": "/wallet-integration-mappings",
+  "contract": "wallet",
+  "summary": "How one integration's fields, currencies, statuses and credit types map onto the wallet",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletIntegrationMapping",
+  "responds": "WalletIntegrationMapping"
+ },
+ "setWalletRiskRules": {
+  "method": "PUT",
+  "path": "/wallet-risk-rules",
+  "contract": "wallet",
+  "summary": "Velocity, behaviour and what happens when a rule trips",
+  "permission": "WALLET_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletRiskRules",
+  "responds": "WalletRiskRules"
+ },
+ "testWebhookSubscription": {
+  "method": "POST",
+  "path": "/webhook-subscriptions/{subscriptionId}/test",
+  "contract": "public-api",
+  "summary": "Send a signed test event to the endpoint, now",
+  "permission": "DEVELOPER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WebhookDelivery"
+ },
+ "withdrawWalletDispute": {
+  "method": "POST",
+  "path": "/wallet-disputes/{disputeId}/withdraw",
+  "contract": "wallet",
+  "summary": "Withdraw a wallet dispute that is still open or under review",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletDispute"
+ }
+}

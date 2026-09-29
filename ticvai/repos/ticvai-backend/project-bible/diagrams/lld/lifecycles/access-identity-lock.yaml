@@ -1,0 +1,48 @@
+id: LLD-AccessIdentityLock
+title: AccessIdentityLock — 3 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/access-identity-lock.yaml
+entity: AccessIdentityLock
+contract: access
+enum: AccessIdentityLock.status
+enumKind: inline
+enumSchema: AccessIdentityLock
+enumProperty: status
+owner: access
+description: One lock on an identity, with its scope, duration, reason, the credentials linked to it
+  and where it has propagated (declared 29 September, writers pass). Created `active` by `lockIdentity`
+  (`POST /identity-locks`), or by the fraud detection job when a rule's response is `temporarilyLock`
+  or `fullIdentityLock`. Released by `releaseIdentityLock` (`POST /identity-locks/{lockId}/release`),
+  by a timer for `endOfDay` and `nHours` locks, or when the investigation an `untilInvestigationComplete`
+  lock waits for ends.
+initial:
+- active
+terminal:
+- released
+transitions:
+- from: active
+  to: released
+  operation: releaseIdentityLock
+  trigger: operation
+  guard: Released by staff, with who and when; the release propagates the way the lock did. An `untilInvestigationComplete`
+    lock whose investigation is still open is refused `409 investigation-open`
+  isReversal: true
+- from: active
+  to: released
+  trigger: timer
+  guard: '`lockDuration` `endOfDay` and the venue''s operating day ended, or `nHours` and `lockHours`
+    have passed since the lock'
+  isReversal: true
+- from: active
+  to: released
+  trigger: cascade
+  guard: '`lockDuration` `untilInvestigationComplete` and the linked `securityInvestigationId` reached
+    `resolved` or `closed`'
+  isReversal: true
+openQuestions:
+- Whether `releaseIdentityLock` may release a `permanent` lock, and under what approval, is not stated;
+  confirm it is refused or needs a second person.
+notes: '**`released` is terminal.** Locking the identity again is a new lock, so the history shows each
+  lock and its release. Credential bindings under the lock''s scope follow it (`suspended` while it
+  is active, `active` again when the last covering lock is released).'

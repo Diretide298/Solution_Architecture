@@ -1,0 +1,46 @@
+id: LLD-Product lifecycle action
+title: Product lifecycle action — 6 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/lifecycle-action.yaml
+entity: Product lifecycle action
+contract: catalogue
+enum: LifecycleAction.status
+enumKind: inline
+enumSchema: LifecycleAction
+enumProperty: status
+owner: catalogue
+initial:
+- scheduled
+terminal:
+- completed
+- failed
+transitions:
+- from: scheduled
+  to: running
+  trigger: timer
+  guard: '`scheduledAt` is reached'
+- from: running
+  to: completed
+  trigger: job
+  guard: Pre-action validation passed (where enabled) and the product moved to the target state
+- from: running
+  to: scheduled
+  trigger: job
+  guard: '`failureHandling: retryThenNotify` and retries remain'
+- from: running
+  to: failed
+  trigger: job
+  guard: '`skipAndNotify`, or retries exhausted; `failureReason` records why'
+- from: running
+  to: heldForManualAction
+  trigger: job
+  guard: '`failureHandling: holdForManualAction`'
+- from: heldForManualAction
+  to: scheduled
+  operation: publishActivationScheduler
+  trigger: operation
+  guard: The operator fixes the cause and reschedules the same `scheduleId`
+notes: '**Created `scheduled` by `publishActivationScheduler`.** An action changes the product''s lifecycle
+  and publication, never an issued entitlement unless the retirement''s `existingTicketTreatment` says
+  so.'

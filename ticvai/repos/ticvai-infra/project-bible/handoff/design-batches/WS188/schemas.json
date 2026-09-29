@@ -1,0 +1,438 @@
+{
+ "CreditAllocation": {
+  "type": "object",
+  "description": "Board 3.10. **Which lots this purchase would draw on**, in order.",
+  "properties": {
+   "requested": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "covered": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "shortfall": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "lotId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "creditTypeId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "creditTypeName": {
+       "type": "string"
+      },
+      "amount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "expiresAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "reason": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "rejected": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "creditTypeId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "notEligibleHere",
+        "notEligibleForProduct",
+        "expired",
+        "basketCapReached",
+        "restricted"
+       ]
+      }
+     }
+    }
+   }
+  }
+ },
+ "CreditConsumptionPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.consumption_policy",
+  "description": "Boards 3.5 and 3.7. **There is no neutral default**, which is why this is configuration.\n",
+  "properties": {
+   "strategy": {
+    "type": "string",
+    "enum": [
+     "expiringFirst",
+     "typePriority",
+     "nonRefundableFirst",
+     "manual"
+    ],
+    "default": "expiringFirst",
+    "description": "**`expiringFirst` is the default because it is the one that does not quietly profit from the guest forgetting.**\n"
+   },
+   "typeOrder": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "withinTypeOrder": {
+    "type": "string",
+    "enum": [
+     "fefo",
+     "fifo",
+     "lifo"
+    ],
+    "default": "fefo"
+   },
+   "allowSplitTender": {
+    "type": "boolean",
+    "default": true
+   },
+   "allowGuestChoice": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Whether a guest may override the order at the till.** Rarely enabled, and the venues that want it want it badly.\n"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "CreditEligibility": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.credit_eligibility",
+  "description": "Board 3.4. **Where credit may be spent** — acceptance, not funding.",
+  "properties": {
+   "creditTypeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "allowedVenueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "allowedOutletKinds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "allowedProductCategoryIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "excludedProductIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "allowedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "minimumSpend": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "maximumPercentOfBasket": {
+    "type": "number",
+    "nullable": true,
+    "description": "**Caps how much of a purchase one credit type may cover.** A venue that lets promotional credit pay for everything has run a free day it did not intend.\n"
+   },
+   "validDaysOfWeek": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "CreditExpiryResult": {
+  "type": "object",
+  "description": "Board 3.9. **Expiry has an accounting consequence**, so the preview carries it.",
+  "properties": {
+   "lotsAffected": {
+    "type": "integer"
+   },
+   "totalAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "breakageAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "walletsAffected": {
+    "type": "integer"
+   },
+   "applied": {
+    "type": "boolean"
+   },
+   "asOf": {
+    "type": "string",
+    "format": "date"
+   }
+  }
+ },
+ "CreditLot": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.credit_lot",
+  "description": "Board 3.7. **The tranche behind a balance.** Expiry belongs here, not on the wallet.",
+  "required": [
+   "id",
+   "walletId",
+   "creditTypeId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "walletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "creditTypeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "issuedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "remainingAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "sourceKind": {
+    "type": "string",
+    "enum": [
+     "topUp",
+     "refund",
+     "promotion",
+     "giftCard",
+     "membershipBenefit",
+     "loyaltyConversion",
+     "transfer",
+     "adjustment"
+    ]
+   },
+   "sourceReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "termsSnapshot": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "**The credit type's terms as they stood at issue.** Changing a credit type must not retro-expire credit already given, so the lot carries its own terms.\n**Open on purpose, and its shape lives in `CreditType`**: the snapshot is that credit type's properties copied at issue, so it follows `CreditType` as it stood then rather than as it stands now.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "exhausted",
+     "expired",
+     "forfeited",
+     "reversed"
+    ]
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "CreditType": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.credit_type",
+  "description": "Board 1.6. **What value sits inside a wallet** — the second vocabulary, and the one the acceptance condition requires to be a table.\n",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "category": {
+    "type": "string",
+    "enum": [
+     "cash",
+     "refund",
+     "bonus",
+     "promotional",
+     "giftCard",
+     "membership",
+     "loyalty",
+     "ride",
+     "attraction",
+     "redemption",
+     "fnb",
+     "retail",
+     "parking",
+     "event",
+     "other"
+    ]
+   },
+   "monetary": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Loyalty points are not money.** A non-monetary credit has a conversion rate to money or it cannot be spent, and treating points as currency puts them on the balance sheet.\n"
+   },
+   "conversionRate": {
+    "type": "number",
+    "nullable": true
+   },
+   "refundable": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Promotional credit is not refundable and cash credit is.** A venue that refunds promotional credit to a card has converted marketing spend into cash.\n"
+   },
+   "transferable": {
+    "type": "boolean",
+    "default": false
+   },
+   "expires": {
+    "type": "boolean",
+    "default": false
+   },
+   "validityDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "breakageEligible": {
+    "type": "boolean",
+    "default": false
+   },
+   "ledgerAccountCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "priority": {
+    "type": "integer",
+    "default": 0
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "WalletConfigurationVersion": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.configuration_version",
+  "description": "Boards 1.10 and 10.8. **Ten boards of configuration that interact.**",
+  "properties": {
+   "version": {
+    "type": "integer"
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "publishedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   },
+   "findings": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "severity": {
+       "type": "string",
+       "enum": [
+        "blocking",
+        "warning"
+       ]
+      },
+      "code": {
+       "type": "string"
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WalletLiabilityRow": {
+  "type": "object",
+  "description": "Boards 9.5 and 9.6. **The number the finance director asks for.**",
+  "properties": {
+   "key": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "outstanding": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "expiringThisPeriod": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "breakageRecognised": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "walletCount": {
+    "type": "integer"
+   },
+   "oldestLotAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   }
+  }
+ }
+}

@@ -1,6 +1,6 @@
 # WS105 — Subscription Licensing AI Self Service board 8
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 2 operations · 1 schemas · 1 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 1 permissions apply here:
+  `PLATFORM_TENANT_MANAGE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,20 +60,20 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-605` | Go-Live Readiness Command Center | listDetail | 0 | 0 | — |
-| `BO-606` | Automated Validation Plan | listDetail | 0 | 0 | — |
-| `BO-607` | Ticketing & Product Validation | listDetail | 0 | 0 | — |
-| `BO-608` | End-to-End Sales Channel Testing | listDetail | 0 | 0 | — |
-| `BO-609` | Payment & Financial Validation | listDetail | 0 | 0 | — |
-| `BO-610` | Ticket, QR & Access Validation | listDetail | 0 | 0 | — |
-| `BO-611` | User, Security & Integration Validation | listDetail | 0 | 0 | — |
-| `BO-612` | Communication & Customer Journey Validation | listDetail | 0 | 0 | — |
-| `BO-613` | Blocker, Warning & AI Resolution Center | configEditor | 0 | 0 | — |
-| `BO-614` | Final Go-Live Approval & Production Launch | listDetail | 0 | 0 | — |
+| `BO-605` | Go-Live Readiness Command Center | listDetail | 1 | 0 | — |
+| `BO-606` | Automated Validation Plan | listDetail | 1 | 0 | — |
+| `BO-607` | Ticketing & Product Validation | listDetail | 1 | 0 | — |
+| `BO-608` | End-to-End Sales Channel Testing | listDetail | 1 | 0 | — |
+| `BO-609` | Payment & Financial Validation | listDetail | 1 | 0 | — |
+| `BO-610` | Ticket, QR & Access Validation | listDetail | 1 | 0 | — |
+| `BO-611` | User, Security & Integration Validation | listDetail | 1 | 0 | — |
+| `BO-612` | Communication & Customer Journey Validation | listDetail | 1 | 0 | — |
+| `BO-613` | Blocker, Warning & AI Resolution Center | configEditor | 1 | 0 | — |
+| `BO-614` | Final Go-Live Approval & Production Launch | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-605, BO-606, BO-607, BO-608, BO-609, BO-610, BO-611, BO-612, BO-614 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-606, BO-607, BO-608, BO-609, BO-610, BO-611, BO-612 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -182,16 +181,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
+  "notes": "**Moved from P09 `ADM-439` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-439` is retired and never reissued.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide one central dashboard showing whether the customer is ready for production.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 97"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
@@ -200,7 +195,126 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Go-live readiness",
+       "columns": [
+        "Go-live readiness"
+       ],
+       "notes": "The pack's percentage (82%); the contract returns `status`, `blockers` and `warnings` but no score.",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 97"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Status",
+       "bindsTo": "GoLiveReadiness",
+       "columns": [
+        "GoLiveReadiness.status"
+       ],
+       "operation": "getGoLiveReadiness",
+       "provenance": "contract subscription.yaml GET /go-live-readiness"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Blockers",
+       "bindsTo": "GoLiveReadiness",
+       "columns": [
+        "GoLiveReadiness.blockers"
+       ],
+       "operation": "getGoLiveReadiness",
+       "provenance": "contract subscription.yaml GET /go-live-readiness"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Warnings",
+       "bindsTo": "GoLiveReadiness",
+       "columns": [
+        "GoLiveReadiness.warnings"
+       ],
+       "operation": "getGoLiveReadiness",
+       "provenance": "contract subscription.yaml GET /go-live-readiness"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Tests passed / pending",
+       "bindsTo": "GoLiveReadiness.groups",
+       "columns": [
+        "GoLiveReadiness.groups[].checks[].outcome"
+       ],
+       "operation": "getGoLiveReadiness",
+       "notes": "Counted by `outcome` across every group; pending is `skipped`.",
+       "provenance": "contract subscription.yaml GET /go-live-readiness"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Validation areas",
+       "bindsTo": "GoLiveReadiness.groups",
+       "columns": [
+        "GoLiveReadiness.groups[].code",
+        "GoLiveReadiness.groups[].label",
+        "Area status"
+       ],
+       "operation": "getGoLiveReadiness",
+       "notes": "Area status is the worst check outcome in the group (Passed / Warning / Testing / Pending). The pack's Operational Readiness area has no group code.",
+       "provenance": "contract subscription.yaml GET /go-live-readiness"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Checks in the selected area",
+       "bindsTo": "GoLiveReadiness.groups[].checks",
+       "columns": [
+        "GoLiveReadiness.groups[].checks[].code",
+        "GoLiveReadiness.groups[].checks[].label",
+        "GoLiveReadiness.groups[].checks[].outcome",
+        "GoLiveReadiness.groups[].checks[].detail",
+        "GoLiveReadiness.groups[].checks[].remediation"
+       ],
+       "operation": "getGoLiveReadiness",
+       "provenance": "contract subscription.yaml GET /go-live-readiness"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Run all validations",
+       "notes": "No run operation is bound to this screen.",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 97"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "View blockers",
+       "notes": "Filters the areas to checks whose outcome is fail.",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 97"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Ask AI",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 97"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The go-live readiness list.",
@@ -209,13 +323,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the go-live readiness are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getGoLiveReadiness",
+    "contract": "subscription",
+    "purpose": "Readiness at a glance",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-605"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-605",
+   "workshopBoard": "wireframes/WS160 Subscription Licensing AI Self Service Board 8.dc.html#bo-605"
   },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 97. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**Moved from P09 `ADM-439` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-439` is retired and never reissued.",
+  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 97. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Subscription_Licensing_AI_Self_Service.pdf p.97; contract subscription.yaml GET /go-live-readiness. Pack labels with no schema field yet (shown as plain labels): Go-live readiness, Operational Readiness area, Customer name and plan in header, Environment (Production).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -273,6 +395,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
+  "notes": "**Moved from P09 `ADM-440` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-440` is retired and never reissued.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -291,7 +414,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "runGoLiveValidation",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "runGoLiveValidation"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The automated validation plan list.",
@@ -300,13 +442,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the automated validation plan are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "runGoLiveValidation",
+    "contract": "subscription",
+    "purpose": "Run the plan",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGoLiveReadiness"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-606"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-606",
+   "workshopBoard": "wireframes/WS160 Subscription Licensing AI Self Service Board 8.dc.html#bo-606"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 98. 0 of 0 labels bound to a contract property; 0 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**Moved from P09 `ADM-440` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-440` is retired and never reissued.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -364,6 +517,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
+  "notes": "**Moved from P09 `ADM-441` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-441` is retired and never reissued.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -382,7 +536,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "runGoLiveValidation",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "runGoLiveValidation"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The ticketing product validation list.",
@@ -391,13 +564,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the ticketing product validation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "runGoLiveValidation",
+    "contract": "subscription",
+    "purpose": "Ticketing and product checks",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGoLiveReadiness"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-607"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-607",
+   "workshopBoard": "wireframes/WS160 Subscription Licensing AI Self Service Board 8.dc.html#bo-607"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 99. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**Moved from P09 `ADM-441` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-441` is retired and never reissued.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -455,6 +639,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
+  "notes": "**Moved from P09 `ADM-442` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-442` is retired and never reissued.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -473,7 +658,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "runGoLiveValidation",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "runGoLiveValidation"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The end-to-end sales channel list.",
@@ -482,13 +686,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the end-to-end sales channel are still there. The pack's own statuses are ✓ Passed — the state names which is selected.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "runGoLiveValidation",
+    "contract": "subscription",
+    "purpose": "Sales channel tests",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGoLiveReadiness"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-608"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-608",
+   "workshopBoard": "wireframes/WS160 Subscription Licensing AI Self Service Board 8.dc.html#bo-608"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 100. 0 of 0 labels bound to a contract property; 2 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**Moved from P09 `ADM-442` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-442` is retired and never reissued.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -546,6 +761,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
+  "notes": "**Moved from P09 `ADM-443` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-443` is retired and never reissued.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -564,7 +780,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "runGoLiveValidation",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "runGoLiveValidation"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The payment financial validation list.",
@@ -573,13 +808,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the payment financial validation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "runGoLiveValidation",
+    "contract": "subscription",
+    "purpose": "Payment and financial checks",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGoLiveReadiness"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-609"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-609",
+   "workshopBoard": "wireframes/WS160 Subscription Licensing AI Self Service Board 8.dc.html#bo-609"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 101. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**Moved from P09 `ADM-443` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-443` is retired and never reissued.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -637,6 +883,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
+  "notes": "**Moved from P09 `ADM-444` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-444` is retired and never reissued.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -655,7 +902,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "runGoLiveValidation",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "runGoLiveValidation"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The ticket access validation list.",
@@ -664,13 +930,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the ticket access validation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "runGoLiveValidation",
+    "contract": "subscription",
+    "purpose": "Ticket, QR and access checks",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGoLiveReadiness"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-610"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-610",
+   "workshopBoard": "wireframes/WS160 Subscription Licensing AI Self Service Board 8.dc.html#bo-610"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 102. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**Moved from P09 `ADM-444` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-444` is retired and never reissued.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -728,6 +1005,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
+  "notes": "**Moved from P09 `ADM-445` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-445` is retired and never reissued.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -758,6 +1036,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 103 §User & Permission Tests"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "runGoLiveValidation",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "runGoLiveValidation"
+      }
+     ]
     }
    ]
   },
@@ -768,13 +1064,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the user security integration are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "runGoLiveValidation",
+    "contract": "subscription",
+    "purpose": "User, security and integration checks",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGoLiveReadiness"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-611"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-611",
+   "workshopBoard": "wireframes/WS160 Subscription Licensing AI Self Service Board 8.dc.html#bo-611"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 103. 0 of 0 labels bound to a contract property; 8 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**Moved from P09 `ADM-445` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-445` is retired and never reissued.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -832,6 +1139,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
+  "notes": "**Moved from P09 `ADM-446` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-446` is retired and never reissued.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -850,7 +1158,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "runGoLiveValidation",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "runGoLiveValidation"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The communication customer journey list.",
@@ -859,13 +1186,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the communication customer journey are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "runGoLiveValidation",
+    "contract": "subscription",
+    "purpose": "Communication and journey checks",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGoLiveReadiness"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-612"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-612",
+   "workshopBoard": "wireframes/WS160 Subscription Licensing AI Self Service Board 8.dc.html#bo-612"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 104. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**Moved from P09 `ADM-446` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-446` is retired and never reissued.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -923,6 +1261,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
+  "notes": "**Moved from P09 `ADM-447` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-447` is retired and never reissued.",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Where override is permitted, capture) and no display directory — it is settings, not a population",
@@ -975,13 +1314,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getGoLiveReadiness",
+    "contract": "subscription",
+    "purpose": "Blockers and warnings",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-613"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-613",
+   "workshopBoard": "wireframes/WS160 Subscription Licensing AI Self Service Board 8.dc.html#bo-613"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 105. 0 of 0 labels bound to a contract property; 6 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**Moved from P09 `ADM-447` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-447` is retired and never reissued.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1039,16 +1386,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
+  "notes": "**Moved from P09 `ADM-448` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-448` is retired and never reissued.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide the final controlled decision to activate production operation.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 106"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
@@ -1057,7 +1400,128 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Final readiness",
+       "columns": [
+        "Final readiness"
+       ],
+       "notes": "The pack's 100% READY; the contract has `status` (ready / readyWithWarnings) and no score.",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 106"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Passed",
+       "bindsTo": "GoLiveReadiness.groups",
+       "columns": [
+        "GoLiveReadiness.groups[].checks[].outcome"
+       ],
+       "operation": "getGoLiveReadiness",
+       "notes": "Count of checks with outcome pass.",
+       "provenance": "contract subscription.yaml GET /go-live-readiness"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Blockers",
+       "bindsTo": "GoLiveReadiness",
+       "columns": [
+        "GoLiveReadiness.blockers"
+       ],
+       "operation": "getGoLiveReadiness",
+       "provenance": "contract subscription.yaml GET /go-live-readiness"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Accepted non-critical warnings",
+       "bindsTo": "GoLiveReadiness",
+       "columns": [
+        "GoLiveReadiness.warnings"
+       ],
+       "operation": "getGoLiveReadiness",
+       "notes": "The contract counts warnings; it does not record which were accepted.",
+       "provenance": "contract subscription.yaml GET /go-live-readiness"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Validation summary",
+       "bindsTo": "GoLiveReadiness.groups",
+       "columns": [
+        "GoLiveReadiness.groups[].label",
+        "GoLiveReadiness.groups[].checks[].outcome"
+       ],
+       "operation": "getGoLiveReadiness",
+       "notes": "One line per area, as in the pack's ticked summary.",
+       "provenance": "contract subscription.yaml GET /go-live-readiness"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "toggle",
+       "label": "Customer declaration",
+       "notes": "\"I confirm that I have reviewed the configuration and validation results and authorize activation of the production environment.\"",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 106"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Authorized by",
+       "bindsTo": "GoLiveReadiness",
+       "columns": [
+        "GoLiveReadiness.signedOffBy",
+        "GoLiveReadiness.signedOffAt",
+        "GoLiveReadiness.status",
+        "GoLiveReadiness.runAt",
+        "Role"
+       ],
+       "operation": "getGoLiveReadiness",
+       "notes": "The signer's role is a pack label with no field.",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 107"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Approve & go live",
+       "notes": "No activation operation is bound.",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 107"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Download validation report",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 107"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Return to configuration",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 107"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The final go-live approval list.",
@@ -1066,13 +1530,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the final go-live approval are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getGoLiveReadiness",
+    "contract": "subscription",
+    "purpose": "Final sign-off",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-614"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-614",
+   "workshopBoard": "wireframes/WS160 Subscription Licensing AI Self Service Board 8.dc.html#bo-614"
   },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 106. 0 of 0 labels bound to a contract property; 0 of 81 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "notes": "**Moved from P09 `ADM-448` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-448` is retired and never reissued.",
+  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 106. 0 of 0 labels bound to a contract property; 0 of 81 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Subscription_Licensing_AI_Self_Service.pdf p.106; pack Subscription_Licensing_AI_Self_Service.pdf p.107; contract subscription.yaml GET /go-live-readiness. Pack labels with no schema field yet (shown as plain labels): Final readiness, Accepted-warning flag, Signer role, Environment / subscription / operational status after activation.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1104,7 +1576,46 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
-{}
+{
+ "getGoLiveReadiness": {
+  "method": "GET",
+  "path": "/go-live-readiness",
+  "contract": "subscription",
+  "summary": "Everything that must pass before a tenant can sell",
+  "permission": "PLATFORM_TENANT_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": "tenantId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "GoLiveReadiness"
+ },
+ "runGoLiveValidation": {
+  "method": "POST",
+  "path": "/go-live-readiness/run",
+  "contract": "subscription",
+  "summary": "Run the validation plan against a tenant",
+  "permission": "PLATFORM_TENANT_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ }
+}
 ```
 
 ## `schemas.json`
@@ -1112,5 +1623,102 @@ Method, path, parameters, request and response for every operation these screens
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
-{}
+{
+ "GoLiveReadiness": {
+  "type": "object",
+  "x-ticvai-persistence": "subscription.go_live_readiness",
+  "description": "Board 8. **The screen that stops a launch going wrong in public.**",
+  "properties": {
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "runAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "notStarted",
+     "running",
+     "blocked",
+     "readyWithWarnings",
+     "ready"
+    ]
+   },
+   "groups": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "ticketingAndProducts",
+        "salesChannels",
+        "payment",
+        "ticketQrAccess",
+        "usersAndSecurity",
+        "integrations",
+        "communications",
+        "financialSetup"
+       ]
+      },
+      "label": {
+       "type": "string"
+      },
+      "checks": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "properties": {
+         "code": {
+          "type": "string"
+         },
+         "label": {
+          "type": "string"
+         },
+         "outcome": {
+          "type": "string",
+          "enum": [
+           "pass",
+           "warn",
+           "fail",
+           "skipped"
+          ]
+         },
+         "detail": {
+          "type": "string",
+          "nullable": true
+         },
+         "remediation": {
+          "type": "string",
+          "nullable": true
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "blockers": {
+    "type": "integer"
+   },
+   "warnings": {
+    "type": "integer"
+   },
+   "signedOffBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "signedOffAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ }
+}
 ```

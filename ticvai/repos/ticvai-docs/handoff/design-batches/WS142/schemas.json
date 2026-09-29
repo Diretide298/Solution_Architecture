@@ -1,0 +1,1198 @@
+{
+ "ApprovalKind": {
+  "type": "string",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n",
+  "enum": [
+   "refund",
+   "priceOverride",
+   "discountOverride",
+   "complimentaryTicket",
+   "membershipCancellation",
+   "accessPermissionChange",
+   "configurationChange",
+   "aiRecommendation",
+   "releasePromotion",
+   "requisition",
+   "stockWriteOff",
+   "journalEntry",
+   "periodClose",
+   "periodReopen",
+   "purchaseOrderCancel",
+   "purchaseOrderShortClose",
+   "tenantMigration",
+   "productChange",
+   "pricingChange"
+  ]
+ },
+ "ApprovalSlaPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.sla_policy",
+  "description": "Approvals boards 5.5 and 5.6. **A target with no consequence is a number in a table**, so the reminder and breach behaviour are part of the policy.\n",
+  "required": [
+   "code"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "appliesToRequestKinds": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ApprovalKind"
+    }
+   },
+   "targetMinutes": {
+    "type": "integer"
+   },
+   "businessHoursOnly": {
+    "type": "boolean",
+    "default": true,
+    "description": "**A four-hour SLA starting at five in the afternoon is breached by nine the next morning with nobody having done anything wrong.**\n"
+   },
+   "calendarId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "reminders": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "atPercentOfTarget": {
+       "type": "integer"
+      },
+      "notify": {
+       "type": "string",
+       "enum": [
+        "approver",
+        "approverManager",
+        "requester",
+        "escalationGroup"
+       ]
+      }
+     }
+    }
+   },
+   "firstReminderAtPercent": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 100,
+    "nullable": true,
+    "description": "**Percent of `targetMinutes` at which the first reminder goes** (decided 29 September, readiness close-out: the reminder steps are percentages of target). A column so the SLA, Escalation, Reminder & Timeout Rules screen reads it rather than unpacking `reminders`; the reminder in `reminders` at this percentage says whom it notifies (data model for the agreed operations, 29 September)."
+   },
+   "secondReminderAtPercent": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Percent of `targetMinutes` at which the second reminder goes; above `firstReminderAtPercent`"
+   },
+   "escalateAtPercent": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Percent of `targetMinutes` at which the request or workflow escalates; at or above `secondReminderAtPercent`"
+   },
+   "onBreach": {
+    "type": "string",
+    "enum": [
+     "notifyOnly",
+     "escalate",
+     "autoApprove",
+     "autoReject"
+    ],
+    "default": "escalate"
+   },
+   "autoActionAllowed": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Auto-approval on breach is off unless somebody says otherwise, in writing.** A queue that approves itself when nobody looks is not an approval process.\n"
+   },
+   "escalationGroupId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "Case": {
+  "x-ticvai-persistence": "marketing.case",
+  "x-ticvai-retired-columns": [
+   "guest_name",
+   "subject",
+   "is_sla_breached"
+  ],
+  "type": "object",
+  "required": [
+   "id",
+   "caseNumber",
+   "subject",
+   "status",
+   "priority",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a ULID."
+   },
+   "caseNumber": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity. Assigned when the case reaches the server, so a retry with the same `id` keeps its number.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "guestName": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from `pii.subject` when the case is read, never stored on the case.** A name copied onto a case row is personal data outside the erasable store (ADR-0023), and it had no source anyway — no request carries it. Returned only to callers holding `GUEST_VIEW_PII`, as `searchGuests` does.\n"
+   },
+   "subject": {
+    "type": "string",
+    "x-ticvai-column": "title",
+    "description": "**The case's one-line title**, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps `subject` because screens bind it.\n"
+   },
+   "kind": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CaseKind"
+     }
+    ],
+    "nullable": true,
+    "description": "What the guest said it was about, where the guest raised it."
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MessageChannel"
+     }
+    ],
+    "description": "How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`."
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time the case was raised — the start of the SLA clock."
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "Server time the case arrived. Equal to `recordedAt` for a case raised online."
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "queueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `ServiceQueue` the case waits in, set by routing (`CaseRoutingRule.queueId`). Null once routed straight to an agent. (decided 29 September, data model for the agreed operations)"
+   },
+   "membershipId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. (decided 29 September, coordinator decision DM4, writers pass)"
+   },
+   "status": {
+    "$ref": "#/components/schemas/CaseStatus"
+   },
+   "priority": {
+    "$ref": "#/components/schemas/CasePriority"
+   },
+   "assignedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "relatedOrderId": {
+    "type": "string",
+    "nullable": true
+   },
+   "slaDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isSlaBreached": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Computed when read, never stored.** True once the case has been open longer than its SLA allows — the time from `recordedAt` to `resolvedAt` (or to now, while unresolved), less `slaPausedSeconds`, is past the target that set `slaDueAt`. A stored flag would need a job to flip it at the moment of breach, and no such job is designed; `listCases?breachedSla` filters on the same computation.\n"
+   },
+   "slaPausedSeconds": {
+    "type": "integer",
+    "description": "Accrued only while awaiting the guest. Waiting on an internal team does not pause the clock.\n"
+   },
+   "escalationCount": {
+    "type": "integer"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "CaseCategory": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.case_category",
+  "description": "**The venue's case taxonomy**: categories and, under them, subcategories (`parentCategoryId`). `Case.categoryId` and the routing rules' `match.categoryIds` point here; `createCaseClassificationIntelligent` recommends one. Maintained by `setCaseCategoryDefinition`, read by `listCaseCategories` (decided 29 September, writers pass). (decided 29 September, data model for the agreed operations)\n",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 60
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "parentCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Set on a subcategory; null on a top-level category."
+   },
+   "defaultPriority": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CasePriority"
+     }
+    ],
+    "nullable": true,
+    "description": "The priority a case in this category starts at before routing factors apply."
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "CaseDetail": {
+  "x-ticvai-persistence": "marketing.case",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/Case"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "description": {
+      "type": "string"
+     },
+     "resolutionNote": {
+      "type": "string",
+      "nullable": true
+     },
+     "messages": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/CaseMessage"
+      }
+     }
+    }
+   }
+  ]
+ },
+ "CaseInvestigationResolutionWorkspaceInput": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.case_linked_record",
+  "x-ticvai-record-definition": "Related Records (agents can attach)",
+  "description": "One link between a case and a record another contract owns. The reference is a pointer, never a copy.",
+  "required": [
+   "caseId",
+   "kind",
+   "referenceId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "caseId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "order",
+     "ticket",
+     "payment",
+     "refund",
+     "membership",
+     "walletTransaction",
+     "groupBooking",
+     "accessEvent"
+    ]
+   },
+   "referenceId": {
+    "type": "string",
+    "maxLength": 64,
+    "description": "The record's id in its owning contract (orders, payments, access, wallet)."
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true,
+    "description": "False unlinks; the row stays for the audit trail."
+   },
+   "linkedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "CaseInvestigationResolutionWorkspaceView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.case, marketing.case_message, marketing.case_linked_record (new), marketing.sla_policy and ai.suggestion",
+  "description": "The case workspace (pack 10.1.5). Recommended actions and the summary keep verified data, policy and AI recommendation apart.",
+  "required": [
+   "caseId",
+   "caseNumber",
+   "subject",
+   "priority",
+   "status",
+   "created",
+   "lastUpdated",
+   "linkedRecords",
+   "recommendedActions"
+  ],
+  "properties": {
+   "caseId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "caseNumber": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "customer": {
+    "type": "string",
+    "nullable": true,
+    "description": "The guest's name, as `Case.guestName`; null unless the caller holds GUEST_VIEW_PII."
+   },
+   "subject": {
+    "type": "string"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "category": {
+    "type": "string",
+    "nullable": true,
+    "description": "The category's display name."
+   },
+   "priority": {
+    "$ref": "#/components/schemas/CasePriority"
+   },
+   "status": {
+    "$ref": "#/components/schemas/CaseStatus"
+   },
+   "sla": {
+    "type": "object",
+    "properties": {
+     "policyCode": {
+      "type": "string",
+      "nullable": true
+     },
+     "dueAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "remainingSeconds": {
+      "type": "integer",
+      "nullable": true,
+      "description": "Negative once breached."
+     },
+     "isBreached": {
+      "type": "boolean"
+     },
+     "isPaused": {
+      "type": "boolean",
+      "description": "True while `awaitingGuest`."
+     }
+    }
+   },
+   "owner": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The assigned agent's principal id (`Case.assignedToPrincipalId`)."
+   },
+   "queue": {
+    "type": "string",
+    "nullable": true
+   },
+   "created": {
+    "type": "string",
+    "format": "date-time",
+    "description": "`Case.createdAt`."
+   },
+   "lastUpdated": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "linkedRecords": {
+    "type": "array",
+    "description": "Active links, newest first.",
+    "items": {
+     "$ref": "#/components/schemas/CaseInvestigationResolutionWorkspaceInput"
+    }
+   },
+   "recommendedActions": {
+    "type": "array",
+    "maxItems": 10,
+    "items": {
+     "type": "object",
+     "required": [
+      "action",
+      "basis"
+     ],
+     "properties": {
+      "action": {
+       "type": "string",
+       "enum": [
+        "reply",
+        "call",
+        "reschedule",
+        "exchange",
+        "reissue",
+        "requestRefund",
+        "requestCompensation",
+        "raiseInternalRequest",
+        "escalate",
+        "resolve"
+       ]
+      },
+      "basis": {
+       "type": "string",
+       "enum": [
+        "verifiedData",
+        "policy",
+        "aiRecommendation"
+       ]
+      },
+      "reason": {
+       "type": "string",
+       "maxLength": 500
+      },
+      "policyReference": {
+       "type": "string",
+       "nullable": true,
+       "description": "The policy the action rests on; an AI recommendation never invents one."
+      }
+     }
+    }
+   },
+   "aiSummary": {
+    "type": "object",
+    "nullable": true,
+    "description": "Where the AI policy enables `summarise`; AI-derived and labelled as such.",
+    "properties": {
+     "issue": {
+      "type": "string"
+     },
+     "policy": {
+      "type": "string",
+      "nullable": true
+     },
+     "currentStatus": {
+      "type": "string",
+      "nullable": true
+     },
+     "commercialImpact": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "nullable": true
+     },
+     "recommendedAction": {
+      "type": "string",
+      "nullable": true
+     },
+     "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  }
+ },
+ "CaseKind": {
+  "type": "string",
+  "description": "**What the guest says the case is about**, in their words rather than the venue's taxonomy — `raiseMyCase` asks for it and `categoryId` is what staff file it under. Stored on the case, because a lost-property report that forgets it was one cannot be routed to the lost and found desk.\n**`other` only with a note (decided 28 September, audit R222).** A case raised as `other` must carry a non-empty `detail` (`raiseMyCase`), or it is refused with 400; the notes are reviewed quarterly to add the real kinds they reveal.\n",
+  "enum": [
+   "lostProperty",
+   "complaint",
+   "question",
+   "accessibility",
+   "refundRequest",
+   "other"
+  ]
+ },
+ "CaseMessage": {
+  "x-ticvai-persistence": "marketing.case_message",
+  "type": "object",
+  "required": [
+   "id",
+   "body",
+   "isInternal",
+   "authorKind",
+   "recordedAt"
+  ],
+  "properties": {
+   "resolution": {
+    "type": "string",
+    "description": "**What was actually done about it.** Indexed for retrieval: an agent facing a complaint benefits more from how the last one was resolved than from a policy. Without this column `marketing.case` can only embed its subject line.\n"
+   },
+   "id": {
+    "type": "string"
+   },
+   "body": {
+    "type": "string"
+   },
+   "isInternal": {
+    "type": "boolean"
+   },
+   "authorKind": {
+    "type": "string",
+    "enum": [
+     "agent",
+     "guest",
+     "system",
+     "ai"
+    ]
+   },
+   "authorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "attachmentRefs": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time — `addCaseMessage` is offline-capable."
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "Server time the message arrived."
+   }
+  }
+ },
+ "CasePriority": {
+  "type": "string",
+  "enum": [
+   "low",
+   "normal",
+   "high",
+   "urgent"
+  ]
+ },
+ "CaseStatus": {
+  "type": "string",
+  "enum": [
+   "open",
+   "inProgress",
+   "awaitingGuest",
+   "escalated",
+   "resolved",
+   "closed"
+  ]
+ },
+ "CreateCaseRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "subject",
+   "description",
+   "channel",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subject": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 10000
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "membershipId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. Must belong to `subjectId` when both are given (422). (decided 29 September, coordinator decision DM4, writers pass)"
+   },
+   "priority": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CasePriority"
+     }
+    ],
+    "default": "normal"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/CaseKind"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "relatedOrderId": {
+    "type": "string"
+   },
+   "attachmentRefs": {
+    "type": "array",
+    "description": "Stored on the opening `CaseMessage`, not on the case.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time the case was raised. The server stamps `Case.syncedAt` on arrival."
+   }
+  }
+ },
+ "MarketingSlaPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.sla_policy",
+  "description": "**Taken from the backend workbook, 20 September.** Defines service-level response and resolution targets used by support cases.",
+  "required": [
+   "code",
+   "name",
+   "businessHoursOnly",
+   "isActive",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string",
+    "nullable": true
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "priority": {
+    "type": "string",
+    "maxLength": 20,
+    "nullable": true
+   },
+   "firstResponseMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "resolutionMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "escalationMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "businessHoursOnly": {
+    "type": "boolean"
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "RefundCompensationServiceExceptionWorkspaceInput": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.case_compensation_request",
+  "x-ticvai-record-definition": "Request Types",
+  "description": "One refund, compensation or policy-exception request raised from a case. The order, refund and approval are references, never copies.",
+  "required": [
+   "id",
+   "caseId",
+   "requestType",
+   "value",
+   "reason"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID; equals the `Idempotency-Key` header."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "caseId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Required for `fullRefund`, `partialRefund`, `feeWaiver`, `upgrade` and `discount`."
+   },
+   "lineIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    }
+   },
+   "requestType": {
+    "type": "string",
+    "enum": [
+     "fullRefund",
+     "partialRefund",
+     "serviceCredit",
+     "walletCredit",
+     "voucher",
+     "complimentaryTicket",
+     "feeWaiver",
+     "upgrade",
+     "discount",
+     "policyException"
+    ]
+   },
+   "value": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "The money value requested; for a complimentary ticket or upgrade, its face value. This is what the approval thresholds are compared with."
+   },
+   "reason": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 1000
+   },
+   "isPolicyException": {
+    "type": "boolean",
+    "default": false,
+    "description": "True when the standard policy would not allow it; always needs approval."
+   },
+   "exceptionReason": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true,
+    "description": "Required when `isPolicyException` is true."
+   },
+   "submit": {
+    "type": "boolean",
+    "default": false,
+    "description": "False saves a draft; true routes it.",
+    "writeOnly": true
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "draft",
+     "pendingApproval",
+     "approved",
+     "declined",
+     "fulfilled",
+     "failed",
+     "withdrawn"
+    ]
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "readOnly": true,
+    "nullable": true
+   },
+   "fulfilmentOperation": {
+    "type": "string",
+    "readOnly": true,
+    "nullable": true,
+    "description": "e.g. `createRefund`, `topUpWallet`."
+   },
+   "fulfilmentReference": {
+    "type": "string",
+    "readOnly": true,
+    "nullable": true,
+    "description": "The refund, wallet transaction or voucher it produced."
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "RefundCompensationServiceExceptionWorkspaceView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.case_compensation_request (new), orders.sales_order, orders.refund, orders.order_fee, orders.refund_policy and approvals.request",
+  "description": "The request, the order's financial context, the policy evaluation and who must approve.",
+  "required": [
+   "request",
+   "approvalLevel"
+  ],
+  "properties": {
+   "request": {
+    "$ref": "#/components/schemas/RefundCompensationServiceExceptionWorkspaceInput"
+   },
+   "originalTransaction": {
+    "type": "string",
+    "nullable": true,
+    "description": "The order number."
+   },
+   "amountPaid": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "amountUsed": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Value of tickets already scanned or consumed."
+   },
+   "refundableAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "What the refund policy's time bands allow now, less previous refunds."
+   },
+   "previousRefund": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "fees": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "proposedRefund": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "proposedCompensation": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "requestType": {
+      "type": "string"
+     },
+     "value": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    }
+   },
+   "policyEvaluation": {
+    "type": "object",
+    "properties": {
+     "standardPolicy": {
+      "type": "string",
+      "description": "The rule that applies, as the venue's refund policy states it."
+     },
+     "isWithinPolicy": {
+      "type": "boolean"
+     },
+     "policyReference": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   },
+   "approvalLevel": {
+    "type": "string",
+    "enum": [
+     "agent",
+     "secondUser",
+     "approver"
+    ],
+    "description": "From the venue's `selfAuthoriseLimit`, `requiresSecondUserAbove` and `requiresApprovalAbove`; a policy exception is always `approver`."
+   },
+   "aiExplanation": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 1000,
+    "description": "AI-derived and labelled as such; cites a recorded policy or says none applies."
+   }
+  }
+ },
+ "SlaPolicyServiceLevelManagementView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.case and marketing.sla_policy",
+  "description": "SLA performance for the filters given. Counts are of open cases for the state counts and of cases in the period for the averages and the compliance rate.",
+  "required": [
+   "withinSla",
+   "atRisk",
+   "breached",
+   "byPolicy"
+  ],
+  "properties": {
+   "withinSla": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "atRisk": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "breached": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "averageResponseSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Mean time to first response, less paused time."
+   },
+   "averageResolutionSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "slaComplianceRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "description": "Cases resolved in the period within target, over cases resolved in the period."
+   },
+   "byPolicy": {
+    "type": "array",
+    "description": "One row per SLA policy that timed a case in the period, worst compliance first.",
+    "items": {
+     "type": "object",
+     "required": [
+      "slaPolicyId",
+      "code",
+      "name",
+      "withinSla",
+      "atRisk",
+      "breached"
+     ],
+     "properties": {
+      "slaPolicyId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "code": {
+       "type": "string"
+      },
+      "name": {
+       "type": "string"
+      },
+      "firstResponseMinutes": {
+       "type": "integer",
+       "nullable": true
+      },
+      "resolutionMinutes": {
+       "type": "integer",
+       "nullable": true
+      },
+      "withinSla": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "atRisk": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "breached": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "slaComplianceRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1,
+       "nullable": true
+      }
+     }
+    }
+   },
+   "forecastBreaches": {
+    "type": "array",
+    "maxItems": 50,
+    "description": "AI forecast of open cases likely to breach before the static thresholds fire, soonest first. Advisory; empty when AI is disabled for the tenant.",
+    "items": {
+     "type": "object",
+     "required": [
+      "caseCount",
+      "horizonMinutes"
+     ],
+     "properties": {
+      "queueId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "queueName": {
+       "type": "string",
+       "nullable": true
+      },
+      "slaPolicyId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "caseCount": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "horizonMinutes": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "confidence": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      }
+     }
+    }
+   }
+  }
+ }
+}

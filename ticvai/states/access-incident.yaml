@@ -1,0 +1,54 @@
+# Access incident — state model
+# Contract: access.AccessAccessIncident.status
+# Checked by tools/check-states.py.
+
+entity: AccessIncident
+contract: access
+enum: AccessAccessIncident.status
+enumKind: inline
+enumSchema: AccessAccessIncident
+enumProperty: status
+owner: access
+description: One access incident in a venue that needs more than an override (declared 29 September,
+  writers pass). `setOperationalIncidentException` is keyed by `incidentId` and venue and carries
+  `status`, so every move is that write, under permission `INCIDENT_MANAGE`. Scan history, reason
+  codes, device, operator and alerts are attached by the system and change no status.
+initial:
+- open
+terminal:
+- closed
+transitions:
+- from: open
+  to: investigating
+  operation: setOperationalIncidentException
+  trigger: operation
+  guard: '`status` `investigating`; the incident is assigned to a team (`assignedTo`)'
+- from: open
+  to: resolved
+  operation: setOperationalIncidentException
+  trigger: operation
+  guard: '`status` `resolved`; handled at once without an investigation'
+- from: open
+  to: closed
+  operation: setOperationalIncidentException
+  trigger: operation
+  guard: '`status` `closed`; raised in error or a duplicate of another incident'
+- from: investigating
+  to: resolved
+  operation: setOperationalIncidentException
+  trigger: operation
+  guard: '`status` `resolved`; the cause is dealt with'
+- from: resolved
+  to: investigating
+  operation: setOperationalIncidentException
+  trigger: operation
+  guard: '`status` `investigating`; reopened before it was closed because the resolution did not hold'
+  isReversal: true
+- from: resolved
+  to: closed
+  operation: setOperationalIncidentException
+  trigger: operation
+  guard: '`status` `closed`; reviewed and closed'
+openQuestions: null
+notes: '**Only `closed` is terminal.** A resolved incident may be reopened; a closed one is not, and a
+  recurrence is a new incident linked to it.'

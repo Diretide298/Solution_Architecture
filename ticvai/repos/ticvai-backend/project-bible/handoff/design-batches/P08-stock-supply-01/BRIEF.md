@@ -1,6 +1,6 @@
 # P08-stock-supply-01 — P08 · Stock & Supply (1 of 2)
 
-**10 screens · 51 operations · 31 schemas · 11 permissions**
+**10 screens · 51 operations · 32 schemas · 12 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 11 permissions apply here:
-  `APPROVAL_ACT, LEDGER_APPROVE, LEDGER_POST, LEDGER_VIEW, ORDER_CANCEL, ORDER_CREATE, ORDER_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE, TENANT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 12 permissions apply here:
+  `APPROVAL_ACT, LEDGER_APPROVE, LEDGER_POST, LEDGER_VIEW, ORDER_VIEW, PROCUREMENT_MANAGE, PROCUREMENT_RECEIVE, PROCUREMENT_REQUEST, PROCUREMENT_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **16 of these operations work offline**: createGoodsReceipt, createRequisition, enterCountLine, getCountVariance, getInventoryItem, getStockPositions, getStockTransfer, getVenueSettings
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-049` | Stock Levels | listDetail | 6 | 0 | — |
+| `BO-049` | Stock Levels | listDetail | 6 | 3 | — |
 | `BO-050` | Stock Position & Valuation | statusTracker | 2 | 0 | — |
-| `BO-052` | Goods Receipt | listDetail | 12 | 4 | — |
-| `BO-078` | Requisitions | approvalInbox | 10 | 2 | — |
-| `BO-079` | Stock Count | listDetail | 8 | 1 | — |
-| `BO-080` | Stock Transfers | listDetail | 6 | 1 | — |
-| `BO-081` | Inventory Items | listDetail | 7 | 0 | — |
-| `BO-082` | Stock Movements | listDetail | 4 | 0 | — |
-| `BO-083` | Suppliers | listDetail | 5 | 0 | — |
-| `BO-105` | Stock & Supply | listDetail | 4 | 0 | — |
+| `BO-051` | Purchase Orders | listDetail | 7 | 4 | — |
+| `BO-052` | Goods Receipt | listDetail | 12 | 7 | — |
+| `BO-078` | Requisitions | approvalInbox | 10 | 6 | — |
+| `BO-079` | Stock Count | listDetail | 9 | 7 | — |
+| `BO-080` | Stock Transfers | listDetail | 6 | 4 | — |
+| `BO-081` | Inventory Items | listDetail | 7 | 3 | — |
+| `BO-082` | Stock Movements | listDetail | 4 | 2 | — |
+| `BO-083` | Suppliers | listDetail | 5 | 3 | — |
 
 ## Thin screens in this batch
 

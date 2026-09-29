@@ -1,0 +1,47 @@
+id: LLD-Group task
+title: Group task — 6 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/group-task.yaml
+entity: Group task
+contract: orders
+enum: GroupTask.status
+enumKind: inline
+enumSchema: GroupTask
+enumProperty: status
+owner: orders
+initial:
+- open
+terminal:
+- done
+- cancelled
+transitions:
+- from: open
+  to: inProgress
+  operation: setGroupOperationalPlanning
+  trigger: operation
+  guard: The owning department started it
+- from: inProgress
+  to: done
+  operation: setGroupOperationalPlanning
+  trigger: operation
+  guard: Completed before the group's arrival
+- from: open
+  to: done
+  operation: setGroupOperationalPlanning
+  trigger: operation
+  guard: Completed without being marked started
+- from: open
+  to: cancelled
+  operation: setGroupOperationalPlanning
+  trigger: operation
+  guard: No longer needed (the plan changed)
+- from: inProgress
+  to: cancelled
+  operation: setGroupOperationalPlanning
+  trigger: operation
+  guard: No longer needed (the plan changed)
+- from: open
+  to: cancelled
+  trigger: cascade
+  guard: The group booking was cancelled

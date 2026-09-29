@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 69 |
-| Operations | 55 |
+| Operations | 58 |
 | Contracts | 11 |
 | Modules | 1 |
 | Undrawn | 0 |
@@ -72,14 +72,14 @@
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `ANL-001` | Executive Command Center | Analytics | 3 | 5 | yes |
-| `ANL-002` | Sales, Revenue & Channel | Analytics | 3 | 2 | yes |
-| `ANL-003` | Operational Performance | Analytics | 3 | 5 | yes |
-| `ANL-004` | Product Performance | Analytics | 3 | 3 | yes |
-| `ANL-005` | Cost, Margin & Profitability | Analytics | 3 | 3 | yes |
-| `ANL-006` | Inventory & Waste Intelligence | Analytics | 3 | 4 | yes |
-| `ANL-007` | Guest & Conversion Intelligence | Analytics | 3 | 5 | yes |
-| `ANL-008` | Demand Forecasting | Analytics | 3 | 2 | yes |
+| `ANL-001` | Executive Command Center | Analytics | 3 | 6 | yes |
+| `ANL-002` | Sales, Revenue & Channel | Analytics | 3 | 3 | yes |
+| `ANL-003` | Operational Performance | Analytics | 3 | 6 | yes |
+| `ANL-004` | Product Performance | Analytics | 3 | 4 | yes |
+| `ANL-005` | Cost, Margin & Profitability | Analytics | 3 | 4 | yes |
+| `ANL-006` | Inventory & Waste Intelligence | Analytics | 3 | 5 | yes |
+| `ANL-007` | Guest & Conversion Intelligence | Analytics | 3 | 6 | yes |
+| `ANL-008` | Demand Forecasting | Analytics | 3 | 3 | yes |
 | `ANL-009` | AI Assistant & Action Center | Analytics | 3 | 8 | yes |
 | `ANL-010` | Suggestions & Advice | Analytics | 3 | 2 | yes |
 | `ANL-012` | Live Operations Dashboard | Analytics | 3 | 2 | yes |
@@ -90,17 +90,17 @@
 | `ANL-017` | Customer, Membership & Loyalty Pulse | Analytics | 3 | 1 | yes |
 | `ANL-018` | Alerts & Exception Center | Analytics | 3 | 1 | yes |
 | `ANL-019` | AI Management Insights | Analytics | 3 | 2 | yes |
-| `ANL-020` | Multi-Site & Performance Comparison | Analytics | 3 | 1 | yes |
-| `ANL-021` | Dashboard Library | Analytics | 3 | 3 | yes |
+| `ANL-020` | Multi-Site & Performance Comparison | Analytics | 3 | 2 | yes |
+| `ANL-021` | Dashboard Library | Analytics | 3 | 4 | yes |
 | `ANL-022` | Dashboard Creation Wizard | Analytics | 3 | 1 | yes |
-| `ANL-023` | Drag-and-Drop Dashboard Canvas | Analytics | 3 | 3 | yes |
+| `ANL-023` | Drag-and-Drop Dashboard Canvas | Analytics | 3 | 4 | yes |
 | `ANL-024` | Widget & Visualization Library | Analytics | 3 | 1 | yes |
 | `ANL-025` | KPI Builder | Analytics | 3 | 2 | yes |
 | `ANL-026` | Targets, Thresholds & KPI Status Rules | Analytics | 3 | 2 | yes |
 | `ANL-027` | Data & Filter Configuration | Analytics | 3 | 2 | yes |
 | `ANL-028` | Drill-Down & Interaction Designer | Analytics | 3 | 1 | yes |
 | `ANL-029` | Dashboard Access, Publishing & Versioning | Analytics | 3 | 1 | yes |
-| `ANL-030` | Dashboard Preview, Validation & Health | Analytics | 3 | 2 | yes |
+| `ANL-030` | Dashboard Preview, Validation & Health | Analytics | 3 | 3 | yes |
 | `ANL-031` | Report Catalogue & Library | Analytics | 3 | 2 | yes |
 | `ANL-032` | Report Creation Wizard | Analytics | 3 | 1 | yes |
 | `ANL-033` | Data Domain & Dataset Selector | Analytics | 3 | 1 | yes |
@@ -134,7 +134,7 @@
 | `ANL-061` | BI & Analytics Administration Command Center | Analytics | 3 | 2 | yes |
 | `ANL-062` | Enterprise KPI Library | Analytics | 3 | 2 | yes |
 | `ANL-063` | KPI Targets, Thresholds & Scorecards | Analytics | 3 | 2 | yes |
-| `ANL-064` | Benchmark & Comparative Analytics Configuration | Analytics | 3 | 1 | yes |
+| `ANL-064` | Benchmark & Comparative Analytics Configuration | Analytics | 3 | 3 | yes |
 | `ANL-065` | Data Source & Integration Registry | Analytics | 3 | 1 | yes |
 | `ANL-066` | Semantic Model & Business Data Catalogue | Analytics | 3 | 2 | yes |
 | `ANL-067` | Data Refresh, Pipeline & Data Health Monitor | Analytics | 3 | 1 | yes |

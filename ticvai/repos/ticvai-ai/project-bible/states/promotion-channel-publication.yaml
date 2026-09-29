@@ -1,0 +1,64 @@
+# Promotion channel publication — state model
+# Contract: promotions.PromotionChannelPublication.status
+# Checked by tools/check-states.py.
+
+entity: Promotion channel publication
+contract: promotions
+enum: PromotionChannelPublication.status
+enumKind: inline
+enumSchema: PromotionChannelPublication
+enumProperty: status
+owner: promotions
+initial:
+- notAssigned
+- pendingPublication
+terminal: []
+transitions:
+- from: notAssigned
+  to: pendingPublication
+  operation: publishPromotion
+  trigger: operation
+  guard: The promotion is published and this channel is one it runs on
+- from: pendingPublication
+  to: synchronizing
+  trigger: job
+  guard: The channel sync job has picked the promotion up
+- from: synchronizing
+  to: published
+  trigger: job
+  guard: The channel accepted the rules, products and codes; `publishedVersion` is the promotion's version
+- from: synchronizing
+  to: publicationFailed
+  trigger: job
+  guard: The channel rejected it; `lastError` says why and a promotionFailedToPublish alert is raised
+- from: publicationFailed
+  to: pendingPublication
+  trigger: job
+  guard: Retried by the sync job after the cause is fixed
+- from: published
+  to: outOfSync
+  operation: updatePromotion
+  trigger: operation
+  guard: The promotion changed after it was published, so the channel holds an older version
+- from: outOfSync
+  to: synchronizing
+  trigger: job
+  guard: The sync job pushes the new version
+- from: published
+  to: suspended
+  operation: pausePromotion
+  trigger: operation
+  guard: Paused; the channel stops offering it
+- from: published
+  to: suspended
+  operation: endPromotion
+  trigger: operation
+  guard: Ended early; the channel stops offering it
+- from: suspended
+  to: pendingPublication
+  operation: publishPromotion
+  trigger: operation
+  guard: Resumed within the window
+notes: 'One row per promotion (or coupon campaign) per sales channel (DM5, 29 September: data model for
+  the agreed operations). **No terminal state by design**: the row lives as long as the promotion does,
+  and an ended or expired promotion leaves its channels `suspended`, which the monitor still shows.'
